@@ -1,0 +1,35 @@
+{
+  "total_mutants": 123,
+  "missed": 0,
+  "caught": 112,
+  "timeout": 0,
+  "unviable": 11,
+  "success": 0,
+  "start_time": "2026-11-01T03:42:13.003277387Z",
+  "end_time": "2026-11-01T03:43:18.370247841Z",
+  "cargo_mutants_version": "27.1.0",
+  "scope": "Rust experiment library; excludes main.rs, bin orchestration, shaders, and third-party implementations",
+  "features": [
+    "syntax",
+    "watch"
+  ],
+  "excluded": [
+    {
+      "pattern": "^crates/vizzi-perf/src/syntax\\.rs:\\d+:\\d+: replace - with \\+ in prepare_edit$",
+      "reason": "Initial Vec allocation capacity only; edited bytes and InputEdit coordinates are unchanged."
+    }
+  ],
+  "unviable_mutations": [
+    "crates/vizzi-perf/src/scene.rs:15:9: replace Scene::grid -> Result<Self, &'static str> with Ok(Default::default())",
+    "crates/vizzi-perf/src/snapshot.rs:20:9: replace Fingerprint::of -> Self with Default::default()",
+    "crates/vizzi-perf/src/snapshot.rs:62:9: replace Manifest::files -> &BTreeMap<PathBuf, Fingerprint> with Box::leak(Box::new(BTreeMap::from_iter([(Default::default(), Default::default())])))",
+    "crates/vizzi-perf/src/snapshot.rs:67:9: replace Manifest::changes_from -> Vec<Change> with vec![Default::default()]",
+    "crates/vizzi-perf/src/snapshot.rs:90:9: replace Manifest::apply -> Vec<Change> with vec![Default::default()]",
+    "crates/vizzi-perf/src/snapshot.rs:110:5: replace classify -> Option<ChangeKind> with Some(Default::default())",
+    "crates/vizzi-perf/src/source.rs:52:5: replace fingerprint_file -> io::Result<Fingerprint> with Ok(Default::default())",
+    "crates/vizzi-perf/src/timing.rs:23:5: replace summarize -> Option<Summary> with Some(Default::default())",
+    "crates/vizzi-perf/src/syntax.rs:81:5: replace prepare_edit -> Result<PreparedEdit, SyntaxError> with Ok(Default::default())",
+    "crates/vizzi-perf/src/syntax.rs:128:5: replace reparse -> Result<Tree, SyntaxError> with Ok(Default::default())",
+    "crates/vizzi-perf/src/syntax.rs:182:5: replace shape -> Vec<NodeShape> with vec![Default::default()]"
+  ]
+}

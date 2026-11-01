@@ -1,0 +1,3 @@
+# This changes only the initial Vec capacity, not edited bytes or InputEdit fields.
+# Allocation hints are checked through performance measurements, not API assertions.
+exclude_re = ['^crates/vizzi-perf/src/syntax\.rs:\d+:\d+: replace - with \+ in prepare_edit$']

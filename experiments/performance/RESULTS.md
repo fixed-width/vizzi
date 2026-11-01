@@ -5,6 +5,9 @@ They do not select a production renderer or measure semantic indexing. Run condi
 source revisions, and verification evidence are recorded in [run.json](results/run.json).
 Use the [experiment guide](README.md) to repeat the measurements.
 
+Completed follow-up measurements using the local Linux and PyTorch checkouts are in
+[the repository parsing and filesystem event report](SECOND_RESULTS.md).
+
 ## File inventory observations
 
 The runs used an Intel Core i7-13700H system reporting approximately 62 GiB of RAM.

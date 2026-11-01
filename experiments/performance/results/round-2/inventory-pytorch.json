@@ -1,0 +1,63 @@
+{
+  "conditions": {
+    "analysis": "content fingerprints only; no parsing, semantic analysis, or dependency invalidation",
+    "arch": "x86_64",
+    "build": "release",
+    "excluded_root_directories": [
+      ".git",
+      "target",
+      "node_modules"
+    ],
+    "filesystem_cache": "uncontrolled; first observed scan is not a cold-cache measurement",
+    "manifest_cache": "JSON decoded from memory; disk loading is not measured",
+    "os": "linux",
+    "symlinks": "not followed",
+    "update_input": "supplied in-memory buffer; excludes event detection and disk reads"
+  },
+  "content_bytes": 250498902,
+  "experiment": "content_inventory",
+  "files": 22720,
+  "first_observed_scan_us": 314005.722,
+  "manifest_json_bytes": 4683862,
+  "measurements": {
+    "discovery": {
+      "max_us": 50521.979,
+      "min_us": 46651.84,
+      "p50_us": 48489.422,
+      "p95_us": 50521.979,
+      "samples": 7
+    },
+    "manifest_json_decode": {
+      "max_us": 69858.933,
+      "min_us": 66187.938,
+      "p50_us": 69149.296,
+      "p95_us": 69858.933,
+      "samples": 7
+    },
+    "metadata_for_known_files": {
+      "max_us": 28235.072,
+      "min_us": 24158.002,
+      "p50_us": 25947.339,
+      "p95_us": 28235.072,
+      "samples": 7
+    },
+    "supplied_buffer_hash_and_update": {
+      "max_us": 14.488,
+      "min_us": 3.106,
+      "p50_us": 3.144,
+      "p95_us": 3.18,
+      "samples": 700
+    },
+    "verified_rescan_and_diff": {
+      "max_us": 378571.318,
+      "min_us": 364478.142,
+      "p50_us": 369924.812,
+      "p95_us": 378571.318,
+      "samples": 7
+    }
+  },
+  "schema_version": 1,
+  "source_root": "/tmp/vizzi-perf-corpus/pytorch-1f4d2d5e",
+  "update_file": ".agents/skills/add-op-overload/SKILL.md",
+  "update_file_bytes": 6886
+}

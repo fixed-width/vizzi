@@ -1,0 +1,144 @@
+[
+  {
+    "name": "inventory-lpc-rs",
+    "command": [
+      "/usr/bin/time",
+      "-v",
+      "-o",
+      "/home/mpd/git-sources/vizzi/experiments/performance/results/round-2/inventory-lpc-rs-memory.txt",
+      "/home/mpd/git-sources/vizzi/target/release/vizzi-perf",
+      "inventory",
+      "/tmp/vizzi-perf-corpus/lpc-rs",
+      "7"
+    ],
+    "started_at_utc": "2026-11-01T03:25:21.412214+00:00",
+    "elapsed_seconds": 0.1833318828139454,
+    "exit_code": 0
+  },
+  {
+    "name": "inventory-linux",
+    "command": [
+      "/usr/bin/time",
+      "-v",
+      "-o",
+      "/home/mpd/git-sources/vizzi/experiments/performance/results/round-2/inventory-linux-memory.txt",
+      "/home/mpd/git-sources/vizzi/target/release/vizzi-perf",
+      "inventory",
+      "/tmp/vizzi-perf-corpus/linux-cbbddb6b",
+      "7"
+    ],
+    "started_at_utc": "2026-11-01T03:25:21.596145+00:00",
+    "elapsed_seconds": 18.776141905924305,
+    "exit_code": 0
+  },
+  {
+    "name": "inventory-pytorch",
+    "command": [
+      "/usr/bin/time",
+      "-v",
+      "-o",
+      "/home/mpd/git-sources/vizzi/experiments/performance/results/round-2/inventory-pytorch-memory.txt",
+      "/home/mpd/git-sources/vizzi/target/release/vizzi-perf",
+      "inventory",
+      "/tmp/vizzi-perf-corpus/pytorch-1f4d2d5e",
+      "7"
+    ],
+    "started_at_utc": "2026-11-01T03:25:40.372593+00:00",
+    "elapsed_seconds": 3.969920597039163,
+    "exit_code": 0
+  },
+  {
+    "name": "syntax-lpc-rust",
+    "command": [
+      "/usr/bin/time",
+      "-v",
+      "-o",
+      "/home/mpd/git-sources/vizzi/experiments/performance/results/round-2/syntax-lpc-rust-memory.txt",
+      "/home/mpd/git-sources/vizzi/target/release/vizzi-syntax",
+      "rust",
+      "/tmp/vizzi-perf-corpus/lpc-rs",
+      "3"
+    ],
+    "started_at_utc": "2026-11-01T03:25:44.343141+00:00",
+    "elapsed_seconds": 27.088811984984204,
+    "exit_code": 0
+  },
+  {
+    "name": "watch-1000",
+    "command": [
+      "/usr/bin/time",
+      "-v",
+      "-o",
+      "/home/mpd/git-sources/vizzi/experiments/performance/results/round-2/watch-1000-memory.txt",
+      "/home/mpd/git-sources/vizzi/target/release/vizzi-watch",
+      "1000",
+      "50"
+    ],
+    "started_at_utc": "2026-11-01T03:26:11.432639+00:00",
+    "elapsed_seconds": 0.05001436802558601,
+    "exit_code": 0
+  },
+  {
+    "name": "watch-100000",
+    "command": [
+      "/usr/bin/time",
+      "-v",
+      "-o",
+      "/home/mpd/git-sources/vizzi/experiments/performance/results/round-2/watch-100000-memory.txt",
+      "/home/mpd/git-sources/vizzi/target/release/vizzi-watch",
+      "100000",
+      "50"
+    ],
+    "started_at_utc": "2026-11-01T03:26:11.483224+00:00",
+    "elapsed_seconds": 4.422387320082635,
+    "exit_code": 0
+  },
+  {
+    "name": "syntax-pytorch-python",
+    "command": [
+      "/usr/bin/time",
+      "-v",
+      "-o",
+      "/home/mpd/git-sources/vizzi/experiments/performance/results/round-2/syntax-pytorch-python-memory.txt",
+      "/home/mpd/git-sources/vizzi/target/release/vizzi-syntax",
+      "python",
+      "/tmp/vizzi-perf-corpus/pytorch-1f4d2d5e",
+      "3"
+    ],
+    "started_at_utc": "2026-11-01T03:26:15.906002+00:00",
+    "elapsed_seconds": 88.0301158358343,
+    "exit_code": 0
+  },
+  {
+    "name": "syntax-pytorch-cpp",
+    "command": [
+      "/usr/bin/time",
+      "-v",
+      "-o",
+      "/home/mpd/git-sources/vizzi/experiments/performance/results/round-2/syntax-pytorch-cpp-memory.txt",
+      "/home/mpd/git-sources/vizzi/target/release/vizzi-syntax",
+      "cpp",
+      "/tmp/vizzi-perf-corpus/pytorch-1f4d2d5e",
+      "3"
+    ],
+    "started_at_utc": "2026-11-01T03:27:43.936511+00:00",
+    "elapsed_seconds": 52.76055260421708,
+    "exit_code": 0
+  },
+  {
+    "name": "syntax-linux-c",
+    "command": [
+      "/usr/bin/time",
+      "-v",
+      "-o",
+      "/home/mpd/git-sources/vizzi/experiments/performance/results/round-2/syntax-linux-c-memory.txt",
+      "/home/mpd/git-sources/vizzi/target/release/vizzi-syntax",
+      "c",
+      "/tmp/vizzi-perf-corpus/linux-cbbddb6b",
+      "3"
+    ],
+    "started_at_utc": "2026-11-01T03:28:36.697405+00:00",
+    "elapsed_seconds": 404.30752859287895,
+    "exit_code": 0
+  }
+]

@@ -9,6 +9,8 @@ workspace = true
 
 [features]
 gpu = ["dep:wgpu", "dep:pollster"]
+syntax = ["dep:thiserror", "dep:tree-sitter", "dep:tree-sitter-rust", "dep:tree-sitter-python", "dep:tree-sitter-c", "dep:tree-sitter-cpp"]
+watch = ["dep:notify", "dep:tempfile"]
 
 [dependencies]
 blake3.workspace = true
@@ -16,6 +18,14 @@ serde.workspace = true
 serde_json.workspace = true
 wgpu = { workspace = true, optional = true }
 pollster = { workspace = true, optional = true }
+notify = { workspace = true, optional = true }
+tempfile = { workspace = true, optional = true }
+thiserror = { workspace = true, optional = true }
+tree-sitter = { workspace = true, optional = true }
+tree-sitter-rust = { workspace = true, optional = true }
+tree-sitter-python = { workspace = true, optional = true }
+tree-sitter-c = { workspace = true, optional = true }
+tree-sitter-cpp = { workspace = true, optional = true }
 
 [dev-dependencies]
 tempfile.workspace = true
@@ -24,3 +34,13 @@ tempfile.workspace = true
 name = "vizzi-gpu"
 path = "src/bin/gpu.rs"
 required-features = ["gpu"]
+
+[[bin]]
+name = "vizzi-syntax"
+path = "src/bin/syntax.rs"
+required-features = ["syntax"]
+
+[[bin]]
+name = "vizzi-watch"
+path = "src/bin/watch.rs"
+required-features = ["watch"]

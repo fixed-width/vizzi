@@ -1,0 +1,63 @@
+{
+  "conditions": {
+    "analysis": "content fingerprints only; no parsing, semantic analysis, or dependency invalidation",
+    "arch": "x86_64",
+    "build": "release",
+    "excluded_root_directories": [
+      ".git",
+      "target",
+      "node_modules"
+    ],
+    "filesystem_cache": "uncontrolled; first observed scan is not a cold-cache measurement",
+    "manifest_cache": "JSON decoded from memory; disk loading is not measured",
+    "os": "linux",
+    "symlinks": "not followed",
+    "update_input": "supplied in-memory buffer; excludes event detection and disk reads"
+  },
+  "content_bytes": 1675627822,
+  "experiment": "content_inventory",
+  "files": 97239,
+  "first_observed_scan_us": 1882704.577,
+  "manifest_json_bytes": 17576011,
+  "measurements": {
+    "discovery": {
+      "max_us": 209343.535,
+      "min_us": 159393.024,
+      "p50_us": 171116.417,
+      "p95_us": 209343.535,
+      "samples": 7
+    },
+    "manifest_json_decode": {
+      "max_us": 293087.472,
+      "min_us": 225109.975,
+      "p50_us": 238482.347,
+      "p95_us": 293087.472,
+      "samples": 7
+    },
+    "metadata_for_known_files": {
+      "max_us": 139492.985,
+      "min_us": 103572.766,
+      "p50_us": 115226.154,
+      "p95_us": 139492.985,
+      "samples": 7
+    },
+    "supplied_buffer_hash_and_update": {
+      "max_us": 17.82,
+      "min_us": 7.35,
+      "p50_us": 7.655,
+      "p95_us": 8.23,
+      "samples": 700
+    },
+    "verified_rescan_and_diff": {
+      "max_us": 2073612.162,
+      "min_us": 1684000.499,
+      "p50_us": 1810619.69,
+      "p95_us": 2073612.162,
+      "samples": 7
+    }
+  },
+  "schema_version": 1,
+  "source_root": "/tmp/vizzi-perf-corpus/linux-cbbddb6b",
+  "update_file": "drivers/android/binder/allocation.rs",
+  "update_file_bytes": 21795
+}

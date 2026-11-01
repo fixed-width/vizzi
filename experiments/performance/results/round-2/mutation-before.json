@@ -1,0 +1,12 @@
+{
+  "total_mutants": 39,
+  "missed": 3,
+  "caught": 33,
+  "timeout": 0,
+  "unviable": 3,
+  "success": 0,
+  "start_time": "2026-11-01T03:16:47.608126932Z",
+  "end_time": "2026-11-01T03:17:18.880659105Z",
+  "cargo_mutants_version": "27.1.0",
+  "missed_mutations": []
+}

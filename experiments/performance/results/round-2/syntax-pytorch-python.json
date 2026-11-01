@@ -1,0 +1,328 @@
+{
+  "conditions": {
+    "build": "release",
+    "coverage": "syntax only; no name resolution, cross-language links, or build configuration",
+    "edits": "median, approximately 95th-percentile, and largest files by bytes; duplicates removed",
+    "inspection": "all nodes counted, including punctuation, error nodes, and missing nodes",
+    "parsing": "sequential, raw unpreprocessed source; parser reused; trees dropped between files",
+    "selection": "sorted path prefix when a file limit is supplied; otherwise all matching files",
+    "validation": "full and incremental preorder node shapes, fields, flags, depths, and byte ranges compared outside timed phases"
+  },
+  "content_bytes": 120488307,
+  "experiment": "syntax_parsing",
+  "files_with_syntax_recovery": 4,
+  "incremental_edits": [
+    {
+      "edit": "append_comment",
+      "edit_start_byte": 6975,
+      "full_parse_of_edited_buffer": {
+        "max_us": 1449.47,
+        "min_us": 515.988,
+        "p50_us": 807.127,
+        "p95_us": 1101.912,
+        "samples": 60
+      },
+      "incremental_parse": {
+        "max_us": 267.514,
+        "min_us": 75.019,
+        "p50_us": 121.451,
+        "p95_us": 174.913,
+        "samples": 60
+      },
+      "path": "torch/backends/_nnapi/prepare.py",
+      "preparation": {
+        "max_us": 54.57,
+        "min_us": 4.441,
+        "p50_us": 30.976,
+        "p95_us": 39.705,
+        "samples": 60
+      },
+      "requested_samples": 60,
+      "sampling": "capped by 32 MiB of source per case, with at least three repetitions",
+      "source_bytes": 6975,
+      "syntax_recovery_present": false,
+      "validation_passed": true
+    },
+    {
+      "edit": "prepend_comment",
+      "edit_start_byte": 0,
+      "full_parse_of_edited_buffer": {
+        "max_us": 1537.857,
+        "min_us": 532.317,
+        "p50_us": 879.027,
+        "p95_us": 1122.24,
+        "samples": 60
+      },
+      "incremental_parse": {
+        "max_us": 144.194,
+        "min_us": 39.872,
+        "p50_us": 74.164,
+        "p95_us": 102.761,
+        "samples": 60
+      },
+      "path": "torch/backends/_nnapi/prepare.py",
+      "preparation": {
+        "max_us": 48.475,
+        "min_us": 16.662,
+        "p50_us": 29.402,
+        "p95_us": 37.924,
+        "samples": 60
+      },
+      "requested_samples": 60,
+      "sampling": "capped by 32 MiB of source per case, with at least three repetitions",
+      "source_bytes": 6975,
+      "syntax_recovery_present": false,
+      "validation_passed": true
+    },
+    {
+      "edit": "replace_middle_ascii_byte",
+      "edit_start_byte": 3494,
+      "full_parse_of_edited_buffer": {
+        "max_us": 1830.194,
+        "min_us": 708.643,
+        "p50_us": 1014.646,
+        "p95_us": 1511.71,
+        "samples": 60
+      },
+      "incremental_parse": {
+        "max_us": 1189.015,
+        "min_us": 454.703,
+        "p50_us": 666.44,
+        "p95_us": 1014.536,
+        "samples": 60
+      },
+      "path": "torch/backends/_nnapi/prepare.py",
+      "preparation": {
+        "max_us": 215.457,
+        "min_us": 32.689,
+        "p50_us": 45.954,
+        "p95_us": 70.894,
+        "samples": 60
+      },
+      "requested_samples": 60,
+      "sampling": "capped by 32 MiB of source per case, with at least three repetitions",
+      "source_bytes": 6975,
+      "syntax_recovery_present": true,
+      "validation_passed": true
+    },
+    {
+      "edit": "append_comment",
+      "edit_start_byte": 93373,
+      "full_parse_of_edited_buffer": {
+        "max_us": 18667.566,
+        "min_us": 5785.291,
+        "p50_us": 9203.746,
+        "p95_us": 12964.429,
+        "samples": 60
+      },
+      "incremental_parse": {
+        "max_us": 1461.978,
+        "min_us": 424.211,
+        "p50_us": 663.22,
+        "p95_us": 1013.443,
+        "samples": 60
+      },
+      "path": "torch/autograd/gradcheck.py",
+      "preparation": {
+        "max_us": 1847.481,
+        "min_us": 24.361,
+        "p50_us": 42.99,
+        "p95_us": 99.777,
+        "samples": 60
+      },
+      "requested_samples": 60,
+      "sampling": "capped by 32 MiB of source per case, with at least three repetitions",
+      "source_bytes": 93373,
+      "syntax_recovery_present": false,
+      "validation_passed": true
+    },
+    {
+      "edit": "prepend_comment",
+      "edit_start_byte": 0,
+      "full_parse_of_edited_buffer": {
+        "max_us": 21737.547,
+        "min_us": 6459.002,
+        "p50_us": 10380.351,
+        "p95_us": 16925.222,
+        "samples": 60
+      },
+      "incremental_parse": {
+        "max_us": 1532.652,
+        "min_us": 471.202,
+        "p50_us": 728.997,
+        "p95_us": 1384.256,
+        "samples": 60
+      },
+      "path": "torch/autograd/gradcheck.py",
+      "preparation": {
+        "max_us": 56.548,
+        "min_us": 11.289,
+        "p50_us": 16.417,
+        "p95_us": 40.614,
+        "samples": 60
+      },
+      "requested_samples": 60,
+      "sampling": "capped by 32 MiB of source per case, with at least three repetitions",
+      "source_bytes": 93373,
+      "syntax_recovery_present": false,
+      "validation_passed": true
+    },
+    {
+      "edit": "replace_middle_ascii_byte",
+      "edit_start_byte": 46702,
+      "full_parse_of_edited_buffer": {
+        "max_us": 15318.406,
+        "min_us": 6189.929,
+        "p50_us": 9385.83,
+        "p95_us": 12294.387,
+        "samples": 60
+      },
+      "incremental_parse": {
+        "max_us": 2726.586,
+        "min_us": 455.029,
+        "p50_us": 707.747,
+        "p95_us": 893.556,
+        "samples": 60
+      },
+      "path": "torch/autograd/gradcheck.py",
+      "preparation": {
+        "max_us": 65.671,
+        "min_us": 18.151,
+        "p50_us": 30.463,
+        "p95_us": 40.608,
+        "samples": 60
+      },
+      "requested_samples": 60,
+      "sampling": "capped by 32 MiB of source per case, with at least three repetitions",
+      "source_bytes": 93373,
+      "syntax_recovery_present": false,
+      "validation_passed": true
+    },
+    {
+      "edit": "append_comment",
+      "edit_start_byte": 1320308,
+      "full_parse_of_edited_buffer": {
+        "max_us": 227935.502,
+        "min_us": 116221.947,
+        "p50_us": 138609.547,
+        "p95_us": 187364.051,
+        "samples": 25
+      },
+      "incremental_parse": {
+        "max_us": 8163.668,
+        "min_us": 3057.056,
+        "p50_us": 5212.18,
+        "p95_us": 7999.402,
+        "samples": 25
+      },
+      "path": "torch/testing/_internal/common_methods_invocations.py",
+      "preparation": {
+        "max_us": 12880.165,
+        "min_us": 393.468,
+        "p50_us": 676.298,
+        "p95_us": 1358.283,
+        "samples": 25
+      },
+      "requested_samples": 60,
+      "sampling": "capped by 32 MiB of source per case, with at least three repetitions",
+      "source_bytes": 1320308,
+      "syntax_recovery_present": false,
+      "validation_passed": true
+    },
+    {
+      "edit": "prepend_comment",
+      "edit_start_byte": 0,
+      "full_parse_of_edited_buffer": {
+        "max_us": 218299.68,
+        "min_us": 103960.214,
+        "p50_us": 138324.368,
+        "p95_us": 177513.844,
+        "samples": 25
+      },
+      "incremental_parse": {
+        "max_us": 7804.748,
+        "min_us": 2980.907,
+        "p50_us": 4587.36,
+        "p95_us": 7045.419,
+        "samples": 25
+      },
+      "path": "torch/testing/_internal/common_methods_invocations.py",
+      "preparation": {
+        "max_us": 375.859,
+        "min_us": 98.442,
+        "p50_us": 134.959,
+        "p95_us": 316.405,
+        "samples": 25
+      },
+      "requested_samples": 60,
+      "sampling": "capped by 32 MiB of source per case, with at least three repetitions",
+      "source_bytes": 1320308,
+      "syntax_recovery_present": false,
+      "validation_passed": true
+    },
+    {
+      "edit": "replace_middle_ascii_byte",
+      "edit_start_byte": 660170,
+      "full_parse_of_edited_buffer": {
+        "max_us": 144391.1,
+        "min_us": 104462.615,
+        "p50_us": 110151.357,
+        "p95_us": 143612.044,
+        "samples": 25
+      },
+      "incremental_parse": {
+        "max_us": 7146.384,
+        "min_us": 3886.739,
+        "p50_us": 4638.963,
+        "p95_us": 6979.99,
+        "samples": 25
+      },
+      "path": "torch/testing/_internal/common_methods_invocations.py",
+      "preparation": {
+        "max_us": 635.889,
+        "min_us": 234.764,
+        "p50_us": 299.402,
+        "p95_us": 457.538,
+        "samples": 25
+      },
+      "requested_samples": 60,
+      "sampling": "capped by 32 MiB of source per case, with at least three repetitions",
+      "source_bytes": 1320308,
+      "syntax_recovery_present": false,
+      "validation_passed": true
+    }
+  ],
+  "language": "python",
+  "matching_files": 5115,
+  "measured_files": 5115,
+  "per_pass": {
+    "file_reads": {
+      "max_us": 307190.199,
+      "min_us": 275252.548,
+      "p50_us": 300295.614,
+      "p95_us": 307190.199,
+      "samples": 3
+    },
+    "full_parsing": {
+      "max_us": 13049985.11,
+      "min_us": 12876100.896,
+      "p50_us": 12981431.425,
+      "p95_us": 13049985.11,
+      "samples": 3
+    },
+    "node_inspection": {
+      "max_us": 1911304.16,
+      "min_us": 1821271.25,
+      "p50_us": 1888416.696,
+      "p95_us": 1911304.16,
+      "samples": 3
+    }
+  },
+  "source_root": "/tmp/vizzi-perf-corpus/pytorch-1f4d2d5e",
+  "syntax_counts": {
+    "errors": 5,
+    "missing": 0,
+    "named": 17141429,
+    "nodes": 26667134
+  }
+}

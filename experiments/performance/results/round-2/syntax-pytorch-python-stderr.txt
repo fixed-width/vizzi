@@ -1,0 +1,12 @@
+syntax pass 1/3: 5115 files, 12.876s parsing
+syntax pass 2/3: 5115 files, 13.050s parsing
+syntax pass 3/3: 5115 files, 12.981s parsing
+incremental append_comment: torch/backends/_nnapi/prepare.py (6975 bytes, 60 samples)
+incremental prepend_comment: torch/backends/_nnapi/prepare.py (6975 bytes, 60 samples)
+incremental replace_middle_ascii_byte: torch/backends/_nnapi/prepare.py (6975 bytes, 60 samples)
+incremental append_comment: torch/autograd/gradcheck.py (93373 bytes, 60 samples)
+incremental prepend_comment: torch/autograd/gradcheck.py (93373 bytes, 60 samples)
+incremental replace_middle_ascii_byte: torch/autograd/gradcheck.py (93373 bytes, 60 samples)
+incremental append_comment: torch/testing/_internal/common_methods_invocations.py (1320308 bytes, 25 samples)
+incremental prepend_comment: torch/testing/_internal/common_methods_invocations.py (1320308 bytes, 25 samples)
+incremental replace_middle_ascii_byte: torch/testing/_internal/common_methods_invocations.py (1320308 bytes, 25 samples)

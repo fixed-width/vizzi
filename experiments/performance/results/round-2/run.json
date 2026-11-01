@@ -1,0 +1,66 @@
+{
+  "recorded_at_utc": "2026-11-01T03:39:00.418168+00:00",
+  "parent_commit": "b43a04749c62fcf5aa49aaebb698d68f63eb05c1",
+  "harness_source_sha256": "b062e6b5aaedd46b50e321a2cc11bc511e2d94fa39504568086f300934642314",
+  "dependency_versions": {
+    "blake3": "1.8.7",
+    "notify": "8.2.1",
+    "notify-types": "2.2.0",
+    "tree-sitter": "0.27.1",
+    "tree-sitter-c": "0.24.2",
+    "tree-sitter-cpp": "0.23.4",
+    "tree-sitter-python": "0.25.0",
+    "tree-sitter-rust": "0.24.2"
+  },
+  "environment": {
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13700H",
+    "reported_memory_bytes": 67080241152,
+    "platform": "Linux-6.8.0-147-lowlatency-x86_64-with-glibc2.39",
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+    "physical_gpu_device_directory_present": false,
+    "filesystem_stat_type": "ext2/ext3",
+    "own_build_and_mutation_jobs_finished_before_timing": true,
+    "other_load_power_and_cache": "uncontrolled"
+  },
+  "corpora": [
+    {
+      "name": "lpc-rs",
+      "revision": "8d3b1f54b36eae33f689bae3e42c716647000e4d",
+      "capture": "previous local Git archive",
+      "root": "/tmp/vizzi-perf-corpus/lpc-rs"
+    },
+    {
+      "name": "linux",
+      "revision": "cbbddb6b08cc9900a87cccaa9b22bbe06aa4f50a",
+      "capture": "Git archive from user-provided clean shallow checkout",
+      "root": "/tmp/vizzi-perf-corpus/linux-cbbddb6b"
+    },
+    {
+      "name": "pytorch",
+      "revision": "1f4d2d5e820dd870626dca4f9603e3a49879dbde",
+      "previously_planned_revision": "64ef93aaaee3f39b5dcac9d0c8a49d4d6d92ca42",
+      "capture": "Git archive from user-provided clean shallow checkout; uses its available HEAD",
+      "root": "/tmp/vizzi-perf-corpus/pytorch-1f4d2d5e"
+    }
+  ],
+  "source_scope": "committed archive contents; symlinks skipped, submodules not expanded, build outputs and uncommitted changes not added",
+  "verification": {
+    "unit_tests": 37,
+    "cli_integration_tests": 5,
+    "format": "passed",
+    "clippy": "all targets and features, warnings denied, passed",
+    "mutation": "mutation.json: combined library run; targeted new-module result retained in mutation-new-modules.json",
+    "execution_log": "executions.json"
+  },
+  "not_measured": [
+    "semantic indexing",
+    "dependency invalidation",
+    "immutable index publication",
+    "concurrent writer/initial watch registration races",
+    "actual OS queue overflow",
+    "remote filesystems",
+    "browser rendering",
+    "target GPU"
+  ],
+  "qualification": "Native Linux exploratory measurements; does not qualify the integrated-GPU 16GB target."
+}

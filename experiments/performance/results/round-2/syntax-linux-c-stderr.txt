@@ -1,0 +1,12 @@
+syntax pass 1/3: 65034 files, 108.580s parsing
+syntax pass 2/3: 65034 files, 106.671s parsing
+syntax pass 3/3: 65034 files, 109.277s parsing
+incremental append_comment: drivers/scsi/isci/task.h (5622 bytes, 60 samples)
+incremental prepend_comment: drivers/scsi/isci/task.h (5622 bytes, 60 samples)
+incremental replace_middle_ascii_byte: drivers/scsi/isci/task.h (5622 bytes, 60 samples)
+incremental append_comment: drivers/infiniband/hw/mlx5/mr.c (60193 bytes, 60 samples)
+incremental prepend_comment: drivers/infiniband/hw/mlx5/mr.c (60193 bytes, 60 samples)
+incremental replace_middle_ascii_byte: drivers/infiniband/hw/mlx5/mr.c (60193 bytes, 60 samples)
+incremental append_comment: drivers/gpu/drm/amd/include/asic_reg/dcn/dcn_3_2_0_sh_mask.h (24009174 bytes, 3 samples)
+incremental prepend_comment: drivers/gpu/drm/amd/include/asic_reg/dcn/dcn_3_2_0_sh_mask.h (24009174 bytes, 3 samples)
+incremental replace_middle_ascii_byte: drivers/gpu/drm/amd/include/asic_reg/dcn/dcn_3_2_0_sh_mask.h (24009174 bytes, 3 samples)

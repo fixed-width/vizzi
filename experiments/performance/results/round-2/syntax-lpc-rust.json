@@ -1,0 +1,328 @@
+{
+  "conditions": {
+    "build": "release",
+    "coverage": "syntax only; no name resolution, cross-language links, or build configuration",
+    "edits": "median, approximately 95th-percentile, and largest files by bytes; duplicates removed",
+    "inspection": "all nodes counted, including punctuation, error nodes, and missing nodes",
+    "parsing": "sequential, raw unpreprocessed source; parser reused; trees dropped between files",
+    "selection": "sorted path prefix when a file limit is supplied; otherwise all matching files",
+    "validation": "full and incremental preorder node shapes, fields, flags, depths, and byte ranges compared outside timed phases"
+  },
+  "content_bytes": 7562179,
+  "experiment": "syntax_parsing",
+  "files_with_syntax_recovery": 0,
+  "incremental_edits": [
+    {
+      "edit": "append_comment",
+      "edit_start_byte": 7487,
+      "full_parse_of_edited_buffer": {
+        "max_us": 1633.211,
+        "min_us": 519.316,
+        "p50_us": 813.865,
+        "p95_us": 898.199,
+        "samples": 60
+      },
+      "incremental_parse": {
+        "max_us": 38.255,
+        "min_us": 10.839,
+        "p50_us": 20.473,
+        "p95_us": 33.29,
+        "samples": 60
+      },
+      "path": "src/interpreter/efun/regexp.rs",
+      "preparation": {
+        "max_us": 48.365,
+        "min_us": 3.812,
+        "p50_us": 35.983,
+        "p95_us": 38.909,
+        "samples": 60
+      },
+      "requested_samples": 60,
+      "sampling": "capped by 32 MiB of source per case, with at least three repetitions",
+      "source_bytes": 7487,
+      "syntax_recovery_present": false,
+      "validation_passed": true
+    },
+    {
+      "edit": "prepend_comment",
+      "edit_start_byte": 0,
+      "full_parse_of_edited_buffer": {
+        "max_us": 1165.441,
+        "min_us": 499.977,
+        "p50_us": 832.402,
+        "p95_us": 1011.814,
+        "samples": 60
+      },
+      "incremental_parse": {
+        "max_us": 56.059,
+        "min_us": 11.749,
+        "p50_us": 21.345,
+        "p95_us": 39.312,
+        "samples": 60
+      },
+      "path": "src/interpreter/efun/regexp.rs",
+      "preparation": {
+        "max_us": 46.572,
+        "min_us": 20.0,
+        "p50_us": 33.861,
+        "p95_us": 41.357,
+        "samples": 60
+      },
+      "requested_samples": 60,
+      "sampling": "capped by 32 MiB of source per case, with at least three repetitions",
+      "source_bytes": 7487,
+      "syntax_recovery_present": false,
+      "validation_passed": true
+    },
+    {
+      "edit": "replace_middle_ascii_byte",
+      "edit_start_byte": 3743,
+      "full_parse_of_edited_buffer": {
+        "max_us": 1276.96,
+        "min_us": 508.47,
+        "p50_us": 830.832,
+        "p95_us": 1218.495,
+        "samples": 60
+      },
+      "incremental_parse": {
+        "max_us": 115.717,
+        "min_us": 32.805,
+        "p50_us": 57.295,
+        "p95_us": 90.251,
+        "samples": 60
+      },
+      "path": "src/interpreter/efun/regexp.rs",
+      "preparation": {
+        "max_us": 48.312,
+        "min_us": 20.623,
+        "p50_us": 36.814,
+        "p95_us": 43.335,
+        "samples": 60
+      },
+      "requested_samples": 60,
+      "sampling": "capped by 32 MiB of source per case, with at least three repetitions",
+      "source_bytes": 7487,
+      "syntax_recovery_present": false,
+      "validation_passed": true
+    },
+    {
+      "edit": "append_comment",
+      "edit_start_byte": 41906,
+      "full_parse_of_edited_buffer": {
+        "max_us": 6933.768,
+        "min_us": 2994.364,
+        "p50_us": 4386.302,
+        "p95_us": 6574.081,
+        "samples": 60
+      },
+      "incremental_parse": {
+        "max_us": 100.954,
+        "min_us": 23.973,
+        "p50_us": 43.699,
+        "p95_us": 85.194,
+        "samples": 60
+      },
+      "path": "src/interpreter/vm/global_state.rs",
+      "preparation": {
+        "max_us": 747.629,
+        "min_us": 15.405,
+        "p50_us": 155.385,
+        "p95_us": 302.269,
+        "samples": 60
+      },
+      "requested_samples": 60,
+      "sampling": "capped by 32 MiB of source per case, with at least three repetitions",
+      "source_bytes": 41906,
+      "syntax_recovery_present": false,
+      "validation_passed": true
+    },
+    {
+      "edit": "prepend_comment",
+      "edit_start_byte": 0,
+      "full_parse_of_edited_buffer": {
+        "max_us": 7624.623,
+        "min_us": 2902.204,
+        "p50_us": 4348.331,
+        "p95_us": 6348.39,
+        "samples": 60
+      },
+      "incremental_parse": {
+        "max_us": 102.893,
+        "min_us": 25.441,
+        "p50_us": 46.412,
+        "p95_us": 94.626,
+        "samples": 60
+      },
+      "path": "src/interpreter/vm/global_state.rs",
+      "preparation": {
+        "max_us": 1374.789,
+        "min_us": 7.598,
+        "p50_us": 192.821,
+        "p95_us": 314.45,
+        "samples": 60
+      },
+      "requested_samples": 60,
+      "sampling": "capped by 32 MiB of source per case, with at least three repetitions",
+      "source_bytes": 41906,
+      "syntax_recovery_present": false,
+      "validation_passed": true
+    },
+    {
+      "edit": "replace_middle_ascii_byte",
+      "edit_start_byte": 20969,
+      "full_parse_of_edited_buffer": {
+        "max_us": 10586.954,
+        "min_us": 2967.25,
+        "p50_us": 4166.881,
+        "p95_us": 6207.686,
+        "samples": 60
+      },
+      "incremental_parse": {
+        "max_us": 281.211,
+        "min_us": 88.852,
+        "p50_us": 160.704,
+        "p95_us": 238.961,
+        "samples": 60
+      },
+      "path": "src/interpreter/vm/global_state.rs",
+      "preparation": {
+        "max_us": 490.899,
+        "min_us": 8.994,
+        "p50_us": 191.632,
+        "p95_us": 331.555,
+        "samples": 60
+      },
+      "requested_samples": 60,
+      "sampling": "capped by 32 MiB of source per case, with at least three repetitions",
+      "source_bytes": 41906,
+      "syntax_recovery_present": false,
+      "validation_passed": true
+    },
+    {
+      "edit": "append_comment",
+      "edit_start_byte": 329530,
+      "full_parse_of_edited_buffer": {
+        "max_us": 43253.11,
+        "min_us": 28276.149,
+        "p50_us": 35985.984,
+        "p95_us": 41286.521,
+        "samples": 60
+      },
+      "incremental_parse": {
+        "max_us": 163.286,
+        "min_us": 58.698,
+        "p50_us": 81.442,
+        "p95_us": 147.036,
+        "samples": 60
+      },
+      "path": "src/compiler/codegen/codegen_walker.rs",
+      "preparation": {
+        "max_us": 220.672,
+        "min_us": 84.31,
+        "p50_us": 130.656,
+        "p95_us": 168.323,
+        "samples": 60
+      },
+      "requested_samples": 60,
+      "sampling": "capped by 32 MiB of source per case, with at least three repetitions",
+      "source_bytes": 329530,
+      "syntax_recovery_present": false,
+      "validation_passed": true
+    },
+    {
+      "edit": "prepend_comment",
+      "edit_start_byte": 0,
+      "full_parse_of_edited_buffer": {
+        "max_us": 40692.761,
+        "min_us": 28569.691,
+        "p50_us": 32365.854,
+        "p95_us": 38443.806,
+        "samples": 60
+      },
+      "incremental_parse": {
+        "max_us": 272.277,
+        "min_us": 53.543,
+        "p50_us": 79.656,
+        "p95_us": 142.951,
+        "samples": 60
+      },
+      "path": "src/compiler/codegen/codegen_walker.rs",
+      "preparation": {
+        "max_us": 213.752,
+        "min_us": 24.703,
+        "p50_us": 34.869,
+        "p95_us": 96.902,
+        "samples": 60
+      },
+      "requested_samples": 60,
+      "sampling": "capped by 32 MiB of source per case, with at least three repetitions",
+      "source_bytes": 329530,
+      "syntax_recovery_present": false,
+      "validation_passed": true
+    },
+    {
+      "edit": "replace_middle_ascii_byte",
+      "edit_start_byte": 164765,
+      "full_parse_of_edited_buffer": {
+        "max_us": 45758.091,
+        "min_us": 28617.927,
+        "p50_us": 40027.244,
+        "p95_us": 44817.163,
+        "samples": 60
+      },
+      "incremental_parse": {
+        "max_us": 676.837,
+        "min_us": 180.182,
+        "p50_us": 287.43,
+        "p95_us": 521.983,
+        "samples": 60
+      },
+      "path": "src/compiler/codegen/codegen_walker.rs",
+      "preparation": {
+        "max_us": 147.059,
+        "min_us": 61.975,
+        "p50_us": 89.713,
+        "p95_us": 120.34,
+        "samples": 60
+      },
+      "requested_samples": 60,
+      "sampling": "capped by 32 MiB of source per case, with at least three repetitions",
+      "source_bytes": 329530,
+      "syntax_recovery_present": false,
+      "validation_passed": true
+    }
+  ],
+  "language": "rust",
+  "matching_files": 551,
+  "measured_files": 551,
+  "per_pass": {
+    "file_reads": {
+      "max_us": 27707.164,
+      "min_us": 25687.462,
+      "p50_us": 26639.757,
+      "p95_us": 27707.164,
+      "samples": 3
+    },
+    "full_parsing": {
+      "max_us": 941021.53,
+      "min_us": 881337.973,
+      "p50_us": 928117.529,
+      "p95_us": 941021.53,
+      "samples": 3
+    },
+    "node_inspection": {
+      "max_us": 150086.442,
+      "min_us": 146142.414,
+      "p50_us": 147706.423,
+      "p95_us": 150086.442,
+      "samples": 3
+    }
+  },
+  "source_root": "/tmp/vizzi-perf-corpus/lpc-rs",
+  "syntax_counts": {
+    "errors": 0,
+    "missing": 0,
+    "named": 1034186,
+    "nodes": 1941483
+  }
+}

@@ -70,3 +70,46 @@ fn generator_creates_the_requested_workload_and_refuses_to_overwrite_it() {
     assert!(!run().status.success());
     assert_eq!(vizzi_perf::source::capture(&root).unwrap(), captured);
 }
+
+#[cfg(feature = "syntax")]
+#[test]
+fn syntax_command_scopes_files_and_verifies_incremental_results() {
+    let root = tempfile::tempdir().unwrap();
+    fs::write(root.path().join("code.rs"), b"fn f() {}").unwrap();
+    fs::write(root.path().join("fixture.c"), b"not Rust source").unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_vizzi-syntax"))
+        .arg("rust")
+        .arg(root.path())
+        .arg("1")
+        .output()
+        .unwrap();
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(
+        (
+            report["matching_files"].as_u64(),
+            report["measured_files"].as_u64()
+        ),
+        (Some(1), Some(1))
+    );
+    let edits = report["incremental_edits"].as_array().unwrap();
+    assert_eq!(edits.len(), 3);
+    assert!(edits.iter().all(|edit| edit["validation_passed"] == true));
+    assert_eq!(fs::read(root.path().join("code.rs")).unwrap(), b"fn f() {}");
+}
+
+#[cfg(feature = "watch")]
+#[test]
+fn watcher_command_rejects_insufficient_distinct_files() {
+    let output = Command::new(env!("CARGO_BIN_EXE_vizzi-watch"))
+        .arg("2")
+        .arg("2")
+        .output()
+        .unwrap();
+    assert!(!output.status.success());
+    assert!(output.stdout.is_empty());
+}

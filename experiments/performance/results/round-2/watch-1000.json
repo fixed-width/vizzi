@@ -1,0 +1,78 @@
+{
+  "conditions": {
+    "build": "release",
+    "coverage": "native filesystem notifications and content verification only; no parsing, semantic invalidation, immutable publication, or UI",
+    "event_clock": "watcher callback records arrival time; notifications may precede completion of the write",
+    "failure_policy": "timeouts, watcher failures, and incorrect updates abort the run rather than being omitted from summaries",
+    "fixture": "owned temporary directory; 100 files per directory; distinct file per operation; source repositories not modified",
+    "os": "linux",
+    "overflow": "recovery deliberately discards one event; actual operating-system queue overflow is not induced",
+    "verification": "fingerprint file after a candidate event, then update the mutable manifest; five-second deadline per operation"
+  },
+  "experiment": "native_filesystem_events",
+  "files": 1000,
+  "operations": [
+    {
+      "attempted": 50,
+      "mode": "same_length_write",
+      "rescan_requests_observed": 0,
+      "successful": 50,
+      "write_call": {
+        "max_us": 186.117,
+        "min_us": 14.903,
+        "p50_us": 15.904,
+        "p95_us": 21.031,
+        "samples": 50
+      },
+      "write_start_to_callback": {
+        "max_us": 96.303,
+        "min_us": 9.187,
+        "p50_us": 10.254,
+        "p95_us": 16.095,
+        "samples": 50
+      },
+      "write_start_to_verified_manifest_update": {
+        "max_us": 237.316,
+        "min_us": 26.335,
+        "p50_us": 29.301,
+        "p95_us": 41.537,
+        "samples": 50
+      }
+    },
+    {
+      "attempted": 50,
+      "mode": "atomic_replacement",
+      "rescan_requests_observed": 0,
+      "successful": 50,
+      "write_call": {
+        "max_us": 116.166,
+        "min_us": 32.226,
+        "p50_us": 38.98,
+        "p95_us": 58.607,
+        "samples": 50
+      },
+      "write_start_to_callback": {
+        "max_us": 113.546,
+        "min_us": 31.042,
+        "p50_us": 37.887,
+        "p95_us": 62.2,
+        "samples": 50
+      },
+      "write_start_to_verified_manifest_update": {
+        "max_us": 128.501,
+        "min_us": 40.802,
+        "p50_us": 49.482,
+        "p95_us": 105.552,
+        "samples": 50
+      }
+    }
+  ],
+  "recovery": {
+    "changed_paths": 1,
+    "event_deliberately_ignored": true,
+    "recovered": true,
+    "scan_and_compare_us": 9261.82
+  },
+  "registration_us": 2563.283,
+  "status": "complete"
+}

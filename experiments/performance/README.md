@@ -1,9 +1,12 @@
-# Run the initial performance experiments
+# Run native performance experiments
 
 Use these experiments to establish native input-processing costs and check renderer
 availability before selecting production implementations. Use a current stable Rust
 toolchain; the recorded runs used Rust 1.99.1. The project's supported minimum compiler
 version remains undecided. Run commands from the repository root.
+
+Recorded observations are in [the initial report](RESULTS.md) and
+[the repository parsing and event report](SECOND_RESULTS.md).
 
 ## Build the executables
 
@@ -14,6 +17,9 @@ cargo build --release --workspace --features gpu --locked
 The `gpu` feature adds the native `vizzi-gpu` executable. Leave it disabled when
 working only on file inventory measurements. Use `--offline` if dependencies are
 already cached and network access is unavailable.
+
+Add `syntax,watch` to enable the parsing and native notification experiments, or build
+with `--all-features` to include every current experiment.
 
 ## Measure a stable source snapshot
 
@@ -40,6 +46,74 @@ mkdir -p experiments/performance/results/local
   target/release/vizzi-perf inventory /path/to/source-snapshot 7 \
   > experiments/performance/results/local/inventory.json
 ```
+
+For a local Git checkout, capture the committed revision in a new directory before
+measuring it. Record the revision returned by `git rev-parse HEAD`, then use
+`git archive --format=tar REVISION` and extract into the new directory. This excludes
+uncommitted changes and does not expand submodules. A shallow checkout is sufficient
+when it contains the selected commit.
+
+## Measure syntax parsing and incremental edits
+
+```sh
+cargo build --release --workspace --features syntax --locked
+target/release/vizzi-syntax rust /path/to/lpc-rs-snapshot 3
+target/release/vizzi-syntax c /path/to/linux-snapshot 3
+target/release/vizzi-syntax python /path/to/pytorch-snapshot 3
+target/release/vizzi-syntax cpp /path/to/pytorch-snapshot 3
+```
+
+The language argument selects a grammar and its file extensions. C and C++ experiments
+include headers in their respective scopes. C++ excludes CUDA. Rust experiments exclude
+LPC fixtures. An optional final `MAX_FILES` argument limits the run to a sorted path
+prefix; the output records matching and measured file counts.
+
+The report separates source reads, full parsing, and syntax-node inspection. Raw source
+is parsed without preprocessing, compilation, or name resolution. Syntax recovery is
+counted and reported; a returned tree is not evidence of complete language support.
+
+Incremental probes select files near the median, 95th percentile, and maximum byte
+size. They append a comment, prepend a comment, and replace an ASCII letter near the
+middle. The replacement can produce invalid syntax; recovery is reported. Every edited
+tree is compared with a full parse of the same buffer, including node kinds, fields,
+flags, depths, and byte ranges, while the original tree must remain unchanged.
+
+Each edit case requests 20 repetitions per corpus pass. Large-file repetitions are
+capped by a 32 MiB source-byte budget, with at least three repetitions; requested and
+actual sample counts are recorded. Treat these as exploratory observations, especially
+for large files with few repetitions.
+
+Edit preparation, incremental parsing, and full parsing of the edited buffer are timed
+separately. Preparation includes copying the buffer and calculating byte-oriented
+positions. Validation is outside the timed phases. These are independent edits against
+the original tree, with full/incremental execution order alternated; they are not an
+editor session, a semantic reindex, or a measurement of persistent index publication.
+
+## Measure native filesystem notifications
+
+```sh
+cargo build --release --workspace --features watch --locked
+target/release/vizzi-watch 1000 50
+target/release/vizzi-watch 100000 50
+```
+
+Arguments are fixture file count and samples per operation. The file count must be at
+least twice the sample count plus one. The command creates and removes an owned
+temporary fixture, leaving reference repositories untouched. Files are grouped in
+directories of 100; each operation uses a distinct path.
+
+The report separates watcher registration, same-length writes, and replacement through
+a temporary file and rename. A callback records notification arrival; the main thread
+checks the resulting content fingerprint and updates the manifest. Timings begin before
+the write, so a callback can arrive before the write call completes. A five-second
+deadline applies to each operation. Failures abort the run instead of disappearing
+from successful latency summaries.
+
+A final edit is deliberately ignored by event processing and recovered through a full
+scan. This validates the reconciliation route; it does not induce a real operating-system
+queue overflow. Fixture creation, initial capture, parsing, semantic invalidation,
+immutable publication, and rendering are outside these latency measurements. Results
+apply to the observed filesystem and notification backend.
 
 ## Generate a controlled file-count workload
 
@@ -77,13 +151,29 @@ Use software runs to exercise the rendering path. Preserve the adapter identity 
 cargo fmt --all --check
 cargo test --workspace --all-features --locked
 cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
-cargo mutants --workspace --file 'crates/vizzi-perf/src/*.rs' \
-  --exclude '**/main.rs' --exclude '**/bin/**' --jobs 2 --timeout 45
+cargo mutants --workspace --features syntax,watch \
+  --file 'crates/vizzi-perf/src/*.rs' --exclude '**/main.rs' --exclude '**/bin/**' \
+  --config experiments/performance/mutants.toml --jobs 2 --timeout 60
 ```
 
-The mutation scope covers content manifests, filesystem capture, geometry generation,
-and timing summaries. CLI orchestration and GPU/shader code are outside that mutation
-scope. Tests and mutation runs should finish before collecting timing results.
+The full library mutation scope covers manifests, filesystem capture, geometry,
+timing, edit preparation, syntax inspection, and event classification. For a focused
+run on the parser and event-classification modules, use:
+
+```sh
+cargo mutants --workspace --features syntax,watch \
+  --file 'crates/vizzi-perf/src/syntax.rs' --file 'crates/vizzi-perf/src/watch.rs' \
+  --config experiments/performance/mutants.toml --jobs 2 --timeout 60
+```
+
+CLI orchestration, third-party parser/watcher implementations, and GPU/shader code are
+outside these mutation scopes. Tests and mutation runs should finish before collecting
+timing results.
+
+The experiment-specific mutation configuration excludes one allocation-capacity-only
+mutation in edit preparation. It changes the initial allocation hint, while preserving
+the edited bytes and tree-edit coordinates; buffer capacity is not an interface promise.
+Performance measurements address allocation costs separately.
 
 ## Interpret the measurements
 

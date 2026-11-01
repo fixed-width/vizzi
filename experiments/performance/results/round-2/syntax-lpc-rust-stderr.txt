@@ -1,0 +1,12 @@
+syntax pass 1/3: 551 files, 0.881s parsing
+syntax pass 2/3: 551 files, 0.928s parsing
+syntax pass 3/3: 551 files, 0.941s parsing
+incremental append_comment: src/interpreter/efun/regexp.rs (7487 bytes, 60 samples)
+incremental prepend_comment: src/interpreter/efun/regexp.rs (7487 bytes, 60 samples)
+incremental replace_middle_ascii_byte: src/interpreter/efun/regexp.rs (7487 bytes, 60 samples)
+incremental append_comment: src/interpreter/vm/global_state.rs (41906 bytes, 60 samples)
+incremental prepend_comment: src/interpreter/vm/global_state.rs (41906 bytes, 60 samples)
+incremental replace_middle_ascii_byte: src/interpreter/vm/global_state.rs (41906 bytes, 60 samples)
+incremental append_comment: src/compiler/codegen/codegen_walker.rs (329530 bytes, 60 samples)
+incremental prepend_comment: src/compiler/codegen/codegen_walker.rs (329530 bytes, 60 samples)
+incremental replace_middle_ascii_byte: src/compiler/codegen/codegen_walker.rs (329530 bytes, 60 samples)

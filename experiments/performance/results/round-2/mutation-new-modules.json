@@ -1,0 +1,30 @@
+{
+  "total_mutants": 38,
+  "missed": 0,
+  "caught": 35,
+  "timeout": 0,
+  "unviable": 3,
+  "success": 0,
+  "start_time": "2026-11-01T03:19:55.499510479Z",
+  "end_time": "2026-11-01T03:20:28.423771757Z",
+  "cargo_mutants_version": "27.1.0",
+  "scope": [
+    "crates/vizzi-perf/src/syntax.rs",
+    "crates/vizzi-perf/src/watch.rs"
+  ],
+  "features": [
+    "syntax",
+    "watch"
+  ],
+  "excluded": [
+    {
+      "pattern": "^crates/vizzi-perf/src/syntax\\.rs:\\d+:\\d+: replace - with \\+ in prepare_edit$",
+      "reason": "Changes only the initial Vec allocation capacity, not edited bytes or InputEdit coordinates."
+    }
+  ],
+  "unviable_mutations": [
+    "crates/vizzi-perf/src/syntax.rs:81:5: replace prepare_edit -> Result<PreparedEdit, SyntaxError> with Ok(Default::default())",
+    "crates/vizzi-perf/src/syntax.rs:128:5: replace reparse -> Result<Tree, SyntaxError> with Ok(Default::default())",
+    "crates/vizzi-perf/src/syntax.rs:182:5: replace shape -> Vec<NodeShape> with vec![Default::default()]"
+  ]
+}

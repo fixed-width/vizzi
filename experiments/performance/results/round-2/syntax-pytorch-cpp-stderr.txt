@@ -1,0 +1,12 @@
+syntax pass 1/3: 4876 files, 7.961s parsing
+syntax pass 2/3: 4876 files, 8.382s parsing
+syntax pass 3/3: 4876 files, 7.561s parsing
+incremental append_comment: torch/csrc/autograd/forward_grad.cpp (3075 bytes, 60 samples)
+incremental prepend_comment: torch/csrc/autograd/forward_grad.cpp (3075 bytes, 60 samples)
+incremental replace_middle_ascii_byte: torch/csrc/autograd/forward_grad.cpp (3075 bytes, 60 samples)
+incremental append_comment: torch/csrc/lazy/core/lazy_graph_executor.cpp (38659 bytes, 60 samples)
+incremental prepend_comment: torch/csrc/lazy/core/lazy_graph_executor.cpp (38659 bytes, 60 samples)
+incremental replace_middle_ascii_byte: torch/csrc/lazy/core/lazy_graph_executor.cpp (38659 bytes, 60 samples)
+incremental append_comment: third_party/perfetto/sdk/perfetto.h (8416629 bytes, 3 samples)
+incremental prepend_comment: third_party/perfetto/sdk/perfetto.h (8416629 bytes, 3 samples)
+incremental replace_middle_ascii_byte: third_party/perfetto/sdk/perfetto.h (8416629 bytes, 3 samples)
