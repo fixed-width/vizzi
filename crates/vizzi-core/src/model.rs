@@ -1,0 +1,405 @@
+//! Captured source and immutable analysis identities.
+
+use serde::{Deserialize, Serialize};
+use std::{collections::BTreeSet, ops::Range, sync::Arc};
+
+macro_rules! identity {
+    ($name:ident, $description:literal) => {
+        #[doc = $description]
+        #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+        #[serde(transparent)]
+        pub struct $name(String);
+        impl $name {
+            /// Derives a namespaced identity from length-delimited parts.
+            pub fn derive(parts: &[&[u8]]) -> Self {
+                let mut hash = blake3::Hasher::new();
+                hash.update(stringify!($name).as_bytes());
+                for part in parts {
+                    hash.update(&(part.len() as u64).to_le_bytes());
+                    hash.update(part);
+                }
+                Self(hash.finalize().to_hex().to_string())
+            }
+            /// Returns the opaque transport representation.
+            pub fn as_str(&self) -> &str {
+                &self.0
+            }
+        }
+    };
+}
+identity!(WorkspaceId, "An adapter-supplied workspace identity.");
+identity!(FileId, "A path identity scoped to a workspace.");
+identity!(ContentId, "An identity of captured source bytes.");
+identity!(
+    ContextId,
+    "An identity of analyzer, configuration, and implementation."
+);
+identity!(
+    SnapshotId,
+    "An identity of immutable source and analysis observations."
+);
+identity!(
+    EntityId,
+    "An identity of a declaration in a file and analysis context."
+);
+
+/// The language and implementation responsible for a set of facts.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Context {
+    /// Language identifier; the host initially configures only Rust.
+    pub language: String,
+    /// Human-readable analyzer and configuration description.
+    pub description: String,
+    /// Fingerprint including analyzer implementation and configuration.
+    pub id: ContextId,
+}
+
+/// Coverage of syntax extraction, without a semantic-resolution claim.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Coverage {
+    /// Parsing completed without grammar recovery.
+    Syntax,
+    /// Grammar recovery occurred; extracted declarations may be incomplete.
+    Partial,
+    /// Analysis could not run on this input.
+    Unavailable,
+}
+
+/// A lexical declaration before binding to a workspace path.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Fact {
+    /// Lexical qualification and kind, with a duplicate ordinal when needed.
+    pub key: String,
+    /// Display name.
+    pub name: String,
+    /// Declaration kind.
+    pub kind: String,
+    /// UTF-8 byte range with an exclusive end.
+    pub span: Range<usize>,
+    /// Whether this lexical identity is unambiguous in the captured file.
+    pub unique: bool,
+}
+
+/// Path-independent facts that can be persisted in an analysis cache.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Analysis {
+    /// Captured byte identity to which the facts apply.
+    pub content: ContentId,
+    /// Analyzer configuration and implementation identity.
+    pub context: Context,
+    /// Syntax coverage classification.
+    pub coverage: Coverage,
+    /// Lexical declarations, in source order.
+    pub facts: Vec<Fact>,
+    /// Recovery or availability explanations.
+    pub diagnostics: Vec<String>,
+}
+
+/// Rejected inconsistent or ambiguous input.
+#[derive(Debug, thiserror::Error)]
+#[error("{0}")]
+pub struct ModelError(pub String);
+
+/// A frozen source document with analyses for zero or more contexts.
+#[derive(Clone, Debug)]
+pub struct Document {
+    workspace: WorkspaceId,
+    id: FileId,
+    path: String,
+    content: ContentId,
+    bytes: usize,
+    source: Option<Arc<str>>,
+    line_starts: Vec<usize>,
+    analyses: Vec<Analysis>,
+}
+
+impl Document {
+    /// Validates source-backed facts and captures immutable source text.
+    pub fn capture(
+        workspace: WorkspaceId,
+        path: String,
+        bytes: &[u8],
+        analyses: Vec<Analysis>,
+    ) -> Result<Self, ModelError> {
+        if path.is_empty()
+            || path.contains('\\')
+            || path.split('/').any(|part| matches!(part, "" | "." | ".."))
+        {
+            return Err(ModelError("expected a normalized relative path".into()));
+        }
+        let content = ContentId::derive(&[bytes]);
+        let source = std::str::from_utf8(bytes).ok();
+        let mut contexts = BTreeSet::new();
+        for analysis in &analyses {
+            if analysis.content != content || !contexts.insert(&analysis.context.id) {
+                return Err(ModelError("analysis content or context mismatch".into()));
+            }
+            let mut keys = BTreeSet::new();
+            for fact in &analysis.facts {
+                if !keys.insert(&fact.key)
+                    || fact.span.start >= fact.span.end
+                    || !source.is_some_and(|text| text.get(fact.span.clone()).is_some())
+                {
+                    return Err(ModelError(
+                        "invalid or duplicate declaration range/key".into(),
+                    ));
+                }
+            }
+            if source.is_none() && analysis.coverage != Coverage::Unavailable {
+                return Err(ModelError(
+                    "non-UTF-8 source requires unavailable analysis".into(),
+                ));
+            }
+        }
+        let mut line_starts = vec![0];
+        if let Some(source) = source {
+            line_starts.extend(
+                source
+                    .bytes()
+                    .enumerate()
+                    .filter_map(|(i, byte)| (byte == b'\n').then_some(i + 1)),
+            );
+        }
+        Ok(Self {
+            id: FileId::derive(&[workspace.as_str().as_bytes(), path.as_bytes()]),
+            workspace,
+            path,
+            content,
+            bytes: bytes.len(),
+            source: source.map(Arc::from),
+            line_starts,
+            analyses,
+        })
+    }
+    /// Returns the path identity.
+    pub fn id(&self) -> &FileId {
+        &self.id
+    }
+    /// Returns the workspace-relative path.
+    pub fn path(&self) -> &str {
+        &self.path
+    }
+    /// Returns the captured byte identity.
+    pub fn content(&self) -> &ContentId {
+        &self.content
+    }
+    /// Returns the captured byte count.
+    pub fn bytes(&self) -> usize {
+        self.bytes
+    }
+    /// Returns UTF-8 source, or none for non-UTF-8 input.
+    pub fn source(&self) -> Option<&str> {
+        self.source.as_deref()
+    }
+    /// Returns all analysis contexts for this document.
+    pub fn analyses(&self) -> &[Analysis] {
+        &self.analyses
+    }
+    /// Binds a declaration identity, conservatively scoping duplicate keys to content.
+    pub fn entity_id(&self, analysis: &Analysis, fact: &Fact) -> EntityId {
+        let mut parts = vec![
+            self.id.as_str().as_bytes(),
+            analysis.context.id.as_str().as_bytes(),
+            fact.key.as_bytes(),
+        ];
+        if !fact.unique {
+            parts.push(self.content.as_str().as_bytes());
+        }
+        EntityId::derive(&parts)
+    }
+    /// Converts a nonempty byte span to inclusive one-based source lines.
+    pub fn lines(&self, span: &Range<usize>) -> Range<usize> {
+        let start = self
+            .line_starts
+            .partition_point(|offset| *offset <= span.start);
+        let end = self
+            .line_starts
+            .partition_point(|offset| *offset <= span.end.saturating_sub(1));
+        start..end
+    }
+}
+
+/// An immutable, path-sorted collection of captured documents.
+#[derive(Debug)]
+pub struct Snapshot {
+    id: SnapshotId,
+    workspace: WorkspaceId,
+    documents: Vec<Arc<Document>>,
+}
+
+impl Snapshot {
+    /// Rejects duplicate paths and cross-workspace documents.
+    pub fn new(
+        workspace: WorkspaceId,
+        mut documents: Vec<Arc<Document>>,
+    ) -> Result<Self, ModelError> {
+        documents.sort_by(|a, b| a.path.cmp(&b.path));
+        let mut paths = BTreeSet::new();
+        let mut hash = blake3::Hasher::new();
+        hash.update(workspace.as_str().as_bytes());
+        for document in &documents {
+            if document.workspace != workspace || !paths.insert(document.path()) {
+                return Err(ModelError("duplicate path or mismatched workspace".into()));
+            }
+            hash.update(document.id.as_str().as_bytes());
+            hash.update(document.content.as_str().as_bytes());
+            let facts = serde_json::to_vec(&document.analyses)
+                .map_err(|error| ModelError(error.to_string()))?;
+            hash.update(&(facts.len() as u64).to_le_bytes());
+            hash.update(&facts);
+        }
+        Ok(Self {
+            id: SnapshotId::derive(&[hash.finalize().as_bytes()]),
+            workspace,
+            documents,
+        })
+    }
+    /// Returns this observation's identity.
+    pub fn id(&self) -> &SnapshotId {
+        &self.id
+    }
+    /// Returns the workspace identity.
+    pub fn workspace(&self) -> &WorkspaceId {
+        &self.workspace
+    }
+    /// Returns documents in path order.
+    pub fn documents(&self) -> &[Arc<Document>] {
+        &self.documents
+    }
+    /// Finds a captured document by opaque identity.
+    pub fn file(&self, id: &str) -> Option<&Arc<Document>> {
+        self.documents.iter().find(|file| file.id.as_str() == id)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    fn workspace() -> WorkspaceId {
+        WorkspaceId::derive(&[b"test"])
+    }
+    fn analysis(text: &[u8]) -> Analysis {
+        Analysis {
+            content: ContentId::derive(&[text]),
+            context: Context {
+                language: "rust".into(),
+                description: "test".into(),
+                id: ContextId::derive(&[b"test"]),
+            },
+            coverage: Coverage::Syntax,
+            facts: vec![Fact {
+                key: "fn::f".into(),
+                name: "f".into(),
+                kind: "function".into(),
+                span: 0..9,
+                unique: true,
+            }],
+            diagnostics: vec![],
+        }
+    }
+    #[test]
+    fn rejects_facts_for_different_source_or_invalid_spans() {
+        assert!(
+            Document::capture(
+                workspace(),
+                "a.rs".into(),
+                b"fn g() {}",
+                vec![analysis(b"fn f() {}")]
+            )
+            .is_err()
+        );
+        let mut facts = analysis(b"fn f() {}");
+        facts.facts[0].span = 0..100;
+        assert!(Document::capture(workspace(), "a.rs".into(), b"fn f() {}", vec![facts]).is_err());
+    }
+    #[test]
+    fn stable_file_and_unique_declaration_ids_survive_position_changes() {
+        let old = Document::capture(
+            workspace(),
+            "a.rs".into(),
+            b"fn f() {}",
+            vec![analysis(b"fn f() {}")],
+        )
+        .unwrap();
+        let mut facts = analysis(b"\nfn f() {}");
+        facts.facts[0].span = 1..10;
+        let new =
+            Document::capture(workspace(), "a.rs".into(), b"\nfn f() {}", vec![facts]).unwrap();
+        assert_eq!(old.id(), new.id());
+        assert_ne!(old.content(), new.content());
+        assert_eq!(
+            old.entity_id(&old.analyses[0], &old.analyses[0].facts[0]),
+            new.entity_id(&new.analyses[0], &new.analyses[0].facts[0])
+        );
+        assert_eq!(new.lines(&new.analyses[0].facts[0].span), 2..2);
+        assert_eq!(old.source(), Some("fn f() {}"));
+    }
+    #[test]
+    fn rejects_traversal_duplicate_contexts_and_utf8_midpoints() {
+        assert!(Document::capture(workspace(), "../a.rs".into(), b"", vec![]).is_err());
+        let a = analysis(b"fn f() {}");
+        assert!(
+            Document::capture(workspace(), "a.rs".into(), b"fn f() {}", vec![a.clone(), a])
+                .is_err()
+        );
+        let mut a = analysis("éabcdefg".as_bytes());
+        a.facts[0].span = 1..9;
+        assert!(
+            Document::capture(workspace(), "a.rs".into(), "éabcdefg".as_bytes(), vec![a]).is_err()
+        );
+    }
+    #[test]
+    fn snapshots_sort_and_include_analysis_in_their_identity() {
+        let a = Arc::new(Document::capture(workspace(), "z.rs".into(), b"", vec![]).unwrap());
+        let b = Arc::new(Document::capture(workspace(), "a.rs".into(), b"", vec![]).unwrap());
+        let first = Snapshot::new(workspace(), vec![a.clone(), b.clone()]).unwrap();
+        let second = Snapshot::new(workspace(), vec![b, a.clone()]).unwrap();
+        assert_eq!(first.id(), second.id());
+        assert_eq!(first.documents()[0].path(), "a.rs");
+        assert!(Snapshot::new(workspace(), vec![a.clone(), a]).is_err());
+        let changed = Analysis {
+            content: ContentId::derive(&[b""]),
+            facts: vec![],
+            ..analysis(b"")
+        };
+        let changed =
+            Arc::new(Document::capture(workspace(), "z.rs".into(), b"", vec![changed]).unwrap());
+        assert_ne!(
+            Snapshot::new(workspace(), vec![changed]).unwrap().id(),
+            first.id()
+        );
+    }
+
+    #[test]
+    fn validates_empty_spans_duplicate_keys_and_unsupported_encoding() {
+        for path in ["", "a\\b.rs", "/a.rs", "a//b.rs", "./a.rs"] {
+            assert!(Document::capture(workspace(), path.into(), b"", vec![]).is_err());
+        }
+        let mut a = analysis(b"fn f() {}");
+        a.facts[0].span = 0..0;
+        assert!(Document::capture(workspace(), "a.rs".into(), b"fn f() {}", vec![a]).is_err());
+        let mut a = analysis(b"fn f() {}");
+        a.facts.push(a.facts[0].clone());
+        assert!(Document::capture(workspace(), "a.rs".into(), b"fn f() {}", vec![a]).is_err());
+        let mut a = analysis(&[0xff]);
+        a.facts.clear();
+        assert!(Document::capture(workspace(), "a.rs".into(), &[0xff], vec![a.clone()]).is_err());
+        a.coverage = Coverage::Unavailable;
+        let unsupported = Document::capture(workspace(), "a.rs".into(), &[0xff], vec![a]).unwrap();
+        assert_eq!(unsupported.source(), None);
+        assert_eq!(unsupported.bytes(), 1);
+        let a = Document::capture(
+            workspace(),
+            "a.rs".into(),
+            b"// first\n// next\nfn f() {}\n",
+            vec![],
+        )
+        .unwrap();
+        assert_eq!(a.bytes(), 27);
+        assert_eq!(a.lines(&(17..26)), 3..3);
+        assert_eq!(a.lines(&(0..9)), 1..1);
+        assert_eq!(a.lines(&(9..17)), 2..2);
+        assert_eq!(a.lines(&(26..27)), 3..3);
+    }
+}

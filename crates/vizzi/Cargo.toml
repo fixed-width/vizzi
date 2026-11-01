@@ -1,0 +1,23 @@
+[package]
+name = "vizzi"
+version = "0.1.0"
+edition.workspace = true
+publish = false
+
+[lints]
+workspace = true
+
+[dependencies]
+vizzi-core = { path = "../vizzi-core" }
+blake3.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+notify.workspace = true
+tempfile.workspace = true
+axum.workspace = true
+tokio.workspace = true
+tower.workspace = true
+
+[dev-dependencies]
+http-body-util.workspace = true

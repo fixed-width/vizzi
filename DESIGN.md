@@ -67,3 +67,6 @@ The rendering backend, storage engine, supported compiler version, and concrete 
 protocol remain to be selected. Record their rationale here as the design develops;
 keep task sequencing and completion evidence in a separate implementation plan when
 one is needed.
+
+The first end-to-end slice is specified in [the workspace behaviour contract](docs/prototype/PRODUCT.md)
+and [the technical contract](docs/prototype/TECH.md).

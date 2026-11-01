@@ -1,0 +1,55 @@
+:root { color-scheme: light; font-family: "Noto Sans", "DejaVu Sans", sans-serif; color: #183044; background: #f3f6f9; font-size: 13px; }
+* { box-sizing: border-box; }
+body { margin: 0; height: 100dvh; display: flex; flex-direction: column; }
+button, input { font: inherit; }
+button { cursor: pointer; border: 1px solid #cbd6df; border-radius: 4px; padding: 7px 11px; color: #183044; background: white; }
+button:hover { background: #eaf0f8; }
+:focus-visible { outline: 3px solid #265dc5; outline-offset: 2px; }
+header { height: 64px; flex: 0 0 auto; padding: 0 24px; display: flex; align-items: center; gap: 28px; border-bottom: 1px solid #cdd8e2; background: white; }
+.brand { font-size: 23px; font-weight: 750; text-decoration: none; color: #183044; letter-spacing: -1px; }
+.brand span { font-size: 12px; font-weight: 400; color: #6b7c8f; letter-spacing: 0; margin-left: 12px; }
+#workspace { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#status { margin-left: auto; color: #526a7e; font-size: 12px; }
+main { min-height: 0; flex: 1; display: grid; grid-template-columns: minmax(320px, 43%) minmax(480px, 1fr); }
+.map-panel, .inspector { min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+.map-panel { padding: 24px 20px 0 24px; border-right: 1px solid #cdd8e2; }
+.inspector { background: white; }
+.panel-heading { display: flex; gap: 10px; align-items: center; justify-content: space-between; min-width: 0; }
+h1, h2 { margin: 0; font-size: 18px; letter-spacing: -.35px; font-weight: 650; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+h2 { font-family: "DejaVu Sans Mono", monospace; font-size: 13px; letter-spacing: -.2px; }
+.panel-heading > div { min-width: 0; }
+.panel-heading p { margin: 7px 0 0; color: #6b7c8f; font-size: 11px; }
+.search { display: flex; align-items: center; gap: 14px; padding: 20px 0 16px; font-size: 11px; color: #526a7e; }
+input { flex: 1; width: 0; border: 1px solid #c3d1dc; background: white; border-radius: 4px; padding: 9px 11px; color: #183044; }
+.map-surface { flex: 1; min-height: 220px; position: relative; overflow: hidden; border: 1px solid #d4dee7; background: #edf2f7; border-radius: 5px; }
+canvas { width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+canvas:active { cursor: grabbing; }
+#tooltip { position: absolute; pointer-events: none; max-width: 90%; padding: 9px 11px; background: #183044; color: white; border-radius: 4px; font-size: 11px; white-space: pre-wrap; overflow-wrap: anywhere; box-shadow: 0 3px 12px #18304425; }
+#empty { position: absolute; inset: 40% 18px auto; text-align: center; color: #6b7c8f; pointer-events: none; }
+.map-footer { display: flex; justify-content: space-between; gap: 15px; padding: 12px 0; font-size: 10px; color: #6b7c8f; }
+details { border-top: 1px solid #d4dee7; padding: 10px 0 13px; font-size: 11px; }
+summary { cursor: pointer; }
+#file-list { max-height: 150px; overflow: auto; padding-top: 8px; }
+#file-list button { display: block; width: 100%; border: 0; text-align: left; font-family: monospace; font-size: 11px; overflow-wrap: anywhere; }
+.inspector > .panel-heading { min-height: 87px; padding: 20px 22px; border-bottom: 1px solid #dce4eb; }
+#snapshot { white-space: nowrap; font: 10px "DejaVu Sans Mono", monospace; color: #6b7c8f; }
+#diagnostics { margin: 0; padding: 10px 20px; font-size: 11px; color: #7a500b; background: #fff5dd; border-bottom: 1px solid #ead9b0; }
+.source-layout { display: grid; grid-template-columns: 175px minmax(0, 1fr); min-height: 0; flex: 1; }
+.outline { border-right: 1px solid #e1e7ed; overflow: auto; padding: 16px 10px; }
+h3 { margin: 0 7px 13px; font-size: 11px; font-weight: 650; color: #6b7c8f; }
+.outline button { border: 0; padding: 8px 7px; text-align: left; width: 100%; display: block; background: transparent; font: 11px "DejaVu Sans Mono", monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.outline button:hover { background: #eef3fa; }
+.outline button[aria-current="true"] { background: #e2ecff; color: #174dad; }
+.outline small { display: block; font: 9px "Noto Sans", sans-serif; color: #6b7c8f; padding-top: 4px; }
+.outline p { color: #6b7c8f; margin: 7px; font-size: 11px; }
+#source { position: relative; overflow: auto; min-height: 0; font: 11px/22px "DejaVu Sans Mono", monospace; tab-size: 4; }
+#source-space { position: relative; min-width: 100%; width: max-content; }
+.code-line { position: absolute; height: 22px; white-space: pre; min-width: 100%; padding-right: 22px; }
+.code-line.active { background: #edf3ff; }
+.line-no { display: inline-block; width: 60px; padding-right: 14px; text-align: right; color: #8c9aaa; user-select: none; }
+.source-empty { padding: 24px; color: #6b7c8f; font-family: "Noto Sans", sans-serif; }
+footer { min-height: 36px; padding: 10px 24px; border-top: 1px solid #cdd8e2; display: flex; justify-content: space-between; gap: 14px; font-size: 10px; color: #6b7c8f; }
+#error { position: fixed; bottom: 46px; left: 24px; right: 24px; padding: 12px 16px; color: #803b2b; background: #fff1ed; border: 1px solid #e8b8a8; border-radius: 4px; }
+[hidden] { display: none !important; }
+@media (max-width: 1000px) { main { grid-template-columns: minmax(280px, 40%) minmax(400px, 1fr); } .brand span { display: none; } .source-layout { grid-template-columns: 130px minmax(0, 1fr); } .map-footer span:last-child { display: none; } }
+@media (max-width: 740px) { body { height: auto; min-height: 100dvh; } main { display: flex; flex-direction: column; } .map-panel { min-height: 500px; border-right: 0; } .inspector { height: 650px; } header { padding: 0 16px; gap: 16px; } footer { flex-direction: column; } }

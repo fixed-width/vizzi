@@ -8,6 +8,8 @@ version remains undecided. Run commands from the repository root.
 Recorded observations are in [the initial report](RESULTS.md) and
 [the repository parsing and event report](SECOND_RESULTS.md). File-level worker-pool
 scaling is recorded in [the parallel parsing report](PARALLEL_RESULTS.md).
+The coordinated-view application's cache and live refresh measurements are recorded
+in [the application report](../prototype/RESULTS.md).
 
 ## Build the executables
 
