@@ -221,7 +221,8 @@ async function qualify(chromium, definition) {
     const final = await (await fetch(`${host.url}/api/view`)).json();
     return { name: definition.name, revision: definition.revision, originalSourceManifestSha256: manifest.digest("hex"), rustFiles: files.length, sourceBytes: files.reduce((sum, file) => sum + file.bytes, 0),
       overviewFiles: final.files.length, heavyFiles: heavy.map(file => ({ path: file.path.slice(input.root.length + 1), bytes: file.bytes })),
-      runs, picking, editLatency, heap, webgpu, screenshot, nativeRss: await sampleRss(host.pid), errors: session.errors };
+      runs, picking, editLatency, heap, webgpu, screenshot, nativeRss: await sampleRss(host.pid), errors: session.errors,
+      browserRequests: Object.fromEntries([...new Set(session.requests)].map(path => [path, session.requests.filter(value => value === path).length])) };
   } finally { await session?.close(); await host?.close(); await input.close(); }
 }
 

@@ -36,7 +36,7 @@ impl Host {
                 .unwrap_or_default()
                 .to_string_lossy()
                 .into(),
-        ));
+        )?);
         let (signal, receive) = mpsc::sync_channel(1);
         let callback_app = application.clone();
         let callback_signal = signal.clone();
@@ -174,6 +174,7 @@ fn observe(
 impl Drop for Host {
     fn drop(&mut self) {
         self.stop.store(true, Ordering::Release);
+        self.application.close_updates();
         let _ = self.signal.try_send(());
         if let Some(task) = self.task.take() {
             let _ = task.join();
@@ -185,7 +186,7 @@ impl Drop for Host {
 pub fn one_shot(engine: &Engine) -> Result<Arc<Application>, EngineError> {
     let app = Arc::new(Application::new(
         engine.directory().root().display().to_string(),
-    ));
+    )?);
     let ticket = app.request();
     let refresh: Refresh = engine
         .refresh(None, &|| false)?

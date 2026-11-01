@@ -61,7 +61,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         return Ok(());
     }
     let host = Host::start(engine)?;
-    let router = vizzi::server::router(host.application());
+    let application = host.application();
+    let router = vizzi::server::router(application.clone());
     if stdio {
         let stdin = std::io::stdin();
         let mut stdout = std::io::stdout().lock();
@@ -99,8 +100,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let listener = tokio::net::TcpListener::bind((std::net::Ipv4Addr::LOCALHOST, port)).await?;
         eprintln!("Vizzi: http://{}", listener.local_addr()?);
         axum::serve(listener, router)
-            .with_graceful_shutdown(async {
+            .with_graceful_shutdown(async move {
                 let _ = tokio::signal::ctrl_c().await;
+                application.close_updates();
             })
             .await?;
     }

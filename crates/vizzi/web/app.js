@@ -1,4 +1,5 @@
 import { createController } from "/controller.js";
+import { followChanges } from "/updates.js";
 
 const element = id => document.getElementById(id);
 const canvas = element("map"), context = canvas.getContext("2d");
@@ -8,11 +9,12 @@ window.vizziMetrics = metrics;
 function sample(series, value) { series.push(value); if (series.length > 512) series.shift(); }
 let view = null, lines = [], active = null, camera = { x: 20, y: 20, scale: 1 };
 let scheduled = false, drag = null, previousFrame = null, filterTimer = null;
+let updates;
 
 const controller = createController({
-  transport: async uri => {
+  transport: async (uri, options) => {
     const start = performance.now();
-    try { const response = await fetch(uri); if (!response.ok) throw new Error(await response.text()); return await response.json(); }
+    try { const response = await fetch(uri, options); if (!response.ok) throw new Error(await response.text()); return await response.json(); }
     finally { sample(metrics.requestMs, performance.now() - start); }
   },
   onView: next => {
@@ -20,7 +22,6 @@ const controller = createController({
     const changedEntity = view?.selection.entity !== next.selection.entity;
     const changedSource = changedFile || view?.source?.text !== next.source?.text;
     view = next;
-    element("error").hidden = true;
     element("counts").textContent = `${next.files.length} shown / ${next.matching} matching / ${next.total} Rust files`;
     element("empty").hidden = next.files.length > 0;
     element("file-title").textContent = next.source?.path ?? "Choose a file";
@@ -63,6 +64,7 @@ const controller = createController({
     else element("error").hidden = true;
   },
   onError: showError,
+  onResync: () => updates?.restart(),
 });
 function showError(error) { element("error").textContent = `${error.message || error} · Keeping the last captured view; retrying.`; element("error").hidden = false; }
 
@@ -168,5 +170,4 @@ source.addEventListener("scroll", renderSource, { passive: true });
 const viewportObserver = new ResizeObserver(() => { invalidate(); renderSource(); });
 viewportObserver.observe(canvas);
 viewportObserver.observe(source);
-async function tick() { await controller.poll(); setTimeout(tick, document.hidden ? 2000 : 500); }
-tick();
+updates = followChanges({ session: () => controller.updates() });

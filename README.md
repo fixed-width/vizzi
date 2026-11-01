@@ -12,6 +12,7 @@ validating coordination; it does not qualify large-codebase GPU performance.
 - [Architecture and scope](DESIGN.md)
 - [First-slice behaviour](docs/prototype/PRODUCT.md) and [technical contract](docs/prototype/TECH.md)
 - [Host API reference](docs/prototype/API.md)
+- [Change-notification contract](docs/prototype/CHANGES.md)
 - [Application measurement procedure](experiments/prototype/README.md)
 - [Browser validation and measurements](experiments/browser/README.md)
 - [Earlier performance experiments](experiments/performance/README.md)

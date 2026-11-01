@@ -132,17 +132,26 @@ test("opening the file list resizes the canvas with its viewport", async () => {
   } finally { await session.close(); }
 });
 
-test("a recovered connection clears the error without requiring a source edit", async () => {
+test("a live client resynchronises after host restart without polling or losing selection", async () => {
   const session = await openWorkspace(chromium, host);
   const { page } = session;
   try {
+    await page.locator("summary").click();
+    await page.getByRole("button", { name: "src/b.rs", exact: true }).click();
+    await page.getByRole("button", { name: /^beta/ }).click();
+    await page.waitForFunction(() => document.querySelector('#outline [aria-current="true"]')?.textContent.startsWith("beta"));
     const before = await page.locator("#file-title").textContent();
-    const abort = route => route.abort();
-    await page.route("**/api/**", abort);
+    const port = new URL(host.url).port;
+    await host.close();
     await page.locator("#error").waitFor({ state: "visible" });
     assert.equal(await page.locator("#file-title").textContent(), before);
-    await page.unroute("**/api/**", abort);
-    await page.locator("#error").waitFor({ state: "hidden", timeout: 3000 });
+    await writeFile(join(input.root, "src/b.rs"), "// changed while disconnected\nfn beta() {}");
+    host = await startHost(input, 4, port);
+    await page.locator("#error").waitFor({ state: "hidden", timeout: 5000 });
+    await page.waitForFunction(() => document.getElementById("source").textContent.includes("changed while disconnected"));
+    assert.ok((await page.locator("#outline [aria-current=true]").textContent()).startsWith("beta"));
+    assert.equal(session.requests.filter(path => path === "/api/status").length, 0);
+    assert.ok(session.requests.filter(path => path === "/api/events").length >= 2);
   } finally { await session.close(); }
 });
 

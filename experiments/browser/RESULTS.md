@@ -1,5 +1,8 @@
 # Browser interaction measurements
 
+This is the polling-era baseline. Subsequent [notification measurements](NOTIFICATIONS_RESULTS.md)
+repeat the workload after replacing browser polling with latest-state subscriptions.
+
 Actual Chromium now exercises the linked reference view with both software rendering
 and Intel Iris Xe acceleration. During background refresh, synthetic-workspace CPU
 draw-submission p99 was **1.1 ms in SwiftShader** and **1.2 ms in Intel Chromium**,

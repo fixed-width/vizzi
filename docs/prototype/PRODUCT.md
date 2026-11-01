@@ -23,6 +23,9 @@ engine and works without a project build or external account.
   Explicitly selecting a declaration, including the current one, reveals its lines.
 - A source edit triggers analysis and publishes a complete replacement snapshot.
   Queries continue to use the previous snapshot while work is in progress.
+- Versioned change notifications replace browser polling. Reconnection starts with
+  current state, including after a host restart; slow clients need no event replay.
+  A response for a superseded snapshot cannot change the selection or displayed source.
 - Unchanged contents reuse analysis. A fresh process can reuse persisted analysis.
   Cache corruption or an unavailable cache must not produce incorrect source views.
 - Syntax recovery and unavailable analysis are visible. The outline does not claim

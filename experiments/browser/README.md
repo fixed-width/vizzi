@@ -3,6 +3,7 @@
 Use this procedure to exercise the real browser UI and measure its reference renderer
 while the native engine refreshes source. It builds Vizzi itself; analysed projects are
 never built. Browser results and their limits are explained in [the report](RESULTS.md).
+The latest delivery measurements are in [the notification report](NOTIFICATIONS_RESULTS.md).
 
 ## Install and check
 
@@ -29,7 +30,9 @@ with `cargo build --release --offline -p vizzi`.
 against a real native HTTP host on an ephemeral loopback port. Tests cover readable
 labels, transformed map picking, linked source/outline selection, reader scroll
 continuity, source virtualisation, narrow layout, unsupported encoding, syntax recovery,
-literal source text, map resizing when the file list opens, and connection recovery. Temporary source/cache directories are
+literal source text, map resizing when the file list opens, and live-stream recovery
+after restarting a host with connected clients. The client makes no status-polling
+requests. Temporary source/cache directories are
 removed after each run.
 
 ## Check the actual rendering environment
@@ -66,7 +69,9 @@ both conditions. The driver submits trusted Playwright input at a target 60 Hz w
 bounded requests in flight. Raw submission and completion times expose actual cadence.
 It records independent rAF intervals, observed draw intervals, CPU draw submission,
 status-observed pending intervals, label counts, picking costs, heap samples, native
-RSS, and five single-file update observations. Screenshots accompany the JSON report.
+RSS, browser request counts, and five single-file update observations. The driver still
+queries status from Node to classify pending periods; this is separate from the
+browser client, which consumes change notifications. Screenshots accompany the JSON report.
 
 Use `--samples 1 --duration 1000` for a harness smoke test. Durations are milliseconds;
 allowed ranges are 1–10 samples and 1,000–30,000 ms. Existing reports and screenshots
@@ -85,12 +90,25 @@ actual adapter request separately.
 npm test -- --mutations
 ```
 
-Stryker tests the complete request-controller module using the Node behavioural tests.
+Stryker tests the complete request-controller and live-update adapter modules using
+the Node behavioural tests.
 The unmodified baseline must pass first. Its threshold rejects surviving mutants;
 timeouts are still reported separately from assertion failures. The
 [command runner](https://stryker-mutator.io/docs/stryker-js/configuration/#commandrunner-object)
 does not provide per-test coverage mapping. JSON output goes to
 `results/local/controller-mutation.json`. Painting, CSS, the native engine, and benchmark
 orchestration are outside this mutation scope; browser regressions have their own tests.
+
+For native delivery and its HTTP adapter:
+
+```sh
+cargo mutants -p vizzi --no-config \
+  --file 'crates/vizzi/src/{changes,application,server}.rs' \
+  --jobs 4 --timeout 15 --build-timeout 180 -- --lib
+```
+
+This scope covers initial delivery, coalescing, closure, stale publication, pinned views,
+and diagnostic limits. Tests exercise complete modules; unviable generated replacements
+are recorded separately from assertion failures.
 
 The existing [native checks](../prototype/README.md#verify-correctness) remain required.

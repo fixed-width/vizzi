@@ -19,6 +19,9 @@ use vizzi_core::{
 /// Native source/analysis failure; the host retains its previous snapshot.
 #[derive(Debug, thiserror::Error)]
 pub enum EngineError {
+    /// Creating a fresh notification stream identity failed.
+    #[error("cannot initialise change stream: {0}")]
+    Changes(#[from] getrandom::Error),
     /// Reading the source directory failed.
     #[error(transparent)]
     Io(#[from] std::io::Error),
@@ -30,7 +33,7 @@ pub enum EngineError {
     Configuration(String),
 }
 /// Measurements of an entire capture and analysis attempt.
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize)]
 pub struct Measurements {
     /// Captured Rust files.
     pub files: usize,

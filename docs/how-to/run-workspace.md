@@ -56,7 +56,9 @@ Send one request per line:
 
 Each response contains the same HTTP handler status, content type, and text body used
 by the browser. JSON bodies are encoded as strings inside the diagnostic envelope.
-See the [API reference](../prototype/API.md) for pinned source requests.
+The streaming `/api/events` endpoint is available through HTTP or native subscriptions;
+the finite diagnostic mode rejects it. See the [API reference](../prototype/API.md)
+for pinned source and view requests.
 
 ## Handle a failed refresh
 

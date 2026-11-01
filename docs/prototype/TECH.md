@@ -14,6 +14,9 @@ vertical slice; the performance experiment crate remains independent.
   offsets; line ranges are derived from the captured source.
 - The native `vizzi` host captures source, runs bounded analyzer workers, persists
   analysis, coordinates refresh requests, and owns published snapshots.
+- Its `changes` module retains one versioned status for independent native subscriptions.
+  Application mutations update it under the publication lock; HTTP serialisation and
+  client queries happen outside that lock. Each application gets a fresh stream identity.
 - HTTP and stdio diagnostics adapt the same application operations. Browser code owns
   input handling, painting, and transport state, with no source-analysis implementation.
 
@@ -63,12 +66,19 @@ parse is not interruptible in this slice. Parsing never holds the publication lo
   from one snapshot. File and declaration identities are opaque query parameters.
 - `GET /api/source` supports an explicitly pinned snapshot and file identity. Unknown
   or expired snapshots fail explicitly.
+- `GET /api/events` adapts the native subscription to SSE. Every connection starts at
+  current state; slow clients can skip intermediate metadata without an event log.
+  View requests can also pin their snapshot, returning 409 if it has expired.
 - The diagnostic host accepts JSON lines carrying an id and request URI, and returns
   the HTTP status, content type, and text body from those same handlers.
 
-The browser polls small status records and reloads a view on publication or user action.
-Opaque request tokens reject older responses. Source lines are virtualised; map geometry is
-supplied by Rust, with visible-item painting and hit testing in the host adapter.
+The browser consumes versioned status notifications and reloads a pinned view on
+publication or user action. Opaque request/connection tokens reject obsolete results;
+new notifications coalesce while a fetch is pending. Fetch failure or stream loss
+initiates bounded reconnection, without a periodic status poll. Explicit stream closure
+unblocks active HTTP responses during shutdown. See the [notification contract](CHANGES.md).
+Source lines are virtualised; map geometry is supplied by Rust, with visible-item painting
+and hit testing in the host adapter.
 
 ## Rendering and validation scope
 

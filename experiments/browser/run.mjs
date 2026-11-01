@@ -18,7 +18,7 @@ if (process.argv.includes("--install-browser")) {
 } else if (process.argv.includes("--measure")) {
   await import("./measure.mjs");
 } else {
-  for (const file of ["crates/vizzi/web/controller.test.js", "experiments/browser/statistics.test.mjs", "experiments/browser/browser.test.mjs"]) {
+  for (const file of ["crates/vizzi/web/controller.test.js", "crates/vizzi/web/updates.test.js", "experiments/browser/statistics.test.mjs", "experiments/browser/browser.test.mjs"]) {
     const result = spawnSync(process.execPath, [file], { stdio: "inherit" });
     if (result.status !== 0) process.exit(result.status ?? 1);
   }

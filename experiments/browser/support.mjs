@@ -23,8 +23,8 @@ export async function workspace({ files, source, name = "source" } = {}) {
   return { root, cache, close: () => rm(temporary, { recursive: true, force: true }) };
 }
 
-export async function startHost(input, workers = 4) {
-  const child = spawn(resolve("target/release/vizzi"), ["--root", input.root, "--cache", input.cache, "--port", "0", "--workers", String(workers)], { stdio: ["ignore", "ignore", "pipe"] });
+export async function startHost(input, workers = 4, port = 0) {
+  const child = spawn(resolve("target/release/vizzi"), ["--root", input.root, "--cache", input.cache, "--port", String(port), "--workers", String(workers)], { stdio: ["ignore", "ignore", "pipe"] });
   let stderr = "";
   const url = await new Promise((accept, reject) => {
     const timeout = setTimeout(() => { child.kill("SIGKILL"); reject(new Error(`Host startup timed out: ${stderr}`)); }, 30000);
@@ -44,7 +44,10 @@ export async function startHost(input, workers = 4) {
       const exited = once(child, "exit");
       const timeout = setTimeout(() => child.kill("SIGKILL"), 5000);
       child.kill("SIGINT");
-      try { await exited; } finally { clearTimeout(timeout); }
+      try {
+        const [code, signal] = await exited;
+        if (code !== 0 || signal !== null) throw new Error(`Host did not stop gracefully: ${code}/${signal}`);
+      } finally { clearTimeout(timeout); }
     },
   };
 }
@@ -56,7 +59,8 @@ export async function browser() {
 export async function openWorkspace(browser, host, viewport = { width: 1440, height: 900 }) {
   const context = await browser.newContext({ viewport, deviceScaleFactor: 1 });
   const page = await context.newPage();
-  const errors = [];
+  const errors = [], requests = [];
+  page.on("request", request => { const url = new URL(request.url()); if (url.pathname.startsWith("/api/")) requests.push(url.pathname); });
   page.on("pageerror", error => errors.push(error.message));
   await page.route("**/*", route => {
     if (new URL(route.request().url()).origin === host.url) return route.continue();
@@ -64,7 +68,7 @@ export async function openWorkspace(browser, host, viewport = { width: 1440, hei
   });
   await page.goto(host.url);
   await page.waitForFunction(() => document.getElementById("snapshot").textContent.length === 8);
-  return { page, errors, close: () => context.close() };
+  return { page, errors, requests, close: () => context.close() };
 }
 
 export async function paint(page) {

@@ -6,7 +6,10 @@ use axum::{
     body::Body,
     extract::{Query, State},
     http::{StatusCode, header},
-    response::{IntoResponse, Response},
+    response::{
+        IntoResponse, Response,
+        sse::{Event, KeepAlive, Sse},
+    },
     routing::get,
 };
 use serde::Deserialize;
@@ -19,9 +22,11 @@ type ApiError = (StatusCode, String);
 pub fn router(application: Arc<Application>) -> Router {
     Router::new()
         .route("/api/status", get(status)).route("/api/view", get(view)).route("/api/source", get(source))
+        .route("/api/events", get(events))
         .route("/", get(|| async { asset("text/html; charset=utf-8", include_str!("../web/index.html")) }))
         .route("/app.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/app.js")) }))
         .route("/controller.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/controller.js")) }))
+        .route("/updates.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/updates.js")) }))
         .route("/app.css", get(|| async { asset("text/css; charset=utf-8", include_str!("../web/app.css")) }))
         .layer(axum::middleware::map_response(|mut response: Response| async move {
             response.headers_mut().insert(header::CACHE_CONTROL, header::HeaderValue::from_static("no-store"));
@@ -34,14 +39,37 @@ pub fn router(application: Arc<Application>) -> Router {
 async fn status(State(app): State<Arc<Application>>) -> Json<crate::application::Status> {
     Json(app.status())
 }
+async fn events(State(app): State<Arc<Application>>) -> impl IntoResponse {
+    let stream = futures_util::stream::unfold(app.subscribe(), |mut subscription| async move {
+        let change = subscription.next().await?;
+        let event = Event::default()
+            .event("workspace")
+            .id(change.id())
+            .json_data(&*change);
+        Some((event, subscription))
+    });
+    Sse::new(stream).keep_alive(KeepAlive::default())
+}
+#[derive(Deserialize)]
+struct VersionQuery {
+    snapshot: Option<String>,
+}
 async fn view(
     State(app): State<Arc<Application>>,
+    Query(version): Query<VersionQuery>,
     Query(query): Query<ViewQuery>,
 ) -> Result<Json<View>, ApiError> {
-    let snapshot = app.snapshot().ok_or((
-        StatusCode::SERVICE_UNAVAILABLE,
-        "Initial capture is not ready".into(),
-    ))?;
+    let snapshot = if let Some(id) = version.snapshot {
+        app.pinned(&id).ok_or((
+            StatusCode::CONFLICT,
+            "Snapshot expired or unknown; resynchronise updates".into(),
+        ))?
+    } else {
+        app.snapshot().ok_or((
+            StatusCode::SERVICE_UNAVAILABLE,
+            "Initial capture is not ready".into(),
+        ))?
+    };
     Ok(Json(snapshot.view(&query)))
 }
 #[derive(Deserialize)]
@@ -91,6 +119,9 @@ pub async fn diagnostic(
     let request = axum::http::Request::builder()
         .uri(uri)
         .body(Body::empty())?;
+    if request.uri().path() == "/api/events" {
+        return Ok(DiagnosticResponse { id, status: 400, content_type: "text/plain".into(), body: "Event streaming requires HTTP or a native subscription; diagnostics return finite bodies".into() });
+    }
     let response = router.oneshot(request).await?;
     let status = response.status().as_u16();
     let content_type = response
@@ -127,7 +158,7 @@ mod tests {
             1,
         )
         .unwrap();
-        let application = Arc::new(Application::new("fixture".into()));
+        let application = Arc::new(Application::new("fixture".into()).unwrap());
         let ticket = application.request();
         application.publish(ticket, engine.refresh(None, &|| false).unwrap().unwrap());
         let router = router(application.clone());
@@ -159,6 +190,28 @@ mod tests {
             serde_json::from_str::<serde_json::Value>(&pinned.body).unwrap()["text"],
             "fn original() {}"
         );
+        let pinned_view = diagnostic(
+            router.clone(),
+            serde_json::json!(6),
+            &pinned_uri.replacen("/api/source", "/api/view", 1),
+        )
+        .await
+        .unwrap();
+        assert_eq!(
+            serde_json::from_str::<serde_json::Value>(&pinned_view.body).unwrap()["source"]["text"],
+            "fn original() {}"
+        );
+        assert_eq!(
+            diagnostic(
+                router.clone(),
+                serde_json::Value::Null,
+                "/api/view?snapshot=expired"
+            )
+            .await
+            .unwrap()
+            .status,
+            409
+        );
         let expired = diagnostic(
             router.clone(),
             serde_json::json!(3),
@@ -183,5 +236,107 @@ mod tests {
                 .status,
             404
         );
+    }
+
+    #[tokio::test]
+    async fn event_stream_delivers_latest_state_and_finishes_on_shutdown() {
+        use futures_util::FutureExt;
+        use http_body_util::BodyExt;
+        use tower::ServiceExt;
+        let app = Arc::new(Application::new("events".into()).unwrap());
+        let response = router(app.clone())
+            .oneshot(
+                axum::http::Request::builder()
+                    .uri("/api/events")
+                    .header("Last-Event-ID", "obsolete:900")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), 200);
+        assert_eq!(
+            response.headers()[header::CONTENT_TYPE],
+            "text/event-stream"
+        );
+        let mut body = response.into_body();
+        let first = body
+            .frame()
+            .now_or_never()
+            .expect("stream frame should be ready")
+            .unwrap()
+            .unwrap()
+            .into_data()
+            .unwrap();
+        let first = std::str::from_utf8(&first).unwrap();
+        assert!(first.contains("event: workspace"));
+        let notification: serde_json::Value = serde_json::from_str(
+            first
+                .lines()
+                .find_map(|line| line.strip_prefix("data: "))
+                .unwrap(),
+        )
+        .unwrap();
+        assert_eq!(notification["revision"], "0");
+        assert_eq!(notification["status"]["name"], "events");
+        assert!(first.contains(&format!(
+            "id: {}:0",
+            notification["stream"].as_str().unwrap()
+        )));
+        app.request();
+        app.observation("ready".into());
+        let next = body
+            .frame()
+            .now_or_never()
+            .expect("stream frame should be ready")
+            .unwrap()
+            .unwrap()
+            .into_data()
+            .unwrap();
+        let next = std::str::from_utf8(&next).unwrap();
+        let next: serde_json::Value = serde_json::from_str(
+            next.lines()
+                .find_map(|line| line.strip_prefix("data: "))
+                .unwrap(),
+        )
+        .unwrap();
+        assert_eq!(next["revision"], "2");
+        assert_eq!(next["status"]["pending"], true);
+        assert_eq!(next["status"]["observation"], "ready");
+        app.close_updates();
+        assert!(
+            body.frame()
+                .now_or_never()
+                .expect("stream frame should be ready")
+                .is_none()
+        );
+    }
+
+    #[tokio::test]
+    async fn diagnostics_reject_an_unbounded_stream() {
+        let app = Arc::new(Application::new("events".into()).unwrap());
+        let response = diagnostic(router(app), serde_json::json!(9), "/api/events?ignored=1")
+            .await
+            .unwrap();
+        assert_eq!(response.id, 9);
+        assert_eq!(response.status, 400);
+        assert!(response.body.contains("stream"));
+    }
+
+    #[tokio::test]
+    async fn diagnostic_bodies_can_exceed_one_megabyte() {
+        let data = "x".repeat(2 * 1024 * 1024);
+        let route = Router::new().route(
+            "/large",
+            get(move || {
+                let data = data.clone();
+                async move { data }
+            }),
+        );
+        let response = diagnostic(route, serde_json::json!(1), "/large")
+            .await
+            .unwrap();
+        assert_eq!(response.status, 200);
+        assert_eq!(response.body.len(), 2 * 1024 * 1024);
     }
 }

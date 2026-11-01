@@ -1470,6 +1470,8 @@ version = "0.1.0"
 dependencies = [
  "axum",
  "blake3",
+ "futures-util",
+ "getrandom",
  "http-body-util",
  "notify",
  "serde",

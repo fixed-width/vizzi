@@ -1,0 +1,121 @@
+{
+  "tool": "cargo-mutants 27.1.0",
+  "baseline": "passed",
+  "scope": [
+    "crates/vizzi/src/changes.rs",
+    "crates/vizzi/src/application.rs",
+    "crates/vizzi/src/server.rs"
+  ],
+  "counts": {
+    "Unviable": 26,
+    "CaughtMutant": 26
+  },
+  "tested": 52,
+  "exclusions": [],
+  "non_caught": [
+    {
+      "name": "crates/vizzi/src/application.rs:69:9: replace Application::inner -> MutexGuard<'_, Inner> with MutexGuard::new()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/application.rs:69:9: replace Application::inner -> MutexGuard<'_, Inner> with MutexGuard::from_iter([Default::default()])",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/application.rs:87:9: replace Application::snapshot -> Option<Arc<Snapshot>> with Some(Arc::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/application.rs:91:9: replace Application::pinned -> Option<Arc<Snapshot>> with Some(Arc::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/application.rs:95:9: replace Application::publish -> Outcome with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/application.rs:69:9: replace Application::inner -> MutexGuard<'_, Inner> with MutexGuard::new(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/application.rs:69:9: replace Application::inner -> MutexGuard<'_, Inner> with MutexGuard::from(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/application.rs:121:9: replace Application::status -> Status with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/application.rs:125:9: replace Application::subscribe -> Subscription with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/application.rs:134:5: replace status -> Status with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/changes.rs:28:5: replace decimal -> Result<S::Ok, S::Error> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/changes.rs:65:9: replace Changes::subscribe -> Subscription with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/changes.rs:85:9: replace Subscription::next -> Option<Arc<Change>> with Some(Arc::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:40:5: replace status -> Json<crate::application::Status> with Json::from_iter([Default::default()])",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:40:5: replace status -> Json<crate::application::Status> with Json::new()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:40:5: replace status -> Json<crate::application::Status> with Json::new(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:40:5: replace status -> Json<crate::application::Status> with Json::from(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:62:5: replace view -> Result<Json<View>, ApiError> with Ok(Json::from_iter([Default::default()]))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:62:5: replace view -> Result<Json<View>, ApiError> with Ok(Json::new())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:62:5: replace view -> Result<Json<View>, ApiError> with Ok(Json::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:62:5: replace view -> Result<Json<View>, ApiError> with Ok(Json::from(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:84:5: replace source -> Result<Json<serde_json::Value>, ApiError> with Ok(Json::new())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:84:5: replace source -> Result<Json<serde_json::Value>, ApiError> with Ok(Json::from_iter([Default::default()]))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:84:5: replace source -> Result<Json<serde_json::Value>, ApiError> with Ok(Json::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:84:5: replace source -> Result<Json<serde_json::Value>, ApiError> with Ok(Json::from(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:118:5: replace diagnostic -> Result<DiagnosticResponse, Box<dyn std::error::Error>> with Ok(Default::default())",
+      "outcome": "Unviable"
+    }
+  ]
+}
