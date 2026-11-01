@@ -1,0 +1,56 @@
+{
+  "recorded_at_utc": "2026-11-01T01:38:46.211458+00:00",
+  "documentation_commit": "f32e5ff9dfffd2a7ffe7ac5f763d5aff0078e7ab",
+  "harness_source_sha256": "ce58752d21473e61ba43845752d5c830203a5978fabe25d6aa6f6a7231700cc1",
+  "environment": {
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13700H",
+    "reported_memory_bytes": 67080241152,
+    "platform": "Linux-6.8.0-147-lowlatency-x86_64-with-glibc2.39",
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+    "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)",
+    "physical_gpu_exposed": false,
+    "own_build_and_mutation_jobs_finished_before_timing": true,
+    "other_system_load_and_power_settings": "uncontrolled"
+  },
+  "corpora": [
+    {
+      "name": "lpc-rs",
+      "revision": "8d3b1f54b36eae33f689bae3e42c716647000e4d",
+      "capture": "git archive from local checkout",
+      "measured": true,
+      "result": "lpc-rs.json"
+    },
+    {
+      "name": "synthetic-100k",
+      "capture": "generated 100000 distinct 1024-byte files, 100 files per directory",
+      "measured": true,
+      "result": "synthetic-100k.json"
+    },
+    {
+      "name": "linux",
+      "revision": "cbbddb6b08cc9900a87cccaa9b22bbe06aa4f50a",
+      "measured": false,
+      "reason": "archive download failed in this environment"
+    },
+    {
+      "name": "pytorch",
+      "revision": "64ef93aaaee3f39b5dcac9d0c8a49d4d6d92ca42",
+      "measured": false,
+      "reason": "archive download failed in this environment"
+    }
+  ],
+  "verification": {
+    "unit_tests_passed": 21,
+    "test_command": "cargo test --workspace --all-features --locked --offline",
+    "clippy": "passed, all targets and all features, warnings denied",
+    "format": "passed",
+    "mutation_result": "mutation.json",
+    "native_rendering": "executed on llvmpipe with explicit software opt-in",
+    "browser_and_wasm": "not tested",
+    "cli_integration_tests_passed": 3
+  },
+  "rendering_result": "software-rendering.json",
+  "interpretation": "Exploratory native calibration; does not qualify the integrated-GPU 16GB target. No language analysis, filesystem watching, or production index is implemented.",
+  "verification_source_sha256": "a742e102892a2115a7dc5cf936563d0231b200b5544d051654eb22de5752fa2d",
+  "post_measurement_changes": "Added CLI integration tests and normalised trailing whitespace; runtime source implementations were unchanged."
+}

@@ -1,0 +1,34 @@
+{
+  "adapter": {
+    "backend": "Vulkan",
+    "device_type": "Cpu",
+    "driver": "llvmpipe",
+    "driver_info": "Mesa 25.2.8-0ubuntu0.24.04.4 (LLVM 20.1.2)",
+    "name": "llvmpipe (LLVM 20.1.2, 256 bits)"
+  },
+  "conditions": {
+    "build": "release",
+    "presentation": "offscreen; no browser, compositor, or vsync",
+    "scope": "unlabelled nodes and straight edges; no picking, layout updates, or multiple views",
+    "timing": "wall clock for uniform update, command encoding, submission, and completion wait; not GPU timestamps",
+    "warmup_frames": 5
+  },
+  "edges": 40000,
+  "experiment": "native_offscreen_calibration",
+  "hardware_baseline": false,
+  "height": 1080,
+  "labels": 0,
+  "nodes": 10000,
+  "scene_preparation_us": 697.859,
+  "status": "measured",
+  "synchronous_frame": {
+    "max_us": 112976.846,
+    "min_us": 93040.135,
+    "p50_us": 98824.819,
+    "p95_us": 106552.418,
+    "samples": 30
+  },
+  "upload_and_pipeline_setup_us": 1382.295,
+  "vertex_buffer_bytes": 800000,
+  "width": 1920
+}

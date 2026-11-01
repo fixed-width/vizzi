@@ -1,0 +1,63 @@
+{
+  "conditions": {
+    "analysis": "content fingerprints only; no parsing, semantic analysis, or dependency invalidation",
+    "arch": "x86_64",
+    "build": "release",
+    "excluded_root_directories": [
+      ".git",
+      "target",
+      "node_modules"
+    ],
+    "filesystem_cache": "uncontrolled; first observed scan is not a cold-cache measurement",
+    "manifest_cache": "JSON decoded from memory; disk loading is not measured",
+    "os": "linux",
+    "symlinks": "not followed",
+    "update_input": "supplied in-memory buffer; excludes event detection and disk reads"
+  },
+  "content_bytes": 11013197,
+  "experiment": "content_inventory",
+  "files": 1032,
+  "first_observed_scan_us": 16898.337,
+  "manifest_json_bytes": 176376,
+  "measurements": {
+    "discovery": {
+      "max_us": 2540.594,
+      "min_us": 2023.083,
+      "p50_us": 2278.299,
+      "p95_us": 2540.594,
+      "samples": 7
+    },
+    "manifest_json_decode": {
+      "max_us": 2559.714,
+      "min_us": 1939.698,
+      "p50_us": 2131.263,
+      "p95_us": 2559.714,
+      "samples": 7
+    },
+    "metadata_for_known_files": {
+      "max_us": 1727.421,
+      "min_us": 1170.546,
+      "p50_us": 1551.269,
+      "p95_us": 1727.421,
+      "samples": 7
+    },
+    "supplied_buffer_hash_and_update": {
+      "max_us": 11.175,
+      "min_us": 4.051,
+      "p50_us": 4.211,
+      "p95_us": 4.268,
+      "samples": 700
+    },
+    "verified_rescan_and_diff": {
+      "max_us": 18892.456,
+      "min_us": 15454.402,
+      "p50_us": 16331.656,
+      "p95_us": 18892.456,
+      "samples": 7
+    }
+  },
+  "schema_version": 1,
+  "source_root": "/tmp/vizzi-perf-corpus/lpc-rs",
+  "update_file": "benches/bench_arithmetic.rs",
+  "update_file_bytes": 4069
+}

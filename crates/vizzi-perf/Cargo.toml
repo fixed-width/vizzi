@@ -1,0 +1,26 @@
+[package]
+name = "vizzi-perf"
+version = "0.1.0"
+edition.workspace = true
+publish = false
+
+[lints]
+workspace = true
+
+[features]
+gpu = ["dep:wgpu", "dep:pollster"]
+
+[dependencies]
+blake3.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+wgpu = { workspace = true, optional = true }
+pollster = { workspace = true, optional = true }
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[[bin]]
+name = "vizzi-gpu"
+path = "src/bin/gpu.rs"
+required-features = ["gpu"]
