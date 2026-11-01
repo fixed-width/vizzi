@@ -1,0 +1,268 @@
+{
+  "actual_workers": 8,
+  "conditions": {
+    "build": "release",
+    "dependency_fingerprint": "afd82e7bc9634d2fb0d1a2c1aa07e0f01cc30f26d2541cb93cc3a1d5cf490eb2",
+    "excluded": "file discovery and sizing, baseline loading/writing, result comparison and JSON digest",
+    "memory": "process high-water RSS also includes baseline/result vectors and their serialization",
+    "phases": "summed worker phase wall durations, not CPU time or latency; may exceed pass wall time",
+    "pool": "new bounded scoped threads each pass; one parser per worker, reused across files",
+    "schedule": "dynamic atomic queue, descending source byte size with path tie-breaker",
+    "scope": "raw syntax only; no semantic analysis or retained whole-project trees",
+    "validation": "every file's path, content hash, byte count, and syntax counts match the sequential baseline; full AST shapes are not compared in this experiment",
+    "wall": "includes pool startup, parser setup, reads, parse, inspection, hashing, tree disposal, joins, and result sorting"
+  },
+  "content_bytes": 59694681,
+  "experiment": "parallel_syntax",
+  "files": 4876,
+  "files_with_syntax_recovery": 2079,
+  "language": "cpp",
+  "pass_wall": {
+    "max_us": 1783177.235,
+    "min_us": 1730007.166,
+    "p50_us": 1730041.34,
+    "p95_us": 1783177.235,
+    "samples": 3
+  },
+  "passes": [
+    {
+      "actual_workers": 8,
+      "summed_worker_phase_us": {
+        "inspect": 1283546.113,
+        "parse": 11503086.519,
+        "read": 377634.425
+      },
+      "validation_passed": true,
+      "wall_us": 1730041.34,
+      "workers": [
+        {
+          "bytes": 8519901,
+          "files": 189,
+          "inspect_us": 157750.592,
+          "parse_us": 1429785.394,
+          "read_us": 69727.231,
+          "worker": 0
+        },
+        {
+          "bytes": 5729416,
+          "files": 504,
+          "inspect_us": 154959.64,
+          "parse_us": 1467695.993,
+          "read_us": 30961.455,
+          "worker": 1
+        },
+        {
+          "bytes": 9086266,
+          "files": 725,
+          "inspect_us": 146816.953,
+          "parse_us": 1463083.061,
+          "read_us": 53552.641,
+          "worker": 2
+        },
+        {
+          "bytes": 8324272,
+          "files": 774,
+          "inspect_us": 146956.019,
+          "parse_us": 1466409.81,
+          "read_us": 32283.738,
+          "worker": 3
+        },
+        {
+          "bytes": 4707567,
+          "files": 450,
+          "inspect_us": 225596.466,
+          "parse_us": 1284930.34,
+          "read_us": 94962.573,
+          "worker": 4
+        },
+        {
+          "bytes": 7717704,
+          "files": 710,
+          "inspect_us": 148051.707,
+          "parse_us": 1465009.201,
+          "read_us": 31877.499,
+          "worker": 5
+        },
+        {
+          "bytes": 7120707,
+          "files": 754,
+          "inspect_us": 157208.043,
+          "parse_us": 1457176.948,
+          "read_us": 32785.003,
+          "worker": 6
+        },
+        {
+          "bytes": 8488848,
+          "files": 770,
+          "inspect_us": 146206.693,
+          "parse_us": 1468995.772,
+          "read_us": 31484.285,
+          "worker": 7
+        }
+      ]
+    },
+    {
+      "actual_workers": 8,
+      "summed_worker_phase_us": {
+        "inspect": 1300690.884,
+        "parse": 11894276.499,
+        "read": 241617.03
+      },
+      "validation_passed": true,
+      "wall_us": 1783177.235,
+      "workers": [
+        {
+          "bytes": 9208644,
+          "files": 439,
+          "inspect_us": 168114.645,
+          "parse_us": 1449539.803,
+          "read_us": 18892.013,
+          "worker": 0
+        },
+        {
+          "bytes": 7353596,
+          "files": 659,
+          "inspect_us": 171905.512,
+          "parse_us": 1477099.982,
+          "read_us": 25530.347,
+          "worker": 1
+        },
+        {
+          "bytes": 7018855,
+          "files": 595,
+          "inspect_us": 169689.208,
+          "parse_us": 1486433.046,
+          "read_us": 31982.944,
+          "worker": 2
+        },
+        {
+          "bytes": 7922626,
+          "files": 542,
+          "inspect_us": 159332.475,
+          "parse_us": 1498721.083,
+          "read_us": 36432.226,
+          "worker": 3
+        },
+        {
+          "bytes": 8440723,
+          "files": 739,
+          "inspect_us": 157049.601,
+          "parse_us": 1504435.79,
+          "read_us": 33177.627,
+          "worker": 4
+        },
+        {
+          "bytes": 5641021,
+          "files": 499,
+          "inspect_us": 163104.441,
+          "parse_us": 1499000.844,
+          "read_us": 31920.828,
+          "worker": 5
+        },
+        {
+          "bytes": 6650930,
+          "files": 676,
+          "inspect_us": 167908.185,
+          "parse_us": 1449885.393,
+          "read_us": 31257.089,
+          "worker": 6
+        },
+        {
+          "bytes": 7458286,
+          "files": 727,
+          "inspect_us": 143586.817,
+          "parse_us": 1529160.558,
+          "read_us": 32423.956,
+          "worker": 7
+        }
+      ]
+    },
+    {
+      "actual_workers": 8,
+      "summed_worker_phase_us": {
+        "inspect": 1181591.618,
+        "parse": 10971477.413,
+        "read": 244026.792
+      },
+      "validation_passed": true,
+      "wall_us": 1730007.166,
+      "workers": [
+        {
+          "bytes": 6437948,
+          "files": 770,
+          "inspect_us": 145525.637,
+          "parse_us": 1344423.718,
+          "read_us": 21993.734,
+          "worker": 0
+        },
+        {
+          "bytes": 6268540,
+          "files": 532,
+          "inspect_us": 153980.755,
+          "parse_us": 1334627.32,
+          "read_us": 32941.196,
+          "worker": 1
+        },
+        {
+          "bytes": 8416629,
+          "files": 1,
+          "inspect_us": 162237.657,
+          "parse_us": 1422907.089,
+          "read_us": 15301.085,
+          "worker": 2
+        },
+        {
+          "bytes": 6421431,
+          "files": 556,
+          "inspect_us": 147229.404,
+          "parse_us": 1365119.628,
+          "read_us": 30906.085,
+          "worker": 3
+        },
+        {
+          "bytes": 8616254,
+          "files": 820,
+          "inspect_us": 143723.949,
+          "parse_us": 1366178.889,
+          "read_us": 40935.342,
+          "worker": 4
+        },
+        {
+          "bytes": 7551442,
+          "files": 782,
+          "inspect_us": 145643.202,
+          "parse_us": 1367703.085,
+          "read_us": 39305.638,
+          "worker": 5
+        },
+        {
+          "bytes": 7903195,
+          "files": 635,
+          "inspect_us": 138807.852,
+          "parse_us": 1390835.685,
+          "read_us": 32125.386,
+          "worker": 6
+        },
+        {
+          "bytes": 8079242,
+          "files": 780,
+          "inspect_us": 144443.162,
+          "parse_us": 1379681.999,
+          "read_us": 30518.326,
+          "worker": 7
+        }
+      ]
+    }
+  ],
+  "requested_workers": 8,
+  "result_fingerprint": "e9e3651df22aa1deaa4f924070e4e5c624a0c8e28d9f71b54372f1dba0027a63",
+  "selection_and_sizing_us": 53999.904,
+  "source_root": "/tmp/vizzi-perf-corpus/pytorch-1f4d2d5e",
+  "syntax_counts": {
+    "errors": 14929,
+    "missing": 12432,
+    "named": 8872136,
+    "nodes": 14811672
+  },
+  "validation": "sequential_baseline"
+}

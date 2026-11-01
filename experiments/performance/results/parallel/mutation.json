@@ -1,0 +1,18 @@
+{
+  "total_mutants": 19,
+  "missed": 0,
+  "caught": 15,
+  "timeout": 0,
+  "unviable": 4,
+  "success": 0,
+  "start_time": "2026-11-01T04:09:03.469246894Z",
+  "end_time": "2026-11-01T04:09:26.535181722Z",
+  "cargo_mutants_version": "27.1.0",
+  "scope": "crates/vizzi-perf/src/parallel.rs only; CLI orchestration excluded",
+  "unviable_mutations": [
+    "crates/vizzi-perf/src/parallel.rs:46:20: replace += with *= in WorkerStats::record",
+    "crates/vizzi-perf/src/parallel.rs:47:22: replace += with *= in WorkerStats::record",
+    "crates/vizzi-perf/src/parallel.rs:48:25: replace += with *= in WorkerStats::record",
+    "crates/vizzi-perf/src/parallel.rs:133:5: replace worker_files -> Result<(Vec<ParsedFile>, WorkerStats), ParallelError> with Ok((vec![Default::default()], Default::default()))"
+  ]
+}

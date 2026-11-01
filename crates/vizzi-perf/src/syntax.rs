@@ -1,11 +1,11 @@
 //! Syntax-only parser experiments; no name resolution or semantic indexing.
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::path::Path;
 use tree_sitter::{InputEdit, Parser, Point, Tree};
 
 /// The grammar is chosen explicitly for each experiment.
-#[derive(Clone, Copy, Debug, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum SourceLanguage {
     /// Rust source.
@@ -133,7 +133,7 @@ pub fn reparse(
 }
 
 /// Syntax counts used to expose grammar errors in corpus measurements.
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SyntaxCounts {
     /// All syntax nodes, including punctuation.
     pub nodes: usize,

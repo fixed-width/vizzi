@@ -1,0 +1,3 @@
+pool pass 1/3: 1 workers, 4876 files, 9.269s wall
+pool pass 2/3: 1 workers, 4876 files, 8.363s wall
+pool pass 3/3: 1 workers, 4876 files, 9.403s wall

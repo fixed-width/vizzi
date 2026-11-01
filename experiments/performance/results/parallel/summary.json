@@ -1,0 +1,166 @@
+{
+  "rows": [
+    {
+      "corpus": "lpc-rust",
+      "workers": 1,
+      "samples": 3,
+      "wall_seconds": 0.912948196,
+      "speedup": 1.0,
+      "peak_rss_mib": 14.74609375
+    },
+    {
+      "corpus": "lpc-rust",
+      "workers": 2,
+      "samples": 3,
+      "wall_seconds": 0.505693935,
+      "speedup": 1.8053374438829288,
+      "peak_rss_mib": 20.07421875
+    },
+    {
+      "corpus": "lpc-rust",
+      "workers": 4,
+      "samples": 3,
+      "wall_seconds": 0.28758184000000003,
+      "speedup": 3.174568310711135,
+      "peak_rss_mib": 34.8359375
+    },
+    {
+      "corpus": "lpc-rust",
+      "workers": 8,
+      "samples": 3,
+      "wall_seconds": 0.184435178,
+      "speedup": 4.949967820130278,
+      "peak_rss_mib": 54.8671875
+    },
+    {
+      "corpus": "lpc-rust",
+      "workers": 16,
+      "samples": 3,
+      "wall_seconds": 0.141024583,
+      "speedup": 6.473681230456111,
+      "peak_rss_mib": 78.40625
+    },
+    {
+      "corpus": "pytorch-python",
+      "workers": 1,
+      "samples": 3,
+      "wall_seconds": 14.994132915,
+      "speedup": 1.0,
+      "peak_rss_mib": 44.34765625
+    },
+    {
+      "corpus": "pytorch-python",
+      "workers": 2,
+      "samples": 3,
+      "wall_seconds": 8.389693808,
+      "speedup": 1.787208598805159,
+      "peak_rss_mib": 71.3046875
+    },
+    {
+      "corpus": "pytorch-python",
+      "workers": 4,
+      "samples": 3,
+      "wall_seconds": 4.832996929999999,
+      "speedup": 3.1024503288894083,
+      "peak_rss_mib": 133.31640625
+    },
+    {
+      "corpus": "pytorch-python",
+      "workers": 8,
+      "samples": 3,
+      "wall_seconds": 3.048633087,
+      "speedup": 4.918313384099278,
+      "peak_rss_mib": 251.59375
+    },
+    {
+      "corpus": "pytorch-python",
+      "workers": 16,
+      "samples": 3,
+      "wall_seconds": 2.0501930379999997,
+      "speedup": 7.313522501094358,
+      "peak_rss_mib": 411.07421875
+    },
+    {
+      "corpus": "pytorch-cpp",
+      "workers": 1,
+      "samples": 3,
+      "wall_seconds": 9.269018327,
+      "speedup": 1.0,
+      "peak_rss_mib": 176.9609375
+    },
+    {
+      "corpus": "pytorch-cpp",
+      "workers": 2,
+      "samples": 3,
+      "wall_seconds": 5.0818916409999995,
+      "speedup": 1.8239307293014357,
+      "peak_rss_mib": 345.6796875
+    },
+    {
+      "corpus": "pytorch-cpp",
+      "workers": 4,
+      "samples": 3,
+      "wall_seconds": 2.75877264,
+      "speedup": 3.3598340771568616,
+      "peak_rss_mib": 432.078125
+    },
+    {
+      "corpus": "pytorch-cpp",
+      "workers": 8,
+      "samples": 3,
+      "wall_seconds": 1.73004134,
+      "speedup": 5.357686034831977,
+      "peak_rss_mib": 486.15625
+    },
+    {
+      "corpus": "pytorch-cpp",
+      "workers": 16,
+      "samples": 3,
+      "wall_seconds": 1.738626215,
+      "speedup": 5.331231202561845,
+      "peak_rss_mib": 619.26953125
+    },
+    {
+      "corpus": "linux-c",
+      "workers": 1,
+      "samples": 1,
+      "wall_seconds": 128.981191496,
+      "speedup": 1.0,
+      "peak_rss_mib": 109.34375
+    },
+    {
+      "corpus": "linux-c",
+      "workers": 2,
+      "samples": 1,
+      "wall_seconds": 70.537571348,
+      "speedup": 1.8285459653787342,
+      "peak_rss_mib": 162.109375
+    },
+    {
+      "corpus": "linux-c",
+      "workers": 4,
+      "samples": 1,
+      "wall_seconds": 40.367965338,
+      "speedup": 3.19513729305016,
+      "peak_rss_mib": 262.35546875
+    },
+    {
+      "corpus": "linux-c",
+      "workers": 8,
+      "samples": 1,
+      "wall_seconds": 25.003741891,
+      "speedup": 5.158475561708878,
+      "peak_rss_mib": 443.23828125
+    },
+    {
+      "corpus": "linux-c",
+      "workers": 16,
+      "samples": 1,
+      "wall_seconds": 18.570707945,
+      "speedup": 6.94541058305357,
+      "peak_rss_mib": 650.3515625
+    }
+  ],
+  "linux_baseline_repeat_seconds": 119.684736899,
+  "linux_baseline_drift_percent": -7.207604836933379
+}

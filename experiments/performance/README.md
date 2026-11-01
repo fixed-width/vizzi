@@ -6,7 +6,8 @@ toolchain; the recorded runs used Rust 1.99.1. The project's supported minimum c
 version remains undecided. Run commands from the repository root.
 
 Recorded observations are in [the initial report](RESULTS.md) and
-[the repository parsing and event report](SECOND_RESULTS.md).
+[the repository parsing and event report](SECOND_RESULTS.md). File-level worker-pool
+scaling is recorded in [the parallel parsing report](PARALLEL_RESULTS.md).
 
 ## Build the executables
 
@@ -88,6 +89,40 @@ separately. Preparation includes copying the buffer and calculating byte-oriente
 positions. Validation is outside the timed phases. These are independent edits against
 the original tree, with full/incremental execution order alternated; they are not an
 editor session, a semantic reindex, or a measurement of persistent index publication.
+
+## Compare file-level parser worker counts
+
+Build with the `syntax` feature, then create a sequential reference in a new file:
+
+```sh
+mkdir -p experiments/performance/results/local
+target/release/vizzi-parallel rust /path/to/lpc-rs-snapshot 1 3 \
+  --write-baseline experiments/performance/results/local/lpc-baseline.json
+target/release/vizzi-parallel rust /path/to/lpc-rs-snapshot 8 3 \
+  --baseline experiments/performance/results/local/lpc-baseline.json
+```
+
+Arguments are language, source root, worker limit, and pass count. Only a one-worker
+run can create a reference. Existing baseline files are never overwritten. Language
+and dependency context must match; every pass checks all paths, content fingerprints,
+byte lengths, and syntax counts against the reference. Baseline data is an experimental
+validation artefact, rather than a production index format.
+
+Each pass creates a bounded native pool. Every thread owns one parser and reuses it
+across files. A dynamic queue serves files in descending byte size, with path as a
+tie-breaker. Jobs are indivisible files. Results are collected and sorted deterministically.
+
+Compare `pass_wall` across worker limits. It includes pool and parser creation, file
+reads, parsing, inspection, hashing, tree disposal, joins, and result sorting. Discovery,
+sizing, baseline loading/writing, validation, and the JSON result digest are outside
+that timer. Summed worker phase durations include scheduling delays and can exceed
+wall time; they are not process CPU time or latency.
+
+Run each worker count in a separate process under `/usr/bin/time -v` to compare peak
+RSS. Baseline and result vectors and their serialization also contribute to that peak.
+Only one worker-count experiment should run at a time. These measurements do not
+include semantic analysis, whole-project syntax-tree retention, interactive contention,
+or browser workers.
 
 ## Measure native filesystem notifications
 

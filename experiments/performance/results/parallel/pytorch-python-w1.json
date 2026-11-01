@@ -1,0 +1,100 @@
+{
+  "actual_workers": 1,
+  "conditions": {
+    "build": "release",
+    "dependency_fingerprint": "afd82e7bc9634d2fb0d1a2c1aa07e0f01cc30f26d2541cb93cc3a1d5cf490eb2",
+    "excluded": "file discovery and sizing, baseline loading/writing, result comparison and JSON digest",
+    "memory": "process high-water RSS also includes baseline/result vectors and their serialization",
+    "phases": "summed worker phase wall durations, not CPU time or latency; may exceed pass wall time",
+    "pool": "new bounded scoped threads each pass; one parser per worker, reused across files",
+    "schedule": "dynamic atomic queue, descending source byte size with path tie-breaker",
+    "scope": "raw syntax only; no semantic analysis or retained whole-project trees",
+    "validation": "every file's path, content hash, byte count, and syntax counts match the sequential baseline; full AST shapes are not compared in this experiment",
+    "wall": "includes pool startup, parser setup, reads, parse, inspection, hashing, tree disposal, joins, and result sorting"
+  },
+  "content_bytes": 120488307,
+  "experiment": "parallel_syntax",
+  "files": 5115,
+  "files_with_syntax_recovery": 4,
+  "language": "python",
+  "pass_wall": {
+    "max_us": 15382239.85,
+    "min_us": 13922103.21,
+    "p50_us": 14994132.915,
+    "p95_us": 15382239.85,
+    "samples": 3
+  },
+  "passes": [
+    {
+      "actual_workers": 1,
+      "summed_worker_phase_us": {
+        "inspect": 1513087.884,
+        "parse": 11069696.273,
+        "read": 248447.18
+      },
+      "validation_passed": true,
+      "wall_us": 13922103.21,
+      "workers": [
+        {
+          "bytes": 120488307,
+          "files": 5115,
+          "inspect_us": 1513087.884,
+          "parse_us": 11069696.273,
+          "read_us": 248447.18,
+          "worker": 0
+        }
+      ]
+    },
+    {
+      "actual_workers": 1,
+      "summed_worker_phase_us": {
+        "inspect": 1635363.884,
+        "parse": 11889956.643,
+        "read": 271212.19
+      },
+      "validation_passed": true,
+      "wall_us": 14994132.915,
+      "workers": [
+        {
+          "bytes": 120488307,
+          "files": 5115,
+          "inspect_us": 1635363.884,
+          "parse_us": 11889956.643,
+          "read_us": 271212.19,
+          "worker": 0
+        }
+      ]
+    },
+    {
+      "actual_workers": 1,
+      "summed_worker_phase_us": {
+        "inspect": 1695642.139,
+        "parse": 12200777.86,
+        "read": 278004.934
+      },
+      "validation_passed": true,
+      "wall_us": 15382239.85,
+      "workers": [
+        {
+          "bytes": 120488307,
+          "files": 5115,
+          "inspect_us": 1695642.139,
+          "parse_us": 12200777.86,
+          "read_us": 278004.934,
+          "worker": 0
+        }
+      ]
+    }
+  ],
+  "requested_workers": 1,
+  "result_fingerprint": "d7aa15211daa6f5177a57d0829071a7e62dfd48ef50c38df4a7856732267f1b6",
+  "selection_and_sizing_us": 54229.519,
+  "source_root": "/tmp/vizzi-perf-corpus/pytorch-1f4d2d5e",
+  "syntax_counts": {
+    "errors": 5,
+    "missing": 0,
+    "named": 17141429,
+    "nodes": 26667134
+  },
+  "validation": "created_sequential_baseline"
+}

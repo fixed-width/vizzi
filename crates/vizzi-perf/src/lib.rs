@@ -6,6 +6,8 @@ pub mod source;
 pub mod timing;
 
 #[cfg(feature = "syntax")]
+pub mod parallel;
+#[cfg(feature = "syntax")]
 pub mod syntax;
 #[cfg(feature = "watch")]
 pub mod watch;

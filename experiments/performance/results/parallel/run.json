@@ -1,0 +1,84 @@
+{
+  "recorded_at_utc": "2026-11-01T04:26:06.659377+00:00",
+  "parent_commit": "6df3a7debe99900c27ea92a1da19ad401ab1cb6b",
+  "harness_source_sha256": "c4d333d30148dbc1ad52f9555acd231858916eda0fc2d0e49deffc08275be6d7",
+  "environment": {
+    "cpu": "Intel Core i7-13700H",
+    "reported_logical_cpus": 20,
+    "affinity_cpus": 20,
+    "physical_cores_from_lscpu": 14,
+    "cpu_quota": "cgroup cpu.max unavailable",
+    "memory_quota": "cgroup memory.max unavailable",
+    "platform": "Linux-6.8.0-147-lowlatency-x86_64-with-glibc2.39",
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+    "power_load_and_cache": "uncontrolled; warm observations",
+    "own_build_and_mutation_jobs_finished_before_measurement": true,
+    "reported_memory_bytes": 67080241152
+  },
+  "source_revisions": [
+    {
+      "name": "lpc-rs",
+      "revision": "8d3b1f54b36eae33f689bae3e42c716647000e4d",
+      "capture": "previous local Git archive",
+      "root": "/tmp/vizzi-perf-corpus/lpc-rs"
+    },
+    {
+      "name": "linux",
+      "revision": "cbbddb6b08cc9900a87cccaa9b22bbe06aa4f50a",
+      "capture": "Git archive from user-provided clean shallow checkout",
+      "root": "/tmp/vizzi-perf-corpus/linux-cbbddb6b"
+    },
+    {
+      "name": "pytorch",
+      "revision": "1f4d2d5e820dd870626dca4f9603e3a49879dbde",
+      "previously_planned_revision": "64ef93aaaee3f39b5dcac9d0c8a49d4d6d92ca42",
+      "capture": "Git archive from user-provided clean shallow checkout; uses its available HEAD",
+      "root": "/tmp/vizzi-perf-corpus/pytorch-1f4d2d5e"
+    }
+  ],
+  "protocol": {
+    "worker_limits": [
+      1,
+      2,
+      4,
+      8,
+      16
+    ],
+    "passes_per_case": {
+      "lpc-rust": 3,
+      "pytorch-python": 3,
+      "pytorch-cpp": 3,
+      "linux-c": 1
+    },
+    "linux_repeat": "one final one-worker pass to observe drift",
+    "schedule": "largest source first, dynamically claimed indivisible files",
+    "case_processes": "separate process per worker count; new pool per pass",
+    "validation": "per-file relative path, source hash, byte count and syntax counts equal sequential baseline; aggregate counts also equal round-2 results",
+    "case_order": "ascending worker counts within each corpus; not randomised",
+    "baseline_creation": "initial one-worker case creates reference; other cases load it outside timed passes"
+  },
+  "verification": {
+    "unit_tests": 41,
+    "cli_integration_tests": 6,
+    "clippy": "all targets/features, warnings denied, passed",
+    "mutation": "mutation.json"
+  },
+  "not_measured": [
+    "interactive contention",
+    "single-file internal parallelism",
+    "semantic analysis",
+    "whole-project tree retention",
+    "browser execution",
+    "16GB target hardware qualification"
+  ],
+  "dependency_versions": {
+    "blake3": "1.8.7",
+    "notify": "8.2.1",
+    "notify-types": "2.2.0",
+    "tree-sitter": "0.27.1",
+    "tree-sitter-c": "0.24.2",
+    "tree-sitter-cpp": "0.23.4",
+    "tree-sitter-python": "0.25.0",
+    "tree-sitter-rust": "0.24.2"
+  }
+}

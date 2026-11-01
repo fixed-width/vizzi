@@ -1,0 +1,60 @@
+{
+  "actual_workers": 1,
+  "conditions": {
+    "build": "release",
+    "dependency_fingerprint": "afd82e7bc9634d2fb0d1a2c1aa07e0f01cc30f26d2541cb93cc3a1d5cf490eb2",
+    "excluded": "file discovery and sizing, baseline loading/writing, result comparison and JSON digest",
+    "memory": "process high-water RSS also includes baseline/result vectors and their serialization",
+    "phases": "summed worker phase wall durations, not CPU time or latency; may exceed pass wall time",
+    "pool": "new bounded scoped threads each pass; one parser per worker, reused across files",
+    "schedule": "dynamic atomic queue, descending source byte size with path tie-breaker",
+    "scope": "raw syntax only; no semantic analysis or retained whole-project trees",
+    "validation": "every file's path, content hash, byte count, and syntax counts match the sequential baseline; full AST shapes are not compared in this experiment",
+    "wall": "includes pool startup, parser setup, reads, parse, inspection, hashing, tree disposal, joins, and result sorting"
+  },
+  "content_bytes": 1483099196,
+  "experiment": "parallel_syntax",
+  "files": 65034,
+  "files_with_syntax_recovery": 32896,
+  "language": "c",
+  "pass_wall": {
+    "max_us": 128981191.496,
+    "min_us": 128981191.496,
+    "p50_us": 128981191.496,
+    "p95_us": 128981191.496,
+    "samples": 1
+  },
+  "passes": [
+    {
+      "actual_workers": 1,
+      "summed_worker_phase_us": {
+        "inspect": 12175512.752,
+        "parse": 107428434.574,
+        "read": 2749973.177
+      },
+      "validation_passed": true,
+      "wall_us": 128981191.496,
+      "workers": [
+        {
+          "bytes": 1483099196,
+          "files": 65034,
+          "inspect_us": 12175512.752,
+          "parse_us": 107428434.574,
+          "read_us": 2749973.177,
+          "worker": 0
+        }
+      ]
+    }
+  ],
+  "requested_workers": 1,
+  "result_fingerprint": "5d4e260973df0918cb389ab9e698492a1872689bc84b1e27e87613ff023c02af",
+  "selection_and_sizing_us": 230279.732,
+  "source_root": "/tmp/vizzi-perf-corpus/linux-cbbddb6b",
+  "syntax_counts": {
+    "errors": 325303,
+    "missing": 96903,
+    "named": 140276786,
+    "nodes": 232256293
+  },
+  "validation": "created_sequential_baseline"
+}

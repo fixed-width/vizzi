@@ -113,3 +113,51 @@ fn watcher_command_rejects_insufficient_distinct_files() {
     assert!(!output.status.success());
     assert!(output.stdout.is_empty());
 }
+
+#[cfg(feature = "syntax")]
+#[test]
+fn parallel_command_validates_results_and_does_not_overwrite_baselines() {
+    let parent = tempfile::tempdir().unwrap();
+    let root = parent.path().join("source");
+    fs::create_dir(&root).unwrap();
+    fs::write(root.join("a.rs"), b"fn a() {}").unwrap();
+    fs::write(root.join("b.rs"), b"@").unwrap();
+    let baseline = parent.path().join("baseline.json");
+    let run = |workers: &str, mode: &str| {
+        Command::new(env!("CARGO_BIN_EXE_vizzi-parallel"))
+            .arg("rust")
+            .arg(&root)
+            .arg(workers)
+            .arg("1")
+            .arg(mode)
+            .arg(&baseline)
+            .output()
+            .unwrap()
+    };
+    let sequential = run("1", "--write-baseline");
+    assert!(
+        sequential.status.success(),
+        "{}",
+        String::from_utf8_lossy(&sequential.stderr)
+    );
+    let before = fs::read(&baseline).unwrap();
+    let parallel = run("4", "--baseline");
+    assert!(
+        parallel.status.success(),
+        "{}",
+        String::from_utf8_lossy(&parallel.stderr)
+    );
+    let report: serde_json::Value = serde_json::from_slice(&parallel.stdout).unwrap();
+    assert_eq!(
+        (report["files"].as_u64(), report["actual_workers"].as_u64()),
+        (Some(2), Some(2))
+    );
+    assert_eq!(report["validation"], "sequential_baseline");
+    assert!(!run("1", "--write-baseline").status.success());
+    assert_eq!(fs::read(&baseline).unwrap(), before);
+    assert_eq!(fs::read(root.join("a.rs")).unwrap(), b"fn a() {}");
+    fs::write(root.join("a.rs"), b"fn z() {}").unwrap();
+    let changed = run("2", "--baseline");
+    assert!(!changed.status.success());
+    assert!(String::from_utf8_lossy(&changed.stderr).contains("differ from baseline"));
+}

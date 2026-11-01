@@ -44,3 +44,8 @@ required-features = ["syntax"]
 name = "vizzi-watch"
 path = "src/bin/watch.rs"
 required-features = ["watch"]
+
+[[bin]]
+name = "vizzi-parallel"
+path = "src/bin/parallel.rs"
+required-features = ["syntax"]

@@ -1,0 +1,172 @@
+{
+  "actual_workers": 4,
+  "conditions": {
+    "build": "release",
+    "dependency_fingerprint": "afd82e7bc9634d2fb0d1a2c1aa07e0f01cc30f26d2541cb93cc3a1d5cf490eb2",
+    "excluded": "file discovery and sizing, baseline loading/writing, result comparison and JSON digest",
+    "memory": "process high-water RSS also includes baseline/result vectors and their serialization",
+    "phases": "summed worker phase wall durations, not CPU time or latency; may exceed pass wall time",
+    "pool": "new bounded scoped threads each pass; one parser per worker, reused across files",
+    "schedule": "dynamic atomic queue, descending source byte size with path tie-breaker",
+    "scope": "raw syntax only; no semantic analysis or retained whole-project trees",
+    "validation": "every file's path, content hash, byte count, and syntax counts match the sequential baseline; full AST shapes are not compared in this experiment",
+    "wall": "includes pool startup, parser setup, reads, parse, inspection, hashing, tree disposal, joins, and result sorting"
+  },
+  "content_bytes": 7562179,
+  "experiment": "parallel_syntax",
+  "files": 551,
+  "files_with_syntax_recovery": 0,
+  "language": "rust",
+  "pass_wall": {
+    "max_us": 293547.561,
+    "min_us": 267713.006,
+    "p50_us": 287581.84,
+    "p95_us": 293547.561,
+    "samples": 3
+  },
+  "passes": [
+    {
+      "actual_workers": 4,
+      "summed_worker_phase_us": {
+        "inspect": 137421.985,
+        "parse": 897308.136,
+        "read": 34136.166
+      },
+      "validation_passed": true,
+      "wall_us": 287581.84,
+      "workers": [
+        {
+          "bytes": 1917696,
+          "files": 138,
+          "inspect_us": 34619.957,
+          "parse_us": 225391.487,
+          "read_us": 8499.331,
+          "worker": 0
+        },
+        {
+          "bytes": 1842470,
+          "files": 137,
+          "inspect_us": 33147.816,
+          "parse_us": 225305.66,
+          "read_us": 7790.598,
+          "worker": 1
+        },
+        {
+          "bytes": 1947237,
+          "files": 139,
+          "inspect_us": 35336.985,
+          "parse_us": 222716.682,
+          "read_us": 7014.648,
+          "worker": 2
+        },
+        {
+          "bytes": 1854776,
+          "files": 137,
+          "inspect_us": 34317.227,
+          "parse_us": 223894.307,
+          "read_us": 10831.589,
+          "worker": 3
+        }
+      ]
+    },
+    {
+      "actual_workers": 4,
+      "summed_worker_phase_us": {
+        "inspect": 127978.335,
+        "parse": 834991.748,
+        "read": 26159.861
+      },
+      "validation_passed": true,
+      "wall_us": 267713.006,
+      "workers": [
+        {
+          "bytes": 1866488,
+          "files": 136,
+          "inspect_us": 31123.414,
+          "parse_us": 207829.504,
+          "read_us": 6297.29,
+          "worker": 0
+        },
+        {
+          "bytes": 1886816,
+          "files": 140,
+          "inspect_us": 32527.408,
+          "parse_us": 209871.564,
+          "read_us": 6089.431,
+          "worker": 1
+        },
+        {
+          "bytes": 1958588,
+          "files": 143,
+          "inspect_us": 32895.851,
+          "parse_us": 206706.509,
+          "read_us": 7429.857,
+          "worker": 2
+        },
+        {
+          "bytes": 1850287,
+          "files": 132,
+          "inspect_us": 31431.662,
+          "parse_us": 210584.171,
+          "read_us": 6343.283,
+          "worker": 3
+        }
+      ]
+    },
+    {
+      "actual_workers": 4,
+      "summed_worker_phase_us": {
+        "inspect": 139990.927,
+        "parse": 912419.597,
+        "read": 29773.368
+      },
+      "validation_passed": true,
+      "wall_us": 293547.561,
+      "workers": [
+        {
+          "bytes": 1810678,
+          "files": 139,
+          "inspect_us": 34045.899,
+          "parse_us": 226128.304,
+          "read_us": 7665.739,
+          "worker": 0
+        },
+        {
+          "bytes": 1914903,
+          "files": 141,
+          "inspect_us": 34887.299,
+          "parse_us": 230553.693,
+          "read_us": 6665.698,
+          "worker": 1
+        },
+        {
+          "bytes": 1992752,
+          "files": 129,
+          "inspect_us": 35365.104,
+          "parse_us": 230519.031,
+          "read_us": 7548.488,
+          "worker": 2
+        },
+        {
+          "bytes": 1843846,
+          "files": 142,
+          "inspect_us": 35692.625,
+          "parse_us": 225218.569,
+          "read_us": 7893.443,
+          "worker": 3
+        }
+      ]
+    }
+  ],
+  "requested_workers": 4,
+  "result_fingerprint": "a40310c0bf7bc421d39c920f9f02be7028ba4f343a333ccc2a2fbd05a5c6f314",
+  "selection_and_sizing_us": 2626.405,
+  "source_root": "/tmp/vizzi-perf-corpus/lpc-rs",
+  "syntax_counts": {
+    "errors": 0,
+    "missing": 0,
+    "named": 1034186,
+    "nodes": 1941483
+  },
+  "validation": "sequential_baseline"
+}
