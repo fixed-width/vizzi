@@ -32,6 +32,11 @@ The host registers Rust and Python syntax adapters through one source policy. Th
 fingerprints conservatively include adapter/shared implementation sources and the
 dependency lockfile. See [language and worker contracts](LANGUAGES.md).
 
+The [C/C++ design contract](C_FAMILY_POLICY.md) specifies a future source-policy seam,
+capture-policy identity, and configured translation-unit inputs. These extensions are
+sequenced separately in the [implementation plan](../plans/c-family.md); the current
+host still uses the Rust/Python registry and byte-only analyzers described here.
+
 Snapshots sort documents and identify their actual captured contents and analysis.
 They represent immutable observations, not an atomic filesystem transaction. A source
 query never reads a mutable file after choosing its snapshot.

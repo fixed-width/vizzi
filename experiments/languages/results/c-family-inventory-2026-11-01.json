@@ -1,0 +1,184 @@
+{
+  "recorded_at": "2026-11-01T23:40:12.618896+00:00",
+  "base_commit": "28492a6",
+  "inventory_script_sha256": "e88f6ea6d4d93a893567a565728bb82e364467d7cccf69a268cafe83ba46f4ad",
+  "scope": "Candidate suffixes only; language is not established by this inventory",
+  "excluded": [
+    "symlinks",
+    "root .git",
+    "root target",
+    "root node_modules"
+  ],
+  "manifest_algorithm": "SHA-256 of compact ASCII JSON, sorted [relative path, byte length, SHA-256 bytes] triples",
+  "corpora": [
+    {
+      "name": "linux",
+      "source": "/tmp/vizzi-perf-corpus/linux-cbbddb6b",
+      "revision": "cbbddb6b08cc9900a87cccaa9b22bbe06aa4f50a",
+      "extensions": {
+        ".c": {
+          "files": 37752,
+          "bytes": 748943675,
+          "examples": [
+            "Documentation/scheduler/sched-pelt.c",
+            "Documentation/usb/usbdevfs-drop-permissions.c",
+            "arch/alpha/boot/bootp.c"
+          ]
+        },
+        ".cc": {
+          "files": 1,
+          "bytes": 43176,
+          "examples": [
+            "scripts/kconfig/qconf.cc"
+          ]
+        },
+        ".cpp": {
+          "files": 7,
+          "bytes": 13763,
+          "examples": [
+            "tools/build/feature/test-cxa-demangle.cpp",
+            "tools/build/feature/test-llvm-perf.cpp",
+            "tools/build/feature/test-llvm.cpp"
+          ]
+        },
+        ".h": {
+          "files": 27282,
+          "bytes": 734155521,
+          "examples": [
+            "Documentation/gpu/rfc/i915_small_bar.h",
+            "Documentation/gpu/rfc/i915_vm_bind.h",
+            "arch/alpha/include/asm/agp_backend.h"
+          ]
+        },
+        ".inc": {
+          "files": 3,
+          "bytes": 188,
+          "examples": [
+            "samples/check-exec/script-ask.inc",
+            "samples/check-exec/script-exec.inc",
+            "samples/check-exec/script-noexec.inc"
+          ]
+        },
+        ".inl": {
+          "files": 2,
+          "bytes": 3859,
+          "examples": [
+            "arch/arm/nwfpe/fpa11.inl",
+            "arch/arm/nwfpe/fpmodule.inl"
+          ]
+        }
+      },
+      "manifest_sha256": "2aa16d960d14b650bd6c4e630ac88fc138fff0c837686c10d13d1cc18f6abc19"
+    },
+    {
+      "name": "pytorch",
+      "source": "/tmp/vizzi-perf-corpus/pytorch-1f4d2d5e",
+      "revision": "1f4d2d5e820dd870626dca4f9603e3a49879dbde",
+      "extensions": {
+        ".c": {
+          "files": 194,
+          "bytes": 1654123,
+          "examples": [
+            "aten/src/ATen/native/quantized/cpu/qnnpack/deps/clog/src/clog.c",
+            "aten/src/ATen/native/quantized/cpu/qnnpack/src/add.c",
+            "aten/src/ATen/native/quantized/cpu/qnnpack/src/average-pooling.c"
+          ]
+        },
+        ".cc": {
+          "files": 95,
+          "bytes": 5146835,
+          "examples": [
+            "aten/src/ATen/native/quantized/cpu/qnnpack/bench/add.cc",
+            "aten/src/ATen/native/quantized/cpu/qnnpack/bench/average-pooling.cc",
+            "aten/src/ATen/native/quantized/cpu/qnnpack/bench/channel-shuffle.cc"
+          ]
+        },
+        ".cpp": {
+          "files": 2251,
+          "bytes": 30666274,
+          "examples": [
+            ".ci/pytorch/test_example_code/check-torch-cuda.cpp",
+            ".ci/pytorch/test_example_code/check-torch-mkl.cpp",
+            ".ci/pytorch/test_example_code/check-torch-xnnpack.cpp"
+          ]
+        },
+        ".cu": {
+          "files": 361,
+          "bytes": 3552274,
+          "examples": [
+            "aten/src/ATen/cuda/CUDAGraph.cu",
+            "aten/src/ATen/cuda/Sleep.cu",
+            "aten/src/ATen/cuda/cub-RadixSortKeys.cu"
+          ]
+        },
+        ".cuh": {
+          "files": 70,
+          "bytes": 827872,
+          "examples": [
+            "aten/src/ATen/cuda/ApplyGridUtils.cuh",
+            "aten/src/ATen/cuda/AsmUtils.cuh",
+            "aten/src/ATen/cuda/Atomic.cuh"
+          ]
+        },
+        ".h": {
+          "files": 2431,
+          "bytes": 23198564,
+          "examples": [
+            ".ci/docker/java/jni.h",
+            "android/pytorch_android/src/main/cpp/cmake_macros.h",
+            "android/pytorch_android/src/main/cpp/pytorch_jni_common.h"
+          ]
+        },
+        ".hpp": {
+          "files": 98,
+          "bytes": 681842,
+          "examples": [
+            "aten/src/ATen/native/transformers/hip/flash_attn/ck/launch_kernel_pt.hpp",
+            "aten/src/ATen/native/transformers/hip/flash_attn/flash_common_hip.hpp",
+            "test/cpp/c10d/CUDATest.hpp"
+          ]
+        },
+        ".inl": {
+          "files": 1,
+          "bytes": 1166,
+          "examples": [
+            "test/cpp_extensions/open_registration_extension/torch_openreg/third_party/openreg/include/openreg.inl"
+          ]
+        }
+      },
+      "manifest_sha256": "6b1d24eb4740c920877d4d177bed6f4532f88d3244dba2663a72fb81afb90f0e"
+    },
+    {
+      "name": "lpc-rs",
+      "source": "/tmp/vizzi-perf-corpus/lpc-rs",
+      "revision": "8d3b1f54b36eae33f689bae3e42c716647000e4d",
+      "extensions": {
+        ".c": {
+          "files": 70,
+          "bytes": 66742,
+          "examples": [
+            "benches/fixtures/inheritance/base.c",
+            "benches/fixtures/inheritance/left.c",
+            "benches/fixtures/inheritance/right.c"
+          ]
+        },
+        ".h": {
+          "files": 16,
+          "bytes": 1177,
+          "examples": [
+            "lpc-rs-errors/tests/fixtures/code/include/simple.h",
+            "lpc-rs-utils/tests/fixtures/newlines/file_ending_with_newline.h",
+            "lpc-rs-utils/tests/fixtures/newlines/file_not_ending_with_newline.h"
+          ]
+        }
+      },
+      "manifest_sha256": "2b7850d1b4ac2ad70392047ffadfadaeb3ea672c407ea8d1eaf68255b0ad21d6"
+    }
+  ],
+  "limits": [
+    "Revisions are caller-supplied archive provenance, not inferred from Git",
+    "No submodule expansion, project builds, or compiler execution",
+    "No parsing, grammar-accuracy, or performance measurement",
+    "Includes LPC and non-code textual candidates; file kinds require source policy"
+  ]
+}

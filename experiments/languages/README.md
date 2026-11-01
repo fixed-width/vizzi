@@ -50,3 +50,23 @@ The driver edits only temporary copies, chooses a language-appropriate comment p
 and compares every observed edit with a separate fresh complete capture. It refuses
 to overwrite reports. Preserve the binary hash and source revision with each result;
 the checked-in report additionally records selected-source inventory hashes.
+
+## Inspect C-family candidates
+
+Run the read-only suffix inventory on the same pinned archives to reproduce the
+[policy evidence](../../docs/explanation/c-family-analysis.md). This counts candidates;
+it does not identify their language, parse them, or measure performance:
+
+```sh
+python3 experiments/languages/inventory-c-family.py \
+  --corpus linux /tmp/vizzi-perf-corpus/linux-cbbddb6b cbbddb6b08cc9900a87cccaa9b22bbe06aa4f50a \
+  --corpus pytorch /tmp/vizzi-perf-corpus/pytorch-1f4d2d5e 1f4d2d5e820dd870626dca4f9603e3a49879dbde \
+  --corpus lpc-rs /tmp/vizzi-perf-corpus/lpc-rs 8d3b1f54b36eae33f689bae3e42c716647000e4d \
+  --output /tmp/vizzi-c-family-inventory.json
+```
+
+Revision strings are caller-supplied archive provenance. The optional
+`--implementation-revision` records the Vizzi revision. The report fingerprints the
+inventory script and each corpus's sorted path/size/content manifest, skips symlinks
+and root `.git`/`target`/`node_modules`, and refuses to overwrite an existing report.
+It reads candidate contents but runs no builds, compiler commands, or project scripts.

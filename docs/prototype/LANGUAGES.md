@@ -34,6 +34,11 @@ CUDA, Python stubs, notebooks, and LPC. Counts describe this selected scope, not
 repository files. C/C++ integration still needs a policy for dialects, compilation
 contexts, preprocessor configurations, and headers. There is no extension guessing.
 
+The [C/C++ policy](C_FAMILY_POLICY.md) now defines the next extension, including scoped
+enablement and source-only ambiguous headers. It is a design contract, not implemented
+behavior. Its [delivery plan](../plans/c-family.md) starts by separating source policy
+from analyzer registration and enforcing snapshot-level capture-policy validity.
+
 ## Native source policy
 
 `Directory::open` uses the built-in registry. `Directory::with_languages` accepts a

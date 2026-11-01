@@ -18,6 +18,11 @@ Support mixed-language workspaces and differing analysis capabilities. Preserve
 source locations, provenance, configuration, and analysis coverage. Language-specific
 findings should retain their meaning when presented through shared views.
 
+Source selection policy and language analysis have distinct responsibilities. Preserve
+raw syntax for build-free exploration and keep configured compilation results tied to
+their actual environments. The [C/C++ policy](docs/prototype/C_FAMILY_POLICY.md) defines
+this extension; its [rationale](docs/explanation/c-family-analysis.md) records the evidence.
+
 Initial delivery uses a local Rust engine and browser interface, with offline
 operation. Preserve an integration path for editor plugins through host interfaces.
 Editor integration is a future capability.
