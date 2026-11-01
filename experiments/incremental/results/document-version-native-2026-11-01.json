@@ -1,0 +1,256 @@
+{
+  "source_revision": "8d3b1f54b36eae33f689bae3e42c716647000e4d",
+  "source": "/tmp/vizzi-perf-corpus/lpc-rs",
+  "scope": "Rust files only; disposable copy; no analyzed project builds",
+  "platform": "Linux-6.8.0-147-lowlatency-x86_64-with-glibc2.39",
+  "workers": 4,
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "binary_sha256": "f2e54f974ef8bf6eae495c5d798765fc99ffe674e1b6591a3a6710cbaba9cbb8",
+  "cold": [
+    {
+      "process_wall_ms": 351.88983008265495,
+      "peak_rss_kib": 38080,
+      "status": {
+        "schema": 1,
+        "name": "/tmp/vizzi-workspace-yww3l_n6/source",
+        "generation": 1,
+        "snapshot": "4e68e8c9de775b5654500668128a8ac5ab3354330a4ccdf56418861782670252",
+        "pending": false,
+        "measurements": {
+          "files": 551,
+          "bytes": 7562179,
+          "read_files": 551,
+          "retained": 0,
+          "reconciled": true,
+          "parsed": 551,
+          "reused": 0,
+          "cache_hits": 0,
+          "cache_warnings": 0,
+          "capture_ms": 8.220989999999999,
+          "total_ms": 344.303601
+        },
+        "error": null,
+        "observation": "one-shot capture"
+      }
+    },
+    {
+      "process_wall_ms": 325.7772789802402,
+      "peak_rss_kib": 38560,
+      "status": {
+        "schema": 1,
+        "name": "/tmp/vizzi-workspace-yww3l_n6/source",
+        "generation": 1,
+        "snapshot": "4e68e8c9de775b5654500668128a8ac5ab3354330a4ccdf56418861782670252",
+        "pending": false,
+        "measurements": {
+          "files": 551,
+          "bytes": 7562179,
+          "read_files": 551,
+          "retained": 0,
+          "reconciled": true,
+          "parsed": 551,
+          "reused": 0,
+          "cache_hits": 0,
+          "cache_warnings": 0,
+          "capture_ms": 5.323416,
+          "total_ms": 318.864882
+        },
+        "error": null,
+        "observation": "one-shot capture"
+      }
+    },
+    {
+      "process_wall_ms": 315.8773700706661,
+      "peak_rss_kib": 37920,
+      "status": {
+        "schema": 1,
+        "name": "/tmp/vizzi-workspace-yww3l_n6/source",
+        "generation": 1,
+        "snapshot": "4e68e8c9de775b5654500668128a8ac5ab3354330a4ccdf56418861782670252",
+        "pending": false,
+        "measurements": {
+          "files": 551,
+          "bytes": 7562179,
+          "read_files": 551,
+          "retained": 0,
+          "reconciled": true,
+          "parsed": 551,
+          "reused": 0,
+          "cache_hits": 0,
+          "cache_warnings": 0,
+          "capture_ms": 6.628806,
+          "total_ms": 309.53107600000004
+        },
+        "error": null,
+        "observation": "one-shot capture"
+      }
+    }
+  ],
+  "warm": [
+    {
+      "process_wall_ms": 27.132409857586026,
+      "peak_rss_kib": 25920,
+      "status": {
+        "schema": 1,
+        "name": "/tmp/vizzi-workspace-yww3l_n6/source",
+        "generation": 1,
+        "snapshot": "4e68e8c9de775b5654500668128a8ac5ab3354330a4ccdf56418861782670252",
+        "pending": false,
+        "measurements": {
+          "files": 551,
+          "bytes": 7562179,
+          "read_files": 551,
+          "retained": 0,
+          "reconciled": true,
+          "parsed": 0,
+          "reused": 0,
+          "cache_hits": 551,
+          "cache_warnings": 0,
+          "capture_ms": 5.471514,
+          "total_ms": 21.033357
+        },
+        "error": null,
+        "observation": "one-shot capture"
+      }
+    },
+    {
+      "process_wall_ms": 37.79170103371143,
+      "peak_rss_kib": 26240,
+      "status": {
+        "schema": 1,
+        "name": "/tmp/vizzi-workspace-yww3l_n6/source",
+        "generation": 1,
+        "snapshot": "4e68e8c9de775b5654500668128a8ac5ab3354330a4ccdf56418861782670252",
+        "pending": false,
+        "measurements": {
+          "files": 551,
+          "bytes": 7562179,
+          "read_files": 551,
+          "retained": 0,
+          "reconciled": true,
+          "parsed": 0,
+          "reused": 0,
+          "cache_hits": 551,
+          "cache_warnings": 0,
+          "capture_ms": 9.013796,
+          "total_ms": 30.296470999999997
+        },
+        "error": null,
+        "observation": "one-shot capture"
+      }
+    },
+    {
+      "process_wall_ms": 26.405571959912777,
+      "peak_rss_kib": 25600,
+      "status": {
+        "schema": 1,
+        "name": "/tmp/vizzi-workspace-yww3l_n6/source",
+        "generation": 1,
+        "snapshot": "4e68e8c9de775b5654500668128a8ac5ab3354330a4ccdf56418861782670252",
+        "pending": false,
+        "measurements": {
+          "files": 551,
+          "bytes": 7562179,
+          "read_files": 551,
+          "retained": 0,
+          "reconciled": true,
+          "parsed": 0,
+          "reused": 0,
+          "cache_hits": 551,
+          "cache_warnings": 0,
+          "capture_ms": 5.694857,
+          "total_ms": 21.699744
+        },
+        "error": null,
+        "observation": "one-shot capture"
+      }
+    }
+  ],
+  "no_op": {
+    "files": 551,
+    "bytes": 7562179,
+    "read_files": 551,
+    "retained": 0,
+    "reconciled": true,
+    "parsed": 0,
+    "reused": 551,
+    "cache_hits": 0,
+    "cache_warnings": 0,
+    "capture_ms": 6.898772,
+    "total_ms": 11.163162000000002
+  },
+  "edits": [
+    {
+      "write_to_publication_ms": 28.53988902643323,
+      "write_to_response_ms": 30.66866984590888,
+      "view_request_ms": 2.103161998093128,
+      "measurements": {
+        "files": 551,
+        "bytes": 4091,
+        "read_files": 1,
+        "retained": 550,
+        "reconciled": false,
+        "parsed": 1,
+        "reused": 550,
+        "cache_hits": 0,
+        "cache_warnings": 0,
+        "capture_ms": 0.169127,
+        "total_ms": 1.463675
+      },
+      "clean_snapshot_matches": true
+    },
+    {
+      "write_to_publication_ms": 29.06579989939928,
+      "write_to_response_ms": 31.477981014177203,
+      "view_request_ms": 2.3523750714957714,
+      "measurements": {
+        "files": 551,
+        "bytes": 4091,
+        "read_files": 1,
+        "retained": 550,
+        "reconciled": false,
+        "parsed": 1,
+        "reused": 550,
+        "cache_hits": 0,
+        "cache_warnings": 0,
+        "capture_ms": 0.171156,
+        "total_ms": 1.359624
+      },
+      "clean_snapshot_matches": true
+    },
+    {
+      "write_to_publication_ms": 28.862447943538427,
+      "write_to_response_ms": 32.45427994988859,
+      "view_request_ms": 3.4757039975374937,
+      "measurements": {
+        "files": 551,
+        "bytes": 4091,
+        "read_files": 1,
+        "retained": 550,
+        "reconciled": false,
+        "parsed": 1,
+        "reused": 550,
+        "cache_hits": 0,
+        "cache_warnings": 0,
+        "capture_ms": 0.224568,
+        "total_ms": 1.247227
+      },
+      "clean_snapshot_matches": true
+    }
+  ],
+  "diagnostic_initial_view_ms": 34.035637974739075,
+  "selected_path": "benches/bench_arithmetic.rs",
+  "selected_declaration": "profiler",
+  "analysis_context": {
+    "language": "rust",
+    "description": "Tree-sitter Rust; raw syntax, no macro expansion",
+    "id": "4b8c5ed282330be5f050522aa1c0d0bd2f29188fbe686bb52df2e2f9208038d0"
+  },
+  "live_peak_rss_kib": 34516,
+  "limits": [
+    "Three samples; no tail-latency claim",
+    "First load has warm OS file cache",
+    "No browser, labels, frame times, GPU, or edit-to-visible measurement",
+    "Hinted files are reopened and hashed; full reconciliation verifies the whole Rust scope; changed files are parsed afresh"
+  ]
+}

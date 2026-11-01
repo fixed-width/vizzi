@@ -31,6 +31,10 @@ identity!(WorkspaceId, "An adapter-supplied workspace identity.");
 identity!(FileId, "A path identity scoped to a workspace.");
 identity!(ContentId, "An identity of captured source bytes.");
 identity!(
+    DocumentVersion,
+    "An identity of a validated captured file and all its analyses."
+);
+identity!(
     ContextId,
     "An identity of analyzer, configuration, and implementation."
 );
@@ -108,6 +112,7 @@ pub struct Document {
     id: FileId,
     path: String,
     content: ContentId,
+    version: DocumentVersion,
     bytes: usize,
     source: Option<Arc<str>>,
     line_starts: Vec<usize>,
@@ -152,6 +157,16 @@ impl Document {
                 ));
             }
         }
+        let id = FileId::derive(&[workspace.as_str().as_bytes(), path.as_bytes()]);
+        let encoded =
+            serde_json::to_vec(&analyses).map_err(|error| ModelError(error.to_string()))?;
+        let analysis_digest = blake3::hash(&encoded);
+        let version = DocumentVersion::derive(&[
+            b"document-v1",
+            id.as_str().as_bytes(),
+            content.as_str().as_bytes(),
+            analysis_digest.as_bytes(),
+        ]);
         let mut line_starts = vec![0];
         if let Some(source) = source {
             line_starts.extend(
@@ -162,10 +177,11 @@ impl Document {
             );
         }
         Ok(Self {
-            id: FileId::derive(&[workspace.as_str().as_bytes(), path.as_bytes()]),
+            id,
             workspace,
             path,
             content,
+            version,
             bytes: bytes.len(),
             source: source.map(Arc::from),
             line_starts,
@@ -183,6 +199,10 @@ impl Document {
     /// Returns the captured byte identity.
     pub fn content(&self) -> &ContentId {
         &self.content
+    }
+    /// Returns the cached identity of this captured file and its validated analyses.
+    pub fn version(&self) -> &DocumentVersion {
+        &self.version
     }
     /// Returns the captured byte count.
     pub fn bytes(&self) -> usize {
@@ -237,17 +257,13 @@ impl Snapshot {
         documents.sort_by(|a, b| a.path.cmp(&b.path));
         let mut paths = BTreeSet::new();
         let mut hash = blake3::Hasher::new();
+        hash.update(b"snapshot-v2");
         hash.update(workspace.as_str().as_bytes());
         for document in &documents {
             if document.workspace != workspace || !paths.insert(document.path()) {
                 return Err(ModelError("duplicate path or mismatched workspace".into()));
             }
-            hash.update(document.id.as_str().as_bytes());
-            hash.update(document.content.as_str().as_bytes());
-            let facts = serde_json::to_vec(&document.analyses)
-                .map_err(|error| ModelError(error.to_string()))?;
-            hash.update(&(facts.len() as u64).to_le_bytes());
-            hash.update(&facts);
+            hash.update(document.version.as_str().as_bytes());
         }
         Ok(Self {
             id: SnapshotId::derive(&[hash.finalize().as_bytes()]),
@@ -401,5 +417,102 @@ mod tests {
         assert_eq!(a.lines(&(0..9)), 1..1);
         assert_eq!(a.lines(&(9..17)), 2..2);
         assert_eq!(a.lines(&(26..27)), 3..3);
+    }
+
+    #[test]
+    fn document_versions_cover_source_identity_and_every_analysis_field() {
+        let bytes = b"fn f() {}";
+        let capture = |facts| Document::capture(workspace(), "a.rs".into(), bytes, facts).unwrap();
+        let base = capture(vec![analysis(bytes)]);
+        assert_eq!(base.version(), capture(vec![analysis(bytes)]).version());
+        let changes: [fn(&mut Analysis); 11] = [
+            |a| a.context.id = ContextId::derive(&[b"different"]),
+            |a| a.context.language = "another language".into(),
+            |a| a.context.description = "another configuration".into(),
+            |a| a.coverage = Coverage::Partial,
+            |a| a.diagnostics.push("recovered syntax".into()),
+            |a| a.facts[0].key = "another key".into(),
+            |a| a.facts[0].name = "another name".into(),
+            |a| a.facts[0].kind = "another kind".into(),
+            |a| a.facts[0].span = 1..8,
+            |a| a.facts[0].unique = false,
+            |a| a.facts.clear(),
+        ];
+        for change in changes {
+            let mut a = analysis(bytes);
+            change(&mut a);
+            assert_ne!(base.version(), capture(vec![a]).version());
+        }
+        assert_ne!(base.version(), capture(vec![]).version());
+        let other_path =
+            Document::capture(workspace(), "b.rs".into(), bytes, vec![analysis(bytes)]).unwrap();
+        assert_ne!(base.version(), other_path.version());
+        let other_workspace = Document::capture(
+            WorkspaceId::derive(&[b"other"]),
+            "a.rs".into(),
+            bytes,
+            vec![analysis(bytes)],
+        )
+        .unwrap();
+        assert_ne!(base.version(), other_workspace.version());
+        let empty_analysis =
+            Document::capture(workspace(), "a.rs".into(), b"fn g() {}", vec![]).unwrap();
+        assert_ne!(capture(vec![]).version(), empty_analysis.version());
+        let invalid_a = Document::capture(workspace(), "a.rs".into(), &[0xff], vec![]).unwrap();
+        let invalid_b = Document::capture(workspace(), "a.rs".into(), &[0xfe], vec![]).unwrap();
+        assert_ne!(invalid_a.version(), invalid_b.version());
+    }
+
+    #[test]
+    fn ordered_analysis_contexts_and_fresh_capture_define_the_same_snapshot_as_reuse() {
+        let bytes = b"fn f() {}";
+        let first = analysis(bytes);
+        let mut second = first.clone();
+        second.context.id = ContextId::derive(&[b"second context"]);
+        let capture = |path: &str, analyses| {
+            Arc::new(Document::capture(workspace(), path.into(), bytes, analyses).unwrap())
+        };
+        let a = capture("a.rs", vec![first.clone(), second.clone()]);
+        let b = capture("b.rs", vec![]);
+        let original = Snapshot::new(workspace(), vec![a.clone(), b]).unwrap();
+        let fresh = Snapshot::new(
+            workspace(),
+            vec![
+                capture("b.rs", vec![]),
+                capture("a.rs", vec![first.clone(), second.clone()]),
+            ],
+        )
+        .unwrap();
+        assert_eq!(original.id(), fresh.id());
+        let reversed = capture("a.rs", vec![second, first]);
+        assert_ne!(a.version(), reversed.version());
+        let changed = Snapshot::new(
+            workspace(),
+            vec![a.clone(), capture("b.rs", vec![analysis(bytes)])],
+        )
+        .unwrap();
+        let rebuilt = Snapshot::new(
+            workspace(),
+            vec![
+                capture("a.rs", a.analyses().to_vec()),
+                capture("b.rs", vec![analysis(bytes)]),
+            ],
+        )
+        .unwrap();
+        assert_eq!(changed.id(), rebuilt.id());
+        assert_ne!(changed.id(), original.id());
+        assert_eq!(original.documents()[0].source(), Some("fn f() {}"));
+    }
+
+    #[test]
+    fn empty_snapshots_are_workspace_scoped_and_foreign_documents_are_rejected() {
+        let first = Snapshot::new(workspace(), vec![]).unwrap();
+        let other = WorkspaceId::derive(&[b"other"]);
+        assert_ne!(
+            first.id(),
+            Snapshot::new(other.clone(), vec![]).unwrap().id()
+        );
+        let foreign = Arc::new(Document::capture(other, "a.rs".into(), b"", vec![]).unwrap());
+        assert!(Snapshot::new(workspace(), vec![foreign]).is_err());
     }
 }

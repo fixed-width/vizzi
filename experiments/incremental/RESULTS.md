@@ -1,5 +1,9 @@
 # Verified dirty-path capture results
 
+This records dirty capture before cached document versions. Subsequent
+[fingerprint measurements](FINGERPRINT_RESULTS.md) remove repeated fact serialisation
+from snapshot construction while retaining the same capture/reconciliation policy.
+
 Ordinary lpc-rs edits now reopen **one file / 4,091 bytes**, retaining 550 captured
 documents instead of rereading all **551 files / 7,562,179 bytes**. In the generated
 10,008-file browser workload, each observed single edit reopened one file and retained

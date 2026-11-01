@@ -14,6 +14,7 @@ validating coordination; it does not qualify large-codebase GPU performance.
 - [Host API reference](docs/prototype/API.md)
 - [Change-notification contract](docs/prototype/CHANGES.md)
 - [Incremental-capture contract](docs/prototype/INCREMENTAL_CAPTURE.md)
+- [Captured document and snapshot identities](docs/prototype/IDENTITIES.md)
 - [Application measurement procedure](experiments/prototype/README.md)
 - [Browser validation and measurements](experiments/browser/README.md)
 - [Verified incremental-capture measurements](experiments/incremental/RESULTS.md)

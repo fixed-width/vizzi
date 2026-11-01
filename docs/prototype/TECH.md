@@ -34,6 +34,9 @@ includes core implementation sources and the dependency lockfile.
 Snapshots sort documents and identify their actual captured contents and analysis.
 They represent immutable observations, not an atomic filesystem transaction. A source
 query never reads a mutable file after choosing its snapshot.
+Each validated document caches its content-and-analysis version. Snapshot composition
+hashes those fixed-size versions instead of serialising retained facts again. See
+[identity composition](IDENTITIES.md) for inputs and versioning.
 
 Declaration keys use lexical qualification and kind. Unique keys remain stable across
 position-only changes. Duplicate keys receive content-scoped identities, so edits do

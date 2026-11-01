@@ -1,0 +1,129 @@
+{
+  "tool": "cargo-mutants 27.1.0",
+  "baseline": "passed",
+  "scope": [
+    "crates/vizzi-core/src/model.rs",
+    "crates/vizzi-core/src/publication.rs",
+    "crates/vizzi-core/src/query.rs",
+    "crates/vizzi-core/src/rust.rs"
+  ],
+  "tests": "vizzi-core and vizzi library tests",
+  "tested": 118,
+  "counts": {
+    "Unviable": 23,
+    "CaughtMutant": 92,
+    "Timeout": 3
+  },
+  "exclusions": [],
+  "non_caught": [
+    {
+      "name": "crates/vizzi-core/src/model.rs:130:9: replace Document::capture -> Result<Self, ModelError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:193:9: replace Document::id -> &FileId with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:201:9: replace Document::content -> &ContentId with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:205:9: replace Document::version -> &DocumentVersion with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:217:9: replace Document::analyses -> &[Analysis] with Vec::leak(vec![Default::default()])",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:221:9: replace Document::entity_id -> EntityId with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:233:9: replace Document::lines -> Range<usize> with Range::new()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:233:9: replace Document::lines -> Range<usize> with Range::from_iter([0])",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:233:9: replace Document::lines -> Range<usize> with Range::new(0)",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:233:9: replace Document::lines -> Range<usize> with Range::from(0)",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:233:9: replace Document::lines -> Range<usize> with Range::from_iter([1])",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:233:9: replace Document::lines -> Range<usize> with Range::new(1)",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:233:9: replace Document::lines -> Range<usize> with Range::from(1)",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:276:9: replace Snapshot::id -> &SnapshotId with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:280:9: replace Snapshot::workspace -> &WorkspaceId with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:284:9: replace Snapshot::documents -> &[Arc<Document>] with Vec::leak(vec![Arc::new(Default::default())])",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:288:9: replace Snapshot::file -> Option<&Arc<Document>> with Some(Box::leak(Box::new(Arc::new(Default::default()))))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/publication.rs:47:9: replace Publication::current -> Option<Arc<Snapshot>> with Some(Arc::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/publication.rs:51:9: replace Publication::pinned -> Option<Arc<Snapshot>> with Some(Arc::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/publication.rs:65:9: replace Publication::publish -> Outcome with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/query.rs:126:9: replace Snapshot::view -> View with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/publication.rs:29:9: replace Publication::request -> u64 with 1",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi-core/src/rust.rs:25:9: replace RustAnalyzer::context -> Context with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/rust.rs:38:9: replace RustAnalyzer::analyze -> Result<Analysis, ModelError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/publication.rs:65:19: replace != with == in Publication::publish",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi-core/src/rust.rs:93:20: delete ! in RustAnalyzer::analyze",
+      "outcome": "Timeout"
+    }
+  ],
+  "limitations": [
+    "Macro-generated identity hashing is not mutated by cargo-mutants",
+    "Timeouts are distinct from assertion failures",
+    "Native host and browser implementations are outside this mutation scope"
+  ]
+}

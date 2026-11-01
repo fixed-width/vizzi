@@ -3,6 +3,8 @@
 Use this procedure to compare dirty-path verification with complete capture. The
 [capture contract](../../docs/prototype/INCREMENTAL_CAPTURE.md) defines retention,
 fallbacks, and acknowledgement; [results](RESULTS.md) explain the recorded evidence.
+The [cached document-version report](FINGERPRINT_RESULTS.md) records the subsequent
+snapshot-assembly optimisation with the same verification and reconciliation policy.
 
 Build the optimized application and run the native driver on a pinned source archive:
 
