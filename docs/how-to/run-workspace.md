@@ -65,6 +65,7 @@ error and wait for reconciliation. If native watching is unavailable, the host r
 polling mode and checks the workspace every two seconds. Cache write failures appear
 in the status measurements; valid source analysis continues without persistence.
 
-The current execution sandbox prevents binding listeners and starting Chromium. Use
-stdio here; run the browser host in an environment that permits local sockets and
-browser IPC. Browser layout and GPU performance have not yet been qualified.
+Use the [browser validation procedure](../../experiments/browser/README.md) for automated
+UI checks and renderer measurements. Stdio remains useful in environments without
+socket access. Production renderer and baseline-laptop qualification remain separate
+from the current bounded reference-view measurements.

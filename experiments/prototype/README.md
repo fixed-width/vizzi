@@ -59,7 +59,8 @@ transport, and browser-adapter mutations are outside this run. Keep timeouts and
 mutations separate from those caught by assertions. No prototype-specific exclusions
 are configured.
 
-Browser follow-up must measure labeled overview interaction, picking, virtualized source,
-edit-to-visible delay, frame-time tails, and memory during background analysis on the
-baseline integrated-GPU laptop. `window.vizziMetrics` supplies bounded CPU draw/request
-samples; those are instrumentation, not a substitute for presentation/GPU measurements.
+The [browser follow-up](../browser/README.md) measures labelled overview interaction,
+picking, virtualised source, render-ready update delay, and frame scheduling during
+background analysis. The 16 GB laptop baseline and physical presentation remain separate
+qualification work. `window.vizziMetrics` supplies bounded CPU draw/request samples;
+those are instrumentation, not a substitute for presentation/GPU measurements.

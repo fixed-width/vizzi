@@ -62,6 +62,9 @@ Adapter information and all summaries are in
 This run only exercises the native offscreen rendering path. Browser presentation,
 text, picking, multiple simultaneous views, and background analysis remain unmeasured.
 The integrated-GPU laptop with 16 GB RAM remains the hardware qualification target.
+Subsequent [browser validation](../browser/RESULTS.md) accessed Intel Iris Xe through
+the approved test workflow. The earlier device observations describe the direct
+sandboxed executable environment, rather than all execution modes on this host.
 
 ## Verification observations
 

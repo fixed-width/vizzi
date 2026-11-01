@@ -72,8 +72,10 @@ experiments are not wired into this application slice.
 The browser polls status every 500 ms while visible, so native response timings cannot
 be quoted as edit-to-visible latency. Labels, picking, pan/zoom, source virtualization,
 background parsing interference, and frame-time tails need actual browser measurements.
-The current sandbox blocks listeners and Chromium IPC. Handler and controller tests
-do not validate Canvas painting, browser layout, accessibility, or GPU rendering.
+The initial direct sandbox probes blocked listeners and Chromium IPC. Subsequent
+[browser measurements](../browser/RESULTS.md) use the approved test workflow, which can
+run Chromium and access Intel graphics. Handler and controller tests alone do not
+validate Canvas painting, browser layout, accessibility, or GPU rendering.
 
 The Canvas2D reference view does not settle the production renderer. Next qualification
 should compare labeled views and interaction under background work on the baseline

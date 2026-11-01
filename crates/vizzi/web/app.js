@@ -3,7 +3,7 @@ import { createController } from "/controller.js";
 const element = id => document.getElementById(id);
 const canvas = element("map"), context = canvas.getContext("2d");
 const source = element("source"), space = element("source-space");
-const metrics = { drawCpuMs: [], interactionFrameMs: [], requestMs: [] };
+const metrics = { drawCpuMs: [], interactionFrameMs: [], requestMs: [], pickingMs: [], lastFrame: null };
 window.vizziMetrics = metrics;
 function sample(series, value) { series.push(value); if (series.length > 512) series.shift(); }
 let view = null, lines = [], active = null, camera = { x: 20, y: 20, scale: 1 };
@@ -17,6 +17,7 @@ const controller = createController({
   },
   onView: next => {
     const first = !view, changedFile = view?.selection.file !== next.selection.file;
+    const changedEntity = view?.selection.entity !== next.selection.entity;
     const changedSource = changedFile || view?.source?.text !== next.source?.text;
     view = next;
     element("error").hidden = true;
@@ -38,14 +39,19 @@ const controller = createController({
       button.textContent = fact.name; button.title = `${fact.kind} ${fact.name} · line ${fact.start_line}`;
       button.setAttribute("aria-current", String(fact.id === next.selection.entity));
       const kind = document.createElement("small"); kind.textContent = `${fact.kind} · ${fact.start_line}`; button.append(kind);
-      button.addEventListener("click", () => controller.load({ entity: fact.id }));
+      button.addEventListener("click", async () => {
+        if (await controller.load({ entity: fact.id }) && active?.id === fact.id) {
+          source.scrollTop = Math.max(0, (active.start_line - 4) * 22);
+          renderSource();
+        }
+      });
       element("outline").append(button);
     }
     if (!facts.length) { const note = document.createElement("p"); note.textContent = "No declarations extracted"; element("outline").append(note); }
     if (changedSource) { lines = next.source?.text?.split(/\r?\n/) ?? []; if (changedFile) source.scrollTop = 0; }
-    if (active) source.scrollTop = Math.max(0, (active.start_line - 4) * 22);
+    if (active && (changedFile || changedEntity)) source.scrollTop = Math.max(0, (active.start_line - 4) * 22);
     renderSource(); renderFileList();
-    if (first) fit(); else invalidate();
+    if (first) fit(true); else invalidate();
   },
   onStatus: status => {
     element("workspace").textContent = status.name;
@@ -54,6 +60,7 @@ const controller = createController({
     const m = status.measurements;
     if (m) element("measurements").textContent = `${m.total_ms.toFixed(1)} ms refresh · ${m.parsed} parsed · ${m.reused} reused · ${m.cache_hits} cache hits${m.cache_warnings ? ` · ${m.cache_warnings} cache write failures` : ""}`;
     if (status.error) showError(new Error(status.error));
+    else element("error").hidden = true;
   },
   onError: showError,
 });
@@ -88,9 +95,11 @@ function renderFileList() {
   }
 }
 function invalidate() { if (!scheduled) { scheduled = true; requestAnimationFrame(draw); } }
-function fit() {
+function fit(readable = false) {
   if (!view) return;
-  camera = { x: 18, y: 22, scale: Math.max(0.04, Math.min((canvas.clientWidth - 36) / 1424, (canvas.clientHeight - 44) / Math.max(view.height, 1), 1.5)) };
+  const width = Math.max(1, ...view.files.map(file => file.rect.x + file.rect.width));
+  const scale = Math.min((canvas.clientWidth - 36) / width, (canvas.clientHeight - 44) / Math.max(view.height, 1), 1.5);
+  camera = { x: 18, y: 22, scale: Math.max(readable ? .55 : .001, scale) };
   invalidate();
 }
 function draw(timestamp) {
@@ -100,6 +109,7 @@ function draw(timestamp) {
   const width = canvas.clientWidth, height = canvas.clientHeight, dpr = Math.min(window.devicePixelRatio || 1, 2);
   if (canvas.width !== Math.round(width * dpr) || canvas.height !== Math.round(height * dpr)) { canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr); }
   context.setTransform(dpr, 0, 0, dpr, 0, 0); context.clearRect(0, 0, width, height);
+  let visibleFiles = 0, labels = 0;
   if (view) {
     context.font = "11px 'DejaVu Sans', sans-serif";
     for (const group of view.groups) {
@@ -109,10 +119,12 @@ function draw(timestamp) {
     for (const file of view.files) {
       const rect = file.rect, x = camera.x + rect.x * camera.scale, y = camera.y + rect.y * camera.scale, w = rect.width * camera.scale, h = rect.height * camera.scale;
       if (x + w < 0 || y + h < 0 || x > width || y > height) continue;
+      visibleFiles++;
       const selected = file.id === view.selection.file;
       context.fillStyle = selected ? "#265dc5" : file.coverage === "partial" ? "#f3deb2" : file.coverage === "unavailable" ? "#d5dce4" : "#d0deed";
       context.fillRect(x, y, w, h);
       if (w > 80 && h > 20) {
+        labels++;
         context.save(); context.beginPath(); context.rect(x + 5, y, w - 10, h); context.clip();
         context.fillStyle = selected ? "white" : "#183044"; context.font = "10px 'DejaVu Sans Mono', monospace";
         context.fillText(file.path.split("/").at(-1), x + 7, y + Math.min(h - 5, 17));
@@ -121,11 +133,15 @@ function draw(timestamp) {
     }
   }
   sample(metrics.drawCpuMs, performance.now() - start);
+  metrics.lastFrame = { snapshot: view?.snapshot, camera: { ...camera }, visibleFiles, labels, width, height };
 }
 function hit(x, y) {
   if (!view) return null;
   const worldX = (x - camera.x) / camera.scale, worldY = (y - camera.y) / camera.scale;
-  return view.files.find(file => worldX >= file.rect.x && worldX <= file.rect.x + file.rect.width && worldY >= file.rect.y && worldY <= file.rect.y + file.rect.height);
+  const start = performance.now();
+  const file = view.files.find(file => worldX >= file.rect.x && worldX <= file.rect.x + file.rect.width && worldY >= file.rect.y && worldY <= file.rect.y + file.rect.height);
+  sample(metrics.pickingMs, performance.now() - start);
+  return file;
 }
 function point(event) { const bounds = canvas.getBoundingClientRect(); return { x: event.clientX - bounds.left, y: event.clientY - bounds.top }; }
 canvas.addEventListener("pointerdown", event => { if (event.button !== 0) return; const p = point(event); drag = { ...p, startX: p.x, startY: p.y, moved: false }; canvas.setPointerCapture(event.pointerId); element("tooltip").hidden = true; });
@@ -140,15 +156,17 @@ canvas.addEventListener("pointercancel", () => { drag = null; previousFrame = nu
 canvas.addEventListener("pointerleave", () => { element("tooltip").hidden = true; });
 canvas.addEventListener("wheel", event => {
   event.preventDefault(); const p = point(event), old = camera.scale;
-  camera.scale = Math.max(.025, Math.min(4, old * Math.exp(-event.deltaY * .0015)));
+  camera.scale = Math.max(.001, Math.min(4, old * Math.exp(-event.deltaY * .0015)));
   camera.x = p.x - (p.x - camera.x) * camera.scale / old; camera.y = p.y - (p.y - camera.y) * camera.scale / old;
   element("tooltip").hidden = true; invalidate();
 }, { passive: false });
 canvas.addEventListener("keydown", event => { const direction = { ArrowLeft: [40, 0], ArrowRight: [-40, 0], ArrowUp: [0, 40], ArrowDown: [0, -40] }[event.key]; if (direction) { event.preventDefault(); camera.x += direction[0]; camera.y += direction[1]; invalidate(); } else if (event.key === "Home") { event.preventDefault(); fit(); } });
-element("fit").addEventListener("click", fit);
+element("fit").addEventListener("click", () => fit());
 element("filter").addEventListener("input", event => { clearTimeout(filterTimer); filterTimer = setTimeout(() => controller.load({ filter: event.target.value }), 160); });
 element("file-list").closest("details").addEventListener("toggle", renderFileList);
 source.addEventListener("scroll", renderSource, { passive: true });
-new ResizeObserver(() => { invalidate(); renderSource(); }).observe(document.querySelector("main"));
+const viewportObserver = new ResizeObserver(() => { invalidate(); renderSource(); });
+viewportObserver.observe(canvas);
+viewportObserver.observe(source);
 async function tick() { await controller.poll(); setTimeout(tick, document.hidden ? 2000 : 500); }
 tick();

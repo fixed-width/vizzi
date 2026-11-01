@@ -1,0 +1,13 @@
+{
+  "name": "vizzi-browser-validation",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node experiments/browser/run.mjs"
+  },
+  "devDependencies": {
+    "@stryker-mutator/core": "10.1.1",
+    "node": "26.13.0",
+    "playwright": "1.64.1"
+  }
+}

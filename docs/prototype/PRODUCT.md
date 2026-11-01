@@ -11,12 +11,16 @@ engine and works without a project build or external account.
   `target`, or `node_modules` directories. LPC analysis remains out of scope.
 - The overview groups files by directory, supports filtering, pan, zoom, and selection,
   and provides readable file labels and hover details.
+  Its initial camera reveals readable labels; fitting the whole map can hide labels
+  until the user zooms in again.
 - Selecting a file updates its source and declaration outline together. Selecting a
   declaration reveals its lines. Source inspection is read only.
 - Each displayed source and outline belongs to the displayed immutable snapshot.
   Requests and responses from older browser selections cannot replace newer selections.
 - File selection survives content edits. Unique lexical declaration identities survive
   position changes; ambiguous duplicate identities fall back to file selection.
+  Background publication preserves the reader's scroll position in the same file.
+  Explicitly selecting a declaration, including the current one, reveals its lines.
 - A source edit triggers analysis and publishes a complete replacement snapshot.
   Queries continue to use the previous snapshot while work is in progress.
 - Unchanged contents reuse analysis. A fresh process can reuse persisted analysis.
@@ -25,6 +29,8 @@ engine and works without a project build or external account.
   compiler-level name resolution, call relationships, or build-configuration coverage.
 - Empty workspaces, removed selections, analysis failures, and connection failures have
   clear states. Source text and file names are displayed as text, not interpreted HTML.
+  A recovered connection clears its error, and a failed selection request is retried
+  even when the published snapshot has not changed.
 
 ## Verification
 

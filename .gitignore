@@ -1,3 +1,6 @@
 /target/
 /mutants.out*/
 /experiments/performance/results/local/
+/node_modules/
+/experiments/browser/results/local/
+/.stryker-tmp/

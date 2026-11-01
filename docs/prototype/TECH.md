@@ -67,18 +67,21 @@ parse is not interruptible in this slice. Parsing never holds the publication lo
   the HTTP status, content type, and text body from those same handlers.
 
 The browser polls small status records and reloads a view on publication or user action.
-A request epoch rejects older responses. Source lines are virtualised; map geometry is
+Opaque request tokens reject older responses. Source lines are virtualised; map geometry is
 supplied by Rust, with visible-item painting and hit testing in the host adapter.
 
 ## Rendering and validation scope
 
 The initial browser uses DOM controls and a Canvas2D reference overview. This validates
 coordinated views and the transport contract without settling the production renderer.
-Rust/Wasm with wgpu remains the leading GPU candidate. The current sandbox lacks an
-installed browser Wasm target, blocks listeners, and prevents Chromium startup through
-its IPC restrictions. HTTP handlers can be tested in process, and the stdio host can
-exercise the live native engine without sockets. Browser layout, frame-time tails,
-WebGPU/WebGL comparison, and hardware GPU qualification remain explicit follow-up work.
+Rust/Wasm with wgpu remains the leading GPU candidate. Playwright exercises the actual
+release host over loopback, with software-rendered headless and hardware-enabled headed
+Chromium measurements. These qualify a bounded Canvas2D reference workload, not the
+production renderer or the 16 GB laptop baseline. HTTP handlers are also tested in
+process; stdio supports socket-free diagnostic use. See the
+[browser validation procedure](../../experiments/browser/README.md) for reproducible
+checks. Browser Wasm, WebGPU/WebGL comparison, and broader hardware qualification remain
+follow-up work.
 
 The UI uses a cool light workspace palette, blue selection, amber partial analysis,
 and green change feedback. The overview is the primary visual object; source and its
