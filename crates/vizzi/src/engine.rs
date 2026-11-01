@@ -15,8 +15,8 @@ use std::{
     time::{Duration, Instant},
 };
 use vizzi_core::{
-    model::{ContentId, Context, Document, ModelError, Snapshot},
-    rust::RustAnalyzer,
+    analysis::Analyzer,
+    model::{ContentId, Document, ModelError, Snapshot},
 };
 
 /// Native source/analysis failure; the host retains its previous snapshot.
@@ -38,7 +38,7 @@ pub enum EngineError {
 /// Measurements of an entire capture and analysis attempt.
 #[derive(Clone, Debug, Default, PartialEq, Serialize)]
 pub struct Measurements {
-    /// Total indexed Rust files in the candidate snapshot.
+    /// Total indexed source files in the candidate snapshot.
     pub files: usize,
     /// Source bytes read and verified, including unchanged files.
     pub bytes: usize,
@@ -77,7 +77,7 @@ pub struct Engine {
     workers: usize,
 }
 impl Engine {
-    /// Configures 1–32 workers, each with its own parser.
+    /// Configures 1–32 workers shared across languages, with worker-local parsers.
     pub fn new(directory: Directory, cache: Cache, workers: usize) -> Result<Self, EngineError> {
         if !(1..=32).contains(&workers) {
             return Err(EngineError::Configuration(
@@ -104,6 +104,7 @@ impl Engine {
     }
 
     /// Verifies a path hint set or reconciles, using only the published baseline.
+    /// After replacing the source registry, call `refresh` for full discovery first.
     pub fn refresh_scoped(
         &self,
         previous: Option<&Snapshot>,
@@ -116,11 +117,9 @@ impl Engine {
         let started = Instant::now();
         let previous =
             previous.filter(|snapshot| snapshot.workspace() == self.directory.workspace());
-        let context = RustAnalyzer::context();
         let capture = match scope {
             CaptureScope::Paths(paths)
-                if previous
-                    .is_some_and(|snapshot| self.can_capture_paths(snapshot, paths, &context)) =>
+                if previous.is_some_and(|snapshot| self.can_capture_paths(snapshot, paths)) =>
             {
                 self.directory.capture_paths(paths)?
             }
@@ -161,15 +160,22 @@ impl Engine {
                 return Ok(None);
             }
             let content = ContentId::derive(&[&file.bytes]);
+            let language = self
+                .directory
+                .language(Path::new(&file.path))
+                .ok_or_else(|| {
+                    EngineError::Configuration("captured input has no language adapter".into())
+                })?;
+            let context = language.context();
             if let Some(old) = previous.get(file.path.as_str()).filter(|old| {
                 old.content() == &content
                     && old.analyses().len() == 1
-                    && old.analyses()[0].context == context
+                    && old.analyses()[0].context == *context
             }) {
                 documents.push((*old).clone());
                 measurements.reused += 1;
             } else {
-                jobs.push((file, content));
+                jobs.push((file, content, language));
             }
         }
         jobs.sort_by_key(|job| std::cmp::Reverse(job.0.bytes.len()));
@@ -178,7 +184,7 @@ impl Engine {
             let handles: Vec<_> = (0..self.workers.min(jobs.len()))
                 .map(|_| {
                     scope.spawn(|| -> Result<_, EngineError> {
-                        let mut parser = RustAnalyzer::new()?;
+                        let mut parsers = BTreeMap::<_, Box<dyn Analyzer>>::new();
                         let mut batch = Vec::new();
                         let mut counters = (0, 0, 0);
                         loop {
@@ -186,11 +192,15 @@ impl Engine {
                                 break;
                             }
                             let index = next.fetch_add(1, Ordering::Relaxed);
-                            let Some((file, content)) = jobs.get(index) else {
+                            let Some((file, content, language)) = jobs.get(index) else {
                                 break;
                             };
-                            let cached =
-                                self.cache.load(&context.id, content).and_then(|analysis| {
+                            let context = language.context();
+                            let cached = self
+                                .cache
+                                .load(&context.id, content)
+                                .filter(|analysis| analysis.context == *context)
+                                .and_then(|analysis| {
                                     Document::capture(
                                         self.directory.workspace().clone(),
                                         file.path.clone(),
@@ -203,17 +213,31 @@ impl Engine {
                                 counters.1 += 1;
                                 document
                             } else {
+                                let parser = match parsers.entry(context.id.clone()) {
+                                    std::collections::btree_map::Entry::Occupied(entry) => {
+                                        entry.into_mut()
+                                    }
+                                    std::collections::btree_map::Entry::Vacant(entry) => {
+                                        entry.insert(language.create()?)
+                                    }
+                                };
                                 let analysis = parser.analyze(&file.bytes)?;
-                                counters.0 += 1;
-                                if self.cache.store(&analysis).is_err() {
-                                    counters.2 += 1;
+                                if analysis.context != *context {
+                                    return Err(EngineError::Configuration(
+                                        "analyzer returned an unregistered context".into(),
+                                    ));
                                 }
-                                Document::capture(
+                                let document = Document::capture(
                                     self.directory.workspace().clone(),
                                     file.path.clone(),
                                     &file.bytes,
                                     vec![analysis],
-                                )?
+                                )?;
+                                counters.0 += 1;
+                                if self.cache.store(&document.analyses()[0]).is_err() {
+                                    counters.2 += 1;
+                                }
+                                document
                             };
                             batch.push(Arc::new(document));
                         }
@@ -252,19 +276,16 @@ impl Engine {
         }))
     }
 
-    fn can_capture_paths(
-        &self,
-        snapshot: &Snapshot,
-        paths: &BTreeSet<PathBuf>,
-        context: &Context,
-    ) -> bool {
+    fn can_capture_paths(&self, snapshot: &Snapshot, paths: &BTreeSet<PathBuf>) -> bool {
         if paths.is_empty() || paths.len() > MAX_PATH_HINTS {
             return false;
         }
         if snapshot.documents().iter().any(|file| {
-            !Directory::source_path(Path::new(file.path()))
-                || file.analyses().len() != 1
-                || file.analyses()[0].context != *context
+            self.directory
+                .language(Path::new(file.path()))
+                .is_none_or(|language| {
+                    file.analyses().len() != 1 || file.analyses()[0].context != *language.context()
+                })
         }) {
             return false;
         }
@@ -305,6 +326,79 @@ fn milliseconds(duration: Duration) -> f64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn mixed_languages_share_cache_and_incremental_source_policy() {
+        let source = tempfile::tempdir().unwrap();
+        let cache = tempfile::tempdir().unwrap();
+        std::fs::write(source.path().join("a.rs"), "fn rust() {}").unwrap();
+        std::fs::write(source.path().join("b.py"), "def python(): pass\n").unwrap();
+        std::fs::write(source.path().join("skip.h"), "ambiguous header").unwrap();
+        std::fs::write(source.path().join("skip.lpc"), "LPC").unwrap();
+        let engine = engine(source.path(), cache.path(), 2);
+        let first = engine.refresh(None, &|| false).unwrap().unwrap();
+        assert_eq!(first.measurements.files, 2);
+        assert_eq!(first.measurements.parsed, 2);
+        assert_eq!(
+            first.snapshot.documents()[0].analyses()[0].context.language,
+            "rust"
+        );
+        assert_eq!(
+            first.snapshot.documents()[1].analyses()[0].context.language,
+            "python"
+        );
+        let warm = engine.refresh(None, &|| false).unwrap().unwrap();
+        assert_eq!(warm.measurements.cache_hits, 2);
+        assert_eq!(warm.snapshot.id(), first.snapshot.id());
+        std::fs::write(source.path().join("b.py"), "def edited(): pass\n").unwrap();
+        let edited = engine
+            .refresh_scoped(
+                Some(&first.snapshot),
+                &CaptureScope::Paths(BTreeSet::from(["b.py".into()])),
+                &|| false,
+            )
+            .unwrap()
+            .unwrap();
+        assert!(!edited.measurements.reconciled);
+        assert_eq!(edited.measurements.read_files, 1);
+        assert_eq!(edited.measurements.parsed, 1);
+        assert_eq!(edited.measurements.retained, 1);
+        assert_eq!(
+            edited.snapshot.documents()[1].analyses()[0].facts[0].name,
+            "edited"
+        );
+        assert!(Arc::ptr_eq(
+            &first.snapshot.documents()[0],
+            &edited.snapshot.documents()[0]
+        ));
+        std::fs::rename(source.path().join("b.py"), source.path().join("b.txt")).unwrap();
+        std::fs::write(source.path().join("c.py"), "class Added: pass\n").unwrap();
+        let renamed = engine
+            .refresh_scoped(
+                Some(&edited.snapshot),
+                &CaptureScope::Paths(BTreeSet::from([
+                    "b.py".into(),
+                    "b.txt".into(),
+                    "c.py".into(),
+                ])),
+                &|| false,
+            )
+            .unwrap()
+            .unwrap();
+        assert_eq!(renamed.measurements.read_files, 1);
+        assert_eq!(renamed.measurements.retained, 1);
+        let clean = engine.refresh(None, &|| false).unwrap().unwrap();
+        assert_eq!(renamed.snapshot.id(), clean.snapshot.id());
+        assert_eq!(
+            renamed
+                .snapshot
+                .documents()
+                .iter()
+                .map(|doc| doc.path())
+                .collect::<Vec<_>>(),
+            ["a.rs", "c.py"]
+        );
+    }
+
     fn engine(source: &std::path::Path, cache: &std::path::Path, workers: usize) -> Engine {
         Engine::new(
             Directory::open(source).unwrap(),

@@ -4,6 +4,9 @@ This procedure measures the native application through its public diagnostic tra
 It complements the isolated [performance experiments](../performance/README.md), and
 does not measure browser presentation. The script edits only a temporary source copy.
 See [the first application report](RESULTS.md) for recorded results and limitations.
+The current driver supports the configured Rust/Python scope; it uses `//` or `#`
+for edit probes according to the selected outline language. See the
+[mixed-language procedure and evidence](../languages/README.md) for PyTorch runs.
 
 Build the optimized host and run with a pinned, build-artifact-free source archive:
 
@@ -47,11 +50,10 @@ Run mutation testing for the core model and native source/cache/publication boun
 
 ```sh
 cargo mutants -p vizzi-core -p vizzi --no-config \
-  --file 'crates/vizzi-core/src/{model,publication,query,rust}.rs' \
+  --file 'crates/vizzi-core/src/{model,publication,query,rust,python,syntax,analysis}.rs' \
   --file 'crates/vizzi/src/{cache,engine,application,source}.rs' \
   --test-package vizzi-core --test-package vizzi \
-  --jobs 4 --timeout 15 --build-timeout 180 -- \
-  --lib
+  --jobs 4 --timeout 15 --build-timeout 180
 ```
 
 This scope covers complete modules rather than just changed lines. Scheduler, HTTP/stdio

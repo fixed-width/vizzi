@@ -1,6 +1,9 @@
 //! Immutable source-backed models and analysis, independent of native hosts.
 
+pub mod analysis;
 pub mod model;
 pub mod publication;
+pub mod python;
 pub mod query;
 pub mod rust;
+mod syntax;

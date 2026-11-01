@@ -13,7 +13,7 @@ HTTP responses disable caching. The host serves `/`, `/app.js`, `/controller.js`
 | `GET /api/events` | None; `Last-Event-ID` does not request replay | Latest-state `workspace` events over SSE, followed by changes |
 
 `filter` is a case-insensitive path substring. `limit` defaults to 2,000 and is clamped
-to 1–2,000. `total` counts all discovered Rust files; `matching` counts matches before
+to 1–2,000. `total` counts all discovered supported source files; `matching` counts matches before
 limiting. The view includes world-space tile rectangles, directory labels, and height.
 Tile coverage combines all configured analysis contexts. Source outlines retain each
 context's identity, coverage, diagnostics, and declarations separately.

@@ -114,18 +114,19 @@ def measure(args):
             pinned_uri = "/api/source?" + urllib.parse.urlencode({"snapshot": first["snapshot"], "file": file_id})
             target = root / source["path"]
             original = target.read_bytes()
+            comment = "#" if source["outlines"][0]["context"]["language"] == "python" else "//"
             previous_snapshot = first["snapshot"]
             edits = []
             for index in range(3):
                 started = time.perf_counter()
-                target.write_bytes(f"// vizzi edit probe {index}\n".encode() + original)
+                target.write_bytes(f"{comment} vizzi edit probe {index}\n".encode() + original)
                 status = session.wait(lambda status: status["snapshot"] != previous_snapshot and not status["pending"])
                 publication_ms = milliseconds(started)
                 updated, request_ms = session.request(uri)
                 response_ms = milliseconds(started)
                 assert updated["selection"]["file"] == file_id
                 assert updated["selection"]["entity"] == entity_id
-                assert updated["source"]["text"].startswith(f"// vizzi edit probe {index}\n")
+                assert updated["source"]["text"].startswith(f"{comment} vizzi edit probe {index}\n")
                 assert status["measurements"]["parsed"] == 1, status
                 assert status["measurements"]["read_files"] == 1, status
                 clean = once(binary, root, cache, args.workers)
@@ -138,7 +139,7 @@ def measure(args):
                 previous_snapshot = updated["snapshot"]
             peak = re.search(r"VmHWM:\s+(\d+) kB", pathlib.Path(f"/proc/{session.process.pid}/status").read_text())
             return {"source_revision": args.revision, "source": str(args.source.resolve()),
-                    "scope": "Rust files only; disposable copy; no analyzed project builds",
+                    "scope": "Rust .rs and Python .py only; disposable copy; no analyzed project builds",
                     "platform": platform.platform(), "workers": args.workers,
                     "rustc": subprocess.check_output(["rustc", "--version"], text=True).strip(),
                     "binary_sha256": hashlib.sha256(binary.read_bytes()).hexdigest(),
@@ -149,7 +150,7 @@ def measure(args):
                     "live_peak_rss_kib": int(peak[1]) if peak else None,
                     "limits": ["Three samples; no tail-latency claim", "First load has warm OS file cache",
                                "No browser, labels, frame times, GPU, or edit-to-visible measurement",
-                               "Hinted files are reopened and hashed; full reconciliation verifies the whole Rust scope; changed files are parsed afresh"]}
+                               "Hinted files are reopened and hashed; full reconciliation verifies the whole configured source scope; changed files are parsed afresh"]}
         finally:
             session.close()
 

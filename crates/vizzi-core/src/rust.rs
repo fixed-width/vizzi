@@ -1,23 +1,38 @@
 //! Rust lexical declarations from raw, unexpanded source.
 
-use crate::model::{Analysis, ContentId, Context, ContextId, Coverage, Fact, ModelError};
-use std::collections::BTreeMap;
+use crate::{
+    analysis::{Analyzer, LanguageAdapter},
+    model::{Analysis, Context, ContextId, ModelError},
+    syntax::SyntaxAnalyzer,
+};
+
+/// Registers the Rust syntax adapter for `.rs` inputs.
+pub struct RustAdapter;
+impl LanguageAdapter for RustAdapter {
+    fn extensions(&self) -> &[&str] {
+        &["rs"]
+    }
+    fn context(&self) -> Context {
+        RustAnalyzer::context()
+    }
+    fn create(&self) -> Result<Box<dyn Analyzer>, ModelError> {
+        Ok(Box::new(RustAnalyzer::new()?))
+    }
+}
 
 /// A reusable parser; each worker owns its instance.
 pub struct RustAnalyzer {
-    parser: tree_sitter::Parser,
-    context: Context,
+    syntax: SyntaxAnalyzer,
 }
 impl RustAnalyzer {
     /// Configures the current grammar and implementation fingerprint.
     pub fn new() -> Result<Self, ModelError> {
-        let mut parser = tree_sitter::Parser::new();
-        parser
-            .set_language(&tree_sitter_rust::LANGUAGE.into())
-            .map_err(|error| ModelError(error.to_string()))?;
         Ok(Self {
-            parser,
-            context: Self::context(),
+            syntax: SyntaxAnalyzer::new(
+                tree_sitter_rust::LANGUAGE.into(),
+                Self::context(),
+                declaration,
+            )?,
         })
     }
     /// Identifies the current grammar, configuration, and source implementation.
@@ -27,6 +42,8 @@ impl RustAnalyzer {
             description: "Tree-sitter Rust; raw syntax, no macro expansion".into(),
             id: ContextId::derive(&[
                 include_bytes!("rust.rs"),
+                include_bytes!("syntax.rs"),
+                include_bytes!("analysis.rs"),
                 include_bytes!("model.rs"),
                 include_bytes!("../../../Cargo.lock"),
                 b"raw-rust-syntax-v1",
@@ -35,79 +52,12 @@ impl RustAnalyzer {
     }
     /// Extracts source-backed declarations and reports syntax recovery.
     pub fn analyze(&mut self, bytes: &[u8]) -> Result<Analysis, ModelError> {
-        let mut analysis = Analysis {
-            content: ContentId::derive(&[bytes]),
-            context: self.context.clone(),
-            coverage: Coverage::Syntax,
-            facts: Vec::new(),
-            diagnostics: Vec::new(),
-        };
-        let Ok(text) = std::str::from_utf8(bytes) else {
-            analysis.coverage = Coverage::Unavailable;
-            analysis
-                .diagnostics
-                .push("Source is not UTF-8; syntax analysis is unavailable".into());
-            return Ok(analysis);
-        };
-        let tree = self
-            .parser
-            .parse(text, None)
-            .ok_or_else(|| ModelError("parser did not return a tree".into()))?;
-        if tree.root_node().has_error() {
-            analysis.coverage = Coverage::Partial;
-            analysis.diagnostics.push(
-                "Raw source required grammar recovery; declarations may be incomplete".into(),
-            );
-        }
-        let mut cursor = tree.walk();
-        loop {
-            let node = cursor.node();
-            if let Some((kind, name)) = declaration(node, text) {
-                let mut scope = Vec::new();
-                let mut parent = node.parent();
-                while let Some(ancestor) = parent {
-                    if let Some((kind, name)) = declaration(ancestor, text) {
-                        scope.push(format!("{kind}:{name}"));
-                    }
-                    parent = ancestor.parent();
-                }
-                scope.reverse();
-                scope.push(format!("{kind}:{name}"));
-                let key =
-                    serde_json::to_string(&scope).map_err(|error| ModelError(error.to_string()))?;
-                analysis.facts.push(Fact {
-                    key,
-                    kind: kind.into(),
-                    name,
-                    span: node.byte_range(),
-                    unique: true,
-                });
-            }
-            if cursor.goto_first_child() {
-                continue;
-            }
-            loop {
-                if cursor.goto_next_sibling() {
-                    break;
-                }
-                if !cursor.goto_parent() {
-                    let mut counts = BTreeMap::<String, usize>::new();
-                    for fact in &analysis.facts {
-                        *counts.entry(fact.key.clone()).or_default() += 1;
-                    }
-                    let mut ordinals = BTreeMap::<String, usize>::new();
-                    for fact in &mut analysis.facts {
-                        fact.unique = counts[&fact.key] == 1;
-                        let ordinal = ordinals.entry(fact.key.clone()).or_default();
-                        let key = serde_json::to_string(&(&fact.key, *ordinal))
-                            .map_err(|error| ModelError(error.to_string()))?;
-                        *ordinal += 1;
-                        fact.key = key;
-                    }
-                    return Ok(analysis);
-                }
-            }
-        }
+        self.syntax.analyze(bytes)
+    }
+}
+impl Analyzer for RustAnalyzer {
+    fn analyze(&mut self, bytes: &[u8]) -> Result<Analysis, ModelError> {
+        self.syntax.analyze(bytes)
     }
 }
 
@@ -141,7 +91,7 @@ fn declaration(node: tree_sitter::Node<'_>, text: &str) -> Option<(&'static str,
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::model::{Document, WorkspaceId};
+    use crate::model::{Coverage, Document, WorkspaceId};
     #[test]
     fn extracts_qualified_declarations_and_marks_duplicates_ambiguous() {
         let text = b"mod one { fn same() {} } mod two { fn same() {} } fn repeated() {} fn repeated() {} struct Example; impl Example { fn method(&self) {} }";

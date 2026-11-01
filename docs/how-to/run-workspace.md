@@ -1,6 +1,6 @@
 # Run a source workspace
 
-Use these instructions to inspect a local directory of Rust source. Build Vizzi with
+Use these instructions to inspect a local directory of Rust and/or Python source. Build Vizzi with
 a current stable Rust toolchain; the lockfile records the tested dependencies. No build
 commands are run in the directory being inspected.
 
@@ -26,9 +26,11 @@ analysis in progress while the previous observation remains usable. Syntax recov
 appears beside the source. The outline describes raw syntax, without macro expansion
 or compiler name resolution.
 
-The first host discovers `.rs` files, skips symlinks and root `.git`, `target`, and
+The host discovers `.rs` and `.py` files, skips symlinks and root `.git`, `target`, and
 `node_modules` directories, and preserves nested source directories with those names.
-It uses four parsing workers by default; choose 1–32 with `--workers`. The overview
+It shares four parsing workers across both languages by default; choose 1–32 with
+`--workers`. Other extensions are omitted; see the [language scope](../prototype/LANGUAGES.md).
+The overview
 returns at most 2,000 files per filtered query. Use a path filter to narrow larger scopes.
 
 ## Inspect without a browser

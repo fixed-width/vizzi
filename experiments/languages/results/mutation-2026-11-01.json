@@ -1,0 +1,149 @@
+{
+  "tool": "cargo-mutants 27.1.0",
+  "base_commit": "746962dc86166347d229b4c963c70c803fa5c743",
+  "working_tree": "implementation before documentation-only edits",
+  "baseline": "passed",
+  "scope": [
+    "crates/vizzi-core/src/analysis.rs",
+    "crates/vizzi-core/src/python.rs",
+    "crates/vizzi-core/src/rust.rs",
+    "crates/vizzi-core/src/syntax.rs",
+    "crates/vizzi/src/engine.rs",
+    "crates/vizzi/src/source.rs",
+    "crates/vizzi/src/invalidation.rs"
+  ],
+  "tests": "Complete vizzi-core and vizzi tests, including language integration tests and live native CLI tests",
+  "command": "cargo mutants -p vizzi-core -p vizzi --config experiments/incremental/mutants.toml --file 'crates/vizzi-core/src/{analysis,python,rust,syntax}.rs' --file 'crates/vizzi/src/{engine,source,invalidation}.rs' --test-package vizzi-core --test-package vizzi --jobs 4 --timeout 15 --build-timeout 180 --output /tmp/vizzi-language-mutations",
+  "tested": 171,
+  "counts": {
+    "Unviable": 25,
+    "CaughtMutant": 143,
+    "Timeout": 3
+  },
+  "exclusions": [
+    {
+      "pattern": "^crates/vizzi/src/engine\\.rs:\\d+:\\d+: replace < with <= in has_descendant$",
+      "reason": "Existing equivalent comparison: validated document paths cannot equal a directory prefix ending in '/'."
+    }
+  ],
+  "non_caught": [
+    {
+      "name": "crates/vizzi/src/engine.rs:95:9: replace Engine::directory -> &Directory with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:103:9: replace Engine::refresh -> Result<Option<Refresh>, EngineError> with Ok(Some(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:113:9: replace Engine::refresh_scoped -> Result<Option<Refresh>, EngineError> with Ok(Some(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:113:9: replace Engine::refresh_scoped -> Result<Option<Refresh>, EngineError> with Ok(None)",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:301:17: replace && with || in Engine::can_capture_paths",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/invalidation.rs:95:9: replace PendingRefresh::plan -> Plan with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/invalidation.rs:106:9: replace PendingRefresh::publish -> Outcome with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:66:9: replace Directory::open -> io::Result<Self> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:73:9: replace Directory::with_languages -> io::Result<Self> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:86:9: replace Directory::root -> &Path with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:90:9: replace Directory::workspace -> &WorkspaceId with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:105:9: replace Directory::capture -> io::Result<Capture> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:153:9: replace Directory::capture_paths -> io::Result<Capture> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/invalidation.rs:79:9: replace Plan::cancelled -> bool with true",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/invalidation.rs:79:34: replace != with == in Plan::cancelled",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:215:9: replace Directory::language -> Option<&Language> with Some(Box::leak(Box::new(Default::default())))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/analysis.rs:34:9: replace Language::context -> &Context with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/analysis.rs:38:9: replace Language::create -> Result<Box<dyn Analyzer>, ModelError> with Ok(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/analysis.rs:80:9: replace Languages::builtin -> Result<Self, ModelError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/analysis.rs:84:9: replace Languages::select -> Option<&Language> with Some(Box::leak(Box::new(Default::default())))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/python.rs:16:9: replace <impl LanguageAdapter for PythonAdapter>::context -> Context with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/python.rs:30:9: replace <impl LanguageAdapter for PythonAdapter>::create -> Result<Box<dyn Analyzer>, ModelError> with Ok(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/rust.rs:16:9: replace <impl LanguageAdapter for RustAdapter>::context -> Context with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/rust.rs:19:9: replace <impl LanguageAdapter for RustAdapter>::create -> Result<Box<dyn Analyzer>, ModelError> with Ok(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/rust.rs:40:9: replace RustAnalyzer::context -> Context with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/rust.rs:55:9: replace RustAnalyzer::analyze -> Result<Analysis, ModelError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/rust.rs:60:9: replace <impl Analyzer for RustAnalyzer>::analyze -> Result<Analysis, ModelError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/syntax.rs:34:9: replace <impl Analyzer for SyntaxAnalyzer>::analyze -> Result<Analysis, ModelError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    }
+  ],
+  "limitations": [
+    "Timeouts and unviable builds are separate from assertion-detected mutations.",
+    "Three timeouts suppress initial publication and leave host-startup tests waiting.",
+    "Hash macro expansion, native filesystem implementation, browser painting, and dependency internals are not mutated.",
+    "Browser controller/update modules were unchanged; their previous mutation evidence is separate."
+  ]
+}

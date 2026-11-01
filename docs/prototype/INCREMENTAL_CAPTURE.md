@@ -9,7 +9,7 @@ The portable snapshot model remains independent of filesystem events and source 
 Initial indexing, an invalid baseline/context, ambiguous events, directory changes,
 watcher errors/rescan flags, and periodic recovery use full reconciliation. Ordinary
 file writes and named rename sides/pairs can use workspace-relative path hints. Hinted
-Rust files are reopened and content-hashed, including same-size and same-mtime edits.
+supported source files are reopened and content-hashed, including same-size and same-mtime edits.
 Deleted or symlink-replaced files are removed. Ancestor changes and directory targets
 fall back to full discovery. New source parents require discovery and watch registration.
 

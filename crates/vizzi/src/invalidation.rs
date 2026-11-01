@@ -50,7 +50,7 @@ pub(crate) fn classify(
         | EventKind::Remove(RemoveKind::File)
         | EventKind::Modify(ModifyKind::Data(_))
         | EventKind::Access(AccessKind::Close(AccessMode::Write)) => {
-            paths.retain(|path| Directory::source_path(path))
+            paths.retain(|path| directory.source_path(path))
         }
         EventKind::Modify(ModifyKind::Name(RenameMode::Both)) if event.paths.len() == 2 => {}
         EventKind::Modify(ModifyKind::Name(RenameMode::From | RenameMode::To))
@@ -134,6 +134,10 @@ mod tests {
             assert_eq!(
                 classify(&dir, Ok(Event::new(kind).add_path(dir.root().join("a.rs")))),
                 Some(paths(&["a.rs"]))
+            );
+            assert_eq!(
+                classify(&dir, Ok(Event::new(kind).add_path(dir.root().join("b.py")))),
+                Some(paths(&["b.py"]))
             );
             assert!(
                 classify(

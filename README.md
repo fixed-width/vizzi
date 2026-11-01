@@ -1,7 +1,7 @@
 # Vizzi
 
 Coordinated views for exploring source code and, eventually, reviewing changes.
-The current prototype links a Rust file map, captured source, and a lexical declaration
+The current prototype links a Rust/Python file map, captured source, and a lexical declaration
 outline. A native Rust engine supplies immutable observations to a local browser host.
 
 The production renderer, compiler-backed language integrations, review workflow, and
@@ -15,9 +15,11 @@ validating coordination; it does not qualify large-codebase GPU performance.
 - [Change-notification contract](docs/prototype/CHANGES.md)
 - [Incremental-capture contract](docs/prototype/INCREMENTAL_CAPTURE.md)
 - [Captured document and snapshot identities](docs/prototype/IDENTITIES.md)
+- [Language adapters and shared worker budget](docs/prototype/LANGUAGES.md)
 - [Application measurement procedure](experiments/prototype/README.md)
 - [Browser validation and measurements](experiments/browser/README.md)
 - [Verified incremental-capture measurements](experiments/incremental/RESULTS.md)
+- [Mixed-language adapter measurements](experiments/languages/RESULTS.md)
 - [Earlier performance experiments](experiments/performance/README.md)
 - [Contributor guidance](AGENTS.md)
 

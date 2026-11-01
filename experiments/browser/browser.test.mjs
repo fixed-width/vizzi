@@ -8,11 +8,32 @@ let chromium, input, host;
 const text = `const HTML: &str = "<img src=x onerror='window.injected=true'>";\nfn first() {}\nfn anchor() {\n${"    // captured line\n".repeat(10000)}}\n`;
 before(async () => {
   buildHost();
-  input = await workspace({ files: { "src/a.rs": text, "src/b.rs": "fn beta() {}", "src/partial.rs": "fn broken( {", "src/encoding.rs": Buffer.from([255]) } });
+  input = await workspace({ files: { "src/a.rs": text, "src/b.rs": "fn beta() {}", "src/partial.rs": "fn broken( {", "src/encoding.rs": Buffer.from([255]), "src/z.py": "class Example:\n    def read(self): pass\n" } });
   host = await startHost(input);
   chromium = await browser();
 });
 after(async () => { await chromium?.close(); await host?.close(); await input?.close(); });
+
+test("Python source and outline share selection and update through native notifications", async () => {
+  const session = await openWorkspace(chromium, host);
+  const { page } = session;
+  try {
+    await page.locator("summary").click();
+    await page.getByRole("button", { name: "src/z.py", exact: true }).click();
+    await page.waitForFunction(() => document.getElementById("file-title").textContent === "src/z.py");
+    assert.ok((await page.locator("#coverage").textContent()).includes("python"));
+    assert.ok((await page.locator("#counts").textContent()).includes("source files"));
+    await page.getByRole("button", { name: /^read/ }).click();
+    const selected = await page.locator('#outline [aria-current="true"]').textContent();
+    const snapshot = await page.locator("#snapshot").getAttribute("title");
+    await writeFile(join(input.root, "src/z.py"), "# new position\nclass Example:\n    def read(self): pass\n");
+    await page.waitForFunction(previous => document.getElementById("snapshot").title !== previous, snapshot);
+    assert.ok((await page.locator('#outline [aria-current="true"]').textContent()).startsWith("read"));
+    assert.ok(selected.startsWith("read"));
+    assert.ok((await page.locator("#source").textContent()).includes("# new position"));
+    assert.deepEqual(session.errors, []);
+  } finally { await session.close(); }
+});
 
 test("Chromium can paint a local page", async () => {
   const page = await chromium.newPage();

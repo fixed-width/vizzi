@@ -9,7 +9,7 @@ vertical slice; the performance experiment crate remains independent.
 - `vizzi-core` owns typed identities, captured documents, source-backed syntax facts,
   snapshot queries, selection reconciliation, layout, and publication rules. It does
   not open files, watch directories, or know about HTTP and Git.
-- Its Rust analyzer owns a reusable Tree-sitter parser and emits lexical declaration
+- Its language adapters own reusable Tree-sitter parsers and emit lexical declaration
   facts. Analysis carries a context and content identity. Source ranges use UTF-8 byte
   offsets; line ranges are derived from the captured source.
 - The native `vizzi` host captures source, runs bounded analyzer workers, persists
@@ -28,8 +28,9 @@ identities are hashes of captured bytes, independently of source-control identif
 
 Documents retain captured source and can contain analyses for multiple contexts.
 Analysis contexts identify language, analyzer, configuration, and implementation.
-The first host configures one Rust syntax analyzer. Its fingerprint conservatively
-includes core implementation sources and the dependency lockfile.
+The host registers Rust and Python syntax adapters through one source policy. Their
+fingerprints conservatively include adapter/shared implementation sources and the
+dependency lockfile. See [language and worker contracts](LANGUAGES.md).
 
 Snapshots sort documents and identify their actual captured contents and analysis.
 They represent immutable observations, not an atomic filesystem transaction. A source
@@ -61,7 +62,8 @@ reconciles the whole source scope. It retains unread documents only from the pub
 baseline; cancelled and superseded jobs do not consume pending hints. Directory or
 ambiguous changes fall back to complete discovery. New watch registration closes its
 discovery gap with another full pass. See [incremental capture](INCREMENTAL_CAPTURE.md).
-Parser ownership remains local to a bounded worker. Cancellation is checked between
+One worker budget and queue cover all languages; parser creation is lazy and ownership
+remains local to a bounded worker. Cancellation is checked between
 files; a long individual parse is not interruptible. Parsing never holds the publication lock.
 
 ## Host interface

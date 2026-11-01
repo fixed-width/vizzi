@@ -22,14 +22,14 @@ const controller = createController({
     const changedEntity = view?.selection.entity !== next.selection.entity;
     const changedSource = changedFile || view?.source?.text !== next.source?.text;
     view = next;
-    element("counts").textContent = `${next.files.length} shown / ${next.matching} matching / ${next.total} Rust files`;
+    element("counts").textContent = `${next.files.length} shown / ${next.matching} matching / ${next.total} source files`;
     element("empty").hidden = next.files.length > 0;
     element("file-title").textContent = next.source?.path ?? "Choose a file";
     element("snapshot").textContent = next.snapshot.slice(0, 8);
     element("snapshot").title = `Captured observation ${next.snapshot}`;
     const outlines = next.source?.outlines ?? [];
     const diagnostics = outlines.flatMap(outline => outline.diagnostics);
-    element("coverage").textContent = outlines.length ? `Read-only · ${outlines.map(outline => outline.coverage === "syntax" ? "syntax parsed" : outline.coverage === "partial" ? "partial syntax" : "analysis unavailable").join(" · ")}` : "Read-only · no syntax analysis";
+    element("coverage").textContent = outlines.length ? `Read-only · ${outlines.map(outline => `${outline.context.language}: ${outline.coverage === "syntax" ? "syntax parsed" : outline.coverage === "partial" ? "partial syntax" : "analysis unavailable"}`).join(" · ")}` : "Read-only · no syntax analysis";
     element("diagnostics").hidden = diagnostics.length === 0;
     element("diagnostics").textContent = diagnostics.join(". ");
     const facts = outlines.flatMap(outline => outline.declarations);

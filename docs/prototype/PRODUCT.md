@@ -1,14 +1,18 @@
 # First codebase workspace behaviour
 
-The first slice lets a developer explore Rust source through a repository overview,
+The first slice lets a developer explore Rust and Python source through a repository overview,
 a source inspector, and a declaration outline sharing one selection. It uses the local
 engine and works without a project build or external account.
 
 ## Required behaviour
 
 - The root directory and cache directory are chosen when launching the native host.
-- Rust files are discovered without following symlinks or reading root `.git`,
+- Rust `.rs` and Python `.py` files share discovery, selection, and analysis scheduling,
+  without following symlinks or reading root `.git`,
   `target`, or `node_modules` directories. LPC analysis remains out of scope.
+- Supported scope and declaration kinds follow the [language contract](LANGUAGES.md).
+  The source inspector identifies each analysis language and coverage; overview counts
+  describe supported source files. Unconfigured languages are omitted.
 - The overview groups files by directory, supports filtering, pan, zoom, and selection,
   and provides readable file labels and hover details.
   Its initial camera reveals readable labels; fitting the whole map can hide labels

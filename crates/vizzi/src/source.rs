@@ -1,11 +1,15 @@
 //! Read-only directory snapshots, independent of source-control systems.
 
+use std::sync::Arc;
 use std::{
     collections::BTreeSet,
     io,
     path::{Component, Path, PathBuf},
 };
-use vizzi_core::model::WorkspaceId;
+use vizzi_core::{
+    analysis::{Language, Languages},
+    model::WorkspaceId,
+};
 
 /// Input verification scope; paths are hints relative to the canonical workspace.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -41,9 +45,9 @@ pub struct CapturedFile {
     /// Frozen bytes read during discovery.
     pub bytes: Vec<u8>,
 }
-/// Captured Rust inputs and the directories to observe for changes.
+/// Captured supported inputs and the directories to observe for changes.
 pub struct Capture {
-    /// Rust source files in path order.
+    /// Supported source files in path order.
     pub files: Vec<CapturedFile>,
     /// Traversed directories, excluding root build/VCS dependencies.
     pub directories: Option<Vec<PathBuf>>,
@@ -54,16 +58,28 @@ pub struct Capture {
 pub struct Directory {
     root: PathBuf,
     workspace: WorkspaceId,
+    languages: Arc<Languages>,
 }
 impl Directory {
     /// Opens a directory; never executes project build scripts.
     pub fn open(root: &Path) -> io::Result<Self> {
+        Self::with_languages(
+            root,
+            Arc::new(Languages::builtin().map_err(io::Error::other)?),
+        )
+    }
+    /// Opens a directory with an explicit shared source and analysis policy.
+    pub fn with_languages(root: &Path, languages: Arc<Languages>) -> io::Result<Self> {
         let root = root.canonicalize()?;
         if !root.is_dir() {
             return Err(io::Error::other("workspace root is not a directory"));
         }
         let workspace = WorkspaceId::derive(&[root.as_os_str().as_encoded_bytes()]);
-        Ok(Self { root, workspace })
+        Ok(Self {
+            root,
+            workspace,
+            languages,
+        })
     }
     /// Returns the canonical root.
     pub fn root(&self) -> &Path {
@@ -81,11 +97,10 @@ impl Directory {
                 [".git", "target", "node_modules"]
                     .iter()
                     .any(|name| part == *name)
-            }) && (path.extension().is_some_and(|extension| extension == "rs")
-                || path.extension().is_none())
+            }) && (self.source_path(path) || path.extension().is_none())
         })
     }
-    /// Reads Rust files without following symlinks; errors preserve the prior snapshot.
+    /// Reads supported files without following symlinks; errors preserve the prior snapshot.
     pub fn capture(&self) -> io::Result<Capture> {
         self.check_root()?;
         let mut capture = Capture {
@@ -109,9 +124,7 @@ impl Directory {
                         continue;
                     }
                     pending.push(path);
-                } else if kind.is_file()
-                    && path.extension().is_some_and(|extension| extension == "rs")
-                {
+                } else if kind.is_file() && self.source_path(&path) {
                     let relative = path.strip_prefix(&self.root).map_err(io::Error::other)?;
                     let parts: Result<Vec<_>, _> = relative
                         .components()
@@ -158,7 +171,7 @@ impl Directory {
                 let metadata = match std::fs::symlink_metadata(&absolute) {
                     Ok(metadata) => metadata,
                     Err(error) if error.kind() == io::ErrorKind::NotFound && leaf => {
-                        if Self::source_path(path) {
+                        if self.source_path(path) {
                             capture.removed.push(key.clone());
                         }
                         break;
@@ -171,7 +184,7 @@ impl Directory {
                     }
                 } else if metadata.file_type().is_dir() {
                     return self.capture();
-                } else if Self::source_path(path) {
+                } else if self.source_path(path) {
                     if metadata.file_type().is_file() {
                         reads.push((key.clone(), absolute.clone()));
                     } else {
@@ -195,8 +208,11 @@ impl Directory {
         }
         Ok(())
     }
-    pub(crate) fn source_path(path: &Path) -> bool {
-        path.extension().is_some_and(|extension| extension == "rs")
+    pub(crate) fn source_path(&self, path: &Path) -> bool {
+        self.language(path).is_some()
+    }
+    pub(crate) fn language(&self, path: &Path) -> Option<&Language> {
+        self.languages.select(path.extension()?.to_str()?)
     }
     pub(crate) fn relative_key(&self, path: &Path) -> io::Result<Option<String>> {
         let mut parts = Vec::new();
