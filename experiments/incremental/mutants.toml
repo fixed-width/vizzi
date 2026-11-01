@@ -1,0 +1,2 @@
+# Validated document paths cannot equal a directory prefix ending in '/'.
+exclude_re = ['^crates/vizzi/src/engine\.rs:\d+:\d+: replace < with <= in has_descendant$']

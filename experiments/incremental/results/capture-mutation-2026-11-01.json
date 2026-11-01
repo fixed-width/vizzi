@@ -1,0 +1,77 @@
+{
+  "tool": "cargo-mutants 27.1.0",
+  "baseline": "passed",
+  "scope": [
+    "source.rs",
+    "engine.rs",
+    "invalidation.rs"
+  ],
+  "tests": "library",
+  "tested": 123,
+  "counts": {
+    "Unviable": 11,
+    "CaughtMutant": 109,
+    "Timeout": 3
+  },
+  "exclusions": [
+    "replace < with <= in has_descendant: no validated file path equals a trailing-slash directory prefix"
+  ],
+  "non_caught": [
+    {
+      "name": "crates/vizzi/src/engine.rs:95:9: replace Engine::directory -> &Directory with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:103:9: replace Engine::refresh -> Result<Option<Refresh>, EngineError> with Ok(Some(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:113:9: replace Engine::refresh_scoped -> Result<Option<Refresh>, EngineError> with Ok(Some(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:281:17: replace && with || in Engine::can_capture_paths",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:113:9: replace Engine::refresh_scoped -> Result<Option<Refresh>, EngineError> with Ok(None)",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/invalidation.rs:95:9: replace PendingRefresh::plan -> Plan with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/invalidation.rs:106:9: replace PendingRefresh::publish -> Outcome with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:61:9: replace Directory::open -> io::Result<Self> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:70:9: replace Directory::root -> &Path with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:74:9: replace Directory::workspace -> &WorkspaceId with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:90:9: replace Directory::capture -> io::Result<Capture> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:140:9: replace Directory::capture_paths -> io::Result<Capture> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/invalidation.rs:79:9: replace Plan::cancelled -> bool with true",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/invalidation.rs:79:34: replace != with == in Plan::cancelled",
+      "outcome": "Timeout"
+    }
+  ]
+}

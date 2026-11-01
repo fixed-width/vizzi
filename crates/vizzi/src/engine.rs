@@ -1,10 +1,13 @@
 //! Bounded parallel analysis with immutable reuse and disposable persistence.
 
-use crate::{cache::Cache, source::Directory};
+use crate::{
+    cache::Cache,
+    source::{CaptureScope, Directory, MAX_PATH_HINTS},
+};
 use serde::Serialize;
 use std::{
-    collections::BTreeMap,
-    path::PathBuf,
+    collections::{BTreeMap, BTreeSet},
+    path::{Path, PathBuf},
     sync::{
         Arc,
         atomic::{AtomicUsize, Ordering},
@@ -12,7 +15,7 @@ use std::{
     time::{Duration, Instant},
 };
 use vizzi_core::{
-    model::{ContentId, Document, ModelError, Snapshot},
+    model::{ContentId, Context, Document, ModelError, Snapshot},
     rust::RustAnalyzer,
 };
 
@@ -35,10 +38,16 @@ pub enum EngineError {
 /// Measurements of an entire capture and analysis attempt.
 #[derive(Clone, Debug, Default, PartialEq, Serialize)]
 pub struct Measurements {
-    /// Captured Rust files.
+    /// Total indexed Rust files in the candidate snapshot.
     pub files: usize,
     /// Source bytes read and verified, including unchanged files.
     pub bytes: usize,
+    /// Source files reopened and verified during this attempt.
+    pub read_files: usize,
+    /// Unread documents retained using the supplied hints, not metadata proof.
+    pub retained: usize,
+    /// Whether this attempt rediscovered and verified the complete source scope.
+    pub reconciled: bool,
     /// Files requiring syntax parsing.
     pub parsed: usize,
     /// Files reusing immutable in-memory documents.
@@ -47,7 +56,7 @@ pub struct Measurements {
     pub cache_hits: usize,
     /// Nonfatal cache write failures.
     pub cache_warnings: usize,
-    /// Full source discovery and read wall time.
+    /// Source discovery/candidate inspection and read wall time.
     pub capture_ms: f64,
     /// Capture, analysis, cache, and snapshot-construction wall time.
     pub total_ms: f64,
@@ -57,7 +66,7 @@ pub struct Refresh {
     /// Complete immutable observation.
     pub snapshot: Arc<Snapshot>,
     /// Directories for native observation.
-    pub directories: Vec<PathBuf>,
+    pub directories: Option<Vec<PathBuf>>,
     /// Capture and analysis measurements.
     pub measurements: Measurements,
 }
@@ -91,14 +100,35 @@ impl Engine {
         previous: Option<&Snapshot>,
         cancelled: &(dyn Fn() -> bool + Sync),
     ) -> Result<Option<Refresh>, EngineError> {
+        self.refresh_scoped(previous, &CaptureScope::Reconcile, cancelled)
+    }
+
+    /// Verifies a path hint set or reconciles, using only the published baseline.
+    pub fn refresh_scoped(
+        &self,
+        previous: Option<&Snapshot>,
+        scope: &CaptureScope,
+        cancelled: &(dyn Fn() -> bool + Sync),
+    ) -> Result<Option<Refresh>, EngineError> {
         if cancelled() {
             return Ok(None);
         }
         let started = Instant::now();
-        let capture = self.directory.capture()?;
+        let previous =
+            previous.filter(|snapshot| snapshot.workspace() == self.directory.workspace());
         let context = RustAnalyzer::context();
+        let capture = match scope {
+            CaptureScope::Paths(paths)
+                if previous
+                    .is_some_and(|snapshot| self.can_capture_paths(snapshot, paths, &context)) =>
+            {
+                self.directory.capture_paths(paths)?
+            }
+            _ => self.directory.capture()?,
+        };
         let mut measurements = Measurements {
-            files: capture.files.len(),
+            read_files: capture.files.len(),
+            reconciled: capture.directories.is_some(),
             bytes: capture.files.iter().map(|file| file.bytes.len()).sum(),
             capture_ms: milliseconds(started.elapsed()),
             ..Default::default()
@@ -109,6 +139,22 @@ impl Engine {
             .map(|file| (file.path(), file))
             .collect();
         let mut documents = Vec::with_capacity(capture.files.len());
+        if !measurements.reconciled {
+            let touched: BTreeSet<_> = capture
+                .files
+                .iter()
+                .map(|file| file.path.as_str())
+                .chain(capture.removed.iter().map(String::as_str))
+                .collect();
+            for old in previous
+                .values()
+                .filter(|file| !touched.contains(file.path()))
+            {
+                documents.push((*old).clone());
+                measurements.retained += 1;
+                measurements.reused += 1;
+            }
+        }
         let mut jobs = Vec::new();
         for file in capture.files {
             if cancelled() {
@@ -197,6 +243,7 @@ impl Engine {
             self.directory.workspace().clone(),
             documents,
         )?);
+        measurements.files = snapshot.documents().len();
         measurements.total_ms = milliseconds(started.elapsed());
         Ok(Some(Refresh {
             snapshot,
@@ -204,6 +251,51 @@ impl Engine {
             measurements,
         }))
     }
+
+    fn can_capture_paths(
+        &self,
+        snapshot: &Snapshot,
+        paths: &BTreeSet<PathBuf>,
+        context: &Context,
+    ) -> bool {
+        if paths.is_empty() || paths.len() > MAX_PATH_HINTS {
+            return false;
+        }
+        if snapshot.documents().iter().any(|file| {
+            !Directory::source_path(Path::new(file.path()))
+                || file.analyses().len() != 1
+                || file.analyses()[0].context != *context
+        }) {
+            return false;
+        }
+        for path in paths {
+            let key = match self.directory.relative_key(path) {
+                Ok(Some(key)) => key,
+                Ok(None) => continue,
+                Err(_) => return false,
+            };
+            if has_descendant(snapshot, &key) {
+                return false;
+            }
+            if let Some((parent, _)) = key.rsplit_once('/')
+                && !has_descendant(snapshot, parent)
+            {
+                return false;
+            }
+        }
+        true
+    }
+}
+
+fn has_descendant(snapshot: &Snapshot, path: &str) -> bool {
+    let prefix = format!("{path}/");
+    let index = snapshot
+        .documents()
+        .partition_point(|file| file.path() < prefix.as_str());
+    snapshot
+        .documents()
+        .get(index)
+        .is_some_and(|file| file.path().starts_with(&prefix))
 }
 
 fn milliseconds(duration: Duration) -> f64 {
@@ -299,5 +391,292 @@ mod tests {
     fn measurement_units_preserve_submillisecond_precision() {
         assert_eq!(milliseconds(Duration::from_micros(1500)), 1.5);
         assert_eq!(milliseconds(Duration::from_secs(2)), 2000.0);
+    }
+
+    #[test]
+    fn hinted_reads_detect_same_stamp_edits_and_reconciliation_recovers_silent_changes() {
+        let source = tempfile::tempdir().unwrap();
+        let cache = tempfile::tempdir().unwrap();
+        let a = source.path().join("a.rs");
+        let b = source.path().join("b.rs");
+        std::fs::write(&a, "fn a() {}").unwrap();
+        std::fs::write(&b, "fn b() {}").unwrap();
+        let engine = engine(source.path(), cache.path(), 2);
+        let initial = engine.refresh(None, &|| false).unwrap().unwrap();
+        let stamp = std::fs::metadata(&a).unwrap().modified().unwrap();
+        std::fs::write(&a, "fn c() {}").unwrap();
+        std::fs::File::options()
+            .write(true)
+            .open(&a)
+            .unwrap()
+            .set_times(std::fs::FileTimes::new().set_modified(stamp))
+            .unwrap();
+        std::fs::write(&b, "fn d() {}").unwrap();
+        let hint = CaptureScope::Paths(["a.rs".into()].into());
+        let incremental = engine
+            .refresh_scoped(Some(&initial.snapshot), &hint, &|| false)
+            .unwrap()
+            .unwrap();
+        assert_eq!(incremental.measurements.read_files, 1);
+        assert_eq!(incremental.measurements.bytes, 9);
+        assert_eq!(incremental.measurements.files, 2);
+        assert_eq!(incremental.measurements.retained, 1);
+        assert_eq!(incremental.measurements.reused, 1);
+        assert_eq!(incremental.measurements.parsed, 1);
+        assert!(!incremental.measurements.reconciled);
+        assert!(incremental.directories.is_none());
+        assert_eq!(
+            incremental.snapshot.documents()[0].analyses()[0].facts[0].name,
+            "c"
+        );
+        assert_eq!(
+            incremental.snapshot.documents()[1].source(),
+            Some("fn b() {}")
+        );
+        assert!(Arc::ptr_eq(
+            &initial.snapshot.documents()[1],
+            &incremental.snapshot.documents()[1]
+        ));
+        let complete = engine
+            .refresh(Some(&incremental.snapshot), &|| false)
+            .unwrap()
+            .unwrap();
+        assert_eq!(complete.measurements.read_files, 2);
+        assert!(complete.measurements.reconciled);
+        assert_eq!(complete.snapshot.documents()[1].source(), Some("fn d() {}"));
+        let both = engine
+            .refresh_scoped(
+                Some(&initial.snapshot),
+                &CaptureScope::Paths(["a.rs".into(), "b.rs".into()].into()),
+                &|| false,
+            )
+            .unwrap()
+            .unwrap();
+        assert_eq!(both.snapshot.id(), complete.snapshot.id());
+    }
+
+    #[test]
+    fn hinted_renames_and_deletions_match_clean_capture() {
+        let source = tempfile::tempdir().unwrap();
+        let cache = tempfile::tempdir().unwrap();
+        std::fs::write(source.path().join("old.rs"), "fn a() {}").unwrap();
+        let engine = engine(source.path(), cache.path(), 1);
+        let initial = engine.refresh(None, &|| false).unwrap().unwrap();
+        std::fs::rename(source.path().join("old.rs"), source.path().join("new.rs")).unwrap();
+        let renamed = engine
+            .refresh_scoped(
+                Some(&initial.snapshot),
+                &CaptureScope::Paths(["old.rs".into(), "new.rs".into()].into()),
+                &|| false,
+            )
+            .unwrap()
+            .unwrap();
+        assert_eq!(renamed.measurements.read_files, 1);
+        assert_eq!(renamed.snapshot.documents()[0].path(), "new.rs");
+        assert_eq!(
+            renamed.snapshot.id(),
+            engine
+                .refresh(None, &|| false)
+                .unwrap()
+                .unwrap()
+                .snapshot
+                .id()
+        );
+        std::fs::remove_file(source.path().join("new.rs")).unwrap();
+        let removed = engine
+            .refresh_scoped(
+                Some(&renamed.snapshot),
+                &CaptureScope::Paths(["new.rs".into()].into()),
+                &|| false,
+            )
+            .unwrap()
+            .unwrap();
+        assert_eq!(removed.measurements.read_files, 0);
+        assert!(removed.snapshot.documents().is_empty());
+        assert_eq!(
+            removed.snapshot.id(),
+            engine
+                .refresh(None, &|| false)
+                .unwrap()
+                .unwrap()
+                .snapshot
+                .id()
+        );
+    }
+
+    #[test]
+    fn new_parent_and_removed_subtree_require_complete_discovery() {
+        let source = tempfile::tempdir().unwrap();
+        let cache = tempfile::tempdir().unwrap();
+        let engine = engine(source.path(), cache.path(), 1);
+        let initial = engine.refresh(None, &|| false).unwrap().unwrap();
+        std::fs::create_dir(source.path().join("folder.rs")).unwrap();
+        std::fs::write(source.path().join("folder.rs/a.rs"), "fn a() {}").unwrap();
+        let created = engine
+            .refresh_scoped(
+                Some(&initial.snapshot),
+                &CaptureScope::Paths(["folder.rs/a.rs".into()].into()),
+                &|| false,
+            )
+            .unwrap()
+            .unwrap();
+        assert!(created.measurements.reconciled);
+        assert!(created.directories.is_some());
+        std::fs::rename(
+            source.path().join("folder.rs"),
+            source.path().join("renamed"),
+        )
+        .unwrap();
+        let moved = engine
+            .refresh_scoped(
+                Some(&created.snapshot),
+                &CaptureScope::Paths(["folder.rs".into()].into()),
+                &|| false,
+            )
+            .unwrap()
+            .unwrap();
+        assert!(moved.measurements.reconciled);
+        assert_eq!(moved.snapshot.documents()[0].path(), "renamed/a.rs");
+    }
+
+    #[test]
+    fn incompatible_context_and_workspace_cannot_supply_unread_documents() {
+        let source = tempfile::tempdir().unwrap();
+        let cache = tempfile::tempdir().unwrap();
+        for name in ["a", "b"] {
+            std::fs::write(
+                source.path().join(format!("{name}.rs")),
+                format!("fn {name}() {{}}"),
+            )
+            .unwrap();
+        }
+        let engine = engine(source.path(), cache.path(), 1);
+        let initial = engine.refresh(None, &|| false).unwrap().unwrap();
+        let documents = initial
+            .snapshot
+            .documents()
+            .iter()
+            .map(|document| {
+                let mut analysis = document.analyses()[0].clone();
+                analysis.context.description = "old implementation".into();
+                Arc::new(
+                    Document::capture(
+                        initial.snapshot.workspace().clone(),
+                        document.path().into(),
+                        document.source().unwrap().as_bytes(),
+                        vec![analysis],
+                    )
+                    .unwrap(),
+                )
+            })
+            .collect();
+        let previous = Snapshot::new(initial.snapshot.workspace().clone(), documents).unwrap();
+        let fresh = engine
+            .refresh_scoped(
+                Some(&previous),
+                &CaptureScope::Paths(["a.rs".into()].into()),
+                &|| false,
+            )
+            .unwrap()
+            .unwrap();
+        assert!(fresh.measurements.reconciled);
+        assert_eq!(fresh.measurements.read_files, 2);
+        assert_eq!(fresh.measurements.retained, 0);
+        assert_eq!(fresh.snapshot.id(), initial.snapshot.id());
+        let unrelated =
+            Snapshot::new(vizzi_core::model::WorkspaceId::derive(&[b"other"]), vec![]).unwrap();
+        let fresh = engine
+            .refresh_scoped(
+                Some(&unrelated),
+                &CaptureScope::Paths(["a.rs".into()].into()),
+                &|| false,
+            )
+            .unwrap()
+            .unwrap();
+        assert!(fresh.measurements.reconciled);
+        assert_eq!(fresh.snapshot.id(), initial.snapshot.id());
+    }
+
+    #[test]
+    fn compatible_nested_hints_stay_partial_and_bad_baselines_and_limits_reconcile() {
+        let source = tempfile::tempdir().unwrap();
+        let cache = tempfile::tempdir().unwrap();
+        std::fs::create_dir(source.path().join("src")).unwrap();
+        std::fs::write(source.path().join("a.rs"), "fn first() {}").unwrap();
+        std::fs::write(source.path().join("src/z.rs"), "fn nested() {}").unwrap();
+        let engine = engine(source.path(), cache.path(), 1);
+        let initial = engine.refresh(None, &|| false).unwrap().unwrap();
+        let changed = engine
+            .refresh_scoped(
+                Some(&initial.snapshot),
+                &CaptureScope::Paths(["src/z.rs".into()].into()),
+                &|| false,
+            )
+            .unwrap()
+            .unwrap();
+        assert!(!changed.measurements.reconciled);
+        assert_eq!(changed.measurements.read_files, 1);
+        for (path, analyses) in [
+            ("a.rs", vec![]),
+            (
+                "not-rust.txt",
+                initial.snapshot.documents()[0].analyses().to_vec(),
+            ),
+        ] {
+            let document = Document::capture(
+                initial.snapshot.workspace().clone(),
+                path.into(),
+                b"fn first() {}",
+                analyses,
+            )
+            .unwrap();
+            let previous = Snapshot::new(
+                initial.snapshot.workspace().clone(),
+                vec![Arc::new(document)],
+            )
+            .unwrap();
+            assert!(
+                engine
+                    .refresh_scoped(
+                        Some(&previous),
+                        &CaptureScope::Paths(["src/z.rs".into()].into()),
+                        &|| false
+                    )
+                    .unwrap()
+                    .unwrap()
+                    .measurements
+                    .reconciled
+            );
+        }
+        let limit: BTreeSet<_> = (0..MAX_PATH_HINTS)
+            .map(|i| format!("gone{i}.rs").into())
+            .collect();
+        let at_limit = engine
+            .refresh_scoped(
+                Some(&initial.snapshot),
+                &CaptureScope::Paths(limit.clone()),
+                &|| false,
+            )
+            .unwrap()
+            .unwrap();
+        assert!(!at_limit.measurements.reconciled);
+        assert_eq!(at_limit.measurements.read_files, 0);
+        for paths in [
+            BTreeSet::new(),
+            limit.into_iter().chain(["extra.rs".into()]).collect(),
+        ] {
+            assert!(
+                engine
+                    .refresh_scoped(
+                        Some(&initial.snapshot),
+                        &CaptureScope::Paths(paths),
+                        &|| false
+                    )
+                    .unwrap()
+                    .unwrap()
+                    .measurements
+                    .reconciled
+            );
+        }
     }
 }

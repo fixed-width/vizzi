@@ -163,13 +163,24 @@ async function singleEdits(page, input, host, picking) {
   const path = join(input.root, view.source.path), original = await readFile(path);
   const results = [];
   for (const offset of [0, 97, 211, 367, 463]) {
-    await settled(host); await delay(offset);
+    const before = await settled(host); await delay(offset);
     const marker = `// browser-visible-${offset}`;
     const started = performance.now();
     await writeFile(path, Buffer.concat([Buffer.from(marker + "\n"), original]));
+    const publication = (async () => {
+      const deadline = performance.now() + 15000;
+      while (performance.now() < deadline) {
+        const status = await (await fetch(`${host.url}/api/status`)).json();
+        if (status.snapshot !== before.snapshot && !status.pending) return status;
+        await delay(3);
+      }
+      throw new Error("Edit publication did not arrive");
+    })();
     await page.waitForFunction(marker => [...document.querySelectorAll(".code-line")].some(line => line.textContent.includes(marker)), marker);
     await paint(page);
-    results.push({ offsetMs: offset, writeToDomAndTwoRafMs: performance.now() - started });
+    const latency = performance.now() - started;
+    const status = await publication;
+    results.push({ offsetMs: offset, writeToDomAndTwoRafMs: latency, measurements: status.measurements });
   }
   return { samples: results, summary: summary(results.map(result => result.writeToDomAndTwoRafMs)) };
 }
@@ -193,6 +204,7 @@ async function qualify(chromium, definition) {
     for (let sample = 0; sample < options.samples; sample++) {
       for (const condition of ["steady", "refresh"]) {
         await settled(host); await session.page.reload();
+        await session.page.bringToFront();
         await session.page.waitForFunction(() => window.vizziMetrics?.lastFrame?.snapshot);
         await paint(session.page);
         const run = await interaction(session.page, host, condition === "refresh" ? () => Promise.all(heavy.map((file, index) => writeFile(file.path, Buffer.concat([Buffer.from(`// background ${sample}\n`), originals[index]])))) : null);
@@ -219,9 +231,12 @@ async function qualify(chromium, definition) {
     await writeFile(screenshot, await session.page.screenshot({ fullPage: true }), { flag: "wx" });
     assert.deepEqual(session.errors, []);
     const final = await (await fetch(`${host.url}/api/view`)).json();
+    const clean = spawnSync("target/release/vizzi", ["--root", input.root, "--cache", input.cache, "--once"], { encoding: "utf8" });
+    assert.equal(clean.status, 0, clean.stderr);
+    assert.equal(JSON.parse(clean.stdout).snapshot, final.snapshot, "incremental result differs from a fresh full capture");
     return { name: definition.name, revision: definition.revision, originalSourceManifestSha256: manifest.digest("hex"), rustFiles: files.length, sourceBytes: files.reduce((sum, file) => sum + file.bytes, 0),
       overviewFiles: final.files.length, heavyFiles: heavy.map(file => ({ path: file.path.slice(input.root.length + 1), bytes: file.bytes })),
-      runs, picking, editLatency, heap, webgpu, screenshot, nativeRss: await sampleRss(host.pid), errors: session.errors,
+      runs, picking, editLatency, heap, webgpu, screenshot, cleanSnapshotMatches: true, nativeRss: await sampleRss(host.pid), errors: session.errors,
       browserRequests: Object.fromEntries([...new Set(session.requests)].map(path => [path, session.requests.filter(value => value === path).length])) };
   } finally { await session?.close(); await host?.close(); await input.close(); }
 }

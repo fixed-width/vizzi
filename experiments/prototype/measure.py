@@ -127,11 +127,14 @@ def measure(args):
                 assert updated["selection"]["entity"] == entity_id
                 assert updated["source"]["text"].startswith(f"// vizzi edit probe {index}\n")
                 assert status["measurements"]["parsed"] == 1, status
+                assert status["measurements"]["read_files"] == 1, status
+                clean = once(binary, root, cache, args.workers)
+                assert clean["status"]["snapshot"] == updated["snapshot"], "incremental index differs from clean capture"
                 if index == 0:
                     pinned, _ = session.request(pinned_uri)
                     assert pinned["text"] == source["text"]
                 edits.append({"write_to_publication_ms": publication_ms, "write_to_response_ms": response_ms,
-                              "view_request_ms": request_ms, "measurements": status["measurements"]})
+                              "view_request_ms": request_ms, "measurements": status["measurements"], "clean_snapshot_matches": True})
                 previous_snapshot = updated["snapshot"]
             peak = re.search(r"VmHWM:\s+(\d+) kB", pathlib.Path(f"/proc/{session.process.pid}/status").read_text())
             return {"source_revision": args.revision, "source": str(args.source.resolve()),
@@ -146,7 +149,7 @@ def measure(args):
                     "live_peak_rss_kib": int(peak[1]) if peak else None,
                     "limits": ["Three samples; no tail-latency claim", "First load has warm OS file cache",
                                "No browser, labels, frame times, GPU, or edit-to-visible measurement",
-                               "Whole Rust scope is reread and hashed on refresh; changed files are parsed afresh"]}
+                               "Hinted files are reopened and hashed; full reconciliation verifies the whole Rust scope; changed files are parsed afresh"]}
         finally:
             session.close()
 

@@ -44,8 +44,13 @@ Coverage values are `syntax` (parsed without grammar recovery), `partial` (recov
 occurred), and `unavailable`. None claims compiler-level resolution or complete build
 configuration coverage.
 
-Measurements count files, captured bytes, parsed files, in-memory reuse, persisted
-cache hits, and cache write warnings. `capture_ms` includes discovery and reads;
+Measurements count total indexed `files`, actual read `bytes`, parsed files, in-memory
+reuse, persisted cache hits, and cache write warnings. `read_files` counts reopened
+source files; `retained` counts unread baseline documents carried by hints. Retained
+documents also count as `reused` analysis. `reconciled` distinguishes a complete pass
+from targeted verification, including conservative fallbacks. None treats unchanged
+metadata as content proof. `capture_ms` includes input validation, discovery/candidate
+inspection, and reads;
 `total_ms` includes capture, verification, analysis/cache activity, and snapshot creation.
 Transport, debounce, notification delivery, and painting are outside those timings.
 

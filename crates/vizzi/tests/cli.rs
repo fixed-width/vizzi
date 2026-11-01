@@ -71,7 +71,23 @@ fn live_edit_keeps_selection_and_pinned_source_coherent() {
     let source = tempfile::tempdir().unwrap();
     let cache = tempfile::tempdir().unwrap();
     std::fs::write(source.path().join("a.rs"), "fn one() {}").unwrap();
+    std::fs::write(source.path().join("b.rs"), "fn untouched() {}").unwrap();
     let mut session = Session::start(source.path(), cache.path());
+    let ready = Instant::now();
+    loop {
+        let status = session.request("/api/status");
+        if status["pending"] == false
+            && status["measurements"]["reconciled"] == true
+            && status["measurements"]["reused"] == 2
+        {
+            break;
+        }
+        assert!(
+            ready.elapsed() < Duration::from_secs(8),
+            "initial reconciliation did not finish"
+        );
+        std::thread::sleep(Duration::from_millis(5));
+    }
     let first = session.request("/api/view");
     let selected = &first["source"]["outlines"][0]["declarations"][0]["id"];
     let uri = format!(
@@ -111,4 +127,106 @@ fn live_edit_keeps_selection_and_pinned_source_coherent() {
         first["selection"]["file"].as_str().unwrap()
     ));
     assert_eq!(pinned["text"], "fn one() {}");
+    let status = session.request("/api/status");
+    assert_eq!(status["measurements"]["read_files"], 1);
+    assert_eq!(status["measurements"]["retained"], 1);
+    assert_eq!(status["measurements"]["reconciled"], false);
+}
+
+#[test]
+fn reconciliation_runs_while_write_hints_keep_arriving() {
+    use std::sync::{
+        Arc,
+        atomic::{AtomicBool, Ordering},
+    };
+    let source = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    let file = source.path().join("a.rs");
+    std::fs::write(&file, "fn a() {}").unwrap();
+    let mut session = Session::start(source.path(), cache.path());
+    let initial = Instant::now();
+    let baseline = loop {
+        let state = session.request("/api/status");
+        if state["pending"] == false
+            && state["measurements"]["reused"] == 1
+            && state["measurements"]["reconciled"] == true
+        {
+            break state["snapshot"].clone();
+        }
+        assert!(initial.elapsed() < Duration::from_secs(8));
+        std::thread::sleep(Duration::from_millis(5));
+    };
+    let stop = Arc::new(AtomicBool::new(false));
+    let writer_stop = stop.clone();
+    let writer = std::thread::spawn(move || {
+        let mut number = 0;
+        while !writer_stop.load(Ordering::Acquire) {
+            std::fs::write(&file, format!("fn a() {{ let n = {number}; }}")).unwrap();
+            number += 1;
+            std::thread::sleep(Duration::from_millis(75));
+        }
+    });
+    let started = Instant::now();
+    let mut recovered = false;
+    while started.elapsed() < Duration::from_secs(6) {
+        let state = session.request("/api/status");
+        if state["snapshot"] != baseline
+            && state["pending"] == false
+            && state["measurements"]["reconciled"] == true
+        {
+            recovered = true;
+            break;
+        }
+        std::thread::sleep(Duration::from_millis(5));
+    }
+    stop.store(true, Ordering::Release);
+    writer.join().unwrap();
+    assert!(
+        recovered,
+        "continuous hints starved periodic reconciliation"
+    );
+}
+
+#[test]
+fn newly_discovered_directories_keep_their_file_watches() {
+    let source = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    std::fs::write(source.path().join("a.rs"), "fn a() {}").unwrap();
+    let mut session = Session::start(source.path(), cache.path());
+    let wait = Instant::now();
+    loop {
+        let status = session.request("/api/status");
+        if status["pending"] == false && status["measurements"]["reused"] == 1 {
+            break;
+        }
+        assert!(wait.elapsed() < Duration::from_secs(8));
+        std::thread::sleep(Duration::from_millis(5));
+    }
+    std::fs::create_dir(source.path().join("nested")).unwrap();
+    let file = source.path().join("nested/new.rs");
+    std::fs::write(&file, "fn new() {}").unwrap();
+    let wait = Instant::now();
+    let previous = loop {
+        let status = session.request("/api/status");
+        if status["pending"] == false
+            && status["measurements"]["files"] == 2
+            && status["measurements"]["reused"] == 2
+        {
+            break status["snapshot"].clone();
+        }
+        assert!(wait.elapsed() < Duration::from_secs(8));
+        std::thread::sleep(Duration::from_millis(5));
+    };
+    std::fs::write(&file, "fn updated() {}").unwrap();
+    let wait = Instant::now();
+    let status = loop {
+        let status = session.request("/api/status");
+        if status["snapshot"] != previous && status["pending"] == false {
+            break status;
+        }
+        assert!(wait.elapsed() < Duration::from_secs(8));
+        std::thread::sleep(Duration::from_millis(5));
+    };
+    assert_eq!(status["measurements"]["reconciled"], false);
+    assert_eq!(status["measurements"]["read_files"], 1);
 }

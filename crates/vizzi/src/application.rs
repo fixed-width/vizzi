@@ -154,7 +154,7 @@ mod tests {
     fn refresh(parsed: usize) -> Refresh {
         Refresh {
             snapshot: Arc::new(Snapshot::new(WorkspaceId::derive(&[b"test"]), vec![]).unwrap()),
-            directories: vec![],
+            directories: Some(vec![]),
             measurements: Measurements {
                 parsed,
                 ..Default::default()

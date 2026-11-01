@@ -1,5 +1,9 @@
 # Versioned change-notification measurements
 
+This records the notification-only baseline. Subsequent
+[dirty-capture measurements](../incremental/RESULTS.md) repeat the software workload
+after avoiding unhinted source reads.
+
 Replacing browser status polling with latest-state notifications reduced median
 lpc-rs update observations from approximately **402 ms to 85–86 ms** in these runs.
 The browser made **zero `/api/status` requests**. Source and outline still arrive in

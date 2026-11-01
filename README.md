@@ -13,8 +13,10 @@ validating coordination; it does not qualify large-codebase GPU performance.
 - [First-slice behaviour](docs/prototype/PRODUCT.md) and [technical contract](docs/prototype/TECH.md)
 - [Host API reference](docs/prototype/API.md)
 - [Change-notification contract](docs/prototype/CHANGES.md)
+- [Incremental-capture contract](docs/prototype/INCREMENTAL_CAPTURE.md)
 - [Application measurement procedure](experiments/prototype/README.md)
 - [Browser validation and measurements](experiments/browser/README.md)
+- [Verified incremental-capture measurements](experiments/incremental/RESULTS.md)
 - [Earlier performance experiments](experiments/performance/README.md)
 - [Contributor guidance](AGENTS.md)
 

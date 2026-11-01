@@ -28,6 +28,9 @@ engine and works without a project build or external account.
   A response for a superseded snapshot cannot change the selection or displayed source.
 - Unchanged contents reuse analysis. A fresh process can reuse persisted analysis.
   Cache corruption or an unavailable cache must not produce incorrect source views.
+- File-event hints avoid reading unhinted documents. Hinted bytes are verified even
+  when size and timestamps match. Full reconciliation recovers missed changes and
+  remains scheduled during continuous edits. Obsolete/failed work cannot lose hints.
 - Syntax recovery and unavailable analysis are visible. The outline does not claim
   compiler-level name resolution, call relationships, or build-configuration coverage.
 - Empty workspaces, removed selections, analysis failures, and connection failures have

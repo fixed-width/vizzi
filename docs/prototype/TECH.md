@@ -53,10 +53,13 @@ a schema version and payload checksum. Temporary files and atomic replacement pr
 writes. Invalid records are misses; write failures are reported as cache warnings while
 valid analysis remains usable. JSON is a prototype implementation, not a storage decision.
 
-The native coordinator watches source directories and periodically reconciles. It
-captures inputs before analysis, reuses unchanged documents, and keeps parser ownership
-local to a bounded worker. Cancellation is checked between files. A long individual
-parse is not interruptible in this slice. Parsing never holds the publication lock.
+The native coordinator carries verified dirty-path hints into capture and periodically
+reconciles the whole source scope. It retains unread documents only from the published
+baseline; cancelled and superseded jobs do not consume pending hints. Directory or
+ambiguous changes fall back to complete discovery. New watch registration closes its
+discovery gap with another full pass. See [incremental capture](INCREMENTAL_CAPTURE.md).
+Parser ownership remains local to a bounded worker. Cancellation is checked between
+files; a long individual parse is not interruptible. Parsing never holds the publication lock.
 
 ## Host interface
 

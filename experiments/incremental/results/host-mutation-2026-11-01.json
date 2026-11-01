@@ -1,0 +1,61 @@
+{
+  "tool": "cargo-mutants 27.1.0",
+  "baseline": "passed",
+  "scope": [
+    "host.rs"
+  ],
+  "tests": "library and live CLI integration",
+  "tested": 30,
+  "counts": {
+    "Unviable": 10,
+    "Timeout": 1,
+    "CaughtMutant": 19
+  },
+  "exclusions": [],
+  "non_caught": [
+    {
+      "name": "crates/vizzi/src/host.rs:32:9: replace Host::start -> Result<Self, EngineError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/host.rs:119:29: replace && with || in Host::start",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/host.rs:73:17: replace != with == in Host::start",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/host.rs:141:9: replace Host::application -> Arc<Application> with Arc::new(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/host.rs:145:5: replace pending -> MutexGuard<'_, PendingRefresh> with MutexGuard::new()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/host.rs:145:5: replace pending -> MutexGuard<'_, PendingRefresh> with MutexGuard::from_iter([Default::default()])",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/host.rs:145:5: replace pending -> MutexGuard<'_, PendingRefresh> with MutexGuard::new(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/host.rs:145:5: replace pending -> MutexGuard<'_, PendingRefresh> with MutexGuard::from(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/host.rs:160:25: replace + with * in Reconciliation::due",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/host.rs:167:25: replace + with * in Reconciliation::completed",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/host.rs:218:5: replace one_shot -> Result<Arc<Application>, EngineError> with Ok(Arc::new(Default::default()))",
+      "outcome": "Unviable"
+    }
+  ]
+}
