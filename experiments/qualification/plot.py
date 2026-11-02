@@ -39,4 +39,5 @@ fig.suptitle("Full-corpus native qualification · median and range of three runs
 fig.text(.5, .01, "Per-panel scales differ. Warm OS caches; retained probes include old snapshots and serialized view queries. No 16 GB laptop emulation.", ha="center", fontsize=8)
 fig.tight_layout(rect=(0, .045, 1, .94))
 fig.savefig(args.output)
+args.output.write_text("\n".join(line.rstrip() for line in args.output.read_text().splitlines()) + "\n")
 print(args.output)

@@ -61,7 +61,7 @@ if __name__ == "__main__":
         json.dump({"profiles": profiles, "conditions": conditions, "identities_agree_across_samples_workers_and_cache_state": True}, output, indent=2)
         output.write("\n")
     with args.output.with_suffix(".csv").open("x", newline="") as output:
-        writer = csv.DictWriter(output, fieldnames=list(csv_rows[0]))
+        writer = csv.DictWriter(output, fieldnames=list(csv_rows[0]), lineterminator="\n")
         writer.writeheader()
         writer.writerows(csv_rows)
     print(args.output)
