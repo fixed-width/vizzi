@@ -1,0 +1,18 @@
+{
+  "base_commit": "2df1f409ae6b901306bb81c2caf2b2c03e43e6ea",
+  "note": "Working tree source measured before commit; analyzer contexts and production admission policy unchanged.",
+  "sha256": {
+    "crates/vizzi/src/syntax_cache.rs": "16dee77f17006cc4a87464ebb3177085dc800373c826d9a1b2211f47b3e84603",
+    "crates/vizzi/src/working_set.rs": "55c70a2e687cd2f8e74581fbed2ee779e0a5596a1dafbd19fb6b27c155454818",
+    "crates/vizzi/src/lib.rs": "5600bb555ee37c787b6bc0579506c8180778cc4f26ecce1b6bc72dbc271b7797",
+    "crates/vizzi/examples/working_set.rs": "d335e2496e73e24240ad8f91a076c37a018372461df24fb63911095352b55aa8",
+    "crates/vizzi/tests/syntax_cache.rs": "7218b90dc33ca1750934d06bf986ad36a623d12e82df054ba1fd6ca2724e30b5",
+    "crates/vizzi/tests/working_set_probe.rs": "9b1eb38e9f1587110abc08bf88004d4369bfe3e212c0da2cbd0511d2ac99c609",
+    "crates/vizzi/Cargo.toml": "206080c52656ba6ef4c59cc702cab4986c2a6a472f53d07f67eea6df82ccb2aa",
+    "Cargo.lock": "032ea2295563c2354c3d92c54cf4be9943ad62eb1ed116d6267b7c2c0ee1456d",
+    "Cargo.toml": "b48edcbfd70277e9d0a58f7680b6ed414bc70108b279fdfba98dcd9a07092636",
+    "experiments/working-set/measure.py": "cde981c10876ba88681908a4515067ff91da4785ac8032a6bb6abcff71dd0953",
+    "experiments/qualification/native.py": "e637e001eff0f81059c10e02f5381c00ef44e45efbd79348f94b792203ef924a",
+    "experiments/qualification/profiles.json": "fe3443645d36e1749ab6f360cecc52c667269e0504326155ed89e1baf98af260"
+  }
+}

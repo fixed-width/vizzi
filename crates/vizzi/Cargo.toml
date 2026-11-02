@@ -34,3 +34,7 @@ required-features = ["qualification"]
 [[example]]
 name = "retain"
 required-features = ["qualification"]
+
+[[example]]
+name = "working_set"
+required-features = ["qualification"]

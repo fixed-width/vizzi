@@ -13,3 +13,5 @@ pub mod syntax_cache;
 pub mod qualification;
 #[cfg(feature = "qualification")]
 pub mod retention;
+#[cfg(feature = "qualification")]
+pub mod working_set;

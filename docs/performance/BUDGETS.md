@@ -72,6 +72,14 @@ agreement. Full verification still takes about 1.1–1.3 s Linux and 0.19–0.25
 in the sampled accepted passes. Perfetto's large edit takes 1.34 s without tree reuse;
 large-file admission and working sets remain unresolved. One-worker hosts remain serial.
 
+The [working-set investigation](../../experiments/working-set/RESULTS.md) reproduces
+Perfetto state loss under the 512 MiB policy and shows batch bypasses even at 1 GiB.
+Four idle states weigh about 436 MiB, but old/new overlap and maximum replacement
+reservations require additional headroom. Investigate demand-based allowances while
+preserving accounting; increasing the default has not been justified. This direct
+engine probe includes correctness verification in its process peaks and does not
+repeat browser or baseline-laptop qualification.
+
 Do not replace semantic correctness checks with these performance targets. Language
 assignments, partial grammar coverage, source-only cases, cancellation, cache validity,
 and immutable publication must remain explicit and independently tested.

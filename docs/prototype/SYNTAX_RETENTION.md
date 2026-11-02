@@ -67,6 +67,16 @@ idle source/node counts, active leases, evictions, and bypasses. Status `tree_re
 instead counts files receiving compatible old trees in that completed engine attempt.
 They still count as `parsed`, separately from document reuse and persisted analysis hits.
 
+`SyntaxCache::entry(&SyntaxKey)` observes one complete key: `None` for absent state,
+`SyntaxEntry::Idle` with retained weight/source-byte/node counts, or `SyntaxEntry::Leased`.
+Invalidated active reservations remain leased until released. Inspection does not lease,
+promote, copy source/tree state, or change LRU order. Availability may change immediately
+after return. This diagnostic interface does not alter admission or add host/status fields.
+The [mixed working-set procedure](../../experiments/working-set/README.md) uses it to
+distinguish isolated reuse from pressure across files. The
+[working-set explanation](../explanation/syntax-working-sets.md) describes why fixed
+replacement reservations can evict useful state.
+
 The [Tree-sitter reference](https://docs.rs/tree-sitter/0.27.1/tree_sitter/struct.Tree.html#method.edit)
 specifies matching byte and point edits before reusing an old tree. Allocation costs
 and progress callbacks retain their dependency/grammar limits.

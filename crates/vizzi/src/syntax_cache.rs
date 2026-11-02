@@ -62,6 +62,23 @@ pub struct SyntaxCacheStats {
     pub bypassed: usize,
 }
 
+/// Point observation of one key, without transferring or touching its retained state.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[serde(tag = "state", rename_all = "snake_case")]
+pub enum SyntaxEntry {
+    /// Exclusively checked out, including an invalidated reservation awaiting release.
+    Leased,
+    /// Immutable accounting for state available to the next lease.
+    Idle {
+        /// Admission weight of the retained source and tree.
+        weight: usize,
+        /// Exact retained source byte count.
+        source_bytes: usize,
+        /// Descendant nodes in the retained tree.
+        nodes: usize,
+    },
+}
+
 struct Inner {
     idle: VecDeque<(SyntaxKey, SyntaxState)>,
     active: BTreeMap<SyntaxKey, bool>,
@@ -107,6 +124,23 @@ impl SyntaxCache {
         self.inner
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner)
+    }
+    /// Observes a complete key without leasing state, promoting it, or changing LRU order.
+    /// Absence returns `None`; another thread can change availability after this call.
+    pub fn entry(&self, key: &SyntaxKey) -> Option<SyntaxEntry> {
+        let inner = self.lock();
+        if inner.active.contains_key(key) {
+            return Some(SyntaxEntry::Leased);
+        }
+        inner
+            .idle
+            .iter()
+            .find(|(candidate, _)| candidate == key)
+            .map(|(_, state)| SyntaxEntry::Idle {
+                weight: state.weight(),
+                source_bytes: state.source_bytes(),
+                nodes: state.nodes(),
+            })
     }
     /// Exclusively checks out compatible state; promotion allows a new key.
     /// Unavailable admission returns immediately without waiting for another lease.

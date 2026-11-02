@@ -246,3 +246,93 @@ fn weight_pressure_evicts_idle_entries_before_the_entry_count_limit() {
     assert_eq!(policy.entry_weight_limit, 268_435_456);
     assert_eq!(policy.budget_weight, 536_870_912);
 }
+
+#[test]
+fn inspecting_an_entry_preserves_lease_ownership_and_lru_order() {
+    use vizzi::syntax_cache::SyntaxEntry;
+    let value = state();
+    let weight = value.weight();
+    let content = value.content().clone();
+    let cache = SyntaxCache::new(weight * 4, weight, 2).unwrap();
+    let first = key("a.rs", &value);
+    let second = key("b.rs", &value);
+    assert_eq!(cache.entry(&first), None);
+    for requested in [&first, &second] {
+        let lease = cache.lease(requested.clone(), true).unwrap();
+        assert_eq!(cache.entry(requested), Some(SyntaxEntry::Leased));
+        lease.finish(Some(state()), &content);
+    }
+    assert_eq!(
+        cache.entry(&first),
+        Some(SyntaxEntry::Idle {
+            weight,
+            source_bytes: value.source_bytes(),
+            nodes: value.nodes(),
+        })
+    );
+    let before = cache.stats();
+    assert!(matches!(
+        cache.entry(&first),
+        Some(SyntaxEntry::Idle { .. })
+    ));
+    assert_eq!(cache.stats(), before);
+    let third = cache.lease(key("c.rs", &value), true).unwrap();
+    assert_eq!(
+        cache.entry(&first),
+        None,
+        "inspection must not refresh LRU order"
+    );
+    assert!(matches!(
+        cache.entry(&second),
+        Some(SyntaxEntry::Idle { .. })
+    ));
+    drop(third);
+    let lease = cache.lease(second.clone(), false).unwrap();
+    cache.invalidate(&WorkspaceId::derive(&[b"cache fixture"]), "b.rs");
+    assert_eq!(cache.entry(&second), Some(SyntaxEntry::Leased));
+    drop(lease);
+    assert_eq!(cache.entry(&second), None);
+}
+
+#[test]
+fn maximum_new_state_reservations_can_evict_a_large_idle_tree_for_a_small_edit() {
+    let source: String = (0..100).map(|i| format!("fn item_{i}() {{}}\n")).collect();
+    let large = Languages::builtin()
+        .unwrap()
+        .select("rust")
+        .unwrap()
+        .create()
+        .unwrap()
+        .analyze_with_state(source.as_bytes(), None, usize::MAX, &|| false)
+        .unwrap()
+        .unwrap()
+        .state
+        .unwrap();
+    let small = state();
+    let weight = large.weight();
+    assert!(weight > 2 * small.weight());
+    let large_key = key("large.rs", &large);
+    let small_key = key("ordinary.rs", &small);
+    let cache = SyntaxCache::new(2 * weight, weight, 8).unwrap();
+    let content = large.content().clone();
+    cache
+        .lease(large_key.clone(), true)
+        .unwrap()
+        .finish(Some(large), &content);
+    let content = small.content().clone();
+    cache
+        .lease(key("other.rs", &small), true)
+        .unwrap()
+        .finish(Some(small), &content);
+    assert!(cache.entry(&large_key).is_some());
+    let before = cache.stats();
+    assert_eq!(before.idle_entries, 2);
+    assert_eq!(before.evicted, 0);
+    let lease = cache.lease(small_key, true).unwrap();
+    assert_eq!(lease.allowance(), weight);
+    lease.finish(Some(state()), &content);
+    assert_eq!(cache.entry(&large_key), None);
+    assert_eq!(cache.stats().evicted, 1);
+    assert_eq!(cache.stats().idle_entries, 2);
+    assert!(cache.stats().peak_charged_weight <= 2 * weight);
+}

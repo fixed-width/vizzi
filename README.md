@@ -38,6 +38,7 @@ validating coordination; it does not qualify large-codebase GPU performance.
 - [Shared-source capture memory measurements](experiments/shared-source/RESULTS.md)
 - [Windowed source/outline delivery measurements](experiments/windows/RESULTS.md)
 - [Foreground edits during periodic recovery](experiments/recovery/RESULTS.md)
+- [Retained syntax across mixed working sets](experiments/working-set/RESULTS.md)
 - [Earlier performance experiments](experiments/performance/README.md)
 - [Contributor guidance](AGENTS.md)
 
