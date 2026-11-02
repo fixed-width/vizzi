@@ -74,8 +74,9 @@ implements bounded outline controls and verified capture plans. Large-file parsi
 transport data bounds, and memory admission remain open. The
 [cancellation follow-up](../../experiments/qualification/CANCELLATION_RESULTS.md)
 implements cooperative interruption within built-in parsing and extraction; bounded
-hot-file syntax-tree ownership is next in the
-[parser plan](parser-responsiveness.md).
+hot-file syntax retention is now opt-in with
+[measured limits](../../experiments/retention/RESULTS.md). Capture memory overlap and
+bounded projection delivery remain work before compiler-context expansion.
 
 Use scoped raw-C/C++ profiles, including explicit header assignments where desired,
 and retain their classification provenance in reports. Record source-only candidates

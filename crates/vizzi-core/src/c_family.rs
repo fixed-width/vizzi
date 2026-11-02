@@ -52,6 +52,7 @@ fn context(language: &str, description: &str) -> Context {
             language.as_bytes(),
             include_bytes!("c_family.rs"),
             include_bytes!("syntax.rs"),
+            include_bytes!("syntax_state.rs"),
             include_bytes!("analysis.rs"),
             include_bytes!("model.rs"),
             include_bytes!("../../../Cargo.lock"),

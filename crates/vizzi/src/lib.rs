@@ -7,6 +7,9 @@ pub mod host;
 mod invalidation;
 pub mod server;
 pub mod source;
+pub mod syntax_cache;
 
 #[cfg(feature = "qualification")]
 pub mod qualification;
+#[cfg(feature = "qualification")]
+pub mod retention;

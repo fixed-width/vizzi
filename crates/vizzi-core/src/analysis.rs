@@ -1,5 +1,6 @@
 //! Worker-owned analysis adapters, independent of source selection and filesystem access.
 
+pub use crate::syntax_state::{AnalysisResult, SyntaxState};
 use crate::{
     c_family::{CAdapter, CppAdapter},
     model::{Analysis, Context, ModelError},
@@ -26,6 +27,25 @@ pub trait Analyzer {
         }
         let analysis = self.analyze(bytes)?;
         Ok((!cancelled()).then_some(analysis))
+    }
+
+    /// Consumes optional previous syntax state and returns complete new facts.
+    /// `retain_weight` limits returned state; zero permits reuse without retention.
+    /// Existing adapters use cancellable analysis and return no retained state.
+    fn analyze_with_state(
+        &mut self,
+        bytes: &[u8],
+        _previous: Option<SyntaxState>,
+        _retain_weight: usize,
+        cancelled: &dyn Fn() -> bool,
+    ) -> Result<Option<AnalysisResult>, ModelError> {
+        Ok(self
+            .analyze_cancellable(bytes, cancelled)?
+            .map(|analysis| AnalysisResult {
+                analysis,
+                state: None,
+                tree_reused: false,
+            }))
     }
 }
 

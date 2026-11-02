@@ -17,8 +17,9 @@ repeats four-worker retained reparse and measures cooperative interruption withi
 | Background throughput | Eight only with available resources and measured query impact | Retained reparse improves about 1.6×; Linux core-query p95 grows from at most 44.4 to 52.6 ms |
 | Native workspace memory | Aim below 8 GiB peak while retaining the previous observation | Maximum sampled Linux reparse RSS 6.492 GiB on a 62.5 GiB host; no enforced cap |
 | Bounded core view | Aim for p95 below 50 ms for the current 2,000-tile query | Four-worker observations fit on this host; eight-worker Linux has misses |
-| Ordinary edit visibility | Aim for all five probe edits below 200 ms before collecting meaningful tails | Follow-up: PyTorch 98–121 ms; Linux 135–192 ms. Five samples each fit, with no tail claim; periodic recovery can still dominate |
+| Ordinary edit visibility | Aim for all five probe edits below 200 ms before collecting meaningful tails | Latest paired PyTorch probe: medians 102/88 ms disabled/enabled, maxima 299 ms in both conditions; full recovery still fails the gate. Earlier Linux UI samples were 135–192 ms |
 | Cancellation response | Aim below 250 ms after a request during parsing | Follow-up direct engine-return ranges: Linux 41–46 ms; PyTorch 18–23 ms. Three samples each; cooperative callbacks do not impose a hard deadline |
+| Retained syntax | Opt-in shared admission quota, initially 512 MiB and eight entries | Charges old/new state together; Perfetto peaks at 500.3 MiB weight. Normal parsing/capture allocations remain outside it |
 | Source and outline DOM | Bound each pane by visible rows plus overscan; initial ceiling 200 rendered entries | Source lines 56–58; 42,443-declaration C++ outline now renders 21 buttons. Complete transport/index construction remains linear in source/declaration size |
 | Overview motion | Maintain rAF p99 below 33.3 ms in the software reference workload | 16.8 ms in all recorded steady/refresh runs; physical presentation unqualified |
 
@@ -44,10 +45,13 @@ Cooperative built-in parser/extraction cancellation is implemented and measured.
 preserves old publications and resets interrupted parsers; necessary complete edits
 still require analysis and transfer.
 
-1. Design bounded hot-file incremental trees using the
-   [session/admission plan](../plans/parser-responsiveness.md).
-   Keep immutable published facts separate from mutable parser/tree ownership. Tree cache
-   memory must be admitted within an explicit budget, not multiplied by every language.
+Bounded syntax retention is implemented as an opt-in [shared cache](../prototype/SYNTAX_RETENTION.md).
+The [repeated-edit report](../../experiments/retention/RESULTS.md) measures faster large
+headers and an ordinary-edit recovery outlier. Continue working-set and hardware
+validation before choosing a default.
+
+1. Qualify admission policy with multiple active large files and baseline hardware.
+   Keep cache weight separate from parser scratch space and whole-process memory.
 2. Reduce full-capture memory overlap, for example by streaming bounded input batches
    and sharing immutable captured source across analysis-context changes. Keep byte
    verification and pinned-source consistency; metadata alone is still not proof.

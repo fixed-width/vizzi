@@ -1,0 +1,412 @@
+{
+  "base_commit": "377f406d505c53515a1cf846e54b78f8f7326fed",
+  "tool": "cargo-mutants 27.1.0",
+  "scope": [
+    "crates/vizzi-core/src/analysis.rs",
+    "crates/vizzi-core/src/rust.rs",
+    "crates/vizzi-core/src/python.rs",
+    "crates/vizzi-core/src/c_family.rs",
+    "crates/vizzi-core/src/syntax.rs",
+    "crates/vizzi-core/src/syntax_state.rs",
+    "crates/vizzi/src/engine.rs",
+    "crates/vizzi/src/syntax_cache.rs",
+    "crates/vizzi/src/retention.rs",
+    "crates/vizzi/src/main.rs"
+  ],
+  "phases": [
+    {
+      "label": "broad integration",
+      "baseline": "passed",
+      "tested": 386,
+      "counts": {
+        "CaughtMutant": 322,
+        "Unviable": 47,
+        "Timeout": 15,
+        "MissedMutant": 2
+      },
+      "non_caught": [
+        {
+          "name": "crates/vizzi/src/main.rs:33:13: delete match arm \"--cache\" in main",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/main.rs:28:13: delete match arm \"--root\" in main",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/engine.rs:104:9: replace Engine::with_syntax_cache -> Self with Default::default()",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/engine.rs:109:9: replace Engine::directory -> &Directory with Box::leak(Box::new(Default::default()))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/engine.rs:117:9: replace Engine::refresh -> Result<Option<Refresh>, EngineError> with Ok(Some(Default::default()))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/engine.rs:128:9: replace Engine::refresh_scoped -> Result<Option<Refresh>, EngineError> with Ok(Some(Default::default()))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/engine.rs:128:9: replace Engine::refresh_scoped -> Result<Option<Refresh>, EngineError> with Ok(None)",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi/src/engine.rs:374:17: replace && with || in Engine::can_capture_paths",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/syntax_cache.rs:83:9: replace SyntaxCache::for_budget -> Result<Self, ModelError> with Ok(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/syntax_cache.rs:107:9: replace SyntaxCache::lock -> MutexGuard<'_, Inner> with MutexGuard::new()",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/syntax_cache.rs:107:9: replace SyntaxCache::lock -> MutexGuard<'_, Inner> with MutexGuard::from_iter([Default::default()])",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/syntax_cache.rs:107:9: replace SyntaxCache::lock -> MutexGuard<'_, Inner> with MutexGuard::new(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/syntax_cache.rs:107:9: replace SyntaxCache::lock -> MutexGuard<'_, Inner> with MutexGuard::from(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/syntax_cache.rs:114:9: replace SyntaxCache::lease -> Option<SyntaxLease<'_>> with Some(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/syntax_cache.rs:131:45: replace || with && in SyntaxCache::lease",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi/src/syntax_cache.rs:131:74: replace > with == in SyntaxCache::lease",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi/src/syntax_cache.rs:131:88: replace - with + in SyntaxCache::lease",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi/src/syntax_cache.rs:140:29: replace > with == in SyntaxCache::lease",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi/src/syntax_cache.rs:140:29: replace > with >= in SyntaxCache::lease",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi/src/syntax_cache.rs:144:31: replace -= with += in SyntaxCache::lease",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi/src/syntax_cache.rs:200:9: replace SyntaxCache::stats -> SyntaxCacheStats with Default::default()",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/syntax_cache.rs:231:9: replace SyntaxLease<'_>::take_previous -> Option<SyntaxState> with Some(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/syntax_cache.rs:248:21: replace && with || in SyntaxLease<'_>::finish",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/retention.rs:28:5: replace engine -> Result<Engine, Error> with Ok(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/analysis.rs:25:9: replace Analyzer::analyze_cancellable -> Result<Option<Analysis>, ModelError> with Ok(Some(Default::default()))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/analysis.rs:42:9: replace Analyzer::analyze_with_state -> Result<Option<AnalysisResult>, ModelError> with Ok(Some(Default::default()))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/analysis.rs:68:9: replace Language::context -> &Context with Box::leak(Box::new(Default::default()))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/analysis.rs:72:9: replace Language::create -> Result<Box<dyn Analyzer>, ModelError> with Ok(Box::new(Default::default()))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/analysis.rs:102:9: replace Languages::builtin -> Result<Self, ModelError> with Ok(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/analysis.rs:111:9: replace Languages::select -> Option<&Language> with Some(Box::leak(Box::new(Default::default())))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/c_family.rs:14:9: replace <impl LanguageAdapter for CAdapter>::context -> Context with Default::default()",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/c_family.rs:20:9: replace <impl LanguageAdapter for CAdapter>::create -> Result<Box<dyn Analyzer>, ModelError> with Ok(Box::new(Default::default()))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/c_family.rs:32:9: replace <impl LanguageAdapter for CppAdapter>::context -> Context with Default::default()",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/c_family.rs:38:9: replace <impl LanguageAdapter for CppAdapter>::create -> Result<Box<dyn Analyzer>, ModelError> with Ok(Box::new(Default::default()))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/c_family.rs:47:5: replace context -> Context with Default::default()",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/c_family.rs:74:9: replace && with || in collect",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/python.rs:13:9: replace <impl LanguageAdapter for PythonAdapter>::context -> Context with Default::default()",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/python.rs:28:9: replace <impl LanguageAdapter for PythonAdapter>::create -> Result<Box<dyn Analyzer>, ModelError> with Ok(Box::new(Default::default()))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/rust.rs:13:9: replace <impl LanguageAdapter for RustAdapter>::context -> Context with Default::default()",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/rust.rs:16:9: replace <impl LanguageAdapter for RustAdapter>::create -> Result<Box<dyn Analyzer>, ModelError> with Ok(Box::new(Default::default()))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/rust.rs:38:9: replace RustAnalyzer::context -> Context with Default::default()",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/rust.rs:54:9: replace RustAnalyzer::analyze -> Result<Analysis, ModelError> with Ok(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/rust.rs:59:9: replace <impl Analyzer for RustAnalyzer>::analyze -> Result<Analysis, ModelError> with Ok(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/rust.rs:66:9: replace <impl Analyzer for RustAnalyzer>::analyze_cancellable -> Result<Option<Analysis>, ModelError> with Ok(Some(Default::default()))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/rust.rs:75:9: replace <impl Analyzer for RustAnalyzer>::analyze_with_state -> Result<Option<AnalysisResult>, ModelError> with Ok(Some(Default::default()))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/rust.rs:66:9: replace <impl Analyzer for RustAnalyzer>::analyze_cancellable -> Result<Option<Analysis>, ModelError> with Ok(None)",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:28:9: replace Declaration::at -> Self with Default::default()",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:67:9: replace <impl Analyzer for SyntaxAnalyzer>::analyze -> Result<Analysis, ModelError> with Ok(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:76:9: replace <impl Analyzer for SyntaxAnalyzer>::analyze_cancellable -> Result<Option<Analysis>, ModelError> with Ok(Some(Default::default()))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:87:9: replace <impl Analyzer for SyntaxAnalyzer>::analyze_with_state -> Result<Option<AnalysisResult>, ModelError> with Ok(Some(Default::default()))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:98:9: replace SyntaxAnalyzer::run -> Result<Option<AnalysisResult>, ModelError> with Ok(Some(Default::default()))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:16:9: replace Checkpoints<'_>::poll -> bool with true",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:76:9: replace <impl Analyzer for SyntaxAnalyzer>::analyze_cancellable -> Result<Option<Analysis>, ModelError> with Ok(None)",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax_state.rs:33:9: replace SyntaxState::capture -> Option<Self> with Some(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:98:9: replace SyntaxAnalyzer::run -> Result<Option<AnalysisResult>, ModelError> with Ok(None)",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax_state.rs:64:9: replace SyntaxState::context -> &Context with Box::leak(Box::new(Default::default()))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax_state.rs:68:9: replace SyntaxState::content -> &ContentId with Box::leak(Box::new(Default::default()))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax_state.rs:77:5: replace edit_between -> Option<InputEdit> with Some(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax_state.rs:84:17: replace < with <= in edit_between",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax_state.rs:104:55: replace - with + in edit_between",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax_state.rs:109:32: replace - with + in edit_between",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax_state.rs:101:15: replace -= with /= in edit_between",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax_state.rs:105:18: replace < with <= in edit_between",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax_state.rs:128:17: replace += with *= in edit_between",
+          "outcome": "Timeout"
+        }
+      ]
+    },
+    {
+      "label": "complete updated syntax_state module",
+      "baseline": "passed",
+      "tested": 70,
+      "counts": {
+        "CaughtMutant": 56,
+        "Unviable": 4,
+        "Timeout": 10
+      },
+      "non_caught": [
+        {
+          "name": "crates/vizzi-core/src/syntax_state.rs:33:9: replace SyntaxState::capture -> Option<Self> with Some(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax_state.rs:64:9: replace SyntaxState::context -> &Context with Box::leak(Box::new(Default::default()))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax_state.rs:68:9: replace SyntaxState::content -> &ContentId with Box::leak(Box::new(Default::default()))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax_state.rs:77:5: replace edit_between -> Option<InputEdit> with Some(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax_state.rs:84:17: replace < with <= in edit_between",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax_state.rs:88:26: replace + with * in edit_between",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax_state.rs:95:18: replace < with == in edit_between",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax_state.rs:95:18: replace < with > in edit_between",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax_state.rs:101:15: replace -= with /= in edit_between",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax_state.rs:105:18: replace < with <= in edit_between",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax_state.rs:121:17: replace < with == in edit_between",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax_state.rs:121:17: replace < with > in edit_between",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax_state.rs:125:33: replace - with + in edit_between",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax_state.rs:128:17: replace += with *= in edit_between",
+          "outcome": "Timeout"
+        }
+      ]
+    }
+  ],
+  "broad_source_sha256": {
+    "crates/vizzi-core/src/analysis.rs": "04e94c44b8f3e1adb3b748e99903d118b8dc99162bef501b1f78256d1f3d0119",
+    "crates/vizzi-core/src/rust.rs": "36d78d82b1837fa01a543b83848d87963d71d31405f787762dec6d07356c41b6",
+    "crates/vizzi-core/src/python.rs": "a8b262d865fc25377d839b0256d2126e099d5f0a7fcaf8c0af027a70d86c0ac1",
+    "crates/vizzi-core/src/c_family.rs": "0be22cd887b65b871f706be5939bc0f419302b19489b533986ef0aa35fb544e1",
+    "crates/vizzi-core/src/syntax.rs": "d3ee2d10c23fcc2353a8cf6b8d28641ecb28a94a35983dee2693a95f3fd90981",
+    "crates/vizzi-core/src/syntax_state.rs": "94a2dc082cd634850ebcf4a4dc34f630c6fa1c3e1ee683043cbd5b7e96e47ed5",
+    "crates/vizzi/src/engine.rs": "4e21dbc144a1b0dec305eb2412aa89a86824d480b3b2db65059dd4413c29077f",
+    "crates/vizzi/src/syntax_cache.rs": "9855a454942af3337677b6214756fc0c42496208329978ed74b5dddec100aec9",
+    "crates/vizzi/src/retention.rs": "7e3125aad708a3120f986768a4ef3fc74cef8f98ff8ed1e1f22435048fb3ac5b",
+    "crates/vizzi/src/main.rs": "13b454e1519fddc7eb19b19dfc8a62bf2302f8c164b960c55bc996f2012faef9"
+  },
+  "final_source_sha256": {
+    "crates/vizzi-core/src/analysis.rs": "04e94c44b8f3e1adb3b748e99903d118b8dc99162bef501b1f78256d1f3d0119",
+    "crates/vizzi-core/src/rust.rs": "36d78d82b1837fa01a543b83848d87963d71d31405f787762dec6d07356c41b6",
+    "crates/vizzi-core/src/python.rs": "a8b262d865fc25377d839b0256d2126e099d5f0a7fcaf8c0af027a70d86c0ac1",
+    "crates/vizzi-core/src/c_family.rs": "0be22cd887b65b871f706be5939bc0f419302b19489b533986ef0aa35fb544e1",
+    "crates/vizzi-core/src/syntax.rs": "d3ee2d10c23fcc2353a8cf6b8d28641ecb28a94a35983dee2693a95f3fd90981",
+    "crates/vizzi-core/src/syntax_state.rs": "544118da4b5584be09294ec43fb37e009a64842b2b17ab0145aa6318b0b641ed",
+    "crates/vizzi/src/engine.rs": "4e21dbc144a1b0dec305eb2412aa89a86824d480b3b2db65059dd4413c29077f",
+    "crates/vizzi/src/syntax_cache.rs": "9855a454942af3337677b6214756fc0c42496208329978ed74b5dddec100aec9",
+    "crates/vizzi/src/retention.rs": "7e3125aad708a3120f986768a4ef3fc74cef8f98ff8ed1e1f22435048fb3ac5b",
+    "crates/vizzi/src/main.rs": "13b454e1519fddc7eb19b19dfc8a62bf2302f8c164b960c55bc996f2012faef9"
+  },
+  "unresolved_survivors": 0,
+  "exclusions": [
+    "Existing equivalent has_descendant strict/non-strict directory-prefix comparison in the broad run; no new exclusions. The updated syntax-state module uses --no-config."
+  ],
+  "commands": [
+    "cargo mutants -p vizzi-core -p vizzi --config experiments/incremental/mutants.toml --features qualification --file 'crates/vizzi-core/src/{analysis,rust,python,c_family,syntax,syntax_state}.rs' --file 'crates/vizzi/src/{engine,syntax_cache,retention,main}.rs' --test-package vizzi-core --test-package vizzi --jobs 4 --timeout 15 --build-timeout 180",
+    "cargo mutants -p vizzi-core --no-config --file crates/vizzi-core/src/syntax_state.rs --test-package vizzi-core --jobs 4 --timeout 10 --build-timeout 180"
+  ],
+  "manual_mutation": {
+    "change": "Omit application of the computed edit to the old tree",
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "vizzi-core",
+      "--offline",
+      "--test",
+      "retention",
+      "owned_state_reuses_trees_and_matches_fresh_facts_across_all_four_languages"
+    ],
+    "outcome": "Caught by failing fresh-analysis comparison",
+    "source_sha256": "d3ee2d10c23fcc2353a8cf6b8d28641ecb28a94a35983dee2693a95f3fd90981"
+  },
+  "development_notes": [
+    "Initial full run: 391 tested, 293 caught, 46 unviable, 13 timeouts, 39 survivors. Investigated gaps in exact quota boundaries, invalidation/bypass accounting, probe metrics/positions, and multi-chunk/Unicode edit boundaries.",
+    "The broad integration rerun retained two survivors in syntax_state. A focused two-mutant attempt caught one; an added symmetric deletion case and equivalent simplification to common_length - prefix removed the remaining gap. The complete updated syntax_state module was then retested with no survivors.",
+    "Other nine module bodies match the recorded broad-run hashes. Final syntax_state changes also conservatively change embedded analyzer fingerprints. Phases overlap and must not be summed as unique mutations."
+  ],
+  "limits": [
+    "Timeouts cover startup fixtures without complete analysis and deliberately broken admission/diff loops; they are separate from assertion-detected mutants.",
+    "Macro-expanded fingerprints/JSON, grammar/dependency internals, OS watchers, browser execution, and Python driver logic are outside this Rust mutation scope.",
+    "The full integration phase itself has two recorded survivors; both are resolved by the complete updated-module rerun. This is not a single full-suite zero-survivor run of all final source files."
+  ]
+}

@@ -1,5 +1,8 @@
 # Cancellation during parsing and extraction
 
+The later [retention report](../retention/RESULTS.md) implements bounded owned-tree
+reuse and records the remaining capture/transport work.
+
 Built-in analyzers now stop cooperatively inside a file, using safe Tree-sitter
 progress callbacks and bounded polling during fact extraction. On the full Linux and
 PyTorch profiles, request-to-engine-return time was **41–46 ms** and **18–23 ms**,

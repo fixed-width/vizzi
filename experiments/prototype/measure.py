@@ -6,6 +6,7 @@ not browser presentation or rendering. Run without competing benchmark work.
 """
 
 import argparse
+import uuid
 import hashlib
 import json
 import pathlib
@@ -94,6 +95,9 @@ class Diagnostic:
 def measure(args):
     binary = args.binary.resolve()
     source_arguments = []
+    if args.syntax_cache_mib:
+        source_arguments.extend(["--syntax-cache-mib", str(args.syntax_cache_mib)])
+    probe_id = str(uuid.uuid4())
     for flag, values in [("--c-family-root", args.c_family_root), ("--syntax-language", args.syntax_language), ("--exclude-source", args.exclude_source)]:
         for value in values:
             source_arguments.extend([flag, value])
@@ -139,7 +143,8 @@ def measure(args):
             edits = []
             for index in range(args.edit_samples):
                 started = time.perf_counter()
-                data = f"{comment} vizzi edit probe {index}\n".encode() + original
+                marker = f"{comment} vizzi edit probe {probe_id} {index}\n"
+                data = marker.encode() + original
                 if args.atomic_edits:
                     with tempfile.NamedTemporaryFile(dir=target.parent, prefix=".vizzi-edit-", delete=False) as replacement:
                         replacement.write(data)
@@ -153,7 +158,7 @@ def measure(args):
                 response_ms = milliseconds(started)
                 assert updated["selection"]["file"] == file_id
                 assert updated["selection"]["entity"] == entity_id
-                assert updated["source"]["text"].startswith(f"{comment} vizzi edit probe {index}\n")
+                assert updated["source"]["text"].startswith(marker)
                 if not args.allow_reconcile:
                     assert status["measurements"]["parsed"] == 1, status
                     assert status["measurements"]["read_files"] == 1, status
@@ -169,6 +174,7 @@ def measure(args):
             return {"source_revision": args.revision, "source": str(args.source.resolve()),
                     "scope": "Configured raw capture; disposable copy; no analyzed project builds",
                     "source_arguments": source_arguments, "capture_policy": first["policy"],
+                    "probe_id": probe_id, "syntax_cache_mib": args.syntax_cache_mib,
                     "selected_classification": source["classification"], "captured_inventory": inventory,
                     "platform": platform.platform(), "workers": args.workers,
                     "rustc": subprocess.check_output(["rustc", "--version"], text=True).strip(),
@@ -181,7 +187,7 @@ def measure(args):
                     "live_peak_rss_kib": int(peak[1]) if peak else None,
                     "limits": ["Three samples; no tail-latency claim", "First load has warm OS file cache",
                                "No browser, labels, frame times, GPU, or edit-to-visible measurement",
-                               "Hinted files are reopened and hashed; full reconciliation verifies the whole configured source scope; changed files are parsed afresh"]}
+                               "Hinted files are reopened and hashed; full reconciliation verifies the whole configured source scope; tree_reuses distinguishes incremental parsing from full parsing"]}
         finally:
             session.close()
 
@@ -192,6 +198,7 @@ if __name__ == "__main__":
     parser.add_argument("--source", type=pathlib.Path, required=True)
     parser.add_argument("--revision", required=True)
     parser.add_argument("--workers", type=int, default=4)
+    parser.add_argument("--syntax-cache-mib", type=int, default=0)
     parser.add_argument("--c-family-root", action="append", default=[])
     parser.add_argument("--syntax-language", action="append", default=[])
     parser.add_argument("--exclude-source", action="append", default=[])

@@ -74,3 +74,8 @@ picking, virtualised source, render-ready update delay, and frame scheduling dur
 background analysis. The 16 GB laptop baseline and physical presentation remain separate
 qualification work. `window.vizziMetrics` supplies bounded CPU draw/request samples;
 those are instrumentation, not a substitute for presentation/GPU measurements.
+
+Use `--syntax-cache-mib 512` to opt into retained trees, or omit it for the disabled
+comparison. Each run records a fresh `probe_id` in its edit comments, preventing reuse
+of a prior probe input from persistent analysis caches. See the
+[retention experiment](../retention/README.md) for controlled repeated edits and limits.

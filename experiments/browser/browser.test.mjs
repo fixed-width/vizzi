@@ -9,7 +9,7 @@ const text = `const HTML: &str = "<img src=x onerror='window.injected=true'>";\n
 const largeOutline = Array.from({ length: 50000 }, (_, i) => `fn item_${String(i).padStart(5, "0")}() {}`).join("\n");
 before(async () => {
   buildHost();
-  input = await workspace({ files: { "src/a.rs": text, "src/b.rs": "fn beta() {}", "src/partial.rs": "fn broken( {", "src/encoding.rs": Buffer.from([255]), "src/z.py": "class Example:\n    def read(self): pass\n", "include/shared.h": "struct Header;", "include/device.cuh": "__device__ void kernel();", "include/encoding.h": Buffer.from([255]), "include/example.c++": "class Example {};", "include/sample.c": "int sum(int a, int b) { return a + b; }", "include/assigned/defs.h": "class Definition { public: int read() { return 1; } };", "zzz/large.rs": largeOutline }, sourceArguments: ["--c-family-root", "include", "--syntax-language", "include/assigned=cpp"] });
+  input = await workspace({ files: { "src/a.rs": text, "src/b.rs": "fn beta() {}", "src/partial.rs": "fn broken( {", "src/encoding.rs": Buffer.from([255]), "src/z.py": "class Example:\n    def read(self): pass\n", "include/shared.h": "struct Header;", "include/device.cuh": "__device__ void kernel();", "include/encoding.h": Buffer.from([255]), "include/example.c++": "class Example {};", "include/sample.c": "int sum(int a, int b) { return a + b; }", "include/assigned/defs.h": "class Definition { public: int read() { return 1; } };", "zzz/large.rs": largeOutline }, sourceArguments: ["--c-family-root", "include", "--syntax-language", "include/assigned=cpp", "--syntax-cache-mib", "512"] });
   host = await startHost(input);
   chromium = await browser();
 });

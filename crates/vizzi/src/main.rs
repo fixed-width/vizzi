@@ -5,6 +5,7 @@ use std::{
     path::PathBuf,
     sync::Arc,
 };
+use vizzi::syntax_cache::SyntaxCache;
 use vizzi::{cache::Cache, engine::Engine, host::Host, source::Directory};
 use vizzi_core::{
     analysis::Languages,
@@ -19,6 +20,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut port = 7474;
     let mut stdio = false;
     let mut once = false;
+    let mut syntax_cache_mib = 0usize;
     let mut policy = PolicyConfig::default();
     let mut arguments = std::env::args().skip(1);
     while let Some(argument) = arguments.next() {
@@ -42,6 +44,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             "--stdio" => stdio = true,
             "--once" => once = true,
+            "--syntax-cache-mib" => {
+                syntax_cache_mib = arguments
+                    .next()
+                    .ok_or("--syntax-cache-mib needs a weight budget")?
+                    .parse()?
+            }
             "--c-family-root" => policy.c_family_roots.push(
                 arguments
                     .next()
@@ -71,7 +79,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             "--help" | "-h" => {
                 println!(
-                    "vizzi --root DIR --cache DIR [--workers 1..32] [--port 7474] [--stdio | --once]\n  [--c-family-root SCOPE] [--exclude-source SCOPE] [--syntax-language SCOPE=c|cpp] (repeatable)"
+                    "vizzi --root DIR --cache DIR [--workers 1..32] [--port 7474] [--stdio | --once]\n  [--syntax-cache-mib N] (0 disables, default 0; weighted retention, not a heap cap)\n  [--c-family-root SCOPE] [--exclude-source SCOPE] [--syntax-language SCOPE=c|cpp] (repeatable)"
                 );
                 return Ok(());
             }
@@ -89,7 +97,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cache =
         cache.ok_or("--cache is required; choose a directory outside the analyzed workspace")?;
     let cache = vizzi::cache::external_path(&cache, directory.root())?;
-    let engine = Engine::new(directory, Cache::new(cache), workers)?;
+    let mut engine = Engine::new(directory, Cache::new(cache), workers)?;
+    if syntax_cache_mib != 0 {
+        let budget = syntax_cache_mib
+            .checked_mul(1024 * 1024)
+            .ok_or("syntax cache budget overflow")?;
+        engine = engine.with_syntax_cache(Arc::new(SyntaxCache::for_budget(budget)?));
+    }
     if once {
         println!(
             "{}",

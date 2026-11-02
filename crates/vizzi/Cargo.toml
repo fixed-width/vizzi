@@ -30,3 +30,7 @@ qualification = []
 [[example]]
 name = "qualify"
 required-features = ["qualification"]
+
+[[example]]
+name = "retain"
+required-features = ["qualification"]

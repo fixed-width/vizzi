@@ -1,7 +1,7 @@
 //! Rust lexical declarations from raw, unexpanded source.
 
 use crate::{
-    analysis::{Analyzer, LanguageAdapter},
+    analysis::{AnalysisResult, Analyzer, LanguageAdapter, SyntaxState},
     model::{Analysis, Context, ContextId, ModelError},
     syntax::{Declaration, SyntaxAnalyzer},
 };
@@ -41,6 +41,7 @@ impl RustAnalyzer {
             id: ContextId::derive(&[
                 include_bytes!("rust.rs"),
                 include_bytes!("syntax.rs"),
+                include_bytes!("syntax_state.rs"),
                 include_bytes!("analysis.rs"),
                 include_bytes!("model.rs"),
                 include_bytes!("../../../Cargo.lock"),
@@ -63,6 +64,16 @@ impl Analyzer for RustAnalyzer {
         cancelled: &dyn Fn() -> bool,
     ) -> Result<Option<Analysis>, ModelError> {
         self.syntax.analyze_cancellable(bytes, cancelled)
+    }
+    fn analyze_with_state(
+        &mut self,
+        bytes: &[u8],
+        previous: Option<SyntaxState>,
+        retain_weight: usize,
+        cancelled: &dyn Fn() -> bool,
+    ) -> Result<Option<AnalysisResult>, ModelError> {
+        self.syntax
+            .analyze_with_state(bytes, previous, retain_weight, cancelled)
     }
 }
 

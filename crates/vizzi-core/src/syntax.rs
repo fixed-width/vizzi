@@ -1,8 +1,9 @@
 //! Shared raw-syntax traversal and declaration identity construction.
 
 use crate::{
-    analysis::Analyzer,
+    analysis::{AnalysisResult, Analyzer, SyntaxState},
     model::{Analysis, ContentId, Context, Coverage, Fact, ModelError},
+    syntax_state::edit_between,
 };
 use std::{collections::BTreeMap, ops::ControlFlow};
 
@@ -72,6 +73,28 @@ impl Analyzer for SyntaxAnalyzer {
         bytes: &[u8],
         cancelled: &dyn Fn() -> bool,
     ) -> Result<Option<Analysis>, ModelError> {
+        Ok(self
+            .run(bytes, None, 0, cancelled)?
+            .map(|result| result.analysis))
+    }
+    fn analyze_with_state(
+        &mut self,
+        bytes: &[u8],
+        previous: Option<SyntaxState>,
+        retain_weight: usize,
+        cancelled: &dyn Fn() -> bool,
+    ) -> Result<Option<AnalysisResult>, ModelError> {
+        self.run(bytes, previous, retain_weight, cancelled)
+    }
+}
+impl SyntaxAnalyzer {
+    fn run(
+        &mut self,
+        bytes: &[u8],
+        previous: Option<SyntaxState>,
+        retain_weight: usize,
+        cancelled: &dyn Fn() -> bool,
+    ) -> Result<Option<AnalysisResult>, ModelError> {
         if cancelled() {
             return Ok(None);
         }
@@ -87,7 +110,11 @@ impl Analyzer for SyntaxAnalyzer {
             analysis
                 .diagnostics
                 .push("Source is not UTF-8; syntax analysis is unavailable".into());
-            return Ok((!cancelled()).then_some(analysis));
+            return Ok((!cancelled()).then_some(AnalysisResult {
+                analysis,
+                state: None,
+                tree_reused: false,
+            }));
         };
         let mut stopped = false;
         let mut progress = |_: &tree_sitter::ParseState| {
@@ -98,11 +125,23 @@ impl Analyzer for SyntaxAnalyzer {
                 ControlFlow::Continue(())
             }
         };
+        let mut previous = previous.filter(|state| state.context() == &self.context);
+        if let Some(state) = &mut previous {
+            let Some(edit) = edit_between(&state.source, text, cancelled) else {
+                return Ok(None);
+            };
+            state.tree.edit(&edit);
+        }
+        if cancelled() {
+            return Ok(None);
+        }
+        let tree_reused = previous.is_some();
         let tree = self.parser.parse_with_options(
             &mut |offset, _| bytes.get(offset..).unwrap_or_default(),
-            None,
+            previous.as_ref().map(|state| &state.tree),
             Some(tree_sitter::ParseOptions::new().progress_callback(&mut progress)),
         );
+        drop(previous);
         let Some(tree) = tree else {
             // Interrupted parsers otherwise resume the abandoned input on the next call.
             self.parser.reset();
@@ -193,7 +232,22 @@ impl Analyzer for SyntaxAnalyzer {
                         *ordinal += 1;
                         fact.key = key;
                     }
-                    return Ok((!cancelled()).then_some(analysis));
+                    if cancelled() {
+                        return Ok(None);
+                    }
+                    drop(cursor);
+                    let state = SyntaxState::capture(
+                        self.context.clone(),
+                        analysis.content.clone(),
+                        text,
+                        tree,
+                        retain_weight,
+                    );
+                    return Ok(Some(AnalysisResult {
+                        analysis,
+                        state,
+                        tree_reused,
+                    }));
                 }
             }
         }

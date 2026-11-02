@@ -46,7 +46,8 @@ old pinned observations and pending dirty hints retain their existing rules.
 This is cooperative cancellation during parsing and extraction. Discovery, reads,
 cache access, document validation, snapshot construction, and destructor work do not
 have a hard cancellation deadline. Neither a worker limit nor this operation implements
-memory admission or persistent hot-file trees. See the
+a process-memory cap. [Optional syntax retention](SYNTAX_RETENTION.md) supplies a
+separate cache quota and discards interrupted leases. See the
 [parser responsiveness plan](../plans/parser-responsiveness.md) for the ownership and
 resource contracts required before retaining trees across refreshes.
 

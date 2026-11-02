@@ -104,3 +104,8 @@ Use the [browser validation procedure](../../experiments/browser/README.md) for 
 UI checks and renderer measurements. Stdio remains useful in environments without
 socket access. Production renderer and baseline-laptop qualification remain separate
 from the current bounded reference-view measurements.
+
+To try retained syntax trees for repeated edits, add `--syntax-cache-mib 512`.
+The default is disabled. This limits admitted cache weight and entries, rather than
+whole-process memory. See the [retention contract](../prototype/SYNTAX_RETENTION.md)
+for ownership, fallback, and resource accounting.

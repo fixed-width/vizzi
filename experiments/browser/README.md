@@ -5,7 +5,9 @@ while the native engine refreshes source. It builds Vizzi itself; analysed proje
 never built. Browser results and their limits are explained in [the report](RESULTS.md).
 The latest delivery measurements are in [the notification report](NOTIFICATIONS_RESULTS.md).
 Full Linux/PyTorch interaction results and current outline/edit improvements are in the
-[responsiveness report](../qualification/RESPONSIVENESS_RESULTS.md).
+[responsiveness report](../qualification/RESPONSIVENESS_RESULTS.md). The
+[retention report](../retention/RESULTS.md) adds a same-build enabled/disabled browser
+comparison and documents the remaining periodic-recovery outlier.
 
 ## Install and check
 

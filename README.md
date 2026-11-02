@@ -18,6 +18,7 @@ validating coordination; it does not qualify large-codebase GPU performance.
 - [Captured document and snapshot identities](docs/prototype/IDENTITIES.md)
 - [Language adapters and shared worker budget](docs/prototype/LANGUAGES.md)
 - [Cooperative analysis cancellation](docs/prototype/ANALYSIS_CANCELLATION.md)
+- [Bounded syntax retention](docs/prototype/SYNTAX_RETENTION.md)
 - [Source selection and policy identity](docs/prototype/SOURCE_POLICY.md)
 - [Verified capture plans](docs/prototype/CAPTURE_PLAN.md) and [bounded outlines](docs/prototype/OUTLINE.md)
 - [Raw C/C++ extraction](docs/prototype/C_FAMILY_SYNTAX.md)
@@ -31,6 +32,7 @@ validating coordination; it does not qualify large-codebase GPU performance.
 - [Full-repository qualification](experiments/qualification/RESULTS.md) and [provisional budgets](docs/performance/BUDGETS.md)
 - [Bounded-outline and incremental-edit measurements](experiments/qualification/RESPONSIVENESS_RESULTS.md)
 - [Parser cancellation measurements](experiments/qualification/CANCELLATION_RESULTS.md)
+- [Repeated-edit syntax-retention measurements](experiments/retention/RESULTS.md)
 - [Earlier performance experiments](experiments/performance/README.md)
 - [Contributor guidance](AGENTS.md)
 

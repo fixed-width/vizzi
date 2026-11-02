@@ -3,6 +3,7 @@
 use crate::{
     cache::Cache,
     source::{CaptureScope, Directory, MAX_PATH_HINTS},
+    syntax_cache::{SyntaxCache, SyntaxKey},
 };
 use serde::Serialize;
 use std::{
@@ -15,7 +16,7 @@ use std::{
     time::{Duration, Instant},
 };
 use vizzi_core::{
-    analysis::Analyzer,
+    analysis::{AnalysisResult, Analyzer},
     model::{ContentId, Document, ModelError, Snapshot},
 };
 
@@ -54,6 +55,8 @@ pub struct Measurements {
     pub reconciled: bool,
     /// Files requiring syntax parsing.
     pub parsed: usize,
+    /// Parsed files supplied with a compatible retained syntax tree.
+    pub tree_reuses: usize,
     /// Files reusing immutable in-memory documents.
     pub reused: usize,
     /// Files reusing persisted analysis.
@@ -79,6 +82,7 @@ pub struct Engine {
     directory: Directory,
     cache: Cache,
     workers: usize,
+    syntax_cache: Option<Arc<SyntaxCache>>,
 }
 impl Engine {
     /// Configures 1–32 workers shared across languages, with worker-local parsers.
@@ -92,7 +96,13 @@ impl Engine {
             directory,
             cache,
             workers,
+            syntax_cache: None,
         })
+    }
+    /// Enables explicitly shared, bounded retained syntax independently of persistence.
+    pub fn with_syntax_cache(mut self, cache: Arc<SyntaxCache>) -> Self {
+        self.syntax_cache = Some(cache);
+        self
     }
     /// Returns the source adapter used by the watcher.
     pub fn directory(&self) -> &Directory {
@@ -137,6 +147,11 @@ impl Engine {
             ..Default::default()
         };
         let mut documents = Vec::with_capacity(capture.files.len());
+        if let Some(cache) = &self.syntax_cache {
+            for path in &capture.removed {
+                cache.invalidate(self.directory.workspace(), path);
+            }
+        }
         if !measurements.reconciled {
             let touched: BTreeSet<_> = capture
                 .files
@@ -196,7 +211,7 @@ impl Engine {
                     scope.spawn(|| -> Result<_, EngineError> {
                         let mut parsers = BTreeMap::<_, Box<dyn Analyzer>>::new();
                         let mut batch = Vec::new();
-                        let mut counters = (0, 0, 0);
+                        let mut counters = (0, 0, 0, 0);
                         loop {
                             if cancelled() {
                                 break;
@@ -232,11 +247,36 @@ impl Engine {
                                         entry.insert(language.create()?)
                                     }
                                 };
-                                let Some(analysis) =
-                                    parser.analyze_cancellable(&file.bytes, cancelled)?
-                                else {
+                                let mut lease = self.syntax_cache.as_ref().and_then(|cache| {
+                                    cache.lease(
+                                        SyntaxKey::new(
+                                            self.directory.workspace(),
+                                            &file.path,
+                                            context,
+                                        ),
+                                        !measurements.reconciled,
+                                    )
+                                });
+                                let result = if let Some(lease) = &mut lease {
+                                    parser.analyze_with_state(
+                                        &file.bytes,
+                                        lease.take_previous(),
+                                        lease.allowance(),
+                                        cancelled,
+                                    )?
+                                } else {
+                                    parser.analyze_cancellable(&file.bytes, cancelled)?.map(
+                                        |analysis| AnalysisResult {
+                                            analysis,
+                                            state: None,
+                                            tree_reused: false,
+                                        },
+                                    )
+                                };
+                                let Some(result) = result else {
                                     return Ok(None);
                                 };
+                                let analysis = result.analysis;
                                 if analysis.context != *context {
                                     return Err(EngineError::Configuration(
                                         "analyzer returned an unregistered context".into(),
@@ -249,7 +289,11 @@ impl Engine {
                                     vec![analysis],
                                     file.classification.clone(),
                                 )?;
+                                if let Some(lease) = lease {
+                                    lease.finish(result.state, content);
+                                }
                                 counters.0 += 1;
+                                counters.3 += usize::from(result.tree_reused);
                                 if self.cache.store(&document.analyses()[0]).is_err() {
                                     counters.2 += 1;
                                 }
@@ -274,13 +318,14 @@ impl Engine {
             return Ok(None);
         }
         for batch in batches {
-            let Some((batch, (parsed, hits, warnings))) = batch else {
+            let Some((batch, (parsed, hits, warnings, tree_reuses))) = batch else {
                 return Ok(None);
             };
             documents.extend(batch);
             measurements.parsed += parsed;
             measurements.cache_hits += hits;
             measurements.cache_warnings += warnings;
+            measurements.tree_reuses += tree_reuses;
         }
         let snapshot = Arc::new(if measurements.reconciled {
             self.directory
@@ -295,6 +340,9 @@ impl Engine {
                 &capture.removed,
             )?
         });
+        if let Some(cache) = &self.syntax_cache {
+            cache.reconcile(&snapshot);
+        }
         measurements.files = snapshot.documents().len();
         measurements.analyzed = snapshot.analyzed_files();
         measurements.source_only = measurements.files - measurements.analyzed;

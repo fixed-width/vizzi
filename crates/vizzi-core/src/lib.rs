@@ -10,3 +10,4 @@ pub mod python;
 pub mod query;
 pub mod rust;
 mod syntax;
+mod syntax_state;

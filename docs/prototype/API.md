@@ -65,7 +65,9 @@ host version. No downgrade endpoint is provided; browser validation explicitly r
 the old view schema. Status/SSE consumers retain their existing envelope contract.
 
 Measurements count total indexed `files`, actual read `bytes`, parsed files, in-memory
-reuse, persisted cache hits, and cache write warnings. `read_files` counts reopened
+reuse, persisted cache hits, and cache write warnings. `tree_reuses` counts parsed files
+supplied with retained syntax trees; it is distinct from document/persisted reuse. See
+[syntax retention](SYNTAX_RETENTION.md). `read_files` counts reopened
 source files; `retained` counts unread baseline documents carried by hints. Retained
 documents also count as `reused` analysis. `reconciled` distinguishes a complete pass
 from targeted verification, including conservative fallbacks. None treats unchanged

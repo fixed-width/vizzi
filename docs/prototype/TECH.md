@@ -81,6 +81,9 @@ One worker budget and queue cover all languages; parser creation is lazy and own
 remains local to a bounded worker. [Cooperative cancellation](ANALYSIS_CANCELLATION.md)
 checks during built-in parsing and extraction as well as between files. It does not
 impose a hard deadline on all analysis/capture operations. Parsing never holds the publication lock.
+[Opt-in syntax retention](SYNTAX_RETENTION.md) transfers an owned tree and exact source
+between workers through exclusive, weight/count-bounded native leases. Published
+documents remain immutable and carry no mutable syntax state.
 
 ## Host interface
 

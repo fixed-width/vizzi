@@ -15,11 +15,16 @@ struct Session {
 }
 impl Session {
     fn start(root: &std::path::Path, cache: &std::path::Path) -> Self {
+        Self::start_with_budget(root, cache, 0)
+    }
+    fn start_with_budget(root: &std::path::Path, cache: &std::path::Path, budget: usize) -> Self {
         let mut child = Command::new(env!("CARGO_BIN_EXE_vizzi"))
             .args(["--stdio", "--root"])
             .arg(root)
             .arg("--cache")
             .arg(cache)
+            .arg("--syntax-cache-mib")
+            .arg(budget.to_string())
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::inherit())
@@ -55,6 +60,63 @@ impl Session {
         assert_eq!(response["status"], 200);
         assert_eq!(response["id"], 42);
         serde_json::from_str(response["body"].as_str().unwrap()).unwrap()
+    }
+}
+
+#[test]
+fn opt_in_retention_reuses_a_tree_through_the_live_host() {
+    let source = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    let path = source.path().join("a.rs");
+    let original = (0..2000)
+        .map(|index| format!("fn item_{index}() {{}}\n"))
+        .collect::<String>();
+    std::fs::write(&path, &original).unwrap();
+    let mut session = Session::start_with_budget(source.path(), cache.path(), 8);
+    let start = Instant::now();
+    let mut previous = loop {
+        let status = session.request("/api/status");
+        if status["pending"] == false && status["measurements"]["reused"] == 1 {
+            break status["snapshot"].clone();
+        }
+        assert!(start.elapsed() < Duration::from_secs(8));
+        std::thread::sleep(Duration::from_millis(5));
+    };
+    for index in 1..=2 {
+        std::fs::write(&path, format!("// edit {index}\n{original}")).unwrap();
+        let start = Instant::now();
+        let updated = loop {
+            let status = session.request("/api/status");
+            if status["snapshot"] != previous {
+                break status;
+            }
+            assert!(start.elapsed() < Duration::from_secs(8));
+            std::thread::sleep(Duration::from_millis(5));
+        };
+        assert_eq!(
+            updated["measurements"]["tree_reuses"],
+            if index == 1 { 0 } else { 1 }
+        );
+        previous = updated["snapshot"].clone();
+    }
+}
+
+#[test]
+fn invalid_retention_budgets_fail_without_populating_the_analysis_cache() {
+    let source = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    std::fs::write(source.path().join("a.rs"), "fn example() {}").unwrap();
+    for value in ["-1", "invalid", &usize::MAX.to_string()] {
+        let output = Command::new(env!("CARGO_BIN_EXE_vizzi"))
+            .arg("--root")
+            .arg(source.path())
+            .arg("--cache")
+            .arg(cache.path())
+            .args(["--once", "--syntax-cache-mib", value])
+            .output()
+            .unwrap();
+        assert!(!output.status.success());
+        assert_eq!(std::fs::read_dir(cache.path()).unwrap().count(), 0);
     }
 }
 impl Drop for Session {

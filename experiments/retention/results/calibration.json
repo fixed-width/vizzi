@@ -1,0 +1,34 @@
+{
+  "method": "Isolated safe tree-sitter parse with source resident before measurement; parser dropped before final RSS. Values are descriptive and allocator/grammar dependent.",
+  "dependency": "tree-sitter 0.27.1",
+  "tool_source": "use std::{env,fs,time::Instant};\nfn rss()->u64 {fs::read_to_string(\"/proc/self/status\").unwrap().lines().find(|s|s.starts_with(\"VmRSS:\")).unwrap().split_whitespace().nth(1).unwrap().parse().unwrap()}\nfn main(){let a:Vec<_>=env::args().collect(); let bytes=fs::read(&a[2]).unwrap(); let before=rss();let mut parser=tree_sitter::Parser::new();let language=match a[1].as_str(){\"c\"=>tree_sitter_c::LANGUAGE,\"cpp\"=>tree_sitter_cpp::LANGUAGE,\"python\"=>tree_sitter_python::LANGUAGE,_=>tree_sitter_rust::LANGUAGE};parser.set_language(&language.into()).unwrap();let start=Instant::now();let tree=parser.parse(&bytes,None).unwrap();let parsed=rss();drop(parser);println!(\"{} {} {} {} {} {}\",bytes.len(),tree.root_node().descendant_count(),before,parsed,rss(),start.elapsed().as_secs_f64());}\n",
+  "observations": [
+    {
+      "profile": "linux",
+      "file": "drivers/gpu/drm/amd/include/asic_reg/dcn/dcn_3_2_0_sh_mask.h",
+      "source_bytes": 24009174,
+      "nodes": 807655,
+      "rss_before_parse_kib": 25632,
+      "rss_tree_alive_parser_dropped_kib": 90376,
+      "admission_weight": 127393110
+    },
+    {
+      "profile": "pytorch",
+      "file": "third_party/perfetto/sdk/perfetto.h",
+      "source_bytes": 8416629,
+      "nodes": 1935897,
+      "rss_before_parse_kib": 10464,
+      "rss_tree_alive_parser_dropped_kib": 178536,
+      "admission_weight": 256215541
+    },
+    {
+      "profile": "pytorch",
+      "file": "third_party/perfetto/sdk/perfetto.cc",
+      "source_bytes": 3278344,
+      "nodes": 645802,
+      "rss_before_parse_kib": 5372,
+      "rss_tree_alive_parser_dropped_kib": 63448,
+      "admission_weight": 85945096
+    }
+  ]
+}

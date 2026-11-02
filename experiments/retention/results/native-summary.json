@@ -1,0 +1,149 @@
+{
+  "rows": [
+    {
+      "profile": "linux",
+      "budget_mib": 0,
+      "path": "kernel/locking/mutex.c",
+      "samples": 9,
+      "median_engine_ms": 33.611585999999996,
+      "min_engine_ms": 30.752077,
+      "max_engine_ms": 37.702588,
+      "priming_engine_ms": [
+        34.147569000000004,
+        33.990496,
+        33.179981
+      ],
+      "max_process_rss_gib_including_verification": 5.872398376464844,
+      "peak_admission_weight": null,
+      "last_idle_weight": null
+    },
+    {
+      "profile": "linux",
+      "budget_mib": 0,
+      "path": "drivers/gpu/drm/amd/include/asic_reg/dcn/dcn_3_2_0_sh_mask.h",
+      "samples": 9,
+      "median_engine_ms": 702.67321,
+      "min_engine_ms": 556.1288119999999,
+      "max_engine_ms": 777.579231,
+      "priming_engine_ms": [
+        586.518291,
+        728.5572609999999,
+        723.214831
+      ],
+      "max_process_rss_gib_including_verification": 5.872398376464844,
+      "peak_admission_weight": null,
+      "last_idle_weight": null
+    },
+    {
+      "profile": "linux",
+      "budget_mib": 512,
+      "path": "kernel/locking/mutex.c",
+      "samples": 9,
+      "median_engine_ms": 32.32006,
+      "min_engine_ms": 31.180719999999997,
+      "max_engine_ms": 50.561719,
+      "priming_engine_ms": [
+        37.718863,
+        34.986109,
+        30.067066999999998
+      ],
+      "max_process_rss_gib_including_verification": 5.937122344970703,
+      "peak_admission_weight": 269280705,
+      "last_idle_weight": 845246
+    },
+    {
+      "profile": "linux",
+      "budget_mib": 512,
+      "path": "drivers/gpu/drm/amd/include/asic_reg/dcn/dcn_3_2_0_sh_mask.h",
+      "samples": 9,
+      "median_engine_ms": 163.241443,
+      "min_engine_ms": 135.768462,
+      "max_engine_ms": 219.79879499999998,
+      "priming_engine_ms": [
+        624.111615,
+        608.945018,
+        575.4240520000001
+      ],
+      "max_process_rss_gib_including_verification": 5.937122344970703,
+      "peak_admission_weight": 395828821,
+      "last_idle_weight": 127393362
+    },
+    {
+      "profile": "pytorch",
+      "budget_mib": 0,
+      "path": "c10/core/Device.cpp",
+      "samples": 9,
+      "median_engine_ms": 5.12824,
+      "min_engine_ms": 4.778136,
+      "max_engine_ms": 5.884793999999999,
+      "priming_engine_ms": [
+        5.761365,
+        4.578197,
+        5.4699409999999995
+      ],
+      "max_process_rss_gib_including_verification": 1.3398475646972656,
+      "peak_admission_weight": null,
+      "last_idle_weight": null
+    },
+    {
+      "profile": "pytorch",
+      "budget_mib": 0,
+      "path": "third_party/perfetto/sdk/perfetto.h",
+      "samples": 9,
+      "median_engine_ms": 1531.6157289999999,
+      "min_engine_ms": 1359.2185080000002,
+      "max_engine_ms": 1799.759247,
+      "priming_engine_ms": [
+        1453.113999,
+        1414.28666,
+        1383.142537
+      ],
+      "max_process_rss_gib_including_verification": 1.3398475646972656,
+      "peak_admission_weight": null,
+      "last_idle_weight": null
+    },
+    {
+      "profile": "pytorch",
+      "budget_mib": 512,
+      "path": "c10/core/Device.cpp",
+      "samples": 9,
+      "median_engine_ms": 3.929928,
+      "min_engine_ms": 3.683404,
+      "max_engine_ms": 6.612533,
+      "priming_engine_ms": [
+        5.285172,
+        4.7339139999999995,
+        4.86304
+      ],
+      "max_process_rss_gib_including_verification": 1.2730865478515625,
+      "peak_admission_weight": 268625638,
+      "last_idle_weight": 190179
+    },
+    {
+      "profile": "pytorch",
+      "budget_mib": 512,
+      "path": "third_party/perfetto/sdk/perfetto.h",
+      "samples": 9,
+      "median_engine_ms": 645.3050380000001,
+      "min_engine_ms": 522.676453,
+      "max_engine_ms": 705.719769,
+      "priming_engine_ms": [
+        1265.951065,
+        1499.9150160000002,
+        1474.567532
+      ],
+      "max_process_rss_gib_including_verification": 1.2730865478515625,
+      "peak_admission_weight": 524651227,
+      "last_idle_weight": 256215768
+    }
+  ],
+  "limits": [
+    "Warm OS caches; current-context analysis cache prepared before timing",
+    "One separate process per disabled/enabled condition; priming is separate from repeated edits",
+    "Unique per-condition probe inputs require real parsing, not persisted cache hits",
+    "No watcher, HTTP, or browser timing; all cases use production engine/extraction",
+    "Process peaks include clean-capture verification; point RSS is also recorded before each verification",
+    "Admission weight is a retention quota, not a measured heap cap or whole-process memory limit",
+    "Four shared workers; only one targeted file is changed in a case; this host is not the 16GB baseline laptop"
+  ]
+}

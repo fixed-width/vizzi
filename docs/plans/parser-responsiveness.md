@@ -34,30 +34,33 @@ request-to-worker-return time separately from the query loop's observation caden
 
 ## 2. Bounded hot-file trees
 
-Persistent trees require a new engine-owned session lifetime: current worker-local
-analyzers are dropped after each refresh. Do not attach mutable parser state to published
-documents or create an unbounded session per file/language. A later implementation
-must establish these contracts before enabling retention:
+The retained-tree portion is implemented as opt-in owned tree/source leases, with
+worker-local parsers and a shared admission cache. Whole-process working-memory
+admission remains open. See the [retention contract](../prototype/SYNTAX_RETENTION.md),
+[implementation plan](syntax-retention.md), and
+[measurements](../../experiments/retention/RESULTS.md). The following constraints remain
+part of that interface:
 
 - Identify entries by workspace, file, and complete analysis context; verify the exact
   retained source before deriving byte/point edits. An event path is only a hint.
 - Lease a session to one worker without holding the admission lock while parsing.
   Concurrent refreshes must never edit the same tree or deadlock on a saturated pool.
-  Current analyzer trait objects are worker-local and do not require `Send`; choose
-  between persistent worker ownership and transferable session state explicitly.
-- Set one process-wide admission policy across languages, including active leases,
-  old/new source overlap, trees, parser scratch space, and eviction. Source bytes and
-  node count are useful weights, not an exact native heap measurement.
+  Analyzer trait objects remain worker-local without a `Send` requirement; only owned
+  syntax state transfers between refreshes.
+- Share one retained-state policy across languages, including active leases, old/new
+  source overlap, tree weights, and eviction. Parser scratch space and ordinary capture
+  buffers remain outside this cache quota; a unified memory policy is separate work.
+  Source bytes/node counts are weights, not exact native heap measurements.
 - Reset after interruption; keep or discard the old tree deliberately. Superseded work
   may warm a private cache only if the next use validates source/context again.
 - Preserve immutable facts, unique/ambiguous entity rules, and clean-capture equivalence
   across Unicode/multiline edits, deletion, rename, recovery, and cache eviction.
 
 Tree-sitter exposes descendant counts but no exact per-tree allocation measurement in
-the current safe interface. Establish measured memory weights and a conservative
-admission policy before choosing defaults. Repeat the earlier incremental-parse
-experiments on large headers using the production extraction pipeline; a faster parse
-alone does not bound fact extraction, source transfer, or total edit latency.
+the current safe interface. The current weights have exploratory calibration and
+repeated-edit measurements through production extraction. Expand working-set and
+baseline-hardware qualification before choosing a default; faster parsing alone does
+not bound fact extraction, source transfer, or total edit latency.
 
 ## Sources
 
