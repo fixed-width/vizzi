@@ -179,3 +179,8 @@ npm test
 Fixture tests verify retention/reparse/cancellation, units and timer boundaries,
 explicit file selection, rejected inconsistent views, public JSON entry, and invalid
 configuration. Report unviable/timeouts/exclusions separately from caught mutations.
+
+The [shared-source experiment](../shared-source/README.md) compares allocation overlap
+while preserving full reads/hashes. Its `shared_sources` column counts source storage
+reuse and is null for older reports without that measurement. Compare total engine
+time across implementations: hashing/index construction moved into the capture phase.

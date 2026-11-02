@@ -15,9 +15,9 @@ repeats four-worker retained reparse and measures cooperative interruption withi
 | --- | --- | --- |
 | Interactive parsing | Four shared workers by default | Preserves throughput without separate per-language pools |
 | Background throughput | Eight only with available resources and measured query impact | Retained reparse improves about 1.6×; Linux core-query p95 grows from at most 44.4 to 52.6 ms |
-| Native workspace memory | Aim below 8 GiB peak while retaining the previous observation | Maximum sampled Linux reparse RSS 6.492 GiB on a 62.5 GiB host; no enforced cap |
+| Native workspace memory | Aim below 8 GiB peak while retaining the previous observation | Latest four-worker shared-source reparse: Linux 2.526 GiB, PyTorch 0.757 GiB on the 62.5 GiB host. Earlier eight-worker conditions are separate; no enforced cap |
 | Bounded core view | Aim for p95 below 50 ms for the current 2,000-tile query | Four-worker observations fit on this host; eight-worker Linux has misses |
-| Ordinary edit visibility | Aim for all five probe edits below 200 ms before collecting meaningful tails | Latest paired PyTorch probe: medians 102/88 ms disabled/enabled, maxima 299 ms in both conditions; full recovery still fails the gate. Earlier Linux UI samples were 135–192 ms |
+| Ordinary edit visibility | Aim for all five probe edits below 200 ms before collecting meaningful tails | Latest shared-source PyTorch probe: 85–220 ms, first cold-tree edit above 200 ms. No full recovery in those five updates; earlier paired recovery outliers were 299 ms. The gate remains unmet |
 | Cancellation response | Aim below 250 ms after a request during parsing | Follow-up direct engine-return ranges: Linux 41–46 ms; PyTorch 18–23 ms. Three samples each; cooperative callbacks do not impose a hard deadline |
 | Retained syntax | Opt-in shared admission quota, initially 512 MiB and eight entries | Charges old/new state together; Perfetto peaks at 500.3 MiB weight. Normal parsing/capture allocations remain outside it |
 | Source and outline DOM | Bound each pane by visible rows plus overscan; initial ceiling 200 rendered entries | Source lines 56–58; 42,443-declaration C++ outline now renders 21 buttons. Complete transport/index construction remains linear in source/declaration size |
@@ -50,11 +50,16 @@ The [repeated-edit report](../../experiments/retention/RESULTS.md) measures fast
 headers and an ordinary-edit recovery outlier. Continue working-set and hardware
 validation before choosing a default.
 
+The [shared-source measurements](../../experiments/shared-source/RESULTS.md) reduce
+retained memory while preserving reads and hashes. PyTorch cached loading is slower
+in that paired run; capture-phase timing now includes hashing/index construction.
+
 1. Qualify admission policy with multiple active large files and baseline hardware.
    Keep cache weight separate from parser scratch space and whole-process memory.
-2. Reduce full-capture memory overlap, for example by streaming bounded input batches
-   and sharing immutable captured source across analysis-context changes. Keep byte
-   verification and pinned-source consistency; metadata alone is still not proof.
+2. Continue capture/admission design with bounded working inputs and consider the
+   serial preparation cost of new source. [Verified source sharing](../prototype/CAPTURED_SOURCE.md)
+   now removes duplicate byte/line-index storage; different old/new contents can still
+   coexist. Full recovery still reads/hashes the entire selected scope.
 3. Bound selected-source and outline transport/projection work with coherent snapshot
    and selection semantics. DOM virtualization alone does not bound transferred data
    or eliminate changed-version index construction.

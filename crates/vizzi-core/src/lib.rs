@@ -3,6 +3,7 @@
 pub mod analysis;
 pub mod c_family;
 pub mod capture;
+mod captured_source;
 pub mod model;
 pub mod policy;
 pub mod publication;

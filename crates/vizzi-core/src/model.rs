@@ -1,4 +1,5 @@
 //! Captured source and immutable analysis identities.
+pub use crate::captured_source::CapturedSource;
 
 use crate::policy::Classification;
 use serde::{Deserialize, Serialize};
@@ -130,11 +131,8 @@ pub struct Document {
     workspace: WorkspaceId,
     id: FileId,
     path: String,
-    content: ContentId,
     version: DocumentVersion,
-    bytes: usize,
-    source: Option<Arc<str>>,
-    line_starts: Vec<usize>,
+    source: Arc<CapturedSource>,
     analyses: Vec<Analysis>,
     classification: Classification,
 }
@@ -148,36 +146,52 @@ impl Document {
         analyses: Vec<Analysis>,
         classification: Classification,
     ) -> Result<Self, ModelError> {
+        Self::capture_source(
+            workspace,
+            path,
+            CapturedSource::capture(bytes.to_vec(), None),
+            analyses,
+            classification,
+        )
+    }
+    /// Validates facts against owned immutable source without copying its text/index.
+    pub fn capture_source(
+        workspace: WorkspaceId,
+        path: String,
+        source: Arc<CapturedSource>,
+        analyses: Vec<Analysis>,
+        classification: Classification,
+    ) -> Result<Self, ModelError> {
         if path.is_empty()
             || path.contains('\\')
             || path.split('/').any(|part| matches!(part, "" | "." | ".."))
         {
             return Err(ModelError("expected a normalized relative path".into()));
         }
-        let content = ContentId::derive(&[bytes]);
+        let content = source.content();
         if matches!(classification, Classification::SourceOnly { .. }) && !analyses.is_empty() {
             return Err(ModelError(
                 "source-only documents cannot contain analysis".into(),
             ));
         }
-        let source = std::str::from_utf8(bytes).ok();
+        let text = source.text();
         let mut contexts = BTreeSet::new();
         for analysis in &analyses {
-            if analysis.content != content || !contexts.insert(&analysis.context.id) {
+            if &analysis.content != content || !contexts.insert(&analysis.context.id) {
                 return Err(ModelError("analysis content or context mismatch".into()));
             }
             let mut keys = BTreeSet::new();
             for fact in &analysis.facts {
                 if !keys.insert(&fact.key)
                     || fact.span.start >= fact.span.end
-                    || !source.is_some_and(|text| text.get(fact.span.clone()).is_some())
+                    || !text.is_some_and(|text| text.get(fact.span.clone()).is_some())
                 {
                     return Err(ModelError(
                         "invalid or duplicate declaration range/key".into(),
                     ));
                 }
             }
-            if source.is_none() && analysis.coverage != Coverage::Unavailable {
+            if text.is_none() && analysis.coverage != Coverage::Unavailable {
                 return Err(ModelError(
                     "non-UTF-8 source requires unavailable analysis".into(),
                 ));
@@ -193,24 +207,12 @@ impl Document {
             content.as_str().as_bytes(),
             analysis_digest.as_bytes(),
         ]);
-        let mut line_starts = vec![0];
-        if let Some(source) = source {
-            line_starts.extend(
-                source
-                    .bytes()
-                    .enumerate()
-                    .filter_map(|(i, byte)| (byte == b'\n').then_some(i + 1)),
-            );
-        }
         Ok(Self {
             id,
             workspace,
             path,
-            content,
             version,
-            bytes: bytes.len(),
-            source: source.map(Arc::from),
-            line_starts,
+            source,
             analyses,
             classification,
         })
@@ -225,7 +227,7 @@ impl Document {
     }
     /// Returns the captured byte identity.
     pub fn content(&self) -> &ContentId {
-        &self.content
+        self.source.content()
     }
     /// Returns the cached identity of this captured file and its validated analyses.
     pub fn version(&self) -> &DocumentVersion {
@@ -233,19 +235,19 @@ impl Document {
     }
     /// Returns the captured byte count.
     pub fn bytes(&self) -> usize {
-        self.bytes
+        self.source.bytes().len()
     }
     /// Returns UTF-8 source, or none for non-UTF-8 input.
     pub fn source(&self) -> Option<&str> {
-        self.source.as_deref()
+        self.source.text()
     }
     /// Returns captured encoding availability independently of classification.
     pub fn encoding(&self) -> SourceEncoding {
-        if self.source.is_some() {
-            SourceEncoding::Utf8
-        } else {
-            SourceEncoding::Unsupported
-        }
+        self.source.encoding()
+    }
+    /// Returns shared immutable source storage, independently of classification/facts.
+    pub fn captured(&self) -> &Arc<CapturedSource> {
+        &self.source
     }
     /// Returns all analysis contexts for this document.
     pub fn analyses(&self) -> &[Analysis] {
@@ -263,19 +265,13 @@ impl Document {
             fact.key.as_bytes(),
         ];
         if !fact.unique {
-            parts.push(self.content.as_str().as_bytes());
+            parts.push(self.content().as_str().as_bytes());
         }
         EntityId::derive(&parts)
     }
     /// Converts a nonempty byte span to inclusive one-based source lines.
     pub fn lines(&self, span: &Range<usize>) -> Range<usize> {
-        let start = self
-            .line_starts
-            .partition_point(|offset| *offset <= span.start);
-        let end = self
-            .line_starts
-            .partition_point(|offset| *offset <= span.end.saturating_sub(1));
-        start..end
+        self.source.lines(span)
     }
 }
 

@@ -1,5 +1,8 @@
 # Bounded syntax retention results
 
+The later [shared-source report](../shared-source/RESULTS.md) reduces full-capture
+source overlap and records the remaining startup/transport costs.
+
 Opt-in retained trees reduce repeated large-header analysis time on both full reference
 repositories. Linux's 24 MB AMD header improves from **703 ms to 163 ms** median engine
 time; PyTorch's 8.4 MB Perfetto header improves from **1,532 ms to 645 ms**. A paired

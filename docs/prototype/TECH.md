@@ -43,7 +43,9 @@ in the [implementation plan](../plans/c-family.md). Current analyzers remain byt
 Rust/Python/C/C++; unassigned/unsupported C-family candidates remain source-only.
 
 Snapshots sort documents and identify their actual captured contents and analysis.
-They represent immutable observations, not an atomic filesystem transaction. A source
+They represent immutable observations, not an atomic filesystem transaction.
+[Captured source](CAPTURED_SOURCE.md) shares verified bytes and line indices across
+input jobs and documents, including changed analysis contexts. A source
 query never reads a mutable file after choosing its snapshot.
 Each validated document caches its content/classification/analysis version. Snapshot composition
 hashes those fixed-size versions instead of serialising retained facts again. See

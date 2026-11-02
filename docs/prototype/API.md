@@ -69,10 +69,12 @@ reuse, persisted cache hits, and cache write warnings. `tree_reuses` counts pars
 supplied with retained syntax trees; it is distinct from document/persisted reuse. See
 [syntax retention](SYNTAX_RETENTION.md). `read_files` counts reopened
 source files; `retained` counts unread baseline documents carried by hints. Retained
-documents also count as `reused` analysis. `reconciled` distinguishes a complete pass
+documents also count as `reused` analysis. `shared_sources` counts reopened inputs
+sharing verified byte/index storage with the baseline; their bytes are still read and
+hashed. See [captured source](CAPTURED_SOURCE.md). `reconciled` distinguishes a complete pass
 from targeted verification, including conservative fallbacks. None treats unchanged
 metadata as content proof. `capture_ms` includes input validation, discovery/candidate
-inspection, and reads;
+inspection, reads, content hashing, and new source/index construction;
 `total_ms` includes capture, verification, analysis/cache activity, and snapshot creation.
 Transport, debounce, notification delivery, and painting are outside those timings.
 

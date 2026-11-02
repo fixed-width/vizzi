@@ -232,6 +232,13 @@ fn configuration_changes_reconcile_unread_documents_and_invalidate_cache() {
     assert_eq!(changed.measurements.read_files, 2);
     assert_eq!(changed.measurements.parsed, 2);
     assert_eq!(changed.measurements.retained, 0);
+    assert_eq!(changed.measurements.shared_sources, 2);
+    for path in ["a.rs", "b.py"] {
+        assert!(Arc::ptr_eq(
+            original.snapshot.file_by_path(path).unwrap().captured(),
+            changed.snapshot.file_by_path(path).unwrap().captured()
+        ));
+    }
     assert_ne!(original.snapshot.id(), changed.snapshot.id());
     assert_eq!(
         changed.snapshot.id(),

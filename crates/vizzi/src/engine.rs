@@ -17,7 +17,7 @@ use std::{
 };
 use vizzi_core::{
     analysis::{AnalysisResult, Analyzer},
-    model::{ContentId, Document, ModelError, Snapshot},
+    model::{Document, ModelError, Snapshot},
 };
 
 /// Native source/analysis failure; the host retains its previous snapshot.
@@ -49,6 +49,8 @@ pub struct Measurements {
     pub bytes: usize,
     /// Source files reopened and verified during this attempt.
     pub read_files: usize,
+    /// Reopened inputs sharing verified byte/index storage with the baseline.
+    pub shared_sources: usize,
     /// Unread documents retained using the supplied hints, not metadata proof.
     pub retained: usize,
     /// Whether this attempt rediscovered and verified the complete source scope.
@@ -135,14 +137,23 @@ impl Engine {
             CaptureScope::Paths(paths)
                 if previous.is_some_and(|snapshot| self.can_capture_paths(snapshot, paths)) =>
             {
-                self.directory.capture_paths(paths)?
+                self.directory.capture_reusing(previous, scope, cancelled)?
             }
-            _ => self.directory.capture()?,
+            _ => self
+                .directory
+                .capture_reusing(previous, &CaptureScope::Reconcile, cancelled)?,
+        };
+        let Some(capture) = capture else {
+            return Ok(None);
         };
         let mut measurements = Measurements {
             read_files: capture.files.len(),
             reconciled: capture.directories.is_some(),
-            bytes: capture.files.iter().map(|file| file.bytes.len()).sum(),
+            bytes: capture
+                .files
+                .iter()
+                .map(|file| file.source.bytes().len())
+                .sum(),
             capture_ms: milliseconds(started.elapsed()),
             ..Default::default()
         };
@@ -173,37 +184,38 @@ impl Engine {
             if cancelled() {
                 return Ok(None);
             }
-            let content = ContentId::derive(&[&file.bytes]);
+            let content = file.source.content();
             let language = self.directory.language(&file.classification);
-            if let Some(old) = previous
-                .and_then(|snapshot| snapshot.file_by_path(&file.path))
-                .filter(|old| {
-                    old.content() == &content
-                        && old.classification() == &file.classification
-                        && match language {
-                            Some(language) => {
-                                old.analyses().len() == 1
-                                    && old.analyses()[0].context == *language.context()
-                            }
-                            None => old.analyses().is_empty(),
+            let old = previous.and_then(|snapshot| snapshot.file_by_path(&file.path));
+            if old.is_some_and(|old| Arc::ptr_eq(old.captured(), &file.source)) {
+                measurements.shared_sources += 1;
+            }
+            if let Some(old) = old.filter(|old| {
+                old.content() == content
+                    && old.classification() == &file.classification
+                    && match language {
+                        Some(language) => {
+                            old.analyses().len() == 1
+                                && old.analyses()[0].context == *language.context()
                         }
-                })
-            {
+                        None => old.analyses().is_empty(),
+                    }
+            }) {
                 documents.push((*old).clone());
                 measurements.reused += 1;
             } else if let Some(language) = language {
-                jobs.push((file, content, language));
+                jobs.push((file, language));
             } else {
-                documents.push(Arc::new(Document::capture(
+                documents.push(Arc::new(Document::capture_source(
                     self.directory.workspace().clone(),
                     file.path,
-                    &file.bytes,
+                    file.source,
                     vec![],
                     file.classification,
                 )?));
             }
         }
-        jobs.sort_by_key(|job| std::cmp::Reverse(job.0.bytes.len()));
+        jobs.sort_by_key(|job| std::cmp::Reverse(job.0.source.bytes().len()));
         let next = AtomicUsize::new(0);
         let batches = std::thread::scope(|scope| {
             let handles: Vec<_> = (0..self.workers.min(jobs.len()))
@@ -217,19 +229,20 @@ impl Engine {
                                 break;
                             }
                             let index = next.fetch_add(1, Ordering::Relaxed);
-                            let Some((file, content, language)) = jobs.get(index) else {
+                            let Some((file, language)) = jobs.get(index) else {
                                 break;
                             };
                             let context = language.context();
+                            let content = file.source.content();
                             let cached = self
                                 .cache
                                 .load(&context.id, content)
                                 .filter(|analysis| analysis.context == *context)
                                 .and_then(|analysis| {
-                                    Document::capture(
+                                    Document::capture_source(
                                         self.directory.workspace().clone(),
                                         file.path.clone(),
-                                        &file.bytes,
+                                        file.source.clone(),
                                         vec![analysis],
                                         file.classification.clone(),
                                     )
@@ -259,19 +272,19 @@ impl Engine {
                                 });
                                 let result = if let Some(lease) = &mut lease {
                                     parser.analyze_with_state(
-                                        &file.bytes,
+                                        file.source.bytes(),
                                         lease.take_previous(),
                                         lease.allowance(),
                                         cancelled,
                                     )?
                                 } else {
-                                    parser.analyze_cancellable(&file.bytes, cancelled)?.map(
-                                        |analysis| AnalysisResult {
+                                    parser
+                                        .analyze_cancellable(file.source.bytes(), cancelled)?
+                                        .map(|analysis| AnalysisResult {
                                             analysis,
                                             state: None,
                                             tree_reused: false,
-                                        },
-                                    )
+                                        })
                                 };
                                 let Some(result) = result else {
                                     return Ok(None);
@@ -282,10 +295,10 @@ impl Engine {
                                         "analyzer returned an unregistered context".into(),
                                     ));
                                 }
-                                let document = Document::capture(
+                                let document = Document::capture_source(
                                     self.directory.workspace().clone(),
                                     file.path.clone(),
-                                    &file.bytes,
+                                    file.source.clone(),
                                     vec![analysis],
                                     file.classification.clone(),
                                 )?;

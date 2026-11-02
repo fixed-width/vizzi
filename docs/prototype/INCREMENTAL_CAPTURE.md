@@ -23,6 +23,10 @@ recovers missed events. Captures are observations, not atomic filesystem transac
 Existing symlinks are excluded; source access retains the adapter's current concurrent
 filesystem-mutation limitations.
 
+Full/hinted capture supports cancellation between filesystem operations. Reopened
+bytes may share immutable storage only after current-byte hashing; contexts and
+classification remain independently validated. See [captured source](CAPTURED_SOURCE.md).
+
 ## Scheduling and acknowledgement
 
 Dirty paths coalesce in a bounded set; overflow promotes the request to reconciliation.

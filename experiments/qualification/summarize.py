@@ -46,6 +46,7 @@ if __name__ == "__main__":
                    "cancel_to_return_ms": probe.get("cancel_to_return_ms") if probe else None,
                    "snapshot": status["snapshot"], "files": status["measurements"]["files"], "analyzed": status["measurements"]["analyzed"],
                    "source_only": status["measurements"]["source_only"], "input_bytes": status["measurements"]["bytes"]}
+            row["shared_sources"] = measurements.get("shared_sources") if measurements else None
             rows.append(row)
             csv_rows.append(row)
         assert len({row["snapshot"] for row in rows}) == 1, path

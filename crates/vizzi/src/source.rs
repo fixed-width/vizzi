@@ -9,7 +9,7 @@ use std::{
 use vizzi_core::{
     analysis::{Language, Languages},
     capture::CapturePlan,
-    model::WorkspaceId,
+    model::{CapturedSource, Snapshot, WorkspaceId},
     policy::{Classification, PolicyConfig, SourcePolicy},
 };
 
@@ -44,8 +44,8 @@ impl CaptureScope {
 pub struct CapturedFile {
     /// Normalized workspace-relative path.
     pub path: String,
-    /// Frozen bytes read during discovery.
-    pub bytes: Vec<u8>,
+    /// Verified immutable bytes and line index, shared with resulting documents.
+    pub source: Arc<CapturedSource>,
     /// Frozen source-selection metadata.
     pub classification: Classification,
 }
@@ -113,6 +113,30 @@ impl Directory {
     }
     /// Reads supported files without following symlinks; errors preserve the prior snapshot.
     pub fn capture(&self) -> io::Result<Capture> {
+        self.capture_full(None, &|| false)?
+            .ok_or_else(|| io::Error::other("uncancelled capture was interrupted"))
+    }
+    /// Reads and hashes current bytes, sharing matching source from an old observation.
+    /// Cancellation abandons all partial work; metadata never establishes reuse.
+    pub fn capture_reusing(
+        &self,
+        previous: Option<&Snapshot>,
+        scope: &CaptureScope,
+        cancelled: &dyn Fn() -> bool,
+    ) -> io::Result<Option<Capture>> {
+        match scope {
+            CaptureScope::Reconcile => self.capture_full(previous, cancelled),
+            CaptureScope::Paths(paths) => self.capture_hints(paths, previous, cancelled),
+        }
+    }
+    fn capture_full(
+        &self,
+        previous: Option<&Snapshot>,
+        cancelled: &dyn Fn() -> bool,
+    ) -> io::Result<Option<Capture>> {
+        if cancelled() {
+            return Ok(None);
+        }
         self.check_root()?;
         let mut capture = Capture {
             files: Vec::new(),
@@ -122,7 +146,13 @@ impl Directory {
         let mut directories = Vec::new();
         let mut pending = vec![self.root.clone()];
         while let Some(directory) = pending.pop() {
+            if cancelled() {
+                return Ok(None);
+            }
             for entry in std::fs::read_dir(&directory)? {
+                if cancelled() {
+                    return Ok(None);
+                }
                 let entry = entry?;
                 let kind = entry.file_type()?;
                 let path = entry.path();
@@ -141,9 +171,12 @@ impl Directory {
                     .classify(&key)
                     .map_err(io::Error::other)?
                 {
+                    let Some(source) = self.read_source(&key, &path, previous, cancelled)? else {
+                        return Ok(None);
+                    };
                     capture.files.push(CapturedFile {
                         path: key,
-                        bytes: std::fs::read(&path)?,
+                        source,
                         classification,
                     });
                 }
@@ -152,11 +185,23 @@ impl Directory {
         }
         capture.files.sort_by(|a, b| a.path.cmp(&b.path));
         capture.directories = Some(directories);
-        Ok(capture)
+        Ok((!cancelled()).then_some(capture))
     }
 
     /// Reopens hinted files; ambiguous paths fall back to complete discovery.
     pub fn capture_paths(&self, paths: &BTreeSet<PathBuf>) -> io::Result<Capture> {
+        self.capture_hints(paths, None, &|| false)?
+            .ok_or_else(|| io::Error::other("uncancelled capture was interrupted"))
+    }
+    fn capture_hints(
+        &self,
+        paths: &BTreeSet<PathBuf>,
+        previous: Option<&Snapshot>,
+        cancelled: &dyn Fn() -> bool,
+    ) -> io::Result<Option<Capture>> {
+        if cancelled() {
+            return Ok(None);
+        }
         self.check_root()?;
         let mut capture = Capture {
             files: Vec::new(),
@@ -165,14 +210,20 @@ impl Directory {
         };
         let mut reads = Vec::new();
         for path in paths {
+            if cancelled() {
+                return Ok(None);
+            }
             let key = match self.relative_key(path) {
                 Ok(Some(key)) => key,
                 Ok(None) => continue,
-                Err(_) => return self.capture(),
+                Err(_) => return self.capture_full(previous, cancelled),
             };
             let mut absolute = self.root.clone();
             let components: Vec<_> = path.components().collect();
             for (index, component) in components.iter().enumerate() {
+                if cancelled() {
+                    return Ok(None);
+                }
                 absolute.push(component.as_os_str());
                 let leaf = index + 1 == components.len();
                 let metadata = match std::fs::symlink_metadata(&absolute) {
@@ -183,14 +234,14 @@ impl Directory {
                         }
                         break;
                     }
-                    Err(_) => return self.capture(),
+                    Err(_) => return self.capture_full(previous, cancelled),
                 };
                 if !leaf {
                     if !metadata.file_type().is_dir() {
-                        return self.capture();
+                        return self.capture_full(previous, cancelled);
                     }
                 } else if metadata.file_type().is_dir() {
-                    return self.capture();
+                    return self.capture_full(previous, cancelled);
                 } else if self.source_path(path) {
                     if metadata.file_type().is_file() {
                         if let Some(classification) = self
@@ -208,13 +259,36 @@ impl Directory {
             }
         }
         for (path, absolute, classification) in reads {
+            let Some(source) = self.read_source(&path, &absolute, previous, cancelled)? else {
+                return Ok(None);
+            };
             capture.files.push(CapturedFile {
                 path,
-                bytes: std::fs::read(absolute)?,
+                source,
                 classification,
             });
         }
-        Ok(capture)
+        Ok((!cancelled()).then_some(capture))
+    }
+    fn read_source(
+        &self,
+        key: &str,
+        path: &Path,
+        previous: Option<&Snapshot>,
+        cancelled: &dyn Fn() -> bool,
+    ) -> io::Result<Option<Arc<CapturedSource>>> {
+        if cancelled() {
+            return Ok(None);
+        }
+        let bytes = std::fs::read(path)?;
+        if cancelled() {
+            return Ok(None);
+        }
+        let old = previous
+            .and_then(|snapshot| snapshot.file_by_path(key))
+            .map(|file| file.captured());
+        let source = CapturedSource::capture(bytes, old);
+        Ok((!cancelled()).then_some(source))
     }
 
     fn check_root(&self) -> io::Result<()> {
@@ -311,7 +385,7 @@ mod tests {
                 .collect::<Vec<_>>(),
             ["drivers/target/real.rs", "src/main.rs"]
         );
-        assert_eq!(capture.files[0].bytes, b"fn f() {}");
+        assert_eq!(capture.files[0].source.bytes(), b"fn f() {}");
         assert!(!directory.relevant(&temp.path().join("target/build.rs")));
         assert!(directory.relevant(&temp.path().join("drivers/target/real.rs")));
         assert!(!directory.relevant(Path::new("/elsewhere/a.rs")));
@@ -341,7 +415,7 @@ mod tests {
         assert!(capture.directories.is_none());
         assert_eq!(capture.files.len(), 1);
         assert_eq!(capture.files[0].path, "a.rs");
-        assert_eq!(capture.files[0].bytes, b"fn a() {}");
+        assert_eq!(capture.files[0].source.bytes(), b"fn a() {}");
         assert_eq!(capture.removed, ["gone.rs"]);
     }
 

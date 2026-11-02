@@ -16,6 +16,7 @@ validating coordination; it does not qualify large-codebase GPU performance.
 - [Change-notification contract](docs/prototype/CHANGES.md)
 - [Incremental-capture contract](docs/prototype/INCREMENTAL_CAPTURE.md)
 - [Captured document and snapshot identities](docs/prototype/IDENTITIES.md)
+- [Shared captured-source ownership](docs/prototype/CAPTURED_SOURCE.md)
 - [Language adapters and shared worker budget](docs/prototype/LANGUAGES.md)
 - [Cooperative analysis cancellation](docs/prototype/ANALYSIS_CANCELLATION.md)
 - [Bounded syntax retention](docs/prototype/SYNTAX_RETENTION.md)
@@ -33,6 +34,7 @@ validating coordination; it does not qualify large-codebase GPU performance.
 - [Bounded-outline and incremental-edit measurements](experiments/qualification/RESPONSIVENESS_RESULTS.md)
 - [Parser cancellation measurements](experiments/qualification/CANCELLATION_RESULTS.md)
 - [Repeated-edit syntax-retention measurements](experiments/retention/RESULTS.md)
+- [Shared-source capture memory measurements](experiments/shared-source/RESULTS.md)
 - [Earlier performance experiments](experiments/performance/README.md)
 - [Contributor guidance](AGENTS.md)
 

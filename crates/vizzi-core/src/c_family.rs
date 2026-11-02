@@ -55,6 +55,7 @@ fn context(language: &str, description: &str) -> Context {
             include_bytes!("syntax_state.rs"),
             include_bytes!("analysis.rs"),
             include_bytes!("model.rs"),
+            include_bytes!("captured_source.rs"),
             include_bytes!("../../../Cargo.lock"),
         ]),
     }
