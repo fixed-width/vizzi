@@ -1,7 +1,7 @@
 import { createController } from "/controller.js";
 import { followChanges } from "/updates.js";
 import { describeSource } from "/source-description.js";
-import { createOutline } from "/outline.js";
+import { createInspector } from "/inspector.js";
 
 const element = id => document.getElementById(id);
 const canvas = element("map"), context = canvas.getContext("2d");
@@ -9,25 +9,23 @@ const source = element("source"), space = element("source-space");
 const metrics = { drawCpuMs: [], interactionFrameMs: [], requestMs: [], pickingMs: [], lastFrame: null };
 window.vizziMetrics = metrics;
 function sample(series, value) { series.push(value); if (series.length > 512) series.shift(); }
-let view = null, lines = [], active = null, camera = { x: 20, y: 20, scale: 1 };
+let view = null, camera = { x: 20, y: 20, scale: 1 };
 let scheduled = false, drag = null, previousFrame = null, filterTimer = null;
 let updates;
-const outline = createOutline({ viewport: element("outline"), select: async fact => {
-  if (await controller.load({ entity: fact.id }) && active?.id === fact.id) {
-    source.scrollTop = Math.max(0, (active.start_line - 4) * 22); renderSource();
-  }
-} });
+const fetchJSON = async (uri, options) => {
+  const start = performance.now();
+  try { const response = await fetch(uri, options); if (!response.ok) throw new Error(await response.text()); return await response.json(); }
+  finally { sample(metrics.requestMs, performance.now() - start); }
+};
+const inspector = createInspector({source,space,outline:element("outline"),transport:fetchJSON,onError:error=>{showError(error);updates?.restart();},select:async fact=>{
+  if(await controller.load({entity:fact.id}))await inspector.revealActive();
+}});
 
 const controller = createController({
-  transport: async (uri, options) => {
-    const start = performance.now();
-    try { const response = await fetch(uri, options); if (!response.ok) throw new Error(await response.text()); return await response.json(); }
-    finally { sample(metrics.requestMs, performance.now() - start); }
-  },
+  viewSchema: 3,
+  transport: async (uri, options) => inspector.prepare(await fetchJSON(`${uri}&projection=summary`, options), options),
   onView: next => {
-    const first = !view, changedFile = view?.selection.file !== next.selection.file;
-    const changedEntity = view?.selection.entity !== next.selection.entity;
-    const changedSource = changedFile || view?.source?.text !== next.source?.text;
+    const first = !view;
     view = next;
     element("counts").textContent = `${next.files.length} shown / ${next.matching} matching / ${next.total} source files · ${next.analyzed} with analysis / ${next.source_only} source only`;
     element("empty").hidden = next.files.length > 0;
@@ -38,10 +36,7 @@ const controller = createController({
     element("coverage").textContent = coverage;
     element("diagnostics").hidden = diagnostics.length === 0;
     element("diagnostics").textContent = diagnostics.join(". ");
-    active = outline.update(next.source, next.selection.entity, changedFile || changedEntity);
-    if (changedSource) { lines = next.source?.text?.split(/\r?\n/) ?? []; if (changedFile) source.scrollTop = 0; }
-    if (active && (changedFile || changedEntity)) source.scrollTop = Math.max(0, (active.start_line - 4) * 22);
-    renderSource(); renderFileList();
+    inspector.apply(next); renderFileList();
     if (first) fit(true); else invalidate();
   },
   onStatus: status => {
@@ -58,25 +53,6 @@ const controller = createController({
 });
 function showError(error) { element("error").textContent = `${error.message || error} · Keeping the last captured view; retrying.`; element("error").hidden = false; }
 
-function renderSource() {
-  space.replaceChildren();
-  if (!lines.length) {
-    space.style.height = "auto";
-    const note = document.createElement("p"); note.className = "source-empty";
-    note.textContent = view?.source ? "Source encoding is unavailable in this inspector." : "Select a file in the repository map.";
-    space.append(note); return;
-  }
-  space.style.height = `${lines.length * 22}px`;
-  const first = Math.max(0, Math.floor(source.scrollTop / 22) - 25);
-  const last = Math.min(lines.length, Math.ceil((source.scrollTop + source.clientHeight) / 22) + 25);
-  for (let i = first; i < last; i++) {
-    const row = document.createElement("div"); row.className = "code-line";
-    if (active && i + 1 >= active.start_line && i + 1 <= active.end_line) row.classList.add("active");
-    row.style.top = `${i * 22}px`;
-    const number = document.createElement("span"); number.className = "line-no"; number.textContent = i + 1; number.setAttribute("aria-hidden", "true");
-    const code = document.createElement("span"); code.textContent = lines[i]; row.append(number, code); space.append(row);
-  }
-}
 function renderFileList() {
   const list = element("file-list"); list.replaceChildren();
   if (!list.closest("details").open || !view) return;
@@ -156,8 +132,7 @@ canvas.addEventListener("keydown", event => { const direction = { ArrowLeft: [40
 element("fit").addEventListener("click", () => fit());
 element("filter").addEventListener("input", event => { clearTimeout(filterTimer); filterTimer = setTimeout(() => controller.load({ filter: event.target.value }), 160); });
 element("file-list").closest("details").addEventListener("toggle", renderFileList);
-source.addEventListener("scroll", renderSource, { passive: true });
-const viewportObserver = new ResizeObserver(() => { invalidate(); renderSource(); });
+const viewportObserver = new ResizeObserver(invalidate);
 viewportObserver.observe(canvas);
 viewportObserver.observe(source);
 updates = followChanges({ session: () => controller.updates() });

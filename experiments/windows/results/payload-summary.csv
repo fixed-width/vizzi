@@ -1,0 +1,5 @@
+profile,path,lines,declarations,bulk_bytes,median_bulk_stdio_ms,summary_bytes,max_window_bytes,median_window_stdio_ms
+linux,kernel/locking/mutex.c,1302,54,46387,13.47561297006905,1456,24112,2.528649056330323
+linux,drivers/gpu/drm/amd/include/asic_reg/dcn/dcn_3_2_0_sh_mask.h,223493,0,24234100,148.61302613280714,1490,20569,0.7483400404453278
+pytorch,c10/core/Device.cpp,171,6,7694,2.716289134696126,1379,14130,0.27342583052814007
+pytorch,third_party/perfetto/sdk/perfetto.h,204651,42443,15248720,129.16444009169936,1509,59676,1.0953780729323626

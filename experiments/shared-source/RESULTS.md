@@ -1,5 +1,8 @@
 # Shared-source capture resource results
 
+The later [windowed-delivery report](../windows/RESULTS.md) bounds browser source/list
+transfer and records the remaining recovery/overview costs.
+
 Sharing freshly verified source removes most source-storage overlap during full
 verification and context reparsing. Linux peak RSS falls from **6.49 GiB to 2.53 GiB**
 during retained reparse; PyTorch falls from **1.15 GiB to 0.76 GiB**. All configured

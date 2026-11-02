@@ -68,6 +68,26 @@ impl CapturedSource {
             SourceEncoding::Unsupported
         }
     }
+    /// Counts display lines, including the final empty line after LF.
+    pub fn line_count(&self) -> usize {
+        if self.text().is_some() {
+            self.line_starts.len()
+        } else {
+            0
+        }
+    }
+    pub(crate) fn line_range(&self, number: usize) -> Option<Range<usize>> {
+        let text = self.text()?;
+        let start = *self.line_starts.get(number.checked_sub(1)?)?;
+        let mut end = self.line_starts.get(number).copied().unwrap_or(text.len());
+        if end > start && text.as_bytes()[end - 1] == b'\n' {
+            end -= 1;
+            if end > start && text.as_bytes()[end - 1] == b'\r' {
+                end -= 1;
+            }
+        }
+        Some(start..end)
+    }
     pub(crate) fn lines(&self, span: &Range<usize>) -> Range<usize> {
         let start = self
             .line_starts

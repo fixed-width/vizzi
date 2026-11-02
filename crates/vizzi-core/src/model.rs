@@ -3,7 +3,11 @@ pub use crate::captured_source::CapturedSource;
 
 use crate::policy::Classification;
 use serde::{Deserialize, Serialize};
-use std::{collections::BTreeSet, ops::Range, sync::Arc};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    ops::Range,
+    sync::{Arc, OnceLock},
+};
 
 macro_rules! identity {
     ($name:ident, $description:literal) => {
@@ -135,6 +139,7 @@ pub struct Document {
     source: Arc<CapturedSource>,
     analyses: Vec<Analysis>,
     classification: Classification,
+    pub(crate) outline_index: OnceLock<BTreeMap<String, usize>>,
 }
 
 impl Document {
@@ -215,6 +220,7 @@ impl Document {
             source,
             analyses,
             classification,
+            outline_index: OnceLock::new(),
         })
     }
     /// Returns the path identity.

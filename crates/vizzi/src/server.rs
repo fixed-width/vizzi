@@ -15,6 +15,10 @@ use axum::{
 use serde::Deserialize;
 use std::sync::Arc;
 use vizzi_core::query::{View, ViewQuery};
+use vizzi_core::{
+    model::SnapshotId,
+    projection::{Window, WindowQuery},
+};
 
 type ApiError = (StatusCode, String);
 
@@ -22,13 +26,15 @@ type ApiError = (StatusCode, String);
 pub fn router(application: Arc<Application>) -> Router {
     Router::new()
         .route("/api/status", get(status)).route("/api/view", get(view)).route("/api/source", get(source))
-        .route("/api/events", get(events))
+        .route("/api/events", get(events)).route("/api/window",get(window))
         .route("/", get(|| async { asset("text/html; charset=utf-8", include_str!("../web/index.html")) }))
         .route("/app.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/app.js")) }))
         .route("/controller.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/controller.js")) }))
         .route("/updates.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/updates.js")) }))
         .route("/source-description.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/source-description.js")) }))
         .route("/outline.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/outline.js")) }))
+        .route("/windows.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/windows.js")) }))
+        .route("/inspector.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/inspector.js")) }))
         .route("/app.css", get(|| async { asset("text/css; charset=utf-8", include_str!("../web/app.css")) }))
         .layer(axum::middleware::map_response(|mut response: Response| async move {
             response.headers_mut().insert(header::CACHE_CONTROL, header::HeaderValue::from_static("no-store"));
@@ -78,6 +84,48 @@ async fn view(
 struct SourceQuery {
     snapshot: String,
     file: String,
+}
+#[derive(Deserialize)]
+struct WindowPin {
+    snapshot: String,
+    file: String,
+    version: String,
+    previous_snapshot: Option<String>,
+}
+#[derive(serde::Serialize)]
+struct PinnedWindow {
+    snapshot: SnapshotId,
+    #[serde(flatten)]
+    window: Window,
+}
+async fn window(
+    State(app): State<Arc<Application>>,
+    Query(pin): Query<WindowPin>,
+    Query(query): Query<WindowQuery>,
+) -> Result<Json<PinnedWindow>, ApiError> {
+    let snapshot = app.pinned(&pin.snapshot).ok_or((
+        StatusCode::CONFLICT,
+        "Snapshot expired or unknown; reload inspection".into(),
+    ))?;
+    let file = snapshot.file(&pin.file).ok_or((
+        StatusCode::NOT_FOUND,
+        "File is absent from this snapshot".into(),
+    ))?;
+    if file.version().as_str() != pin.version {
+        return Err((
+            StatusCode::CONFLICT,
+            "Document version differs; reload inspection".into(),
+        ));
+    }
+    let previous = pin
+        .previous_snapshot
+        .as_deref()
+        .and_then(|id| app.pinned(id));
+    let previous_file = previous.as_ref().and_then(|old| old.file(&pin.file));
+    Ok(Json(PinnedWindow {
+        snapshot: snapshot.id().clone(),
+        window: file.window(&query, previous_file.map(AsRef::as_ref)),
+    }))
 }
 async fn source(
     State(app): State<Arc<Application>>,

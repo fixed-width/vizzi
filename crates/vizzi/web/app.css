@@ -57,3 +57,7 @@ footer { min-height: 36px; padding: 10px 24px; border-top: 1px solid #cdd8e2; di
 [hidden] { display: none !important; }
 @media (max-width: 1000px) { main { grid-template-columns: minmax(280px, 40%) minmax(400px, 1fr); } .brand span { display: none; } .source-layout { grid-template-columns: 130px minmax(0, 1fr); } .map-footer span:last-child { display: none; } }
 @media (max-width: 740px) { body { height: auto; min-height: 100dvh; } main { display: flex; flex-direction: column; } .map-panel { min-height: 500px; border-right: 0; } .inspector { height: 650px; } header { padding: 0 16px; gap: 16px; } footer { flex-direction: column; } }
+
+.fragment-controls { display: inline-flex; position: sticky; left: 60px; z-index: 1; background: white; gap: 2px; margin-right: 5px; }
+.fragment-controls:has(button:not([hidden])) { border-right: 1px solid #cbd6df; padding-right: 4px; }
+.fragment-controls button { font-size: 9px; line-height: 16px; padding: 0 3px; height: 18px; }

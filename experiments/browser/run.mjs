@@ -12,6 +12,9 @@ if (process.argv.includes("--install-browser")) {
     const info = await cdp.send("SystemInfo.getInfo");
     console.log(JSON.stringify({ browser: instance.version(), deviceNodes: await readdir("/dev/dri").catch(() => []), display: process.env.DISPLAY ?? null, wayland: process.env.WAYLAND_DISPLAY ?? null, devices: info.gpu.devices, features: info.gpu.featureStatus }, null, 2));
   } finally { await instance.close(); }
+} else if (process.argv.includes("--window-mutations")) {
+  const result = spawnSync(process.execPath, ["node_modules/@stryker-mutator/core/bin/stryker.js", "run", "experiments/browser/window-stryker.config.json"], { stdio: "inherit" });
+  process.exit(result.status ?? 1);
 } else if (process.argv.includes("--outline-mutations")) {
   const result = spawnSync(process.execPath, ["node_modules/@stryker-mutator/core/bin/stryker.js", "run", "experiments/browser/outline-stryker.config.json"], { stdio: "inherit" });
   process.exit(result.status ?? 1);
@@ -21,7 +24,7 @@ if (process.argv.includes("--install-browser")) {
 } else if (process.argv.includes("--measure")) {
   await import("./measure.mjs");
 } else {
-  for (const file of ["crates/vizzi/web/controller.test.js", "crates/vizzi/web/updates.test.js", "crates/vizzi/web/source-description.test.js", "experiments/browser/statistics.test.mjs", "experiments/browser/outline.test.mjs", "experiments/browser/browser.test.mjs"]) {
+  for (const file of ["crates/vizzi/web/controller.test.js", "crates/vizzi/web/updates.test.js", "crates/vizzi/web/source-description.test.js", "experiments/browser/statistics.test.mjs", "crates/vizzi/web/windows.test.js", "experiments/browser/outline.test.mjs", "experiments/browser/inspection.test.mjs", "experiments/browser/browser.test.mjs"]) {
     const result = spawnSync(process.execPath, [file], { stdio: "inherit" });
     if (result.status !== 0) process.exit(result.status ?? 1);
   }

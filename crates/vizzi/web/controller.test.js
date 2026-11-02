@@ -124,3 +124,9 @@ test("malformed view bodies produce a useful error without reconciling selection
     assert.equal(await c.load(), false); assert.equal(views.length, 0); assert.match(errors[0], /view/i);
   }
 });
+
+ test("summary-view schema is explicit and does not accept a bulk response", async () => {
+  let schema=3;const errors=[];
+  const controller=createController({viewSchema:3,transport:async()=>({schema,snapshot:"one",selection:{file:null,entity:null},source:null}),onError:error=>errors.push(error)});
+  assert.equal(await controller.load(),true);schema=2;assert.equal(await controller.load(),false);assert.equal(errors.length,1);
+});

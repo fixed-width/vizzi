@@ -1,0 +1,14 @@
+{
+  "$schema": "../../node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "mutate": ["crates/vizzi/web/windows.js", "crates/vizzi/web/controller.js"],
+  "testRunner": "command",
+  "commandRunner": { "command": "node crates/vizzi/web/windows.test.js && node crates/vizzi/web/controller.test.js" },
+  "coverageAnalysis": "off",
+  "concurrency": 4,
+  "timeoutMS": 5000,
+  "reporters": ["clear-text", "json"],
+  "clearTextReporter": { "reportMutants": false, "logTests": false },
+  "jsonReporter": { "fileName": "experiments/browser/results/local/window-mutation.json" },
+  "ignorePatterns": ["target", "docs", "crates/vizzi-core", "crates/vizzi-perf", "crates/vizzi/src", "crates/vizzi/tests", "experiments/qualification", "experiments/shared-source", "experiments/retention", "experiments/performance", "experiments/browser/results"],
+  "thresholds": { "break": 100 }
+}

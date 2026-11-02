@@ -107,7 +107,7 @@ new notifications coalesce while a fetch is pending. Fetch failure or stream los
 initiates bounded reconnection, without a periodic status poll. Explicit stream closure
 unblocks active HTTP responses during shutdown. See the [notification contract](CHANGES.md).
 Source lines and [declaration controls](OUTLINE.md) are virtualised; selected-source
-transport still includes complete text and outlines. Map geometry is supplied by Rust,
+transport uses [pinned windows](WINDOWS.md), with summary metadata in the linked overview. Map geometry is supplied by Rust,
 with visible-item painting and hit testing in the host adapter.
 
 ## Rendering and validation scope

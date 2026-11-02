@@ -135,3 +135,14 @@ and diagnostic limits. Tests exercise complete modules; unviable generated repla
 are recorded separately from assertion failures.
 
 The existing [native checks](../prototype/README.md#verify-correctness) remain required.
+
+For the complete window-reader/controller mutation scope, run:
+
+```sh
+npm test -- --window-mutations
+```
+
+This uses Node behavioral tests and writes `results/local/window-mutation.json`.
+Inspector DOM painting/CSS are outside that mutation scope; native HTTP/browser
+regressions exercise navigation, pinning, fragments, and live updates. The
+[windowed report](../windows/RESULTS.md) records scopes, limits, and response-byte audits.

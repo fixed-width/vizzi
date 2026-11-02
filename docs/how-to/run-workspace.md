@@ -109,3 +109,8 @@ To try retained syntax trees for repeated edits, add `--syntax-cache-mib 512`.
 The default is disabled. This limits admitted cache weight and entries, rather than
 whole-process memory. See the [retention contract](../prototype/SYNTAX_RETENTION.md)
 for ownership, fallback, and resource accounting.
+
+The browser fetches [pinned source/outline windows](../prototype/WINDOWS.md) automatically.
+Generated long lines expose text-fragment controls; outline Home/End navigate the whole
+logical list. The diagnostic `/api/view` and `/api/source` operations retain explicit
+bulk access, while `projection=summary` and `/api/window` are available to other hosts.

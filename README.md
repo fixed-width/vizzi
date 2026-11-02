@@ -13,6 +13,7 @@ validating coordination; it does not qualify large-codebase GPU performance.
 - [Architecture and scope](DESIGN.md)
 - [First-slice behaviour](docs/prototype/PRODUCT.md) and [technical contract](docs/prototype/TECH.md)
 - [Host API reference](docs/prototype/API.md)
+- [Bounded document windows](docs/prototype/WINDOWS.md)
 - [Change-notification contract](docs/prototype/CHANGES.md)
 - [Incremental-capture contract](docs/prototype/INCREMENTAL_CAPTURE.md)
 - [Captured document and snapshot identities](docs/prototype/IDENTITIES.md)
@@ -35,6 +36,7 @@ validating coordination; it does not qualify large-codebase GPU performance.
 - [Parser cancellation measurements](experiments/qualification/CANCELLATION_RESULTS.md)
 - [Repeated-edit syntax-retention measurements](experiments/retention/RESULTS.md)
 - [Shared-source capture memory measurements](experiments/shared-source/RESULTS.md)
+- [Windowed source/outline delivery measurements](experiments/windows/RESULTS.md)
 - [Earlier performance experiments](experiments/performance/README.md)
 - [Contributor guidance](AGENTS.md)
 

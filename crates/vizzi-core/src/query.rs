@@ -10,6 +10,14 @@ use crate::{
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
+/// Selected-document projection; bulk views remain available for diagnostics.
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum Projection {
+    /// Metadata only, with separately requested pinned windows.
+    Summary,
+}
+
 /// Browser selection and overview bounds.
 #[derive(Clone, Debug, Default, Deserialize)]
 pub struct ViewQuery {
@@ -22,6 +30,8 @@ pub struct ViewQuery {
     pub filter: String,
     /// Maximum visible files, clamped to 1–2,000.
     pub limit: Option<usize>,
+    /// Request schema-3 metadata without complete text/declarations.
+    pub projection: Option<Projection>,
 }
 /// A rectangle in overview world coordinates.
 #[derive(Clone, Debug, Serialize)]
@@ -92,6 +102,9 @@ pub struct Outline {
 /// Selected source and all its configured outlines.
 #[derive(Debug, Serialize)]
 pub struct SourceView {
+    /// Present only in schema-3 summary views.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub summary: Option<crate::projection::Summary>,
     /// Captured document version, permitting reuse across unchanged source projections.
     pub version: DocumentVersion,
     /// Opaque file identity.
@@ -164,10 +177,25 @@ impl Snapshot {
             .and_then(|id| self.file(id))
             .or_else(|| limited.first().copied());
         let source = selected.map(|file| SourceView {
+            summary: (query.projection == Some(Projection::Summary)).then(|| {
+                crate::projection::Summary {
+                    lines: file.captured().line_count(),
+                    declarations: file.declaration_count(),
+                    active: query
+                        .entity
+                        .as_deref()
+                        .and_then(|id| file.entity_position(id))
+                        .and_then(|index| file.entry(index)),
+                }
+            }),
             version: file.version().clone(),
             id: file.id().clone(),
             path: file.path().into(),
-            text: file.source().map(str::to_owned),
+            text: if query.projection.is_some() {
+                None
+            } else {
+                file.source().map(str::to_owned)
+            },
             encoding: file.encoding(),
             classification: file.classification().clone(),
             outlines: file
@@ -182,6 +210,11 @@ impl Snapshot {
                     declarations: analysis
                         .facts
                         .iter()
+                        .take(if query.projection.is_none() {
+                            usize::MAX
+                        } else {
+                            0
+                        })
                         .map(|fact| {
                             let lines = file.lines(&fact.span);
                             Declaration {
@@ -197,11 +230,18 @@ impl Snapshot {
                 .collect(),
         });
         let entity = source
-            .iter()
-            .flat_map(|source| &source.outlines)
-            .flat_map(|outline| &outline.declarations)
-            .find(|fact| query.entity.as_deref() == Some(fact.id.as_str()))
-            .map(|fact| fact.id.clone());
+            .as_ref()
+            .and_then(|source| source.summary.as_ref())
+            .and_then(|summary| summary.active.as_ref())
+            .map(|entry| entry.id.clone())
+            .or_else(|| {
+                source
+                    .iter()
+                    .flat_map(|source| &source.outlines)
+                    .flat_map(|outline| &outline.declarations)
+                    .find(|fact| query.entity.as_deref() == Some(fact.id.as_str()))
+                    .map(|fact| fact.id.clone())
+            });
         let mut directories = BTreeMap::<&str, Vec<_>>::new();
         for file in limited {
             directories
@@ -256,7 +296,7 @@ impl Snapshot {
             y += documents.len().div_ceil(8) as f64 * 56.0 + 18.0;
         }
         View {
-            schema: 2,
+            schema: if query.projection.is_some() { 3 } else { 2 },
             snapshot: self.id().clone(),
             policy: self.policy().clone(),
             total: self.documents().len(),

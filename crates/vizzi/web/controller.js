@@ -12,7 +12,7 @@ function notification(change) {
   return BigInt(change.revision);
 }
 
-export function createController({ transport, onView = () => {}, onStatus = () => {}, onError = () => {}, onResync = () => {} }) {
+export function createController({ transport, onView = () => {}, onStatus = () => {}, onError = () => {}, onResync = () => {}, viewSchema = 2 }) {
   let query = {}, viewRequest, completedViewRequest, liveSession, activeFetch;
   let displayedSnapshot = null, latestStatus = null;
   function invalidate() {
@@ -32,7 +32,7 @@ export function createController({ transport, onView = () => {}, onStatus = () =
     try {
       const next = await transport(`/api/view?${parameters}`, { signal: fetch.signal });
       if (request !== viewRequest) return false;
-      if (!next || next.schema !== 2 || typeof next.snapshot !== "string" || !next.selection || (target && next.snapshot !== target)) throw new Error("Invalid or mismatched pinned view response");
+      if (!next || next.schema !== viewSchema || typeof next.snapshot !== "string" || !next.selection || (target && next.snapshot !== target)) throw new Error("Invalid or mismatched pinned view response");
       if (target && latestStatus.snapshot !== target) return load();
       query = { ...query, file: next.selection.file, entity: next.selection.entity };
       displayedSnapshot = next.snapshot; onView(next); completedViewRequest = request;

@@ -17,10 +17,10 @@ repeats four-worker retained reparse and measures cooperative interruption withi
 | Background throughput | Eight only with available resources and measured query impact | Retained reparse improves about 1.6×; Linux core-query p95 grows from at most 44.4 to 52.6 ms |
 | Native workspace memory | Aim below 8 GiB peak while retaining the previous observation | Latest four-worker shared-source reparse: Linux 2.526 GiB, PyTorch 0.757 GiB on the 62.5 GiB host. Earlier eight-worker conditions are separate; no enforced cap |
 | Bounded core view | Aim for p95 below 50 ms for the current 2,000-tile query | Four-worker observations fit on this host; eight-worker Linux has misses |
-| Ordinary edit visibility | Aim for all five probe edits below 200 ms before collecting meaningful tails | Latest shared-source PyTorch probe: 85–220 ms, first cold-tree edit above 200 ms. No full recovery in those five updates; earlier paired recovery outliers were 299 ms. The gate remains unmet |
+| Ordinary edit visibility | Aim for all five probe edits below 200 ms before collecting meaningful tails | Latest windowed probes: Linux median/max 123/174 ms; PyTorch 105/301 ms with full recovery. The gate remains unmet for PyTorch |
 | Cancellation response | Aim below 250 ms after a request during parsing | Follow-up direct engine-return ranges: Linux 41–46 ms; PyTorch 18–23 ms. Three samples each; cooperative callbacks do not impose a hard deadline |
 | Retained syntax | Opt-in shared admission quota, initially 512 MiB and eight entries | Charges old/new state together; Perfetto peaks at 500.3 MiB weight. Normal parsing/capture allocations remain outside it |
-| Source and outline DOM | Bound each pane by visible rows plus overscan; initial ceiling 200 rendered entries | Source lines 56–58; 42,443-declaration C++ outline now renders 21 buttons. Complete transport/index construction remains linear in source/declaration size |
+| Source and outline DOM | Bound each pane by visible rows plus overscan; initial ceiling 200 rendered entries | Latest headers render 47–49 source rows and 0/21 outline controls. Browser delivery uses <=96 source rows/32 KiB text and <=200 outline entries; lazy identity indexing remains input-dependent |
 | Overview motion | Maintain rAF p99 below 33.3 ms in the software reference workload | 16.8 ms in all recorded steady/refresh runs; physical presentation unqualified |
 
 Cold indexing is a separate throughput/startup measure: about 60 s Linux and 11 s
@@ -60,9 +60,10 @@ in that paired run; capture-phase timing now includes hashing/index construction
    serial preparation cost of new source. [Verified source sharing](../prototype/CAPTURED_SOURCE.md)
    now removes duplicate byte/line-index storage; different old/new contents can still
    coexist. Full recovery still reads/hashes the entire selected scope.
-3. Bound selected-source and outline transport/projection work with coherent snapshot
-   and selection semantics. DOM virtualization alone does not bound transferred data
-   or eliminate changed-version index construction.
+3. Continue overview/recovery and first-use identity-index work after
+   [bounded document delivery](../prototype/WINDOWS.md). The
+   [windowed measurements](../../experiments/windows/RESULTS.md) remove bulk browser
+   source/list transfer; necessary indexing and full source verification remain.
 
 Do not replace semantic correctness checks with these performance targets. Language
 assignments, partial grammar coverage, source-only cases, cancellation, cache validity,

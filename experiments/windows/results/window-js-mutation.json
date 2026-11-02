@@ -1,0 +1,255 @@
+{
+  "baseline": "passed",
+  "tool": "StrykerJS10.1.1",
+  "scope": [
+    "crates/vizzi/web/controller.js",
+    "crates/vizzi/web/windows.js"
+  ],
+  "tested": 543,
+  "counts": {
+    "Killed": 528,
+    "Timeout": 15
+  },
+  "exclusions": [],
+  "command": "npm test -- --window-mutations",
+  "sha256": {
+    "crates/vizzi/web/controller.js": "5bc29a5641feceec4a4f255c5d68dba9735ea83ce1bf125053e610a7703871a4",
+    "crates/vizzi/web/windows.js": "af30f90b28a22468dd6b8ed3586bc56b45308cb0d25fbeb6052c9dcb3316bd87"
+  },
+  "timeouts": [
+    {
+      "file": "crates/vizzi/web/controller.js",
+      "location": {
+        "end": {
+          "column": 25,
+          "line": 31
+        },
+        "start": {
+          "column": 20,
+          "line": 31
+        }
+      },
+      "mutator": "BooleanLiteral",
+      "replacement": "true"
+    },
+    {
+      "file": "crates/vizzi/web/controller.js",
+      "location": {
+        "end": {
+          "column": 142,
+          "line": 35
+        },
+        "start": {
+          "column": 11,
+          "line": 35
+        }
+      },
+      "mutator": "ConditionalExpression",
+      "replacement": "false"
+    },
+    {
+      "file": "crates/vizzi/web/controller.js",
+      "location": {
+        "end": {
+          "column": 142,
+          "line": 35
+        },
+        "start": {
+          "column": 11,
+          "line": 35
+        }
+      },
+      "mutator": "LogicalOperator",
+      "replacement": "(!next || next.schema !== viewSchema || typeof next.snapshot !== \"string\" || !next.selection) && target && next.snapshot !== target"
+    },
+    {
+      "file": "crates/vizzi/web/controller.js",
+      "location": {
+        "end": {
+          "column": 141,
+          "line": 35
+        },
+        "start": {
+          "column": 107,
+          "line": 35
+        }
+      },
+      "mutator": "ConditionalExpression",
+      "replacement": "false"
+    },
+    {
+      "file": "crates/vizzi/web/controller.js",
+      "location": {
+        "end": {
+          "column": 141,
+          "line": 35
+        },
+        "start": {
+          "column": 117,
+          "line": 35
+        }
+      },
+      "mutator": "EqualityOperator",
+      "replacement": "next.snapshot === target"
+    },
+    {
+      "file": "crates/vizzi/web/controller.js",
+      "location": {
+        "end": {
+          "column": 53,
+          "line": 36
+        },
+        "start": {
+          "column": 11,
+          "line": 36
+        }
+      },
+      "mutator": "ConditionalExpression",
+      "replacement": "true"
+    },
+    {
+      "file": "crates/vizzi/web/controller.js",
+      "location": {
+        "end": {
+          "column": 53,
+          "line": 36
+        },
+        "start": {
+          "column": 11,
+          "line": 36
+        }
+      },
+      "mutator": "LogicalOperator",
+      "replacement": "target || latestStatus.snapshot !== target"
+    },
+    {
+      "file": "crates/vizzi/web/controller.js",
+      "location": {
+        "end": {
+          "column": 53,
+          "line": 36
+        },
+        "start": {
+          "column": 21,
+          "line": 36
+        }
+      },
+      "mutator": "ConditionalExpression",
+      "replacement": "true"
+    },
+    {
+      "file": "crates/vizzi/web/controller.js",
+      "location": {
+        "end": {
+          "column": 53,
+          "line": 36
+        },
+        "start": {
+          "column": 21,
+          "line": 36
+        }
+      },
+      "mutator": "EqualityOperator",
+      "replacement": "latestStatus.snapshot === target"
+    },
+    {
+      "file": "crates/vizzi/web/controller.js",
+      "location": {
+        "end": {
+          "column": 94,
+          "line": 46
+        },
+        "start": {
+          "column": 13,
+          "line": 46
+        }
+      },
+      "mutator": "ConditionalExpression",
+      "replacement": "true"
+    },
+    {
+      "file": "crates/vizzi/web/controller.js",
+      "location": {
+        "end": {
+          "column": 94,
+          "line": 46
+        },
+        "start": {
+          "column": 13,
+          "line": 46
+        }
+      },
+      "mutator": "LogicalOperator",
+      "replacement": "accepted && latestStatus?.snapshot || latestStatus.snapshot !== displayedSnapshot"
+    },
+    {
+      "file": "crates/vizzi/web/controller.js",
+      "location": {
+        "end": {
+          "column": 47,
+          "line": 46
+        },
+        "start": {
+          "column": 13,
+          "line": 46
+        }
+      },
+      "mutator": "ConditionalExpression",
+      "replacement": "true"
+    },
+    {
+      "file": "crates/vizzi/web/controller.js",
+      "location": {
+        "end": {
+          "column": 47,
+          "line": 46
+        },
+        "start": {
+          "column": 13,
+          "line": 46
+        }
+      },
+      "mutator": "LogicalOperator",
+      "replacement": "accepted || latestStatus?.snapshot"
+    },
+    {
+      "file": "crates/vizzi/web/controller.js",
+      "location": {
+        "end": {
+          "column": 94,
+          "line": 46
+        },
+        "start": {
+          "column": 51,
+          "line": 46
+        }
+      },
+      "mutator": "ConditionalExpression",
+      "replacement": "true"
+    },
+    {
+      "file": "crates/vizzi/web/controller.js",
+      "location": {
+        "end": {
+          "column": 94,
+          "line": 46
+        },
+        "start": {
+          "column": 51,
+          "line": 46
+        }
+      },
+      "mutator": "EqualityOperator",
+      "replacement": "latestStatus.snapshot === displayedSnapshot"
+    }
+  ],
+  "development_notes": [
+    "Early malformed-input tests threw assertions inside onWindow; the reader caught them as application errors, masking invalid application. Assertions now run outside callbacks.",
+    "Strengthened exact bounds, independent cursor/entry fixtures, optional metadata, UTF-8 offsets, completion cleanup and ignored-abort/late-failure tests. Removed logically redundant guards instead of excluding them.",
+    "Final complete reader/controller run has no survivors."
+  ],
+  "limits": [
+    "Command runner has no per-test coverage mapping. Timeouts are separate from assertion catches.",
+    "Inspector DOM painting, legacy outline adapter, CSS, native transport and benchmark code are not mutated by this JS scope; real-browser regression tests cover integration."
+  ]
+}

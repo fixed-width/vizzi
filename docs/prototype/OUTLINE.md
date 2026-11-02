@@ -35,7 +35,11 @@ Scroll and resize events coalesce into animation-frame work. The DOM contains on
 the window and optional focus pin; row nodes are keyed so scrolling/publication does
 not detach a surviving focused control. Labels are text, not HTML.
 
-The current response still transfers the complete selected outline and source text.
+The compatibility bulk-input adapter still receives the complete selected outline and source text.
 Index construction on document changes remains linear in declaration count, and
 source splitting remains linear in source size. This module bounds DOM work; it does
 not claim paged source/outline transport or a memory-admission policy.
+
+The browser now uses [pinned document windows](WINDOWS.md) for finite source/outline
+delivery. The original bulk-input outline adapter remains available for compatibility;
+its full-list index is not the browser delivery path.

@@ -1,0 +1,48 @@
+{
+  "rows": [
+    {
+      "profile": "linux",
+      "path": "kernel/locking/mutex.c",
+      "lines": 1302,
+      "declarations": 54,
+      "bulk_bytes": 46387,
+      "median_bulk_stdio_ms": 13.47561297006905,
+      "summary_bytes": 1456,
+      "max_window_bytes": 24112,
+      "median_window_stdio_ms": 2.528649056330323
+    },
+    {
+      "profile": "linux",
+      "path": "drivers/gpu/drm/amd/include/asic_reg/dcn/dcn_3_2_0_sh_mask.h",
+      "lines": 223493,
+      "declarations": 0,
+      "bulk_bytes": 24234100,
+      "median_bulk_stdio_ms": 148.61302613280714,
+      "summary_bytes": 1490,
+      "max_window_bytes": 20569,
+      "median_window_stdio_ms": 0.7483400404453278
+    },
+    {
+      "profile": "pytorch",
+      "path": "c10/core/Device.cpp",
+      "lines": 171,
+      "declarations": 6,
+      "bulk_bytes": 7694,
+      "median_bulk_stdio_ms": 2.716289134696126,
+      "summary_bytes": 1379,
+      "max_window_bytes": 14130,
+      "median_window_stdio_ms": 0.27342583052814007
+    },
+    {
+      "profile": "pytorch",
+      "path": "third_party/perfetto/sdk/perfetto.h",
+      "lines": 204651,
+      "declarations": 42443,
+      "bulk_bytes": 15248720,
+      "median_bulk_stdio_ms": 129.16444009169936,
+      "summary_bytes": 1509,
+      "max_window_bytes": 59676,
+      "median_window_stdio_ms": 1.0953780729323626
+    }
+  ]
+}

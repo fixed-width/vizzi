@@ -1,14 +1,17 @@
 # Local host API reference
 
-Views and pinned source use schema **2**; status and notification envelopes remain
+Bulk views and pinned source use schema **2**. Browser summary views use schema **3**,
+and pinned document windows use schema **1**; see [WINDOWS.md](WINDOWS.md).
+Status and notification envelopes remain
 schema **1**. These prototype contracts are independent of Git. Identities are opaque
 strings. HTTP responses disable caching. The host serves `/`, `/app.js`, `/controller.js`,
-`/updates.js`, `/source-description.js`, `/outline.js`, and `/app.css` without external assets.
+`/updates.js`, `/source-description.js`, `/outline.js`, `/windows.js`, `/inspector.js`, and `/app.css` without external assets.
 
 | Request | Parameters | Response |
 | --- | --- | --- |
 | `GET /api/status` | None | Workspace name, generation, snapshot, pending flag, measurements, refresh error, observation mode |
 | `GET /api/view` | Optional `snapshot`, `file`, `entity`, `filter`, `limit` | One snapshot's bounded overview, selection, captured source, and outlines |
+| `GET /api/window` | Required `snapshot`, `file`, `version`; optional source/outline ranges | Bounded text fragments, declaration page, and logical cursor from that exact pin |
 | `GET /api/source` | Required `snapshot`, `file` | Captured source from the requested retained observation |
 | `GET /api/events` | None; `Last-Event-ID` does not request replay | Latest-state `workspace` events over SSE, followed by changes |
 

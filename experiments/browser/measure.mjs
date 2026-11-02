@@ -239,6 +239,19 @@ async function qualify(chromium, definition) {
     host = await startHost(input);
     await settled(host);
     session = await openWorkspace(chromium, host);
+    const payloads = [], payloadJobs = [], payloadErrors = [];
+    session.page.on("response", response => {
+      const url = new URL(response.url());
+      if (!["/api/view", "/api/window"].includes(url.pathname) || response.status() !== 200) return;
+      payloadJobs.push(response.body().then(body => {
+        const data = JSON.parse(body.toString());
+        if (url.pathname === "/api/view") {
+          assert.equal(url.searchParams.get("projection"), "summary", "browser fetched bulk source");
+          assert.ok(!data.source || (data.source.text === null && data.source.outlines.every(outline => outline.declarations.length === 0)));
+        } else assert.ok(body.length < 512 * 1024, "window exceeded serialized payload bound");
+        payloads.push({ path:url.pathname, bytes:body.length, schema:data.schema, snapshot:data.snapshot, version:data.version ?? data.source?.version ?? null });
+      }).catch(error => { if (!/closed|aborted|No data found|No resource with given identifier/.test(error.message)) payloadErrors.push(error.message); }));
+    });
     const files = await capturedFiles(input.root, input.root, [], definition.profile);
     if (definition.profile) assert.equal(files.length, (await (await fetch(`${host.url}/api/status`)).json()).measurements.files, "independent full-profile inventory differs from capture");
     const manifest = createHash("sha256");
@@ -282,10 +295,12 @@ async function qualify(chromium, definition) {
     const clean = spawnSync("target/release/vizzi", ["--root", input.root, "--cache", input.cache, "--once", ...(input.sourceArguments ?? [])], { encoding: "utf8" });
     assert.equal(clean.status, 0, clean.stderr);
     assert.equal(JSON.parse(clean.stdout).snapshot, final.snapshot, "incremental result differs from a fresh full capture");
+    await Promise.all(payloadJobs);
+    assert.deepEqual(payloadErrors, []);
     return { name: definition.name, revision: definition.revision, originalSourceManifestSha256: manifest.digest("hex"), capturedFiles: files.length, sourceArguments: input.sourceArguments, sourceBytes: files.reduce((sum, file) => sum + file.bytes, 0),
       overviewFiles: final.files.length, heavyFiles: heavy.map(file => ({ path: file.path.slice(input.root.length + 1), bytes: file.bytes })),
       runs, picking, editLatency, largeSource: large, heap, webgpu, screenshot, cleanSnapshotMatches: true, nativeRss: await sampleRss(host.pid), errors: session.errors,
-      browserRequests: Object.fromEntries([...new Set(session.requests)].map(path => [path, session.requests.filter(value => value === path).length])) };
+      payloads, browserRequests: Object.fromEntries([...new Set(session.requests)].map(path => [path, session.requests.filter(value => value === path).length])) };
   } finally { await session?.close(); await host?.close(); await input.close(); }
 }
 

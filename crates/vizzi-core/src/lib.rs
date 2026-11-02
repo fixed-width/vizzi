@@ -6,6 +6,7 @@ pub mod capture;
 mod captured_source;
 pub mod model;
 pub mod policy;
+pub mod projection;
 pub mod publication;
 pub mod python;
 pub mod query;
