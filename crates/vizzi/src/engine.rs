@@ -7,7 +7,7 @@ use crate::{
 use serde::Serialize;
 use std::{
     collections::{BTreeMap, BTreeSet},
-    path::{Path, PathBuf},
+    path::PathBuf,
     sync::{
         Arc,
         atomic::{AtomicUsize, Ordering},
@@ -136,11 +136,6 @@ impl Engine {
             capture_ms: milliseconds(started.elapsed()),
             ..Default::default()
         };
-        let previous: BTreeMap<_, _> = previous
-            .into_iter()
-            .flat_map(Snapshot::documents)
-            .map(|file| (file.path(), file))
-            .collect();
         let mut documents = Vec::with_capacity(capture.files.len());
         if !measurements.reconciled {
             let touched: BTreeSet<_> = capture
@@ -149,13 +144,13 @@ impl Engine {
                 .map(|file| file.path.as_str())
                 .chain(capture.removed.iter().map(String::as_str))
                 .collect();
-            for old in previous
-                .values()
-                .filter(|file| !touched.contains(file.path()))
-            {
-                documents.push((*old).clone());
-                measurements.retained += 1;
-                measurements.reused += 1;
+            if let Some(previous) = previous {
+                measurements.retained = previous.documents().len()
+                    - touched
+                        .iter()
+                        .filter(|path| previous.file_by_path(path).is_some())
+                        .count();
+                measurements.reused = measurements.retained;
             }
         }
         let mut jobs = Vec::new();
@@ -165,17 +160,20 @@ impl Engine {
             }
             let content = ContentId::derive(&[&file.bytes]);
             let language = self.directory.language(&file.classification);
-            if let Some(old) = previous.get(file.path.as_str()).filter(|old| {
-                old.content() == &content
-                    && old.classification() == &file.classification
-                    && match language {
-                        Some(language) => {
-                            old.analyses().len() == 1
-                                && old.analyses()[0].context == *language.context()
+            if let Some(old) = previous
+                .and_then(|snapshot| snapshot.file_by_path(&file.path))
+                .filter(|old| {
+                    old.content() == &content
+                        && old.classification() == &file.classification
+                        && match language {
+                            Some(language) => {
+                                old.analyses().len() == 1
+                                    && old.analyses()[0].context == *language.context()
+                            }
+                            None => old.analyses().is_empty(),
                         }
-                        None => old.analyses().is_empty(),
-                    }
-            }) {
+                })
+            {
                 documents.push((*old).clone());
                 measurements.reused += 1;
             } else if let Some(language) = language {
@@ -277,17 +275,21 @@ impl Engine {
             measurements.cache_hits += hits;
             measurements.cache_warnings += warnings;
         }
-        let snapshot = Arc::new(Snapshot::new(
-            self.directory.workspace().clone(),
-            documents,
-            self.directory.policy().id().clone(),
-        )?);
+        let snapshot = Arc::new(if measurements.reconciled {
+            self.directory
+                .plan()
+                .snapshot(self.directory.workspace().clone(), documents)?
+        } else {
+            self.directory.plan().update(
+                previous.ok_or_else(|| {
+                    EngineError::Configuration("partial capture lost its baseline".into())
+                })?,
+                documents,
+                &capture.removed,
+            )?
+        });
         measurements.files = snapshot.documents().len();
-        measurements.analyzed = snapshot
-            .documents()
-            .iter()
-            .filter(|file| !file.analyses().is_empty())
-            .count();
+        measurements.analyzed = snapshot.analyzed_files();
         measurements.source_only = measurements.files - measurements.analyzed;
         measurements.total_ms = milliseconds(started.elapsed());
         Ok(Some(Refresh {
@@ -298,28 +300,10 @@ impl Engine {
     }
 
     fn can_capture_paths(&self, snapshot: &Snapshot, paths: &BTreeSet<PathBuf>) -> bool {
-        if snapshot.policy() != self.directory.policy().id()
+        if snapshot.capture_plan() != Some(self.directory.plan().id())
             || paths.is_empty()
             || paths.len() > MAX_PATH_HINTS
         {
-            return false;
-        }
-        if snapshot.documents().iter().any(|file| {
-            self.directory
-                .classification(Path::new(file.path()))
-                .ok()
-                .flatten()
-                .is_none_or(|classification| {
-                    classification != *file.classification()
-                        || match self.directory.language(&classification) {
-                            Some(language) => {
-                                file.analyses().len() != 1
-                                    || file.analyses()[0].context != *language.context()
-                            }
-                            None => !file.analyses().is_empty(),
-                        }
-                })
-        }) {
             return false;
         }
         for path in paths {

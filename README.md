@@ -18,6 +18,7 @@ validating coordination; it does not qualify large-codebase GPU performance.
 - [Captured document and snapshot identities](docs/prototype/IDENTITIES.md)
 - [Language adapters and shared worker budget](docs/prototype/LANGUAGES.md)
 - [Source selection and policy identity](docs/prototype/SOURCE_POLICY.md)
+- [Verified capture plans](docs/prototype/CAPTURE_PLAN.md) and [bounded outlines](docs/prototype/OUTLINE.md)
 - [Raw C/C++ extraction](docs/prototype/C_FAMILY_SYNTAX.md)
 - [C/C++ policy](docs/prototype/C_FAMILY_POLICY.md), [rationale](docs/explanation/c-family-analysis.md), and [delivery plan](docs/plans/c-family.md)
 - [Application measurement procedure](experiments/prototype/README.md)
@@ -27,6 +28,7 @@ validating coordination; it does not qualify large-codebase GPU performance.
 - [Source-policy validation and measurements](experiments/languages/SOURCE_POLICY_RESULTS.md)
 - [Raw C/C++ validation and scoped measurements](experiments/languages/C_FAMILY_RESULTS.md)
 - [Full-repository qualification](experiments/qualification/RESULTS.md) and [provisional budgets](docs/performance/BUDGETS.md)
+- [Bounded-outline and incremental-edit measurements](experiments/qualification/RESPONSIVENESS_RESULTS.md)
 - [Earlier performance experiments](experiments/performance/README.md)
 - [Contributor guidance](AGENTS.md)
 

@@ -5,6 +5,8 @@ assignment remains separate from compiler configuration. Run one benchmark at a 
 do not run builds, tests, or mutation jobs concurrently with measurements.
 The [recorded results](RESULTS.md) distinguish successful collection from the performance
 failures it exposed.
+The [responsiveness follow-up](RESPONSIVENESS_RESULTS.md) measures bounded outlines and
+verified capture plans on the same profiles.
 
 ## Profiles
 
@@ -131,6 +133,8 @@ edit visibility, large-file opening/editing, long frames, renderer heap, native 
 request counts, and clean-capture agreement. Header opening is timed after filter
 results are ready. The large-source operation uses actual UI selection and records
 rendered line/outline counts. The overview remains bounded to 2,000 tiles.
+Each run records a UUID in `options.probeId` and its source-edit comments so seeded
+caches cannot reuse earlier probe inputs. Use `--probe-id` only for deliberate replay.
 
 Hardware, OS cache state, scheduling probes, and renderer choice limit interpretation.
 Headless software Chromium does not qualify GPU or physical presentation performance.

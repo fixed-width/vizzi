@@ -3,7 +3,7 @@
 Views and pinned source use schema **2**; status and notification envelopes remain
 schema **1**. These prototype contracts are independent of Git. Identities are opaque
 strings. HTTP responses disable caching. The host serves `/`, `/app.js`, `/controller.js`,
-`/updates.js`, `/source-description.js`, and `/app.css` without external assets.
+`/updates.js`, `/source-description.js`, `/outline.js`, and `/app.css` without external assets.
 
 | Request | Parameters | Response |
 | --- | --- | --- |
@@ -28,6 +28,9 @@ contain a structured `reason`; see [SOURCE_POLICY.md](SOURCE_POLICY.md).
 Selected source includes `encoding` (`utf8` or `unsupported`). Grammar recovery,
 assignment, and encoding are separate facts. Current outlines carry `mode: "raw_syntax"`
 and `configuration_coverage: "unknown"`; a clean grammar parse is not compiler coverage.
+Selected and pinned source also include `version`, the immutable document version.
+It changes with source, classification, or analysis; unchanged file/version keys allow
+clients to reuse projection indexes across selection/filter requests.
 Pinned `/api/source` replies include `policy`, `classification`, and `encoding` from
 the retained snapshot along with the existing file/path/text fields.
 

@@ -4,6 +4,8 @@ Use this procedure to exercise the real browser UI and measure its reference ren
 while the native engine refreshes source. It builds Vizzi itself; analysed projects are
 never built. Browser results and their limits are explained in [the report](RESULTS.md).
 The latest delivery measurements are in [the notification report](NOTIFICATIONS_RESULTS.md).
+Full Linux/PyTorch interaction results and current outline/edit improvements are in the
+[responsiveness report](../qualification/RESPONSIVENESS_RESULTS.md).
 
 ## Install and check
 
@@ -26,7 +28,7 @@ The browser installer downloads [Playwright's matching Chromium builds](https://
 toolchain and cached Cargo dependencies are required: tests build the release host
 with `cargo build --release --offline -p vizzi`.
 
-`npm test` runs request-controller tests, timing-summary tests, and browser checks
+`npm test` runs request-controller tests, timing-summary tests, outline DOM tests, and browser checks
 against a real native HTTP host on an ephemeral loopback port. Tests cover readable
 labels, transformed map picking, linked source/outline selection, reader scroll
 continuity, source virtualisation, narrow layout, unsupported encoding, syntax recovery,
@@ -34,6 +36,8 @@ literal source text, map resizing when the file list opens, and live-stream reco
 after restarting a host with connected clients. The client makes no status-polling
 requests. Temporary source/cache directories are
 removed after each run.
+The standalone outline tests use real Chromium without the native host; an integration
+fixture also checks 50,000 declarations through the actual HTTP/source-selection path.
 
 ## Check the actual rendering environment
 
@@ -77,6 +81,9 @@ Use `--samples 1 --duration 1000` for a harness smoke test. Durations are millis
 allowed ranges are 1–10 samples and 1,000–30,000 ms. Existing reports and screenshots
 are never overwritten. Local scratch results belong in `results/local/`, which Git
 ignores. Performance runs should have no competing tests, mutation jobs, or benchmarks.
+Every run generates a UUID recorded as `options.probeId` in source-edit comments, so
+persisted caches cannot reuse a prior run's probe content. `--probe-id` overrides it
+for deliberate replay; use a new value when measuring fresh parsing.
 
 These timings do not establish physical presentation or GPU execution latency. The
 write-to-update observation ends after matching visible source DOM and two subsequent
@@ -98,6 +105,20 @@ timeouts are still reported separately from assertion failures. The
 does not provide per-test coverage mapping. JSON output goes to
 `results/local/controller-mutation.json`. Painting, CSS, the native engine, and benchmark
 orchestration are outside this mutation scope; browser regressions have their own tests.
+
+For the complete virtual outline module:
+
+```sh
+npm test -- --outline-mutations
+```
+
+This runs the real-Chromium DOM tests against instrumented `outline.js`, using the
+actual stylesheet. The harness explicitly forwards Stryker's active-mutant constants
+into the page before importing the module; a Node environment variable alone cannot
+activate browser mutations. Reports go to `results/local/outline-mutation.json`.
+CSS, app orchestration, native HTTP integration, and benchmark code are outside this
+mutation scope. Its final results and investigated gaps are recorded in the
+[responsiveness report](../qualification/RESPONSIVENESS_RESULTS.md).
 
 For native delivery and its HTTP adapter:
 

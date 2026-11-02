@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile, writeFile, mkdir, readdir, stat, access } from "node:fs/promises";
 import { join, dirname, basename, extname } from "node:path";
 import { cpus, totalmem, platform, release } from "node:os";
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { setTimeout as delay } from "node:timers/promises";
 import { spawnSync } from "node:child_process";
 import { buildHost, browser, workspace, startHost, openWorkspace, paint } from "./support.mjs";
@@ -13,11 +13,12 @@ for (let i = 2; i < process.argv.length; i++) {
   const flag = process.argv[i];
   if (["--measure", "--headed"].includes(flag)) continue;
   if (flag === "--reference-only") { options.referenceOnly = true; continue; }
-  if (!["--source", "--revision", "--output", "--duration", "--samples", "--profile"].includes(flag)) throw new Error(`Unknown argument ${flag}`);
+  if (!["--source", "--revision", "--output", "--duration", "--samples", "--profile", "--probe-id"].includes(flag)) throw new Error(`Unknown argument ${flag}`);
   const value = process.argv[++i];
   if (!value) throw new Error(`${flag} requires a value`);
   options[flag.slice(2)] = ["--duration", "--samples"].includes(flag) ? Number(value) : value;
 }
+options.probeId = options["probe-id"] ?? randomUUID();
 const profile = options.profile ? JSON.parse(await readFile(options.profile, "utf8")) : null;
 if (profile) { options.source ??= profile.source; options.revision ??= profile.revision; }
 assert.ok(!options.referenceOnly || options.source, "--reference-only requires source/profile");
@@ -172,7 +173,7 @@ async function singleEdits(page, input, host, picking) {
   const results = [];
   for (const offset of [0, 97, 211, 367, 463]) {
     const before = await settled(host); await delay(offset);
-    const marker = `${view.source.outlines[0].context.language === "python" ? "#" : "//"} browser-visible-${offset}`;
+    const marker = `${view.source.outlines[0].context.language === "python" ? "#" : "//"} browser-visible-${options.probeId}-${offset}`;
     const started = performance.now();
     await writeFile(path, Buffer.concat([Buffer.from(marker + "\n"), original]));
     const publication = (async () => {
@@ -208,7 +209,7 @@ async function largeSource(page, input, host, file) {
   const openMs = performance.now() - opened;
   const openProbe = await endProbe(page);
   const original = await readFile(file.path);
-  const marker = "// full-corpus-large-source-edit";
+  const marker = `// full-corpus-large-source-edit-${options.probeId}`;
   const before = await settled(host);
   await beginProbe(page);
   const edited = performance.now();
@@ -253,7 +254,7 @@ async function qualify(chromium, definition) {
         await session.page.bringToFront();
         await session.page.waitForFunction(() => window.vizziMetrics?.lastFrame?.snapshot);
         await paint(session.page);
-        const run = await interaction(session.page, host, condition === "refresh" ? () => Promise.all(heavy.map((file, index) => writeFile(file.path, Buffer.concat([Buffer.from(`${extname(file.path) === ".py" ? "#" : "//"} background ${sample}\n`), originals[index]])))) : null);
+        const run = await interaction(session.page, host, condition === "refresh" ? () => Promise.all(heavy.map((file, index) => writeFile(file.path, Buffer.concat([Buffer.from(`${extname(file.path) === ".py" ? "#" : "//"} background ${options.probeId}-${sample}\n`), originals[index]])))) : null);
         runs.push({ sample, condition, ...run });
         console.log(`${definition.name} ${condition} ${sample + 1}: ${run.frameSummary.count} rAF intervals; ${run.pendingObservations} pending observations`);
       }

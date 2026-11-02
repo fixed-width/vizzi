@@ -1,6 +1,7 @@
 import { createController } from "/controller.js";
 import { followChanges } from "/updates.js";
 import { describeSource } from "/source-description.js";
+import { createOutline } from "/outline.js";
 
 const element = id => document.getElementById(id);
 const canvas = element("map"), context = canvas.getContext("2d");
@@ -11,6 +12,11 @@ function sample(series, value) { series.push(value); if (series.length > 512) se
 let view = null, lines = [], active = null, camera = { x: 20, y: 20, scale: 1 };
 let scheduled = false, drag = null, previousFrame = null, filterTimer = null;
 let updates;
+const outline = createOutline({ viewport: element("outline"), select: async fact => {
+  if (await controller.load({ entity: fact.id }) && active?.id === fact.id) {
+    source.scrollTop = Math.max(0, (active.start_line - 4) * 22); renderSource();
+  }
+} });
 
 const controller = createController({
   transport: async (uri, options) => {
@@ -28,28 +34,11 @@ const controller = createController({
     element("file-title").textContent = next.source?.path ?? "Choose a file";
     element("snapshot").textContent = next.snapshot.slice(0, 8);
     element("snapshot").title = `Captured observation ${next.snapshot}`;
-    const outlines = next.source?.outlines ?? [];
     const { coverage, diagnostics } = describeSource(next.source);
     element("coverage").textContent = coverage;
     element("diagnostics").hidden = diagnostics.length === 0;
     element("diagnostics").textContent = diagnostics.join(". ");
-    const facts = outlines.flatMap(outline => outline.declarations);
-    active = facts.find(fact => fact.id === next.selection.entity) ?? null;
-    element("outline").replaceChildren();
-    for (const fact of facts) {
-      const button = document.createElement("button");
-      button.textContent = fact.name; button.title = `${fact.kind} ${fact.name} · line ${fact.start_line}`;
-      button.setAttribute("aria-current", String(fact.id === next.selection.entity));
-      const kind = document.createElement("small"); kind.textContent = `${fact.kind} · ${fact.start_line}`; button.append(kind);
-      button.addEventListener("click", async () => {
-        if (await controller.load({ entity: fact.id }) && active?.id === fact.id) {
-          source.scrollTop = Math.max(0, (active.start_line - 4) * 22);
-          renderSource();
-        }
-      });
-      element("outline").append(button);
-    }
-    if (!facts.length) { const note = document.createElement("p"); note.textContent = "No declarations extracted"; element("outline").append(note); }
+    active = outline.update(next.source, next.selection.entity, changedFile || changedEntity);
     if (changedSource) { lines = next.source?.text?.split(/\r?\n/) ?? []; if (changedFile) source.scrollTop = 0; }
     if (active && (changedFile || changedEntity)) source.scrollTop = Math.max(0, (active.start_line - 4) * 22);
     renderSource(); renderFileList();

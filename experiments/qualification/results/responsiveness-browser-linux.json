@@ -1,0 +1,6400 @@
+{
+  "schema": 1,
+  "recordedUtc": "2026-11-02T06:00:56.012Z",
+  "browser": "156.0.8078.4",
+  "node": "v26.13.0",
+  "playwright": "1.64.1",
+  "machine": {
+    "platform": "linux",
+    "release": "6.8.0-147-lowlatency",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13700H",
+    "logicalCpus": 20,
+    "memoryBytes": 67080241152
+  },
+  "gpu": {
+    "devices": [
+      {
+        "vendorId": 65535,
+        "deviceId": 65535,
+        "vendorString": "Google Inc. (Google)",
+        "deviceString": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0)",
+        "driverVendor": "SwANGLE",
+        "driverVersion": "5.0.0"
+      }
+    ],
+    "featureStatus": {
+      "2d_canvas": "unavailable_software",
+      "direct_rendering_display_compositor": "disabled_off_ok",
+      "gpu_compositing": "disabled_software",
+      "multiple_raster_threads": "enabled_on",
+      "opengl": "disabled_off",
+      "rasterization": "disabled_software",
+      "raw_draw": "disabled_off_ok",
+      "skia_graphite": "disabled_off",
+      "trees_in_viz": "disabled_off",
+      "video_decode": "disabled_software",
+      "video_encode": "disabled_software",
+      "vulkan": "disabled_off",
+      "webgl": "unavailable_software",
+      "webgpu": "unavailable_software",
+      "webgpu_on_vk_via_gl_interop": "disabled_off",
+      "webnn": "unavailable_software"
+    },
+    "auxAttributes": {
+      "amdSwitchable": false,
+      "canSupportThreadedTextureMailbox": false,
+      "directRenderingVersion": "",
+      "displayType": "ANGLE_SWIFTSHADER",
+      "glExtensions": "GL_AMD_performance_monitor GL_ANGLE_base_vertex_base_instance_shader_builtin GL_ANGLE_blob_cache GL_ANGLE_client_arrays GL_ANGLE_clip_cull_distance GL_ANGLE_compressed_texture_etc GL_ANGLE_copy_texture_3d GL_ANGLE_depth_texture GL_ANGLE_framebuffer_blit GL_ANGLE_framebuffer_multisample GL_ANGLE_get_image GL_ANGLE_get_serialized_context_string GL_ANGLE_get_tex_level_parameter GL_ANGLE_instanced_arrays GL_ANGLE_memory_object_flags GL_ANGLE_memory_size GL_ANGLE_multi_draw GL_ANGLE_pack_reverse_row_order GL_ANGLE_polygon_mode GL_ANGLE_program_binary_readiness_query GL_ANGLE_program_cache_control GL_ANGLE_read_only_depth_stencil_feedback_loops GL_ANGLE_relaxed_vertex_attribute_type GL_ANGLE_renderability_validation GL_ANGLE_request_extension GL_ANGLE_rgbx_internal_format GL_ANGLE_robust_client_memory GL_ANGLE_robust_fragment_shader_output GL_ANGLE_robust_resource_initialization GL_ANGLE_shader_pixel_local_storage GL_ANGLE_shader_pixel_local_storage_coherent GL_ANGLE_stencil_texturing GL_ANGLE_texture_compression_dxt3 GL_ANGLE_texture_compression_dxt5 GL_ANGLE_texture_multisample GL_ANGLE_texture_usage GL_ANGLE_translated_shader_source GL_ANGLE_vulkan_image GL_ANGLE_yuv_internal_format GL_APPLE_clip_distance GL_ARM_rgba8 GL_ARM_shader_framebuffer_fetch GL_CHROMIUM_bind_generates_resource GL_CHROMIUM_bind_uniform_location GL_CHROMIUM_copy_compressed_texture GL_CHROMIUM_copy_texture GL_CHROMIUM_lose_context GL_EXT_EGL_image_array GL_EXT_EGL_image_external_wrap_modes GL_EXT_EGL_image_storage GL_EXT_base_instance GL_EXT_blend_minmax GL_EXT_buffer_storage GL_EXT_clear_texture GL_EXT_clip_control GL_EXT_clip_cull_distance GL_EXT_color_buffer_float GL_EXT_color_buffer_half_float GL_EXT_compressed_ETC1_RGB8_sub_texture GL_EXT_conservative_depth GL_EXT_copy_image GL_EXT_debug_label GL_EXT_debug_marker GL_EXT_depth_clamp GL_EXT_discard_framebuffer GL_EXT_disjoint_timer_query GL_EXT_draw_buffers GL_EXT_draw_buffers_indexed GL_EXT_draw_elements_base_vertex GL_EXT_float_blend GL_EXT_frag_depth GL_EXT_instanced_arrays GL_EXT_map_buffer_range GL_EXT_memory_object GL_EXT_memory_object_fd GL_EXT_occlusion_query_boolean GL_EXT_polygon_offset_clamp GL_EXT_read_format_bgra GL_EXT_robustness GL_EXT_sRGB GL_EXT_sRGB_write_control GL_EXT_semaphore GL_EXT_semaphore_fd GL_EXT_separate_shader_objects GL_EXT_shader_framebuffer_fetch GL_EXT_shader_framebuffer_fetch_non_coherent GL_EXT_shader_non_constant_global_initializers GL_EXT_shader_texture_lod GL_EXT_shadow_samplers GL_EXT_texture_border_clamp GL_EXT_texture_compression_bptc GL_EXT_texture_compression_dxt1 GL_EXT_texture_compression_rgtc GL_EXT_texture_compression_s3tc_srgb GL_EXT_texture_filter_anisotropic GL_EXT_texture_format_BGRA8888 GL_EXT_texture_lod_bias GL_EXT_texture_mirror_clamp_to_edge GL_EXT_texture_rg GL_EXT_texture_sRGB_R8 GL_EXT_texture_sRGB_RG8 GL_EXT_texture_sRGB_decode GL_EXT_texture_shadow_lod GL_EXT_texture_storage GL_EXT_texture_type_2_10_10_10_REV GL_EXT_unpack_subimage GL_KHR_blend_equation_advanced GL_KHR_debug GL_KHR_robust_buffer_access_behavior GL_KHR_robustness GL_KHR_texture_compression_astc_ldr GL_NV_fence GL_NV_framebuffer_blit GL_NV_pack_subimage GL_NV_pixel_buffer_object GL_NV_polygon_mode GL_NV_read_depth GL_NV_read_depth_stencil GL_NV_read_stencil GL_NV_shader_noperspective_interpolation GL_OES_EGL_image GL_OES_EGL_image_external GL_OES_EGL_image_external_essl3 GL_OES_EGL_sync GL_OES_compressed_ETC1_RGB8_texture GL_OES_compressed_paletted_texture GL_OES_copy_image GL_OES_depth24 GL_OES_depth32 GL_OES_depth_texture GL_OES_depth_texture_cube_map GL_OES_draw_buffers_indexed GL_OES_draw_elements_base_vertex GL_OES_element_index_uint GL_OES_fbo_render_mipmap GL_OES_get_program_binary GL_OES_mapbuffer GL_OES_packed_depth_stencil GL_OES_required_internalformat GL_OES_rgb8_rgba8 GL_OES_sample_shading GL_OES_sample_variables GL_OES_shader_multisample_interpolation GL_OES_standard_derivatives GL_OES_surfaceless_context GL_OES_texture_3D GL_OES_texture_border_clamp GL_OES_texture_float GL_OES_texture_float_linear GL_OES_texture_half_float GL_OES_texture_half_float_linear GL_OES_texture_npot GL_OES_texture_stencil8 GL_OES_texture_storage_multisample_2d_array GL_OES_vertex_array_object GL_OES_vertex_half_float GL_OES_vertex_type_10_10_10_2 GL_OVR_multiview GL_OVR_multiview2 GL_QCOM_texture_lod_bias ",
+      "glImplementationParts": "(gl=egl-angle,angle=swiftshader)",
+      "glRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0)",
+      "glResetNotificationStrategy": 33362,
+      "glVendor": "Google Inc. (Google)",
+      "glVersion": "OpenGL ES 3.0 (ANGLE 2.1.28967 git hash: dfeede58b618)",
+      "glWsExtensions": "EGL_EXT_create_context_robustness EGL_ANGLE_surface_orientation EGL_KHR_create_context EGL_KHR_image EGL_KHR_image_base EGL_EXT_image_gl_colorspace EGL_KHR_gl_colorspace EGL_KHR_gl_texture_2D_image EGL_KHR_gl_texture_cubemap_image EGL_KHR_gl_renderbuffer_image EGL_KHR_get_all_proc_addresses EGL_KHR_fence_sync EGL_KHR_wait_sync EGL_ANGLE_create_context_webgl_compatibility EGL_CHROMIUM_create_context_bind_generates_resource EGL_KHR_swap_buffers_with_damage EGL_EXT_pixel_format_float EGL_KHR_surfaceless_context EGL_ANGLE_display_texture_share_group EGL_ANGLE_display_semaphore_share_group EGL_ANGLE_create_context_client_arrays EGL_ANGLE_program_cache_control EGL_ANGLE_robust_resource_initialization EGL_ANGLE_create_context_extensions_enabled EGL_ANDROID_blob_cache EGL_ANDROID_recordable EGL_ANGLE_create_context_backwards_compatible EGL_KHR_no_config_context EGL_IMG_context_priority EGL_KHR_create_context_no_error EGL_KHR_reusable_sync EGL_EXT_buffer_age EGL_ANGLE_create_surface_swap_interval EGL_ANGLE_vulkan_image EGL_KHR_partial_update EGL_ANGLE_global_fence_sync EGL_ANGLE_memory_usage_report ",
+      "glWsVendor": "Google Inc. (Google)",
+      "glWsVersion": "1.5 (ANGLE 2.1.28967 git hash: dfeede58b618)",
+      "hardwareSupportsVulkan": false,
+      "inProcessGpu": false,
+      "initializationTime": 0.015332,
+      "isAsan": false,
+      "isClangCoverage": false,
+      "jpegDecodeAcceleratorSupported": false,
+      "maxMsaaSamples": "4",
+      "optimus": false,
+      "passthroughCmdDecoder": true,
+      "pixelShaderVersion": "3.00",
+      "processCrashCount": 0,
+      "sandboxed": false,
+      "skiaBackendType": "None",
+      "subpixelFontRendering": true,
+      "targetCpuBits": 64,
+      "vertexShaderVersion": "3.00",
+      "visibilityCallbackCallCount": 0
+    }
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 1,
+    "headless": true
+  },
+  "executor": {
+    "deviceNodes": [
+      "by-path",
+      "card1",
+      "card2",
+      "renderD128",
+      "renderD129"
+    ],
+    "display": ":0",
+    "wayland": null
+  },
+  "nativeRevision": "1a421e043fb1edba44ea0c0752184919e3a148d2",
+  "binarySha256": "da414ad4901d999098b2d4420973c8e4e7a491ba2373c9f0743aa90713eb5e18",
+  "appSha256": "e81c36feeff43611e9c64ca516563eff27776eb8a229d4c3998183e54f3db844",
+  "options": {
+    "duration": 4000,
+    "samples": 1,
+    "referenceOnly": true,
+    "profile": "/tmp/vizzi-verified-edit-browser-linux.json",
+    "output": "/tmp/vizzi-bounded-outline-epoch-linux.json",
+    "probeId": "0691527c-3e13-4f22-94ee-225311c6d4d6",
+    "source": "/tmp/vizzi-perf-corpus/linux-cbbddb6b",
+    "revision": "cbbddb6b08cc9900a87cccaa9b22bbe06aa4f50a"
+  },
+  "results": [
+    {
+      "name": "linux",
+      "revision": "cbbddb6b08cc9900a87cccaa9b22bbe06aa4f50a",
+      "originalSourceManifestSha256": "3ce68aeb82a96fb6abd215437473d8eb18a81a6666e3835d4c190426763fcde7",
+      "capturedFiles": 66066,
+      "sourceArguments": [
+        "--c-family-root",
+        ".",
+        "--syntax-language",
+        ".=c",
+        "--syntax-language",
+        "scripts/kconfig/qconf.cc=cpp",
+        "--syntax-language",
+        "tools/build/feature/test-cxa-demangle.cpp=cpp",
+        "--syntax-language",
+        "tools/build/feature/test-llvm-perf.cpp=cpp",
+        "--syntax-language",
+        "tools/build/feature/test-llvm.cpp=cpp",
+        "--syntax-language",
+        "tools/perf/util/demangle-cxx.cpp=cpp",
+        "--syntax-language",
+        "tools/perf/util/llvm-c-helpers.cpp=cpp",
+        "--syntax-language",
+        "tools/testing/selftests/bpf/progs/unwind_cxx.cpp=cpp",
+        "--syntax-language",
+        "tools/testing/selftests/bpf/test_cpp.cpp=cpp",
+        "--exclude-source",
+        "samples/check-exec/script-ask.inc",
+        "--exclude-source",
+        "samples/check-exec/script-exec.inc",
+        "--exclude-source",
+        "samples/check-exec/script-noexec.inc"
+      ],
+      "sourceBytes": 1495484792,
+      "overviewFiles": 2000,
+      "heavyFiles": [
+        {
+          "path": "drivers/gpu/drm/amd/include/asic_reg/dcn/dcn_3_2_0_sh_mask.h",
+          "bytes": 24009174
+        },
+        {
+          "path": "drivers/gpu/drm/amd/include/asic_reg/nbio/nbio_7_7_0_sh_mask.h",
+          "bytes": 16730577
+        },
+        {
+          "path": "drivers/gpu/drm/amd/include/asic_reg/nbio/nbio_7_2_0_sh_mask.h",
+          "bytes": 16414003
+        }
+      ],
+      "runs": [
+        {
+          "sample": 0,
+          "condition": "steady",
+          "elapsedMs": 4019.1234590000004,
+          "pendingObservations": 68,
+          "publishedRefresh": null,
+          "inputs": [
+            {
+              "atMs": 0.08305600000130653,
+              "kind": "pan",
+              "completedAtMs": 5.350335000000996
+            },
+            {
+              "atMs": 16.133504999999786,
+              "kind": "pan",
+              "completedAtMs": 21.849777999999787
+            },
+            {
+              "atMs": 33.04088700000102,
+              "kind": "pan",
+              "completedAtMs": 38.32545399999981
+            },
+            {
+              "atMs": 49.54168500000014,
+              "kind": "pan",
+              "completedAtMs": 54.39583300000049
+            },
+            {
+              "atMs": 67.01371900000049,
+              "kind": "pan",
+              "completedAtMs": 71.43217600000025
+            },
+            {
+              "atMs": 83.62895000000026,
+              "kind": "pan",
+              "completedAtMs": 88.24677100000008
+            },
+            {
+              "atMs": 100.49644100000114,
+              "kind": "pan",
+              "completedAtMs": 120.33975600000122
+            },
+            {
+              "atMs": 116.2173840000014,
+              "kind": "pan",
+              "completedAtMs": 121.55555100000129
+            },
+            {
+              "atMs": 132.67120000000068,
+              "kind": "pan",
+              "completedAtMs": 137.98564100000112
+            },
+            {
+              "atMs": 149.81755599999997,
+              "kind": "pan",
+              "completedAtMs": 154.62314400000105
+            },
+            {
+              "atMs": 165.75348699999995,
+              "kind": "pan",
+              "completedAtMs": 171.94412999999986
+            },
+            {
+              "atMs": 183.1253340000003,
+              "kind": "pan",
+              "completedAtMs": 187.64189400000032
+            },
+            {
+              "atMs": 199.49458200000117,
+              "kind": "pan",
+              "completedAtMs": 204.6429700000008
+            },
+            {
+              "atMs": 215.74920200000088,
+              "kind": "pan",
+              "completedAtMs": 221.34410500000013
+            },
+            {
+              "atMs": 233.4312170000012,
+              "kind": "pan",
+              "completedAtMs": 237.41941600000064
+            },
+            {
+              "atMs": 250.1272200000003,
+              "kind": "pan",
+              "completedAtMs": 254.46866600000067
+            },
+            {
+              "atMs": 266.6135540000014,
+              "kind": "pan",
+              "completedAtMs": 270.96018300000105
+            },
+            {
+              "atMs": 283.2074240000002,
+              "kind": "pan",
+              "completedAtMs": 287.7153610000005
+            },
+            {
+              "atMs": 299.0047140000006,
+              "kind": "pan",
+              "completedAtMs": 304.7529570000006
+            },
+            {
+              "atMs": 315.8426159999999,
+              "kind": "pan",
+              "completedAtMs": 321.60916800000086
+            },
+            {
+              "atMs": 333.56040399999983,
+              "kind": "pan",
+              "completedAtMs": 337.6833939999997
+            },
+            {
+              "atMs": 349.79841600000145,
+              "kind": "pan",
+              "completedAtMs": 354.9366719999998
+            },
+            {
+              "atMs": 366.0932730000004,
+              "kind": "pan",
+              "completedAtMs": 370.7057820000009
+            },
+            {
+              "atMs": 382.4827640000003,
+              "kind": "pan",
+              "completedAtMs": 387.871314
+            },
+            {
+              "atMs": 400.17935000000034,
+              "kind": "pan",
+              "completedAtMs": 404.29173100000116
+            },
+            {
+              "atMs": 416.47251700000015,
+              "kind": "pan",
+              "completedAtMs": 421.46165400000064
+            },
+            {
+              "atMs": 433.2563370000007,
+              "kind": "pan",
+              "completedAtMs": 437.4005280000001
+            },
+            {
+              "atMs": 450.5169220000007,
+              "kind": "pan",
+              "completedAtMs": 454.21060899999975
+            },
+            {
+              "atMs": 466.4307090000002,
+              "kind": "pan",
+              "completedAtMs": 470.57233300000007
+            },
+            {
+              "atMs": 483.319485,
+              "kind": "pan",
+              "completedAtMs": 487.8658969999997
+            },
+            {
+              "atMs": 500.0521310000004,
+              "kind": "pan",
+              "completedAtMs": 519.6948069999999
+            },
+            {
+              "atMs": 516.128616,
+              "kind": "pan",
+              "completedAtMs": 521.203082
+            },
+            {
+              "atMs": 532.3014070000008,
+              "kind": "pan",
+              "completedAtMs": 537.720408000001
+            },
+            {
+              "atMs": 548.8127870000008,
+              "kind": "pan",
+              "completedAtMs": 554.8142829999997
+            },
+            {
+              "atMs": 565.8154880000002,
+              "kind": "pan",
+              "completedAtMs": 572.4697080000005
+            },
+            {
+              "atMs": 583.0792899999997,
+              "kind": "pan",
+              "completedAtMs": 588.0745360000001
+            },
+            {
+              "atMs": 599.3109480000003,
+              "kind": "pan",
+              "completedAtMs": 604.3676960000012
+            },
+            {
+              "atMs": 617.2411010000014,
+              "kind": "pan",
+              "completedAtMs": 621.2191500000008
+            },
+            {
+              "atMs": 633.3225570000013,
+              "kind": "pan",
+              "completedAtMs": 637.9043899999997
+            },
+            {
+              "atMs": 650.048764000001,
+              "kind": "pan",
+              "completedAtMs": 655.1060500000003
+            },
+            {
+              "atMs": 665.7654890000013,
+              "kind": "pan",
+              "completedAtMs": 671.1053540000012
+            },
+            {
+              "atMs": 683.2874000000011,
+              "kind": "pan",
+              "completedAtMs": 687.9903759999997
+            },
+            {
+              "atMs": 700.2607310000003,
+              "kind": "pan",
+              "completedAtMs": 704.0313349999997
+            },
+            {
+              "atMs": 716.8335610000013,
+              "kind": "pan",
+              "completedAtMs": 720.8158910000002
+            },
+            {
+              "atMs": 732.974295,
+              "kind": "pan",
+              "completedAtMs": 741.5510110000014
+            },
+            {
+              "atMs": 748.7144640000006,
+              "kind": "pan",
+              "completedAtMs": 755.077878
+            },
+            {
+              "atMs": 766.7240860000002,
+              "kind": "pan",
+              "completedAtMs": 771.2770639999999
+            },
+            {
+              "atMs": 783.3819820000008,
+              "kind": "pan",
+              "completedAtMs": 787.9713950000005
+            },
+            {
+              "atMs": 799.9208260000014,
+              "kind": "pan",
+              "completedAtMs": 805.736753000001
+            },
+            {
+              "atMs": 816.0306770000007,
+              "kind": "pan",
+              "completedAtMs": 820.9662980000012
+            },
+            {
+              "atMs": 833.1470680000002,
+              "kind": "pan",
+              "completedAtMs": 837.4677700000011
+            },
+            {
+              "atMs": 850.4312090000003,
+              "kind": "pan",
+              "completedAtMs": 855.3405010000006
+            },
+            {
+              "atMs": 866.5364890000001,
+              "kind": "pan",
+              "completedAtMs": 887.458630000001
+            },
+            {
+              "atMs": 883.5708590000013,
+              "kind": "pan",
+              "completedAtMs": 887.5426960000004
+            },
+            {
+              "atMs": 900.5067840000011,
+              "kind": "pan",
+              "completedAtMs": 904.0299700000014
+            },
+            {
+              "atMs": 916.1992030000001,
+              "kind": "pan",
+              "completedAtMs": 920.4419570000009
+            },
+            {
+              "atMs": 932.7787779999999,
+              "kind": "pan",
+              "completedAtMs": 937.7808560000012
+            },
+            {
+              "atMs": 948.7948530000012,
+              "kind": "pan",
+              "completedAtMs": 955.1553760000006
+            },
+            {
+              "atMs": 966.3539099999998,
+              "kind": "pan",
+              "completedAtMs": 970.9505669999999
+            },
+            {
+              "atMs": 983.5428950000005,
+              "kind": "pan",
+              "completedAtMs": 987.9896900000003
+            },
+            {
+              "atMs": 999.54702,
+              "kind": "pan",
+              "completedAtMs": 1004.0926090000012
+            },
+            {
+              "atMs": 1016.3215790000013,
+              "kind": "pan",
+              "completedAtMs": 1021.5319870000003
+            },
+            {
+              "atMs": 1032.718374,
+              "kind": "pan",
+              "completedAtMs": 1039.1112030000004
+            },
+            {
+              "atMs": 1049.238389,
+              "kind": "pan",
+              "completedAtMs": 1054.7205700000013
+            },
+            {
+              "atMs": 1065.869783,
+              "kind": "pan",
+              "completedAtMs": 1071.9082170000001
+            },
+            {
+              "atMs": 1083.2271579999997,
+              "kind": "pan",
+              "completedAtMs": 1088.387546
+            },
+            {
+              "atMs": 1100.550421,
+              "kind": "pan",
+              "completedAtMs": 1104.8530620000001
+            },
+            {
+              "atMs": 1115.9881970000006,
+              "kind": "pan",
+              "completedAtMs": 1121.2368130000013
+            },
+            {
+              "atMs": 1133.235874,
+              "kind": "pan",
+              "completedAtMs": 1137.700490000001
+            },
+            {
+              "atMs": 1149.932286000001,
+              "kind": "pan",
+              "completedAtMs": 1154.566911
+            },
+            {
+              "atMs": 1166.1861930000014,
+              "kind": "pan",
+              "completedAtMs": 1170.838162
+            },
+            {
+              "atMs": 1182.747469,
+              "kind": "pan",
+              "completedAtMs": 1188.1169470000004
+            },
+            {
+              "atMs": 1200.325678000001,
+              "kind": "pan",
+              "completedAtMs": 1204.9749520000005
+            },
+            {
+              "atMs": 1217.626470000001,
+              "kind": "pan",
+              "completedAtMs": 1237.6865859999998
+            },
+            {
+              "atMs": 1233.453222,
+              "kind": "pan",
+              "completedAtMs": 1237.7532179999998
+            },
+            {
+              "atMs": 1249.9818219999997,
+              "kind": "pan",
+              "completedAtMs": 1254.9946630000013
+            },
+            {
+              "atMs": 1266.2685880000008,
+              "kind": "pan",
+              "completedAtMs": 1271.4439300000013
+            },
+            {
+              "atMs": 1283.6255579999997,
+              "kind": "pan",
+              "completedAtMs": 1301.3133710000002
+            },
+            {
+              "atMs": 1298.9083550000014,
+              "kind": "pan",
+              "completedAtMs": 1304.1887540000007
+            },
+            {
+              "atMs": 1316.3772430000008,
+              "kind": "pan",
+              "completedAtMs": 1320.958267
+            },
+            {
+              "atMs": 1333.1767580000014,
+              "kind": "pan",
+              "completedAtMs": 1337.3210870000003
+            },
+            {
+              "atMs": 1350.5448780000006,
+              "kind": "pan",
+              "completedAtMs": 1368.6955180000004
+            },
+            {
+              "atMs": 1366.2587220000005,
+              "kind": "pan",
+              "completedAtMs": 1371.0571200000013
+            },
+            {
+              "atMs": 1383.194759,
+              "kind": "pan",
+              "completedAtMs": 1388.8090570000004
+            },
+            {
+              "atMs": 1398.9945399999997,
+              "kind": "pan",
+              "completedAtMs": 1404.389263000001
+            },
+            {
+              "atMs": 1416.521458000001,
+              "kind": "pan",
+              "completedAtMs": 1420.5140389999997
+            },
+            {
+              "atMs": 1432.6666299999997,
+              "kind": "pan",
+              "completedAtMs": 1437.390171000001
+            },
+            {
+              "atMs": 1448.9252150000011,
+              "kind": "pan",
+              "completedAtMs": 1454.7858640000013
+            },
+            {
+              "atMs": 1465.8922930000008,
+              "kind": "pan",
+              "completedAtMs": 1471.409880000001
+            },
+            {
+              "atMs": 1483.611132,
+              "kind": "pan",
+              "completedAtMs": 1488.218347
+            },
+            {
+              "atMs": 1499.030546,
+              "kind": "pan",
+              "completedAtMs": 1504.7263030000013
+            },
+            {
+              "atMs": 1516.0130800000006,
+              "kind": "pan",
+              "completedAtMs": 1520.9934979999998
+            },
+            {
+              "atMs": 1532.1617450000012,
+              "kind": "pan",
+              "completedAtMs": 1537.2880459999997
+            },
+            {
+              "atMs": 1549.3011939999997,
+              "kind": "pan",
+              "completedAtMs": 1554.7527480000008
+            },
+            {
+              "atMs": 1566.9084440000006,
+              "kind": "pan",
+              "completedAtMs": 1571.9665010000008
+            },
+            {
+              "atMs": 1583.1436300000005,
+              "kind": "pan",
+              "completedAtMs": 1587.7155010000006
+            },
+            {
+              "atMs": 1600.4988850000009,
+              "kind": "pan",
+              "completedAtMs": 1604.4470180000008
+            },
+            {
+              "atMs": 1616.6907730000003,
+              "kind": "pan",
+              "completedAtMs": 1621.2233969999997
+            },
+            {
+              "atMs": 1633.479464,
+              "kind": "pan",
+              "completedAtMs": 1637.1871890000002
+            },
+            {
+              "atMs": 1650.4128820000005,
+              "kind": "pan",
+              "completedAtMs": 1672.1510400000006
+            },
+            {
+              "atMs": 1666.568201,
+              "kind": "pan",
+              "completedAtMs": 1672.3128429999997
+            },
+            {
+              "atMs": 1683.7799560000003,
+              "kind": "pan",
+              "completedAtMs": 1701.4787660000002
+            },
+            {
+              "atMs": 1698.972718000001,
+              "kind": "pan",
+              "completedAtMs": 1703.6906490000001
+            },
+            {
+              "atMs": 1715.8466129999997,
+              "kind": "pan",
+              "completedAtMs": 1721.9884230000007
+            },
+            {
+              "atMs": 1733.0181510000002,
+              "kind": "pan",
+              "completedAtMs": 1738.077564000001
+            },
+            {
+              "atMs": 1749.2114340000007,
+              "kind": "pan",
+              "completedAtMs": 1755.0146920000007
+            },
+            {
+              "atMs": 1766.1967679999998,
+              "kind": "pan",
+              "completedAtMs": 1770.9944000000014
+            },
+            {
+              "atMs": 1782.0703599999997,
+              "kind": "pan",
+              "completedAtMs": 1787.3348860000006
+            },
+            {
+              "atMs": 1799.5018020000007,
+              "kind": "pan",
+              "completedAtMs": 1804.4964740000014
+            },
+            {
+              "atMs": 1816.063338,
+              "kind": "pan",
+              "completedAtMs": 1820.6868000000013
+            },
+            {
+              "atMs": 1832.0083009999998,
+              "kind": "pan",
+              "completedAtMs": 1837.3597179999997
+            },
+            {
+              "atMs": 1849.5445580000014,
+              "kind": "pan",
+              "completedAtMs": 1854.3245370000004
+            },
+            {
+              "atMs": 1866.120105,
+              "kind": "pan",
+              "completedAtMs": 1871.2557859999997
+            },
+            {
+              "atMs": 1883.3800449999999,
+              "kind": "pan",
+              "completedAtMs": 1904.141536000001
+            },
+            {
+              "atMs": 1900.5746740000013,
+              "kind": "pan",
+              "completedAtMs": 1904.205591
+            },
+            {
+              "atMs": 1916.075108000001,
+              "kind": "pan",
+              "completedAtMs": 1921.0539580000004
+            },
+            {
+              "atMs": 1932.2071520000009,
+              "kind": "pan",
+              "completedAtMs": 1938.6456800000014
+            },
+            {
+              "atMs": 1948.7535270000008,
+              "kind": "pan",
+              "completedAtMs": 1954.5700750000015
+            },
+            {
+              "atMs": 1966.2661710000011,
+              "kind": "pan",
+              "completedAtMs": 1970.8694770000002
+            },
+            {
+              "atMs": 1982.0071740000003,
+              "kind": "pan",
+              "completedAtMs": 1987.5202430000008
+            },
+            {
+              "atMs": 2019.7278180000012,
+              "kind": "zoom",
+              "completedAtMs": 2036.8979830000007
+            },
+            {
+              "atMs": 2021.2993970000007,
+              "kind": "zoom",
+              "completedAtMs": 2036.712601000001
+            },
+            {
+              "atMs": 2032.5610580000011,
+              "kind": "zoom",
+              "completedAtMs": 2036.9192660000008
+            },
+            {
+              "atMs": 2049.9560309999997,
+              "kind": "zoom",
+              "completedAtMs": 2069.8957100000007
+            },
+            {
+              "atMs": 2065.714177,
+              "kind": "zoom",
+              "completedAtMs": 2086.2903189999997
+            },
+            {
+              "atMs": 2083.0754859999997,
+              "kind": "zoom",
+              "completedAtMs": 2103.0291159999997
+            },
+            {
+              "atMs": 2099.424992,
+              "kind": "zoom",
+              "completedAtMs": 2119.3986210000003
+            },
+            {
+              "atMs": 2116.2057780000014,
+              "kind": "zoom",
+              "completedAtMs": 2136.135110000001
+            },
+            {
+              "atMs": 2133.5308029999997,
+              "kind": "zoom",
+              "completedAtMs": 2153.455167
+            },
+            {
+              "atMs": 2150.007222,
+              "kind": "zoom",
+              "completedAtMs": 2170.1348080000007
+            },
+            {
+              "atMs": 2166.7069819999997,
+              "kind": "zoom",
+              "completedAtMs": 2186.700726000001
+            },
+            {
+              "atMs": 2183.353016000001,
+              "kind": "zoom",
+              "completedAtMs": 2203.255499000001
+            },
+            {
+              "atMs": 2199.789007000001,
+              "kind": "zoom",
+              "completedAtMs": 2219.757413000001
+            },
+            {
+              "atMs": 2216.4036750000014,
+              "kind": "zoom",
+              "completedAtMs": 2236.003304
+            },
+            {
+              "atMs": 2233.5661760000003,
+              "kind": "zoom",
+              "completedAtMs": 2252.925763000001
+            },
+            {
+              "atMs": 2249.7584939999997,
+              "kind": "zoom",
+              "completedAtMs": 2269.841990000001
+            },
+            {
+              "atMs": 2266.0760740000005,
+              "kind": "zoom",
+              "completedAtMs": 2286.3355900000006
+            },
+            {
+              "atMs": 2282.095905,
+              "kind": "zoom",
+              "completedAtMs": 2302.8718129999997
+            },
+            {
+              "atMs": 2299.9382990000013,
+              "kind": "zoom",
+              "completedAtMs": 2319.5971100000006
+            },
+            {
+              "atMs": 2315.972978,
+              "kind": "zoom",
+              "completedAtMs": 2336.3628719999997
+            },
+            {
+              "atMs": 2333.578592,
+              "kind": "zoom",
+              "completedAtMs": 2353.298054000001
+            },
+            {
+              "atMs": 2350.491863000001,
+              "kind": "zoom",
+              "completedAtMs": 2369.6293000000005
+            },
+            {
+              "atMs": 2367.595201,
+              "kind": "zoom",
+              "completedAtMs": 2386.500680000001
+            },
+            {
+              "atMs": 2383.435482000001,
+              "kind": "zoom",
+              "completedAtMs": 2403.0853320000006
+            },
+            {
+              "atMs": 2400.690939,
+              "kind": "zoom",
+              "completedAtMs": 2419.563236
+            },
+            {
+              "atMs": 2416.2259360000007,
+              "kind": "zoom",
+              "completedAtMs": 2436.4270990000005
+            },
+            {
+              "atMs": 2433.4321180000006,
+              "kind": "zoom",
+              "completedAtMs": 2453.236721000001
+            },
+            {
+              "atMs": 2450.5732610000014,
+              "kind": "zoom",
+              "completedAtMs": 2469.4019559999997
+            },
+            {
+              "atMs": 2466.470752000001,
+              "kind": "zoom",
+              "completedAtMs": 2486.815574
+            },
+            {
+              "atMs": 2483.4741860000013,
+              "kind": "zoom",
+              "completedAtMs": 2503.183534
+            },
+            {
+              "atMs": 2500.0079560000013,
+              "kind": "zoom",
+              "completedAtMs": 2519.900160000001
+            },
+            {
+              "atMs": 2516.611748000001,
+              "kind": "zoom",
+              "completedAtMs": 2536.6455690000003
+            },
+            {
+              "atMs": 2533.0506590000005,
+              "kind": "zoom",
+              "completedAtMs": 2552.8812390000003
+            },
+            {
+              "atMs": 2548.7476590000006,
+              "kind": "zoom",
+              "completedAtMs": 2569.882628000001
+            },
+            {
+              "atMs": 2565.884957,
+              "kind": "zoom",
+              "completedAtMs": 2586.5554890000003
+            },
+            {
+              "atMs": 2583.0610159999997,
+              "kind": "zoom",
+              "completedAtMs": 2603.405917
+            },
+            {
+              "atMs": 2598.7250320000003,
+              "kind": "zoom",
+              "completedAtMs": 2620.061603
+            },
+            {
+              "atMs": 2615.6574360000013,
+              "kind": "zoom",
+              "completedAtMs": 2637.7745110000014
+            },
+            {
+              "atMs": 2633.2836750000006,
+              "kind": "zoom",
+              "completedAtMs": 2653.1849700000002
+            },
+            {
+              "atMs": 2649.9499910000013,
+              "kind": "zoom",
+              "completedAtMs": 2669.784165000001
+            },
+            {
+              "atMs": 2666.082276000001,
+              "kind": "zoom",
+              "completedAtMs": 2686.6109620000007
+            },
+            {
+              "atMs": 2681.898065000001,
+              "kind": "zoom",
+              "completedAtMs": 2703.180709
+            },
+            {
+              "atMs": 2698.707676,
+              "kind": "zoom",
+              "completedAtMs": 2719.605402000001
+            },
+            {
+              "atMs": 2715.541789000001,
+              "kind": "zoom",
+              "completedAtMs": 2736.698126000001
+            },
+            {
+              "atMs": 2732.8087160000014,
+              "kind": "zoom",
+              "completedAtMs": 2753.102922
+            },
+            {
+              "atMs": 2749.5884920000008,
+              "kind": "zoom",
+              "completedAtMs": 2769.554529000001
+            },
+            {
+              "atMs": 2766.703300000001,
+              "kind": "zoom",
+              "completedAtMs": 2786.764217
+            },
+            {
+              "atMs": 2782.6858630000006,
+              "kind": "zoom",
+              "completedAtMs": 2802.8620420000007
+            },
+            {
+              "atMs": 2800.5832609999998,
+              "kind": "zoom",
+              "completedAtMs": 2819.7337450000014
+            },
+            {
+              "atMs": 2815.9769429999997,
+              "kind": "zoom",
+              "completedAtMs": 2836.594720000001
+            },
+            {
+              "atMs": 2832.888474000001,
+              "kind": "zoom",
+              "completedAtMs": 2852.7364640000014
+            },
+            {
+              "atMs": 2849.2987950000006,
+              "kind": "zoom",
+              "completedAtMs": 2869.639956000001
+            },
+            {
+              "atMs": 2866.9093310000007,
+              "kind": "zoom",
+              "completedAtMs": 2886.4788850000004
+            },
+            {
+              "atMs": 2882.845889,
+              "kind": "zoom",
+              "completedAtMs": 2902.8643060000013
+            },
+            {
+              "atMs": 2899.322472,
+              "kind": "zoom",
+              "completedAtMs": 2919.8938450000005
+            },
+            {
+              "atMs": 2916.9497060000012,
+              "kind": "zoom",
+              "completedAtMs": 2936.342232000001
+            },
+            {
+              "atMs": 2932.6459080000004,
+              "kind": "zoom",
+              "completedAtMs": 2952.9857859999993
+            },
+            {
+              "atMs": 2950.329201999999,
+              "kind": "zoom",
+              "completedAtMs": 2969.750575
+            },
+            {
+              "atMs": 2967.1989760000015,
+              "kind": "zoom",
+              "completedAtMs": 2986.3051460000006
+            },
+            {
+              "atMs": 2983.296346000001,
+              "kind": "zoom",
+              "completedAtMs": 3003.6412839999994
+            },
+            {
+              "atMs": 3000.242174000001,
+              "kind": "zoom",
+              "completedAtMs": 3022.152830000001
+            },
+            {
+              "atMs": 3016.8143790000013,
+              "kind": "zoom",
+              "completedAtMs": 3036.5503230000013
+            },
+            {
+              "atMs": 3032.749442000002,
+              "kind": "zoom",
+              "completedAtMs": 3053.237510000001
+            },
+            {
+              "atMs": 3048.894269999999,
+              "kind": "zoom",
+              "completedAtMs": 3069.487131
+            },
+            {
+              "atMs": 3066.4898120000016,
+              "kind": "zoom",
+              "completedAtMs": 3086.4378530000013
+            },
+            {
+              "atMs": 3083.398124000001,
+              "kind": "zoom",
+              "completedAtMs": 3103.0363610000004
+            },
+            {
+              "atMs": 3100.6520199999995,
+              "kind": "zoom",
+              "completedAtMs": 3119.965538999999
+            },
+            {
+              "atMs": 3116.285447,
+              "kind": "zoom",
+              "completedAtMs": 3136.4886320000023
+            },
+            {
+              "atMs": 3133.0845659999995,
+              "kind": "zoom",
+              "completedAtMs": 3153.5037009999996
+            },
+            {
+              "atMs": 3149.628418000002,
+              "kind": "zoom",
+              "completedAtMs": 3170.102982000002
+            },
+            {
+              "atMs": 3165.7090890000018,
+              "kind": "zoom",
+              "completedAtMs": 3186.528336000001
+            },
+            {
+              "atMs": 3183.014277,
+              "kind": "zoom",
+              "completedAtMs": 3202.975220000002
+            },
+            {
+              "atMs": 3198.612712,
+              "kind": "zoom",
+              "completedAtMs": 3219.61038
+            },
+            {
+              "atMs": 3216.7316560000017,
+              "kind": "zoom",
+              "completedAtMs": 3236.1622670000015
+            },
+            {
+              "atMs": 3233.573039000001,
+              "kind": "zoom",
+              "completedAtMs": 3253.0408030000017
+            },
+            {
+              "atMs": 3250.2842550000005,
+              "kind": "zoom",
+              "completedAtMs": 3269.747078999999
+            },
+            {
+              "atMs": 3267.504612999999,
+              "kind": "zoom",
+              "completedAtMs": 3286.2126929999995
+            },
+            {
+              "atMs": 3283.494531000002,
+              "kind": "zoom",
+              "completedAtMs": 3302.873626999999
+            },
+            {
+              "atMs": 3300.4355670000023,
+              "kind": "zoom",
+              "completedAtMs": 3319.819439000001
+            },
+            {
+              "atMs": 3316.1390550000015,
+              "kind": "zoom",
+              "completedAtMs": 3336.226165000002
+            },
+            {
+              "atMs": 3331.9361130000016,
+              "kind": "zoom",
+              "completedAtMs": 3352.7336799999994
+            },
+            {
+              "atMs": 3349.357009000001,
+              "kind": "zoom",
+              "completedAtMs": 3369.8043530000014
+            },
+            {
+              "atMs": 3367.428140000002,
+              "kind": "zoom",
+              "completedAtMs": 3386.649072000002
+            },
+            {
+              "atMs": 3382.9668250000013,
+              "kind": "zoom",
+              "completedAtMs": 3402.9625830000023
+            },
+            {
+              "atMs": 3398.819353000001,
+              "kind": "zoom",
+              "completedAtMs": 3419.8538979999994
+            },
+            {
+              "atMs": 3415.9621610000013,
+              "kind": "zoom",
+              "completedAtMs": 3436.669967
+            },
+            {
+              "atMs": 3432.9908940000005,
+              "kind": "zoom",
+              "completedAtMs": 3453.233484999999
+            },
+            {
+              "atMs": 3448.7821029999996,
+              "kind": "zoom",
+              "completedAtMs": 3469.7362980000016
+            },
+            {
+              "atMs": 3466.2533889999995,
+              "kind": "zoom",
+              "completedAtMs": 3486.4965150000007
+            },
+            {
+              "atMs": 3482.8816370000004,
+              "kind": "zoom",
+              "completedAtMs": 3503.1265780000012
+            },
+            {
+              "atMs": 3498.806531,
+              "kind": "zoom",
+              "completedAtMs": 3519.5043000000023
+            },
+            {
+              "atMs": 3515.551250999999,
+              "kind": "zoom",
+              "completedAtMs": 3536.1914180000003
+            },
+            {
+              "atMs": 3532.659052000001,
+              "kind": "zoom",
+              "completedAtMs": 3553.2376940000013
+            },
+            {
+              "atMs": 3550.2322540000005,
+              "kind": "zoom",
+              "completedAtMs": 3569.3728070000016
+            },
+            {
+              "atMs": 3566.405144999999,
+              "kind": "zoom",
+              "completedAtMs": 3586.3298889999987
+            },
+            {
+              "atMs": 3583.553388000002,
+              "kind": "zoom",
+              "completedAtMs": 3602.8161520000012
+            },
+            {
+              "atMs": 3600.2239339999996,
+              "kind": "zoom",
+              "completedAtMs": 3620.0379310000008
+            },
+            {
+              "atMs": 3615.9144240000005,
+              "kind": "zoom",
+              "completedAtMs": 3635.9872379999997
+            },
+            {
+              "atMs": 3632.805720999999,
+              "kind": "zoom",
+              "completedAtMs": 3652.95831
+            },
+            {
+              "atMs": 3649.701278999999,
+              "kind": "zoom",
+              "completedAtMs": 3669.7412559999993
+            },
+            {
+              "atMs": 3666.082655,
+              "kind": "zoom",
+              "completedAtMs": 3686.553785000002
+            },
+            {
+              "atMs": 3682.763026999999,
+              "kind": "zoom",
+              "completedAtMs": 3702.885569
+            },
+            {
+              "atMs": 3699.217713,
+              "kind": "zoom",
+              "completedAtMs": 3719.7334150000006
+            },
+            {
+              "atMs": 3716.0072070000006,
+              "kind": "zoom",
+              "completedAtMs": 3736.389422000002
+            },
+            {
+              "atMs": 3733.0837730000003,
+              "kind": "zoom",
+              "completedAtMs": 3752.70097
+            },
+            {
+              "atMs": 3749.9660239999994,
+              "kind": "zoom",
+              "completedAtMs": 3769.5339409999997
+            },
+            {
+              "atMs": 3765.8799420000014,
+              "kind": "zoom",
+              "completedAtMs": 3786.289827999999
+            },
+            {
+              "atMs": 3783.53464,
+              "kind": "zoom",
+              "completedAtMs": 3802.7255380000006
+            },
+            {
+              "atMs": 3800.418001,
+              "kind": "zoom",
+              "completedAtMs": 3819.5838920000006
+            },
+            {
+              "atMs": 3815.8516529999997,
+              "kind": "zoom",
+              "completedAtMs": 3836.3322879999996
+            },
+            {
+              "atMs": 3833.52873,
+              "kind": "zoom",
+              "completedAtMs": 3853.318706
+            },
+            {
+              "atMs": 3850.4473320000016,
+              "kind": "zoom",
+              "completedAtMs": 3869.5988500000003
+            },
+            {
+              "atMs": 3866.477022000001,
+              "kind": "zoom",
+              "completedAtMs": 3886.3803439999992
+            },
+            {
+              "atMs": 3883.552185999999,
+              "kind": "zoom",
+              "completedAtMs": 3903.1393880000014
+            },
+            {
+              "atMs": 3900.541271,
+              "kind": "zoom",
+              "completedAtMs": 3919.7111110000023
+            },
+            {
+              "atMs": 3916.1070769999988,
+              "kind": "zoom",
+              "completedAtMs": 3936.7703420000016
+            },
+            {
+              "atMs": 3931.989492999999,
+              "kind": "zoom",
+              "completedAtMs": 3952.845564000001
+            },
+            {
+              "atMs": 3948.8943579999996,
+              "kind": "zoom",
+              "completedAtMs": 3969.6978050000016
+            },
+            {
+              "atMs": 3966.459933,
+              "kind": "zoom",
+              "completedAtMs": 3986.3066340000023
+            },
+            {
+              "atMs": 3983.5393139999996,
+              "kind": "zoom",
+              "completedAtMs": 4002.9544509999996
+            }
+          ],
+          "inputTargetHz": 60,
+          "paintObservationTimesEpochMs": [
+            1793599235330.7002,
+            1793599235347.4001,
+            1793599235364.1,
+            1793599235380.7002,
+            1793599235397.4001,
+            1793599235414,
+            1793599235447.3,
+            1793599235464,
+            1793599235480.7002,
+            1793599235497.3,
+            1793599235514,
+            1793599235530.7002,
+            1793599235547.4001,
+            1793599235564,
+            1793599235580.7002,
+            1793599235597.3,
+            1793599235614.1,
+            1793599235630.7002,
+            1793599235647.4001,
+            1793599235664,
+            1793599235680.7002,
+            1793599235697.4001,
+            1793599235714,
+            1793599235730.7002,
+            1793599235747.4001,
+            1793599235764.1,
+            1793599235780.7002,
+            1793599235797.3,
+            1793599235814.1,
+            1793599235847.3,
+            1793599235864,
+            1793599235880.7002,
+            1793599235897.3,
+            1793599235914,
+            1793599235930.7002,
+            1793599235947.4001,
+            1793599235964,
+            1793599235980.7002,
+            1793599235997.3,
+            1793599236014,
+            1793599236030.7002,
+            1793599236047.4001,
+            1793599236064,
+            1793599236080.7002,
+            1793599236097.4001,
+            1793599236114.1,
+            1793599236130.7002,
+            1793599236147.4001,
+            1793599236164,
+            1793599236180.7002,
+            1793599236214.1,
+            1793599236230.6,
+            1793599236247.3,
+            1793599236264,
+            1793599236280.6,
+            1793599236297.4001,
+            1793599236314.1,
+            1793599236330.7002,
+            1793599236347.3,
+            1793599236364,
+            1793599236380.7002,
+            1793599236397.4001,
+            1793599236414,
+            1793599236430.7002,
+            1793599236447.4001,
+            1793599236464,
+            1793599236480.7002,
+            1793599236497.4001,
+            1793599236514,
+            1793599236530.7002,
+            1793599236564,
+            1793599236580.7002,
+            1793599236597.4001,
+            1793599236630.7002,
+            1793599236647.3,
+            1793599236664,
+            1793599236697.4001,
+            1793599236714,
+            1793599236730.7002,
+            1793599236747.3,
+            1793599236764,
+            1793599236780.6,
+            1793599236797.3,
+            1793599236814,
+            1793599236830.7002,
+            1793599236847.3,
+            1793599236864,
+            1793599236880.7002,
+            1793599236897.3,
+            1793599236914,
+            1793599236930.7002,
+            1793599236947.3,
+            1793599236964,
+            1793599236997.3,
+            1793599237030.6,
+            1793599237047.3,
+            1793599237063.9001,
+            1793599237080.7002,
+            1793599237097.4001,
+            1793599237114,
+            1793599237130.6,
+            1793599237147.3,
+            1793599237163.9001,
+            1793599237180.7002,
+            1793599237197.3,
+            1793599237230.7002,
+            1793599237247.3,
+            1793599237264,
+            1793599237280.7002,
+            1793599237297.3,
+            1793599237314,
+            1793599237380.6,
+            1793599237397.3,
+            1793599237414,
+            1793599237430.6,
+            1793599237447.3,
+            1793599237463.9001,
+            1793599237480.7002,
+            1793599237497.3,
+            1793599237514,
+            1793599237530.6,
+            1793599237547.3,
+            1793599237563.9001,
+            1793599237580.6,
+            1793599237597.3,
+            1793599237614,
+            1793599237630.6,
+            1793599237647.3,
+            1793599237663.9001,
+            1793599237680.6,
+            1793599237697.3,
+            1793599237713.9001,
+            1793599237730.6,
+            1793599237747.3,
+            1793599237764,
+            1793599237780.7002,
+            1793599237797.3,
+            1793599237813.9001,
+            1793599237830.6,
+            1793599237847.3,
+            1793599237863.9001,
+            1793599237880.7002,
+            1793599237897.3,
+            1793599237914,
+            1793599237930.6,
+            1793599237947.3,
+            1793599237964,
+            1793599237980.6,
+            1793599237997.2002,
+            1793599238013.9001,
+            1793599238030.6,
+            1793599238047.3,
+            1793599238063.9001,
+            1793599238080.6,
+            1793599238097.3,
+            1793599238113.9001,
+            1793599238130.6,
+            1793599238147.3,
+            1793599238164,
+            1793599238180.6,
+            1793599238197.3,
+            1793599238213.9001,
+            1793599238230.6,
+            1793599238247.3,
+            1793599238264,
+            1793599238280.6,
+            1793599238297.2002,
+            1793599238314,
+            1793599238330.6,
+            1793599238347.3,
+            1793599238364,
+            1793599238380.6,
+            1793599238397.3,
+            1793599238413.9001,
+            1793599238430.6,
+            1793599238447.3,
+            1793599238464,
+            1793599238480.6,
+            1793599238497.3,
+            1793599238513.9001,
+            1793599238530.6,
+            1793599238547.3,
+            1793599238563.9001,
+            1793599238580.6,
+            1793599238597.3,
+            1793599238613.9001,
+            1793599238630.6,
+            1793599238647.3,
+            1793599238663.9001,
+            1793599238680.6,
+            1793599238697.3,
+            1793599238713.9001,
+            1793599238730.6,
+            1793599238747.2002,
+            1793599238763.9001,
+            1793599238780.5,
+            1793599238797.2002,
+            1793599238813.9001,
+            1793599238830.5,
+            1793599238847.2002,
+            1793599238863.9001,
+            1793599238880.6,
+            1793599238897.3,
+            1793599238913.9001,
+            1793599238930.6,
+            1793599238947.2002,
+            1793599238963.9001,
+            1793599238980.6,
+            1793599238997.3,
+            1793599239013.9001,
+            1793599239030.6,
+            1793599239047.2002,
+            1793599239063.9001,
+            1793599239080.5,
+            1793599239097.2002,
+            1793599239113.9001,
+            1793599239130.6,
+            1793599239147.3,
+            1793599239163.9001,
+            1793599239180.5,
+            1793599239197.2002,
+            1793599239213.9001,
+            1793599239230.6,
+            1793599239247.2002,
+            1793599239263.9001,
+            1793599239280.5,
+            1793599239297.2002,
+            1793599239313.9001
+          ],
+          "drawIntervalsMs": [
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.599853515625,
+            33.300048828125,
+            16.699951171875,
+            16.7001953125,
+            16.599853515625,
+            16.699951171875,
+            16.7001953125,
+            16.699951171875,
+            16.599853515625,
+            16.7001953125,
+            16.599853515625,
+            16.800048828125,
+            16.60009765625,
+            16.699951171875,
+            16.599853515625,
+            16.7001953125,
+            16.699951171875,
+            16.599853515625,
+            16.7001953125,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.599853515625,
+            16.800048828125,
+            33.199951171875,
+            16.699951171875,
+            16.7001953125,
+            16.599853515625,
+            16.699951171875,
+            16.7001953125,
+            16.699951171875,
+            16.599853515625,
+            16.7001953125,
+            16.599853515625,
+            16.699951171875,
+            16.7001953125,
+            16.699951171875,
+            16.599853515625,
+            16.7001953125,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.599853515625,
+            16.7001953125,
+            33.39990234375,
+            16.5,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.800048828125,
+            16.699951171875,
+            16.60009765625,
+            16.599853515625,
+            16.699951171875,
+            16.7001953125,
+            16.699951171875,
+            16.599853515625,
+            16.7001953125,
+            16.699951171875,
+            16.599853515625,
+            16.7001953125,
+            16.699951171875,
+            16.599853515625,
+            16.7001953125,
+            33.2998046875,
+            16.7001953125,
+            16.699951171875,
+            33.300048828125,
+            16.599853515625,
+            16.699951171875,
+            33.400146484375,
+            16.599853515625,
+            16.7001953125,
+            16.599853515625,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.7001953125,
+            16.599853515625,
+            16.699951171875,
+            16.7001953125,
+            16.599853515625,
+            16.699951171875,
+            16.7001953125,
+            16.599853515625,
+            16.699951171875,
+            33.300048828125,
+            33.300048828125,
+            16.699951171875,
+            16.60009765625,
+            16.800048828125,
+            16.699951171875,
+            16.599853515625,
+            16.60009765625,
+            16.699951171875,
+            16.60009765625,
+            16.800048828125,
+            16.599853515625,
+            33.400146484375,
+            16.599853515625,
+            16.699951171875,
+            16.7001953125,
+            16.599853515625,
+            16.699951171875,
+            66.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.60009765625,
+            16.800048828125,
+            16.599853515625,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.699951171875,
+            16.7001953125,
+            16.599853515625,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.800048828125,
+            16.599853515625,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.60009765625,
+            16.7998046875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.599853515625,
+            16.7001953125,
+            16.699951171875,
+            16.599853515625,
+            16.7001953125,
+            16.699951171875,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.599853515625,
+            16.7001953125,
+            16.699951171875,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.599853515625,
+            16.7001953125,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.599853515625,
+            16.7001953125,
+            16.699951171875
+          ],
+          "drawIntervalSummary": {
+            "count": 227,
+            "p50": 16.699951171875,
+            "p95": 16.800048828125,
+            "p99": 33.400146484375,
+            "max": 66.60009765625,
+            "over33ms": 4,
+            "over50ms": 1
+          },
+          "frameIntervalsMs": [
+            16.700000000000017,
+            16.69999999999999,
+            16.599999999999994,
+            16.700000000000017,
+            16.69999999999999,
+            16.600000000000023,
+            16.69999999999999,
+            16.599999999999966,
+            16.700000000000045,
+            16.599999999999966,
+            16.69999999999999,
+            16.700000000000045,
+            16.599999999999966,
+            16.69999999999999,
+            16.700000000000045,
+            16.69999999999999,
+            16.599999999999966,
+            16.700000000000045,
+            16.599999999999966,
+            16.80000000000001,
+            16.600000000000023,
+            16.699999999999932,
+            16.600000000000023,
+            16.700000000000045,
+            16.699999999999932,
+            16.600000000000023,
+            16.700000000000045,
+            16.699999999999932,
+            16.700000000000045,
+            16.600000000000023,
+            16.600000000000023,
+            16.799999999999955,
+            16.600000000000023,
+            16.600000000000023,
+            16.699999999999932,
+            16.700000000000045,
+            16.600000000000023,
+            16.699999999999932,
+            16.700000000000045,
+            16.699999999999932,
+            16.600000000000023,
+            16.700000000000045,
+            16.600000000000023,
+            16.699999999999932,
+            16.700000000000045,
+            16.699999999999932,
+            16.600000000000023,
+            16.700000000000045,
+            16.699999999999932,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.700000000000045,
+            16.700000000000045,
+            16.5,
+            16.700000000000045,
+            16.700000000000045,
+            16.59999999999991,
+            16.799999999999955,
+            16.700000000000045,
+            16.59999999999991,
+            16.600000000000136,
+            16.700000000000045,
+            16.699999999999818,
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.600000000000136,
+            16.700000000000045,
+            16.699999999999818,
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.600000000000136,
+            16.700000000000045,
+            16.699999999999818,
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.600000000000136,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.700000000000045,
+            16.699999999999818,
+            16.600000000000136,
+            16.700000000000045,
+            16.699999999999818,
+            16.600000000000136,
+            16.700000000000045,
+            16.699999999999818,
+            16.600000000000136,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.700000000000045,
+            16.59999999999991,
+            16.799999999999955,
+            16.700000000000045,
+            16.600000000000136,
+            16.59999999999991,
+            16.700000000000045,
+            16.600000000000136,
+            16.799999999999727,
+            16.59999999999991,
+            16.700000000000273,
+            16.699999999999818,
+            16.59999999999991,
+            16.700000000000273,
+            16.699999999999818,
+            16.59999999999991,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.600000000000364,
+            16.799999999999727,
+            16.59999999999991,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.600000000000364,
+            16.699999999999818,
+            16.699999999999818,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.600000000000364,
+            16.699999999999818,
+            16.699999999999818,
+            16.600000000000364,
+            16.699999999999818,
+            16.699999999999818,
+            16.700000000000273,
+            16.699999999999818,
+            16.59999999999991,
+            16.600000000000364,
+            16.699999999999818,
+            16.699999999999818,
+            16.600000000000364,
+            16.799999999999727,
+            16.59999999999991,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.700000000000273,
+            16.59999999999991,
+            16.59999999999991,
+            16.700000000000273,
+            16.699999999999818,
+            16.699999999999818,
+            16.600000000000364,
+            16.699999999999818,
+            16.699999999999818,
+            16.600000000000364,
+            16.699999999999818,
+            16.699999999999818,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.600000000000364,
+            16.699999999999818,
+            16.699999999999818,
+            16.700000000000273,
+            16.59999999999991,
+            16.59999999999991,
+            16.800000000000182,
+            16.59999999999991,
+            16.699999999999818,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.600000000000364,
+            16.699999999999818,
+            16.699999999999818,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.600000000000364,
+            16.699999999999818,
+            16.699999999999818,
+            16.600000000000364,
+            16.699999999999818,
+            16.699999999999818,
+            16.600000000000364,
+            16.699999999999818,
+            16.699999999999818,
+            16.600000000000364,
+            16.699999999999818,
+            16.699999999999818,
+            16.600000000000364,
+            16.699999999999818,
+            16.59999999999991,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.700000000000273,
+            16.699999999999818,
+            16.699999999999818,
+            16.600000000000364,
+            16.699999999999818,
+            16.59999999999991,
+            16.700000000000273,
+            16.699999999999818,
+            16.699999999999818,
+            16.600000000000364,
+            16.699999999999818,
+            16.59999999999991,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.700000000000273,
+            16.699999999999818,
+            16.699999999999818,
+            16.600000000000364,
+            16.59999999999991,
+            16.699999999999818,
+            16.700000000000273,
+            16.699999999999818,
+            16.600000000000364,
+            16.699999999999818,
+            16.599999999999454,
+            16.700000000000728,
+            16.699999999999818
+          ],
+          "frameSummary": {
+            "count": 242,
+            "p50": 16.699999999999818,
+            "p95": 16.700000000000273,
+            "p99": 16.799999999999955,
+            "max": 16.800000000000182,
+            "over33ms": 0,
+            "over50ms": 0
+          },
+          "statusSamples": [
+            {
+              "atEpochMs": 1793599235274.3748,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599235300.6614,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599235326.9036,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599235353.1934,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599235380.1606,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599235406.142,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599235431.767,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599235457.537,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599235483.7637,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599235509.2188,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599235535.0918,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599235560.8503,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599235586.8767,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599235613.1958,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599235638.0173,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599235663.2642,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599235688.159,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599235713.5369,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599235739.9875,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599235765.6218,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599235790.9802,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599235816.659,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599235843.0034,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599235868.4966,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599235895.918,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599235921.8682,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599235947.3716,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599235972.5354,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599235998.8987,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599236024.5898,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599236053.093,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599236079.509,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599236105.5188,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599236131.1309,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236157.1106,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236183.1572,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236208.1484,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236234.387,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236259.5408,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236286.1443,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236312.2131,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236337.3613,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236363.3342,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236388.811,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236414.689,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236440.964,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236466.8542,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236492.4973,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236519.1672,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236545.1787,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236570.946,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236597.3574,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236623.081,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236648.8386,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236674.9841,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236700.5657,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236727.157,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236753.5825,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236779.3633,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236804.7712,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236830.6243,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236856.9583,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236883.4155,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236909.2588,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236935.0532,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236961.0864,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599236988.1538,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237013.1328,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237038.7273,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237065.9893,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237091.8237,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237118.6677,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237145.046,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237171.5088,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237198.1516,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237223.8215,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237250.387,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237275.0002,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237300.321,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237325.754,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237351.6636,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237378.2183,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237404.081,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237429.9443,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237455.7131,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237481.6382,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237507.501,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237534.1475,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237559.5298,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237585.8032,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237613.0576,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237638.316,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237663.2034,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237688.1296,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237713.9216,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237739.1172,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237764.829,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237791.1577,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237817.1074,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237845.8513,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237871.6238,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599237897.2,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599237923.3691,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599237949.5835,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599237975.8513,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238001.4688,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238027.806,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238053.287,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238079.8115,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238105.3418,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238131.0317,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238156.0205,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238181.0667,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238207.0762,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238232.356,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238258.007,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238283.9749,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238309.9844,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238336.3662,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238361.732,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238388.0732,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238413.8682,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238439.745,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238466.371,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238491.709,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238518.201,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238543.27,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238569.1382,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238594.21,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238619.8599,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238646.1445,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238671.1338,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238696.1755,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238721.607,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238748.4583,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238775.0046,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238801.5312,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238827.976,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238853.9268,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238880.187,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238905.9136,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238932.5273,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238958.4766,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599238984.5122,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599239010.0037,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599239035.689,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599239063.0566,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599239088.3157,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599239113.8865,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599239139.2183,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599239165.134,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599239190.2256,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599239215.6047,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599239241.3564,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599239267.069,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599239292.2432,
+              "pending": false
+            }
+          ],
+          "observedPendingFrameIntervalsMs": [
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.700000000000045,
+            16.700000000000045,
+            16.5,
+            16.700000000000045,
+            16.700000000000045,
+            16.59999999999991,
+            16.799999999999955,
+            16.700000000000045,
+            16.59999999999991,
+            16.600000000000136,
+            16.700000000000045,
+            16.699999999999818,
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.600000000000136,
+            16.700000000000045,
+            16.699999999999818,
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.600000000000136,
+            16.700000000000045,
+            16.699999999999818,
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.600000000000136,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.700000000000045,
+            16.699999999999818,
+            16.600000000000136,
+            16.700000000000045,
+            16.699999999999818,
+            16.600000000000136,
+            16.700000000000045,
+            16.699999999999818,
+            16.600000000000136,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.700000000000045,
+            16.59999999999991,
+            16.799999999999955,
+            16.700000000000045,
+            16.600000000000136,
+            16.59999999999991,
+            16.700000000000045,
+            16.600000000000136,
+            16.799999999999727,
+            16.59999999999991,
+            16.700000000000273,
+            16.699999999999818,
+            16.59999999999991,
+            16.700000000000273,
+            16.699999999999818,
+            16.59999999999991,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.600000000000364,
+            16.799999999999727,
+            16.59999999999991,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.600000000000364,
+            16.699999999999818,
+            16.699999999999818,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.600000000000364,
+            16.699999999999818,
+            16.699999999999818,
+            16.600000000000364,
+            16.699999999999818,
+            16.699999999999818,
+            16.700000000000273,
+            16.699999999999818,
+            16.59999999999991,
+            16.600000000000364,
+            16.699999999999818,
+            16.699999999999818,
+            16.600000000000364,
+            16.799999999999727
+          ],
+          "observedPendingFrameSummary": {
+            "count": 105,
+            "p50": 16.699999999999818,
+            "p95": 16.700000000000273,
+            "p99": 16.799999999999955,
+            "max": 16.799999999999955,
+            "over33ms": 0,
+            "over50ms": 0
+          },
+          "drawCpuMs": [
+            0.5999999046325684,
+            0.6000001430511475,
+            0.2999999523162842,
+            0.39999985694885254,
+            0.40000009536743164,
+            0.5,
+            0.5,
+            0.39999985694885254,
+            0.2999999523162842,
+            0.2999999523162842,
+            0.2999999523162842,
+            0.20000004768371582,
+            0.2999999523162842,
+            0.20000004768371582,
+            0.39999985694885254,
+            0.19999980926513672,
+            0.40000009536743164,
+            0.39999985694885254,
+            0.39999985694885254,
+            0.39999985694885254,
+            0.2999999523162842,
+            0.20000004768371582,
+            0.3000001907348633,
+            0.20000004768371582,
+            0.39999985694885254,
+            0.19999980926513672,
+            0.20000004768371582,
+            0.09999990463256836,
+            0.3000001907348633,
+            0.2999999523162842,
+            0.39999985694885254,
+            0.40000009536743164,
+            0.40000009536743164,
+            0.2999999523162842,
+            0.2999999523162842,
+            0.40000009536743164,
+            0.39999985694885254,
+            0.5,
+            0.2999999523162842,
+            0.2999999523162842,
+            0.20000004768371582,
+            0.20000004768371582,
+            0.2999999523162842,
+            0.39999985694885254,
+            0.40000009536743164,
+            0.40000009536743164,
+            0.2999999523162842,
+            0.2999999523162842,
+            0.19999980926513672,
+            0.5,
+            0.20000004768371582,
+            0.2999999523162842,
+            0.10000014305114746,
+            0.40000009536743164,
+            0.2999999523162842,
+            0.20000004768371582,
+            0.19999980926513672,
+            0.20000004768371582,
+            0.2999999523162842,
+            0.40000009536743164,
+            0.3000001907348633,
+            0.2999999523162842,
+            0.5,
+            0.39999985694885254,
+            0.39999985694885254,
+            0.19999980926513672,
+            0.2999999523162842,
+            0.20000004768371582,
+            0.2999999523162842,
+            0.40000009536743164,
+            0.20000004768371582,
+            0.2999999523162842,
+            0.2999999523162842,
+            0.3000001907348633,
+            0.2999999523162842,
+            0.20000004768371582,
+            0.3000001907348633,
+            0.20000004768371582,
+            0.40000009536743164,
+            0.20000004768371582,
+            0.2999999523162842,
+            0.2999999523162842,
+            0.40000009536743164,
+            0.2999999523162842,
+            0.2999999523162842,
+            0.39999985694885254,
+            0.20000004768371582,
+            0.2999999523162842,
+            0.39999985694885254,
+            0.20000004768371582,
+            0.40000009536743164,
+            0.2999999523162842,
+            0.10000014305114746,
+            0.2999999523162842,
+            0.19999980926513672,
+            0.5,
+            0.40000009536743164,
+            0.5999999046325684,
+            0.20000004768371582,
+            0.2999999523162842,
+            0.3000001907348633,
+            0.10000014305114746,
+            0.2999999523162842,
+            0.20000004768371582,
+            0.2999999523162842,
+            0.3000001907348633,
+            0.40000009536743164,
+            0.40000009536743164,
+            0.40000009536743164,
+            0.2999999523162842,
+            0.2999999523162842,
+            0.5999999046325684,
+            0.5,
+            0.40000009536743164,
+            0.5,
+            0.3000001907348633,
+            0.2999999523162842,
+            0.5999999046325684,
+            0.20000004768371582,
+            0.7000000476837158,
+            0.6000001430511475,
+            0.39999985694885254,
+            0.2999999523162842,
+            0.2999999523162842,
+            0.5999999046325684,
+            0.5,
+            0.5999999046325684,
+            0.39999985694885254,
+            0.6999998092651367,
+            0.40000009536743164,
+            0.2999999523162842,
+            0.40000009536743164,
+            0.2999999523162842,
+            0.5999999046325684,
+            0.5999999046325684,
+            0.7000000476837158,
+            0.3000001907348633,
+            0.40000009536743164,
+            0.7000000476837158,
+            0.5999999046325684,
+            0.5,
+            0.10000014305114746,
+            0.09999990463256836,
+            0.2999999523162842,
+            0.5999999046325684,
+            0.7000000476837158,
+            0.7000000476837158,
+            0.5999999046325684,
+            0.5,
+            0.40000009536743164,
+            0.5,
+            0.40000009536743164,
+            0.6000001430511475,
+            0.5,
+            0.39999985694885254,
+            0.6000001430511475,
+            0.39999985694885254,
+            0.6000001430511475,
+            0.5,
+            0.2999999523162842,
+            0.6000001430511475,
+            0.40000009536743164,
+            0.20000004768371582,
+            0.5,
+            0.20000004768371582,
+            0.2999999523162842,
+            0.40000009536743164,
+            0.20000004768371582,
+            0.40000009536743164,
+            1.1000001430511475,
+            0.39999985694885254,
+            0.2999999523162842,
+            0.20000004768371582,
+            0.39999985694885254,
+            0.6000001430511475,
+            0.5,
+            0.5,
+            0.40000009536743164,
+            0.2999999523162842,
+            0.40000009536743164,
+            0.40000009536743164,
+            0.20000004768371582,
+            0.19999980926513672,
+            0.39999985694885254,
+            0.2999999523162842,
+            0.2999999523162842,
+            0.5,
+            0.5,
+            0.19999980926513672,
+            0.2999999523162842,
+            0.39999985694885254,
+            0.6000001430511475,
+            0.39999985694885254,
+            0.2999999523162842,
+            0.20000004768371582,
+            0.39999985694885254,
+            0.2999999523162842,
+            0.5,
+            0.5,
+            0.39999985694885254,
+            0.20000004768371582,
+            0.5,
+            0.3000001907348633,
+            0.40000009536743164,
+            0.19999980926513672,
+            0.20000004768371582,
+            0.20000004768371582,
+            0.39999985694885254,
+            0.40000009536743164,
+            0.5999999046325684,
+            0.2999999523162842,
+            0.39999985694885254,
+            0.40000009536743164,
+            0.5,
+            0.2999999523162842,
+            0.2999999523162842,
+            0.2999999523162842,
+            0.39999985694885254,
+            0.5,
+            0.5999999046325684,
+            0.5,
+            0.5,
+            0.40000009536743164,
+            0.5,
+            1.7000000476837158,
+            0.40000009536743164,
+            0.5,
+            0.2999999523162842,
+            0.40000009536743164
+          ],
+          "drawSummary": {
+            "count": 229,
+            "p50": 0.39999985694885254,
+            "p95": 0.6000001430511475,
+            "p99": 0.7000000476837158,
+            "max": 1.7000000476837158,
+            "over33ms": 0,
+            "over50ms": 0
+          },
+          "longFrames": [],
+          "finalFrame": {
+            "snapshot": "bddca74c84b6dc9aa71c2ac4dc4e9af6b9ae47cdb71b076b8a17545f75216e1d",
+            "camera": {
+              "x": -27.85683041377257,
+              "y": -16.93467684476684,
+              "scale": 0.5404177679677542
+            },
+            "visibleFiles": 23,
+            "labels": 23,
+            "width": 572,
+            "height": 580
+          },
+          "requestMs": [],
+          "nativeRss": {
+            "currentKiB": 4489560,
+            "highWaterKiB": 4489560
+          }
+        },
+        {
+          "sample": 0,
+          "condition": "refresh",
+          "elapsedMs": 4051.6552520000005,
+          "pendingObservations": 106,
+          "publishedRefresh": {
+            "schema": 1,
+            "name": "linux",
+            "generation": 2,
+            "snapshot": "23a7c5bb5faeff369699d01e79507f4711d68280b73951437de7203f3a5adb94",
+            "pending": true,
+            "measurements": {
+              "files": 66066,
+              "analyzed": 66066,
+              "source_only": 0,
+              "bytes": 57153913,
+              "read_files": 3,
+              "retained": 66063,
+              "reconciled": false,
+              "parsed": 3,
+              "reused": 66063,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 11.136181,
+              "total_ms": 988.9648239999999
+            },
+            "error": null,
+            "observation": "native directory watches + 2 s reconciliation"
+          },
+          "inputs": [
+            {
+              "atMs": 83.33927300000141,
+              "kind": "pan",
+              "completedAtMs": 86.16796299999987
+            },
+            {
+              "atMs": 84.00896999999895,
+              "kind": "pan",
+              "completedAtMs": 86.24940400000196
+            },
+            {
+              "atMs": 84.86512099999891,
+              "kind": "pan",
+              "completedAtMs": 86.808986
+            },
+            {
+              "atMs": 85.80630999999994,
+              "kind": "pan",
+              "completedAtMs": 87.76795499999935
+            },
+            {
+              "atMs": 86.7040960000013,
+              "kind": "pan",
+              "completedAtMs": 88.66604400000142
+            },
+            {
+              "atMs": 87.683097000001,
+              "kind": "pan",
+              "completedAtMs": 98.54415199999858
+            },
+            {
+              "atMs": 100.62430500000119,
+              "kind": "pan",
+              "completedAtMs": 114.8759710000013
+            },
+            {
+              "atMs": 115.94748800000161,
+              "kind": "pan",
+              "completedAtMs": 131.82060400000046
+            },
+            {
+              "atMs": 132.8961449999988,
+              "kind": "pan",
+              "completedAtMs": 148.6008980000006
+            },
+            {
+              "atMs": 149.65407499999856,
+              "kind": "pan",
+              "completedAtMs": 166.03642200000104
+            },
+            {
+              "atMs": 165.72263400000156,
+              "kind": "pan",
+              "completedAtMs": 182.22731700000077
+            },
+            {
+              "atMs": 183.3286799999987,
+              "kind": "pan",
+              "completedAtMs": 199.17922499999986
+            },
+            {
+              "atMs": 198.76307100000122,
+              "kind": "pan",
+              "completedAtMs": 215.44681000000128
+            },
+            {
+              "atMs": 216.55855000000156,
+              "kind": "pan",
+              "completedAtMs": 232.01813400000174
+            },
+            {
+              "atMs": 232.92548399999941,
+              "kind": "pan",
+              "completedAtMs": 249.03149100000155
+            },
+            {
+              "atMs": 248.67971899999975,
+              "kind": "pan",
+              "completedAtMs": 265.43627299999935
+            },
+            {
+              "atMs": 266.53264000000127,
+              "kind": "pan",
+              "completedAtMs": 282.1297349999986
+            },
+            {
+              "atMs": 283.2193479999987,
+              "kind": "pan",
+              "completedAtMs": 299.75138199999856
+            },
+            {
+              "atMs": 298.7523309999997,
+              "kind": "pan",
+              "completedAtMs": 315.22997899999973
+            },
+            {
+              "atMs": 316.327193000001,
+              "kind": "pan",
+              "completedAtMs": 333.260714
+            },
+            {
+              "atMs": 332.90486800000144,
+              "kind": "pan",
+              "completedAtMs": 349.12215600000127
+            },
+            {
+              "atMs": 348.7907870000017,
+              "kind": "pan",
+              "completedAtMs": 365.2802460000021
+            },
+            {
+              "atMs": 366.3676039999991,
+              "kind": "pan",
+              "completedAtMs": 382.29365400000097
+            },
+            {
+              "atMs": 383.3864390000017,
+              "kind": "pan",
+              "completedAtMs": 398.97891000000163
+            },
+            {
+              "atMs": 398.7342749999989,
+              "kind": "pan",
+              "completedAtMs": 416.47715900000185
+            },
+            {
+              "atMs": 416.1705839999995,
+              "kind": "pan",
+              "completedAtMs": 432.9165189999985
+            },
+            {
+              "atMs": 431.825165000002,
+              "kind": "pan",
+              "completedAtMs": 449.78825900000083
+            },
+            {
+              "atMs": 448.82224900000074,
+              "kind": "pan",
+              "completedAtMs": 466.04649699999936
+            },
+            {
+              "atMs": 465.77895799999897,
+              "kind": "pan",
+              "completedAtMs": 481.9303599999985
+            },
+            {
+              "atMs": 483.0389639999994,
+              "kind": "pan",
+              "completedAtMs": 498.0959619999994
+            },
+            {
+              "atMs": 499.19167799999923,
+              "kind": "pan",
+              "completedAtMs": 516.9561570000005
+            },
+            {
+              "atMs": 515.878510999999,
+              "kind": "pan",
+              "completedAtMs": 533.2290109999994
+            },
+            {
+              "atMs": 532.8212170000006,
+              "kind": "pan",
+              "completedAtMs": 551.081814000001
+            },
+            {
+              "atMs": 549.1855649999998,
+              "kind": "pan",
+              "completedAtMs": 566.2328989999987
+            },
+            {
+              "atMs": 565.9053869999989,
+              "kind": "pan",
+              "completedAtMs": 582.4000019999985
+            },
+            {
+              "atMs": 583.5314330000001,
+              "kind": "pan",
+              "completedAtMs": 599.1002049999988
+            },
+            {
+              "atMs": 600.192160999999,
+              "kind": "pan",
+              "completedAtMs": 616.0830590000005
+            },
+            {
+              "atMs": 615.8131649999996,
+              "kind": "pan",
+              "completedAtMs": 631.9760180000012
+            },
+            {
+              "atMs": 633.1089240000001,
+              "kind": "pan",
+              "completedAtMs": 649.1360029999996
+            },
+            {
+              "atMs": 648.8590379999987,
+              "kind": "pan",
+              "completedAtMs": 665.6437189999997
+            },
+            {
+              "atMs": 665.6574010000004,
+              "kind": "pan",
+              "completedAtMs": 682.0292460000019
+            },
+            {
+              "atMs": 683.1304180000006,
+              "kind": "pan",
+              "completedAtMs": 700.2710420000003
+            },
+            {
+              "atMs": 699.244880000002,
+              "kind": "pan",
+              "completedAtMs": 714.5174450000013
+            },
+            {
+              "atMs": 716.6231570000018,
+              "kind": "pan",
+              "completedAtMs": 732.1030360000004
+            },
+            {
+              "atMs": 733.241575,
+              "kind": "pan",
+              "completedAtMs": 748.4435029999986
+            },
+            {
+              "atMs": 749.5411889999996,
+              "kind": "pan",
+              "completedAtMs": 765.3474580000002
+            },
+            {
+              "atMs": 766.4418960000003,
+              "kind": "pan",
+              "completedAtMs": 784.6181079999988
+            },
+            {
+              "atMs": 783.5390299999999,
+              "kind": "pan",
+              "completedAtMs": 798.2833940000019
+            },
+            {
+              "atMs": 800.407267999999,
+              "kind": "pan",
+              "completedAtMs": 814.6451750000015
+            },
+            {
+              "atMs": 816.7387019999987,
+              "kind": "pan",
+              "completedAtMs": 831.9259160000001
+            },
+            {
+              "atMs": 833.0405099999989,
+              "kind": "pan",
+              "completedAtMs": 848.3634459999994
+            },
+            {
+              "atMs": 849.4757959999988,
+              "kind": "pan",
+              "completedAtMs": 865.6719430000012
+            },
+            {
+              "atMs": 865.7055360000013,
+              "kind": "pan",
+              "completedAtMs": 882.0364259999988
+            },
+            {
+              "atMs": 883.1445429999985,
+              "kind": "pan",
+              "completedAtMs": 898.4354759999987
+            },
+            {
+              "atMs": 899.5150119999998,
+              "kind": "pan",
+              "completedAtMs": 915.2763139999988
+            },
+            {
+              "atMs": 916.3983740000003,
+              "kind": "pan",
+              "completedAtMs": 932.6071469999988
+            },
+            {
+              "atMs": 931.8982370000012,
+              "kind": "pan",
+              "completedAtMs": 948.1131649999988
+            },
+            {
+              "atMs": 949.2368339999994,
+              "kind": "pan",
+              "completedAtMs": 965.0458040000012
+            },
+            {
+              "atMs": 966.4677609999999,
+              "kind": "pan",
+              "completedAtMs": 981.7374779999991
+            },
+            {
+              "atMs": 982.8686249999992,
+              "kind": "pan",
+              "completedAtMs": 999.1735030000018
+            },
+            {
+              "atMs": 998.8405969999985,
+              "kind": "pan",
+              "completedAtMs": 1014.847904000002
+            },
+            {
+              "atMs": 1015.9490499999993,
+              "kind": "pan",
+              "completedAtMs": 1031.8397140000015
+            },
+            {
+              "atMs": 1032.9354439999988,
+              "kind": "pan",
+              "completedAtMs": 1047.8478829999985
+            },
+            {
+              "atMs": 1048.920109999999,
+              "kind": "pan",
+              "completedAtMs": 1065.645198000002
+            },
+            {
+              "atMs": 1065.6701380000013,
+              "kind": "pan",
+              "completedAtMs": 1081.7371329999987
+            },
+            {
+              "atMs": 1082.836181999999,
+              "kind": "pan",
+              "completedAtMs": 1098.369426000001
+            },
+            {
+              "atMs": 1099.5902290000013,
+              "kind": "pan",
+              "completedAtMs": 1115.4260070000018
+            },
+            {
+              "atMs": 1116.582237999999,
+              "kind": "pan",
+              "completedAtMs": 1134.7040469999993
+            },
+            {
+              "atMs": 1133.2377830000005,
+              "kind": "pan",
+              "completedAtMs": 1148.0206240000007
+            },
+            {
+              "atMs": 1149.3099320000001,
+              "kind": "pan",
+              "completedAtMs": 1166.878209999999
+            },
+            {
+              "atMs": 1166.302724000001,
+              "kind": "pan",
+              "completedAtMs": 1181.9037749999989
+            },
+            {
+              "atMs": 1181.6972270000006,
+              "kind": "pan",
+              "completedAtMs": 1198.6499900000017
+            },
+            {
+              "atMs": 1199.7246400000004,
+              "kind": "pan",
+              "completedAtMs": 1215.3760890000012
+            },
+            {
+              "atMs": 1216.4820470000013,
+              "kind": "pan",
+              "completedAtMs": 1232.5299999999988
+            },
+            {
+              "atMs": 1231.8698750000003,
+              "kind": "pan",
+              "completedAtMs": 1248.9325290000015
+            },
+            {
+              "atMs": 1248.720401999999,
+              "kind": "pan",
+              "completedAtMs": 1265.4039169999996
+            },
+            {
+              "atMs": 1266.5308609999993,
+              "kind": "pan",
+              "completedAtMs": 1281.5763819999993
+            },
+            {
+              "atMs": 1283.6429040000003,
+              "kind": "pan",
+              "completedAtMs": 1299.0745959999986
+            },
+            {
+              "atMs": 1300.1635180000012,
+              "kind": "pan",
+              "completedAtMs": 1315.5254539999987
+            },
+            {
+              "atMs": 1316.6016339999987,
+              "kind": "pan",
+              "completedAtMs": 1331.246610000002
+            },
+            {
+              "atMs": 1332.6851109999989,
+              "kind": "pan",
+              "completedAtMs": 1347.977629000001
+            },
+            {
+              "atMs": 1350.1359970000012,
+              "kind": "pan",
+              "completedAtMs": 1364.916842999999
+            },
+            {
+              "atMs": 1366.0135880000016,
+              "kind": "pan",
+              "completedAtMs": 1382.3785979999993
+            },
+            {
+              "atMs": 1383.4863790000018,
+              "kind": "pan",
+              "completedAtMs": 1398.062242
+            },
+            {
+              "atMs": 1400.1430050000017,
+              "kind": "pan",
+              "completedAtMs": 1415.3031169999995
+            },
+            {
+              "atMs": 1416.3863390000006,
+              "kind": "pan",
+              "completedAtMs": 1431.3885149999987
+            },
+            {
+              "atMs": 1433.5105399999993,
+              "kind": "pan",
+              "completedAtMs": 1448.5600190000005
+            },
+            {
+              "atMs": 1450.6416339999996,
+              "kind": "pan",
+              "completedAtMs": 1468.1922010000017
+            },
+            {
+              "atMs": 1466.7429080000002,
+              "kind": "pan",
+              "completedAtMs": 1481.17569
+            },
+            {
+              "atMs": 1483.2715400000016,
+              "kind": "pan",
+              "completedAtMs": 1498.6169750000008
+            },
+            {
+              "atMs": 1500.6572290000004,
+              "kind": "pan",
+              "completedAtMs": 1515.0281409999989
+            },
+            {
+              "atMs": 1516.112562000002,
+              "kind": "pan",
+              "completedAtMs": 1531.5422340000005
+            },
+            {
+              "atMs": 1532.626064,
+              "kind": "pan",
+              "completedAtMs": 1548.0701719999997
+            },
+            {
+              "atMs": 1550.1599610000012,
+              "kind": "pan",
+              "completedAtMs": 1565.2068
+            },
+            {
+              "atMs": 1566.2973679999996,
+              "kind": "pan",
+              "completedAtMs": 1582.6967089999998
+            },
+            {
+              "atMs": 1581.89963,
+              "kind": "pan",
+              "completedAtMs": 1598.382786000002
+            },
+            {
+              "atMs": 1599.501225,
+              "kind": "pan",
+              "completedAtMs": 1614.9089310000018
+            },
+            {
+              "atMs": 1616.007539000002,
+              "kind": "pan",
+              "completedAtMs": 1631.4606280000007
+            },
+            {
+              "atMs": 1633.5881000000008,
+              "kind": "pan",
+              "completedAtMs": 1649.1858119999997
+            },
+            {
+              "atMs": 1650.3440719999999,
+              "kind": "pan",
+              "completedAtMs": 1665.5545669999992
+            },
+            {
+              "atMs": 1666.6890329999987,
+              "kind": "pan",
+              "completedAtMs": 1681.9856099999997
+            },
+            {
+              "atMs": 1683.0736020000004,
+              "kind": "pan",
+              "completedAtMs": 1698.451359999999
+            },
+            {
+              "atMs": 1699.5492049999993,
+              "kind": "pan",
+              "completedAtMs": 1715.0083999999988
+            },
+            {
+              "atMs": 1716.0897460000015,
+              "kind": "pan",
+              "completedAtMs": 1732.711202999999
+            },
+            {
+              "atMs": 1732.0852349999986,
+              "kind": "pan",
+              "completedAtMs": 1749.5944229999986
+            },
+            {
+              "atMs": 1748.9091259999987,
+              "kind": "pan",
+              "completedAtMs": 1765.4088650000012
+            },
+            {
+              "atMs": 1766.5054920000002,
+              "kind": "pan",
+              "completedAtMs": 1781.6056390000012
+            },
+            {
+              "atMs": 1783.6883400000006,
+              "kind": "pan",
+              "completedAtMs": 1798.090862000001
+            },
+            {
+              "atMs": 1800.1990110000006,
+              "kind": "pan",
+              "completedAtMs": 1814.4443150000006
+            },
+            {
+              "atMs": 1816.5275279999987,
+              "kind": "pan",
+              "completedAtMs": 1831.6642350000002
+            },
+            {
+              "atMs": 1832.741957000002,
+              "kind": "pan",
+              "completedAtMs": 1850.0106120000019
+            },
+            {
+              "atMs": 1849.7235550000005,
+              "kind": "pan",
+              "completedAtMs": 1864.978274000001
+            },
+            {
+              "atMs": 1866.1107100000008,
+              "kind": "pan",
+              "completedAtMs": 1883.0133690000002
+            },
+            {
+              "atMs": 1883.0802609999992,
+              "kind": "pan",
+              "completedAtMs": 1898.4058970000006
+            },
+            {
+              "atMs": 1899.5338630000006,
+              "kind": "pan",
+              "completedAtMs": 1914.4677630000006
+            },
+            {
+              "atMs": 1916.551313,
+              "kind": "pan",
+              "completedAtMs": 1931.1010090000018
+            },
+            {
+              "atMs": 1933.1963829999986,
+              "kind": "pan",
+              "completedAtMs": 1947.911827
+            },
+            {
+              "atMs": 1948.9935240000013,
+              "kind": "pan",
+              "completedAtMs": 1964.7413049999996
+            },
+            {
+              "atMs": 1965.822694999999,
+              "kind": "pan",
+              "completedAtMs": 1981.394941999999
+            },
+            {
+              "atMs": 1983.4787770000003,
+              "kind": "pan",
+              "completedAtMs": 1999.529469000001
+            },
+            {
+              "atMs": 2013.7833170000013,
+              "kind": "zoom",
+              "completedAtMs": 2030.3339269999997
+            },
+            {
+              "atMs": 2016.3849499999997,
+              "kind": "zoom",
+              "completedAtMs": 2030.1921470000016
+            },
+            {
+              "atMs": 2032.4596320000019,
+              "kind": "zoom",
+              "completedAtMs": 2063.808408000001
+            },
+            {
+              "atMs": 2049.9295520000014,
+              "kind": "zoom",
+              "completedAtMs": 2080.3454530000017
+            },
+            {
+              "atMs": 2065.960030000002,
+              "kind": "zoom",
+              "completedAtMs": 2096.5454739999986
+            },
+            {
+              "atMs": 2083.5247750000017,
+              "kind": "zoom",
+              "completedAtMs": 2113.595053000001
+            },
+            {
+              "atMs": 2100.6606649999994,
+              "kind": "zoom",
+              "completedAtMs": 2130.2002710000015
+            },
+            {
+              "atMs": 2116.025890000001,
+              "kind": "zoom",
+              "completedAtMs": 2146.9179040000017
+            },
+            {
+              "atMs": 2133.334235999999,
+              "kind": "zoom",
+              "completedAtMs": 2163.119977999999
+            },
+            {
+              "atMs": 2149.020633,
+              "kind": "zoom",
+              "completedAtMs": 2180.142806
+            },
+            {
+              "atMs": 2166.2558150000004,
+              "kind": "zoom",
+              "completedAtMs": 2196.878069999999
+            },
+            {
+              "atMs": 2182.287250000001,
+              "kind": "zoom",
+              "completedAtMs": 2213.5228480000005
+            },
+            {
+              "atMs": 2198.978553000001,
+              "kind": "zoom",
+              "completedAtMs": 2229.9658869999985
+            },
+            {
+              "atMs": 2216.620619000001,
+              "kind": "zoom",
+              "completedAtMs": 2247.2190020000016
+            },
+            {
+              "atMs": 2233.0723179999986,
+              "kind": "zoom",
+              "completedAtMs": 2263.581442999999
+            },
+            {
+              "atMs": 2249.3148770000007,
+              "kind": "zoom",
+              "completedAtMs": 2280.4161889999996
+            },
+            {
+              "atMs": 2266.7355910000006,
+              "kind": "zoom",
+              "completedAtMs": 2297.3550649999997
+            },
+            {
+              "atMs": 2283.500401000001,
+              "kind": "zoom",
+              "completedAtMs": 2313.4035589999985
+            },
+            {
+              "atMs": 2300.040798000002,
+              "kind": "zoom",
+              "completedAtMs": 2330.130602000001
+            },
+            {
+              "atMs": 2316.486552999999,
+              "kind": "zoom",
+              "completedAtMs": 2347.2193140000018
+            },
+            {
+              "atMs": 2333.2495339999987,
+              "kind": "zoom",
+              "completedAtMs": 2363.4250089999987
+            },
+            {
+              "atMs": 2349.381035999999,
+              "kind": "zoom",
+              "completedAtMs": 2379.9615159999994
+            },
+            {
+              "atMs": 2366.536275999999,
+              "kind": "zoom",
+              "completedAtMs": 2397.075778999999
+            },
+            {
+              "atMs": 2383.123104000002,
+              "kind": "zoom",
+              "completedAtMs": 2413.8823340000017
+            },
+            {
+              "atMs": 2399.174922000002,
+              "kind": "zoom",
+              "completedAtMs": 2430.038808000001
+            },
+            {
+              "atMs": 2416.0624470000002,
+              "kind": "zoom",
+              "completedAtMs": 2447.0488750000004
+            },
+            {
+              "atMs": 2432.177695999999,
+              "kind": "zoom",
+              "completedAtMs": 2463.546334999999
+            },
+            {
+              "atMs": 2449.1568689999986,
+              "kind": "zoom",
+              "completedAtMs": 2480.5871689999985
+            },
+            {
+              "atMs": 2466.654437000001,
+              "kind": "zoom",
+              "completedAtMs": 2496.810426
+            },
+            {
+              "atMs": 2483.444359000001,
+              "kind": "zoom",
+              "completedAtMs": 2513.684541999999
+            },
+            {
+              "atMs": 2499.9090990000004,
+              "kind": "zoom",
+              "completedAtMs": 2530.755312000001
+            },
+            {
+              "atMs": 2515.782453,
+              "kind": "zoom",
+              "completedAtMs": 2547.0951889999997
+            },
+            {
+              "atMs": 2533.4395839999997,
+              "kind": "zoom",
+              "completedAtMs": 2563.5002520000016
+            },
+            {
+              "atMs": 2550.1825150000004,
+              "kind": "zoom",
+              "completedAtMs": 2580.3787569999986
+            },
+            {
+              "atMs": 2566.63839,
+              "kind": "zoom",
+              "completedAtMs": 2596.7531310000013
+            },
+            {
+              "atMs": 2583.4676990000007,
+              "kind": "zoom",
+              "completedAtMs": 2613.316583
+            },
+            {
+              "atMs": 2599.8597200000004,
+              "kind": "zoom",
+              "completedAtMs": 2630.0402490000015
+            },
+            {
+              "atMs": 2616.411468000002,
+              "kind": "zoom",
+              "completedAtMs": 2647.065149000002
+            },
+            {
+              "atMs": 2633.194722,
+              "kind": "zoom",
+              "completedAtMs": 2664.0043159999987
+            },
+            {
+              "atMs": 2649.1961249999986,
+              "kind": "zoom",
+              "completedAtMs": 2680.440681
+            },
+            {
+              "atMs": 2666.1561120000006,
+              "kind": "zoom",
+              "completedAtMs": 2696.653064000002
+            },
+            {
+              "atMs": 2682.5970190000007,
+              "kind": "zoom",
+              "completedAtMs": 2713.680672999999
+            },
+            {
+              "atMs": 2699.763751999999,
+              "kind": "zoom",
+              "completedAtMs": 2730.2521720000004
+            },
+            {
+              "atMs": 2716.297340000001,
+              "kind": "zoom",
+              "completedAtMs": 2746.6875150000014
+            },
+            {
+              "atMs": 2732.356463,
+              "kind": "zoom",
+              "completedAtMs": 2763.5480769999995
+            },
+            {
+              "atMs": 2749.793243,
+              "kind": "zoom",
+              "completedAtMs": 2780.695169999999
+            },
+            {
+              "atMs": 2766.958333999999,
+              "kind": "zoom",
+              "completedAtMs": 2796.922197
+            },
+            {
+              "atMs": 2782.817844000001,
+              "kind": "zoom",
+              "completedAtMs": 2813.202217000002
+            },
+            {
+              "atMs": 2799.0067689999996,
+              "kind": "zoom",
+              "completedAtMs": 2830.496374999999
+            },
+            {
+              "atMs": 2816.350354000002,
+              "kind": "zoom",
+              "completedAtMs": 2846.7848669999985
+            },
+            {
+              "atMs": 2832.6138280000014,
+              "kind": "zoom",
+              "completedAtMs": 2863.175115000002
+            },
+            {
+              "atMs": 2849.880443000002,
+              "kind": "zoom",
+              "completedAtMs": 2880.1139360000016
+            },
+            {
+              "atMs": 2866.262705000001,
+              "kind": "zoom",
+              "completedAtMs": 2897.249434000001
+            },
+            {
+              "atMs": 2882.198483,
+              "kind": "zoom",
+              "completedAtMs": 2913.659463
+            },
+            {
+              "atMs": 2899.4074819999987,
+              "kind": "zoom",
+              "completedAtMs": 2930.1617430000006
+            },
+            {
+              "atMs": 2915.7750750000014,
+              "kind": "zoom",
+              "completedAtMs": 2946.986155999999
+            },
+            {
+              "atMs": 2933.2482180000006,
+              "kind": "zoom",
+              "completedAtMs": 2963.733619999999
+            },
+            {
+              "atMs": 2949.2506219999996,
+              "kind": "zoom",
+              "completedAtMs": 2979.838893
+            },
+            {
+              "atMs": 2965.821132000001,
+              "kind": "zoom",
+              "completedAtMs": 2996.998077
+            },
+            {
+              "atMs": 2982.919017,
+              "kind": "zoom",
+              "completedAtMs": 3013.1913060000006
+            },
+            {
+              "atMs": 2999.087703000001,
+              "kind": "zoom",
+              "completedAtMs": 3030.2286160000003
+            },
+            {
+              "atMs": 3016.323117,
+              "kind": "zoom",
+              "completedAtMs": 3046.8834319999987
+            },
+            {
+              "atMs": 3032.3478749999995,
+              "kind": "zoom",
+              "completedAtMs": 3063.4431609999992
+            },
+            {
+              "atMs": 3050.355663000002,
+              "kind": "zoom",
+              "completedAtMs": 3079.9151869999987
+            },
+            {
+              "atMs": 3066.5786829999997,
+              "kind": "zoom",
+              "completedAtMs": 3097.0825030000015
+            },
+            {
+              "atMs": 3083.0669149999994,
+              "kind": "zoom",
+              "completedAtMs": 3113.624060000002
+            },
+            {
+              "atMs": 3099.239597,
+              "kind": "zoom",
+              "completedAtMs": 3130.3660630000013
+            },
+            {
+              "atMs": 3116.736291000001,
+              "kind": "zoom",
+              "completedAtMs": 3146.8164859999997
+            },
+            {
+              "atMs": 3133.451401000002,
+              "kind": "zoom",
+              "completedAtMs": 3163.4439359999997
+            },
+            {
+              "atMs": 3149.9750539999986,
+              "kind": "zoom",
+              "completedAtMs": 3180.2628000000004
+            },
+            {
+              "atMs": 3166.5272619999996,
+              "kind": "zoom",
+              "completedAtMs": 3196.6414240000013
+            },
+            {
+              "atMs": 3182.6732059999995,
+              "kind": "zoom",
+              "completedAtMs": 3213.714831000001
+            },
+            {
+              "atMs": 3199.7233290000004,
+              "kind": "zoom",
+              "completedAtMs": 3230.2238560000005
+            },
+            {
+              "atMs": 3215.8041870000015,
+              "kind": "zoom",
+              "completedAtMs": 3246.946856999999
+            },
+            {
+              "atMs": 3233.7768130000004,
+              "kind": "zoom",
+              "completedAtMs": 3263.546494000002
+            },
+            {
+              "atMs": 3249.0444580000003,
+              "kind": "zoom",
+              "completedAtMs": 3279.977221000001
+            },
+            {
+              "atMs": 3266.6409109999986,
+              "kind": "zoom",
+              "completedAtMs": 3296.7625819999994
+            },
+            {
+              "atMs": 3283.0787600000003,
+              "kind": "zoom",
+              "completedAtMs": 3313.9875810000012
+            },
+            {
+              "atMs": 3298.870153,
+              "kind": "zoom",
+              "completedAtMs": 3329.9688429999987
+            },
+            {
+              "atMs": 3316.125422000001,
+              "kind": "zoom",
+              "completedAtMs": 3346.701505000001
+            },
+            {
+              "atMs": 3332.1310870000016,
+              "kind": "zoom",
+              "completedAtMs": 3363.4484730000004
+            },
+            {
+              "atMs": 3348.7826480000003,
+              "kind": "zoom",
+              "completedAtMs": 3380.0217889999985
+            },
+            {
+              "atMs": 3366.133260999999,
+              "kind": "zoom",
+              "completedAtMs": 3396.686414
+            },
+            {
+              "atMs": 3382.1875739999996,
+              "kind": "zoom",
+              "completedAtMs": 3413.847116000001
+            },
+            {
+              "atMs": 3398.7993840000017,
+              "kind": "zoom",
+              "completedAtMs": 3430.028692
+            },
+            {
+              "atMs": 3415.9573689999997,
+              "kind": "zoom",
+              "completedAtMs": 3446.758156
+            },
+            {
+              "atMs": 3433.1581640000004,
+              "kind": "zoom",
+              "completedAtMs": 3463.266986999999
+            },
+            {
+              "atMs": 3448.872561,
+              "kind": "zoom",
+              "completedAtMs": 3480.179446000002
+            },
+            {
+              "atMs": 3466.3619560000006,
+              "kind": "zoom",
+              "completedAtMs": 3496.5296180000005
+            },
+            {
+              "atMs": 3482.321831000001,
+              "kind": "zoom",
+              "completedAtMs": 3513.7336289999985
+            },
+            {
+              "atMs": 3499.659509000001,
+              "kind": "zoom",
+              "completedAtMs": 3530.0724709999995
+            },
+            {
+              "atMs": 3515.815286000001,
+              "kind": "zoom",
+              "completedAtMs": 3547.2008490000007
+            },
+            {
+              "atMs": 3533.1765410000007,
+              "kind": "zoom",
+              "completedAtMs": 3563.340124999999
+            },
+            {
+              "atMs": 3549.1159689999986,
+              "kind": "zoom",
+              "completedAtMs": 3580.307471
+            },
+            {
+              "atMs": 3566.429701000001,
+              "kind": "zoom",
+              "completedAtMs": 3596.9417319999993
+            },
+            {
+              "atMs": 3583.439187,
+              "kind": "zoom",
+              "completedAtMs": 3613.5170319999997
+            },
+            {
+              "atMs": 3600.5951889999997,
+              "kind": "zoom",
+              "completedAtMs": 3630.08742
+            },
+            {
+              "atMs": 3616.639954000002,
+              "kind": "zoom",
+              "completedAtMs": 3647.051389
+            },
+            {
+              "atMs": 3633.209748000001,
+              "kind": "zoom",
+              "completedAtMs": 3663.360295999999
+            },
+            {
+              "atMs": 3649.1508890000005,
+              "kind": "zoom",
+              "completedAtMs": 3680.269634
+            },
+            {
+              "atMs": 3666.4553610000003,
+              "kind": "zoom",
+              "completedAtMs": 3696.413561000001
+            },
+            {
+              "atMs": 3683.376908000002,
+              "kind": "zoom",
+              "completedAtMs": 3713.5299049999994
+            },
+            {
+              "atMs": 3700.4928169999985,
+              "kind": "zoom",
+              "completedAtMs": 3730.6602669999993
+            },
+            {
+              "atMs": 3716.613741000001,
+              "kind": "zoom",
+              "completedAtMs": 3747.0529989999995
+            },
+            {
+              "atMs": 3732.786737999999,
+              "kind": "zoom",
+              "completedAtMs": 3763.6479010000003
+            },
+            {
+              "atMs": 3750.1894490000013,
+              "kind": "zoom",
+              "completedAtMs": 3780.281902999999
+            },
+            {
+              "atMs": 3765.7378849999986,
+              "kind": "zoom",
+              "completedAtMs": 3796.369476
+            },
+            {
+              "atMs": 3783.6877859999986,
+              "kind": "zoom",
+              "completedAtMs": 3813.8434879999986
+            },
+            {
+              "atMs": 3800.463060000002,
+              "kind": "zoom",
+              "completedAtMs": 3830.2885879999994
+            },
+            {
+              "atMs": 3815.922160000002,
+              "kind": "zoom",
+              "completedAtMs": 3846.719143000002
+            },
+            {
+              "atMs": 3832.9300509999994,
+              "kind": "zoom",
+              "completedAtMs": 3863.071283000001
+            },
+            {
+              "atMs": 3848.828364000001,
+              "kind": "zoom",
+              "completedAtMs": 3880.2413510000006
+            },
+            {
+              "atMs": 3866.2091739999996,
+              "kind": "zoom",
+              "completedAtMs": 3896.475542
+            },
+            {
+              "atMs": 3882.353049000001,
+              "kind": "zoom",
+              "completedAtMs": 3913.5341450000014
+            },
+            {
+              "atMs": 3900.5729949999986,
+              "kind": "zoom",
+              "completedAtMs": 3930.0498000000007
+            },
+            {
+              "atMs": 3916.6391030000013,
+              "kind": "zoom",
+              "completedAtMs": 3946.7505029999993
+            },
+            {
+              "atMs": 3933.177576000002,
+              "kind": "zoom",
+              "completedAtMs": 3963.8559019999993
+            },
+            {
+              "atMs": 3948.8577289999994,
+              "kind": "zoom",
+              "completedAtMs": 3979.791816000001
+            },
+            {
+              "atMs": 3966.736520999999,
+              "kind": "zoom",
+              "completedAtMs": 3996.7475090000007
+            },
+            {
+              "atMs": 3982.905235000002,
+              "kind": "zoom",
+              "completedAtMs": 4013.6598459999987
+            },
+            {
+              "atMs": 3998.830522,
+              "kind": "zoom",
+              "completedAtMs": 4030.5599470000016
+            }
+          ],
+          "inputTargetHz": 60,
+          "paintObservationTimesEpochMs": [
+            1793599239647.3,
+            1793599239664,
+            1793599239680.6,
+            1793599239697.3,
+            1793599239714,
+            1793599239730.7,
+            1793599239747.3,
+            1793599239763.9001,
+            1793599239780.6,
+            1793599239797.3,
+            1793599239813.9001,
+            1793599239830.6,
+            1793599239847.3,
+            1793599239864,
+            1793599239880.6,
+            1793599239897.3,
+            1793599239914,
+            1793599239930.7,
+            1793599239947.3,
+            1793599239963.9001,
+            1793599239980.6,
+            1793599239997.3,
+            1793599240014,
+            1793599240030.6,
+            1793599240047.3,
+            1793599240064,
+            1793599240080.6,
+            1793599240097.3,
+            1793599240114,
+            1793599240130.6,
+            1793599240147.3,
+            1793599240163.9001,
+            1793599240180.6,
+            1793599240197.3,
+            1793599240213.9001,
+            1793599240230.6,
+            1793599240247.3,
+            1793599240263.9001,
+            1793599240280.6,
+            1793599240297.3,
+            1793599240313.9001,
+            1793599240330.6,
+            1793599240347.3,
+            1793599240363.9001,
+            1793599240380.6,
+            1793599240397.2,
+            1793599240413.9001,
+            1793599240430.6,
+            1793599240447.3,
+            1793599240464,
+            1793599240480.6,
+            1793599240497.3,
+            1793599240513.9001,
+            1793599240530.6,
+            1793599240547.2,
+            1793599240564,
+            1793599240580.6,
+            1793599240597.3,
+            1793599240613.9001,
+            1793599240630.6,
+            1793599240647.2,
+            1793599240663.9001,
+            1793599240680.6,
+            1793599240697.3,
+            1793599240713.9001,
+            1793599240730.6,
+            1793599240747.3,
+            1793599240763.9001,
+            1793599240780.6,
+            1793599240797.3,
+            1793599240813.9001,
+            1793599240830.6,
+            1793599240847.2,
+            1793599240864,
+            1793599240880.6,
+            1793599240897.2,
+            1793599240913.9001,
+            1793599240930.6,
+            1793599240947.3,
+            1793599240963.9001,
+            1793599240980.5,
+            1793599240997.3,
+            1793599241013.9001,
+            1793599241030.6,
+            1793599241047.3,
+            1793599241063.9001,
+            1793599241080.6,
+            1793599241097.2,
+            1793599241113.9001,
+            1793599241130.6,
+            1793599241147.2,
+            1793599241163.9001,
+            1793599241180.6,
+            1793599241197.2,
+            1793599241213.9001,
+            1793599241230.6,
+            1793599241247.2,
+            1793599241263.9001,
+            1793599241280.6,
+            1793599241297.2,
+            1793599241313.9001,
+            1793599241330.6,
+            1793599241347.2,
+            1793599241363.9001,
+            1793599241380.6,
+            1793599241397.2,
+            1793599241413.9001,
+            1793599241430.5,
+            1793599241447.3,
+            1793599241463.9001,
+            1793599241480.6,
+            1793599241497.2,
+            1793599241513.9001,
+            1793599241530.6,
+            1793599241547.3,
+            1793599241597.2,
+            1793599241613.9001,
+            1793599241630.5,
+            1793599241647.2,
+            1793599241663.8,
+            1793599241680.5,
+            1793599241697.3,
+            1793599241713.9001,
+            1793599241730.5,
+            1793599241747.3,
+            1793599241763.9001,
+            1793599241780.6,
+            1793599241797.2,
+            1793599241813.9001,
+            1793599241830.6,
+            1793599241847.2,
+            1793599241863.9001,
+            1793599241880.5,
+            1793599241897.2,
+            1793599241913.9001,
+            1793599241930.5,
+            1793599241947.2,
+            1793599241963.8,
+            1793599241980.6,
+            1793599241997.2,
+            1793599242013.9001,
+            1793599242030.6,
+            1793599242047.2,
+            1793599242063.8,
+            1793599242080.5,
+            1793599242097.2,
+            1793599242113.9001,
+            1793599242130.5,
+            1793599242147.2,
+            1793599242163.9001,
+            1793599242180.5,
+            1793599242197.2,
+            1793599242213.9001,
+            1793599242230.6,
+            1793599242247.2,
+            1793599242263.8,
+            1793599242280.6,
+            1793599242297.2,
+            1793599242313.8,
+            1793599242330.6,
+            1793599242347.2,
+            1793599242363.9001,
+            1793599242380.5,
+            1793599242397.2,
+            1793599242413.8,
+            1793599242430.5,
+            1793599242447.2,
+            1793599242463.8,
+            1793599242480.5,
+            1793599242497.2,
+            1793599242513.8,
+            1793599242530.5,
+            1793599242547.2,
+            1793599242563.8,
+            1793599242580.5,
+            1793599242597.2,
+            1793599242613.8,
+            1793599242630.5,
+            1793599242647.2,
+            1793599242663.8,
+            1793599242680.5,
+            1793599242697.2,
+            1793599242713.8,
+            1793599242730.5,
+            1793599242747.2,
+            1793599242763.9001,
+            1793599242780.5,
+            1793599242797.2,
+            1793599242813.8,
+            1793599242830.5,
+            1793599242847.1,
+            1793599242863.9001,
+            1793599242880.5,
+            1793599242897.2,
+            1793599242913.8,
+            1793599242930.5,
+            1793599242947.1,
+            1793599242963.8,
+            1793599242980.5,
+            1793599242997.1,
+            1793599243013.8,
+            1793599243030.5,
+            1793599243047.1,
+            1793599243063.9001,
+            1793599243080.5,
+            1793599243097.1,
+            1793599243113.9001,
+            1793599243130.5,
+            1793599243147.2,
+            1793599243163.8,
+            1793599243180.5,
+            1793599243197.2,
+            1793599243213.9001,
+            1793599243230.5,
+            1793599243247.1,
+            1793599243263.8,
+            1793599243280.5,
+            1793599243297.2,
+            1793599243313.9001,
+            1793599243330.5,
+            1793599243347.2,
+            1793599243363.8,
+            1793599243380.5,
+            1793599243397.1,
+            1793599243413.9001,
+            1793599243430.4001,
+            1793599243447.1,
+            1793599243463.8,
+            1793599243480.4001,
+            1793599243497.1,
+            1793599243513.8,
+            1793599243530.5,
+            1793599243547.1,
+            1793599243563.8
+          ],
+          "drawIntervalsMs": [
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.599853515625,
+            16.7001953125,
+            16.699951171875,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.599853515625,
+            16.800048828125,
+            16.60009765625,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.599853515625,
+            16.7001953125,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.599853515625,
+            16.800048828125,
+            16.60009765625,
+            16.599853515625,
+            16.7001953125,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.599853515625,
+            16.800048828125,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.599853515625,
+            16.7001953125,
+            16.699951171875,
+            16.599853515625,
+            16.7001953125,
+            16.699951171875,
+            16.599853515625,
+            16.7001953125,
+            16.699951171875,
+            16.599853515625,
+            16.7001953125,
+            16.699951171875,
+            16.599853515625,
+            16.7001953125,
+            16.699951171875,
+            16.599853515625,
+            16.7001953125,
+            16.699951171875,
+            16.599853515625,
+            16.7001953125,
+            16.599853515625,
+            16.800048828125,
+            16.60009765625,
+            16.699951171875,
+            16.599853515625,
+            16.7001953125,
+            16.699951171875,
+            16.699951171875,
+            49.89990234375,
+            16.7001953125,
+            16.599853515625,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.800048828125,
+            16.60009765625,
+            16.599853515625,
+            16.800048828125,
+            16.60009765625,
+            16.699951171875,
+            16.599853515625,
+            16.7001953125,
+            16.699951171875,
+            16.599853515625,
+            16.7001953125,
+            16.599853515625,
+            16.699951171875,
+            16.7001953125,
+            16.599853515625,
+            16.699951171875,
+            16.60009765625,
+            16.800048828125,
+            16.599853515625,
+            16.7001953125,
+            16.699951171875,
+            16.599853515625,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.7001953125,
+            16.599853515625,
+            16.699951171875,
+            16.7001953125,
+            16.599853515625,
+            16.699951171875,
+            16.7001953125,
+            16.699951171875,
+            16.599853515625,
+            16.60009765625,
+            16.800048828125,
+            16.599853515625,
+            16.60009765625,
+            16.800048828125,
+            16.599853515625,
+            16.7001953125,
+            16.599853515625,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.7001953125,
+            16.599853515625,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.60009765625,
+            16.800048828125,
+            16.599853515625,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.800048828125,
+            16.599853515625,
+            16.60009765625,
+            16.800048828125,
+            16.599853515625,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.7001953125,
+            16.599853515625,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.699951171875,
+            16.7001953125,
+            16.599853515625,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.60009765625,
+            16.800048828125,
+            16.5,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875,
+            16.699951171875,
+            16.699951171875,
+            16.60009765625,
+            16.699951171875
+          ],
+          "drawIntervalSummary": {
+            "count": 233,
+            "p50": 16.699951171875,
+            "p95": 16.800048828125,
+            "p99": 16.800048828125,
+            "max": 49.89990234375,
+            "over33ms": 1,
+            "over50ms": 0
+          },
+          "frameIntervalsMs": [
+            16.600000000000023,
+            16.69999999999999,
+            16.69999999999999,
+            16.600000000000023,
+            16.69999999999999,
+            16.600000000000023,
+            16.69999999999999,
+            16.69999999999999,
+            16.69999999999999,
+            16.600000000000023,
+            16.69999999999999,
+            16.69999999999999,
+            16.69999999999999,
+            16.600000000000023,
+            16.600000000000023,
+            16.69999999999999,
+            16.69999999999999,
+            16.600000000000023,
+            16.69999999999999,
+            16.69999999999999,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.700000000000045,
+            16.699999999999932,
+            16.600000000000023,
+            16.600000000000023,
+            16.699999999999932,
+            16.700000000000045,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.600000000000023,
+            16.699999999999932,
+            16.700000000000045,
+            16.600000000000023,
+            16.699999999999932,
+            16.700000000000045,
+            16.600000000000023,
+            16.699999999999932,
+            16.700000000000045,
+            16.600000000000023,
+            16.699999999999932,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.700000000000045,
+            16.700000000000045,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.600000000000136,
+            16.799999999999955,
+            16.59999999999991,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.700000000000045,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.600000000000136,
+            16.799999999999955,
+            16.59999999999991,
+            16.600000000000136,
+            16.699999999999818,
+            16.700000000000045,
+            16.700000000000045,
+            16.59999999999991,
+            16.600000000000136,
+            16.799999999999955,
+            16.59999999999991,
+            16.700000000000045,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.59999999999991,
+            16.800000000000182,
+            16.59999999999991,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.700000000000273,
+            16.699999999999818,
+            16.59999999999991,
+            16.59999999999991,
+            16.700000000000273,
+            16.699999999999818,
+            16.59999999999991,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.800000000000182,
+            16.59999999999991,
+            16.59999999999991,
+            16.800000000000182,
+            16.59999999999991,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.59999999999991,
+            16.700000000000273,
+            16.699999999999818,
+            16.59999999999991,
+            16.700000000000273,
+            16.59999999999991,
+            16.800000000000182,
+            16.59999999999991,
+            16.699999999999818,
+            16.700000000000273,
+            16.59999999999991,
+            16.59999999999991,
+            16.699999999999818,
+            16.700000000000273,
+            16.699999999999818,
+            16.59999999999991,
+            16.700000000000273,
+            16.699999999999818,
+            16.59999999999991,
+            16.700000000000273,
+            16.699999999999818,
+            16.700000000000273,
+            16.59999999999991,
+            16.59999999999991,
+            16.800000000000182,
+            16.59999999999991,
+            16.59999999999991,
+            16.800000000000182,
+            16.59999999999991,
+            16.699999999999818,
+            16.59999999999991,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.700000000000273,
+            16.699999999999818,
+            16.59999999999991,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.600000000000364,
+            16.799999999999727,
+            16.59999999999991,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.600000000000364,
+            16.699999999999818,
+            16.699999999999818,
+            16.600000000000364,
+            16.699999999999818,
+            16.699999999999818,
+            16.600000000000364,
+            16.799999999999727,
+            16.59999999999991,
+            16.600000000000364,
+            16.799999999999727,
+            16.59999999999991,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.700000000000273,
+            16.699999999999818,
+            16.59999999999991,
+            16.600000000000364,
+            16.699999999999818,
+            16.699999999999818,
+            16.700000000000273,
+            16.699999999999818,
+            16.59999999999991,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.600000000000364,
+            16.799999999999727,
+            16.5,
+            16.700000000000273,
+            16.699999999999818,
+            16.600000000000364,
+            16.699999999999818,
+            16.699999999999818,
+            16.699999999999818,
+            16.600000000000364,
+            16.699999999999818
+          ],
+          "frameSummary": {
+            "count": 243,
+            "p50": 16.699999999999818,
+            "p95": 16.799999999999727,
+            "p99": 16.800000000000182,
+            "max": 16.800000000000182,
+            "over33ms": 0,
+            "over50ms": 0
+          },
+          "statusSamples": [
+            {
+              "atEpochMs": 1793599239502.5554,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599239528.9817,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599239559.1455,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599239585.5613,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599239611.7905,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599239637.1204,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599239662.9097,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599239688.3953,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599239714.7295,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599239740.4417,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599239767.4822,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599239793.5935,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599239819.6492,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599239846.8992,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599239873.1147,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599239898.957,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599239925.578,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599239952.2754,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599239978.858,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240004.627,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240031.4583,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240058.2927,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240085.0269,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240110.9465,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240136.932,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240162.9775,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240188.5583,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240214.9788,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240240.6577,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240266.746,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240292.3503,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240319.2734,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240345.7742,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240371.926,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240397.3157,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240422.8584,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240449.4307,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240475.441,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240502.2668,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240527.6443,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240553.6787,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240580.1934,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240605.5972,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240632.4885,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240658.4316,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240685.0005,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240710.7117,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240737.0144,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240762.6106,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240788.7864,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240815.8997,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240841.9812,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240868.0662,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240893.6055,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240919.5056,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240946.1243,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599240972.0344,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241002.1655,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241028.2556,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241053.9758,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241079.9033,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241105.6296,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241132.385,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241157.6306,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241183.8467,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241210.186,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241236.1538,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241262.1948,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241287.8545,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241313.8845,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241339.5083,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241365.973,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241391.1716,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241417.6787,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241444.1272,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241469.3848,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241494.7869,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241520.8774,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241547.0005,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241572.4248,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241598.4573,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241624.5972,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241651.738,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241677.213,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241702.4941,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241728.7268,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241754.7314,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241781.6218,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241807.6052,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241834.6648,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241860.3386,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241885.6597,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241912.1016,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241937.6409,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241963.9377,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599241989.6897,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599242015.9905,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599242041.8716,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599242068.06,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599242094.1213,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599242119.7234,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599242146.6829,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599242173.0974,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599242198.6958,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599242224.9004,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599242250.9143,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599242276.3857,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599242302.816,
+              "pending": true
+            },
+            {
+              "atEpochMs": 1793599242329.6533,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599242355.357,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599242380.9272,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599242406.1907,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599242431.9072,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599242457.864,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599242483.904,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599242509.7314,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599242535.3218,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599242560.371,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599242585.8887,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599242611.5522,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599242637.192,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599242664.8103,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599242690.8137,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599242717.3083,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599242742.6375,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599242769.6758,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599242796.7742,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599242822.3752,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599242848.662,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599242874.9602,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599242901.8687,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599242927.2495,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599242953.1592,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599242978.5513,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599243004.6702,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599243030.6934,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599243056.762,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599243082.6877,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599243108.2515,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599243134.111,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599243159.5671,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599243186.4373,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599243212.4526,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599243238.3928,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599243265.3267,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599243291.1946,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599243317.2507,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599243342.371,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599243368.4338,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599243395.2922,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599243420.591,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599243446.4453,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599243473.033,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599243499.2542,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599243524.7288,
+              "pending": false
+            },
+            {
+              "atEpochMs": 1793599243551.1099,
+              "pending": false
+            }
+          ],
+          "observedPendingFrameIntervalsMs": [
+            16.69999999999999,
+            16.600000000000023,
+            16.69999999999999,
+            16.600000000000023,
+            16.69999999999999,
+            16.69999999999999,
+            16.69999999999999,
+            16.600000000000023,
+            16.69999999999999,
+            16.69999999999999,
+            16.69999999999999,
+            16.600000000000023,
+            16.600000000000023,
+            16.69999999999999,
+            16.69999999999999,
+            16.600000000000023,
+            16.69999999999999,
+            16.69999999999999,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.700000000000045,
+            16.699999999999932,
+            16.600000000000023,
+            16.600000000000023,
+            16.699999999999932,
+            16.700000000000045,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.600000000000023,
+            16.699999999999932,
+            16.700000000000045,
+            16.600000000000023,
+            16.699999999999932,
+            16.700000000000045,
+            16.600000000000023,
+            16.699999999999932,
+            16.700000000000045,
+            16.600000000000023,
+            16.699999999999932,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.700000000000045,
+            16.700000000000045,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.600000000000136,
+            16.799999999999955,
+            16.59999999999991,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.700000000000045,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.600000000000136,
+            16.799999999999955,
+            16.59999999999991,
+            16.600000000000136,
+            16.699999999999818,
+            16.700000000000045,
+            16.700000000000045,
+            16.59999999999991,
+            16.600000000000136,
+            16.799999999999955,
+            16.59999999999991,
+            16.700000000000045,
+            16.700000000000045,
+            16.59999999999991,
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.700000000000045,
+            16.600000000000136,
+            16.699999999999818,
+            16.59999999999991,
+            16.800000000000182,
+            16.59999999999991,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.700000000000273,
+            16.699999999999818,
+            16.59999999999991,
+            16.59999999999991,
+            16.700000000000273,
+            16.699999999999818,
+            16.59999999999991,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.800000000000182,
+            16.59999999999991,
+            16.59999999999991,
+            16.800000000000182,
+            16.59999999999991,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.700000000000273,
+            16.59999999999991,
+            16.699999999999818,
+            16.59999999999991,
+            16.700000000000273,
+            16.699999999999818,
+            16.59999999999991,
+            16.700000000000273,
+            16.59999999999991,
+            16.800000000000182,
+            16.59999999999991,
+            16.699999999999818,
+            16.700000000000273,
+            16.59999999999991,
+            16.59999999999991,
+            16.699999999999818,
+            16.700000000000273,
+            16.699999999999818,
+            16.59999999999991,
+            16.700000000000273,
+            16.699999999999818,
+            16.59999999999991,
+            16.700000000000273,
+            16.699999999999818,
+            16.700000000000273,
+            16.59999999999991,
+            16.59999999999991,
+            16.800000000000182,
+            16.59999999999991,
+            16.59999999999991
+          ],
+          "observedPendingFrameSummary": {
+            "count": 166,
+            "p50": 16.699999999999818,
+            "p95": 16.700000000000273,
+            "p99": 16.800000000000182,
+            "max": 16.800000000000182,
+            "over33ms": 0,
+            "over50ms": 0
+          },
+          "drawCpuMs": [
+            0.5999999046325684,
+            0.20000004768371582,
+            0.2999999523162842,
+            0.20000004768371582,
+            0.5,
+            0.40000009536743164,
+            0.39999985694885254,
+            0.5999999046325684,
+            0.3000001907348633,
+            0.2999999523162842,
+            0.39999985694885254,
+            0.40000009536743164,
+            0.5,
+            0.40000009536743164,
+            0.5,
+            0.5,
+            0.39999985694885254,
+            0.40000009536743164,
+            0.5999999046325684,
+            0.5,
+            0.40000009536743164,
+            0.6000001430511475,
+            0.5,
+            0.2999999523162842,
+            0.20000004768371582,
+            0.40000009536743164,
+            0.7000000476837158,
+            0.39999985694885254,
+            0.40000009536743164,
+            0.5,
+            0.40000009536743164,
+            0.40000009536743164,
+            0.40000009536743164,
+            0.39999985694885254,
+            0.39999985694885254,
+            0.40000009536743164,
+            0.2999999523162842,
+            0.10000014305114746,
+            0.20000004768371582,
+            0.20000004768371582,
+            0.2999999523162842,
+            0.09999990463256836,
+            0.3000001907348633,
+            0.20000004768371582,
+            0.20000004768371582,
+            0.40000009536743164,
+            0.40000009536743164,
+            0.2999999523162842,
+            0.5,
+            0.2999999523162842,
+            0.40000009536743164,
+            0.2999999523162842,
+            0.2999999523162842,
+            0.3000001907348633,
+            0.40000009536743164,
+            0.19999980926513672,
+            0.20000004768371582,
+            0.10000014305114746,
+            0.5,
+            0.3000001907348633,
+            0.2999999523162842,
+            0.2999999523162842,
+            0.20000004768371582,
+            0.20000004768371582,
+            0.2999999523162842,
+            0.40000009536743164,
+            0.39999985694885254,
+            0.5,
+            0.2999999523162842,
+            0.39999985694885254,
+            0.5,
+            0.2999999523162842,
+            0.5,
+            0.5,
+            0.20000004768371582,
+            0.09999990463256836,
+            0.2999999523162842,
+            0.5,
+            0.40000009536743164,
+            0.40000009536743164,
+            0.2999999523162842,
+            0.5,
+            0.5,
+            0.19999980926513672,
+            0.39999985694885254,
+            0.2999999523162842,
+            0.2999999523162842,
+            0.2999999523162842,
+            0.2999999523162842,
+            0.5,
+            0.40000009536743164,
+            0.20000004768371582,
+            0.3000001907348633,
+            0.20000004768371582,
+            0.5,
+            0.5,
+            0.20000004768371582,
+            0.2999999523162842,
+            0.5,
+            0.39999985694885254,
+            0.2999999523162842,
+            0.20000004768371582,
+            0.2999999523162842,
+            0.20000004768371582,
+            0.40000009536743164,
+            0.5999999046325684,
+            0.39999985694885254,
+            0.2999999523162842,
+            0.5,
+            0.10000014305114746,
+            0.2999999523162842,
+            0.3000001907348633,
+            0.2999999523162842,
+            0.2999999523162842,
+            0.2999999523162842,
+            0.7000000476837158,
+            0.39999985694885254,
+            0.5,
+            0.20000004768371582,
+            0.39999985694885254,
+            0.39999985694885254,
+            0.2999999523162842,
+            0.20000004768371582,
+            0.40000009536743164,
+            0.7000000476837158,
+            0.5999999046325684,
+            0.5,
+            0.5999999046325684,
+            0.5,
+            0.5999999046325684,
+            0.6000001430511475,
+            0.40000009536743164,
+            0.5,
+            0.7000000476837158,
+            0.5,
+            0.2999999523162842,
+            0.6000001430511475,
+            0.5999999046325684,
+            0.5,
+            0.5999999046325684,
+            0.5,
+            0.40000009536743164,
+            0.5,
+            0.5,
+            0.5,
+            0.5,
+            0.5,
+            0.39999985694885254,
+            0.40000009536743164,
+            0.39999985694885254,
+            0.39999985694885254,
+            0.40000009536743164,
+            0.20000004768371582,
+            0.39999985694885254,
+            0.20000004768371582,
+            0.40000009536743164,
+            0.40000009536743164,
+            0.40000009536743164,
+            0.5,
+            0.40000009536743164,
+            0.5999999046325684,
+            0.20000004768371582,
+            0.2999999523162842,
+            0.39999985694885254,
+            0.09999990463256836,
+            0.2999999523162842,
+            0.3000001907348633,
+            0.2999999523162842,
+            0.3000001907348633,
+            0.5,
+            0.5,
+            0.40000009536743164,
+            0.2999999523162842,
+            0.20000004768371582,
+            0.20000004768371582,
+            0.3000001907348633,
+            0.19999980926513672,
+            0.39999985694885254,
+            0.39999985694885254,
+            0.5,
+            0.5999999046325684,
+            0.40000009536743164,
+            0.5,
+            0.39999985694885254,
+            0.20000004768371582,
+            0.5,
+            0.2999999523162842,
+            0.40000009536743164,
+            0.39999985694885254,
+            0.20000004768371582,
+            0.3000001907348633,
+            0.40000009536743164,
+            0.2999999523162842,
+            0.40000009536743164,
+            0.39999985694885254,
+            0.2999999523162842,
+            0.5,
+            0.5,
+            0.2999999523162842,
+            0.5,
+            0.2999999523162842,
+            0.5,
+            0.2999999523162842,
+            0.40000009536743164,
+            0.2999999523162842,
+            0.40000009536743164,
+            0.3000001907348633,
+            0.40000009536743164,
+            0.39999985694885254,
+            0.19999980926513672,
+            0.40000009536743164,
+            0.3000001907348633,
+            0.20000004768371582,
+            0.3000001907348633,
+            0.09999990463256836,
+            0.39999985694885254,
+            0.39999985694885254,
+            0.5,
+            0.40000009536743164,
+            0.3000001907348633,
+            0.19999980926513672,
+            0.2999999523162842,
+            0.39999985694885254,
+            0.3000001907348633,
+            0.09999990463256836,
+            0.2999999523162842,
+            0.19999980926513672,
+            0.40000009536743164,
+            0.20000004768371582,
+            0.3000001907348633,
+            0.2999999523162842,
+            0.2999999523162842,
+            0.19999980926513672,
+            0.2999999523162842,
+            0.2999999523162842
+          ],
+          "drawSummary": {
+            "count": 235,
+            "p50": 0.39999985694885254,
+            "p95": 0.5999999046325684,
+            "p99": 0.7000000476837158,
+            "max": 0.7000000476837158,
+            "over33ms": 0,
+            "over50ms": 0
+          },
+          "longFrames": [],
+          "finalFrame": {
+            "snapshot": "23a7c5bb5faeff369699d01e79507f4711d68280b73951437de7203f3a5adb94",
+            "camera": {
+              "x": -27.17961083121702,
+              "y": -16.272393428947282,
+              "scale": 0.5392516901266367
+            },
+            "visibleFiles": 23,
+            "labels": 23,
+            "width": 572,
+            "height": 580
+          },
+          "requestMs": [
+            23.09999990463257
+          ],
+          "nativeRss": {
+            "currentKiB": 4644348,
+            "highWaterKiB": 4644348
+          }
+        }
+      ],
+      "picking": {
+        "fileId": "d5b6ef0518825f7b8176e9e43732f091fca6e4799e31e208717339a866dc8c2d",
+        "path": "Documentation/conf.py",
+        "samples": [
+          0.09999990463256836,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0.09999990463256836,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "summary": {
+          "count": 62,
+          "p50": 0,
+          "p95": 0,
+          "p99": 0.09999990463256836,
+          "max": 0.09999990463256836,
+          "over33ms": 0,
+          "over50ms": 0
+        },
+        "renderedLines": 58
+      },
+      "editLatency": {
+        "samples": [
+          {
+            "offsetMs": 0,
+            "writeToDomAndTwoRafMs": 192.10963799999809,
+            "measurements": {
+              "files": 66066,
+              "analyzed": 66066,
+              "source_only": 0,
+              "bytes": 18909,
+              "read_files": 1,
+              "retained": 66065,
+              "reconciled": false,
+              "parsed": 1,
+              "reused": 66065,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 0.39038700000000004,
+              "total_ms": 36.225552
+            }
+          },
+          {
+            "offsetMs": 97,
+            "writeToDomAndTwoRafMs": 134.56912799999918,
+            "measurements": {
+              "files": 66066,
+              "analyzed": 66066,
+              "source_only": 0,
+              "bytes": 18910,
+              "read_files": 1,
+              "retained": 66065,
+              "reconciled": false,
+              "parsed": 1,
+              "reused": 66065,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 0.169221,
+              "total_ms": 35.47347
+            }
+          },
+          {
+            "offsetMs": 211,
+            "writeToDomAndTwoRafMs": 137.4407680000004,
+            "measurements": {
+              "files": 66066,
+              "analyzed": 66066,
+              "source_only": 0,
+              "bytes": 18911,
+              "read_files": 1,
+              "retained": 66065,
+              "reconciled": false,
+              "parsed": 1,
+              "reused": 66065,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 0.144317,
+              "total_ms": 39.103609
+            }
+          },
+          {
+            "offsetMs": 367,
+            "writeToDomAndTwoRafMs": 147.62934600000153,
+            "measurements": {
+              "files": 66066,
+              "analyzed": 66066,
+              "source_only": 0,
+              "bytes": 18911,
+              "read_files": 1,
+              "retained": 66065,
+              "reconciled": false,
+              "parsed": 1,
+              "reused": 66065,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 0.111921,
+              "total_ms": 42.384499999999996
+            }
+          },
+          {
+            "offsetMs": 463,
+            "writeToDomAndTwoRafMs": 152.49737599999935,
+            "measurements": {
+              "files": 66066,
+              "analyzed": 66066,
+              "source_only": 0,
+              "bytes": 18911,
+              "read_files": 1,
+              "retained": 66065,
+              "reconciled": false,
+              "parsed": 1,
+              "reused": 66065,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 0.10970300000000001,
+              "total_ms": 37.845708
+            }
+          }
+        ],
+        "summary": {
+          "count": 5,
+          "p50": 147.62934600000153,
+          "p95": 192.10963799999809,
+          "p99": 192.10963799999809,
+          "max": 192.10963799999809,
+          "over33ms": 5,
+          "over50ms": 5
+        }
+      },
+      "largeSource": {
+        "path": "drivers/gpu/drm/amd/include/asic_reg/dcn/dcn_3_2_0_sh_mask.h",
+        "bytes": 24009174,
+        "openMs": 190.8429619999988,
+        "editToDomAndTwoRafMs": 1117.361482999997,
+        "measurements": {
+          "files": 66066,
+          "analyzed": 66066,
+          "source_only": 0,
+          "bytes": 24009297,
+          "read_files": 1,
+          "retained": 66065,
+          "reconciled": false,
+          "parsed": 1,
+          "reused": 66065,
+          "cache_hits": 0,
+          "cache_warnings": 0,
+          "capture_ms": 3.299166,
+          "total_ms": 845.557491
+        },
+        "openFrames": {
+          "count": 9,
+          "p50": 16.699999999999818,
+          "p95": 50,
+          "p99": 50,
+          "max": 50,
+          "over33ms": 1,
+          "over50ms": 0
+        },
+        "openLongFrames": [
+          {
+            "duration": 77,
+            "blockingDuration": 0
+          }
+        ],
+        "editFrames": {
+          "count": 64,
+          "p50": 16.699999999999818,
+          "p95": 16.700000000000728,
+          "p99": 49.900000000000546,
+          "max": 49.900000000000546,
+          "over33ms": 1,
+          "over50ms": 0
+        },
+        "editLongFrames": [
+          {
+            "duration": 78.20000004768372,
+            "blockingDuration": 0
+          }
+        ],
+        "renderedLines": 58,
+        "outlineButtons": 0
+      },
+      "heap": {
+        "Documents": 1,
+        "Nodes": 693,
+        "JSHeapUsedSize": 66906404,
+        "JSHeapTotalSize": 74563584
+      },
+      "webgpu": {
+        "available": false
+      },
+      "screenshot": "responsiveness-linux-workspace.png",
+      "cleanSnapshotMatches": true,
+      "nativeRss": {
+        "currentKiB": 4613808,
+        "highWaterKiB": 4674596
+      },
+      "errors": [],
+      "browserRequests": {
+        "/api/events": 4,
+        "/api/view": 14
+      }
+    }
+  ],
+  "limitations": [
+    "rAF intervals are scheduling observations, not GPU or physical presentation timings",
+    "Edit observations end after matching visible DOM plus two rAF callbacks",
+    "Pending-frame classification uses the latest status sample at approximately 25 ms resolution; status fetches may be delayed",
+    "Source reads use warm OS caches; periodic reconciliation remains active",
+    "Only bounded overview tiles are drawn; this does not render 10000 files simultaneously",
+    "Heap metrics are point-in-time renderer heap, not peak browser memory",
+    "No WebGPU/WebGL backend comparison or baseline laptop qualification"
+  ]
+}

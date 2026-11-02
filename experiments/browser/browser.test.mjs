@@ -6,13 +6,42 @@ import { buildHost, browser, workspace, startHost, openWorkspace, paint } from "
 
 let chromium, input, host;
 const text = `const HTML: &str = "<img src=x onerror='window.injected=true'>";\nfn first() {}\nfn anchor() {\n${"    // captured line\n".repeat(10000)}}\n`;
+const largeOutline = Array.from({ length: 50000 }, (_, i) => `fn item_${String(i).padStart(5, "0")}() {}`).join("\n");
 before(async () => {
   buildHost();
-  input = await workspace({ files: { "src/a.rs": text, "src/b.rs": "fn beta() {}", "src/partial.rs": "fn broken( {", "src/encoding.rs": Buffer.from([255]), "src/z.py": "class Example:\n    def read(self): pass\n", "include/shared.h": "struct Header;", "include/device.cuh": "__device__ void kernel();", "include/encoding.h": Buffer.from([255]), "include/example.c++": "class Example {};", "include/sample.c": "int sum(int a, int b) { return a + b; }", "include/assigned/defs.h": "class Definition { public: int read() { return 1; } };" }, sourceArguments: ["--c-family-root", "include", "--syntax-language", "include/assigned=cpp"] });
+  input = await workspace({ files: { "src/a.rs": text, "src/b.rs": "fn beta() {}", "src/partial.rs": "fn broken( {", "src/encoding.rs": Buffer.from([255]), "src/z.py": "class Example:\n    def read(self): pass\n", "include/shared.h": "struct Header;", "include/device.cuh": "__device__ void kernel();", "include/encoding.h": Buffer.from([255]), "include/example.c++": "class Example {};", "include/sample.c": "int sum(int a, int b) { return a + b; }", "include/assigned/defs.h": "class Definition { public: int read() { return 1; } };", "zzz/large.rs": largeOutline }, sourceArguments: ["--c-family-root", "include", "--syntax-language", "include/assigned=cpp"] });
   host = await startHost(input);
   chromium = await browser();
 });
 after(async () => { await chromium?.close(); await host?.close(); await input?.close(); });
+
+test("a large outline keeps bounded DOM and keyboard/source identity across edits", async () => {
+  const session = await openWorkspace(chromium, host); const { page } = session;
+  try {
+    await page.locator("summary").click();
+    await page.getByRole("button", { name: "zzz/large.rs", exact: true }).click();
+    await page.waitForFunction(() => document.getElementById("file-title").textContent === "zzz/large.rs");
+    assert.ok(await page.locator("#outline button").count() <= 200);
+    await page.locator("#outline button").first().focus();
+    await page.keyboard.press("End");
+    await page.waitForFunction(() => document.activeElement?.textContent.startsWith("item_49999"));
+    assert.equal(await page.locator("#outline [role=listitem]").last().getAttribute("aria-setsize"), "50000");
+    await page.keyboard.press("Enter");
+    await page.waitForFunction(() => document.querySelector('#outline [aria-current=true]')?.textContent.startsWith("item_49999"));
+    assert.ok((await page.locator("#source").textContent()).includes("item_49999"));
+    const snapshot = await page.locator("#snapshot").getAttribute("title");
+    await writeFile(join(input.root, "zzz/large.rs"), "// moved\n" + largeOutline);
+    await page.waitForFunction(previous => document.getElementById("snapshot").title !== previous, snapshot);
+    assert.ok((await page.locator('#outline [aria-current=true]').textContent()).startsWith("item_49999"));
+    assert.ok(await page.locator("#outline button").count() <= 200);
+    await page.keyboard.press("Home");
+    await page.waitForFunction(() => document.activeElement?.textContent.startsWith("item_00000"));
+    await page.keyboard.press("ArrowDown"); await page.keyboard.press("Space");
+    await page.waitForFunction(() => document.querySelector('#outline [aria-current=true]')?.textContent.startsWith("item_00001"));
+    assert.ok((await page.locator("#source").textContent()).includes("item_00001"));
+    assert.deepEqual(session.errors, []);
+  } finally { await session.close(); }
+});
 
 test("source-only headers expose reasons, encoding, and pinned metadata without invented outlines", async () => {
   const session = await openWorkspace(chromium, host);
@@ -27,7 +56,7 @@ test("source-only headers expose reasons, encoding, and pinned metadata without 
     assert.equal(await page.locator("#outline button").count(), 0);
     assert.ok((await page.locator("#counts").textContent()).includes("3 source only"));
     const view = await (await fetch(`${host.url}/api/view?filter=shared.h`)).json();
-    assert.equal(view.schema, 2); assert.equal(view.analyzed, 8); assert.equal(view.source_only, 3);
+    assert.equal(view.schema, 2); assert.equal(view.analyzed, 9); assert.equal(view.source_only, 3);
     assert.equal(view.source.classification.reason, "language_unassigned");
     assert.equal(view.source.encoding, "utf8");
     const full = await (await fetch(`${host.url}/api/view`)).json();

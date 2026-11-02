@@ -1,0 +1,541 @@
+{
+  "base_commit": "1a421e043fb1edba44ea0c0752184919e3a148d2",
+  "baseline": "passed",
+  "scope": [
+    "crates/vizzi/web/outline.js"
+  ],
+  "tool": "StrykerJS 10.1.1, Playwright 1.64.1 / Chromium 156.0.8078.4",
+  "command": "npm test -- --outline-mutations",
+  "tested": 222,
+  "counts": {
+    "Killed": 188,
+    "Timeout": 34
+  },
+  "exclusions": [],
+  "sha256": {
+    "crates/vizzi/web/outline.js": "273c9cf4aaca130e994edd816def6d2aaa32bf571409ca84985c119c2624e52e",
+    "experiments/browser/outline.test.mjs": "0510263c758253e6e89dd0b44287016f1a8dfbbe401e069fb3f2fae1bbceddd9"
+  },
+  "timeouts": [
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 35,
+          "line": 5
+        },
+        "start": {
+          "column": 3,
+          "line": 5
+        }
+      },
+      "mutator": "CallExpression",
+      "replacement": ";"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 55,
+          "line": 8
+        },
+        "start": {
+          "column": 33,
+          "line": 8
+        }
+      },
+      "mutator": "ArithmeticOperator",
+      "replacement": "MAX_VISIBLE_ROWS / ROW"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 4,
+          "line": 46
+        },
+        "start": {
+          "column": 21,
+          "line": 16
+        }
+      },
+      "mutator": "BlockStatement",
+      "replacement": "{}"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 22,
+          "line": 18
+        },
+        "start": {
+          "column": 9,
+          "line": 18
+        }
+      },
+      "mutator": "BooleanLiteral",
+      "replacement": "facts.length"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 22,
+          "line": 18
+        },
+        "start": {
+          "column": 9,
+          "line": 18
+        }
+      },
+      "mutator": "ConditionalExpression",
+      "replacement": "true"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 78,
+          "line": 23
+        },
+        "start": {
+          "column": 31,
+          "line": 23
+        }
+      },
+      "mutator": "ArithmeticOperator",
+      "replacement": "Math.floor(viewport.scrollTop / ROW) + OVERSCAN"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 139,
+          "line": 24
+        },
+        "start": {
+          "column": 18,
+          "line": 24
+        }
+      },
+      "mutator": "MethodExpression",
+      "replacement": "Math.max(facts.length, Math.ceil((viewport.scrollTop + viewport.clientHeight) / ROW) + OVERSCAN, first + MAX_WINDOW_ROWS)"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 66,
+          "line": 23
+        },
+        "start": {
+          "column": 42,
+          "line": 23
+        }
+      },
+      "mutator": "ArithmeticOperator",
+      "replacement": "viewport.scrollTop * ROW"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 113,
+          "line": 24
+        },
+        "start": {
+          "column": 41,
+          "line": 24
+        }
+      },
+      "mutator": "ArithmeticOperator",
+      "replacement": "Math.ceil((viewport.scrollTop + viewport.clientHeight) / ROW) - OVERSCAN"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 94,
+          "line": 24
+        },
+        "start": {
+          "column": 52,
+          "line": 24
+        }
+      },
+      "mutator": "ArithmeticOperator",
+      "replacement": "viewport.scrollTop - viewport.clientHeight"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 138,
+          "line": 24
+        },
+        "start": {
+          "column": 115,
+          "line": 24
+        }
+      },
+      "mutator": "ArithmeticOperator",
+      "replacement": "first - MAX_WINDOW_ROWS"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 41,
+          "line": 26
+        },
+        "start": {
+          "column": 29,
+          "line": 26
+        }
+      },
+      "mutator": "ConditionalExpression",
+      "replacement": "false"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 41,
+          "line": 26
+        },
+        "start": {
+          "column": 29,
+          "line": 26
+        }
+      },
+      "mutator": "EqualityOperator",
+      "replacement": "index >= last"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 71,
+          "line": 26
+        },
+        "start": {
+          "column": 52,
+          "line": 26
+        }
+      },
+      "mutator": "CallExpression",
+      "replacement": ";"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 94,
+          "line": 29
+        },
+        "start": {
+          "column": 77,
+          "line": 29
+        }
+      },
+      "mutator": "CallExpression",
+      "replacement": ";"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 6,
+          "line": 45
+        },
+        "start": {
+          "column": 34,
+          "line": 30
+        }
+      },
+      "mutator": "BlockStatement",
+      "replacement": "{}"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 134,
+          "line": 34
+        },
+        "start": {
+          "column": 124,
+          "line": 34
+        }
+      },
+      "mutator": "StringLiteral",
+      "replacement": "\"\""
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 57,
+          "line": 36
+        },
+        "start": {
+          "column": 38,
+          "line": 36
+        }
+      },
+      "mutator": "CallExpression",
+      "replacement": ";"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 76,
+          "line": 36
+        },
+        "start": {
+          "column": 58,
+          "line": 36
+        }
+      },
+      "mutator": "CallExpression",
+      "replacement": ";"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 89,
+          "line": 41
+        },
+        "start": {
+          "column": 73,
+          "line": 41
+        }
+      },
+      "mutator": "ConditionalExpression",
+      "replacement": "false"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 75,
+          "line": 42
+        },
+        "start": {
+          "column": 55,
+          "line": 42
+        }
+      },
+      "mutator": "ConditionalExpression",
+      "replacement": "false"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 75,
+          "line": 42
+        },
+        "start": {
+          "column": 55,
+          "line": 42
+        }
+      },
+      "mutator": "EqualityOperator",
+      "replacement": "fact.id !== selected"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 6,
+          "line": 96
+        },
+        "start": {
+          "column": 53,
+          "line": 70
+        }
+      },
+      "mutator": "BlockStatement",
+      "replacement": "{}"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 26,
+          "line": 73
+        },
+        "start": {
+          "column": 11,
+          "line": 73
+        }
+      },
+      "mutator": "ConditionalExpression",
+      "replacement": "false"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 26,
+          "line": 73
+        },
+        "start": {
+          "column": 11,
+          "line": 73
+        }
+      },
+      "mutator": "EqualityOperator",
+      "replacement": "nextKey === key"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 8,
+          "line": 87
+        },
+        "start": {
+          "column": 28,
+          "line": 73
+        }
+      },
+      "mutator": "BlockStatement",
+      "replacement": "{}"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 80,
+          "line": 78
+        },
+        "start": {
+          "column": 17,
+          "line": 78
+        }
+      },
+      "mutator": "LogicalOperator",
+      "replacement": "source?.outlines.flatMap(outline => outline.declarations) && []"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 72,
+          "line": 79
+        },
+        "start": {
+          "column": 56,
+          "line": 79
+        }
+      },
+      "mutator": "ArrayDeclaration",
+      "replacement": "[]"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 24,
+          "line": 80
+        },
+        "start": {
+          "column": 13,
+          "line": 80
+        }
+      },
+      "mutator": "BooleanLiteral",
+      "replacement": "nodes.size"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 24,
+          "line": 80
+        },
+        "start": {
+          "column": 13,
+          "line": 80
+        }
+      },
+      "mutator": "ConditionalExpression",
+      "replacement": "true"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 68,
+          "line": 81
+        },
+        "start": {
+          "column": 30,
+          "line": 81
+        }
+      },
+      "mutator": "StringLiteral",
+      "replacement": "``"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 64,
+          "line": 81
+        },
+        "start": {
+          "column": 33,
+          "line": 81
+        }
+      },
+      "mutator": "ArithmeticOperator",
+      "replacement": "Math.max(1, facts.length) / ROW"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 58,
+          "line": 81
+        },
+        "start": {
+          "column": 33,
+          "line": 81
+        }
+      },
+      "mutator": "MethodExpression",
+      "replacement": "Math.min(1, facts.length)"
+    },
+    {
+      "file": "crates/vizzi/web/outline.js",
+      "location": {
+        "end": {
+          "column": 16,
+          "line": 90
+        },
+        "start": {
+          "column": 7,
+          "line": 90
+        }
+      },
+      "mutator": "CallExpression",
+      "replacement": ";"
+    }
+  ],
+  "development_notes": [
+    "Initial harness run did not propagate the active mutant into Chromium; all-survived output was invalid evidence and discarded. The final harness explicitly propagates the instrumenter constants into the page.",
+    "Subsequent survivors exposed gaps in geometry, row bounds, focus/anchor continuity, fallback data, and key-default assertions. Those tests were strengthened; redundant production operations were removed.",
+    "One intermediate attempt failed its unmutated baseline on initial selected-row visibility. The collapsed empty-note margin was fixed before interpreting later mutation results."
+  ],
+  "limits": [
+    "Only the complete outline module is mutated; app integration, CSS, native host, source view, browser internals, and performance instrumentation are outside this scope.",
+    "The eight DOM behavioral tests run in real headless Chromium. Timeouts are separate from assertion-detected mutations. No per-test coverage mapping.",
+    "Timeouts include runaway loops and browser hangs; zero surviving mutants does not prove correctness."
+  ]
+}

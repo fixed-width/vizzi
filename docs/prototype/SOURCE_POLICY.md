@@ -69,12 +69,15 @@ import, configured profiles, and dynamic configuration reload are not implemente
 `CapturePolicyId` hashes the `source-policy-v1` domain, policy implementation source,
 normalized roots/exclusions/assignments, and the sorted set of available languages.
 Hashing implementation bytes conservatively invalidates policies after code changes.
-Analyzer context/version changes are still checked separately when retaining documents.
+Analyzer context/version changes participate in the verified
+[capture plan](CAPTURE_PLAN.md) used when retaining documents.
 
 Every snapshot retains its policy identity, including empty snapshots. A mismatch
 forces complete discovery before any unread documents can be retained. No caller
-precondition is needed after expanding or reducing scope. Snapshot composition v3
+precondition is needed after expanding or reducing scope. Snapshot composition v4
 includes policy identity; document composition v2 includes classification and analyses.
+Verified native snapshots also contain a plan marker covering all analyzer descriptors;
+matching that marker avoids per-file reclassification on ordinary hints.
 Workspace/file/entity identity rules remain as specified by [IDENTITIES.md](IDENTITIES.md).
 
 Full captures can reuse documents whose bytes, classification, and analysis context

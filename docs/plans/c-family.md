@@ -69,6 +69,9 @@ live source/large-header edits, and software browser interaction. Qualification 
 unbounded outline rendering and latency costs. Address the
 [proposed performance gates](../performance/BUDGETS.md) before compiler-context expansion;
 16 GB baseline hardware and GPU presentation remain unqualified.
+The [responsiveness follow-up](../../experiments/qualification/RESPONSIVENESS_RESULTS.md)
+implements bounded outline controls and verified capture plans. Large-file parsing,
+cancellation, transport data bounds, and memory admission remain open.
 
 Use scoped raw-C/C++ profiles, including explicit header assignments where desired,
 and retain their classification provenance in reports. Record source-only candidates

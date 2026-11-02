@@ -32,6 +32,10 @@ identity!(WorkspaceId, "An adapter-supplied workspace identity.");
 identity!(FileId, "A path identity scoped to a workspace.");
 identity!(ContentId, "An identity of captured source bytes.");
 identity!(
+    CapturePlanId,
+    "An identity of source policy and complete analyzer descriptors."
+);
+identity!(
     CapturePolicyId,
     "An identity of normalized source selection and analyzer availability."
 );
@@ -282,25 +286,59 @@ pub struct Snapshot {
     workspace: WorkspaceId,
     documents: Vec<Arc<Document>>,
     policy: CapturePolicyId,
+    capture_plan: Option<CapturePlanId>,
+    analyzed: usize,
 }
 
 impl Snapshot {
     /// Rejects duplicate paths and cross-workspace documents.
     pub fn new(
         workspace: WorkspaceId,
-        mut documents: Vec<Arc<Document>>,
+        documents: Vec<Arc<Document>>,
         policy: CapturePolicyId,
     ) -> Result<Self, ModelError> {
+        Self::build(workspace, documents, policy, None)
+    }
+    pub(crate) fn verified(
+        workspace: WorkspaceId,
+        documents: Vec<Arc<Document>>,
+        policy: CapturePolicyId,
+        plan: CapturePlanId,
+    ) -> Result<Self, ModelError> {
+        Self::build(workspace, documents, policy, Some(plan))
+    }
+    fn build(
+        workspace: WorkspaceId,
+        mut documents: Vec<Arc<Document>>,
+        policy: CapturePolicyId,
+        capture_plan: Option<CapturePlanId>,
+    ) -> Result<Self, ModelError> {
         documents.sort_by(|a, b| a.path.cmp(&b.path));
-        let mut paths = BTreeSet::new();
+        if documents
+            .windows(2)
+            .any(|pair| pair[0].path() == pair[1].path())
+        {
+            return Err(ModelError("duplicate captured path".into()));
+        }
         let mut hash = blake3::Hasher::new();
-        hash.update(b"snapshot-v3");
+        hash.update(b"snapshot-v4");
         hash.update(workspace.as_str().as_bytes());
         hash.update(policy.as_str().as_bytes());
-        for document in &documents {
-            if document.workspace != workspace || !paths.insert(document.path()) {
-                return Err(ModelError("duplicate path or mismatched workspace".into()));
+        match &capture_plan {
+            Some(plan) => {
+                hash.update(&[1]);
+                hash.update(plan.as_str().as_bytes());
             }
+            None => {
+                hash.update(&[0]);
+            }
+        }
+        let mut analyzed = 0;
+        for document in &documents {
+            if document.workspace != workspace {
+                return Err(ModelError("mismatched captured workspace".into()));
+            }
+            analyzed += usize::from(!document.analyses().is_empty());
             hash.update(document.version.as_str().as_bytes());
         }
         Ok(Self {
@@ -308,6 +346,8 @@ impl Snapshot {
             workspace,
             documents,
             policy,
+            capture_plan,
+            analyzed,
         })
     }
     /// Returns this observation's identity.
@@ -321,6 +361,21 @@ impl Snapshot {
     /// Returns the capture policy used for complete discovery and retention.
     pub fn policy(&self) -> &CapturePolicyId {
         &self.policy
+    }
+    /// Returns a compatibility marker only after capture-plan validation.
+    pub fn capture_plan(&self) -> Option<&CapturePlanId> {
+        self.capture_plan.as_ref()
+    }
+    /// Counts captured files with analysis records, including unavailable analysis.
+    pub fn analyzed_files(&self) -> usize {
+        self.analyzed
+    }
+    /// Finds a captured path without scanning all documents.
+    pub fn file_by_path(&self, path: &str) -> Option<&Arc<Document>> {
+        self.documents
+            .binary_search_by(|file| file.path().cmp(path))
+            .ok()
+            .map(|index| &self.documents[index])
     }
     /// Returns documents in path order.
     pub fn documents(&self) -> &[Arc<Document>] {

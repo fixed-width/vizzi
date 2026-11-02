@@ -11,6 +11,8 @@ watcher errors/rescan flags, and periodic recovery use full reconciliation. Ordi
 file writes and named rename sides/pairs can use workspace-relative path hints. Hinted
 supported source files are reopened and content-hashed, including same-size and same-mtime edits.
 Capture-policy mismatch also requires reconciliation, including an empty baseline.
+Unread retention requires a matching [verified capture-plan marker](CAPTURE_PLAN.md);
+generic snapshots or changed analyzer descriptors force full discovery as well.
 The same policy selects analyzed and source-only candidates and prunes excluded paths.
 Deleted or symlink-replaced files are removed. Ancestor changes and directory targets
 fall back to full discovery. New source parents require discovery and watch registration.

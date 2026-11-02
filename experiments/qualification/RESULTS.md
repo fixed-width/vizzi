@@ -1,5 +1,9 @@
 # Full-repository resource qualification
 
+This is the initial qualification record. The [responsiveness follow-up](RESPONSIVENESS_RESULTS.md)
+implements bounded outlines and cheaper compatible edits, with new measurements and
+remaining limitations. The failures below describe the implementation measured here.
+
 Full Linux/PyTorch runs preserve coherent snapshots and bounded map motion, but do
 **not** establish that all interactions meet the project's performance goal. Two
 important failures are now measured: Linux small edits still pay work proportional

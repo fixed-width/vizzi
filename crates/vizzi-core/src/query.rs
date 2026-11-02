@@ -2,7 +2,8 @@
 
 use crate::{
     model::{
-        CapturePolicyId, Context, Coverage, EntityId, FileId, Snapshot, SnapshotId, SourceEncoding,
+        CapturePolicyId, Context, Coverage, DocumentVersion, EntityId, FileId, Snapshot,
+        SnapshotId, SourceEncoding,
     },
     policy::Classification,
 };
@@ -91,6 +92,8 @@ pub struct Outline {
 /// Selected source and all its configured outlines.
 #[derive(Debug, Serialize)]
 pub struct SourceView {
+    /// Captured document version, permitting reuse across unchanged source projections.
+    pub version: DocumentVersion,
     /// Opaque file identity.
     pub id: FileId,
     /// Relative source path.
@@ -161,6 +164,7 @@ impl Snapshot {
             .and_then(|id| self.file(id))
             .or_else(|| limited.first().copied());
         let source = selected.map(|file| SourceView {
+            version: file.version().clone(),
             id: file.id().clone(),
             path: file.path().into(),
             text: file.source().map(str::to_owned),
@@ -256,16 +260,8 @@ impl Snapshot {
             snapshot: self.id().clone(),
             policy: self.policy().clone(),
             total: self.documents().len(),
-            analyzed: self
-                .documents()
-                .iter()
-                .filter(|file| !file.analyses().is_empty())
-                .count(),
-            source_only: self
-                .documents()
-                .iter()
-                .filter(|file| file.analyses().is_empty())
-                .count(),
+            analyzed: self.analyzed_files(),
+            source_only: self.documents().len() - self.analyzed_files(),
             matching: count,
             files,
             groups,

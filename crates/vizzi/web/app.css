@@ -36,7 +36,10 @@ summary { cursor: pointer; }
 #snapshot { white-space: nowrap; font: 10px "DejaVu Sans Mono", monospace; color: #6b7c8f; }
 #diagnostics { margin: 0; padding: 10px 20px; font-size: 11px; color: #7a500b; background: #fff5dd; border-bottom: 1px solid #ead9b0; }
 .source-layout { display: grid; grid-template-columns: 175px minmax(0, 1fr); min-height: 0; flex: 1; }
-.outline { border-right: 1px solid #e1e7ed; overflow: auto; padding: 16px 10px; }
+.outline { border-right: 1px solid #e1e7ed; overflow: hidden; padding: 16px 10px; display: flex; flex-direction: column; min-height: 0; }
+#outline { flex: 1; min-height: 0; overflow: auto; position: relative; }
+.outline-entry { position: absolute; left: 0; right: 0; height: 48px; }
+.outline-entry button { height: 48px; }
 h3 { margin: 0 7px 13px; font-size: 11px; font-weight: 650; color: #6b7c8f; }
 .outline button { border: 0; padding: 8px 7px; text-align: left; width: 100%; display: block; background: transparent; font: 11px "DejaVu Sans Mono", monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .outline button:hover { background: #eef3fa; }

@@ -14,6 +14,8 @@ vertical slice; the performance experiment crate remains independent.
   offsets; line ranges are derived from the captured source.
 - Its portable source policy maps normalized relative paths to capture/assignment
   metadata. Analyzer factories register by language, independently of selection.
+- Its capture plan freezes that policy and registered descriptors, validates documents,
+  and marks compatible immutable baselines for incremental retention.
 - The native `vizzi` host captures source, runs bounded analyzer workers, persists
   analysis, coordinates refresh requests, and owns published snapshots.
 - Its `changes` module retains one versioned status for independent native subscriptions.
@@ -73,6 +75,8 @@ reconciles the whole source scope. It retains unread documents only from the pub
 baseline; cancelled and superseded jobs do not consume pending hints. Directory or
 ambiguous changes fall back to complete discovery. New watch registration closes its
 discovery gap with another full pass. See [incremental capture](INCREMENTAL_CAPTURE.md).
+The [verified capture plan](CAPTURE_PLAN.md) avoids rescanning unchanged classification
+metadata, while snapshot merging and version hashing remain linear in file count.
 One worker budget and queue cover all languages; parser creation is lazy and ownership
 remains local to a bounded worker. Cancellation is checked between
 files; a long individual parse is not interruptible. Parsing never holds the publication lock.
@@ -96,8 +100,9 @@ publication or user action. Opaque request/connection tokens reject obsolete res
 new notifications coalesce while a fetch is pending. Fetch failure or stream loss
 initiates bounded reconnection, without a periodic status poll. Explicit stream closure
 unblocks active HTTP responses during shutdown. See the [notification contract](CHANGES.md).
-Source lines are virtualised; map geometry is supplied by Rust, with visible-item painting
-and hit testing in the host adapter.
+Source lines and [declaration controls](OUTLINE.md) are virtualised; selected-source
+transport still includes complete text and outlines. Map geometry is supplied by Rust,
+with visible-item painting and hit testing in the host adapter.
 
 ## Rendering and validation scope
 

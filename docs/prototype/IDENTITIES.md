@@ -13,6 +13,11 @@ and available analyzer language names. Snapshots retain it even when empty; a mi
 forces complete discovery before unread documents can be retained. See
 [source policy](SOURCE_POLICY.md) for inputs and normalization.
 
+`CapturePlanId` additionally fingerprints complete registered contexts and validation
+implementation. Only a validated capture-plan constructor attaches this private
+compatibility marker to a snapshot. Generic snapshots are unverified; see
+[CAPTURE_PLAN.md](CAPTURE_PLAN.md).
+
 `DocumentVersion` composition v2 identifies captured contents, source classification,
 and all validated analyses. It combines file identity, content identity, and a digest
 of classification/provenance plus the ordered analysis records. Those records include
@@ -25,13 +30,15 @@ the immutable document. Reusing an `Arc<Document>` reuses that version. Cached f
 are rebound and validated against newly captured bytes before computing a version;
 no persisted document fingerprint is trusted as a substitute for validation.
 
-Snapshot identity composition version 3 hashes the workspace, capture policy, and path-sorted document
+Snapshot identity composition version 4 hashes workspace, policy, optional verified
+capture plan, and path-sorted document
 versions using explicit domain separation. Snapshot construction still rejects duplicate
 paths and mismatched workspaces. It no longer serialises unchanged analysis records.
 Shared-document updates and freshly recaptured documents must produce identical
 snapshot identities for identical input observations.
 
-This changes digest values from document v1/snapshot v2. Existing identifiers
+This changes snapshot digest values from composition v3; document composition v2 remains.
+Existing identifiers
 are not persisted lookup keys; live source/view pins refer to the host's retained
 observations. Host restarts use a fresh notification stream identity. The analyzer
 fingerprint conservatively includes model implementation sources, so this change also

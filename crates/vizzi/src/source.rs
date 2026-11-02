@@ -8,6 +8,7 @@ use std::{
 };
 use vizzi_core::{
     analysis::{Language, Languages},
+    capture::CapturePlan,
     model::WorkspaceId,
     policy::{Classification, PolicyConfig, SourcePolicy},
 };
@@ -62,7 +63,7 @@ pub struct Directory {
     root: PathBuf,
     workspace: WorkspaceId,
     languages: Arc<Languages>,
-    policy: SourcePolicy,
+    plan: CapturePlan,
 }
 impl Directory {
     /// Opens a directory; never executes project build scripts.
@@ -82,8 +83,7 @@ impl Directory {
         config: PolicyConfig,
         languages: Arc<Languages>,
     ) -> io::Result<Self> {
-        let policy = SourcePolicy::new(config, languages.names().map(String::from))
-            .map_err(io::Error::other)?;
+        let plan = CapturePlan::new(config, &languages).map_err(io::Error::other)?;
         let root = root.canonicalize()?;
         if !root.is_dir() {
             return Err(io::Error::other("workspace root is not a directory"));
@@ -93,7 +93,7 @@ impl Directory {
             root,
             workspace,
             languages,
-            policy,
+            plan,
         })
     }
     /// Returns the canonical root.
@@ -135,8 +135,11 @@ impl Directory {
                 };
                 if kind.is_dir() {
                     pending.push(path);
-                } else if let Some(classification) =
-                    self.policy.classify(&key).map_err(io::Error::other)?
+                } else if let Some(classification) = self
+                    .plan
+                    .policy()
+                    .classify(&key)
+                    .map_err(io::Error::other)?
                 {
                     capture.files.push(CapturedFile {
                         path: key,
@@ -190,8 +193,11 @@ impl Directory {
                     return self.capture();
                 } else if self.source_path(path) {
                     if metadata.file_type().is_file() {
-                        if let Some(classification) =
-                            self.policy.classify(&key).map_err(io::Error::other)?
+                        if let Some(classification) = self
+                            .plan
+                            .policy()
+                            .classify(&key)
+                            .map_err(io::Error::other)?
                         {
                             reads.push((key.clone(), absolute.clone(), classification));
                         }
@@ -219,7 +225,11 @@ impl Directory {
     }
     /// Returns the frozen source policy.
     pub fn policy(&self) -> &SourcePolicy {
-        &self.policy
+        self.plan.policy()
+    }
+    /// Returns the frozen policy/context validation plan.
+    pub fn plan(&self) -> &CapturePlan {
+        &self.plan
     }
     pub(crate) fn source_path(&self, path: &Path) -> bool {
         self.classification(path).ok().flatten().is_some()
@@ -231,7 +241,7 @@ impl Directory {
             path
         };
         match self.relative_key(path)? {
-            Some(key) => self.policy.classify(&key).map_err(io::Error::other),
+            Some(key) => self.plan.policy().classify(&key).map_err(io::Error::other),
             None => Ok(None),
         }
     }
@@ -253,7 +263,8 @@ impl Directory {
             return Err(io::Error::other("empty source hint"));
         }
         if self
-            .policy
+            .plan
+            .policy()
             .excludes(&parts.join("/"))
             .map_err(io::Error::other)?
         {

@@ -1,0 +1,216 @@
+{
+  "base_commit": "1a421e043fb1edba44ea0c0752184919e3a148d2",
+  "baseline": "passed",
+  "scope": [
+    "crates/vizzi-core/src/capture.rs",
+    "crates/vizzi-core/src/model.rs",
+    "crates/vizzi-core/src/query.rs",
+    "crates/vizzi/src/engine.rs",
+    "crates/vizzi/src/source.rs"
+  ],
+  "tool": "cargo-mutants 27.1.0",
+  "tested": 205,
+  "counts": {
+    "Unviable": 44,
+    "CaughtMutant": 160,
+    "Timeout": 1
+  },
+  "command": "cargo mutants -p vizzi-core -p vizzi --config experiments/incremental/mutants.toml --file 'crates/vizzi-core/src/{capture,model,query}.rs' --file 'crates/vizzi/src/{engine,source}.rs' --test-package vizzi-core --test-package vizzi --jobs 4 --timeout 15 --build-timeout 180",
+  "exclusions": [
+    "Existing equivalent has_descendant strict/non-strict directory-prefix comparison"
+  ],
+  "non_caught": [
+    {
+      "name": "crates/vizzi/src/engine.rs:99:9: replace Engine::directory -> &Directory with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:107:9: replace Engine::refresh -> Result<Option<Refresh>, EngineError> with Ok(Some(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:118:9: replace Engine::refresh_scoped -> Result<Option<Refresh>, EngineError> with Ok(Some(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:118:9: replace Engine::refresh_scoped -> Result<Option<Refresh>, EngineError> with Ok(None)",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:319:17: replace && with || in Engine::can_capture_paths",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:71:9: replace Directory::open -> io::Result<Self> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:78:9: replace Directory::with_languages -> io::Result<Self> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:86:9: replace Directory::with_policy -> io::Result<Self> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:101:9: replace Directory::root -> &Path with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:105:9: replace Directory::workspace -> &WorkspaceId with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:116:9: replace Directory::capture -> io::Result<Capture> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:160:9: replace Directory::capture_paths -> io::Result<Capture> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:228:9: replace Directory::policy -> &SourcePolicy with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:232:9: replace Directory::plan -> &CapturePlan with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:238:9: replace Directory::classification -> io::Result<Option<Classification>> with Ok(Some(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:249:9: replace Directory::language -> Option<&Language> with Some(Box::leak(Box::new(Default::default())))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/capture.rs:48:9: replace CapturePlan::id -> &CapturePlanId with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/capture.rs:52:9: replace CapturePlan::policy -> &SourcePolicy with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/capture.rs:61:9: replace CapturePlan::snapshot -> Result<Snapshot, ModelError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/capture.rs:79:9: replace CapturePlan::update -> Result<Snapshot, ModelError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:151:9: replace Document::capture -> Result<Self, ModelError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:220:9: replace Document::id -> &FileId with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:228:9: replace Document::content -> &ContentId with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:232:9: replace Document::version -> &DocumentVersion with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:244:9: replace Document::encoding -> SourceEncoding with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:252:9: replace Document::analyses -> &[Analysis] with Vec::leak(vec![Default::default()])",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:256:9: replace Document::classification -> &Classification with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:260:9: replace Document::entity_id -> EntityId with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:272:9: replace Document::lines -> Range<usize> with Range::new()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:272:9: replace Document::lines -> Range<usize> with Range::from_iter([0])",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:272:9: replace Document::lines -> Range<usize> with Range::new(0)",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:272:9: replace Document::lines -> Range<usize> with Range::from(0)",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:272:9: replace Document::lines -> Range<usize> with Range::from(1)",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:272:9: replace Document::lines -> Range<usize> with Range::new(1)",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:272:9: replace Document::lines -> Range<usize> with Range::from_iter([1])",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:308:9: replace Snapshot::verified -> Result<Self, ModelError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:316:9: replace Snapshot::build -> Result<Self, ModelError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:355:9: replace Snapshot::id -> &SnapshotId with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:359:9: replace Snapshot::workspace -> &WorkspaceId with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:363:9: replace Snapshot::policy -> &CapturePolicyId with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:367:9: replace Snapshot::capture_plan -> Option<&CapturePlanId> with Some(Box::leak(Box::new(Default::default())))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:375:9: replace Snapshot::file_by_path -> Option<&Arc<Document>> with Some(Box::leak(Box::new(Arc::new(Default::default()))))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:382:9: replace Snapshot::documents -> &[Arc<Document>] with Vec::leak(vec![Arc::new(Default::default())])",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:386:9: replace Snapshot::file -> Option<&Arc<Document>> with Some(Box::leak(Box::new(Arc::new(Default::default()))))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/query.rs:150:9: replace Snapshot::view -> View with Default::default()",
+      "outcome": "Unviable"
+    }
+  ],
+  "sha256": {
+    "crates/vizzi-core/src/capture.rs": "56a9c05391818f7b91ecd8b8cf38102d53211bfb36739f98c14f10bad5d99055",
+    "crates/vizzi-core/src/model.rs": "7602e74c1ef1f5fe3e4d3730b5b4d9b8bdabff28d1fd4584663c96cc8e053d2b",
+    "crates/vizzi-core/src/query.rs": "ee3e1b33ab275e49e19cff2874a3d8b30574e42191f2d230f6a4e419c6c825d9",
+    "crates/vizzi/src/engine.rs": "83f0203e52b63e43de4f5efeae257214ce7ee505c5740f0cfc5a8fe79842766b",
+    "crates/vizzi/src/source.rs": "6416489afd7aeaead782353f179c1aa8cdc8d98273f2e5aa9b23a90c31097c89"
+  },
+  "limits": [
+    "One timeout replaces refresh with no result and leaves startup waiting",
+    "Unviable/timeouts are separate from assertion-detected mutations",
+    "Hash macro expansion, parser/dependency internals, OS event delivery, and frontend painting are outside scope"
+  ]
+}

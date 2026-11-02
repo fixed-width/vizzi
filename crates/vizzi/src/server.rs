@@ -28,6 +28,7 @@ pub fn router(application: Arc<Application>) -> Router {
         .route("/controller.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/controller.js")) }))
         .route("/updates.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/updates.js")) }))
         .route("/source-description.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/source-description.js")) }))
+        .route("/outline.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/outline.js")) }))
         .route("/app.css", get(|| async { asset("text/css; charset=utf-8", include_str!("../web/app.css")) }))
         .layer(axum::middleware::map_response(|mut response: Response| async move {
             response.headers_mut().insert(header::CACHE_CONTROL, header::HeaderValue::from_static("no-store"));
@@ -91,7 +92,7 @@ async fn source(
         "File is absent from this snapshot".into(),
     ))?;
     Ok(Json(
-        serde_json::json!({ "schema": 2, "snapshot": snapshot.id(), "policy": snapshot.policy(), "file": file.id(), "path": file.path(), "text": file.source(), "encoding": file.encoding(), "classification": file.classification() }),
+        serde_json::json!({ "schema": 2, "snapshot": snapshot.id(), "policy": snapshot.policy(), "file": file.id(), "version": file.version(), "path": file.path(), "text": file.source(), "encoding": file.encoding(), "classification": file.classification() }),
     ))
 }
 fn asset(content_type: &'static str, text: &'static str) -> Response {
