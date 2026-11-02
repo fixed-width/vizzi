@@ -1,0 +1,249 @@
+{
+  "base_commit": "14f61fbb294e2636426d8bdf1b897d18ef6e7956",
+  "tool": "cargo-mutants 27.1.0",
+  "baseline": "passed for both final contributing runs",
+  "scope": [
+    "crates/vizzi/src/application.rs",
+    "crates/vizzi/src/engine.rs",
+    "crates/vizzi/src/host.rs",
+    "crates/vizzi/src/invalidation.rs"
+  ],
+  "tested": 196,
+  "counts": {
+    "Unviable": 39,
+    "CaughtMutant": 151,
+    "Timeout": 6
+  },
+  "per_file": {
+    "crates/vizzi/src/application.rs": {
+      "Unviable": 12,
+      "CaughtMutant": 16,
+      "Timeout": 1
+    },
+    "crates/vizzi/src/engine.rs": {
+      "Unviable": 6,
+      "CaughtMutant": 63,
+      "Timeout": 2
+    },
+    "crates/vizzi/src/host.rs": {
+      "CaughtMutant": 28,
+      "Unviable": 15,
+      "Timeout": 1
+    },
+    "crates/vizzi/src/invalidation.rs": {
+      "CaughtMutant": 44,
+      "Unviable": 6,
+      "Timeout": 2
+    }
+  },
+  "non_caught": [
+    {
+      "name": "crates/vizzi/src/application.rs:89:9: replace Application::inner -> MutexGuard<'_, Inner> with MutexGuard::new()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/application.rs:89:9: replace Application::inner -> MutexGuard<'_, Inner> with MutexGuard::from_iter([Default::default()])",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/application.rs:89:9: replace Application::inner -> MutexGuard<'_, Inner> with MutexGuard::new(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/application.rs:89:9: replace Application::inner -> MutexGuard<'_, Inner> with MutexGuard::from(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/application.rs:107:9: replace Application::snapshot -> Option<Arc<Snapshot>> with Some(Arc::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/application.rs:111:9: replace Application::pinned -> Option<Arc<Snapshot>> with Some(Arc::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/application.rs:115:9: replace Application::publish -> Outcome with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/application.rs:124:9: replace Application::publish_recovery -> Outcome with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/application.rs:135:9: replace Application::publish_as -> Outcome with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/application.rs:181:9: replace Application::status -> Status with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/application.rs:185:9: replace Application::subscribe -> Subscription with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/application.rs:194:5: replace status -> Status with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:107:9: replace Engine::with_syntax_cache -> Self with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:112:9: replace Engine::directory -> &Directory with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/application.rs:103:9: replace Application::desired -> u64 with 0",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:123:9: replace Engine::refresh -> Result<Option<Refresh>, EngineError> with Ok(Some(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:134:9: replace Engine::refresh_scoped -> Result<Option<Refresh>, EngineError> with Ok(Some(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:143:9: replace Engine::refresh_budget -> Result<Option<Refresh>, EngineError> with Ok(Some(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:134:9: replace Engine::refresh_scoped -> Result<Option<Refresh>, EngineError> with Ok(None)",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:143:9: replace Engine::refresh_budget -> Result<Option<Refresh>, EngineError> with Ok(None)",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:401:17: replace && with || in Engine::can_capture_paths",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/invalidation.rs:107:13: replace && with || in PendingRefresh::invalidate",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/invalidation.rs:129:9: replace PendingRefresh::plan -> Plan with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/invalidation.rs:140:9: replace PendingRefresh::publish -> Outcome with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/invalidation.rs:152:9: replace PendingRefresh::begin_recovery -> Option<RecoveryToken> with Some(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/invalidation.rs:170:9: replace PendingRefresh::recovery_plan -> Option<Plan> with Some(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/invalidation.rs:97:9: replace Plan::cancelled -> bool with true",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/invalidation.rs:97:34: replace != with == in Plan::cancelled",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/invalidation.rs:187:9: replace PendingRefresh::publish_recovery -> Outcome with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/host.rs:63:9: replace Host::start_with_options -> Result<Self, EngineError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/host.rs:59:9: replace Host::start -> Result<Self, EngineError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/host.rs:143:29: replace && with || in Host::start_with_options",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/host.rs:173:21: replace && with || in Host::start_with_options",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/host.rs:172:21: replace && with || in Host::start_with_options",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/host.rs:218:33: replace && with || in Host::start_with_options",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/host.rs:232:21: replace && with || in Host::start_with_options",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/host.rs:116:17: replace != with == in Host::start_with_options",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/host.rs:270:41: replace && with || in Host::start_with_options",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/host.rs:324:9: replace Host::application -> Arc<Application> with Arc::new(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/host.rs:330:5: replace join_recovery -> Result<Option<Refresh>, EngineError> with Ok(Some(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/host.rs:337:5: replace pending -> MutexGuard<'_, PendingRefresh> with MutexGuard::new()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/host.rs:337:5: replace pending -> MutexGuard<'_, PendingRefresh> with MutexGuard::from_iter([Default::default()])",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/host.rs:337:5: replace pending -> MutexGuard<'_, PendingRefresh> with MutexGuard::new(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/host.rs:337:5: replace pending -> MutexGuard<'_, PendingRefresh> with MutexGuard::from(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/host.rs:422:5: replace one_shot -> Result<Arc<Application>, EngineError> with Ok(Arc::new(Default::default()))",
+      "outcome": "Unviable"
+    }
+  ],
+  "commands": [
+    "cargo mutants -p vizzi --all-features --config experiments/incremental/mutants.toml -f crates/vizzi/src/application.rs -f crates/vizzi/src/engine.rs -f crates/vizzi/src/host.rs -f crates/vizzi/src/invalidation.rs -j 4 --timeout 20 --build-timeout 180 -C --offline",
+    "cargo mutants -p vizzi --all-features --config experiments/incremental/mutants.toml -f crates/vizzi/src/host.rs -j 4 --timeout 20 --build-timeout 180 -C --offline"
+  ],
+  "exclusions": [
+    {
+      "config": "experiments/incremental/mutants.toml",
+      "reason": "Existing has_descendant < to <= mutation is equivalent: validated source paths cannot equal a directory prefix ending with a slash."
+    }
+  ],
+  "source_sha256": {
+    "crates/vizzi/src/application.rs": "26e8a363ed9ecd859781a9e13fc3d518d1d3f81aee30195ee9c4a2e817362b6f",
+    "crates/vizzi/src/engine.rs": "ebe35d0502dcc0697e0c8ed54b8abcf97b53ef72670b64931c8e0c9ea5c08c1c",
+    "crates/vizzi/src/host.rs": "2687719834a8456f8c32b9619ed59a1326f007d045301101d8a7337e3d3c09b6",
+    "crates/vizzi/src/invalidation.rs": "6dd237b605eba11ddf17865e6453b325a982f0d2e1738e03218203025a09eaec"
+  },
+  "development_notes": [
+    "Initial invocation without --all-features failed its unmutated baseline because feature-gated retention_probe has no crate-level documentation when disabled; no mutations from that invocation are counted.",
+    "First complete development run: 199 tested, 142 caught, 39 unviable, 6 timeouts, 12 survived. Added pending-journal, old-token, fresh-overlay cancellation/retry, finished-private-candidate, worker-width and no-op lifecycle tests. Removed redundant status-pending guard and simplified waiting/error translation.",
+    "Next complete run: 197 tested, 150 caught, 40 unviable, 6 timeouts, 1 survived (foreground discovery/watch registration). Added real-watcher new-directory test with a 60-second recovery interval.",
+    "A shutdown assertion first failed, then shutdown was changed to clear running recovery metadata after joining. Full host scope rerun after final changes: 44 tested, 28 caught, 15 unviable, 1 timeout, no survivors.",
+    "Final aggregate uses only application/engine/invalidation outcomes from the complete four-file run and host outcomes from the final complete host run; no duplicate host outcomes. No new exclusions."
+  ],
+  "limitations": [
+    "Timeouts are separate from assertion catches: desired/plan cancellation mutations and no-result refreshes prevent bootstrap progress; inverted initial publication also loops.",
+    "Unviable substitutions are build failures, not behavioral detection.",
+    "Full affected native modules were covered, not just changed lines. Grammar/dependency internals, serialization macro bodies, OS event delivery, browser execution, and performance driver logic are outside this mutation scope."
+  ]
+}

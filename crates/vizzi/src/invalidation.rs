@@ -5,7 +5,13 @@ use crate::{
     engine::Refresh,
     source::{CaptureScope, Directory, MAX_PATH_HINTS},
 };
-use std::collections::BTreeSet;
+use std::{
+    collections::BTreeSet,
+    sync::{
+        Arc,
+        atomic::{AtomicU64, Ordering},
+    },
+};
 use vizzi_core::publication::Outcome;
 
 pub(crate) fn classify(
@@ -69,6 +75,18 @@ pub(crate) fn classify(
 pub(crate) struct PendingRefresh {
     scope: Option<CaptureScope>,
     ticket: u64,
+    discovery: Arc<AtomicU64>,
+    recovery: Option<BTreeSet<std::path::PathBuf>>,
+}
+#[derive(Clone)]
+pub(crate) struct RecoveryToken {
+    revision: u64,
+    discovery: Arc<AtomicU64>,
+}
+impl RecoveryToken {
+    pub(crate) fn cancelled(&self, stopped: bool) -> bool {
+        stopped || self.discovery.load(Ordering::Acquire) != self.revision
+    }
 }
 pub(crate) struct Plan {
     pub ticket: u64,
@@ -81,15 +99,31 @@ impl Plan {
 }
 impl PendingRefresh {
     pub(crate) fn invalidate(&mut self, app: &Application, scope: CaptureScope) {
-        let scope = match scope {
+        let mut scope = match scope {
             CaptureScope::Paths(paths) if paths.len() > MAX_PATH_HINTS => CaptureScope::Reconcile,
             other => other,
         };
+        if let Some(journal) = &mut self.recovery
+            && let CaptureScope::Paths(paths) = &scope
+        {
+            journal.extend(paths.iter().cloned());
+            if journal.len() > MAX_PATH_HINTS {
+                scope = CaptureScope::Reconcile;
+            }
+        }
         match &mut self.scope {
             Some(current) => current.merge(scope),
             None => self.scope = Some(scope),
         }
-        self.ticket = app.request();
+        if matches!(self.scope, Some(CaptureScope::Reconcile)) {
+            self.cancel_recovery();
+        }
+        let ticket = app.request();
+        if ticket != self.ticket + 1 {
+            self.scope = Some(CaptureScope::Reconcile);
+            self.cancel_recovery();
+        }
+        self.ticket = ticket;
     }
     pub(crate) fn plan(&self, app: &Application) -> Plan {
         let ticket = app.desired();
@@ -103,9 +137,59 @@ impl PendingRefresh {
         }
     }
     pub(crate) fn publish(&mut self, app: &Application, ticket: u64, refresh: Refresh) -> Outcome {
+        let full = refresh.directories.is_some();
         let outcome = app.publish(ticket, refresh);
         if outcome != Outcome::Stale {
             self.scope = None;
+            self.ticket = ticket;
+            if full {
+                self.cancel_recovery();
+            }
+        }
+        outcome
+    }
+    pub(crate) fn begin_recovery(&mut self, app: &Application) -> Option<RecoveryToken> {
+        if matches!(self.scope, Some(CaptureScope::Reconcile)) || app.desired() != self.ticket {
+            return None;
+        }
+        self.cancel_recovery();
+        self.recovery = Some(match &self.scope {
+            Some(CaptureScope::Paths(paths)) => paths.clone(),
+            _ => BTreeSet::new(),
+        });
+        Some(RecoveryToken {
+            revision: self.discovery.load(Ordering::Acquire),
+            discovery: self.discovery.clone(),
+        })
+    }
+    pub(crate) fn cancel_recovery(&mut self) {
+        self.discovery.fetch_add(1, Ordering::AcqRel);
+        self.recovery = None;
+    }
+    pub(crate) fn recovery_plan(&self, app: &Application, token: &RecoveryToken) -> Option<Plan> {
+        if token.cancelled(false) || self.scope.is_some() || app.desired() != self.ticket {
+            return None;
+        }
+        Some(Plan {
+            ticket: self.ticket,
+            scope: CaptureScope::Paths(self.recovery.as_ref()?.clone()),
+        })
+    }
+    pub(crate) fn publish_recovery(
+        &mut self,
+        app: &Application,
+        token: &RecoveryToken,
+        ticket: u64,
+        refresh: Refresh,
+        verification: crate::engine::Measurements,
+        overlay: Option<crate::engine::Measurements>,
+    ) -> Outcome {
+        if self.recovery_plan(app, token).is_none() || ticket != self.ticket {
+            return Outcome::Stale;
+        }
+        let outcome = app.publish_recovery(ticket, refresh, verification, overlay);
+        if outcome != Outcome::Stale {
+            self.cancel_recovery();
         }
         outcome
     }
@@ -393,5 +477,224 @@ mod tests {
             classify(&directory, Ok(from)),
             Some(CaptureScope::Reconcile)
         );
+    }
+    #[test]
+    fn recovery_journal_survives_foreground_acknowledgement_and_stale_overlays() {
+        let source = tempfile::tempdir().unwrap();
+        let cache = tempfile::tempdir().unwrap();
+        std::fs::write(source.path().join("a.rs"), "fn a() {}").unwrap();
+        let engine = Engine::new(
+            Directory::open(source.path()).unwrap(),
+            Cache::new(cache.path().into()),
+            2,
+        )
+        .unwrap();
+        let app = Application::new("journal".into()).unwrap();
+        let mut queue = PendingRefresh::default();
+        queue.invalidate(&app, CaptureScope::Reconcile);
+        let plan = queue.plan(&app);
+        queue.publish(
+            &app,
+            plan.ticket,
+            engine.refresh(None, &|| false).unwrap().unwrap(),
+        );
+        let token = queue.begin_recovery(&app).unwrap();
+        let private = engine
+            .refresh(app.snapshot().as_deref(), &|| false)
+            .unwrap()
+            .unwrap();
+        std::fs::write(source.path().join("a.rs"), "fn latest_a() {}").unwrap();
+        queue.invalidate(&app, paths(&["a.rs"]));
+        assert!(!token.cancelled(false));
+        assert!(queue.recovery_plan(&app, &token).is_none());
+        let foreground = queue.plan(&app);
+        queue.publish(
+            &app,
+            foreground.ticket,
+            engine
+                .refresh_scoped(app.snapshot().as_deref(), &foreground.scope, &|| false)
+                .unwrap()
+                .unwrap(),
+        );
+        let overlay = queue.recovery_plan(&app, &token).unwrap();
+        assert_eq!(overlay.scope, paths(&["a.rs"]));
+        std::fs::write(source.path().join("b.rs"), "fn latest_b() {}").unwrap();
+        queue.invalidate(&app, paths(&["b.rs"]));
+        assert_eq!(
+            queue.publish_recovery(
+                &app,
+                &token,
+                overlay.ticket,
+                private.clone(),
+                private.measurements.clone(),
+                None
+            ),
+            Outcome::Stale
+        );
+        let foreground = queue.plan(&app);
+        queue.publish(
+            &app,
+            foreground.ticket,
+            engine
+                .refresh_scoped(app.snapshot().as_deref(), &foreground.scope, &|| false)
+                .unwrap()
+                .unwrap(),
+        );
+        let overlay = queue.recovery_plan(&app, &token).unwrap();
+        assert_eq!(overlay.scope, paths(&["a.rs", "b.rs"]));
+        let mut result = engine
+            .refresh_scoped(Some(&private.snapshot), &overlay.scope, &|| false)
+            .unwrap()
+            .unwrap();
+        let measurements = result.measurements.clone();
+        result.directories = private.directories.clone();
+        assert_ne!(
+            queue.publish_recovery(
+                &app,
+                &token,
+                overlay.ticket,
+                result,
+                private.measurements,
+                Some(measurements)
+            ),
+            Outcome::Stale
+        );
+        assert_eq!(app.status().recovery.completed, 1);
+        assert!(queue.recovery_plan(&app, &token).is_none());
+        assert_eq!(
+            app.snapshot().unwrap().id(),
+            engine
+                .refresh(None, &|| false)
+                .unwrap()
+                .unwrap()
+                .snapshot
+                .id()
+        );
+    }
+    #[test]
+    fn hard_requests_and_a_journal_overflow_cancel_private_recovery() {
+        let root = tempfile::tempdir().unwrap();
+        let cache = tempfile::tempdir().unwrap();
+        let engine = Engine::new(
+            Directory::open(root.path()).unwrap(),
+            Cache::new(cache.path().into()),
+            2,
+        )
+        .unwrap();
+        let app = Application::new("overflow".into()).unwrap();
+        let mut queue = PendingRefresh::default();
+        queue.invalidate(&app, CaptureScope::Reconcile);
+        let initial = queue.plan(&app);
+        queue.publish(
+            &app,
+            initial.ticket,
+            engine.refresh(None, &|| false).unwrap().unwrap(),
+        );
+        let token = queue.begin_recovery(&app).unwrap();
+        assert!(!token.cancelled(false));
+        assert!(token.cancelled(true));
+        let hints = CaptureScope::Paths(
+            (0..MAX_PATH_HINTS)
+                .map(|i| format!("missing{i}.rs").into())
+                .collect(),
+        );
+        queue.invalidate(&app, hints);
+        let foreground = queue.plan(&app);
+        queue.publish(
+            &app,
+            foreground.ticket,
+            engine
+                .refresh_scoped(app.snapshot().as_deref(), &foreground.scope, &|| false)
+                .unwrap()
+                .unwrap(),
+        );
+        assert!(!token.cancelled(false));
+        queue.invalidate(&app, paths(&["extra.rs"]));
+        assert!(token.cancelled(false));
+        assert_eq!(queue.plan(&app).scope, CaptureScope::Reconcile);
+        let foreground = queue.plan(&app);
+        queue.publish(
+            &app,
+            foreground.ticket,
+            engine
+                .refresh(app.snapshot().as_deref(), &|| false)
+                .unwrap()
+                .unwrap(),
+        );
+        let token = queue.begin_recovery(&app).unwrap();
+        queue.invalidate(&app, CaptureScope::Reconcile);
+        assert!(token.cancelled(false));
+        assert!(queue.begin_recovery(&app).is_none());
+    }
+    #[test]
+    fn manual_request_followed_by_a_path_hint_still_requires_full_discovery() {
+        let app = Application::new("manual".into()).unwrap();
+        let mut queue = PendingRefresh::default();
+        queue.invalidate(&app, paths(&["a.rs"]));
+        app.request();
+        queue.invalidate(&app, paths(&["b.rs"]));
+        assert_eq!(queue.plan(&app).scope, CaptureScope::Reconcile);
+    }
+    #[test]
+    fn recovery_keeps_hints_that_were_pending_before_its_start() {
+        let app = Application::new("seed".into()).unwrap();
+        let mut queue = PendingRefresh::default();
+        queue.invalidate(&app, paths(&["a.rs"]));
+        let token = queue.begin_recovery(&app).unwrap();
+        assert!(queue.recovery_plan(&app, &token).is_none());
+        let root = tempfile::tempdir().unwrap();
+        let cache = tempfile::tempdir().unwrap();
+        let engine = Engine::new(
+            Directory::open(root.path()).unwrap(),
+            Cache::new(cache.path().into()),
+            1,
+        )
+        .unwrap();
+        let mut refresh = engine.refresh(None, &|| false).unwrap().unwrap();
+        // Model a successful path attempt acknowledging the existing hint.
+        refresh.directories = None;
+        let ticket = queue.plan(&app).ticket;
+        queue.publish(&app, ticket, refresh);
+        assert_eq!(
+            queue.recovery_plan(&app, &token).unwrap().scope,
+            paths(&["a.rs"])
+        );
+        let app = Application::new("initial-overflow".into()).unwrap();
+        let mut queue = PendingRefresh::default();
+        queue.invalidate(
+            &app,
+            CaptureScope::Paths(
+                (0..=MAX_PATH_HINTS)
+                    .map(|i| format!("file{i}.rs").into())
+                    .collect(),
+            ),
+        );
+        assert_eq!(queue.plan(&app).scope, CaptureScope::Reconcile);
+    }
+    #[test]
+    fn recovery_rejects_old_tokens_and_unassociated_manual_requests_at_current_tickets() {
+        let app = Application::new("guards".into()).unwrap();
+        let mut queue = PendingRefresh::default();
+        let old = queue.begin_recovery(&app).unwrap();
+        let current = queue.begin_recovery(&app).unwrap();
+        assert!(queue.recovery_plan(&app, &old).is_none());
+        assert!(queue.recovery_plan(&app, &current).is_some());
+        let root = tempfile::tempdir().unwrap();
+        let cache = tempfile::tempdir().unwrap();
+        let engine = Engine::new(
+            Directory::open(root.path()).unwrap(),
+            Cache::new(cache.path().into()),
+            1,
+        )
+        .unwrap();
+        let refresh = engine.refresh(None, &|| false).unwrap().unwrap();
+        let measurements = refresh.measurements.clone();
+        assert_eq!(
+            queue.publish_recovery(&app, &old, app.desired(), refresh, measurements, None),
+            Outcome::Stale
+        );
+        let ticket = app.request();
+        app.fail(ticket, "manual failure".into());
+        assert!(queue.recovery_plan(&app, &current).is_none());
     }
 }

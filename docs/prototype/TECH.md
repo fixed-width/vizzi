@@ -73,14 +73,17 @@ writes. Invalid records are misses; write failures are reported as cache warning
 valid analysis remains usable. JSON is a prototype implementation, not a storage decision.
 
 The native coordinator carries verified dirty-path hints into capture and periodically
-reconciles the whole source scope. It retains unread documents only from the published
-baseline; cancelled and superseded jobs do not consume pending hints. Directory or
+reconciles the whole source scope. Foreground attempts retain unread documents from
+the published baseline; cancelled and superseded jobs do not consume pending hints. Directory or
 ambiguous changes fall back to complete discovery. New watch registration closes its
 discovery gap with another full pass. See [incremental capture](INCREMENTAL_CAPTURE.md).
 The [verified capture plan](CAPTURE_PLAN.md) avoids rescanning unchanged classification
 metadata, while snapshot merging and version hashing remain linear in file count.
-One worker budget and queue cover all languages; parser creation is lazy and ownership
-remains local to a bounded worker. [Cooperative cancellation](ANALYSIS_CANCELLATION.md)
+[Periodic recovery](RECOVERY.md) uses one private verification worker when the budget
+permits, reserving remaining workers for foreground hints. Its final fresh journal
+overlay prevents recovery from replacing newer foreground source. One shared worker
+budget and bounded invalidation queue cover all languages; parser creation is lazy
+and ownership remains local to a bounded worker. [Cooperative cancellation](ANALYSIS_CANCELLATION.md)
 checks during built-in parsing and extraction as well as between files. It does not
 impose a hard deadline on all analysis/capture operations. Parsing never holds the publication lock.
 [Opt-in syntax retention](SYNTAX_RETENTION.md) transfers an owned tree and exact source
@@ -90,7 +93,7 @@ documents remain immutable and carry no mutable syntax state.
 ## Host interface
 
 - `GET /api/status` returns generation, snapshot identity, pending state, and last
-  analysis/cache measurements.
+  analysis/cache measurements, plus separate private recovery progress and phase measurements.
 - `GET /api/view` returns a bounded overview, reconciled selection, and selected source
   from one snapshot. File and declaration identities are opaque query parameters.
 - `GET /api/source` supports an explicitly pinned snapshot and file identity. Unknown

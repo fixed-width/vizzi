@@ -12,6 +12,7 @@ const options = { duration: 4000, samples: 3 };
 for (let i = 2; i < process.argv.length; i++) {
   const flag = process.argv[i];
   if (["--measure", "--headed"].includes(flag)) continue;
+  if (flag === "--during-recovery") { options.duringRecovery = true; continue; }
   if (flag === "--reference-only") { options.referenceOnly = true; continue; }
   if (!["--source", "--revision", "--output", "--duration", "--samples", "--profile", "--probe-id"].includes(flag)) throw new Error(`Unknown argument ${flag}`);
   const value = process.argv[++i];
@@ -49,6 +50,16 @@ async function settled(host) {
     await delay(20);
   }
   throw new Error("Refresh did not settle");
+}
+async function activeRecovery(host, previousCompleted) {
+  const deadline = performance.now() + 30000;
+  while (performance.now() < deadline) {
+    const status = await (await fetch(`${host.url}/api/status`)).json();
+    assert.equal(status.error, null);
+    if (!status.pending && status.recovery?.running && (previousCompleted === undefined || status.recovery.completed > previousCompleted)) return status;
+    await delay(3);
+  }
+  throw new Error("No active periodic recovery observed");
 }
 async function sampleRss(pid) {
   if (platform() !== "linux") return null;
@@ -171,8 +182,12 @@ async function singleEdits(page, input, host, picking) {
   const view = await (await fetch(`${host.url}/api/view?file=${encodeURIComponent(picking.fileId)}`)).json();
   const path = join(input.root, view.source.path), original = await readFile(path);
   const results = [];
-  for (const offset of [0, 97, 211, 367, 463]) {
-    const before = await settled(host); await delay(offset);
+  let previousRecovery;
+  const offsets = options.duringRecovery ? Array.from({length: 10}, (_, i) => i) : [0, 97, 211, 367, 463];
+  for (const offset of offsets) {
+    const before = options.duringRecovery ? await activeRecovery(host, previousRecovery) : await settled(host);
+    previousRecovery = before.recovery?.completed;
+    if (!options.duringRecovery) await delay(offset);
     const marker = `${view.source.outlines[0].context.language === "python" ? "#" : "//"} browser-visible-${options.probeId}-${offset}`;
     const started = performance.now();
     await writeFile(path, Buffer.concat([Buffer.from(marker + "\n"), original]));
@@ -189,7 +204,7 @@ async function singleEdits(page, input, host, picking) {
     await paint(page);
     const latency = performance.now() - started;
     const status = await publication;
-    results.push({ offsetMs: offset, writeToDomAndTwoRafMs: latency, measurements: status.measurements });
+    results.push({ sample: results.length, offsetMs: options.duringRecovery ? 0 : offset, recoveryBeforeWrite: before.recovery ?? null, writeToDomAndTwoRafMs: latency, measurements: status.measurements, recoveryAfterPublication: status.recovery ?? null });
   }
   return { samples: results, summary: summary(results.map(result => result.writeToDomAndTwoRafMs)) };
 }

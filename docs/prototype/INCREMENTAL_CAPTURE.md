@@ -36,7 +36,11 @@ them; cancelled, superseded, and failed attempts leave them pending for the next
 An explicit refresh with no associated hints also reconciles.
 
 The coordinator checks a reconciliation deadline even during repeated file events.
-Completing a full pass resets that deadline. New watch registrations trigger an
+Completing a full pass resets that deadline. With at least two configured workers,
+periodic verification runs privately while foreground path hints continue. A bounded
+journal is freshly verified before that candidate can publish; hard discovery still
+invalidates it. See [recovery scheduling](RECOVERY.md) for worker reservation, status,
+retry, and one-worker serial behavior. New watch registrations trigger an
 additional full pass to close the discovery/registration gap. Existing registrations
 are refreshed during reconciliation so replaced directories can be observed again.
 

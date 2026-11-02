@@ -9,7 +9,7 @@ strings. HTTP responses disable caching. The host serves `/`, `/app.js`, `/contr
 
 | Request | Parameters | Response |
 | --- | --- | --- |
-| `GET /api/status` | None | Workspace name, generation, snapshot, pending flag, measurements, refresh error, observation mode |
+| `GET /api/status` | None | Workspace name, generation, snapshot, foreground pending flag, measurements, recovery metadata, refresh error, observation mode |
 | `GET /api/view` | Optional `snapshot`, `file`, `entity`, `filter`, `limit` | One snapshot's bounded overview, selection, captured source, and outlines |
 | `GET /api/window` | Required `snapshot`, `file`, `version`; optional source/outline ranges | Bounded text fragments, declaration page, and logical cursor from that exact pin |
 | `GET /api/source` | Required `snapshot`, `file` | Captured source from the requested retained observation |
@@ -80,6 +80,13 @@ metadata as content proof. `capture_ms` includes input validation, discovery/can
 inspection, reads, content hashing, and new source/index construction;
 `total_ms` includes capture, verification, analysis/cache activity, and snapshot creation.
 Transport, debounce, notification delivery, and painting are outside those timings.
+
+`pending` excludes private periodic verification. Additive `recovery` metadata contains
+`running`, `completed`, `discarded`, `verification`, `overlay`, and `error`. Verification
+and overlay measurements remain separate; normal `measurements` records the final
+accepted operation, so an accepted recovery overlay can have `reconciled: false`.
+Use `recovery.completed` to track private periodic completion. One-worker serial passes
+use normal measurements. See [recovery scheduling](RECOVERY.md) for exact semantics.
 
 In stdio mode, requests are JSON lines `{"id":1,"uri":"/api/view"}`. Responses are
 `{"id":1,"status":200,"content_type":"application/json","body":"..."}`. The body

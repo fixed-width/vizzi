@@ -79,6 +79,14 @@ RSS, browser request counts, and five single-file update observations. The drive
 queries status from Node to classify pending periods; this is separate from the
 browser client, which consumes change notifications. Screenshots accompany the JSON report.
 
+Use `--during-recovery` to replace the five spaced single-file observations with ten
+writes, each triggered after Node observes a different active private periodic pass.
+The report records recovery metadata immediately before the write and after foreground
+publication. A pass can finish between the status response and the write; this is
+observed overlap, not an instrumented scan/IO ordering guarantee. Controlled held-parser
+tests establish concurrent correctness separately. This mode requires the native
+recovery status contract and can wait up to 30 seconds for each next active pass.
+
 Use `--samples 1 --duration 1000` for a harness smoke test. Durations are milliseconds;
 allowed ranges are 1–10 samples and 1,000–30,000 ms. Existing reports and screenshots
 are never overwritten. Local scratch results belong in `results/local/`, which Git

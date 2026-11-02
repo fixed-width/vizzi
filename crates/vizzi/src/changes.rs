@@ -103,6 +103,7 @@ mod tests {
     use futures_util::FutureExt;
     fn status() -> Status {
         Status {
+            recovery: crate::application::RecoveryStatus::default(),
             schema: 1,
             name: "fixture".into(),
             generation: 0,

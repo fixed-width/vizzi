@@ -71,6 +71,7 @@ pub struct Measurements {
     pub total_ms: f64,
 }
 /// A validated refresh ready for a publication-ticket check.
+#[derive(Clone)]
 pub struct Refresh {
     /// Complete immutable observation.
     pub snapshot: Arc<Snapshot>,
@@ -110,6 +111,9 @@ impl Engine {
     pub fn directory(&self) -> &Directory {
         &self.directory
     }
+    pub(crate) fn workers(&self) -> usize {
+        self.workers
+    }
     /// Captures source, reuses validated analysis, and checks cancellation between jobs.
     pub fn refresh(
         &self,
@@ -119,7 +123,7 @@ impl Engine {
         self.refresh_scoped(previous, &CaptureScope::Reconcile, cancelled)
     }
 
-    /// Verifies a path hint set or reconciles, using only the published baseline.
+    /// Verifies a path hint set or reconciles against an immutable baseline.
     /// A different source policy always forces complete discovery.
     pub fn refresh_scoped(
         &self,
@@ -127,6 +131,16 @@ impl Engine {
         scope: &CaptureScope,
         cancelled: &(dyn Fn() -> bool + Sync),
     ) -> Result<Option<Refresh>, EngineError> {
+        self.refresh_budget(previous, scope, cancelled, self.workers)
+    }
+    pub(crate) fn refresh_budget(
+        &self,
+        previous: Option<&Snapshot>,
+        scope: &CaptureScope,
+        cancelled: &(dyn Fn() -> bool + Sync),
+        workers: usize,
+    ) -> Result<Option<Refresh>, EngineError> {
+        let workers = workers.clamp(1, self.workers);
         if cancelled() {
             return Ok(None);
         }
@@ -218,7 +232,7 @@ impl Engine {
         jobs.sort_by_key(|job| std::cmp::Reverse(job.0.source.bytes().len()));
         let next = AtomicUsize::new(0);
         let batches = std::thread::scope(|scope| {
-            let handles: Vec<_> = (0..self.workers.min(jobs.len()))
+            let handles: Vec<_> = (0..workers.min(jobs.len()))
                 .map(|_| {
                     scope.spawn(|| -> Result<_, EngineError> {
                         let mut parsers = BTreeMap::<_, Box<dyn Analyzer>>::new();

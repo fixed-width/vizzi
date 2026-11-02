@@ -213,7 +213,10 @@ fn reconciliation_runs_while_write_hints_keep_arriving() {
             && state["measurements"]["reused"] == 1
             && state["measurements"]["reconciled"] == true
         {
-            break state["snapshot"].clone();
+            break (
+                state["snapshot"].clone(),
+                state["recovery"]["completed"].as_u64().unwrap(),
+            );
         }
         assert!(initial.elapsed() < Duration::from_secs(8));
         std::thread::sleep(Duration::from_millis(5));
@@ -232,9 +235,9 @@ fn reconciliation_runs_while_write_hints_keep_arriving() {
     let mut recovered = false;
     while started.elapsed() < Duration::from_secs(6) {
         let state = session.request("/api/status");
-        if state["snapshot"] != baseline
+        if state["snapshot"] != baseline.0
             && state["pending"] == false
-            && state["measurements"]["reconciled"] == true
+            && state["recovery"]["completed"].as_u64().unwrap() > baseline.1
         {
             recovered = true;
             break;

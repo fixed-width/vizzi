@@ -19,6 +19,23 @@ struct Inner {
     measurements: Option<crate::engine::Measurements>,
     error: Option<String>,
     observation: String,
+    recovery: RecoveryStatus,
+}
+/// Periodic verification progress, separate from foreground pending work.
+#[derive(Clone, Debug, Default, PartialEq, Serialize)]
+pub struct RecoveryStatus {
+    /// Whether a private verification or its overlay is outstanding.
+    pub running: bool,
+    /// Accepted complete periodic verifications, including unchanged observations.
+    pub completed: u64,
+    /// Cancelled/failed private candidates.
+    pub discarded: u64,
+    /// Complete verification phase of the latest accepted recovery.
+    pub verification: Option<crate::engine::Measurements>,
+    /// Fresh dirty-path overlay phase, when needed; counters are not added together.
+    pub overlay: Option<crate::engine::Measurements>,
+    /// Most recent maintenance failure without changing foreground error state.
+    pub error: Option<String>,
 }
 /// Transport-independent application operations for a single workspace.
 pub struct Application {
@@ -30,6 +47,8 @@ pub struct Application {
 /// A small status response; polling never reads source or runs analysis.
 #[derive(Clone, Debug, PartialEq, Serialize)]
 pub struct Status {
+    /// Private periodic recovery progress and phase measurements.
+    pub recovery: RecoveryStatus,
     /// Version of the host response schema.
     pub schema: u32,
     /// Workspace display name.
@@ -38,7 +57,7 @@ pub struct Status {
     pub generation: u64,
     /// Current opaque snapshot identity.
     pub snapshot: Option<String>,
-    /// Whether a refresh is outstanding.
+    /// Whether foreground work is outstanding; private recovery is separate.
     pub pending: bool,
     /// Latest completed capture and analysis measurements.
     pub measurements: Option<crate::engine::Measurements>,
@@ -56,6 +75,7 @@ impl Application {
             measurements: None,
             error: None,
             observation: "initializing".into(),
+            recovery: RecoveryStatus::default(),
         };
         let changes = Changes::new(status(&name, &inner))?;
         Ok(Self {
@@ -92,14 +112,54 @@ impl Application {
     }
     /// Publishes validated work only for the latest request.
     pub fn publish(&self, ticket: u64, refresh: Refresh) -> Outcome {
+        self.publish_as(ticket, refresh, None)
+    }
+    pub(crate) fn publish_recovery(
+        &self,
+        ticket: u64,
+        refresh: Refresh,
+        verification: crate::engine::Measurements,
+        overlay: Option<crate::engine::Measurements>,
+    ) -> Outcome {
+        self.publish_as(ticket, refresh, Some((verification, overlay)))
+    }
+    fn publish_as(
+        &self,
+        ticket: u64,
+        refresh: Refresh,
+        recovery: Option<(
+            crate::engine::Measurements,
+            Option<crate::engine::Measurements>,
+        )>,
+    ) -> Outcome {
         let mut inner = self.inner();
         let outcome = inner.publication.publish(ticket, refresh.snapshot);
         if outcome != Outcome::Stale {
             inner.measurements = Some(refresh.measurements);
             inner.error = None;
+            if let Some((verification, overlay)) = recovery {
+                inner.recovery.running = false;
+                inner.recovery.completed += 1;
+                inner.recovery.verification = Some(verification);
+                inner.recovery.overlay = overlay;
+                inner.recovery.error = None;
+            }
             self.changes.update(status(&self.name, &inner));
         }
         outcome
+    }
+    pub(crate) fn recovery_started(&self) {
+        let mut inner = self.inner();
+        inner.recovery.running = true;
+        inner.recovery.error = None;
+        self.changes.update(status(&self.name, &inner));
+    }
+    pub(crate) fn recovery_discarded(&self, error: Option<String>) {
+        let mut inner = self.inner();
+        inner.recovery.running = false;
+        inner.recovery.discarded += 1;
+        inner.recovery.error = error;
+        self.changes.update(status(&self.name, &inner));
     }
     /// Records failure of the latest request without clearing the current snapshot.
     pub fn fail(&self, ticket: u64, error: String) {
@@ -132,6 +192,7 @@ impl Application {
 
 fn status(name: &str, inner: &Inner) -> Status {
     Status {
+        recovery: inner.recovery.clone(),
         schema: 1,
         name: name.into(),
         generation: inner.publication.generation(),
@@ -193,6 +254,50 @@ mod tests {
         assert_eq!(app.status().observation, "polling");
         assert_eq!(app.status().name, "fixture");
         assert_eq!(app.status().generation, 1);
+    }
+
+    #[test]
+    fn recovery_metadata_is_independent_of_foreground_failure_and_stale_publication() {
+        let app = Application::new("recovery".into()).unwrap();
+        let first = app.request();
+        app.publish(first, refresh(1));
+        app.recovery_started();
+        assert!(app.status().recovery.running);
+        assert!(!app.status().pending);
+        let next = app.request();
+        app.fail(next, "foreground failed".into());
+        app.recovery_discarded(Some("maintenance failed".into()));
+        let state = app.status();
+        assert!(!state.recovery.running);
+        assert_eq!(state.recovery.discarded, 1);
+        assert_eq!(state.recovery.error.as_deref(), Some("maintenance failed"));
+        assert_eq!(state.error.as_deref(), Some("foreground failed"));
+        app.recovery_started();
+        assert_eq!(app.status().recovery.error, None);
+        let before = app.status();
+        assert_eq!(
+            app.publish_recovery(first, refresh(99), Measurements::default(), None),
+            Outcome::Stale
+        );
+        assert_eq!(app.status(), before);
+        let overlay = refresh(3).measurements;
+        let verification = refresh(2).measurements;
+        assert_eq!(
+            app.publish_recovery(
+                next,
+                refresh(3),
+                verification.clone(),
+                Some(overlay.clone())
+            ),
+            Outcome::Unchanged
+        );
+        let state = app.status();
+        assert_eq!(state.recovery.completed, 1);
+        assert_eq!(state.recovery.discarded, 1);
+        assert!(!state.recovery.running);
+        assert_eq!(state.recovery.verification, Some(verification));
+        assert_eq!(state.recovery.overlay, Some(overlay));
+        assert_eq!(state.error, None);
     }
 
     #[tokio::test]

@@ -69,15 +69,18 @@ outside this host's current contract.
 
 ## Shared worker budget
 
-`Engine::new` accepts 1–32 workers, defaulting to four in the CLI. Every refresh uses
+`Engine::new` accepts 1–32 workers, defaulting to four in the CLI.
+[Private periodic recovery](RECOVERY.md) reserves one of these workers while foreground
+work uses the remainder; a single-worker host stays serial. Every refresh uses
 one largest-file-first queue across all selected languages and at most that many
 workers. A worker creates each needed analyzer lazily and owns it exclusively; there
 are no independent per-language thread pools. Warm cache hits create no analyzers.
 With four adapters, up to four times the worker count of parser instances may exist during
 an attempt, with no more than the worker count actively analyzing files.
 
-The host serializes refresh attempts; direct concurrent `Engine::refresh` callers
-each receive their own per-attempt limit. This is a concurrency budget, not a hard RAM
+The host serializes foreground attempts and allows one private periodic verification
+within the shared budget. Direct concurrent `Engine::refresh` callers each receive
+their own per-attempt limit. This is a concurrency budget, not a hard RAM
 limit. Capture still retains all selected bytes, and a single parser may need a large
 tree. Per-file size limits, admission by memory estimate, and process-wide scheduling
 remain open. Built-in parsing and extraction support cooperative cancellation; this

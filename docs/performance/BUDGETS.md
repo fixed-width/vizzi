@@ -17,7 +17,7 @@ repeats four-worker retained reparse and measures cooperative interruption withi
 | Background throughput | Eight only with available resources and measured query impact | Retained reparse improves about 1.6×; Linux core-query p95 grows from at most 44.4 to 52.6 ms |
 | Native workspace memory | Aim below 8 GiB peak while retaining the previous observation | Latest four-worker shared-source reparse: Linux 2.526 GiB, PyTorch 0.757 GiB on the 62.5 GiB host. Earlier eight-worker conditions are separate; no enforced cap |
 | Bounded core view | Aim for p95 below 50 ms for the current 2,000-tile query | Four-worker observations fit on this host; eight-worker Linux has misses |
-| Ordinary edit visibility | Aim for all five probe edits below 200 ms before collecting meaningful tails | Latest windowed probes: Linux median/max 123/174 ms; PyTorch 105/301 ms with full recovery. The gate remains unmet for PyTorch |
+| Ordinary edit visibility | Aim for ordinary probe edits below 200 ms before collecting meaningful tails | Ten writes following observed active recovery per profile: Linux p50/max 120/139 ms; PyTorch 96/106 ms. All twenty are one-file attempts; finite samples on the reference host |
 | Cancellation response | Aim below 250 ms after a request during parsing | Follow-up direct engine-return ranges: Linux 41–46 ms; PyTorch 18–23 ms. Three samples each; cooperative callbacks do not impose a hard deadline |
 | Retained syntax | Opt-in shared admission quota, initially 512 MiB and eight entries | Charges old/new state together; Perfetto peaks at 500.3 MiB weight. Normal parsing/capture allocations remain outside it |
 | Source and outline DOM | Bound each pane by visible rows plus overscan; initial ceiling 200 rendered entries | Latest headers render 47–49 source rows and 0/21 outline controls. Browser delivery uses <=96 source rows/32 KiB text and <=200 outline entries; lazy identity indexing remains input-dependent |
@@ -60,10 +60,17 @@ in that paired run; capture-phase timing now includes hashing/index construction
    serial preparation cost of new source. [Verified source sharing](../prototype/CAPTURED_SOURCE.md)
    now removes duplicate byte/line-index storage; different old/new contents can still
    coexist. Full recovery still reads/hashes the entire selected scope.
-3. Continue overview/recovery and first-use identity-index work after
+3. Continue overview and first-use identity-index work after
    [bounded document delivery](../prototype/WINDOWS.md). The
    [windowed measurements](../../experiments/windows/RESULTS.md) remove bulk browser
    source/list transfer; necessary indexing and full source verification remain.
+
+[Private periodic recovery](../prototype/RECOVERY.md) now reserves one parser worker
+while foreground hints continue. Its [follow-up](../../experiments/recovery/RESULTS.md)
+meets the ordinary-edit probe target on this host and retains independent clean-capture
+agreement. Full verification still takes about 1.1–1.3 s Linux and 0.19–0.25 s PyTorch
+in the sampled accepted passes. Perfetto's large edit takes 1.34 s without tree reuse;
+large-file admission and working sets remain unresolved. One-worker hosts remain serial.
 
 Do not replace semantic correctness checks with these performance targets. Language
 assignments, partial grammar coverage, source-only cases, cancellation, cache validity,
