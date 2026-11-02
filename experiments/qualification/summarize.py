@@ -43,6 +43,7 @@ if __name__ == "__main__":
                    "lifetime_hwm_gib": run["peaks_kib"].get("VmHWM", 0) / 1048576,
                    "query_p50_ms": summary(times)["p50"], "query_p95_ms": summary(times)["p95"], "query_p99_ms": summary(times)["p99"],
                    "query_count": len(times), "cancel_response_s": at.get("phase_done", 0) - at["cancel_requested"] if "cancel_requested" in at else None,
+                   "cancel_to_return_ms": probe.get("cancel_to_return_ms") if probe else None,
                    "snapshot": status["snapshot"], "files": status["measurements"]["files"], "analyzed": status["measurements"]["analyzed"],
                    "source_only": status["measurements"]["source_only"], "input_bytes": status["measurements"]["bytes"]}
             rows.append(row)

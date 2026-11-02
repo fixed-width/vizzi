@@ -4,7 +4,18 @@ use crate::{
     analysis::Analyzer,
     model::{Analysis, ContentId, Context, Coverage, Fact, ModelError},
 };
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, ops::ControlFlow};
+
+struct Checkpoints<'a> {
+    cancelled: &'a dyn Fn() -> bool,
+    ticks: u8,
+}
+impl Checkpoints<'_> {
+    fn poll(&mut self) -> bool {
+        self.ticks = self.ticks.wrapping_add(1);
+        self.ticks == 0 && (self.cancelled)()
+    }
+}
 
 pub(crate) struct Declaration {
     pub kind: &'static str,
@@ -52,6 +63,18 @@ impl SyntaxAnalyzer {
 impl Analyzer for SyntaxAnalyzer {
     /// Extracts source-backed declarations and reports syntax recovery.
     fn analyze(&mut self, bytes: &[u8]) -> Result<Analysis, ModelError> {
+        self.analyze_cancellable(bytes, &|| false)?
+            .ok_or_else(|| ModelError("uncancelled analysis was interrupted".into()))
+    }
+
+    fn analyze_cancellable(
+        &mut self,
+        bytes: &[u8],
+        cancelled: &dyn Fn() -> bool,
+    ) -> Result<Option<Analysis>, ModelError> {
+        if cancelled() {
+            return Ok(None);
+        }
         let mut analysis = Analysis {
             content: ContentId::derive(&[bytes]),
             context: self.context.clone(),
@@ -64,12 +87,34 @@ impl Analyzer for SyntaxAnalyzer {
             analysis
                 .diagnostics
                 .push("Source is not UTF-8; syntax analysis is unavailable".into());
-            return Ok(analysis);
+            return Ok((!cancelled()).then_some(analysis));
         };
-        let tree = self
-            .parser
-            .parse(text, None)
-            .ok_or_else(|| ModelError("parser did not return a tree".into()))?;
+        let mut stopped = false;
+        let mut progress = |_: &tree_sitter::ParseState| {
+            if cancelled() {
+                stopped = true;
+                ControlFlow::Break(())
+            } else {
+                ControlFlow::Continue(())
+            }
+        };
+        let tree = self.parser.parse_with_options(
+            &mut |offset, _| bytes.get(offset..).unwrap_or_default(),
+            None,
+            Some(tree_sitter::ParseOptions::new().progress_callback(&mut progress)),
+        );
+        let Some(tree) = tree else {
+            // Interrupted parsers otherwise resume the abandoned input on the next call.
+            self.parser.reset();
+            return if stopped {
+                Ok(None)
+            } else {
+                Err(ModelError("parser did not return a tree".into()))
+            };
+        };
+        if cancelled() {
+            return Ok(None);
+        }
         if tree.root_node().has_error() {
             analysis.coverage = Coverage::Partial;
             analysis.diagnostics.push(
@@ -78,13 +123,23 @@ impl Analyzer for SyntaxAnalyzer {
         }
         let mut cursor = tree.walk();
         let mut declarations = Vec::new();
+        let mut checkpoints = Checkpoints {
+            cancelled,
+            ticks: 0,
+        };
         loop {
+            if checkpoints.poll() {
+                return Ok(None);
+            }
             let node = cursor.node();
             (self.declarations)(node, text, &mut declarations);
             if !declarations.is_empty() {
                 let mut scope = Vec::new();
                 let mut parent = node.parent();
                 while let Some(ancestor) = parent {
+                    if checkpoints.poll() {
+                        return Ok(None);
+                    }
                     if let Some((kind, name)) = (self.scope)(ancestor, text) {
                         scope.push(format!("{kind}:{name}"));
                     }
@@ -92,6 +147,9 @@ impl Analyzer for SyntaxAnalyzer {
                 }
                 scope.reverse();
                 for declaration in declarations.drain(..) {
+                    if checkpoints.poll() {
+                        return Ok(None);
+                    }
                     scope.push(format!("{}:{}", declaration.kind, declaration.name));
                     let key = serde_json::to_string(&scope)
                         .map_err(|error| ModelError(error.to_string()))?;
@@ -109,16 +167,25 @@ impl Analyzer for SyntaxAnalyzer {
                 continue;
             }
             loop {
+                if checkpoints.poll() {
+                    return Ok(None);
+                }
                 if cursor.goto_next_sibling() {
                     break;
                 }
                 if !cursor.goto_parent() {
                     let mut counts = BTreeMap::<String, usize>::new();
                     for fact in &analysis.facts {
+                        if checkpoints.poll() {
+                            return Ok(None);
+                        }
                         *counts.entry(fact.key.clone()).or_default() += 1;
                     }
                     let mut ordinals = BTreeMap::<String, usize>::new();
                     for fact in &mut analysis.facts {
+                        if checkpoints.poll() {
+                            return Ok(None);
+                        }
                         fact.unique = counts[&fact.key] == 1;
                         let ordinal = ordinals.entry(fact.key.clone()).or_default();
                         let key = serde_json::to_string(&(&fact.key, *ordinal))
@@ -126,9 +193,111 @@ impl Analyzer for SyntaxAnalyzer {
                         *ordinal += 1;
                         fact.key = key;
                     }
-                    return Ok(analysis);
+                    return Ok((!cancelled()).then_some(analysis));
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::cell::Cell;
+
+    thread_local! { static VISITED: Cell<usize> = const { Cell::new(0) }; }
+
+    fn counting(_: tree_sitter::Node<'_>, _: &str, _: &mut Vec<Declaration>) {
+        VISITED.set(VISITED.get() + 1);
+    }
+    fn no_scope(_: tree_sitter::Node<'_>, _: &str) -> Option<(&'static str, String)> {
+        None
+    }
+
+    #[test]
+    fn parser_progress_interrupts_before_declaration_collection() {
+        let mut analyzer = SyntaxAnalyzer::new(
+            tree_sitter_rust::LANGUAGE.into(),
+            crate::rust::RustAnalyzer::context(),
+            counting,
+            no_scope,
+        )
+        .unwrap();
+        VISITED.set(0);
+        let calls = Cell::new(0);
+        let source = "fn example() { let x = 12; }\n".repeat(10000);
+        assert!(
+            analyzer
+                .analyze_cancellable(source.as_bytes(), &|| {
+                    calls.set(calls.get() + 1);
+                    calls.get() >= 20
+                })
+                .unwrap()
+                .is_none()
+        );
+        assert_eq!(VISITED.get(), 0);
+        assert!(
+            calls.get() < 25,
+            "the parser kept polling after cancellation"
+        );
+    }
+
+    #[test]
+    fn extraction_abandons_traversal_without_visiting_the_remaining_tree() {
+        let mut analyzer = SyntaxAnalyzer::new(
+            tree_sitter_rust::LANGUAGE.into(),
+            crate::rust::RustAnalyzer::context(),
+            counting,
+            no_scope,
+        )
+        .unwrap();
+        VISITED.set(0);
+        let source = "fn example() { let x = 12; }\n".repeat(1000);
+        assert!(
+            analyzer
+                .analyze_cancellable(source.as_bytes(), &|| VISITED.get() >= 100)
+                .unwrap()
+                .is_none()
+        );
+        assert!(
+            (100..=356).contains(&VISITED.get()),
+            "extraction continued after cancellation"
+        );
+        assert!(
+            analyzer
+                .analyze_cancellable(b"fn different() {}", &|| false)
+                .unwrap()
+                .is_some()
+        );
+    }
+
+    #[test]
+    fn extraction_amortises_predicate_calls_across_many_node_visits() {
+        let mut analyzer = SyntaxAnalyzer::new(
+            tree_sitter_rust::LANGUAGE.into(),
+            crate::rust::RustAnalyzer::context(),
+            counting,
+            no_scope,
+        )
+        .unwrap();
+        VISITED.set(0);
+        let polls = Cell::new(0);
+        let source = "fn example() { let x = 12; }\n".repeat(1000);
+        assert!(
+            analyzer
+                .analyze_cancellable(source.as_bytes(), &|| {
+                    if VISITED.get() > 0 {
+                        polls.set(polls.get() + 1);
+                    }
+                    false
+                })
+                .unwrap()
+                .is_some()
+        );
+        assert!(VISITED.get() > 1000);
+        assert!(
+            polls.get() < VISITED.get() / 16,
+            "cancellation polling grew with every node visit"
+        );
     }
 }

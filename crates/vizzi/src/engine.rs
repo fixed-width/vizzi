@@ -232,7 +232,11 @@ impl Engine {
                                         entry.insert(language.create()?)
                                     }
                                 };
-                                let analysis = parser.analyze(&file.bytes)?;
+                                let Some(analysis) =
+                                    parser.analyze_cancellable(&file.bytes, cancelled)?
+                                else {
+                                    return Ok(None);
+                                };
                                 if analysis.context != *context {
                                     return Err(EngineError::Configuration(
                                         "analyzer returned an unregistered context".into(),
@@ -253,7 +257,7 @@ impl Engine {
                             };
                             batch.push(Arc::new(document));
                         }
-                        Ok((batch, counters))
+                        Ok(Some((batch, counters)))
                     })
                 })
                 .collect();
@@ -269,7 +273,10 @@ impl Engine {
         if cancelled() {
             return Ok(None);
         }
-        for (batch, (parsed, hits, warnings)) in batches {
+        for batch in batches {
+            let Some((batch, (parsed, hits, warnings))) = batch else {
+                return Ok(None);
+            };
             documents.extend(batch);
             measurements.parsed += parsed;
             measurements.cache_hits += hits;

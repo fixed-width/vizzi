@@ -8,6 +8,8 @@ claiming the current implementation passes them.
 The [responsiveness follow-up](../../experiments/qualification/RESPONSIVENESS_RESULTS.md)
 updates ordinary edits and outline rendering; it does not repeat retained-reparse or
 cancellation qualification.
+The [cancellation follow-up](../../experiments/qualification/CANCELLATION_RESULTS.md)
+repeats four-worker retained reparse and measures cooperative interruption within files.
 
 | Area | Proposed target / policy | Current evidence |
 | --- | --- | --- |
@@ -16,7 +18,7 @@ cancellation qualification.
 | Native workspace memory | Aim below 8 GiB peak while retaining the previous observation | Maximum sampled Linux reparse RSS 6.492 GiB on a 62.5 GiB host; no enforced cap |
 | Bounded core view | Aim for p95 below 50 ms for the current 2,000-tile query | Four-worker observations fit on this host; eight-worker Linux has misses |
 | Ordinary edit visibility | Aim for all five probe edits below 200 ms before collecting meaningful tails | Follow-up: PyTorch 98–121 ms; Linux 135–192 ms. Five samples each fit, with no tail claim; periodic recovery can still dominate |
-| Cancellation response | Aim below 250 ms after a request during parsing | Observed maxima 845 ms / 2,265 ms; whole-file parsing prevents prompt cancellation |
+| Cancellation response | Aim below 250 ms after a request during parsing | Follow-up direct engine-return ranges: Linux 41–46 ms; PyTorch 18–23 ms. Three samples each; cooperative callbacks do not impose a hard deadline |
 | Source and outline DOM | Bound each pane by visible rows plus overscan; initial ceiling 200 rendered entries | Source lines 56–58; 42,443-declaration C++ outline now renders 21 buttons. Complete transport/index construction remains linear in source/declaration size |
 | Overview motion | Maintain rAF p99 below 33.3 ms in the software reference workload | 16.8 ms in all recorded steady/refresh runs; physical presentation unqualified |
 
@@ -28,8 +30,8 @@ decision, not something the existing loading behavior already provides.
 The native memory target leaves room for an editor, browser, OS, and filesystem cache,
 but the combined envelope has not been validated. Point-in-time renderer heap is not
 peak browser RSS; this host has neither a 16 GiB cgroup cap nor baseline-laptop hardware.
-Per-file size/admission, process-wide scheduling, and cancellation inside a long parse
-are not implemented merely because a worker limit exists.
+Per-file size/admission and process-wide scheduling remain open. The separate
+cooperative cancellation implementation does not impose a hard deadline on a long parse.
 
 ## Work before compiler-context expansion
 
@@ -38,7 +40,12 @@ engine attempts fell from 128–153 ms to 42–45 ms. Merging/hashing still scal
 snapshot size, and full source/outline responses remain large. Keep the follow-up's
 measurements separate from the initial cold/reparse matrix.
 
-1. Investigate safe parser progress cancellation and bounded hot-file incremental trees.
+Cooperative built-in parser/extraction cancellation is implemented and measured. It
+preserves old publications and resets interrupted parsers; necessary complete edits
+still require analysis and transfer.
+
+1. Design bounded hot-file incremental trees using the
+   [session/admission plan](../plans/parser-responsiveness.md).
    Keep immutable published facts separate from mutable parser/tree ownership. Tree cache
    memory must be admitted within an explicit budget, not multiplied by every language.
 2. Reduce full-capture memory overlap, for example by streaming bounded input batches

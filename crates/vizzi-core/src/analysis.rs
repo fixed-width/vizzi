@@ -12,6 +12,21 @@ use std::{collections::BTreeMap, sync::Arc};
 pub trait Analyzer {
     /// Returns facts for exactly these bytes and the adapter's registered context.
     fn analyze(&mut self, bytes: &[u8]) -> Result<Analysis, ModelError>;
+
+    /// Returns complete facts, or `None` when this attempt is cancelled.
+    /// The predicate must be cheap, nonblocking, nonpanicking, and remain true once set.
+    /// The default checks before/after analysis; adapters may also interrupt their work.
+    fn analyze_cancellable(
+        &mut self,
+        bytes: &[u8],
+        cancelled: &dyn Fn() -> bool,
+    ) -> Result<Option<Analysis>, ModelError> {
+        if cancelled() {
+            return Ok(None);
+        }
+        let analysis = self.analyze(bytes)?;
+        Ok((!cancelled()).then_some(analysis))
+    }
 }
 
 /// An immutable context and analyzer factory shared by native workers.

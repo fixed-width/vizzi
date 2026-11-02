@@ -3,6 +3,8 @@
 This is the initial qualification record. The [responsiveness follow-up](RESPONSIVENESS_RESULTS.md)
 implements bounded outlines and cheaper compatible edits, with new measurements and
 remaining limitations. The failures below describe the implementation measured here.
+The [cancellation follow-up](CANCELLATION_RESULTS.md) records interruption within files
+and repeated four-worker retained reparse measurements.
 
 Full Linux/PyTorch runs preserve coherent snapshots and bounded map motion, but do
 **not** establish that all interactions meet the project's performance goal. Two

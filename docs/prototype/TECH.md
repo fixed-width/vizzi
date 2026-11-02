@@ -78,8 +78,9 @@ discovery gap with another full pass. See [incremental capture](INCREMENTAL_CAPT
 The [verified capture plan](CAPTURE_PLAN.md) avoids rescanning unchanged classification
 metadata, while snapshot merging and version hashing remain linear in file count.
 One worker budget and queue cover all languages; parser creation is lazy and ownership
-remains local to a bounded worker. Cancellation is checked between
-files; a long individual parse is not interruptible. Parsing never holds the publication lock.
+remains local to a bounded worker. [Cooperative cancellation](ANALYSIS_CANCELLATION.md)
+checks during built-in parsing and extraction as well as between files. It does not
+impose a hard deadline on all analysis/capture operations. Parsing never holds the publication lock.
 
 ## Host interface
 

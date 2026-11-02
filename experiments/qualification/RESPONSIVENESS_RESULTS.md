@@ -1,5 +1,8 @@
 # Bounded outlines and cheaper compatible edits
 
+The later [cancellation follow-up](CANCELLATION_RESULTS.md) implements interruption
+within parsing/extraction and records the remaining hot-tree ownership work.
+
 This follow-up addresses the two interactive bottlenecks found in the
 [initial qualification](RESULTS.md): declaration DOM growth and repeated validation of
 unchanged snapshot metadata. On the same full Linux/PyTorch profiles, the large C++

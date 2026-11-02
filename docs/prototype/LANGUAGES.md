@@ -8,6 +8,9 @@ the native prototype. The core interfaces live in `vizzi_core::analysis`.
 `LanguageAdapter` supplies an immutable analysis context and
 a factory for worker-owned `Analyzer` values. `Analyzer::analyze` consumes captured
 bytes and returns path-independent analysis. Adapters must not execute project tooling.
+`analyze_cancellable` returns complete analysis or abandons the attempt; built-in adapters
+support checks during parsing and extraction. Existing adapters default to checks before
+and after their complete operation. See [analysis cancellation](ANALYSIS_CANCELLATION.md).
 They report unsupported encoding and syntax recovery through coverage and diagnostics.
 
 `Languages::new` freezes each registered context. Empty/duplicate language names and
@@ -75,7 +78,8 @@ The host serializes refresh attempts; direct concurrent `Engine::refresh` caller
 each receive their own per-attempt limit. This is a concurrency budget, not a hard RAM
 limit. Capture still retains all selected bytes, and a single parser may need a large
 tree. Per-file size limits, admission by memory estimate, and process-wide scheduling
-remain open. Cancellation is checked between jobs; an individual parse is not interrupted.
+remain open. Built-in parsing and extraction support cooperative cancellation; this
+is not a hard deadline or persistent syntax-tree cache.
 
 ## Analysis validity and failure
 

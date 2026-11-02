@@ -7,6 +7,8 @@ The [recorded results](RESULTS.md) distinguish successful collection from the pe
 failures it exposed.
 The [responsiveness follow-up](RESPONSIVENESS_RESULTS.md) measures bounded outlines and
 verified capture plans on the same profiles.
+The [cancellation follow-up](CANCELLATION_RESULTS.md) measures interruption within files
+and complete reparse throughput with the old observation retained.
 
 ## Profiles
 
@@ -77,6 +79,12 @@ identity comparison across worker counts; repeated runs cannot accidentally use 
 phase-cache results. `--cancel-after-ms` defaults to 100; zero exercises immediate
 cancellation at the first analyzer call. Nonzero timers are observed by the query
 loop, so cancellation timing includes that loop's cadence.
+The cooperative-cancellation follow-up additionally records `cancel_requested_us`,
+`worker_return_us`, and `cancel_to_return_ms` using the same monotonic clock in the
+requesting and worker threads. This interval ends when `Engine::refresh` returns;
+it excludes the query loop's wait before noticing completion. It includes worker
+joining and disposal of abandoned captured inputs. Missing or reversed timestamps
+produce no latency value rather than a misleading zero.
 
 During controlled work, the main thread queries and serializes a bounded view of a
 selected captured file. `--query-interval-ms` defaults to 50. Results record each query's
@@ -154,6 +162,8 @@ MPLCONFIGDIR=/tmp/vizzi-mpl python3 experiments/qualification/plot.py \
 Plot generation uses Matplotlib; it is not a product dependency. The checked-in raw
 native observations store each probe report once, with query samples exported to CSV.
 Source manifests and explicit source-only counts remain distinct from compiler coverage.
+The export keeps observed `cancel_response_s` separate from direct
+`cancel_to_return_ms`; older reports have no direct interval and export it as null.
 
 ## Validate the measurement tool
 

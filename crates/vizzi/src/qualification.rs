@@ -53,6 +53,7 @@ struct Factory {
     first_parse: Arc<AtomicU64>,
     immediate_cancel: Option<Arc<Application>>,
     cancel_requested: Arc<AtomicBool>,
+    cancel_at: Arc<AtomicU64>,
 }
 impl LanguageAdapter for Factory {
     fn context(&self) -> Context {
@@ -77,6 +78,7 @@ impl LanguageAdapter for Factory {
             first_parse: self.first_parse.clone(),
             immediate_cancel: self.immediate_cancel.clone(),
             cancel_requested: self.cancel_requested.clone(),
+            cancel_at: self.cancel_at.clone(),
         }))
     }
 }
@@ -87,9 +89,10 @@ struct Parser {
     first_parse: Arc<AtomicU64>,
     immediate_cancel: Option<Arc<Application>>,
     cancel_requested: Arc<AtomicBool>,
+    cancel_at: Arc<AtomicU64>,
 }
-impl Analyzer for Parser {
-    fn analyze(&mut self, bytes: &[u8]) -> Result<Analysis, ModelError> {
+impl Parser {
+    fn begin(&self) {
         let elapsed = self.clock.elapsed().as_micros() as u64;
         if self
             .first_parse
@@ -97,12 +100,33 @@ impl Analyzer for Parser {
             .is_ok()
             && let Some(app) = &self.immediate_cancel
         {
+            self.cancel_at
+                .store(self.clock.elapsed().as_micros() as u64, Ordering::Release);
             app.request();
             self.cancel_requested.store(true, Ordering::Release);
         }
+    }
+}
+impl Analyzer for Parser {
+    fn analyze(&mut self, bytes: &[u8]) -> Result<Analysis, ModelError> {
+        self.begin();
         let mut analysis = self.inner.analyze(bytes)?;
         analysis.context = self.context.clone();
         Ok(analysis)
+    }
+    fn analyze_cancellable(
+        &mut self,
+        bytes: &[u8],
+        cancelled: &dyn Fn() -> bool,
+    ) -> Result<Option<Analysis>, ModelError> {
+        self.begin();
+        Ok(self
+            .inner
+            .analyze_cancellable(bytes, cancelled)?
+            .map(|mut analysis| {
+                analysis.context = self.context.clone();
+                analysis
+            }))
     }
 }
 
@@ -143,6 +167,7 @@ fn qualify(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Error>
     };
     let first_parse = Arc::new(AtomicU64::new(u64::MAX));
     let cancel_requested = Arc::new(AtomicBool::new(false));
+    let cancel_at = Arc::new(AtomicU64::new(u64::MAX));
     let clock = Instant::now();
     let immediate = matches!(config.mode, Mode::Cancel) && config.cancel_after_ms == 0;
     let revision = if matches!(config.mode, Mode::Reconcile) {
@@ -166,6 +191,7 @@ fn qualify(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Error>
                 first_parse: first_parse.clone(),
                 immediate_cancel: immediate.then(|| app.clone()),
                 cancel_requested: cancel_requested.clone(),
+                cancel_at: cancel_at.clone(),
             }) as Arc<dyn LanguageAdapter>
         })
         .collect();
@@ -186,13 +212,14 @@ fn qualify(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Error>
         let previous = old.clone();
         let worker = scope.spawn(move || -> Result<Value, crate::engine::EngineError> {
             let refresh = engine.refresh(Some(&previous), &|| worker_app.desired() != ticket)?;
+            let returned_us = clock.elapsed().as_micros() as u64;
             Ok(match refresh {
                 Some(refresh) => {
                     let measurements = refresh.measurements.clone();
                     let outcome = worker_app.publish(ticket, refresh);
-                    json!({"refresh":measurements,"outcome":format!("{outcome:?}")})
+                    json!({"refresh":measurements,"outcome":format!("{outcome:?}"),"worker_return_us":returned_us})
                 }
-                None => json!({"refresh":null,"outcome":"cancelled"}),
+                None => json!({"refresh":null,"outcome":"cancelled","worker_return_us":returned_us}),
             })
         });
         let mut parse_seen = false;
@@ -211,6 +238,7 @@ fn qualify(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Error>
                 Duration::from_millis(config.cancel_after_ms),
                 cancel_requested.load(Ordering::Acquire),
             ) {
+                cancel_at.store(clock.elapsed().as_micros() as u64, Ordering::Release);
                 app.request();
                 cancel_requested.store(true, Ordering::Release);
                 emit(json!({"event":"cancel_requested"}));
@@ -241,9 +269,14 @@ fn qualify(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Error>
     if !pinned_matches {
         return Err("pinned source changed".into());
     }
+    let requested = parse_time(cancel_at.load(Ordering::Acquire));
+    let returned = phase["worker_return_us"]
+        .as_u64()
+        .map(Duration::from_micros);
     let report = json!({"mode":config.mode,"baseline":baseline_status,"final":app.status(),"refresh":phase["refresh"],"outcome":phase["outcome"],
         "phase_wall_ms":millis(clock.elapsed()),"queries":queries,"query_file":selected.path(),
-        "cancel_requested":cancel_requested.load(Ordering::Acquire),"first_parse_us":parse_time(first_parse.load(Ordering::Acquire)).map(|duration| duration.as_micros()),"pinned_source_matches":pinned_matches});
+        "cancel_requested":cancel_requested.load(Ordering::Acquire),"first_parse_us":parse_time(first_parse.load(Ordering::Acquire)).map(|duration| duration.as_micros()),"pinned_source_matches":pinned_matches,
+        "cancel_requested_us":requested.map(|duration| duration.as_micros()),"worker_return_us":phase["worker_return_us"],"cancel_to_return_ms":cancellation_latency(requested, returned)});
     emit(json!({"event":"phase_done", "outcome":phase["outcome"]}));
     Ok(report)
 }
@@ -253,6 +286,12 @@ fn millis(duration: Duration) -> f64 {
 }
 fn parse_time(value: u64) -> Option<Duration> {
     (value != u64::MAX).then(|| Duration::from_micros(value))
+}
+fn cancellation_latency(requested: Option<Duration>, returned: Option<Duration>) -> Option<f64> {
+    requested
+        .zip(returned)
+        .and_then(|(start, end)| end.checked_sub(start))
+        .map(millis)
 }
 fn cancel_due(
     mode: Mode,
@@ -294,6 +333,76 @@ pub fn run(configuration: &[u8], emit: &mut impl FnMut(Value)) -> Result<Value, 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn cancellation_latency_excludes_poll_cadence_and_requires_ordered_timestamps() {
+        assert_eq!(cancellation_latency(None, Some(Duration::ZERO)), None);
+        assert_eq!(cancellation_latency(Some(Duration::ZERO), None), None);
+        assert_eq!(
+            cancellation_latency(
+                Some(Duration::from_millis(2)),
+                Some(Duration::from_millis(1))
+            ),
+            None
+        );
+        assert_eq!(
+            cancellation_latency(
+                Some(Duration::from_millis(2)),
+                Some(Duration::from_millis(2))
+            ),
+            Some(0.0)
+        );
+        assert_eq!(
+            cancellation_latency(
+                Some(Duration::from_micros(1000)),
+                Some(Duration::from_micros(2500))
+            ),
+            Some(1.5)
+        );
+    }
+
+    #[test]
+    fn qualification_wrapper_forwards_interruption_instead_of_completing_the_input() {
+        struct Interrupted;
+        impl Analyzer for Interrupted {
+            fn analyze(&mut self, _: &[u8]) -> Result<Analysis, ModelError> {
+                panic!("wrapper lost cancellation");
+            }
+            fn analyze_cancellable(
+                &mut self,
+                _: &[u8],
+                _: &dyn Fn() -> bool,
+            ) -> Result<Option<Analysis>, ModelError> {
+                Ok(None)
+            }
+        }
+        let mut parser = Parser {
+            inner: Box::new(Interrupted),
+            context: RustAdapter.context(),
+            clock: Instant::now(),
+            first_parse: Arc::new(AtomicU64::new(u64::MAX)),
+            immediate_cancel: None,
+            cancel_requested: Arc::new(AtomicBool::new(false)),
+            cancel_at: Arc::new(AtomicU64::new(u64::MAX)),
+        };
+        assert!(
+            parser
+                .analyze_cancellable(b"", &|| false)
+                .unwrap()
+                .is_none()
+        );
+        parser.inner = RustAdapter.create().unwrap();
+        parser.context.description = "rebound fixture context".into();
+        let complete = parser.analyze(b"fn example() {}").unwrap();
+        assert_eq!(complete.context, parser.context);
+        assert_eq!(
+            parser
+                .analyze_cancellable(b"fn example() {}", &|| false)
+                .unwrap()
+                .unwrap(),
+            complete
+        );
+    }
 
     #[test]
     fn timers_preserve_units_unstarted_state_and_cancel_boundaries() {
@@ -440,6 +549,9 @@ mod tests {
             assert!(events.iter().any(|event| event["event"] == "phase_start"));
             match mode {
                 Mode::Reconcile => {
+                    assert!(report["cancel_requested_us"].is_null());
+                    assert!(report["cancel_to_return_ms"].is_null());
+                    assert!(report["worker_return_us"].as_u64().is_some());
                     assert_eq!(report["refresh"]["parsed"], 0);
                     assert_eq!(report["refresh"]["reused"], 2);
                     assert_eq!(report["final"]["generation"], 1);
@@ -447,6 +559,7 @@ mod tests {
                     assert_eq!(report["final"]["pending"], false);
                 }
                 Mode::Reparse => {
+                    assert!(report["cancel_to_return_ms"].is_null());
                     assert_eq!(report["refresh"]["parsed"], 2);
                     assert_eq!(report["refresh"]["cache_hits"], 0);
                     assert_eq!(report["final"]["generation"], 2);
@@ -460,6 +573,15 @@ mod tests {
                     );
                 }
                 Mode::Cancel => {
+                    assert!(report["cancel_to_return_ms"].as_f64().unwrap() >= 0.0);
+                    assert!(
+                        report["first_parse_us"].as_u64().unwrap()
+                            <= report["cancel_requested_us"].as_u64().unwrap()
+                    );
+                    assert!(
+                        report["cancel_requested_us"].as_u64().unwrap()
+                            <= report["worker_return_us"].as_u64().unwrap()
+                    );
                     assert!(report["refresh"].is_null());
                     assert_eq!(report["final"]["generation"], 1);
                     assert_eq!(report["cancel_requested"], true);

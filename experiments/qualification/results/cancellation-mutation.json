@@ -1,0 +1,190 @@
+{
+  "base_commit": "91a44791d1f6901e3b615a4784bc74f238a2d547",
+  "baseline": "passed",
+  "tool": "cargo-mutants 27.1.0",
+  "scope": [
+    "crates/vizzi-core/src/analysis.rs",
+    "crates/vizzi-core/src/rust.rs",
+    "crates/vizzi-core/src/syntax.rs",
+    "crates/vizzi/src/engine.rs",
+    "crates/vizzi/src/qualification.rs"
+  ],
+  "command": "cargo mutants -p vizzi-core -p vizzi --config experiments/incremental/mutants.toml --features qualification --file 'crates/vizzi-core/src/{analysis,rust,syntax}.rs' --file 'crates/vizzi/src/{engine,qualification}.rs' --test-package vizzi-core --test-package vizzi --jobs 4 --timeout 15 --build-timeout 180",
+  "tested": 157,
+  "counts": {
+    "Unviable": 24,
+    "CaughtMutant": 128,
+    "Timeout": 5
+  },
+  "exclusions": [
+    "Existing equivalent has_descendant strict/non-strict directory-prefix comparison; no new exclusions"
+  ],
+  "non_caught": [
+    {
+      "name": "crates/vizzi/src/engine.rs:99:9: replace Engine::directory -> &Directory with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:107:9: replace Engine::refresh -> Result<Option<Refresh>, EngineError> with Ok(Some(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:118:9: replace Engine::refresh_scoped -> Result<Option<Refresh>, EngineError> with Ok(Some(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:118:9: replace Engine::refresh_scoped -> Result<Option<Refresh>, EngineError> with Ok(None)",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:326:17: replace && with || in Engine::can_capture_paths",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/qualification.rs:60:9: replace <impl LanguageAdapter for Factory>::context -> Context with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/qualification.rs:74:9: replace <impl LanguageAdapter for Factory>::create -> Result<Box<dyn Analyzer>, ModelError> with Ok(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/qualification.rs:101:13: replace && with || in Parser::begin",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/qualification.rs:112:9: replace <impl Analyzer for Parser>::analyze -> Result<Analysis, ModelError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/qualification.rs:122:9: replace <impl Analyzer for Parser>::analyze_cancellable -> Result<Option<Analysis>, ModelError> with Ok(Some(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/qualification.rs:229:17: replace && with || in qualify",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/analysis.rs:24:9: replace Analyzer::analyze_cancellable -> Result<Option<Analysis>, ModelError> with Ok(Some(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/analysis.rs:48:9: replace Language::context -> &Context with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/analysis.rs:52:9: replace Language::create -> Result<Box<dyn Analyzer>, ModelError> with Ok(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/analysis.rs:82:9: replace Languages::builtin -> Result<Self, ModelError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/analysis.rs:91:9: replace Languages::select -> Option<&Language> with Some(Box::leak(Box::new(Default::default())))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/rust.rs:13:9: replace <impl LanguageAdapter for RustAdapter>::context -> Context with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/rust.rs:16:9: replace <impl LanguageAdapter for RustAdapter>::create -> Result<Box<dyn Analyzer>, ModelError> with Ok(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/rust.rs:38:9: replace RustAnalyzer::context -> Context with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/rust.rs:53:9: replace RustAnalyzer::analyze -> Result<Analysis, ModelError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/rust.rs:58:9: replace <impl Analyzer for RustAnalyzer>::analyze -> Result<Analysis, ModelError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/rust.rs:65:9: replace <impl Analyzer for RustAnalyzer>::analyze_cancellable -> Result<Option<Analysis>, ModelError> with Ok(Some(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/rust.rs:65:9: replace <impl Analyzer for RustAnalyzer>::analyze_cancellable -> Result<Option<Analysis>, ModelError> with Ok(None)",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi-core/src/syntax.rs:27:9: replace Declaration::at -> Self with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/syntax.rs:66:9: replace <impl Analyzer for SyntaxAnalyzer>::analyze -> Result<Analysis, ModelError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/syntax.rs:75:9: replace <impl Analyzer for SyntaxAnalyzer>::analyze_cancellable -> Result<Option<Analysis>, ModelError> with Ok(Some(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/syntax.rs:15:9: replace Checkpoints<'_>::poll -> bool with true",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi-core/src/syntax.rs:75:9: replace <impl Analyzer for SyntaxAnalyzer>::analyze_cancellable -> Result<Option<Analysis>, ModelError> with Ok(None)",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi-core/src/syntax.rs:196:32: delete ! in <impl Analyzer for SyntaxAnalyzer>::analyze_cancellable",
+      "outcome": "Timeout"
+    }
+  ],
+  "sha256": {
+    "crates/vizzi-core/src/analysis.rs": "2b7938a26a790c149ca8546824784b63a89190ab19f4a6b68240981091e73e7c",
+    "crates/vizzi-core/src/rust.rs": "e5520c80f6e95ee985e808765c1a3a96074eac1f4f5080772a761d1621ac7f28",
+    "crates/vizzi-core/src/syntax.rs": "6dd522813c6a5c99593e2d5eb967f48ceaeb244d67768e937116504297ec3fa1",
+    "crates/vizzi/src/engine.rs": "d3850b019ffaa67cbbd3ac442dc5cdbfd1d9f5494e618cca15680e0a710e1e97",
+    "crates/vizzi/src/qualification.rs": "3bc6d9bb729eb5ec4fca63beb1791c1d8f9f7ad6218ed41efb75c3931af3c43d"
+  },
+  "development_notes": [
+    "The first passing-baseline run tested 157 mutants: 127 caught, 24 unviable, five timeouts, one survivor.",
+    "The survivor reversed the polling cadence comparison and called the cancellation predicate on nearly every syntax operation. A behavioral extraction test now verifies that predicate calls are amortised across node visits; the final complete run catches it."
+  ],
+  "limits": [
+    "Five timeout mutants prevent completed results and leave startup fixtures waiting; timeouts are separate from assertion catches.",
+    "Macro-expanded fingerprints, grammar/dependency internals, browser code, source policy, persistence, and OS event delivery are outside this mutation scope.",
+    "Only complete successful analyses may warm the disposable cache during a cancelled attempt. Zero survivors is not proof of correctness."
+  ],
+  "manual_mutations": [
+    {
+      "mutation": "reset",
+      "change": "Delete self.parser.reset();",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "vizzi-core",
+        "--offline",
+        "--test",
+        "cancellation",
+        "cancellation_inside_parsing_drops_facts_and_resets_before_a_different_input"
+      ],
+      "result": "Caught by failing behavioral test",
+      "exit_code": 101
+    },
+    {
+      "mutation": "progress",
+      "change": "Delete Some(tree_sitter::ParseOptions::new().progress_callback(&mut progress))",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "vizzi-core",
+        "--offline",
+        "--lib",
+        "syntax::tests::parser_progress_interrupts_before_declaration_collection"
+      ],
+      "result": "Caught by failing behavioral test",
+      "exit_code": 101
+    }
+  ],
+  "manual_note": "These two deletions are not generated by cargo-mutants; counts above remain the automatic run. The exact original source was restored after each test."
+}

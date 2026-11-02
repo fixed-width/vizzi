@@ -57,6 +57,13 @@ impl Analyzer for RustAnalyzer {
     fn analyze(&mut self, bytes: &[u8]) -> Result<Analysis, ModelError> {
         self.syntax.analyze(bytes)
     }
+    fn analyze_cancellable(
+        &mut self,
+        bytes: &[u8],
+        cancelled: &dyn Fn() -> bool,
+    ) -> Result<Option<Analysis>, ModelError> {
+        self.syntax.analyze_cancellable(bytes, cancelled)
+    }
 }
 
 fn collect(node: tree_sitter::Node<'_>, text: &str, output: &mut Vec<Declaration>) {
