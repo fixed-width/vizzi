@@ -63,6 +63,13 @@ with correctness of extracted declarations or build coverage.
 
 ## 3. Qualify on pinned Linux and PyTorch sources
 
+Full-host collection complete: [results](../../experiments/qualification/RESULTS.md)
+cover cold/warm loads, retained reconciliation/reparse at 4/8 workers, cancellation,
+live source/large-header edits, and software browser interaction. Qualification exposed
+unbounded outline rendering and latency costs. Address the
+[proposed performance gates](../performance/BUDGETS.md) before compiler-context expansion;
+16 GB baseline hardware and GPU presentation remain unqualified.
+
 Use scoped raw-C/C++ profiles, including explicit header assignments where desired,
 and retain their classification provenance in reports. Record source-only candidates
 separately from analyzed files. Capture cold, persisted-cache, in-memory reconciliation,

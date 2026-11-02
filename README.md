@@ -26,6 +26,7 @@ validating coordination; it does not qualify large-codebase GPU performance.
 - [Mixed-language adapter measurements](experiments/languages/RESULTS.md)
 - [Source-policy validation and measurements](experiments/languages/SOURCE_POLICY_RESULTS.md)
 - [Raw C/C++ validation and scoped measurements](experiments/languages/C_FAMILY_RESULTS.md)
+- [Full-repository qualification](experiments/qualification/RESULTS.md) and [provisional budgets](docs/performance/BUDGETS.md)
 - [Earlier performance experiments](experiments/performance/README.md)
 - [Contributor guidance](AGENTS.md)
 

@@ -23,12 +23,12 @@ def milliseconds(start):
     return (time.perf_counter() - start) * 1000
 
 
-def once(binary, root, cache, workers, source_arguments=()):
+def once(binary, root, cache, workers, source_arguments=(), timeout=60):
     started = time.perf_counter()
     result = subprocess.run(
         ["/usr/bin/time", "-f", "VIZZI_RSS_KIB=%M", str(binary), "--root", str(root),
          "--cache", str(cache), "--workers", str(workers), "--once", *source_arguments],
-        capture_output=True, text=True, check=True, timeout=60,
+        capture_output=True, text=True, check=True, timeout=timeout,
     )
     return {"process_wall_ms": milliseconds(started),
             "peak_rss_kib": int(re.search(r"VIZZI_RSS_KIB=(\d+)", result.stderr)[1]),
@@ -36,7 +36,7 @@ def once(binary, root, cache, workers, source_arguments=()):
 
 
 class Diagnostic:
-    def __init__(self, binary, root, cache, workers, source_arguments=()):
+    def __init__(self, binary, root, cache, workers, source_arguments=(), timeout=30):
         self.process = subprocess.Popen(
             [str(binary), "--root", str(root), "--cache", str(cache),
              "--workers", str(workers), "--stdio", *source_arguments],
@@ -44,7 +44,8 @@ class Diagnostic:
         )
         self.selector = selectors.DefaultSelector()
         self.selector.register(self.process.stdout, selectors.EVENT_READ)
-        self.buffer = b""
+        self.buffer = bytearray()
+        self.timeout = timeout
         self.sequence = 0
 
     def request(self, uri):
@@ -52,22 +53,26 @@ class Diagnostic:
         started = time.perf_counter()
         self.process.stdin.write((json.dumps({"id": self.sequence, "uri": uri}) + "\n").encode())
         self.process.stdin.flush()
-        deadline = time.monotonic() + 30
-        while b"\n" not in self.buffer:
+        deadline = time.monotonic() + self.timeout
+        end = self.buffer.find(b"\n")
+        while end < 0:
             remaining = deadline - time.monotonic()
             if remaining <= 0 or not self.selector.select(remaining):
                 raise TimeoutError("diagnostic response timed out")
             chunk = self.process.stdout.read1(65536)
             if not chunk:
                 raise RuntimeError("diagnostic host exited: " + self.process.stderr.read().decode())
-            self.buffer += chunk
-        line, self.buffer = self.buffer.split(b"\n", 1)
+            offset = len(self.buffer)
+            self.buffer.extend(chunk)
+            end = self.buffer.find(b"\n", offset)
+        line = self.buffer[:end]
+        del self.buffer[:end + 1]
         response = json.loads(line)
         assert response["id"] == self.sequence and response["status"] == 200, response
         return json.loads(response["body"]), milliseconds(started)
 
     def wait(self, predicate):
-        deadline = time.monotonic() + 15
+        deadline = time.monotonic() + self.timeout
         while time.monotonic() < deadline:
             status, _ = self.request("/api/status")
             if predicate(status):
@@ -92,20 +97,24 @@ def measure(args):
     for flag, values in [("--c-family-root", args.c_family_root), ("--syntax-language", args.syntax_language), ("--exclude-source", args.exclude_source)]:
         for value in values:
             source_arguments.extend([flag, value])
+    timeout = args.timeout
     with tempfile.TemporaryDirectory(prefix="vizzi-workspace-") as temporary:
         base = pathlib.Path(temporary)
         root, cache = base / "source", base / "cache"
         shutil.copytree(args.source, root, symlinks=True)
         cold, warm = [], []
-        for index in range(3):
+        for index in range(0 if args.seed_cache else args.load_samples):
             isolated_cache = base / f"cold-cache-{index}"
-            cold.append(once(binary, root, isolated_cache, args.workers, source_arguments))
-        shutil.copytree(base / "cold-cache-0", cache)
-        for _ in range(3):
-            warm.append(once(binary, root, cache, args.workers, source_arguments))
+            cold.append(once(binary, root, isolated_cache, args.workers, source_arguments, timeout))
+        if args.seed_cache:
+            cache = args.seed_cache.resolve()
+        else:
+            shutil.copytree(base / "cold-cache-0", cache)
+        for _ in range(args.load_samples):
+            warm.append(once(binary, root, cache, args.workers, source_arguments, timeout))
         assert all(run["status"]["measurements"]["parsed"] == 0 for run in warm)
         assert len({run["status"]["snapshot"] for run in cold + warm}) == 1
-        session = Diagnostic(binary, root, cache, args.workers, source_arguments)
+        session = Diagnostic(binary, root, cache, args.workers, source_arguments, timeout)
         try:
             first, first_ms = session.request("/api/view")
             inventory = {"complete": len(first["files"]) == first["total"], "files": [{"path": file["path"], "bytes": file["bytes"], "coverage": file["coverage"], "classification": file["classification"]} for file in first["files"]]}
@@ -118,7 +127,7 @@ def measure(args):
             source = first["source"]
             assert source["outlines"], "select a file with assigned analysis"
             declarations = [fact for outline in source["outlines"] for fact in outline["declarations"]]
-            entity_id = declarations[0]["id"] if declarations else None
+            entity_id = declarations[0]["id"] if declarations and not args.file_only else None
             uri = "/api/view?" + urllib.parse.urlencode({"file": file_id, **({"entity": entity_id} if entity_id else {})})
             settled = session.wait(lambda status: not status["pending"] and status["measurements"]["reused"] == first["total"])
             no_op = settled["measurements"]
@@ -128,19 +137,27 @@ def measure(args):
             comment = "#" if source["outlines"][0]["context"]["language"] == "python" else "//"
             previous_snapshot = first["snapshot"]
             edits = []
-            for index in range(3):
+            for index in range(args.edit_samples):
                 started = time.perf_counter()
-                target.write_bytes(f"{comment} vizzi edit probe {index}\n".encode() + original)
-                status = session.wait(lambda status: status["snapshot"] != previous_snapshot and not status["pending"])
+                data = f"{comment} vizzi edit probe {index}\n".encode() + original
+                if args.atomic_edits:
+                    with tempfile.NamedTemporaryFile(dir=target.parent, prefix=".vizzi-edit-", delete=False) as replacement:
+                        replacement.write(data)
+                        replacement_path = pathlib.Path(replacement.name)
+                    replacement_path.replace(target)
+                else:
+                    target.write_bytes(data)
+                status = session.wait(lambda status: status["snapshot"] != previous_snapshot)
                 publication_ms = milliseconds(started)
                 updated, request_ms = session.request(uri)
                 response_ms = milliseconds(started)
                 assert updated["selection"]["file"] == file_id
                 assert updated["selection"]["entity"] == entity_id
                 assert updated["source"]["text"].startswith(f"{comment} vizzi edit probe {index}\n")
-                assert status["measurements"]["parsed"] == 1, status
-                assert status["measurements"]["read_files"] == 1, status
-                clean = once(binary, root, cache, args.workers, source_arguments)
+                if not args.allow_reconcile:
+                    assert status["measurements"]["parsed"] == 1, status
+                    assert status["measurements"]["read_files"] == 1, status
+                clean = once(binary, root, cache, args.workers, source_arguments, timeout)
                 assert clean["status"]["snapshot"] == updated["snapshot"], "incremental index differs from clean capture"
                 if index == 0:
                     pinned, _ = session.request(pinned_uri)
@@ -158,7 +175,8 @@ def measure(args):
                     "binary_sha256": hashlib.sha256(binary.read_bytes()).hexdigest(),
                     "cold": cold, "warm": warm, "no_op": no_op, "edits": edits,
                     "diagnostic_initial_view_ms": first_ms, "selected_path": source["path"],
-                    "selected_declaration": declarations[0]["name"] if declarations else None,
+                    "selected_declaration": declarations[0]["name"] if entity_id else None,
+                    "selection_mode": "file" if args.file_only else "first_declaration",
                     "analysis_context": source["outlines"][0]["context"],
                     "live_peak_rss_kib": int(peak[1]) if peak else None,
                     "limits": ["Three samples; no tail-latency claim", "First load has warm OS file cache",
@@ -177,6 +195,13 @@ if __name__ == "__main__":
     parser.add_argument("--c-family-root", action="append", default=[])
     parser.add_argument("--syntax-language", action="append", default=[])
     parser.add_argument("--exclude-source", action="append", default=[])
+    parser.add_argument("--file-only", action="store_true")
+    parser.add_argument("--seed-cache", type=pathlib.Path)
+    parser.add_argument("--atomic-edits", action="store_true")
+    parser.add_argument("--allow-reconcile", action="store_true")
+    parser.add_argument("--timeout", type=float, default=60)
+    parser.add_argument("--load-samples", type=int, default=3)
+    parser.add_argument("--edit-samples", type=int, default=3)
     parser.add_argument("--select-file", help="Exact relative path of the file to edit")
     parser.add_argument("--output", type=pathlib.Path, required=True)
     arguments = parser.parse_args()

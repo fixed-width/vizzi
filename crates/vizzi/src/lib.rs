@@ -7,3 +7,6 @@ pub mod host;
 mod invalidation;
 pub mod server;
 pub mod source;
+
+#[cfg(feature = "qualification")]
+pub mod qualification;

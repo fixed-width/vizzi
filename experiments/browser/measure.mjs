@@ -12,23 +12,31 @@ const options = { duration: 4000, samples: 3 };
 for (let i = 2; i < process.argv.length; i++) {
   const flag = process.argv[i];
   if (["--measure", "--headed"].includes(flag)) continue;
-  if (!["--source", "--revision", "--output", "--duration", "--samples"].includes(flag)) throw new Error(`Unknown argument ${flag}`);
+  if (flag === "--reference-only") { options.referenceOnly = true; continue; }
+  if (!["--source", "--revision", "--output", "--duration", "--samples", "--profile"].includes(flag)) throw new Error(`Unknown argument ${flag}`);
   const value = process.argv[++i];
   if (!value) throw new Error(`${flag} requires a value`);
   options[flag.slice(2)] = ["--duration", "--samples"].includes(flag) ? Number(value) : value;
 }
+const profile = options.profile ? JSON.parse(await readFile(options.profile, "utf8")) : null;
+if (profile) { options.source ??= profile.source; options.revision ??= profile.revision; }
+assert.ok(!options.referenceOnly || options.source, "--reference-only requires source/profile");
 assert.ok(options.output, "--output is required");
 assert.ok(Number.isInteger(options.duration) && options.duration >= 1000 && options.duration <= 30000);
 assert.ok(Number.isInteger(options.samples) && options.samples >= 1 && options.samples <= 10);
 assert.ok(!options.source || options.revision, "a reference source needs --revision");
 try { await access(options.output); throw new Error(`Refusing to overwrite ${options.output}`); } catch (error) { if (error.code !== "ENOENT") throw error; }
 
-async function capturedFiles(root, directory = root, files = []) {
+async function capturedFiles(root, directory = root, files = [], fullProfile = null) {
+  const suffixes = new Set(fullProfile ? [".rs", ".py", ".c", ".cc", ".cpp", ".cxx", ".C", ".c++", ".h", ".hh", ".hpp", ".hxx", ".H", ".h++", ".cu", ".cuh", ".inc", ".inl", ".ipp", ".tpp"] : [".rs"]);
+  const exclusions = fullProfile ? fullProfile.source_arguments.filter((value, index, array) => index > 0 && array[index-1] === "--exclude-source") : [];
   for (const entry of await readdir(directory, { withFileTypes: true })) {
     if (directory === root && ["target", ".git", "node_modules"].includes(entry.name)) continue;
     const path = join(directory, entry.name);
-    if (entry.isDirectory()) await capturedFiles(root, path, files);
-    else if (entry.isFile() && entry.name.endsWith(".rs")) files.push({ path, bytes: (await stat(path)).size });
+    const relative = path.slice(root.length + 1);
+    if (exclusions.some(scope => relative === scope || relative.startsWith(scope + "/"))) continue;
+    if (entry.isDirectory()) await capturedFiles(root, path, files, fullProfile);
+    else if (entry.isFile() && suffixes.has(extname(entry.name))) files.push({ path, bytes: (await stat(path)).size });
   }
   return files;
 }
@@ -146,7 +154,7 @@ async function inspectAndPick(page, host) {
   const view = await (await fetch(`${host.url}/api/view`)).json();
   const frame = await page.evaluate(() => window.vizziMetrics.lastFrame);
   const bounds = await page.locator("canvas").boundingBox();
-  const target = view.files.find(file => file.rect.y * frame.camera.scale + frame.camera.y + file.rect.height * frame.camera.scale < frame.height - 20);
+  const target = view.files.filter(file => file.classification.kind === "assigned" && file.coverage !== "unavailable" && file.bytes < 131072).find(file => file.rect.y * frame.camera.scale + frame.camera.y + file.rect.height * frame.camera.scale < frame.height - 20);
   assert.ok(target);
   const x = bounds.x + frame.camera.x + (target.rect.x + target.rect.width / 2) * frame.camera.scale;
   const y = bounds.y + frame.camera.y + (target.rect.y + target.rect.height / 2) * frame.camera.scale;
@@ -164,7 +172,7 @@ async function singleEdits(page, input, host, picking) {
   const results = [];
   for (const offset of [0, 97, 211, 367, 463]) {
     const before = await settled(host); await delay(offset);
-    const marker = `// browser-visible-${offset}`;
+    const marker = `${view.source.outlines[0].context.language === "python" ? "#" : "//"} browser-visible-${offset}`;
     const started = performance.now();
     await writeFile(path, Buffer.concat([Buffer.from(marker + "\n"), original]));
     const publication = (async () => {
@@ -185,20 +193,58 @@ async function singleEdits(page, input, host, picking) {
   return { samples: results, summary: summary(results.map(result => result.writeToDomAndTwoRafMs)) };
 }
 
+async function largeSource(page, input, host, file) {
+  const path = file.path.slice(input.root.length + 1);
+  await settled(host);
+  if (!await page.locator("summary").evaluate(node => node.parentElement.open)) await page.locator("summary").click();
+  await page.locator("#filter").fill(path);
+  const button = page.getByRole("button", { name: path, exact: true });
+  await button.waitFor();
+  await beginProbe(page);
+  const opened = performance.now();
+  await button.click();
+  await page.waitForFunction(path => document.getElementById("file-title").textContent === path && document.querySelectorAll(".code-line").length > 0, path);
+  await paint(page);
+  const openMs = performance.now() - opened;
+  const openProbe = await endProbe(page);
+  const original = await readFile(file.path);
+  const marker = "// full-corpus-large-source-edit";
+  const before = await settled(host);
+  await beginProbe(page);
+  const edited = performance.now();
+  await writeFile(file.path, Buffer.concat([Buffer.from(marker + "\n"), original]));
+  await page.waitForFunction(marker => [...document.querySelectorAll(".code-line")].some(line => line.textContent.includes(marker)), marker, { timeout: 120000 });
+  await paint(page);
+  const editMs = performance.now() - edited;
+  const editProbe = await endProbe(page);
+  const status = await settled(host);
+  assert.notEqual(status.snapshot, before.snapshot);
+  return { path, bytes: file.bytes, openMs, editToDomAndTwoRafMs: editMs, measurements: status.measurements,
+    openFrames: summary(openProbe.frames.map(frame => frame.duration)), openLongFrames: openProbe.longFrames,
+    editFrames: summary(editProbe.frames.map(frame => frame.duration)), editLongFrames: editProbe.longFrames,
+    renderedLines: await page.locator(".code-line").count(), outlineButtons: await page.locator("#outline button").count() };
+}
+
 async function qualify(chromium, definition) {
   console.log(`Starting ${definition.name}`);
   const input = await workspace({ ...definition.input, name: definition.name });
   let host, session;
   try {
+    if (definition.profile) {
+      input.sourceArguments = definition.profile.source_arguments;
+      input.startupTimeoutMs = 300000; input.stopTimeoutMs = 60000;
+      if (definition.profile.cache) input.cache = definition.profile.cache;
+    }
     host = await startHost(input);
     await settled(host);
     session = await openWorkspace(chromium, host);
-    const files = await capturedFiles(input.root);
+    const files = await capturedFiles(input.root, input.root, [], definition.profile);
+    if (definition.profile) assert.equal(files.length, (await (await fetch(`${host.url}/api/status`)).json()).measurements.files, "independent full-profile inventory differs from capture");
     const manifest = createHash("sha256");
     for (const file of files.toSorted((a, b) => a.path.localeCompare(b.path, "en"))) {
       manifest.update(JSON.stringify([file.path.slice(input.root.length + 1), createHash("sha256").update(await readFile(file.path)).digest("hex")]));
     }
-    const heavy = files.toSorted((a, b) => b.bytes - a.bytes).slice(0, definition.heavyFiles);
+    const heavy = files.filter(file => ![".cu", ".cuh"].includes(extname(file.path))).toSorted((a, b) => b.bytes - a.bytes).slice(0, definition.heavyFiles);
     const originals = await Promise.all(heavy.map(file => readFile(file.path)));
     const runs = [];
     for (let sample = 0; sample < options.samples; sample++) {
@@ -207,7 +253,7 @@ async function qualify(chromium, definition) {
         await session.page.bringToFront();
         await session.page.waitForFunction(() => window.vizziMetrics?.lastFrame?.snapshot);
         await paint(session.page);
-        const run = await interaction(session.page, host, condition === "refresh" ? () => Promise.all(heavy.map((file, index) => writeFile(file.path, Buffer.concat([Buffer.from(`// background ${sample}\n`), originals[index]])))) : null);
+        const run = await interaction(session.page, host, condition === "refresh" ? () => Promise.all(heavy.map((file, index) => writeFile(file.path, Buffer.concat([Buffer.from(`${extname(file.path) === ".py" ? "#" : "//"} background ${sample}\n`), originals[index]])))) : null);
         runs.push({ sample, condition, ...run });
         console.log(`${definition.name} ${condition} ${sample + 1}: ${run.frameSummary.count} rAF intervals; ${run.pendingObservations} pending observations`);
       }
@@ -217,6 +263,7 @@ async function qualify(chromium, definition) {
     await session.page.waitForFunction(() => window.vizziMetrics?.lastFrame?.snapshot); await paint(session.page);
     const picking = await inspectAndPick(session.page, host);
     const editLatency = await singleEdits(session.page, input, host, picking);
+    const large = definition.profile ? await largeSource(session.page, input, host, heavy[0]) : null;
     const cdp = await session.page.context().newCDPSession(session.page);
     await cdp.send("Performance.enable");
     const performanceMetrics = await cdp.send("Performance.getMetrics");
@@ -231,12 +278,12 @@ async function qualify(chromium, definition) {
     await writeFile(screenshot, await session.page.screenshot({ fullPage: true }), { flag: "wx" });
     assert.deepEqual(session.errors, []);
     const final = await (await fetch(`${host.url}/api/view`)).json();
-    const clean = spawnSync("target/release/vizzi", ["--root", input.root, "--cache", input.cache, "--once"], { encoding: "utf8" });
+    const clean = spawnSync("target/release/vizzi", ["--root", input.root, "--cache", input.cache, "--once", ...(input.sourceArguments ?? [])], { encoding: "utf8" });
     assert.equal(clean.status, 0, clean.stderr);
     assert.equal(JSON.parse(clean.stdout).snapshot, final.snapshot, "incremental result differs from a fresh full capture");
-    return { name: definition.name, revision: definition.revision, originalSourceManifestSha256: manifest.digest("hex"), rustFiles: files.length, sourceBytes: files.reduce((sum, file) => sum + file.bytes, 0),
+    return { name: definition.name, revision: definition.revision, originalSourceManifestSha256: manifest.digest("hex"), capturedFiles: files.length, sourceArguments: input.sourceArguments, sourceBytes: files.reduce((sum, file) => sum + file.bytes, 0),
       overviewFiles: final.files.length, heavyFiles: heavy.map(file => ({ path: file.path.slice(input.root.length + 1), bytes: file.bytes })),
-      runs, picking, editLatency, heap, webgpu, screenshot, cleanSnapshotMatches: true, nativeRss: await sampleRss(host.pid), errors: session.errors,
+      runs, picking, editLatency, largeSource: large, heap, webgpu, screenshot, cleanSnapshotMatches: true, nativeRss: await sampleRss(host.pid), errors: session.errors,
       browserRequests: Object.fromEntries([...new Set(session.requests)].map(path => [path, session.requests.filter(value => value === path).length])) };
   } finally { await session?.close(); await host?.close(); await input.close(); }
 }
@@ -251,7 +298,8 @@ try {
   const large = Array.from({ length: 16000 }, (_, i) => `fn work_${i}() -> usize { ${i} }\n`).join("");
   for (let i = 0; i < 8; i++) synthetic[`zzz_load/background_${i}.rs`] = large + `fn unique_${i}() {}\n`;
   const definitions = [{ name: "synthetic-10k", revision: "generated-v1:10000-small+8x16000-functions", input: { files: synthetic }, heavyFiles: 8 }];
-  if (options.source) definitions.push({ name: "lpc-rs", revision: options.revision, input: { source: options.source }, heavyFiles: 32 });
+  if (options.referenceOnly) definitions.length = 0;
+  if (options.source) definitions.push({ name: profile?.name ?? "lpc-rs", revision: options.revision, input: { source: options.source }, heavyFiles: profile ? 3 : 32, profile });
   const results = [];
   for (const definition of definitions) results.push(await qualify(chromium, definition));
   const sha256 = path => readFile(path).then(bytes => createHash("sha256").update(bytes).digest("hex"));

@@ -5,6 +5,8 @@ The [results](RESULTS.md) explain the initial native measurements and their limi
 The [source-policy follow-up](SOURCE_POLICY_RESULTS.md) records selection, snapshot
 identity, schema-2 browser behavior, final mutation evidence, and native regression timings.
 The [C/C++ report](C_FAMILY_RESULTS.md) records raw adapters and scoped reference checks.
+The [full-corpus qualification](../qualification/RESULTS.md) records native/retained
+memory, cancellation, production edit latency, and large-outline performance failures.
 Use pinned source archives without build artifacts; no analyzed project is built.
 
 Run the regular checks and the actual browser:

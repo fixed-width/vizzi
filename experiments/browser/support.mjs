@@ -27,7 +27,7 @@ export async function startHost(input, workers = 4, port = 0) {
   const child = spawn(resolve("target/release/vizzi"), ["--root", input.root, "--cache", input.cache, "--port", String(port), "--workers", String(workers), ...(input.sourceArguments ?? [])], { stdio: ["ignore", "ignore", "pipe"] });
   let stderr = "";
   const url = await new Promise((accept, reject) => {
-    const timeout = setTimeout(() => { child.kill("SIGKILL"); reject(new Error(`Host startup timed out: ${stderr}`)); }, 30000);
+    const timeout = setTimeout(() => { child.kill("SIGKILL"); reject(new Error(`Host startup timed out: ${stderr}`)); }, input.startupTimeoutMs ?? 30000);
     const fail = error => { clearTimeout(timeout); reject(error); };
     child.once("error", fail);
     child.once("exit", code => fail(new Error(`Host exited (${code}): ${stderr}`)));
@@ -42,7 +42,7 @@ export async function startHost(input, workers = 4, port = 0) {
     async close() {
       if (child.exitCode !== null) return;
       const exited = once(child, "exit");
-      const timeout = setTimeout(() => child.kill("SIGKILL"), 5000);
+      const timeout = setTimeout(() => child.kill("SIGKILL"), input.stopTimeoutMs ?? 5000);
       child.kill("SIGINT");
       try {
         const [code, signal] = await exited;

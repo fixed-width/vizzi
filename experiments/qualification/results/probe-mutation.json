@@ -1,0 +1,64 @@
+{
+  "tool": "cargo-mutants 27.1.0",
+  "scope": [
+    "crates/vizzi/src/qualification.rs"
+  ],
+  "feature": "qualification",
+  "baseline": "passed",
+  "tested": 39,
+  "counts": {
+    "Unviable": 5,
+    "CaughtMutant": 34
+  },
+  "command": "cargo mutants -p vizzi --features qualification --file crates/vizzi/src/qualification.rs --jobs 4 --timeout 15 --build-timeout 180 -- --lib",
+  "exclusions": [],
+  "non_caught": [
+    {
+      "name": "crates/vizzi/src/qualification.rs:59:9: replace <impl LanguageAdapter for Factory>::context -> Context with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/qualification.rs:73:9: replace <impl LanguageAdapter for Factory>::create -> Result<Box<dyn Analyzer>, ModelError> with Ok(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/qualification.rs:98:13: replace && with || in <impl Analyzer for Parser>::analyze",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/qualification.rs:93:9: replace <impl Analyzer for Parser>::analyze -> Result<Analysis, ModelError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/qualification.rs:202:17: replace && with || in qualify",
+      "outcome": "Unviable"
+    }
+  ],
+  "source_sha256": "2bef2be2309eb5f36366fc05d695eb83cfc960ca1c9183bf13ed8b5539702c81",
+  "preliminary_attempts": [
+    {
+      "scope": "example target",
+      "tested": 0,
+      "reason": "cargo-mutants does not discover that target; probe moved behind an optional native feature"
+    },
+    {
+      "scope": "initial feature-module baseline",
+      "tested": 0,
+      "reason": "self-crate imports corrected before interpreting mutations"
+    },
+    {
+      "tested": 45,
+      "counts": {
+        "MissedMutant": 24,
+        "CaughtMutant": 17,
+        "Unviable": 4
+      },
+      "resolution": "Added public-entry/selection/inconsistency tests; replaced sentinel arithmetic and inline timers with typed tested helpers; removed parallel query arrays/counter arithmetic"
+    }
+  ],
+  "limits": [
+    "Instrumentation scope only; production analyzers were unchanged",
+    "Source/query consistency and unit/timer checks are validated on deterministic fixtures; timing itself is hardware-dependent",
+    "Mutation results are evidence, not proof"
+  ]
+}
