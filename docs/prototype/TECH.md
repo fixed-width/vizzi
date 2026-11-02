@@ -30,15 +30,15 @@ identities are hashes of captured bytes, independently of source-control identif
 
 Documents retain captured source and can contain analyses for multiple contexts.
 Analysis contexts identify language, analyzer, configuration, and implementation.
-The host registers Rust and Python syntax adapters through one source policy. Their
+The host registers Rust, Python, C, and C++ syntax adapters through one source policy. Their
 fingerprints conservatively include adapter/shared implementation sources and the
 dependency lockfile. See [language and worker contracts](LANGUAGES.md).
 
 The [source-policy contract](SOURCE_POLICY.md) defines the implemented selection seam,
 classification metadata, and snapshot policy identity. The [C/C++ contract](C_FAMILY_POLICY.md)
-also specifies future raw adapters and configured translation-unit inputs, sequenced
+also specifies future configured translation-unit inputs, sequenced
 in the [implementation plan](../plans/c-family.md). Current analyzers remain byte-only
-Rust/Python; explicitly enabled C-family candidates are source-only.
+Rust/Python/C/C++; unassigned/unsupported C-family candidates remain source-only.
 
 Snapshots sort documents and identify their actual captured contents and analysis.
 They represent immutable observations, not an atomic filesystem transaction. A source

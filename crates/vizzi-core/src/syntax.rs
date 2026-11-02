@@ -6,16 +6,36 @@ use crate::{
 };
 use std::collections::BTreeMap;
 
+pub(crate) struct Declaration {
+    pub kind: &'static str,
+    pub name: String,
+    pub span: std::ops::Range<usize>,
+}
+impl Declaration {
+    pub(crate) fn at(node: tree_sitter::Node<'_>, kind: &'static str, name: String) -> Self {
+        Self {
+            kind,
+            name,
+            span: node.byte_range(),
+        }
+    }
+}
+
+type Collector = fn(tree_sitter::Node<'_>, &str, &mut Vec<Declaration>);
+type Scope = fn(tree_sitter::Node<'_>, &str) -> Option<(&'static str, String)>;
+
 pub(crate) struct SyntaxAnalyzer {
     parser: tree_sitter::Parser,
     context: Context,
-    declaration: fn(tree_sitter::Node<'_>, &str) -> Option<(&'static str, String)>,
+    declarations: Collector,
+    scope: Scope,
 }
 impl SyntaxAnalyzer {
     pub(crate) fn new(
         language: tree_sitter::Language,
         context: Context,
-        declaration: fn(tree_sitter::Node<'_>, &str) -> Option<(&'static str, String)>,
+        declarations: Collector,
+        scope: Scope,
     ) -> Result<Self, ModelError> {
         let mut parser = tree_sitter::Parser::new();
         parser
@@ -24,7 +44,8 @@ impl SyntaxAnalyzer {
         Ok(Self {
             parser,
             context,
-            declaration,
+            declarations,
+            scope,
         })
     }
 }
@@ -56,28 +77,33 @@ impl Analyzer for SyntaxAnalyzer {
             );
         }
         let mut cursor = tree.walk();
+        let mut declarations = Vec::new();
         loop {
             let node = cursor.node();
-            if let Some((kind, name)) = (self.declaration)(node, text) {
+            (self.declarations)(node, text, &mut declarations);
+            if !declarations.is_empty() {
                 let mut scope = Vec::new();
                 let mut parent = node.parent();
                 while let Some(ancestor) = parent {
-                    if let Some((kind, name)) = (self.declaration)(ancestor, text) {
+                    if let Some((kind, name)) = (self.scope)(ancestor, text) {
                         scope.push(format!("{kind}:{name}"));
                     }
                     parent = ancestor.parent();
                 }
                 scope.reverse();
-                scope.push(format!("{kind}:{name}"));
-                let key =
-                    serde_json::to_string(&scope).map_err(|error| ModelError(error.to_string()))?;
-                analysis.facts.push(Fact {
-                    key,
-                    kind: kind.into(),
-                    name,
-                    span: node.byte_range(),
-                    unique: true,
-                });
+                for declaration in declarations.drain(..) {
+                    scope.push(format!("{}:{}", declaration.kind, declaration.name));
+                    let key = serde_json::to_string(&scope)
+                        .map_err(|error| ModelError(error.to_string()))?;
+                    scope.pop();
+                    analysis.facts.push(Fact {
+                        key,
+                        kind: declaration.kind.into(),
+                        name: declaration.name,
+                        span: declaration.span,
+                        unique: true,
+                    });
+                }
             }
             if cursor.goto_first_child() {
                 continue;

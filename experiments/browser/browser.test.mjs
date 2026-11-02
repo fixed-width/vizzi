@@ -8,7 +8,7 @@ let chromium, input, host;
 const text = `const HTML: &str = "<img src=x onerror='window.injected=true'>";\nfn first() {}\nfn anchor() {\n${"    // captured line\n".repeat(10000)}}\n`;
 before(async () => {
   buildHost();
-  input = await workspace({ files: { "src/a.rs": text, "src/b.rs": "fn beta() {}", "src/partial.rs": "fn broken( {", "src/encoding.rs": Buffer.from([255]), "src/z.py": "class Example:\n    def read(self): pass\n", "include/shared.h": "struct Header;", "include/device.cuh": "__device__ void kernel();", "include/encoding.h": Buffer.from([255]), "include/example.c++": "class Example {};" }, sourceArguments: ["--c-family-root", "include"] });
+  input = await workspace({ files: { "src/a.rs": text, "src/b.rs": "fn beta() {}", "src/partial.rs": "fn broken( {", "src/encoding.rs": Buffer.from([255]), "src/z.py": "class Example:\n    def read(self): pass\n", "include/shared.h": "struct Header;", "include/device.cuh": "__device__ void kernel();", "include/encoding.h": Buffer.from([255]), "include/example.c++": "class Example {};", "include/sample.c": "int sum(int a, int b) { return a + b; }", "include/assigned/defs.h": "class Definition { public: int read() { return 1; } };" }, sourceArguments: ["--c-family-root", "include", "--syntax-language", "include/assigned=cpp"] });
   host = await startHost(input);
   chromium = await browser();
 });
@@ -25,9 +25,9 @@ test("source-only headers expose reasons, encoding, and pinned metadata without 
     assert.ok((await page.locator("#diagnostics").textContent()).includes("language is unassigned"));
     assert.ok((await page.locator("#source").textContent()).includes("struct Header;"));
     assert.equal(await page.locator("#outline button").count(), 0);
-    assert.ok((await page.locator("#counts").textContent()).includes("4 source only"));
+    assert.ok((await page.locator("#counts").textContent()).includes("3 source only"));
     const view = await (await fetch(`${host.url}/api/view?filter=shared.h`)).json();
-    assert.equal(view.schema, 2); assert.equal(view.analyzed, 5); assert.equal(view.source_only, 4);
+    assert.equal(view.schema, 2); assert.equal(view.analyzed, 8); assert.equal(view.source_only, 3);
     assert.equal(view.source.classification.reason, "language_unassigned");
     assert.equal(view.source.encoding, "utf8");
     const full = await (await fetch(`${host.url}/api/view`)).json();
@@ -55,7 +55,31 @@ test("source-only headers expose reasons, encoding, and pinned metadata without 
     assert.ok((await page.locator("#diagnostics").textContent()).includes("language is unassigned"));
     await page.getByRole("button", { name: "include/example.c++", exact: true }).click();
     await page.waitForFunction(() => document.getElementById("file-title").textContent === "include/example.c++");
-    assert.ok((await page.locator("#diagnostics").textContent()).includes("analyzer is unavailable"));
+    assert.ok((await page.locator("#coverage").textContent()).includes("cpp"));
+    assert.ok((await page.locator("#outline").textContent()).includes("Example"));
+    assert.deepEqual(session.errors, []);
+  } finally { await session.close(); }
+});
+
+test("C/C++ definitions and explicitly assigned headers share source selection across edits", async () => {
+  const session = await openWorkspace(chromium, host);
+  const { page } = session;
+  try {
+    await page.locator("summary").click();
+    await page.getByRole("button", { name: "include/sample.c", exact: true }).click();
+    await page.waitForFunction(() => document.getElementById("file-title").textContent === "include/sample.c");
+    assert.ok((await page.locator("#coverage").textContent()).includes("c: syntax parsed"));
+    assert.ok((await page.locator("#outline").textContent()).includes("sum"));
+    await page.getByRole("button", { name: "include/assigned/defs.h", exact: true }).click();
+    await page.waitForFunction(() => document.getElementById("file-title").textContent === "include/assigned/defs.h");
+    assert.ok((await page.locator("#coverage").textContent()).includes("assigned for include/assigned"));
+    assert.ok((await page.locator("#coverage").textContent()).includes("configuration unknown"));
+    await page.getByRole("button", { name: /^read/ }).click();
+    const snapshot = await page.locator("#snapshot").getAttribute("title");
+    await writeFile(join(input.root, "include/assigned/defs.h"), "// shifted\nclass Definition { public: int read() { return 1; } };");
+    await page.waitForFunction(previous => document.getElementById("snapshot").title !== previous, snapshot);
+    assert.ok((await page.locator('#outline [aria-current="true"]').textContent()).startsWith("read"));
+    assert.ok((await page.locator("#source").textContent()).includes("// shifted"));
     assert.deepEqual(session.errors, []);
   } finally { await session.close(); }
 });

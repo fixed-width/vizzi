@@ -18,10 +18,12 @@ document model also permits multiple analyses.
 
 `Languages::builtin` registers:
 
-| Language | Extension | Extracted declarations | Limits |
+| Language | Selected inputs | Extracted declarations | Limits |
 | --- | --- | --- | --- |
 | Rust | `.rs` | Functions, types, modules, constants, statics, implementations | Raw source; no macro expansion or compiler resolution |
 | Python | `.py` | Classes and functions, including methods, nested and async functions | No import/type resolution, assignments, or call relationships; declaration spans omit decorators |
+| C | `.c` or explicit assignment inside enabled family scopes | Function/type definitions and every typedef alias | No preprocessing, include/type resolution, or compiler configuration |
+| C++ | C++ suffix hints or explicit assignment inside enabled family scopes | C forms plus named classes/namespaces, using aliases, methods/operators with bodies | No template instantiation or overload resolution |
 
 Only UTF-8 source supports declarations. Python encoding cookies do not enable other
 decoders. Grammar recovery sets `partial`; undecodable source sets `unavailable` and
@@ -31,11 +33,13 @@ Unique declaration identities survive position changes in either language.
 
 The default host omits other extensions. Explicit C-family scopes capture C/C++
 candidates, ambiguous headers, fragments, and CUDA source without inventing analysis.
-C/C++ analyzers are the next delivery; Python stubs, notebooks, and LPC remain outside
-scope. Counts describe selected capture scope, not every repository file.
+Assigned C/C++ inputs now receive raw declaration analysis; ambiguous headers and CUDA
+retain source-only coverage. Python stubs, notebooks, and LPC remain outside scope.
+Counts describe selected capture scope, not every repository file. The
+[C/C++ extraction reference](C_FAMILY_SYNTAX.md) defines exact forms, spans, and limits.
 
 The [C/C++ policy](C_FAMILY_POLICY.md) distinguishes implemented source selection from
-future raw adapters and configured analysis. Its [delivery plan](../plans/c-family.md)
+raw adapters and future configured analysis. Its [delivery plan](../plans/c-family.md)
 records the remaining stages.
 
 ## Native source policy
@@ -64,7 +68,7 @@ outside this host's current contract.
 one largest-file-first queue across all selected languages and at most that many
 workers. A worker creates each needed analyzer lazily and owns it exclusively; there
 are no independent per-language thread pools. Warm cache hits create no analyzers.
-With two adapters, up to twice the worker count of parser instances may exist during
+With four adapters, up to four times the worker count of parser instances may exist during
 an attempt, with no more than the worker count actively analyzing files.
 
 The host serializes refresh attempts; direct concurrent `Engine::refresh` callers

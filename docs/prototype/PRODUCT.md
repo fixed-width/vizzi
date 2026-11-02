@@ -15,7 +15,8 @@ engine and works without a project build or external account.
   describe selected source files. Other extensions remain outside capture scope.
 - Explicit C-family scopes add readable source-only candidates, including unassigned
   headers and unavailable dialects/analyzers. Source classification and encoding are
-  reported separately. C/C++ syntax extraction is a later slice. Capture and analysis
+  reported separately. Assigned C/C++ inputs receive raw definition/type-alias outlines.
+  Capture and analysis
   counts remain distinct; no outline is invented for a source-only file.
 - The overview groups files by directory, supports filtering, pan, zoom, and selection,
   and provides readable file labels and hover details.

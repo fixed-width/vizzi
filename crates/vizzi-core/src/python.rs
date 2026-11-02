@@ -3,7 +3,7 @@
 use crate::{
     analysis::{Analyzer, LanguageAdapter},
     model::{Context, ContextId, ModelError},
-    syntax::SyntaxAnalyzer,
+    syntax::{Declaration, SyntaxAnalyzer},
 };
 
 /// Registers raw Python syntax; imports and annotations are not resolved.
@@ -27,8 +27,14 @@ impl LanguageAdapter for PythonAdapter {
         Ok(Box::new(SyntaxAnalyzer::new(
             tree_sitter_python::LANGUAGE.into(),
             self.context(),
+            collect,
             declaration,
         )?))
+    }
+}
+fn collect(node: tree_sitter::Node<'_>, text: &str, output: &mut Vec<Declaration>) {
+    if let Some((kind, name)) = declaration(node, text) {
+        output.push(Declaration::at(node, kind, name));
     }
 }
 fn declaration(node: tree_sitter::Node<'_>, text: &str) -> Option<(&'static str, String)> {

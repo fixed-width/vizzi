@@ -51,11 +51,12 @@ scope fail startup. `--exclude-source SCOPE` removes that path/subtree from all 
 including default Rust/Python inputs. Paths are relative to `--root`; traversal and
 absolute scopes are rejected. Options can be repeated and do not depend on ordering.
 
-The current host has no C/C++ analyzers, so these candidates remain source-only.
-Unassigned `.h` files explain their ambiguity; requested C/C++ and CUDA inputs explain
-the unavailable analyzer/dialect. Source remains readable when UTF-8. The inspector
-shows the assignment evidence, and overview counts separate captured files from files
-with analysis. Raw Rust/Python outlines state that configuration coverage is unknown.
+Assigned C/C++ files now show raw definition/type-alias outlines. Unassigned `.h` files
+remain source-only and explain their ambiguity; CUDA remains an unavailable dialect.
+Source remains readable when UTF-8. The inspector shows assignment evidence, and
+counts separate captured files from files with analysis. All raw outlines state that
+configuration coverage is unknown. See the [extraction reference](../prototype/C_FAMILY_SYNTAX.md)
+for supported forms, template/overload behavior, and limits.
 No compilation database, compiler, build, or project script is invoked.
 
 Keep C-family capture disabled for lpc-rs: its LPC fixtures also use `.c`/`.h` suffixes.

@@ -80,7 +80,7 @@ fn python_adapter_preserves_scopes_ranges_and_duplicate_ambiguity() {
         language.context().id,
         languages.select("rust").unwrap().context().id
     );
-    for extension in ["h", "hpp", "c", "cpp", "cu", "cuh", "lpc", "PY", ""] {
+    for extension in ["h", "hpp", "cu", "cuh", "lpc", "PY", ""] {
         assert!(languages.select(extension).is_none(), "{extension}");
     }
     let text = "@decorator\nclass Café:\n    async def read(self):\n        def nested():\n            pass\n        return nested()\n\ndef repeated(): pass\ndef repeated(): pass\nclass Other:\n    def read(self): pass\n";

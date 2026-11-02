@@ -4,9 +4,17 @@ This procedure measures the native application through its public diagnostic tra
 It complements the isolated [performance experiments](../performance/README.md), and
 does not measure browser presentation. The script edits only a temporary source copy.
 See [the first application report](RESULTS.md) for recorded results and limitations.
-The current driver supports the configured Rust/Python scope; it uses `//` or `#`
-for edit probes according to the selected outline language. See the
+The driver uses `//` or `#` edit probes according to the selected outline language.
+Default capture is Rust/Python; explicit source-policy options also select C/C++ inputs. See the
 [mixed-language procedure and evidence](../languages/README.md) for PyTorch runs.
+
+For C-family runs, repeat `--c-family-root`, `--syntax-language`, and `--exclude-source`
+as needed; these are forwarded to cold, warm, live, and clean-capture processes alike.
+`--select-file RELATIVE_PATH` chooses an assigned file to edit. The report records the
+effective source arguments, capture policy, selection provenance, and bounded captured
+inventory. It also records whether that inventory covers the complete scope. A selected
+source-only file is rejected by this edit/analysis driver. See the
+[C-family procedure](../languages/README.md#check-raw-cc-adapters) for exact scoped runs.
 
 Build the optimized host and run with a pinned, build-artifact-free source archive:
 

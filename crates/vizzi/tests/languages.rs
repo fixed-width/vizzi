@@ -14,7 +14,9 @@ use vizzi::{
 };
 use vizzi_core::{
     analysis::{Analyzer, LanguageAdapter, Languages},
+    c_family::{CAdapter, CppAdapter},
     model::{Analysis, Context, ContextId, ModelError},
+    policy::PolicyConfig,
     python::PythonAdapter,
     rust::RustAdapter,
 };
@@ -123,19 +125,19 @@ fn configured(
 }
 
 #[test]
-fn one_budget_bounds_both_languages_and_warm_hits_create_no_parsers() {
+fn one_budget_bounds_all_four_languages_and_warm_hits_create_no_parsers() {
     let root = tempfile::tempdir().unwrap();
-    for index in 0..16 {
-        std::fs::write(
-            root.path().join(format!("{index:02}.rs")),
-            format!("fn rust{index}() {{}}"),
-        )
-        .unwrap();
-        std::fs::write(
-            root.path().join(format!("{index:02}.py")),
-            format!("def python{index}(): pass\n"),
-        )
-        .unwrap();
+    for index in 0..8 {
+        for (suffix, text) in [
+            ("a.rs", format!("fn rust{index}() {{}}")),
+            ("b.py", format!("def python{index}(): pass\n")),
+            ("c.c", format!("int c{index}(void) {{ return 0; }}")),
+            ("d.cpp", format!("class Cpp{index} {{}};")),
+        ] {
+            let mut bytes = text.into_bytes();
+            bytes.resize(128, b' ');
+            std::fs::write(root.path().join(format!("{index:02}-{suffix}")), bytes).unwrap();
+        }
     }
     let mut expected = None;
     for workers in [1, 2, 4] {
@@ -144,21 +146,43 @@ fn one_budget_bounds_both_languages_and_warm_hits_create_no_parsers() {
             rendezvous: Some((workers, Barrier::new(workers))),
             ..Default::default()
         });
-        let engine = configured(
-            root.path(),
-            cache.path(),
+        let factories: Vec<Arc<dyn LanguageAdapter>> = vec![
+            Arc::new(RustAdapter),
+            Arc::new(PythonAdapter),
+            Arc::new(CAdapter),
+            Arc::new(CppAdapter),
+        ];
+        let adapters = factories
+            .into_iter()
+            .map(|inner| {
+                Arc::new(Adapter {
+                    inner,
+                    activity: activity.clone(),
+                    revision: 0,
+                    fault: Fault::None,
+                }) as Arc<dyn LanguageAdapter>
+            })
+            .collect();
+        let engine = Engine::new(
+            Directory::with_policy(
+                root.path(),
+                PolicyConfig {
+                    c_family_roots: vec![".".into()],
+                    ..Default::default()
+                },
+                Arc::new(Languages::new(adapters).unwrap()),
+            )
+            .unwrap(),
+            Cache::new(cache.path().into()),
             workers,
-            &activity,
-            0,
-            Fault::None,
-            true,
-        );
+        )
+        .unwrap();
         let cold = engine.refresh(None, &|| false).unwrap().unwrap();
         assert_eq!(cold.measurements.parsed, 32);
         assert_eq!(activity.peak.load(Ordering::SeqCst), workers);
         assert_eq!(activity.active.load(Ordering::SeqCst), 0);
         let created = activity.created.load(Ordering::SeqCst);
-        assert!((2..=workers * 2).contains(&created));
+        assert!((4..=workers * 4).contains(&created));
         if let Some(id) = &expected {
             assert_eq!(cold.snapshot.id(), id);
         }

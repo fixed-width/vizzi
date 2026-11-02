@@ -1492,6 +1492,8 @@ dependencies = [
  "serde_json",
  "thiserror",
  "tree-sitter",
+ "tree-sitter-c",
+ "tree-sitter-cpp",
  "tree-sitter-python",
  "tree-sitter-rust",
 ]

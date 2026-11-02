@@ -9,8 +9,9 @@ apply the same frozen policy during discovery, hint verification, and event filt
 `PolicyConfig` contains enabled `c_family_roots`, `exclusions`, and explicit C/C++
 `assignments`. Rust `.rs` and Python `.py` inputs are selected by default. Family scopes
 add the candidate suffixes in [the C-family policy](C_FAMILY_POLICY.md), including
-`.c++` and `.h++`. C/C++ factories are not yet registered, so those requested languages
-produce source-only files rather than invented analyses. CUDA remains unsupported.
+`.c++` and `.h++`. Assigned C/C++ inputs receive [raw declaration extraction](C_FAMILY_SYNTAX.md).
+Ambiguous headers, unassigned fragments, and CUDA remain source-only. An unavailable
+factory in a custom registry still preserves source without fake analysis.
 
 `SourcePolicy::new(config, available_languages)` validates and freezes the configuration.
 `classify(path)` returns no capture for excluded/out-of-scope files, or one immutable
@@ -55,7 +56,7 @@ policy. There is one registered raw adapter per language in this host.
 
 `Directory::with_policy(root, config, languages)` constructs policy and factories
 together so availability cannot drift. `open` uses default configuration and built-in
-Rust/Python factories; `with_languages` supplies a different factory registry with
+Rust/Python/C/C++ factories; `with_languages` supplies a different factory registry with
 default capture rules. Removing a factory preserves selected bytes as source-only.
 
 Policies are immutable for a host's lifetime. The CLI exposes repeatable

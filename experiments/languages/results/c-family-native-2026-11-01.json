@@ -1,0 +1,1023 @@
+{
+  "base_commit": "2e32dde50d6f069dcba71d4121b03d7cf9184197",
+  "working_tree": "raw C/C++ adapters before commit",
+  "method": "Same optimized binary, four shared workers, three empty-analysis-cache loads, three fresh-process warm loads, three hinted edits each checked against a separate complete capture using identical source-policy arguments. No competing tests or mutation jobs.",
+  "manifest_algorithm": "SHA-256 of compact ASCII JSON sorted [relative path, size, SHA-256 original source bytes] triples",
+  "runs": [
+    {
+      "source_revision": "cbbddb6b08cc9900a87cccaa9b22bbe06aa4f50a",
+      "source": "/tmp/vizzi-perf-corpus/linux-cbbddb6b/kernel/locking",
+      "scope": "Configured raw capture; disposable copy; no analyzed project builds",
+      "source_arguments": [
+        "--c-family-root",
+        ".",
+        "--syntax-language",
+        ".=c"
+      ],
+      "capture_policy": "8916b7f274760b9df9214057ee93239c5df17feafcc2a0fbaccfc31c44ce6e8d",
+      "selected_classification": {
+        "kind": "assigned",
+        "language": "c",
+        "provenance": {
+          "kind": "explicit_scope",
+          "scope": "."
+        }
+      },
+      "captured_inventory": {
+        "complete": true,
+        "count": 32,
+        "extensions": {
+          ".c": 21,
+          ".h": 11
+        },
+        "assigned_languages": {
+          "c": 32
+        },
+        "source_only_files": []
+      },
+      "platform": "Linux-6.8.0-147-lowlatency-x86_64-with-glibc2.39",
+      "workers": 4,
+      "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+      "binary_sha256": "dec404ddccfd351306f6c05664556f2133328b42846196d26c8e18add53153df",
+      "cold": [
+        {
+          "process_wall_ms": 48.110186122357845,
+          "peak_rss_kib": 11520,
+          "status": {
+            "schema": 1,
+            "name": "/tmp/vizzi-workspace-ximcxarw/source",
+            "generation": 1,
+            "snapshot": "c172ae8e387f1ef5908d808fb4aa558965032cb53ebec42484c5eb1837b89c19",
+            "pending": false,
+            "measurements": {
+              "files": 32,
+              "analyzed": 32,
+              "source_only": 0,
+              "bytes": 566398,
+              "read_files": 32,
+              "retained": 0,
+              "reconciled": true,
+              "parsed": 32,
+              "reused": 0,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 0.587914,
+              "total_ms": 43.838198
+            },
+            "error": null,
+            "observation": "one-shot capture"
+          }
+        },
+        {
+          "process_wall_ms": 45.178876956924796,
+          "peak_rss_kib": 10880,
+          "status": {
+            "schema": 1,
+            "name": "/tmp/vizzi-workspace-ximcxarw/source",
+            "generation": 1,
+            "snapshot": "c172ae8e387f1ef5908d808fb4aa558965032cb53ebec42484c5eb1837b89c19",
+            "pending": false,
+            "measurements": {
+              "files": 32,
+              "analyzed": 32,
+              "source_only": 0,
+              "bytes": 566398,
+              "read_files": 32,
+              "retained": 0,
+              "reconciled": true,
+              "parsed": 32,
+              "reused": 0,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 0.334065,
+              "total_ms": 42.146405
+            },
+            "error": null,
+            "observation": "one-shot capture"
+          }
+        },
+        {
+          "process_wall_ms": 40.58463592082262,
+          "peak_rss_kib": 11840,
+          "status": {
+            "schema": 1,
+            "name": "/tmp/vizzi-workspace-ximcxarw/source",
+            "generation": 1,
+            "snapshot": "c172ae8e387f1ef5908d808fb4aa558965032cb53ebec42484c5eb1837b89c19",
+            "pending": false,
+            "measurements": {
+              "files": 32,
+              "analyzed": 32,
+              "source_only": 0,
+              "bytes": 566398,
+              "read_files": 32,
+              "retained": 0,
+              "reconciled": true,
+              "parsed": 32,
+              "reused": 0,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 0.812287,
+              "total_ms": 36.642591
+            },
+            "error": null,
+            "observation": "one-shot capture"
+          }
+        }
+      ],
+      "warm": [
+        {
+          "process_wall_ms": 4.580619046464562,
+          "peak_rss_kib": 5920,
+          "status": {
+            "schema": 1,
+            "name": "/tmp/vizzi-workspace-ximcxarw/source",
+            "generation": 1,
+            "snapshot": "c172ae8e387f1ef5908d808fb4aa558965032cb53ebec42484c5eb1837b89c19",
+            "pending": false,
+            "measurements": {
+              "files": 32,
+              "analyzed": 32,
+              "source_only": 0,
+              "bytes": 566398,
+              "read_files": 32,
+              "retained": 0,
+              "reconciled": true,
+              "parsed": 0,
+              "reused": 0,
+              "cache_hits": 32,
+              "cache_warnings": 0,
+              "capture_ms": 0.564029,
+              "total_ms": 2.1438859999999997
+            },
+            "error": null,
+            "observation": "one-shot capture"
+          }
+        },
+        {
+          "process_wall_ms": 4.809713922441006,
+          "peak_rss_kib": 6080,
+          "status": {
+            "schema": 1,
+            "name": "/tmp/vizzi-workspace-ximcxarw/source",
+            "generation": 1,
+            "snapshot": "c172ae8e387f1ef5908d808fb4aa558965032cb53ebec42484c5eb1837b89c19",
+            "pending": false,
+            "measurements": {
+              "files": 32,
+              "analyzed": 32,
+              "source_only": 0,
+              "bytes": 566398,
+              "read_files": 32,
+              "retained": 0,
+              "reconciled": true,
+              "parsed": 0,
+              "reused": 0,
+              "cache_hits": 32,
+              "cache_warnings": 0,
+              "capture_ms": 0.867015,
+              "total_ms": 2.404021
+            },
+            "error": null,
+            "observation": "one-shot capture"
+          }
+        },
+        {
+          "process_wall_ms": 5.070024868473411,
+          "peak_rss_kib": 5920,
+          "status": {
+            "schema": 1,
+            "name": "/tmp/vizzi-workspace-ximcxarw/source",
+            "generation": 1,
+            "snapshot": "c172ae8e387f1ef5908d808fb4aa558965032cb53ebec42484c5eb1837b89c19",
+            "pending": false,
+            "measurements": {
+              "files": 32,
+              "analyzed": 32,
+              "source_only": 0,
+              "bytes": 566398,
+              "read_files": 32,
+              "retained": 0,
+              "reconciled": true,
+              "parsed": 0,
+              "reused": 0,
+              "cache_hits": 32,
+              "cache_warnings": 0,
+              "capture_ms": 0.747091,
+              "total_ms": 2.219859
+            },
+            "error": null,
+            "observation": "one-shot capture"
+          }
+        }
+      ],
+      "no_op": {
+        "files": 32,
+        "analyzed": 32,
+        "source_only": 0,
+        "bytes": 566398,
+        "read_files": 32,
+        "retained": 0,
+        "reconciled": true,
+        "parsed": 0,
+        "reused": 32,
+        "cache_hits": 0,
+        "cache_warnings": 0,
+        "capture_ms": 0.89004,
+        "total_ms": 1.429734
+      },
+      "edits": [
+        {
+          "write_to_publication_ms": 34.841665998101234,
+          "write_to_response_ms": 35.716393031179905,
+          "view_request_ms": 0.8609381038695574,
+          "measurements": {
+            "files": 32,
+            "analyzed": 32,
+            "source_only": 0,
+            "bytes": 34302,
+            "read_files": 1,
+            "retained": 31,
+            "reconciled": false,
+            "parsed": 1,
+            "reused": 31,
+            "cache_hits": 0,
+            "cache_warnings": 0,
+            "capture_ms": 0.086124,
+            "total_ms": 7.799123
+          },
+          "clean_snapshot_matches": true
+        },
+        {
+          "write_to_publication_ms": 32.25010214373469,
+          "write_to_response_ms": 32.91205712594092,
+          "view_request_ms": 0.6327370647341013,
+          "measurements": {
+            "files": 32,
+            "analyzed": 32,
+            "source_only": 0,
+            "bytes": 34302,
+            "read_files": 1,
+            "retained": 31,
+            "reconciled": false,
+            "parsed": 1,
+            "reused": 31,
+            "cache_hits": 0,
+            "cache_warnings": 0,
+            "capture_ms": 0.078098,
+            "total_ms": 6.872616
+          },
+          "clean_snapshot_matches": true
+        },
+        {
+          "write_to_publication_ms": 35.199219128116965,
+          "write_to_response_ms": 36.17713414132595,
+          "view_request_ms": 0.9375221561640501,
+          "measurements": {
+            "files": 32,
+            "analyzed": 32,
+            "source_only": 0,
+            "bytes": 34302,
+            "read_files": 1,
+            "retained": 31,
+            "reconciled": false,
+            "parsed": 1,
+            "reused": 31,
+            "cache_hits": 0,
+            "cache_warnings": 0,
+            "capture_ms": 0.075592,
+            "total_ms": 6.898414000000001
+          },
+          "clean_snapshot_matches": true
+        }
+      ],
+      "diagnostic_initial_view_ms": 0.9260340593755245,
+      "selected_path": "mutex.c",
+      "selected_declaration": "__mutex_init_generic",
+      "analysis_context": {
+        "language": "c",
+        "description": "Tree-sitter C; raw syntax, no preprocessing or build configuration",
+        "id": "68f28adaae7490bdf337ec067d4781db5f62f6c2f38f75d41a5d788487bfc93a"
+      },
+      "live_peak_rss_kib": 8208,
+      "limits": [
+        "Three samples; no tail-latency claim",
+        "First load has warm OS file cache",
+        "No browser, labels, frame times, GPU, or edit-to-visible measurement",
+        "Hinted files are reopened and hashed; full reconciliation verifies the whole configured source scope; changed files are parsed afresh"
+      ],
+      "captured_manifest_sha256": "05e2babc376646f5ab722d8d5ac1bfcd18baf45179e43d06e82d060e784b3855",
+      "coverage_counts": {
+        "partial": 28,
+        "syntax": 4
+      }
+    },
+    {
+      "source_revision": "1f4d2d5e820dd870626dca4f9603e3a49879dbde",
+      "source": "/tmp/vizzi-perf-corpus/pytorch-1f4d2d5e/c10",
+      "scope": "Configured raw capture; disposable copy; no analyzed project builds",
+      "source_arguments": [
+        "--c-family-root",
+        ".",
+        "--syntax-language",
+        ".=cpp"
+      ],
+      "capture_policy": "3a3f92586dd11062a329babd48f01ceb9e7edb9484a7008ef61d2061488977ad",
+      "selected_classification": {
+        "kind": "assigned",
+        "language": "cpp",
+        "provenance": {
+          "kind": "explicit_scope",
+          "scope": "."
+        }
+      },
+      "captured_inventory": {
+        "complete": true,
+        "count": 420,
+        "extensions": {
+          ".cpp": 176,
+          ".h": 237,
+          ".cu": 7
+        },
+        "assigned_languages": {
+          "cpp": 413
+        },
+        "source_only_files": [
+          {
+            "path": "cuda/test/impl/CUDAAssertionsTest_1_var_test.cu",
+            "classification": {
+              "kind": "source_only",
+              "language": "cuda",
+              "provenance": {
+                "kind": "extension",
+                "extension": "cu"
+              },
+              "reason": "dialect_unsupported"
+            }
+          },
+          {
+            "path": "cuda/test/impl/CUDAAssertionsTest_catches_stream.cu",
+            "classification": {
+              "kind": "source_only",
+              "language": "cuda",
+              "provenance": {
+                "kind": "extension",
+                "extension": "cu"
+              },
+              "reason": "dialect_unsupported"
+            }
+          },
+          {
+            "path": "cuda/test/impl/CUDAAssertionsTest_catches_thread_and_block_and_device.cu",
+            "classification": {
+              "kind": "source_only",
+              "language": "cuda",
+              "provenance": {
+                "kind": "extension",
+                "extension": "cu"
+              },
+              "reason": "dialect_unsupported"
+            }
+          },
+          {
+            "path": "cuda/test/impl/CUDAAssertionsTest_from_2_processes.cu",
+            "classification": {
+              "kind": "source_only",
+              "language": "cuda",
+              "provenance": {
+                "kind": "extension",
+                "extension": "cu"
+              },
+              "reason": "dialect_unsupported"
+            }
+          },
+          {
+            "path": "cuda/test/impl/CUDAAssertionsTest_multiple_writes_from_blocks_and_threads.cu",
+            "classification": {
+              "kind": "source_only",
+              "language": "cuda",
+              "provenance": {
+                "kind": "extension",
+                "extension": "cu"
+              },
+              "reason": "dialect_unsupported"
+            }
+          },
+          {
+            "path": "cuda/test/impl/CUDAAssertionsTest_multiple_writes_from_multiple_blocks.cu",
+            "classification": {
+              "kind": "source_only",
+              "language": "cuda",
+              "provenance": {
+                "kind": "extension",
+                "extension": "cu"
+              },
+              "reason": "dialect_unsupported"
+            }
+          },
+          {
+            "path": "cuda/test/impl/CUDAAssertionsTest_multiple_writes_from_same_block.cu",
+            "classification": {
+              "kind": "source_only",
+              "language": "cuda",
+              "provenance": {
+                "kind": "extension",
+                "extension": "cu"
+              },
+              "reason": "dialect_unsupported"
+            }
+          }
+        ]
+      },
+      "platform": "Linux-6.8.0-147-lowlatency-x86_64-with-glibc2.39",
+      "workers": 4,
+      "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+      "binary_sha256": "dec404ddccfd351306f6c05664556f2133328b42846196d26c8e18add53153df",
+      "cold": [
+        {
+          "process_wall_ms": 227.06227912567556,
+          "peak_rss_kib": 21760,
+          "status": {
+            "schema": 1,
+            "name": "/tmp/vizzi-workspace-vgvyb7e2/source",
+            "generation": 1,
+            "snapshot": "2d83226bd8622376bb0af25f4400960d343adf6e349951edb85fc3294d6bfbf2",
+            "pending": false,
+            "measurements": {
+              "files": 420,
+              "analyzed": 413,
+              "source_only": 7,
+              "bytes": 3023982,
+              "read_files": 420,
+              "retained": 0,
+              "reconciled": true,
+              "parsed": 413,
+              "reused": 0,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 6.079133,
+              "total_ms": 220.565192
+            },
+            "error": null,
+            "observation": "one-shot capture"
+          }
+        },
+        {
+          "process_wall_ms": 215.9686430823058,
+          "peak_rss_kib": 21920,
+          "status": {
+            "schema": 1,
+            "name": "/tmp/vizzi-workspace-vgvyb7e2/source",
+            "generation": 1,
+            "snapshot": "2d83226bd8622376bb0af25f4400960d343adf6e349951edb85fc3294d6bfbf2",
+            "pending": false,
+            "measurements": {
+              "files": 420,
+              "analyzed": 413,
+              "source_only": 7,
+              "bytes": 3023982,
+              "read_files": 420,
+              "retained": 0,
+              "reconciled": true,
+              "parsed": 413,
+              "reused": 0,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 5.362769,
+              "total_ms": 206.762306
+            },
+            "error": null,
+            "observation": "one-shot capture"
+          }
+        },
+        {
+          "process_wall_ms": 190.1319120079279,
+          "peak_rss_kib": 22560,
+          "status": {
+            "schema": 1,
+            "name": "/tmp/vizzi-workspace-vgvyb7e2/source",
+            "generation": 1,
+            "snapshot": "2d83226bd8622376bb0af25f4400960d343adf6e349951edb85fc3294d6bfbf2",
+            "pending": false,
+            "measurements": {
+              "files": 420,
+              "analyzed": 413,
+              "source_only": 7,
+              "bytes": 3023982,
+              "read_files": 420,
+              "retained": 0,
+              "reconciled": true,
+              "parsed": 413,
+              "reused": 0,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 5.438173999999999,
+              "total_ms": 183.754336
+            },
+            "error": null,
+            "observation": "one-shot capture"
+          }
+        }
+      ],
+      "warm": [
+        {
+          "process_wall_ms": 18.65112199448049,
+          "peak_rss_kib": 14080,
+          "status": {
+            "schema": 1,
+            "name": "/tmp/vizzi-workspace-vgvyb7e2/source",
+            "generation": 1,
+            "snapshot": "2d83226bd8622376bb0af25f4400960d343adf6e349951edb85fc3294d6bfbf2",
+            "pending": false,
+            "measurements": {
+              "files": 420,
+              "analyzed": 413,
+              "source_only": 7,
+              "bytes": 3023982,
+              "read_files": 420,
+              "retained": 0,
+              "reconciled": true,
+              "parsed": 0,
+              "reused": 0,
+              "cache_hits": 413,
+              "cache_warnings": 0,
+              "capture_ms": 4.563022,
+              "total_ms": 14.833298
+            },
+            "error": null,
+            "observation": "one-shot capture"
+          }
+        },
+        {
+          "process_wall_ms": 25.707880035042763,
+          "peak_rss_kib": 14240,
+          "status": {
+            "schema": 1,
+            "name": "/tmp/vizzi-workspace-vgvyb7e2/source",
+            "generation": 1,
+            "snapshot": "2d83226bd8622376bb0af25f4400960d343adf6e349951edb85fc3294d6bfbf2",
+            "pending": false,
+            "measurements": {
+              "files": 420,
+              "analyzed": 413,
+              "source_only": 7,
+              "bytes": 3023982,
+              "read_files": 420,
+              "retained": 0,
+              "reconciled": true,
+              "parsed": 0,
+              "reused": 0,
+              "cache_hits": 413,
+              "cache_warnings": 0,
+              "capture_ms": 8.075344999999999,
+              "total_ms": 19.871145
+            },
+            "error": null,
+            "observation": "one-shot capture"
+          }
+        },
+        {
+          "process_wall_ms": 17.366283107548952,
+          "peak_rss_kib": 13920,
+          "status": {
+            "schema": 1,
+            "name": "/tmp/vizzi-workspace-vgvyb7e2/source",
+            "generation": 1,
+            "snapshot": "2d83226bd8622376bb0af25f4400960d343adf6e349951edb85fc3294d6bfbf2",
+            "pending": false,
+            "measurements": {
+              "files": 420,
+              "analyzed": 413,
+              "source_only": 7,
+              "bytes": 3023982,
+              "read_files": 420,
+              "retained": 0,
+              "reconciled": true,
+              "parsed": 0,
+              "reused": 0,
+              "cache_hits": 413,
+              "cache_warnings": 0,
+              "capture_ms": 4.201969,
+              "total_ms": 12.529485
+            },
+            "error": null,
+            "observation": "one-shot capture"
+          }
+        }
+      ],
+      "no_op": {
+        "files": 420,
+        "analyzed": 413,
+        "source_only": 7,
+        "bytes": 3023982,
+        "read_files": 420,
+        "retained": 0,
+        "reconciled": true,
+        "parsed": 0,
+        "reused": 420,
+        "cache_hits": 0,
+        "cache_warnings": 0,
+        "capture_ms": 8.207469,
+        "total_ms": 11.550006
+      },
+      "edits": [
+        {
+          "write_to_publication_ms": 28.51473609916866,
+          "write_to_response_ms": 30.550687108188868,
+          "view_request_ms": 2.018714090809226,
+          "measurements": {
+            "files": 420,
+            "analyzed": 413,
+            "source_only": 7,
+            "bytes": 5286,
+            "read_files": 1,
+            "retained": 419,
+            "reconciled": false,
+            "parsed": 1,
+            "reused": 419,
+            "cache_hits": 0,
+            "cache_warnings": 0,
+            "capture_ms": 0.590243,
+            "total_ms": 3.196253
+          },
+          "clean_snapshot_matches": true
+        },
+        {
+          "write_to_publication_ms": 28.89254200272262,
+          "write_to_response_ms": 33.19594683125615,
+          "view_request_ms": 4.147031810134649,
+          "measurements": {
+            "files": 420,
+            "analyzed": 413,
+            "source_only": 7,
+            "bytes": 5286,
+            "read_files": 1,
+            "retained": 419,
+            "reconciled": false,
+            "parsed": 1,
+            "reused": 419,
+            "cache_hits": 0,
+            "cache_warnings": 0,
+            "capture_ms": 0.525565,
+            "total_ms": 2.6315790000000003
+          },
+          "clean_snapshot_matches": true
+        },
+        {
+          "write_to_publication_ms": 29.02894699946046,
+          "write_to_response_ms": 32.447899924591184,
+          "view_request_ms": 3.0897450633347034,
+          "measurements": {
+            "files": 420,
+            "analyzed": 413,
+            "source_only": 7,
+            "bytes": 5286,
+            "read_files": 1,
+            "retained": 419,
+            "reconciled": false,
+            "parsed": 1,
+            "reused": 419,
+            "cache_hits": 0,
+            "cache_warnings": 0,
+            "capture_ms": 0.5607570000000001,
+            "total_ms": 2.973847
+          },
+          "clean_snapshot_matches": true
+        }
+      ],
+      "diagnostic_initial_view_ms": 2.166036982089281,
+      "selected_path": "core/Device.cpp",
+      "selected_declaration": "c10",
+      "analysis_context": {
+        "language": "cpp",
+        "description": "Tree-sitter C++; raw syntax, no preprocessing or build configuration",
+        "id": "66f49638c733ee84f882f8b476b29892a944450c83b893e9d31d8e7536a588b1"
+      },
+      "live_peak_rss_kib": 21328,
+      "limits": [
+        "Three samples; no tail-latency claim",
+        "First load has warm OS file cache",
+        "No browser, labels, frame times, GPU, or edit-to-visible measurement",
+        "Hinted files are reopened and hashed; full reconciliation verifies the whole configured source scope; changed files are parsed afresh"
+      ],
+      "captured_manifest_sha256": "725b759cb312e5598b2dd461402fc66c790317ca469822c3d2a996c1de7bae1f",
+      "coverage_counts": {
+        "syntax": 229,
+        "partial": 184,
+        "unavailable": 7
+      }
+    },
+    {
+      "source_revision": "8d3b1f54b36eae33f689bae3e42c716647000e4d",
+      "source": "/tmp/vizzi-perf-corpus/lpc-rs",
+      "scope": "Configured raw capture; disposable copy; no analyzed project builds",
+      "source_arguments": [],
+      "capture_policy": "8087947c781cd290ded3fe5bc57b024fada4363c472f1ff661df6d0e4f57e59e",
+      "selected_classification": {
+        "kind": "assigned",
+        "language": "rust",
+        "provenance": {
+          "kind": "extension",
+          "extension": "rs"
+        }
+      },
+      "captured_inventory": {
+        "complete": true,
+        "count": 552,
+        "extensions": {
+          ".rs": 551,
+          ".py": 1
+        },
+        "assigned_languages": {
+          "rust": 551,
+          "python": 1
+        },
+        "source_only_files": []
+      },
+      "platform": "Linux-6.8.0-147-lowlatency-x86_64-with-glibc2.39",
+      "workers": 4,
+      "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+      "binary_sha256": "dec404ddccfd351306f6c05664556f2133328b42846196d26c8e18add53153df",
+      "cold": [
+        {
+          "process_wall_ms": 457.64596690423787,
+          "peak_rss_kib": 39200,
+          "status": {
+            "schema": 1,
+            "name": "/tmp/vizzi-workspace-6ueyud5q/source",
+            "generation": 1,
+            "snapshot": "263cfeb82e1e4387fc50a9db4f415029ead84930e5e3bf519ec1210d591f69a8",
+            "pending": false,
+            "measurements": {
+              "files": 552,
+              "analyzed": 552,
+              "source_only": 0,
+              "bytes": 7563695,
+              "read_files": 552,
+              "retained": 0,
+              "reconciled": true,
+              "parsed": 552,
+              "reused": 0,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 8.984208,
+              "total_ms": 447.528044
+            },
+            "error": null,
+            "observation": "one-shot capture"
+          }
+        },
+        {
+          "process_wall_ms": 388.05578905157745,
+          "peak_rss_kib": 39200,
+          "status": {
+            "schema": 1,
+            "name": "/tmp/vizzi-workspace-6ueyud5q/source",
+            "generation": 1,
+            "snapshot": "263cfeb82e1e4387fc50a9db4f415029ead84930e5e3bf519ec1210d591f69a8",
+            "pending": false,
+            "measurements": {
+              "files": 552,
+              "analyzed": 552,
+              "source_only": 0,
+              "bytes": 7563695,
+              "read_files": 552,
+              "retained": 0,
+              "reconciled": true,
+              "parsed": 552,
+              "reused": 0,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 9.577627,
+              "total_ms": 379.690493
+            },
+            "error": null,
+            "observation": "one-shot capture"
+          }
+        },
+        {
+          "process_wall_ms": 415.55850696749985,
+          "peak_rss_kib": 39520,
+          "status": {
+            "schema": 1,
+            "name": "/tmp/vizzi-workspace-6ueyud5q/source",
+            "generation": 1,
+            "snapshot": "263cfeb82e1e4387fc50a9db4f415029ead84930e5e3bf519ec1210d591f69a8",
+            "pending": false,
+            "measurements": {
+              "files": 552,
+              "analyzed": 552,
+              "source_only": 0,
+              "bytes": 7563695,
+              "read_files": 552,
+              "retained": 0,
+              "reconciled": true,
+              "parsed": 552,
+              "reused": 0,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 12.44434,
+              "total_ms": 406.373471
+            },
+            "error": null,
+            "observation": "one-shot capture"
+          }
+        }
+      ],
+      "warm": [
+        {
+          "process_wall_ms": 31.626401003450155,
+          "peak_rss_kib": 26400,
+          "status": {
+            "schema": 1,
+            "name": "/tmp/vizzi-workspace-6ueyud5q/source",
+            "generation": 1,
+            "snapshot": "263cfeb82e1e4387fc50a9db4f415029ead84930e5e3bf519ec1210d591f69a8",
+            "pending": false,
+            "measurements": {
+              "files": 552,
+              "analyzed": 552,
+              "source_only": 0,
+              "bytes": 7563695,
+              "read_files": 552,
+              "retained": 0,
+              "reconciled": true,
+              "parsed": 0,
+              "reused": 0,
+              "cache_hits": 552,
+              "cache_warnings": 0,
+              "capture_ms": 7.840193,
+              "total_ms": 26.52571
+            },
+            "error": null,
+            "observation": "one-shot capture"
+          }
+        },
+        {
+          "process_wall_ms": 36.94390598684549,
+          "peak_rss_kib": 26560,
+          "status": {
+            "schema": 1,
+            "name": "/tmp/vizzi-workspace-6ueyud5q/source",
+            "generation": 1,
+            "snapshot": "263cfeb82e1e4387fc50a9db4f415029ead84930e5e3bf519ec1210d591f69a8",
+            "pending": false,
+            "measurements": {
+              "files": 552,
+              "analyzed": 552,
+              "source_only": 0,
+              "bytes": 7563695,
+              "read_files": 552,
+              "retained": 0,
+              "reconciled": true,
+              "parsed": 0,
+              "reused": 0,
+              "cache_hits": 552,
+              "cache_warnings": 0,
+              "capture_ms": 12.05773,
+              "total_ms": 30.448349
+            },
+            "error": null,
+            "observation": "one-shot capture"
+          }
+        },
+        {
+          "process_wall_ms": 37.6772889867425,
+          "peak_rss_kib": 26080,
+          "status": {
+            "schema": 1,
+            "name": "/tmp/vizzi-workspace-6ueyud5q/source",
+            "generation": 1,
+            "snapshot": "263cfeb82e1e4387fc50a9db4f415029ead84930e5e3bf519ec1210d591f69a8",
+            "pending": false,
+            "measurements": {
+              "files": 552,
+              "analyzed": 552,
+              "source_only": 0,
+              "bytes": 7563695,
+              "read_files": 552,
+              "retained": 0,
+              "reconciled": true,
+              "parsed": 0,
+              "reused": 0,
+              "cache_hits": 552,
+              "cache_warnings": 0,
+              "capture_ms": 8.490214,
+              "total_ms": 29.733798
+            },
+            "error": null,
+            "observation": "one-shot capture"
+          }
+        }
+      ],
+      "no_op": {
+        "files": 552,
+        "analyzed": 552,
+        "source_only": 0,
+        "bytes": 7563695,
+        "read_files": 552,
+        "retained": 0,
+        "reconciled": true,
+        "parsed": 0,
+        "reused": 552,
+        "cache_hits": 0,
+        "cache_warnings": 0,
+        "capture_ms": 6.9281619999999995,
+        "total_ms": 11.540103
+      },
+      "edits": [
+        {
+          "write_to_publication_ms": 29.067819006741047,
+          "write_to_response_ms": 34.17723812162876,
+          "view_request_ms": 5.039011128246784,
+          "measurements": {
+            "files": 552,
+            "analyzed": 552,
+            "source_only": 0,
+            "bytes": 4091,
+            "read_files": 1,
+            "retained": 551,
+            "reconciled": false,
+            "parsed": 1,
+            "reused": 551,
+            "cache_hits": 0,
+            "cache_warnings": 0,
+            "capture_ms": 0.416153,
+            "total_ms": 2.156663
+          },
+          "clean_snapshot_matches": true
+        },
+        {
+          "write_to_publication_ms": 29.244429897516966,
+          "write_to_response_ms": 32.53918793052435,
+          "view_request_ms": 3.187214955687523,
+          "measurements": {
+            "files": 552,
+            "analyzed": 552,
+            "source_only": 0,
+            "bytes": 4091,
+            "read_files": 1,
+            "retained": 551,
+            "reconciled": false,
+            "parsed": 1,
+            "reused": 551,
+            "cache_hits": 0,
+            "cache_warnings": 0,
+            "capture_ms": 0.51369,
+            "total_ms": 2.575492
+          },
+          "clean_snapshot_matches": true
+        },
+        {
+          "write_to_publication_ms": 29.240015894174576,
+          "write_to_response_ms": 36.27010993659496,
+          "view_request_ms": 6.7761060781776905,
+          "measurements": {
+            "files": 552,
+            "analyzed": 552,
+            "source_only": 0,
+            "bytes": 4091,
+            "read_files": 1,
+            "retained": 551,
+            "reconciled": false,
+            "parsed": 1,
+            "reused": 551,
+            "cache_hits": 0,
+            "cache_warnings": 0,
+            "capture_ms": 0.44657600000000003,
+            "total_ms": 1.8529309999999999
+          },
+          "clean_snapshot_matches": true
+        }
+      ],
+      "diagnostic_initial_view_ms": 34.47594400495291,
+      "selected_path": "benches/bench_arithmetic.rs",
+      "selected_declaration": "profiler",
+      "analysis_context": {
+        "language": "rust",
+        "description": "Tree-sitter Rust; raw syntax, no macro expansion",
+        "id": "af8806c13a28a00be8d485d5bcbed6098b3cb674a64e2f9223ae44c55364cb29"
+      },
+      "live_peak_rss_kib": 35316,
+      "limits": [
+        "Three samples; no tail-latency claim",
+        "First load has warm OS file cache",
+        "No browser, labels, frame times, GPU, or edit-to-visible measurement",
+        "Hinted files are reopened and hashed; full reconciliation verifies the whole configured source scope; changed files are parsed afresh"
+      ],
+      "captured_manifest_sha256": "40f4dd33a2291efe7494293aba6479c348259a434b6420223a3b2bf999fd9825",
+      "coverage_counts": {
+        "syntax": 552
+      }
+    }
+  ],
+  "limitations": [
+    "Linux kernel/locking and PyTorch c10 are scoped smoke checks, not full-repository performance qualification.",
+    "Header language is an explicit raw assignment; no build configuration was established and no analyzed project tooling ran.",
+    "Grammar recovery is distinct from source-only coverage; no compiler-accuracy claim.",
+    "Three samples, warm OS caches, no tail-latency claim.",
+    "Native coherent-response timings exclude browser presentation/GPU work; no 16 GB baseline qualification.",
+    "Original archives remain unchanged; all edits are made to disposable copies."
+  ],
+  "inventory_storage": "Per-file API inventory summarized by extension/language with explicit source-only entries; full captured path/size/content manifest is fingerprinted and reproducible from the pinned subtree."
+}

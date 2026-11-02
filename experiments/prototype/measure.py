@@ -23,11 +23,11 @@ def milliseconds(start):
     return (time.perf_counter() - start) * 1000
 
 
-def once(binary, root, cache, workers):
+def once(binary, root, cache, workers, source_arguments=()):
     started = time.perf_counter()
     result = subprocess.run(
         ["/usr/bin/time", "-f", "VIZZI_RSS_KIB=%M", str(binary), "--root", str(root),
-         "--cache", str(cache), "--workers", str(workers), "--once"],
+         "--cache", str(cache), "--workers", str(workers), "--once", *source_arguments],
         capture_output=True, text=True, check=True, timeout=60,
     )
     return {"process_wall_ms": milliseconds(started),
@@ -36,10 +36,10 @@ def once(binary, root, cache, workers):
 
 
 class Diagnostic:
-    def __init__(self, binary, root, cache, workers):
+    def __init__(self, binary, root, cache, workers, source_arguments=()):
         self.process = subprocess.Popen(
             [str(binary), "--root", str(root), "--cache", str(cache),
-             "--workers", str(workers), "--stdio"],
+             "--workers", str(workers), "--stdio", *source_arguments],
             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
         )
         self.selector = selectors.DefaultSelector()
@@ -88,6 +88,10 @@ class Diagnostic:
 
 def measure(args):
     binary = args.binary.resolve()
+    source_arguments = []
+    for flag, values in [("--c-family-root", args.c_family_root), ("--syntax-language", args.syntax_language), ("--exclude-source", args.exclude_source)]:
+        for value in values:
+            source_arguments.extend([flag, value])
     with tempfile.TemporaryDirectory(prefix="vizzi-workspace-") as temporary:
         base = pathlib.Path(temporary)
         root, cache = base / "source", base / "cache"
@@ -95,17 +99,24 @@ def measure(args):
         cold, warm = [], []
         for index in range(3):
             isolated_cache = base / f"cold-cache-{index}"
-            cold.append(once(binary, root, isolated_cache, args.workers))
+            cold.append(once(binary, root, isolated_cache, args.workers, source_arguments))
         shutil.copytree(base / "cold-cache-0", cache)
         for _ in range(3):
-            warm.append(once(binary, root, cache, args.workers))
+            warm.append(once(binary, root, cache, args.workers, source_arguments))
         assert all(run["status"]["measurements"]["parsed"] == 0 for run in warm)
         assert len({run["status"]["snapshot"] for run in cold + warm}) == 1
-        session = Diagnostic(binary, root, cache, args.workers)
+        session = Diagnostic(binary, root, cache, args.workers, source_arguments)
         try:
             first, first_ms = session.request("/api/view")
+            inventory = {"complete": len(first["files"]) == first["total"], "files": [{"path": file["path"], "bytes": file["bytes"], "coverage": file["coverage"], "classification": file["classification"]} for file in first["files"]]}
+            if args.select_file:
+                selected, _ = session.request("/api/view?" + urllib.parse.urlencode({"filter": args.select_file}))
+                file = next(file for file in selected["files"] if file["path"] == args.select_file)
+                first, first_ms = session.request("/api/view?" + urllib.parse.urlencode({"file": file["id"]}))
+            assert first["schema"] == 2
             file_id = first["selection"]["file"]
             source = first["source"]
+            assert source["outlines"], "select a file with assigned analysis"
             declarations = [fact for outline in source["outlines"] for fact in outline["declarations"]]
             entity_id = declarations[0]["id"] if declarations else None
             uri = "/api/view?" + urllib.parse.urlencode({"file": file_id, **({"entity": entity_id} if entity_id else {})})
@@ -129,7 +140,7 @@ def measure(args):
                 assert updated["source"]["text"].startswith(f"{comment} vizzi edit probe {index}\n")
                 assert status["measurements"]["parsed"] == 1, status
                 assert status["measurements"]["read_files"] == 1, status
-                clean = once(binary, root, cache, args.workers)
+                clean = once(binary, root, cache, args.workers, source_arguments)
                 assert clean["status"]["snapshot"] == updated["snapshot"], "incremental index differs from clean capture"
                 if index == 0:
                     pinned, _ = session.request(pinned_uri)
@@ -139,7 +150,9 @@ def measure(args):
                 previous_snapshot = updated["snapshot"]
             peak = re.search(r"VmHWM:\s+(\d+) kB", pathlib.Path(f"/proc/{session.process.pid}/status").read_text())
             return {"source_revision": args.revision, "source": str(args.source.resolve()),
-                    "scope": "Rust .rs and Python .py only; disposable copy; no analyzed project builds",
+                    "scope": "Configured raw capture; disposable copy; no analyzed project builds",
+                    "source_arguments": source_arguments, "capture_policy": first["policy"],
+                    "selected_classification": source["classification"], "captured_inventory": inventory,
                     "platform": platform.platform(), "workers": args.workers,
                     "rustc": subprocess.check_output(["rustc", "--version"], text=True).strip(),
                     "binary_sha256": hashlib.sha256(binary.read_bytes()).hexdigest(),
@@ -161,6 +174,10 @@ if __name__ == "__main__":
     parser.add_argument("--source", type=pathlib.Path, required=True)
     parser.add_argument("--revision", required=True)
     parser.add_argument("--workers", type=int, default=4)
+    parser.add_argument("--c-family-root", action="append", default=[])
+    parser.add_argument("--syntax-language", action="append", default=[])
+    parser.add_argument("--exclude-source", action="append", default=[])
+    parser.add_argument("--select-file", help="Exact relative path of the file to edit")
     parser.add_argument("--output", type=pathlib.Path, required=True)
     arguments = parser.parse_args()
     report = measure(arguments)

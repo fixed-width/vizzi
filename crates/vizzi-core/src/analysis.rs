@@ -1,6 +1,7 @@
 //! Worker-owned analysis adapters, independent of source selection and filesystem access.
 
 use crate::{
+    c_family::{CAdapter, CppAdapter},
     model::{Analysis, Context, ModelError},
     python::PythonAdapter,
     rust::RustAdapter,
@@ -61,9 +62,14 @@ impl Languages {
         }
         Ok(Self { languages })
     }
-    /// Configures raw Rust and Python syntax, without guessing C/C++ or CUDA dialects.
+    /// Registers raw Rust, Python, C, and C++ factories; source policy selects inputs.
     pub fn builtin() -> Result<Self, ModelError> {
-        Self::new(vec![Arc::new(RustAdapter), Arc::new(PythonAdapter)])
+        Self::new(vec![
+            Arc::new(RustAdapter),
+            Arc::new(PythonAdapter),
+            Arc::new(CAdapter),
+            Arc::new(CppAdapter),
+        ])
     }
     /// Looks up a registered analyzer language.
     pub fn select(&self, language: &str) -> Option<&Language> {

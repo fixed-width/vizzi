@@ -3,7 +3,7 @@
 use crate::{
     analysis::{Analyzer, LanguageAdapter},
     model::{Analysis, Context, ContextId, ModelError},
-    syntax::SyntaxAnalyzer,
+    syntax::{Declaration, SyntaxAnalyzer},
 };
 
 /// Registers the Rust raw-syntax adapter.
@@ -28,6 +28,7 @@ impl RustAnalyzer {
             syntax: SyntaxAnalyzer::new(
                 tree_sitter_rust::LANGUAGE.into(),
                 Self::context(),
+                collect,
                 declaration,
             )?,
         })
@@ -58,6 +59,11 @@ impl Analyzer for RustAnalyzer {
     }
 }
 
+fn collect(node: tree_sitter::Node<'_>, text: &str, output: &mut Vec<Declaration>) {
+    if let Some((kind, name)) = declaration(node, text) {
+        output.push(Declaration::at(node, kind, name));
+    }
+}
 fn declaration(node: tree_sitter::Node<'_>, text: &str) -> Option<(&'static str, String)> {
     let kind = match node.kind() {
         "function_item" | "function_signature_item" => "function",

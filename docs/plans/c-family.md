@@ -1,8 +1,9 @@
 # C-family implementation and validation plan
 
 This plan sequences the [C-family policy](../prototype/C_FAMILY_POLICY.md). The policy
-is defined; stage 1 is implemented. Rust/Python remain the delivered syntax analyzers;
-explicit C-family scopes now capture readable source-only inputs. No stage below is
+is defined; stages 1 and 2 are implemented. Rust/Python remain the default capture
+scope; explicit C-family scopes analyze assigned C/C++ inputs and retain source-only
+ambiguity/dialect coverage. No stage below is
 an implicit approval to execute analyzed-project tooling.
 
 ## 1. Separate source policy from analyzer registration
@@ -34,6 +35,15 @@ represent those claims and must not silently drop them. The new source-policy se
 should remove that selection constraint rather than duplicate extension maps.
 
 ## 2. Add raw C/C++ adapters through that interface
+
+Complete: [extraction reference](../prototype/C_FAMILY_SYNTAX.md). Fixtures cover
+multiple typedefs, definitions versus references, templates, methods/operators,
+qualified conversion names, recovery/encoding, header assignments, cache isolation,
+cross-language rename, and a shared 1/2/4-worker budget across all four languages.
+Scoped reference-repository runs are smoke checks; stage 3 still requires full-scale
+application/resource qualification.
+The [adapter validation report](../../experiments/languages/C_FAMILY_RESULTS.md) records
+the final test/mutation scope, scoped checks, and remaining limits.
 
 Use safe grammar wrappers, current stable compatible dependencies, and one shared
 worker budget. Establish declaration extraction on small C/C++ fixtures before

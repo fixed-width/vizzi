@@ -91,7 +91,7 @@ fn changed_policy_keeps_raw_cache_and_file_identity_but_updates_pinned_metadata(
         .unwrap();
     assert!(changed.measurements.reconciled);
     assert_eq!(changed.measurements.files, 2);
-    assert_eq!(changed.measurements.parsed, 0);
+    assert_eq!(changed.measurements.parsed, 1);
     assert!(Arc::ptr_eq(
         &first.snapshot.documents()[0],
         &changed.snapshot.documents()[0]
@@ -234,8 +234,8 @@ fn cli_scopes_are_repeatable_and_invalid_assignments_fail_at_startup() {
     let status: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
     assert_eq!(status["schema"], 1);
     assert_eq!(status["measurements"]["files"], 3);
-    assert_eq!(status["measurements"]["analyzed"], 1);
-    assert_eq!(status["measurements"]["source_only"], 2);
+    assert_eq!(status["measurements"]["analyzed"], 3);
+    assert_eq!(status["measurements"]["source_only"], 0);
     for options in [
         vec![
             "--c-family-root",

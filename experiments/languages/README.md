@@ -4,6 +4,7 @@ Use this procedure to check the [adapter and shared worker contracts](../../docs
 The [results](RESULTS.md) explain the initial native measurements and their limits.
 The [source-policy follow-up](SOURCE_POLICY_RESULTS.md) records selection, snapshot
 identity, schema-2 browser behavior, final mutation evidence, and native regression timings.
+The [C/C++ report](C_FAMILY_RESULTS.md) records raw adapters and scoped reference checks.
 Use pinned source archives without build artifacts; no analyzed project is built.
 
 Run the regular checks and the actual browser:
@@ -77,3 +78,46 @@ Revision strings are caller-supplied archive provenance. The optional
 inventory script and each corpus's sorted path/size/content manifest, skips symlinks
 and root `.git`/`target`/`node_modules`, and refuses to overwrite an existing report.
 It reads candidate contents but runs no builds, compiler commands, or project scripts.
+
+## Check raw C/C++ adapters
+
+Use the regular correctness checks above. `c_family` core/native fixtures cover supported
+declarations, spelling/spans/scopes, conditional and overload ambiguity, selection,
+cache isolation, explicit headers, CUDA/LPC exclusions, and cross-language renames.
+The worker-budget fixture now mixes all four languages at 1, 2, and 4 workers; it also
+requires warm loads to create no parsers.
+
+For complete affected-module mutation testing:
+
+```sh
+cargo mutants -p vizzi-core -p vizzi \
+  --config experiments/incremental/mutants.toml \
+  --file 'crates/vizzi-core/src/{c_family,syntax,analysis,rust,python,policy}.rs' \
+  --file 'crates/vizzi/src/{engine,source}.rs' \
+  --test-package vizzi-core --test-package vizzi \
+  --jobs 4 --timeout 15 --build-timeout 180
+```
+
+For scoped native checks, build the optimized host and run without competing tests
+or mutation jobs. These sample subtrees; they do not qualify full-repository scale:
+
+```sh
+cargo build --release -p vizzi --offline
+python3 experiments/prototype/measure.py \
+  --source /tmp/vizzi-perf-corpus/linux-cbbddb6b/kernel/locking \
+  --revision cbbddb6b08cc9900a87cccaa9b22bbe06aa4f50a \
+  --c-family-root . --syntax-language .=c --select-file mutex.c \
+  --output /tmp/vizzi-c-family-linux-locking.json
+python3 experiments/prototype/measure.py \
+  --source /tmp/vizzi-perf-corpus/pytorch-1f4d2d5e/c10 \
+  --revision 1f4d2d5e820dd870626dca4f9603e3a49879dbde \
+  --c-family-root . --syntax-language .=cpp --select-file core/Device.cpp \
+  --output /tmp/vizzi-c-family-pytorch-c10.json
+```
+
+The explicit root assignments select raw header grammars for these samples. They do
+not import or establish compiler build configurations. Repeat the default lpc-rs run
+without C-family options and confirm the captured inventory contains only `.rs`/`.py`.
+The driver edits temporary copies and compares each incremental result with a complete
+capture using the same policy arguments. Inspect reported grammar recovery separately
+from source-only files and unsupported encoding.
