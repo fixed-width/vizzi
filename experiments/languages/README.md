@@ -2,6 +2,8 @@
 
 Use this procedure to check the [adapter and shared worker contracts](../../docs/prototype/LANGUAGES.md).
 The [results](RESULTS.md) explain the initial native measurements and their limits.
+The [source-policy follow-up](SOURCE_POLICY_RESULTS.md) records selection, snapshot
+identity, schema-2 browser behavior, final mutation evidence, and native regression timings.
 Use pinned source archives without build artifacts; no analyzed project is built.
 
 Run the regular checks and the actual browser:
@@ -30,6 +32,11 @@ cargo mutants -p vizzi-core -p vizzi \
   --test-package vizzi-core --test-package vizzi \
   --jobs 4 --timeout 15 --build-timeout 180
 ```
+
+For the complete source-policy scope, replace the file filters with
+`crates/vizzi-core/src/{policy,model,query,analysis}.rs` and
+`crates/vizzi/src/{source,engine,invalidation,main,server}.rs`. Run
+`npm test -- --mutations` for all controller/update/source-description modules.
 
 Build the release host, then use the [native measurement driver](../prototype/README.md).
 Run measurements without competing tests, mutations, or other benchmark processes:

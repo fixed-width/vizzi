@@ -114,6 +114,37 @@ impl PendingRefresh {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn source_only_and_excluded_inputs_share_the_capture_policy() {
+        use std::sync::Arc;
+        use vizzi_core::{analysis::Languages, policy::PolicyConfig};
+        let root = tempfile::tempdir().unwrap();
+        let directory = Directory::with_policy(
+            root.path(),
+            PolicyConfig {
+                c_family_roots: vec!["src".into()],
+                exclusions: vec!["src/ignored".into()],
+                ..Default::default()
+            },
+            Arc::new(Languages::builtin().unwrap()),
+        )
+        .unwrap();
+        for path in ["src/header.h", "src/device.cuh", "src/example.c++"] {
+            let event =
+                notify::Event::new(notify::EventKind::Create(notify::event::CreateKind::File))
+                    .add_path(root.path().join(path));
+            assert_eq!(
+                classify(&directory, Ok(event)),
+                Some(CaptureScope::Paths([path.into()].into()))
+            );
+        }
+        for path in ["src/ignored/header.h", "src2/header.h", "src/a.lpc"] {
+            let event =
+                notify::Event::new(notify::EventKind::Create(notify::event::CreateKind::File))
+                    .add_path(root.path().join(path));
+            assert!(classify(&directory, Ok(event)).is_none());
+        }
+    }
     use crate::{cache::Cache, engine::Engine, source::MAX_PATH_HINTS};
     use notify::{
         Event, EventKind,

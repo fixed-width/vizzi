@@ -1,5 +1,6 @@
 //! Captured source and immutable analysis identities.
 
+use crate::policy::Classification;
 use serde::{Deserialize, Serialize};
 use std::{collections::BTreeSet, ops::Range, sync::Arc};
 
@@ -31,6 +32,10 @@ identity!(WorkspaceId, "An adapter-supplied workspace identity.");
 identity!(FileId, "A path identity scoped to a workspace.");
 identity!(ContentId, "An identity of captured source bytes.");
 identity!(
+    CapturePolicyId,
+    "An identity of normalized source selection and analyzer availability."
+);
+identity!(
     DocumentVersion,
     "An identity of a validated captured file and all its analyses."
 );
@@ -50,7 +55,7 @@ identity!(
 /// The language and implementation responsible for a set of facts.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Context {
-    /// Language identifier; the host initially configures only Rust.
+    /// Analyzer language identifier.
     pub language: String,
     /// Human-readable analyzer and configuration description.
     pub description: String,
@@ -68,6 +73,16 @@ pub enum Coverage {
     Partial,
     /// Analysis could not run on this input.
     Unavailable,
+}
+
+/// Captured text availability, independent of analyzer assignment.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SourceEncoding {
+    /// Captured bytes are valid UTF-8.
+    Utf8,
+    /// The prototype has no decoder for these captured bytes.
+    Unsupported,
 }
 
 /// A lexical declaration before binding to a workspace path.
@@ -117,6 +132,7 @@ pub struct Document {
     source: Option<Arc<str>>,
     line_starts: Vec<usize>,
     analyses: Vec<Analysis>,
+    classification: Classification,
 }
 
 impl Document {
@@ -126,6 +142,7 @@ impl Document {
         path: String,
         bytes: &[u8],
         analyses: Vec<Analysis>,
+        classification: Classification,
     ) -> Result<Self, ModelError> {
         if path.is_empty()
             || path.contains('\\')
@@ -134,6 +151,11 @@ impl Document {
             return Err(ModelError("expected a normalized relative path".into()));
         }
         let content = ContentId::derive(&[bytes]);
+        if matches!(classification, Classification::SourceOnly { .. }) && !analyses.is_empty() {
+            return Err(ModelError(
+                "source-only documents cannot contain analysis".into(),
+            ));
+        }
         let source = std::str::from_utf8(bytes).ok();
         let mut contexts = BTreeSet::new();
         for analysis in &analyses {
@@ -158,11 +180,11 @@ impl Document {
             }
         }
         let id = FileId::derive(&[workspace.as_str().as_bytes(), path.as_bytes()]);
-        let encoded =
-            serde_json::to_vec(&analyses).map_err(|error| ModelError(error.to_string()))?;
+        let encoded = serde_json::to_vec(&(&classification, &analyses))
+            .map_err(|error| ModelError(error.to_string()))?;
         let analysis_digest = blake3::hash(&encoded);
         let version = DocumentVersion::derive(&[
-            b"document-v1",
+            b"document-v2",
             id.as_str().as_bytes(),
             content.as_str().as_bytes(),
             analysis_digest.as_bytes(),
@@ -186,6 +208,7 @@ impl Document {
             source: source.map(Arc::from),
             line_starts,
             analyses,
+            classification,
         })
     }
     /// Returns the path identity.
@@ -212,9 +235,21 @@ impl Document {
     pub fn source(&self) -> Option<&str> {
         self.source.as_deref()
     }
+    /// Returns captured encoding availability independently of classification.
+    pub fn encoding(&self) -> SourceEncoding {
+        if self.source.is_some() {
+            SourceEncoding::Utf8
+        } else {
+            SourceEncoding::Unsupported
+        }
+    }
     /// Returns all analysis contexts for this document.
     pub fn analyses(&self) -> &[Analysis] {
         &self.analyses
+    }
+    /// Returns immutable source-selection metadata.
+    pub fn classification(&self) -> &Classification {
+        &self.classification
     }
     /// Binds a declaration identity, conservatively scoping duplicate keys to content.
     pub fn entity_id(&self, analysis: &Analysis, fact: &Fact) -> EntityId {
@@ -246,6 +281,7 @@ pub struct Snapshot {
     id: SnapshotId,
     workspace: WorkspaceId,
     documents: Vec<Arc<Document>>,
+    policy: CapturePolicyId,
 }
 
 impl Snapshot {
@@ -253,12 +289,14 @@ impl Snapshot {
     pub fn new(
         workspace: WorkspaceId,
         mut documents: Vec<Arc<Document>>,
+        policy: CapturePolicyId,
     ) -> Result<Self, ModelError> {
         documents.sort_by(|a, b| a.path.cmp(&b.path));
         let mut paths = BTreeSet::new();
         let mut hash = blake3::Hasher::new();
-        hash.update(b"snapshot-v2");
+        hash.update(b"snapshot-v3");
         hash.update(workspace.as_str().as_bytes());
+        hash.update(policy.as_str().as_bytes());
         for document in &documents {
             if document.workspace != workspace || !paths.insert(document.path()) {
                 return Err(ModelError("duplicate path or mismatched workspace".into()));
@@ -269,6 +307,7 @@ impl Snapshot {
             id: SnapshotId::derive(&[hash.finalize().as_bytes()]),
             workspace,
             documents,
+            policy,
         })
     }
     /// Returns this observation's identity.
@@ -279,6 +318,10 @@ impl Snapshot {
     pub fn workspace(&self) -> &WorkspaceId {
         &self.workspace
     }
+    /// Returns the capture policy used for complete discovery and retention.
+    pub fn policy(&self) -> &CapturePolicyId {
+        &self.policy
+    }
     /// Returns documents in path order.
     pub fn documents(&self) -> &[Arc<Document>] {
         &self.documents
@@ -287,6 +330,42 @@ impl Snapshot {
     pub fn file(&self, id: &str) -> Option<&Arc<Document>> {
         self.documents.iter().find(|file| file.id.as_str() == id)
     }
+}
+
+#[cfg(test)]
+pub(crate) fn fixture_document(
+    workspace: WorkspaceId,
+    path: String,
+    bytes: &[u8],
+    analyses: Vec<Analysis>,
+) -> Result<Document, ModelError> {
+    use crate::policy::{Provenance, SourceOnlyReason};
+    let provenance = Provenance::Extension {
+        extension: "fixture".into(),
+    };
+    let classification = match analyses.first() {
+        Some(analysis) => Classification::Assigned {
+            language: analysis.context.language.clone(),
+            provenance,
+        },
+        None => Classification::SourceOnly {
+            language: None,
+            provenance,
+            reason: SourceOnlyReason::LanguageUnassigned,
+        },
+    };
+    Document::capture(workspace, path, bytes, analyses, classification)
+}
+#[cfg(test)]
+pub(crate) fn fixture_snapshot(
+    workspace: WorkspaceId,
+    documents: Vec<Arc<Document>>,
+) -> Result<Snapshot, ModelError> {
+    Snapshot::new(
+        workspace,
+        documents,
+        CapturePolicyId::derive(&[b"fixture-policy"]),
+    )
 }
 
 #[cfg(test)]
@@ -317,7 +396,7 @@ mod tests {
     #[test]
     fn rejects_facts_for_different_source_or_invalid_spans() {
         assert!(
-            Document::capture(
+            crate::model::fixture_document(
                 workspace(),
                 "a.rs".into(),
                 b"fn g() {}",
@@ -327,11 +406,14 @@ mod tests {
         );
         let mut facts = analysis(b"fn f() {}");
         facts.facts[0].span = 0..100;
-        assert!(Document::capture(workspace(), "a.rs".into(), b"fn f() {}", vec![facts]).is_err());
+        assert!(
+            crate::model::fixture_document(workspace(), "a.rs".into(), b"fn f() {}", vec![facts])
+                .is_err()
+        );
     }
     #[test]
     fn stable_file_and_unique_declaration_ids_survive_position_changes() {
-        let old = Document::capture(
+        let old = crate::model::fixture_document(
             workspace(),
             "a.rs".into(),
             b"fn f() {}",
@@ -341,7 +423,8 @@ mod tests {
         let mut facts = analysis(b"\nfn f() {}");
         facts.facts[0].span = 1..10;
         let new =
-            Document::capture(workspace(), "a.rs".into(), b"\nfn f() {}", vec![facts]).unwrap();
+            crate::model::fixture_document(workspace(), "a.rs".into(), b"\nfn f() {}", vec![facts])
+                .unwrap();
         assert_eq!(old.id(), new.id());
         assert_ne!(old.content(), new.content());
         assert_eq!(
@@ -353,36 +436,57 @@ mod tests {
     }
     #[test]
     fn rejects_traversal_duplicate_contexts_and_utf8_midpoints() {
-        assert!(Document::capture(workspace(), "../a.rs".into(), b"", vec![]).is_err());
+        assert!(
+            crate::model::fixture_document(workspace(), "../a.rs".into(), b"", vec![]).is_err()
+        );
         let a = analysis(b"fn f() {}");
         assert!(
-            Document::capture(workspace(), "a.rs".into(), b"fn f() {}", vec![a.clone(), a])
-                .is_err()
+            crate::model::fixture_document(
+                workspace(),
+                "a.rs".into(),
+                b"fn f() {}",
+                vec![a.clone(), a]
+            )
+            .is_err()
         );
         let mut a = analysis("éabcdefg".as_bytes());
         a.facts[0].span = 1..9;
         assert!(
-            Document::capture(workspace(), "a.rs".into(), "éabcdefg".as_bytes(), vec![a]).is_err()
+            crate::model::fixture_document(
+                workspace(),
+                "a.rs".into(),
+                "éabcdefg".as_bytes(),
+                vec![a]
+            )
+            .is_err()
         );
     }
     #[test]
     fn snapshots_sort_and_include_analysis_in_their_identity() {
-        let a = Arc::new(Document::capture(workspace(), "z.rs".into(), b"", vec![]).unwrap());
-        let b = Arc::new(Document::capture(workspace(), "a.rs".into(), b"", vec![]).unwrap());
-        let first = Snapshot::new(workspace(), vec![a.clone(), b.clone()]).unwrap();
-        let second = Snapshot::new(workspace(), vec![b, a.clone()]).unwrap();
+        let a = Arc::new(
+            crate::model::fixture_document(workspace(), "z.rs".into(), b"", vec![]).unwrap(),
+        );
+        let b = Arc::new(
+            crate::model::fixture_document(workspace(), "a.rs".into(), b"", vec![]).unwrap(),
+        );
+        let first =
+            crate::model::fixture_snapshot(workspace(), vec![a.clone(), b.clone()]).unwrap();
+        let second = crate::model::fixture_snapshot(workspace(), vec![b, a.clone()]).unwrap();
         assert_eq!(first.id(), second.id());
         assert_eq!(first.documents()[0].path(), "a.rs");
-        assert!(Snapshot::new(workspace(), vec![a.clone(), a]).is_err());
+        assert!(crate::model::fixture_snapshot(workspace(), vec![a.clone(), a]).is_err());
         let changed = Analysis {
             content: ContentId::derive(&[b""]),
             facts: vec![],
             ..analysis(b"")
         };
-        let changed =
-            Arc::new(Document::capture(workspace(), "z.rs".into(), b"", vec![changed]).unwrap());
+        let changed = Arc::new(
+            crate::model::fixture_document(workspace(), "z.rs".into(), b"", vec![changed]).unwrap(),
+        );
         assert_ne!(
-            Snapshot::new(workspace(), vec![changed]).unwrap().id(),
+            crate::model::fixture_snapshot(workspace(), vec![changed])
+                .unwrap()
+                .id(),
             first.id()
         );
     }
@@ -390,22 +494,32 @@ mod tests {
     #[test]
     fn validates_empty_spans_duplicate_keys_and_unsupported_encoding() {
         for path in ["", "a\\b.rs", "/a.rs", "a//b.rs", "./a.rs"] {
-            assert!(Document::capture(workspace(), path.into(), b"", vec![]).is_err());
+            assert!(crate::model::fixture_document(workspace(), path.into(), b"", vec![]).is_err());
         }
         let mut a = analysis(b"fn f() {}");
         a.facts[0].span = 0..0;
-        assert!(Document::capture(workspace(), "a.rs".into(), b"fn f() {}", vec![a]).is_err());
+        assert!(
+            crate::model::fixture_document(workspace(), "a.rs".into(), b"fn f() {}", vec![a])
+                .is_err()
+        );
         let mut a = analysis(b"fn f() {}");
         a.facts.push(a.facts[0].clone());
-        assert!(Document::capture(workspace(), "a.rs".into(), b"fn f() {}", vec![a]).is_err());
+        assert!(
+            crate::model::fixture_document(workspace(), "a.rs".into(), b"fn f() {}", vec![a])
+                .is_err()
+        );
         let mut a = analysis(&[0xff]);
         a.facts.clear();
-        assert!(Document::capture(workspace(), "a.rs".into(), &[0xff], vec![a.clone()]).is_err());
+        assert!(
+            crate::model::fixture_document(workspace(), "a.rs".into(), &[0xff], vec![a.clone()])
+                .is_err()
+        );
         a.coverage = Coverage::Unavailable;
-        let unsupported = Document::capture(workspace(), "a.rs".into(), &[0xff], vec![a]).unwrap();
+        let unsupported =
+            crate::model::fixture_document(workspace(), "a.rs".into(), &[0xff], vec![a]).unwrap();
         assert_eq!(unsupported.source(), None);
         assert_eq!(unsupported.bytes(), 1);
-        let a = Document::capture(
+        let a = crate::model::fixture_document(
             workspace(),
             "a.rs".into(),
             b"// first\n// next\nfn f() {}\n",
@@ -422,7 +536,9 @@ mod tests {
     #[test]
     fn document_versions_cover_source_identity_and_every_analysis_field() {
         let bytes = b"fn f() {}";
-        let capture = |facts| Document::capture(workspace(), "a.rs".into(), bytes, facts).unwrap();
+        let capture = |facts| {
+            crate::model::fixture_document(workspace(), "a.rs".into(), bytes, facts).unwrap()
+        };
         let base = capture(vec![analysis(bytes)]);
         assert_eq!(base.version(), capture(vec![analysis(bytes)]).version());
         let changes: [fn(&mut Analysis); 11] = [
@@ -444,10 +560,15 @@ mod tests {
             assert_ne!(base.version(), capture(vec![a]).version());
         }
         assert_ne!(base.version(), capture(vec![]).version());
-        let other_path =
-            Document::capture(workspace(), "b.rs".into(), bytes, vec![analysis(bytes)]).unwrap();
+        let other_path = crate::model::fixture_document(
+            workspace(),
+            "b.rs".into(),
+            bytes,
+            vec![analysis(bytes)],
+        )
+        .unwrap();
         assert_ne!(base.version(), other_path.version());
-        let other_workspace = Document::capture(
+        let other_workspace = crate::model::fixture_document(
             WorkspaceId::derive(&[b"other"]),
             "a.rs".into(),
             bytes,
@@ -456,10 +577,13 @@ mod tests {
         .unwrap();
         assert_ne!(base.version(), other_workspace.version());
         let empty_analysis =
-            Document::capture(workspace(), "a.rs".into(), b"fn g() {}", vec![]).unwrap();
+            crate::model::fixture_document(workspace(), "a.rs".into(), b"fn g() {}", vec![])
+                .unwrap();
         assert_ne!(capture(vec![]).version(), empty_analysis.version());
-        let invalid_a = Document::capture(workspace(), "a.rs".into(), &[0xff], vec![]).unwrap();
-        let invalid_b = Document::capture(workspace(), "a.rs".into(), &[0xfe], vec![]).unwrap();
+        let invalid_a =
+            crate::model::fixture_document(workspace(), "a.rs".into(), &[0xff], vec![]).unwrap();
+        let invalid_b =
+            crate::model::fixture_document(workspace(), "a.rs".into(), &[0xfe], vec![]).unwrap();
         assert_ne!(invalid_a.version(), invalid_b.version());
     }
 
@@ -470,12 +594,14 @@ mod tests {
         let mut second = first.clone();
         second.context.id = ContextId::derive(&[b"second context"]);
         let capture = |path: &str, analyses| {
-            Arc::new(Document::capture(workspace(), path.into(), bytes, analyses).unwrap())
+            Arc::new(
+                crate::model::fixture_document(workspace(), path.into(), bytes, analyses).unwrap(),
+            )
         };
         let a = capture("a.rs", vec![first.clone(), second.clone()]);
         let b = capture("b.rs", vec![]);
-        let original = Snapshot::new(workspace(), vec![a.clone(), b]).unwrap();
-        let fresh = Snapshot::new(
+        let original = crate::model::fixture_snapshot(workspace(), vec![a.clone(), b]).unwrap();
+        let fresh = crate::model::fixture_snapshot(
             workspace(),
             vec![
                 capture("b.rs", vec![]),
@@ -486,12 +612,12 @@ mod tests {
         assert_eq!(original.id(), fresh.id());
         let reversed = capture("a.rs", vec![second, first]);
         assert_ne!(a.version(), reversed.version());
-        let changed = Snapshot::new(
+        let changed = crate::model::fixture_snapshot(
             workspace(),
             vec![a.clone(), capture("b.rs", vec![analysis(bytes)])],
         )
         .unwrap();
-        let rebuilt = Snapshot::new(
+        let rebuilt = crate::model::fixture_snapshot(
             workspace(),
             vec![
                 capture("a.rs", a.analyses().to_vec()),
@@ -506,13 +632,16 @@ mod tests {
 
     #[test]
     fn empty_snapshots_are_workspace_scoped_and_foreign_documents_are_rejected() {
-        let first = Snapshot::new(workspace(), vec![]).unwrap();
+        let first = crate::model::fixture_snapshot(workspace(), vec![]).unwrap();
         let other = WorkspaceId::derive(&[b"other"]);
         assert_ne!(
             first.id(),
-            Snapshot::new(other.clone(), vec![]).unwrap().id()
+            crate::model::fixture_snapshot(other.clone(), vec![])
+                .unwrap()
+                .id()
         );
-        let foreign = Arc::new(Document::capture(other, "a.rs".into(), b"", vec![]).unwrap());
-        assert!(Snapshot::new(workspace(), vec![foreign]).is_err());
+        let foreign =
+            Arc::new(crate::model::fixture_document(other, "a.rs".into(), b"", vec![]).unwrap());
+        assert!(crate::model::fixture_snapshot(workspace(), vec![foreign]).is_err());
     }
 }

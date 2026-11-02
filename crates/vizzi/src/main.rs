@@ -3,8 +3,13 @@
 use std::{
     io::{BufRead, Write},
     path::PathBuf,
+    sync::Arc,
 };
 use vizzi::{cache::Cache, engine::Engine, host::Host, source::Directory};
+use vizzi_core::{
+    analysis::Languages,
+    policy::{Assignment, FamilyLanguage, PolicyConfig},
+};
 
 #[tokio::main(worker_threads = 2)]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -14,6 +19,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut port = 7474;
     let mut stdio = false;
     let mut once = false;
+    let mut policy = PolicyConfig::default();
     let mut arguments = std::env::args().skip(1);
     while let Some(argument) = arguments.next() {
         match argument.as_str() {
@@ -36,9 +42,36 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             "--stdio" => stdio = true,
             "--once" => once = true,
+            "--c-family-root" => policy.c_family_roots.push(
+                arguments
+                    .next()
+                    .ok_or("--c-family-root needs a relative scope")?,
+            ),
+            "--exclude-source" => policy.exclusions.push(
+                arguments
+                    .next()
+                    .ok_or("--exclude-source needs a relative scope")?,
+            ),
+            "--syntax-language" => {
+                let rule = arguments
+                    .next()
+                    .ok_or("--syntax-language needs SCOPE=c|cpp")?;
+                let (scope, language) = rule
+                    .rsplit_once('=')
+                    .ok_or("--syntax-language needs SCOPE=c|cpp")?;
+                let language = match language {
+                    "c" => FamilyLanguage::C,
+                    "cpp" => FamilyLanguage::Cpp,
+                    _ => return Err("syntax language must be c or cpp".into()),
+                };
+                policy.assignments.push(Assignment {
+                    scope: scope.into(),
+                    language,
+                });
+            }
             "--help" | "-h" => {
                 println!(
-                    "vizzi --root DIR --cache DIR [--workers 1..32] [--port 7474] [--stdio | --once]"
+                    "vizzi --root DIR --cache DIR [--workers 1..32] [--port 7474] [--stdio | --once]\n  [--c-family-root SCOPE] [--exclude-source SCOPE] [--syntax-language SCOPE=c|cpp] (repeatable)"
                 );
                 return Ok(());
             }
@@ -48,7 +81,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     if once && stdio {
         return Err("choose either --once or --stdio".into());
     }
-    let directory = Directory::open(&root.ok_or("--root is required")?)?;
+    let directory = Directory::with_policy(
+        &root.ok_or("--root is required")?,
+        policy,
+        Arc::new(Languages::builtin()?),
+    )?;
     let cache =
         cache.ok_or("--cache is required; choose a directory outside the analyzed workspace")?;
     let cache = vizzi::cache::external_path(&cache, directory.root())?;

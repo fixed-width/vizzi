@@ -1,8 +1,10 @@
 # C/C++ source and analysis policy
 
-Status: design contract for the next implementation slices. The running host still
-supports Rust/Python as described in [LANGUAGES.md](LANGUAGES.md). This document does
-not enable C/C++, import compilation databases, or describe implemented CLI options.
+Status: source selection, source-only capture, provenance, and snapshot policy identity
+are implemented; see [SOURCE_POLICY.md](SOURCE_POLICY.md). Syntax analyzers remain
+Rust/Python. Raw C/C++ adapters, compilation-database import, and configured analysis
+below are subsequent slices. CLI source-policy options are documented in the
+[workspace guide](../how-to/run-workspace.md).
 The [rationale](../explanation/c-family-analysis.md) connects these decisions to the
 reference corpora and literature; the [delivery plan](../plans/c-family.md) defines gates.
 

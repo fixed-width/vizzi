@@ -43,9 +43,6 @@ struct Adapter {
     fault: Fault,
 }
 impl LanguageAdapter for Adapter {
-    fn extensions(&self) -> &[&str] {
-        self.inner.extensions()
-    }
     fn context(&self) -> Context {
         let mut context = self.inner.context();
         context.id = ContextId::derive(&[context.id.as_str().as_bytes(), &[self.revision]]);
@@ -235,7 +232,16 @@ fn configuration_changes_reconcile_unread_documents_and_invalidate_cache() {
         .unwrap()
         .unwrap();
     assert!(reduced.measurements.reconciled);
-    assert_eq!(reduced.measurements.files, 1);
+    assert_eq!(reduced.measurements.files, 2);
+    assert_eq!(reduced.measurements.analyzed, 1);
+    assert_eq!(reduced.measurements.source_only, 1);
+    assert!(matches!(
+        reduced.snapshot.documents()[1].classification(),
+        vizzi_core::policy::Classification::SourceOnly {
+            reason: vizzi_core::policy::SourceOnlyReason::AnalyzerUnavailable,
+            ..
+        }
+    ));
     assert_eq!(reduced.snapshot.documents()[0].path(), "a.rs");
     assert_eq!(
         reduced.snapshot.id(),
@@ -289,7 +295,7 @@ fn cached_context_metadata_must_match_the_registered_descriptor() {
     let cache = tempfile::tempdir().unwrap();
     std::fs::write(root.path().join("a.py"), "def python(): pass\n").unwrap();
     let languages = Languages::builtin().unwrap();
-    let language = languages.select("py").unwrap();
+    let language = languages.select("python").unwrap();
     let mut analysis = language
         .create()
         .unwrap()

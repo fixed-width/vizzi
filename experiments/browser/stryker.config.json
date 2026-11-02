@@ -1,8 +1,8 @@
 {
   "$schema": "../../node_modules/@stryker-mutator/core/schema/stryker-schema.json",
-  "mutate": ["crates/vizzi/web/controller.js", "crates/vizzi/web/updates.js"],
+  "mutate": ["crates/vizzi/web/controller.js", "crates/vizzi/web/updates.js", "crates/vizzi/web/source-description.js"],
   "testRunner": "command",
-  "commandRunner": { "command": "node crates/vizzi/web/controller.test.js && node crates/vizzi/web/updates.test.js" },
+  "commandRunner": { "command": "node crates/vizzi/web/controller.test.js && node crates/vizzi/web/updates.test.js && node crates/vizzi/web/source-description.test.js" },
   "coverageAnalysis": "off",
   "concurrency": 4,
   "timeoutMS": 2000,

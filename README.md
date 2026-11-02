@@ -16,11 +16,13 @@ validating coordination; it does not qualify large-codebase GPU performance.
 - [Incremental-capture contract](docs/prototype/INCREMENTAL_CAPTURE.md)
 - [Captured document and snapshot identities](docs/prototype/IDENTITIES.md)
 - [Language adapters and shared worker budget](docs/prototype/LANGUAGES.md)
+- [Source selection and policy identity](docs/prototype/SOURCE_POLICY.md)
 - [C/C++ policy](docs/prototype/C_FAMILY_POLICY.md), [rationale](docs/explanation/c-family-analysis.md), and [delivery plan](docs/plans/c-family.md)
 - [Application measurement procedure](experiments/prototype/README.md)
 - [Browser validation and measurements](experiments/browser/README.md)
 - [Verified incremental-capture measurements](experiments/incremental/RESULTS.md)
 - [Mixed-language adapter measurements](experiments/languages/RESULTS.md)
+- [Source-policy validation and measurements](experiments/languages/SOURCE_POLICY_RESULTS.md)
 - [Earlier performance experiments](experiments/performance/README.md)
 - [Contributor guidance](AGENTS.md)
 

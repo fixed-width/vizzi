@@ -6,12 +6,9 @@ use crate::{
     syntax::SyntaxAnalyzer,
 };
 
-/// Registers raw Python syntax for `.py` inputs; imports and annotations are not resolved.
+/// Registers raw Python syntax; imports and annotations are not resolved.
 pub struct PythonAdapter;
 impl LanguageAdapter for PythonAdapter {
-    fn extensions(&self) -> &[&str] {
-        &["py"]
-    }
     fn context(&self) -> Context {
         Context {
             language: "python".into(),

@@ -6,24 +6,20 @@ use vizzi_core::{
 };
 
 #[test]
-fn registration_rejects_ambiguous_selection_and_invalid_extensions() {
+fn registration_rejects_duplicate_languages_and_contexts_and_empty_names() {
     use std::sync::Arc;
     use vizzi_core::{
         analysis::{Analyzer, LanguageAdapter},
         model::{Context, ContextId, ModelError},
-        rust::RustAdapter,
     };
     struct Adapter {
-        extensions: Vec<&'static str>,
+        language: &'static str,
         id: u8,
     }
     impl LanguageAdapter for Adapter {
-        fn extensions(&self) -> &[&str] {
-            &self.extensions
-        }
         fn context(&self) -> Context {
             Context {
-                language: "test".into(),
+                language: self.language.into(),
                 description: "fixture".into(),
                 id: ContextId::derive(&[&[self.id]]),
             }
@@ -32,24 +28,21 @@ fn registration_rejects_ambiguous_selection_and_invalid_extensions() {
             Err(ModelError("factory failure".into()))
         }
     }
-    for extensions in [
-        vec![],
-        vec![""],
-        vec![".rs"],
-        vec!["r/s"],
-        vec!["é"],
-        vec!["rs", "rs"],
-    ] {
-        assert!(Languages::new(vec![Arc::new(Adapter { extensions, id: 1 })]).is_err());
-    }
+    assert!(
+        Languages::new(vec![Arc::new(Adapter {
+            language: "",
+            id: 0
+        })])
+        .is_err()
+    );
     assert!(
         Languages::new(vec![
             Arc::new(Adapter {
-                extensions: vec!["x"],
+                language: "a",
                 id: 1
             }),
             Arc::new(Adapter {
-                extensions: vec!["y"],
+                language: "b",
                 id: 1
             })
         ])
@@ -58,34 +51,34 @@ fn registration_rejects_ambiguous_selection_and_invalid_extensions() {
     assert!(
         Languages::new(vec![
             Arc::new(Adapter {
-                extensions: vec!["rs"],
+                language: "a",
                 id: 1
             }),
-            Arc::new(RustAdapter)
+            Arc::new(Adapter {
+                language: "a",
+                id: 2
+            })
         ])
         .is_err()
     );
     let languages = Languages::new(vec![Arc::new(Adapter {
-        extensions: vec!["x", "y1"],
+        language: "fixture",
         id: 1,
     })])
     .unwrap();
-    assert_eq!(
-        languages.select("x").unwrap().context(),
-        languages.select("y1").unwrap().context()
-    );
-    assert!(languages.select("x").unwrap().create().is_err());
-    assert!(Languages::new(vec![]).unwrap().select("rs").is_none());
+    assert_eq!(languages.names().collect::<Vec<_>>(), ["fixture"]);
+    assert!(languages.select("fixture").unwrap().create().is_err());
+    assert!(Languages::new(vec![]).unwrap().select("rust").is_none());
 }
 
 #[test]
 fn python_adapter_preserves_scopes_ranges_and_duplicate_ambiguity() {
     let languages = Languages::builtin().unwrap();
-    let language = languages.select("py").unwrap();
+    let language = languages.select("python").unwrap();
     assert_eq!(language.context().language, "python");
     assert_ne!(
         language.context().id,
-        languages.select("rs").unwrap().context().id
+        languages.select("rust").unwrap().context().id
     );
     for extension in ["h", "hpp", "c", "cpp", "cu", "cuh", "lpc", "PY", ""] {
         assert!(languages.select(extension).is_none(), "{extension}");
@@ -126,6 +119,12 @@ fn python_adapter_preserves_scopes_ranges_and_duplicate_ambiguity() {
         "a.py".into(),
         text.as_bytes(),
         vec![analysis],
+        vizzi_core::policy::Classification::Assigned {
+            language: "python".into(),
+            provenance: vizzi_core::policy::Provenance::Extension {
+                extension: "py".into(),
+            },
+        },
     )
     .unwrap();
     assert_eq!(document.lines(&document.analyses()[0].facts[1].span), 3..6);

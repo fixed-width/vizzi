@@ -1,4 +1,4 @@
-//! Language selection and worker-owned analysis adapters, without filesystem access.
+//! Worker-owned analysis adapters, independent of source selection and filesystem access.
 
 use crate::{
     model::{Analysis, Context, ModelError},
@@ -13,10 +13,8 @@ pub trait Analyzer {
     fn analyze(&mut self, bytes: &[u8]) -> Result<Analysis, ModelError>;
 }
 
-/// An immutable factory and source-selection policy shared by native workers.
+/// An immutable context and analyzer factory shared by native workers.
 pub trait LanguageAdapter: Send + Sync {
-    /// Exact, case-sensitive extensions without dots. Ambiguous extensions are rejected.
-    fn extensions(&self) -> &[&str];
     /// Identifies language, configuration, grammar, and implementation; stable per registration.
     fn context(&self) -> Context;
     /// Creates one analyzer owned exclusively by its calling worker.
@@ -39,48 +37,40 @@ impl Language {
     }
 }
 
-/// A source policy shared by discovery, invalidation, and analysis dispatch.
+/// Registered analyzer factories, independent of source selection.
 pub struct Languages {
-    extensions: BTreeMap<String, Arc<Language>>,
+    languages: BTreeMap<String, Arc<Language>>,
 }
 impl Languages {
-    /// Registers adapters, rejecting invalid or conflicting extension claims and contexts.
+    /// Registers adapters, rejecting empty/duplicate language names and context identities.
     pub fn new(adapters: Vec<Arc<dyn LanguageAdapter>>) -> Result<Self, ModelError> {
-        let mut extensions = BTreeMap::new();
+        let mut languages = BTreeMap::new();
         let mut contexts = std::collections::BTreeSet::new();
         for adapter in adapters {
             let context = adapter.context();
-            if !contexts.insert(context.id.clone()) {
-                return Err(ModelError("duplicate language context".into()));
+            if context.language.is_empty() || !contexts.insert(context.id.clone()) {
+                return Err(ModelError(
+                    "empty language or duplicate analysis context".into(),
+                ));
             }
+            let key = context.language.clone();
             let language = Arc::new(Language { context, adapter });
-            if language.adapter.extensions().is_empty() {
-                return Err(ModelError("adapter has no source extensions".into()));
-            }
-            for extension in language.adapter.extensions() {
-                if extension.is_empty()
-                    || !extension.bytes().all(|byte| byte.is_ascii_alphanumeric())
-                {
-                    return Err(ModelError("invalid source extension".into()));
-                }
-                if extensions
-                    .insert((*extension).into(), language.clone())
-                    .is_some()
-                {
-                    return Err(ModelError(format!(
-                        "conflicting source extension: {extension}"
-                    )));
-                }
+            if languages.insert(key, language).is_some() {
+                return Err(ModelError("duplicate analyzer language".into()));
             }
         }
-        Ok(Self { extensions })
+        Ok(Self { languages })
     }
     /// Configures raw Rust and Python syntax, without guessing C/C++ or CUDA dialects.
     pub fn builtin() -> Result<Self, ModelError> {
         Self::new(vec![Arc::new(RustAdapter), Arc::new(PythonAdapter)])
     }
-    /// Selects an adapter using an exact extension; unknown inputs have no analysis claim.
-    pub fn select(&self, extension: &str) -> Option<&Language> {
-        self.extensions.get(extension).map(Arc::as_ref)
+    /// Looks up a registered analyzer language.
+    pub fn select(&self, language: &str) -> Option<&Language> {
+        self.languages.get(language).map(Arc::as_ref)
+    }
+    /// Lists registered language identifiers for source-policy construction.
+    pub fn names(&self) -> impl Iterator<Item = &str> {
+        self.languages.keys().map(String::as_str)
     }
 }

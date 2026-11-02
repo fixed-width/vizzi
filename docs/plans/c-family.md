@@ -1,10 +1,18 @@
 # C-family implementation and validation plan
 
 This plan sequences the [C-family policy](../prototype/C_FAMILY_POLICY.md). The policy
-is defined; runtime implementation has not started. Rust/Python remain the delivered
-languages. No stage below is an implicit approval to execute analyzed-project tooling.
+is defined; stage 1 is implemented. Rust/Python remain the delivered syntax analyzers;
+explicit C-family scopes now capture readable source-only inputs. No stage below is
+an implicit approval to execute analyzed-project tooling.
 
 ## 1. Separate source policy from analyzer registration
+
+Complete: [source-policy reference](../prototype/SOURCE_POLICY.md). The policy/native
+tests cover scope expansion/reduction, empty baselines, source-only inputs, normalized
+rules, precedence, availability changes, and classification/pin consistency. Browser
+checks cover schema 2, source-only diagnostics, encoding, live edits, and pinned metadata.
+The [validation report](../../experiments/languages/SOURCE_POLICY_RESULTS.md) records
+the complete test/mutation scope, measurements, and remaining qualification limits.
 
 Introduce a portable source-policy module over normalized relative paths. It produces
 excluded, source-only, or assigned inputs with structured provenance; native source

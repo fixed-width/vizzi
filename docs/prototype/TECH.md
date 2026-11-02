@@ -12,6 +12,8 @@ vertical slice; the performance experiment crate remains independent.
 - Its language adapters own reusable Tree-sitter parsers and emit lexical declaration
   facts. Analysis carries a context and content identity. Source ranges use UTF-8 byte
   offsets; line ranges are derived from the captured source.
+- Its portable source policy maps normalized relative paths to capture/assignment
+  metadata. Analyzer factories register by language, independently of selection.
 - The native `vizzi` host captures source, runs bounded analyzer workers, persists
   analysis, coordinates refresh requests, and owns published snapshots.
 - Its `changes` module retains one versioned status for independent native subscriptions.
@@ -32,17 +34,21 @@ The host registers Rust and Python syntax adapters through one source policy. Th
 fingerprints conservatively include adapter/shared implementation sources and the
 dependency lockfile. See [language and worker contracts](LANGUAGES.md).
 
-The [C/C++ design contract](C_FAMILY_POLICY.md) specifies a future source-policy seam,
-capture-policy identity, and configured translation-unit inputs. These extensions are
-sequenced separately in the [implementation plan](../plans/c-family.md); the current
-host still uses the Rust/Python registry and byte-only analyzers described here.
+The [source-policy contract](SOURCE_POLICY.md) defines the implemented selection seam,
+classification metadata, and snapshot policy identity. The [C/C++ contract](C_FAMILY_POLICY.md)
+also specifies future raw adapters and configured translation-unit inputs, sequenced
+in the [implementation plan](../plans/c-family.md). Current analyzers remain byte-only
+Rust/Python; explicitly enabled C-family candidates are source-only.
 
 Snapshots sort documents and identify their actual captured contents and analysis.
 They represent immutable observations, not an atomic filesystem transaction. A source
 query never reads a mutable file after choosing its snapshot.
-Each validated document caches its content-and-analysis version. Snapshot composition
+Each validated document caches its content/classification/analysis version. Snapshot composition
 hashes those fixed-size versions instead of serialising retained facts again. See
 [identity composition](IDENTITIES.md) for inputs and versioning.
+Snapshot composition also includes capture policy, enforcing complete rediscovery on
+policy mismatch without changing workspace/file identity. Rebinding cached raw facts
+supplies current classification; source-only files bypass parser creation and persistence.
 
 Declaration keys use lexical qualification and kind. Unique keys remain stable across
 position-only changes. Duplicate keys receive content-scoped identities, so edits do

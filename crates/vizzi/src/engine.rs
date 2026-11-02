@@ -40,6 +40,10 @@ pub enum EngineError {
 pub struct Measurements {
     /// Total indexed source files in the candidate snapshot.
     pub files: usize,
+    /// Captured files containing analysis records, including unavailable analysis.
+    pub analyzed: usize,
+    /// Captured files with no analyzer assigned.
+    pub source_only: usize,
     /// Source bytes read and verified, including unchanged files.
     pub bytes: usize,
     /// Source files reopened and verified during this attempt.
@@ -104,7 +108,7 @@ impl Engine {
     }
 
     /// Verifies a path hint set or reconciles, using only the published baseline.
-    /// After replacing the source registry, call `refresh` for full discovery first.
+    /// A different source policy always forces complete discovery.
     pub fn refresh_scoped(
         &self,
         previous: Option<&Snapshot>,
@@ -160,22 +164,30 @@ impl Engine {
                 return Ok(None);
             }
             let content = ContentId::derive(&[&file.bytes]);
-            let language = self
-                .directory
-                .language(Path::new(&file.path))
-                .ok_or_else(|| {
-                    EngineError::Configuration("captured input has no language adapter".into())
-                })?;
-            let context = language.context();
+            let language = self.directory.language(&file.classification);
             if let Some(old) = previous.get(file.path.as_str()).filter(|old| {
                 old.content() == &content
-                    && old.analyses().len() == 1
-                    && old.analyses()[0].context == *context
+                    && old.classification() == &file.classification
+                    && match language {
+                        Some(language) => {
+                            old.analyses().len() == 1
+                                && old.analyses()[0].context == *language.context()
+                        }
+                        None => old.analyses().is_empty(),
+                    }
             }) {
                 documents.push((*old).clone());
                 measurements.reused += 1;
-            } else {
+            } else if let Some(language) = language {
                 jobs.push((file, content, language));
+            } else {
+                documents.push(Arc::new(Document::capture(
+                    self.directory.workspace().clone(),
+                    file.path,
+                    &file.bytes,
+                    vec![],
+                    file.classification,
+                )?));
             }
         }
         jobs.sort_by_key(|job| std::cmp::Reverse(job.0.bytes.len()));
@@ -206,6 +218,7 @@ impl Engine {
                                         file.path.clone(),
                                         &file.bytes,
                                         vec![analysis],
+                                        file.classification.clone(),
                                     )
                                     .ok()
                                 });
@@ -232,6 +245,7 @@ impl Engine {
                                     file.path.clone(),
                                     &file.bytes,
                                     vec![analysis],
+                                    file.classification.clone(),
                                 )?;
                                 counters.0 += 1;
                                 if self.cache.store(&document.analyses()[0]).is_err() {
@@ -266,8 +280,15 @@ impl Engine {
         let snapshot = Arc::new(Snapshot::new(
             self.directory.workspace().clone(),
             documents,
+            self.directory.policy().id().clone(),
         )?);
         measurements.files = snapshot.documents().len();
+        measurements.analyzed = snapshot
+            .documents()
+            .iter()
+            .filter(|file| !file.analyses().is_empty())
+            .count();
+        measurements.source_only = measurements.files - measurements.analyzed;
         measurements.total_ms = milliseconds(started.elapsed());
         Ok(Some(Refresh {
             snapshot,
@@ -277,14 +298,26 @@ impl Engine {
     }
 
     fn can_capture_paths(&self, snapshot: &Snapshot, paths: &BTreeSet<PathBuf>) -> bool {
-        if paths.is_empty() || paths.len() > MAX_PATH_HINTS {
+        if snapshot.policy() != self.directory.policy().id()
+            || paths.is_empty()
+            || paths.len() > MAX_PATH_HINTS
+        {
             return false;
         }
         if snapshot.documents().iter().any(|file| {
             self.directory
-                .language(Path::new(file.path()))
-                .is_none_or(|language| {
-                    file.analyses().len() != 1 || file.analyses()[0].context != *language.context()
+                .classification(Path::new(file.path()))
+                .ok()
+                .flatten()
+                .is_none_or(|classification| {
+                    classification != *file.classification()
+                        || match self.directory.language(&classification) {
+                            Some(language) => {
+                                file.analyses().len() != 1
+                                    || file.analyses()[0].context != *language.context()
+                            }
+                            None => !file.analyses().is_empty(),
+                        }
                 })
         }) {
             return false;
@@ -659,12 +692,18 @@ mod tests {
                         document.path().into(),
                         document.source().unwrap().as_bytes(),
                         vec![analysis],
+                        document.classification().clone(),
                     )
                     .unwrap(),
                 )
             })
             .collect();
-        let previous = Snapshot::new(initial.snapshot.workspace().clone(), documents).unwrap();
+        let previous = Snapshot::new(
+            initial.snapshot.workspace().clone(),
+            documents,
+            initial.snapshot.policy().clone(),
+        )
+        .unwrap();
         let fresh = engine
             .refresh_scoped(
                 Some(&previous),
@@ -677,8 +716,12 @@ mod tests {
         assert_eq!(fresh.measurements.read_files, 2);
         assert_eq!(fresh.measurements.retained, 0);
         assert_eq!(fresh.snapshot.id(), initial.snapshot.id());
-        let unrelated =
-            Snapshot::new(vizzi_core::model::WorkspaceId::derive(&[b"other"]), vec![]).unwrap();
+        let unrelated = Snapshot::new(
+            vizzi_core::model::WorkspaceId::derive(&[b"other"]),
+            vec![],
+            initial.snapshot.policy().clone(),
+        )
+        .unwrap();
         let fresh = engine
             .refresh_scoped(
                 Some(&unrelated),
@@ -722,11 +765,13 @@ mod tests {
                 path.into(),
                 b"fn first() {}",
                 analyses,
+                initial.snapshot.documents()[0].classification().clone(),
             )
             .unwrap();
             let previous = Snapshot::new(
                 initial.snapshot.workspace().clone(),
                 vec![Arc::new(document)],
+                initial.snapshot.policy().clone(),
             )
             .unwrap();
             assert!(

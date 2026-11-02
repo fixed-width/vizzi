@@ -2,6 +2,7 @@
 
 pub mod analysis;
 pub mod model;
+pub mod policy;
 pub mod publication;
 pub mod python;
 pub mod query;

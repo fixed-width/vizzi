@@ -1,5 +1,6 @@
 import { createController } from "/controller.js";
 import { followChanges } from "/updates.js";
+import { describeSource } from "/source-description.js";
 
 const element = id => document.getElementById(id);
 const canvas = element("map"), context = canvas.getContext("2d");
@@ -22,14 +23,14 @@ const controller = createController({
     const changedEntity = view?.selection.entity !== next.selection.entity;
     const changedSource = changedFile || view?.source?.text !== next.source?.text;
     view = next;
-    element("counts").textContent = `${next.files.length} shown / ${next.matching} matching / ${next.total} source files`;
+    element("counts").textContent = `${next.files.length} shown / ${next.matching} matching / ${next.total} source files · ${next.analyzed} with analysis / ${next.source_only} source only`;
     element("empty").hidden = next.files.length > 0;
     element("file-title").textContent = next.source?.path ?? "Choose a file";
     element("snapshot").textContent = next.snapshot.slice(0, 8);
     element("snapshot").title = `Captured observation ${next.snapshot}`;
     const outlines = next.source?.outlines ?? [];
-    const diagnostics = outlines.flatMap(outline => outline.diagnostics);
-    element("coverage").textContent = outlines.length ? `Read-only · ${outlines.map(outline => `${outline.context.language}: ${outline.coverage === "syntax" ? "syntax parsed" : outline.coverage === "partial" ? "partial syntax" : "analysis unavailable"}`).join(" · ")}` : "Read-only · no syntax analysis";
+    const { coverage, diagnostics } = describeSource(next.source);
+    element("coverage").textContent = coverage;
     element("diagnostics").hidden = diagnostics.length === 0;
     element("diagnostics").textContent = diagnostics.join(". ");
     const facts = outlines.flatMap(outline => outline.declarations);
@@ -151,7 +152,7 @@ canvas.addEventListener("pointermove", event => {
   const p = point(event);
   if (drag) { camera.x += p.x - drag.x; camera.y += p.y - drag.y; drag.moved ||= Math.hypot(p.x - drag.startX, p.y - drag.startY) > 4; drag.x = p.x; drag.y = p.y; invalidate(); return; }
   const file = hit(p.x, p.y), tooltip = element("tooltip"); tooltip.hidden = !file;
-  if (file) { tooltip.textContent = `${file.path}\n${file.bytes.toLocaleString()} bytes · ${file.coverage} syntax`; tooltip.style.left = `${Math.min(p.x + 12, canvas.clientWidth * .45)}px`; tooltip.style.top = `${Math.max(0, Math.min(p.y + 12, canvas.clientHeight - 65))}px`; }
+  if (file) { tooltip.textContent = `${file.path}\n${file.bytes.toLocaleString()} bytes · ${file.classification.kind === "source_only" ? "source only" : `${file.coverage} syntax`}`; tooltip.style.left = `${Math.min(p.x + 12, canvas.clientWidth * .45)}px`; tooltip.style.top = `${Math.max(0, Math.min(p.y + 12, canvas.clientHeight - 65))}px`; }
 });
 canvas.addEventListener("pointerup", event => { if (drag && !drag.moved) { const p = point(event), file = hit(p.x, p.y); if (file) controller.load({ file: file.id, entity: null }); } drag = null; previousFrame = null; });
 canvas.addEventListener("pointercancel", () => { drag = null; previousFrame = null; });

@@ -32,7 +32,7 @@ export function createController({ transport, onView = () => {}, onStatus = () =
     try {
       const next = await transport(`/api/view?${parameters}`, { signal: fetch.signal });
       if (request !== viewRequest) return false;
-      if (!next || next.schema !== 1 || typeof next.snapshot !== "string" || !next.selection || (target && next.snapshot !== target)) throw new Error("Invalid or mismatched pinned view response");
+      if (!next || next.schema !== 2 || typeof next.snapshot !== "string" || !next.selection || (target && next.snapshot !== target)) throw new Error("Invalid or mismatched pinned view response");
       if (target && latestStatus.snapshot !== target) return load();
       query = { ...query, file: next.selection.file, entity: next.selection.entity };
       displayedSnapshot = next.snapshot; onView(next); completedViewRequest = request;

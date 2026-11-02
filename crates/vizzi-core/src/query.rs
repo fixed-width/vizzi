@@ -1,6 +1,11 @@
 //! A bounded overview and source inspector computed from one snapshot.
 
-use crate::model::{Context, Coverage, EntityId, FileId, Snapshot, SnapshotId};
+use crate::{
+    model::{
+        CapturePolicyId, Context, Coverage, EntityId, FileId, Snapshot, SnapshotId, SourceEncoding,
+    },
+    policy::Classification,
+};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
@@ -40,6 +45,8 @@ pub struct FileTile {
     pub bytes: usize,
     /// Combined syntax coverage.
     pub coverage: Coverage,
+    /// Source selection and assignment evidence.
+    pub classification: Classification,
     /// World-space geometry supplied by the engine.
     pub rect: Rect,
 }
@@ -68,6 +75,10 @@ pub struct Declaration {
 /// Facts and coverage for one analysis context.
 #[derive(Debug, Serialize)]
 pub struct Outline {
+    /// Analysis capability, currently raw syntax only.
+    pub mode: &'static str,
+    /// Build-configuration coverage, currently unknown.
+    pub configuration_coverage: &'static str,
     /// Analyzer and configuration identity.
     pub context: Context,
     /// Syntax coverage.
@@ -86,6 +97,10 @@ pub struct SourceView {
     pub path: String,
     /// Frozen UTF-8 source, absent when the encoding is unsupported.
     pub text: Option<String>,
+    /// Encoding availability, separate from language assignment.
+    pub encoding: SourceEncoding,
+    /// Captured source classification and provenance.
+    pub classification: Classification,
     /// Analysis contexts and declarations.
     pub outlines: Vec<Outline>,
 }
@@ -104,8 +119,14 @@ pub struct View {
     pub schema: u32,
     /// Source and fact observation used throughout this response.
     pub snapshot: SnapshotId,
+    /// Source policy used to discover this observation.
+    pub policy: CapturePolicyId,
     /// Total files in the observation.
     pub total: usize,
+    /// Captured files containing an analysis record, regardless of grammar recovery.
+    pub analyzed: usize,
+    /// Captured files with no analysis records.
+    pub source_only: usize,
     /// Number of files matching the filter before limiting.
     pub matching: usize,
     /// Bounded overview tiles.
@@ -143,10 +164,14 @@ impl Snapshot {
             id: file.id().clone(),
             path: file.path().into(),
             text: file.source().map(str::to_owned),
+            encoding: file.encoding(),
+            classification: file.classification().clone(),
             outlines: file
                 .analyses()
                 .iter()
                 .map(|analysis| Outline {
+                    mode: "raw_syntax",
+                    configuration_coverage: "unknown",
                     context: analysis.context.clone(),
                     coverage: analysis.coverage.clone(),
                     diagnostics: analysis.diagnostics.clone(),
@@ -215,6 +240,7 @@ impl Snapshot {
                     path: file.path().into(),
                     bytes: file.bytes(),
                     coverage,
+                    classification: file.classification().clone(),
                     rect: Rect {
                         x: (i % 8) as f64 * 178.0,
                         y: y + (i / 8) as f64 * 56.0,
@@ -226,9 +252,20 @@ impl Snapshot {
             y += documents.len().div_ceil(8) as f64 * 56.0 + 18.0;
         }
         View {
-            schema: 1,
+            schema: 2,
             snapshot: self.id().clone(),
+            policy: self.policy().clone(),
             total: self.documents().len(),
+            analyzed: self
+                .documents()
+                .iter()
+                .filter(|file| !file.analyses().is_empty())
+                .count(),
+            source_only: self
+                .documents()
+                .iter()
+                .filter(|file| file.analyses().is_empty())
+                .count(),
             matching: count,
             files,
             groups,
@@ -245,10 +282,7 @@ impl Snapshot {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{
-        model::{Document, WorkspaceId},
-        rust::RustAnalyzer,
-    };
+    use crate::{model::WorkspaceId, rust::RustAnalyzer};
     use std::sync::Arc;
     fn snapshot(text: &str) -> Snapshot {
         let workspace = WorkspaceId::derive(&[b"t"]);
@@ -256,15 +290,16 @@ mod tests {
             .unwrap()
             .analyze(text.as_bytes())
             .unwrap();
-        let a = Document::capture(
+        let a = crate::model::fixture_document(
             workspace.clone(),
             "src/a.rs".into(),
             text.as_bytes(),
             vec![analysis],
         )
         .unwrap();
-        let b = Document::capture(workspace.clone(), "other/b.rs".into(), b"", vec![]).unwrap();
-        Snapshot::new(workspace, vec![Arc::new(a), Arc::new(b)]).unwrap()
+        let b = crate::model::fixture_document(workspace.clone(), "other/b.rs".into(), b"", vec![])
+            .unwrap();
+        crate::model::fixture_snapshot(workspace, vec![Arc::new(a), Arc::new(b)]).unwrap()
     }
     #[test]
     fn selection_uses_frozen_source_and_survives_position_changes() {
@@ -345,7 +380,7 @@ mod tests {
         assert!(view.files.is_empty());
         let workspace = WorkspaceId::derive(&[b"empty"]);
         assert!(
-            Snapshot::new(workspace, vec![])
+            crate::model::fixture_snapshot(workspace, vec![])
                 .unwrap()
                 .view(&ViewQuery::default())
                 .source
@@ -360,7 +395,7 @@ mod tests {
         for directory in ["first", "second"] {
             for i in 0..17 {
                 files.push(Arc::new(
-                    Document::capture(
+                    crate::model::fixture_document(
                         workspace.clone(),
                         format!("{directory}/{i:02}.rs"),
                         b"abc",
@@ -370,7 +405,7 @@ mod tests {
                 ));
             }
         }
-        let view = Snapshot::new(workspace, files)
+        let view = crate::model::fixture_snapshot(workspace, files)
             .unwrap()
             .view(&ViewQuery::default());
         assert_eq!(view.groups.len(), 2);
@@ -422,10 +457,16 @@ mod tests {
         ] {
             let analysis = parser.analyze(bytes).unwrap();
             files.push(Arc::new(
-                Document::capture(workspace.clone(), path.into(), bytes, vec![analysis]).unwrap(),
+                crate::model::fixture_document(
+                    workspace.clone(),
+                    path.into(),
+                    bytes,
+                    vec![analysis],
+                )
+                .unwrap(),
             ));
         }
-        let snapshot = Snapshot::new(workspace.clone(), files).unwrap();
+        let snapshot = crate::model::fixture_snapshot(workspace.clone(), files).unwrap();
         let view = snapshot.view(&ViewQuery::default());
         assert_eq!(
             view.files
@@ -449,14 +490,22 @@ mod tests {
         let files = (0..2003)
             .map(|i| {
                 Arc::new(
-                    Document::capture(workspace.clone(), format!("{i}.rs"), b"", vec![]).unwrap(),
+                    crate::model::fixture_document(
+                        workspace.clone(),
+                        format!("{i}.rs"),
+                        b"",
+                        vec![],
+                    )
+                    .unwrap(),
                 )
             })
             .collect();
-        let view = Snapshot::new(workspace, files).unwrap().view(&ViewQuery {
-            limit: Some(usize::MAX),
-            ..Default::default()
-        });
+        let view = crate::model::fixture_snapshot(workspace, files)
+            .unwrap()
+            .view(&ViewQuery {
+                limit: Some(usize::MAX),
+                ..Default::default()
+            });
         assert_eq!(view.matching, 2003);
         assert_eq!(view.files.len(), 2000);
     }

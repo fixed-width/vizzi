@@ -12,7 +12,11 @@ engine and works without a project build or external account.
   `target`, or `node_modules` directories. LPC analysis remains out of scope.
 - Supported scope and declaration kinds follow the [language contract](LANGUAGES.md).
   The source inspector identifies each analysis language and coverage; overview counts
-  describe supported source files. Unconfigured languages are omitted.
+  describe selected source files. Other extensions remain outside capture scope.
+- Explicit C-family scopes add readable source-only candidates, including unassigned
+  headers and unavailable dialects/analyzers. Source classification and encoding are
+  reported separately. C/C++ syntax extraction is a later slice. Capture and analysis
+  counts remain distinct; no outline is invented for a source-only file.
 - The overview groups files by directory, supports filtering, pan, zoom, and selection,
   and provides readable file labels and hover details.
   Its initial camera reveals readable labels; fitting the whole map can hide labels
@@ -35,6 +39,9 @@ engine and works without a project build or external account.
 - File-event hints avoid reading unhinted documents. Hinted bytes are verified even
   when size and timestamps match. Full reconciliation recovers missed changes and
   remains scheduled during continuous edits. Obsolete/failed work cannot lose hints.
+- Snapshots retain source-policy identity, including empty observations. Changing
+  discovery rules or analyzer availability forces full discovery before unread reuse.
+  File identities and reusable raw analysis survive compatible classification changes.
 - Syntax recovery and unavailable analysis are visible. The outline does not claim
   compiler-level name resolution, call relationships, or build-configuration coverage.
 - Empty workspaces, removed selections, analysis failures, and connection failures have

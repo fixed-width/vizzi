@@ -8,11 +8,57 @@ let chromium, input, host;
 const text = `const HTML: &str = "<img src=x onerror='window.injected=true'>";\nfn first() {}\nfn anchor() {\n${"    // captured line\n".repeat(10000)}}\n`;
 before(async () => {
   buildHost();
-  input = await workspace({ files: { "src/a.rs": text, "src/b.rs": "fn beta() {}", "src/partial.rs": "fn broken( {", "src/encoding.rs": Buffer.from([255]), "src/z.py": "class Example:\n    def read(self): pass\n" } });
+  input = await workspace({ files: { "src/a.rs": text, "src/b.rs": "fn beta() {}", "src/partial.rs": "fn broken( {", "src/encoding.rs": Buffer.from([255]), "src/z.py": "class Example:\n    def read(self): pass\n", "include/shared.h": "struct Header;", "include/device.cuh": "__device__ void kernel();", "include/encoding.h": Buffer.from([255]), "include/example.c++": "class Example {};" }, sourceArguments: ["--c-family-root", "include"] });
   host = await startHost(input);
   chromium = await browser();
 });
 after(async () => { await chromium?.close(); await host?.close(); await input?.close(); });
+
+test("source-only headers expose reasons, encoding, and pinned metadata without invented outlines", async () => {
+  const session = await openWorkspace(chromium, host);
+  const { page } = session;
+  try {
+    await page.locator("summary").click();
+    await page.getByRole("button", { name: "include/shared.h", exact: true }).click();
+    await page.waitForFunction(() => document.getElementById("file-title").textContent === "include/shared.h");
+    assert.ok((await page.locator("#coverage").textContent()).includes("Source only"));
+    assert.ok((await page.locator("#diagnostics").textContent()).includes("language is unassigned"));
+    assert.ok((await page.locator("#source").textContent()).includes("struct Header;"));
+    assert.equal(await page.locator("#outline button").count(), 0);
+    assert.ok((await page.locator("#counts").textContent()).includes("4 source only"));
+    const view = await (await fetch(`${host.url}/api/view?filter=shared.h`)).json();
+    assert.equal(view.schema, 2); assert.equal(view.analyzed, 5); assert.equal(view.source_only, 4);
+    assert.equal(view.source.classification.reason, "language_unassigned");
+    assert.equal(view.source.encoding, "utf8");
+    const full = await (await fetch(`${host.url}/api/view`)).json();
+    const tile = full.files.find(file => file.id === view.selection.file);
+    await paint(page);
+    const bounds = await page.locator("canvas").boundingBox();
+    const camera = await page.evaluate(() => window.vizziMetrics.lastFrame.camera);
+    await page.mouse.move(bounds.x + camera.x + (tile.rect.x + tile.rect.width / 2) * camera.scale, bounds.y + camera.y + (tile.rect.y + tile.rect.height / 2) * camera.scale);
+    await page.waitForFunction(() => !document.getElementById("tooltip").hidden);
+    assert.ok((await page.locator("#tooltip").textContent()).includes("source only"));
+    const pinned = `${host.url}/api/source?snapshot=${view.snapshot}&file=${view.selection.file}`;
+    const snapshot = await page.locator("#snapshot").getAttribute("title");
+    await writeFile(join(input.root, "include/shared.h"), "struct Updated;");
+    await page.waitForFunction(previous => document.getElementById("snapshot").title !== previous, snapshot);
+    assert.ok((await page.locator("#source").textContent()).includes("struct Updated;"));
+    const old = await (await fetch(pinned)).json();
+    assert.equal(old.schema, 2); assert.equal(old.text, "struct Header;");
+    assert.deepEqual(old.classification, view.source.classification); assert.equal(old.policy, view.policy);
+    await page.getByRole("button", { name: "include/device.cuh", exact: true }).click();
+    await page.waitForFunction(() => document.getElementById("file-title").textContent === "include/device.cuh");
+    assert.ok((await page.locator("#diagnostics").textContent()).includes("CUDA"));
+    await page.getByRole("button", { name: "include/encoding.h", exact: true }).click();
+    await page.waitForFunction(() => document.getElementById("file-title").textContent === "include/encoding.h");
+    assert.ok((await page.locator("#diagnostics").textContent()).includes("UTF-8"));
+    assert.ok((await page.locator("#diagnostics").textContent()).includes("language is unassigned"));
+    await page.getByRole("button", { name: "include/example.c++", exact: true }).click();
+    await page.waitForFunction(() => document.getElementById("file-title").textContent === "include/example.c++");
+    assert.ok((await page.locator("#diagnostics").textContent()).includes("analyzer is unavailable"));
+    assert.deepEqual(session.errors, []);
+  } finally { await session.close(); }
+});
 
 test("Python source and outline share selection and update through native notifications", async () => {
   const session = await openWorkspace(chromium, host);
@@ -71,6 +117,8 @@ test("an edit preserves declaration selection and the reader's scroll position",
   const session = await openWorkspace(chromium, host);
   const { page } = session;
   try {
+    await page.locator("summary").click();
+    await page.getByRole("button", { name: "src/a.rs", exact: true }).click();
     await page.getByRole("button", { name: /^anchor/ }).click();
     await page.waitForFunction(() => document.querySelector('#outline button[aria-current="true"]')?.textContent.startsWith("anchor"));
     await page.locator("#source").evaluate(node => { node.scrollTop = 150000; });

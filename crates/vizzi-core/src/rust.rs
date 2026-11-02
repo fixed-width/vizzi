@@ -6,12 +6,9 @@ use crate::{
     syntax::SyntaxAnalyzer,
 };
 
-/// Registers the Rust syntax adapter for `.rs` inputs.
+/// Registers the Rust raw-syntax adapter.
 pub struct RustAdapter;
 impl LanguageAdapter for RustAdapter {
-    fn extensions(&self) -> &[&str] {
-        &["rs"]
-    }
     fn context(&self) -> Context {
         RustAnalyzer::context()
     }
@@ -91,7 +88,7 @@ fn declaration(node: tree_sitter::Node<'_>, text: &str) -> Option<(&'static str,
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::model::{Coverage, Document, WorkspaceId};
+    use crate::model::{Coverage, WorkspaceId};
     #[test]
     fn extracts_qualified_declarations_and_marks_duplicates_ambiguous() {
         let text = b"mod one { fn same() {} } mod two { fn same() {} } fn repeated() {} fn repeated() {} struct Example; impl Example { fn method(&self) {} }";
@@ -122,7 +119,7 @@ mod tests {
                 .filter(|fact| fact.name == "repeated")
                 .all(|fact| !fact.unique)
         );
-        let doc = Document::capture(
+        let doc = crate::model::fixture_document(
             WorkspaceId::derive(&[b"t"]),
             "a.rs".into(),
             text,

@@ -10,6 +10,8 @@ Initial indexing, an invalid baseline/context, ambiguous events, directory chang
 watcher errors/rescan flags, and periodic recovery use full reconciliation. Ordinary
 file writes and named rename sides/pairs can use workspace-relative path hints. Hinted
 supported source files are reopened and content-hashed, including same-size and same-mtime edits.
+Capture-policy mismatch also requires reconciliation, including an empty baseline.
+The same policy selects analyzed and source-only candidates and prunes excluded paths.
 Deleted or symlink-replaced files are removed. Ancestor changes and directory targets
 fall back to full discovery. New source parents require discovery and watch registration.
 
@@ -35,7 +37,9 @@ are refreshed during reconciliation so replaced directories can be observed agai
 ## Measurements
 
 Status measurements distinguish total indexed files, actual files/bytes read, unread
-retained documents, reused analysis, and whether capture reconciled. A path-scoped
+retained documents, reused analysis, and whether capture reconciled.
+`analyzed` and `source_only` additionally distinguish files with/without analysis
+records; unavailable analysis still counts as an analysis record. A path-scoped
 attempt can legitimately report reconciliation after a conservative fallback.
 Incremental results must agree with a clean capture when the supplied hints cover the
 changes. Silent edits outside the hints remain visible only after reconciliation.

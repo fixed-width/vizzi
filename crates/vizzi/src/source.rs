@@ -9,6 +9,7 @@ use std::{
 use vizzi_core::{
     analysis::{Language, Languages},
     model::WorkspaceId,
+    policy::{Classification, PolicyConfig, SourcePolicy},
 };
 
 /// Input verification scope; paths are hints relative to the canonical workspace.
@@ -44,6 +45,8 @@ pub struct CapturedFile {
     pub path: String,
     /// Frozen bytes read during discovery.
     pub bytes: Vec<u8>,
+    /// Frozen source-selection metadata.
+    pub classification: Classification,
 }
 /// Captured supported inputs and the directories to observe for changes.
 pub struct Capture {
@@ -59,6 +62,7 @@ pub struct Directory {
     root: PathBuf,
     workspace: WorkspaceId,
     languages: Arc<Languages>,
+    policy: SourcePolicy,
 }
 impl Directory {
     /// Opens a directory; never executes project build scripts.
@@ -70,6 +74,16 @@ impl Directory {
     }
     /// Opens a directory with an explicit shared source and analysis policy.
     pub fn with_languages(root: &Path, languages: Arc<Languages>) -> io::Result<Self> {
+        Self::with_policy(root, PolicyConfig::default(), languages)
+    }
+    /// Opens a directory with a portable source policy and registered analyzers.
+    pub fn with_policy(
+        root: &Path,
+        config: PolicyConfig,
+        languages: Arc<Languages>,
+    ) -> io::Result<Self> {
+        let policy = SourcePolicy::new(config, languages.names().map(String::from))
+            .map_err(io::Error::other)?;
         let root = root.canonicalize()?;
         if !root.is_dir() {
             return Err(io::Error::other("workspace root is not a directory"));
@@ -79,6 +93,7 @@ impl Directory {
             root,
             workspace,
             languages,
+            policy,
         })
     }
     /// Returns the canonical root.
@@ -92,12 +107,8 @@ impl Directory {
     /// Tests whether a native event could affect discovered source.
     pub fn relevant(&self, path: &Path) -> bool {
         path.strip_prefix(&self.root).is_ok_and(|relative| {
-            let first = relative.components().next().map(|part| part.as_os_str());
-            !first.is_some_and(|part| {
-                [".git", "target", "node_modules"]
-                    .iter()
-                    .any(|name| part == *name)
-            }) && (self.source_path(path) || path.extension().is_none())
+            self.relative_key(relative).is_ok_and(|key| key.is_some())
+                && (self.source_path(relative) || path.extension().is_none())
         })
     }
     /// Reads supported files without following symlinks; errors preserve the prior snapshot.
@@ -115,29 +126,22 @@ impl Directory {
                 let entry = entry?;
                 let kind = entry.file_type()?;
                 let path = entry.path();
+                if !kind.is_dir() && !kind.is_file() {
+                    continue;
+                }
+                let relative = path.strip_prefix(&self.root).map_err(io::Error::other)?;
+                let Some(key) = self.relative_key(relative)? else {
+                    continue;
+                };
                 if kind.is_dir() {
-                    if directory == self.root
-                        && [".git", "target", "node_modules"]
-                            .iter()
-                            .any(|name| entry.file_name() == *name)
-                    {
-                        continue;
-                    }
                     pending.push(path);
-                } else if kind.is_file() && self.source_path(&path) {
-                    let relative = path.strip_prefix(&self.root).map_err(io::Error::other)?;
-                    let parts: Result<Vec<_>, _> = relative
-                        .components()
-                        .map(|component| {
-                            component
-                                .as_os_str()
-                                .to_str()
-                                .ok_or_else(|| io::Error::other("source path is not UTF-8"))
-                        })
-                        .collect();
+                } else if let Some(classification) =
+                    self.policy.classify(&key).map_err(io::Error::other)?
+                {
                     capture.files.push(CapturedFile {
-                        path: parts?.join("/"),
+                        path: key,
                         bytes: std::fs::read(&path)?,
+                        classification,
                     });
                 }
             }
@@ -186,17 +190,22 @@ impl Directory {
                     return self.capture();
                 } else if self.source_path(path) {
                     if metadata.file_type().is_file() {
-                        reads.push((key.clone(), absolute.clone()));
+                        if let Some(classification) =
+                            self.policy.classify(&key).map_err(io::Error::other)?
+                        {
+                            reads.push((key.clone(), absolute.clone(), classification));
+                        }
                     } else {
                         capture.removed.push(key.clone());
                     }
                 }
             }
         }
-        for (path, absolute) in reads {
+        for (path, absolute, classification) in reads {
             capture.files.push(CapturedFile {
                 path,
                 bytes: std::fs::read(absolute)?,
+                classification,
             });
         }
         Ok(capture)
@@ -208,11 +217,26 @@ impl Directory {
         }
         Ok(())
     }
-    pub(crate) fn source_path(&self, path: &Path) -> bool {
-        self.language(path).is_some()
+    /// Returns the frozen source policy.
+    pub fn policy(&self) -> &SourcePolicy {
+        &self.policy
     }
-    pub(crate) fn language(&self, path: &Path) -> Option<&Language> {
-        self.languages.select(path.extension()?.to_str()?)
+    pub(crate) fn source_path(&self, path: &Path) -> bool {
+        self.classification(path).ok().flatten().is_some()
+    }
+    pub(crate) fn classification(&self, path: &Path) -> io::Result<Option<Classification>> {
+        let path = if path.is_absolute() {
+            path.strip_prefix(&self.root).map_err(io::Error::other)?
+        } else {
+            path
+        };
+        match self.relative_key(path)? {
+            Some(key) => self.policy.classify(&key).map_err(io::Error::other),
+            None => Ok(None),
+        }
+    }
+    pub(crate) fn language(&self, classification: &Classification) -> Option<&Language> {
+        self.languages.select(classification.assigned_language()?)
     }
     pub(crate) fn relative_key(&self, path: &Path) -> io::Result<Option<String>> {
         let mut parts = Vec::new();
@@ -228,7 +252,11 @@ impl Directory {
         if parts.is_empty() {
             return Err(io::Error::other("empty source hint"));
         }
-        if [".git", "target", "node_modules"].contains(&parts[0]) {
+        if self
+            .policy
+            .excludes(&parts.join("/"))
+            .map_err(io::Error::other)?
+        {
             return Ok(None);
         }
         Ok(Some(parts.join("/")))
@@ -276,6 +304,7 @@ mod tests {
         assert!(!directory.relevant(&temp.path().join("target/build.rs")));
         assert!(directory.relevant(&temp.path().join("drivers/target/real.rs")));
         assert!(!directory.relevant(Path::new("/elsewhere/a.rs")));
+        assert!(!directory.relevant(&temp.path().join("notes.txt")));
         #[cfg(unix)]
         {
             std::os::unix::fs::symlink(temp.path().join("src"), temp.path().join("linked"))

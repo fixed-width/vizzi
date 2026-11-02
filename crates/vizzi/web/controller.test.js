@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { createController } from "./controller.js";
 function deferred() { let resolve, reject; const promise = new Promise((yes, no) => { resolve = yes; reject = no; }); return { promise, resolve, reject }; }
 const flush = () => new Promise(setImmediate);
-const view = (file = "a", snapshot = "s1") => ({ schema: 1, snapshot, selection: { file, entity: null } });
+const view = (file = "a", snapshot = "s1") => ({ schema: 2, snapshot, selection: { file, entity: null } });
 const state = (snapshot = "s1", patch = {}) => ({ schema: 1, name: "test", generation: 1, snapshot, pending: false, measurements: null, error: null, observation: "native", ...patch });
 const change = (revision = "1", snapshot = "s1", patch = {}) => ({ schema: 1, stream: "host", revision, status: state(snapshot), ...patch });
 
@@ -119,7 +119,7 @@ test("a stale completion cannot clear a newer pending fetch", async () => {
   requests[2].resolve(view("b", "s2")); assert.equal(await selected, true);
 });
 test("malformed view bodies produce a useful error without reconciling selection", async () => {
-  for (const body of [null, {}, { ...view(), schema: 2 }, { ...view(), snapshot: 42 }, { ...view(), selection: null }]) {
+  for (const body of [null, {}, { ...view(), schema: 1 }, { ...view(), snapshot: 42 }, { ...view(), selection: null }]) {
     const errors = [], views = [], c = createController({ transport: async () => body, onError: e => errors.push(e.message), onView: v => views.push(v) });
     assert.equal(await c.load(), false); assert.equal(views.length, 0); assert.match(errors[0], /view/i);
   }

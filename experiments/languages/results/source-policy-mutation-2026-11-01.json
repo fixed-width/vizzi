@@ -1,0 +1,587 @@
+{
+  "base_commit": "a74e75a6c5645ed4a988914c1f267b9dacad9db1",
+  "working_tree": "source-policy implementation before commit",
+  "rust": {
+    "tool": "cargo-mutants 27.1.0",
+    "baseline": "passed",
+    "scope": [
+      "crates/vizzi-core/src/policy.rs",
+      "crates/vizzi-core/src/model.rs",
+      "crates/vizzi-core/src/query.rs",
+      "crates/vizzi-core/src/analysis.rs",
+      "crates/vizzi/src/source.rs",
+      "crates/vizzi/src/engine.rs",
+      "crates/vizzi/src/invalidation.rs",
+      "crates/vizzi/src/main.rs",
+      "crates/vizzi/src/server.rs"
+    ],
+    "tests": "complete vizzi-core and vizzi test packages, including integration and CLI tests",
+    "tested": 290,
+    "counts": {
+      "CaughtMutant": 228,
+      "Unviable": 59,
+      "Timeout": 3
+    },
+    "command": "cargo mutants -p vizzi-core -p vizzi --config experiments/incremental/mutants.toml --file 'crates/vizzi-core/src/{policy,model,query,analysis}.rs' --file 'crates/vizzi/src/{source,engine,invalidation,main,server}.rs' --test-package vizzi-core --test-package vizzi --jobs 4 --timeout 15 --build-timeout 180",
+    "exclusions": [
+      "Existing equivalent < versus <= comparison in has_descendant; validated file paths cannot end with the directory-prefix slash."
+    ],
+    "non_caught": [
+      {
+        "name": "crates/vizzi/src/main.rs:31:13: delete match arm \"--cache\" in main",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/main.rs:26:13: delete match arm \"--root\" in main",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/engine.rs:99:9: replace Engine::directory -> &Directory with Box::leak(Box::new(Default::default()))",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/engine.rs:107:9: replace Engine::refresh -> Result<Option<Refresh>, EngineError> with Ok(Some(Default::default()))",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/engine.rs:118:9: replace Engine::refresh_scoped -> Result<Option<Refresh>, EngineError> with Ok(Some(Default::default()))",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/engine.rs:118:9: replace Engine::refresh_scoped -> Result<Option<Refresh>, EngineError> with Ok(None)",
+        "outcome": "Timeout"
+      },
+      {
+        "name": "crates/vizzi/src/engine.rs:335:17: replace && with || in Engine::can_capture_paths",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/invalidation.rs:95:9: replace PendingRefresh::plan -> Plan with Default::default()",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/invalidation.rs:106:9: replace PendingRefresh::publish -> Outcome with Default::default()",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/server.rs:41:5: replace status -> Json<crate::application::Status> with Json::new()",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/server.rs:41:5: replace status -> Json<crate::application::Status> with Json::from_iter([Default::default()])",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/server.rs:41:5: replace status -> Json<crate::application::Status> with Json::new(Default::default())",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/server.rs:41:5: replace status -> Json<crate::application::Status> with Json::from(Default::default())",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/server.rs:63:5: replace view -> Result<Json<View>, ApiError> with Ok(Json::new())",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/server.rs:63:5: replace view -> Result<Json<View>, ApiError> with Ok(Json::from_iter([Default::default()]))",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/server.rs:63:5: replace view -> Result<Json<View>, ApiError> with Ok(Json::new(Default::default()))",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/server.rs:63:5: replace view -> Result<Json<View>, ApiError> with Ok(Json::from(Default::default()))",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/server.rs:85:5: replace source -> Result<Json<serde_json::Value>, ApiError> with Ok(Json::new())",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/server.rs:85:5: replace source -> Result<Json<serde_json::Value>, ApiError> with Ok(Json::new(Default::default()))",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/server.rs:85:5: replace source -> Result<Json<serde_json::Value>, ApiError> with Ok(Json::from_iter([Default::default()]))",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/server.rs:85:5: replace source -> Result<Json<serde_json::Value>, ApiError> with Ok(Json::from(Default::default()))",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/server.rs:119:5: replace diagnostic -> Result<DiagnosticResponse, Box<dyn std::error::Error>> with Ok(Default::default())",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/invalidation.rs:79:9: replace Plan::cancelled -> bool with true",
+        "outcome": "Timeout"
+      },
+      {
+        "name": "crates/vizzi/src/source.rs:70:9: replace Directory::open -> io::Result<Self> with Ok(Default::default())",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/source.rs:77:9: replace Directory::with_languages -> io::Result<Self> with Ok(Default::default())",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/source.rs:85:9: replace Directory::with_policy -> io::Result<Self> with Ok(Default::default())",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/invalidation.rs:79:34: replace != with == in Plan::cancelled",
+        "outcome": "Timeout"
+      },
+      {
+        "name": "crates/vizzi/src/source.rs:101:9: replace Directory::root -> &Path with Box::leak(Box::new(Default::default()))",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/source.rs:105:9: replace Directory::workspace -> &WorkspaceId with Box::leak(Box::new(Default::default()))",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/source.rs:116:9: replace Directory::capture -> io::Result<Capture> with Ok(Default::default())",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/source.rs:157:9: replace Directory::capture_paths -> io::Result<Capture> with Ok(Default::default())",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/source.rs:222:9: replace Directory::policy -> &SourcePolicy with Box::leak(Box::new(Default::default()))",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/source.rs:228:9: replace Directory::classification -> io::Result<Option<Classification>> with Ok(Some(Default::default()))",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi/src/source.rs:239:9: replace Directory::language -> Option<&Language> with Some(Box::leak(Box::new(Default::default())))",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi-core/src/analysis.rs:32:9: replace Language::context -> &Context with Box::leak(Box::new(Default::default()))",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi-core/src/analysis.rs:66:9: replace Languages::builtin -> Result<Self, ModelError> with Ok(Default::default())",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi-core/src/analysis.rs:36:9: replace Language::create -> Result<Box<dyn Analyzer>, ModelError> with Ok(Box::new(Default::default()))",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi-core/src/analysis.rs:70:9: replace Languages::select -> Option<&Language> with Some(Box::leak(Box::new(Default::default())))",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi-core/src/model.rs:147:9: replace Document::capture -> Result<Self, ModelError> with Ok(Default::default())",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi-core/src/model.rs:216:9: replace Document::id -> &FileId with Box::leak(Box::new(Default::default()))",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi-core/src/model.rs:224:9: replace Document::content -> &ContentId with Box::leak(Box::new(Default::default()))",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi-core/src/model.rs:228:9: replace Document::version -> &DocumentVersion with Box::leak(Box::new(Default::default()))",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi-core/src/model.rs:240:9: replace Document::encoding -> SourceEncoding with Default::default()",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi-core/src/model.rs:248:9: replace Document::analyses -> &[Analysis] with Vec::leak(vec![Default::default()])",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi-core/src/model.rs:252:9: replace Document::classification -> &Classification with Box::leak(Box::new(Default::default()))",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi-core/src/model.rs:256:9: replace Document::entity_id -> EntityId with Default::default()",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi-core/src/model.rs:268:9: replace Document::lines -> Range<usize> with Range::new()",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi-core/src/model.rs:268:9: replace Document::lines -> Range<usize> with Range::from_iter([0])",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi-core/src/model.rs:268:9: replace Document::lines -> Range<usize> with Range::new(0)",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi-core/src/model.rs:268:9: replace Document::lines -> Range<usize> with Range::from(0)",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi-core/src/model.rs:268:9: replace Document::lines -> Range<usize> with Range::from_iter([1])",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi-core/src/model.rs:268:9: replace Document::lines -> Range<usize> with Range::new(1)",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi-core/src/model.rs:268:9: replace Document::lines -> Range<usize> with Range::from(1)",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi-core/src/model.rs:315:9: replace Snapshot::id -> &SnapshotId with Box::leak(Box::new(Default::default()))",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi-core/src/model.rs:319:9: replace Snapshot::workspace -> &WorkspaceId with Box::leak(Box::new(Default::default()))",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi-core/src/model.rs:323:9: replace Snapshot::policy -> &CapturePolicyId with Box::leak(Box::new(Default::default()))",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi-core/src/model.rs:327:9: replace Snapshot::documents -> &[Arc<Document>] with Vec::leak(vec![Arc::new(Default::default())])",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi-core/src/model.rs:331:9: replace Snapshot::file -> Option<&Arc<Document>> with Some(Box::leak(Box::new(Arc::new(Default::default()))))",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi-core/src/policy.rs:163:9: replace SourcePolicy::id -> &CapturePolicyId with Box::leak(Box::new(Default::default()))",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi-core/src/policy.rs:176:9: replace SourcePolicy::classify -> Result<Option<Classification>, ModelError> with Ok(Some(Default::default()))",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi-core/src/policy.rs:246:9: replace SourcePolicy::assignment -> Classification with Default::default()",
+        "outcome": "Unviable"
+      },
+      {
+        "name": "crates/vizzi-core/src/query.rs:147:9: replace Snapshot::view -> View with Default::default()",
+        "outcome": "Unviable"
+      }
+    ]
+  },
+  "javascript": {
+    "tool": "StrykerJS 10.1.1",
+    "baseline": "passed",
+    "command": "npm test -- --mutations",
+    "tested": 367,
+    "counts": {
+      "Killed": 351,
+      "Timeout": 16
+    },
+    "files": {
+      "crates/vizzi/web/controller.js": {
+        "Killed": 247,
+        "Timeout": 15
+      },
+      "crates/vizzi/web/source-description.js": {
+        "Killed": 54
+      },
+      "crates/vizzi/web/updates.js": {
+        "Killed": 50,
+        "Timeout": 1
+      }
+    },
+    "exclusions": [],
+    "non_caught": [
+      {
+        "file": "crates/vizzi/web/controller.js",
+        "status": "Timeout",
+        "mutator": "BooleanLiteral",
+        "location": {
+          "end": {
+            "column": 25,
+            "line": 31
+          },
+          "start": {
+            "column": 20,
+            "line": 31
+          }
+        },
+        "replacement": "true"
+      },
+      {
+        "file": "crates/vizzi/web/controller.js",
+        "status": "Timeout",
+        "mutator": "ConditionalExpression",
+        "location": {
+          "end": {
+            "column": 133,
+            "line": 35
+          },
+          "start": {
+            "column": 11,
+            "line": 35
+          }
+        },
+        "replacement": "false"
+      },
+      {
+        "file": "crates/vizzi/web/controller.js",
+        "status": "Timeout",
+        "mutator": "LogicalOperator",
+        "location": {
+          "end": {
+            "column": 133,
+            "line": 35
+          },
+          "start": {
+            "column": 11,
+            "line": 35
+          }
+        },
+        "replacement": "(!next || next.schema !== 2 || typeof next.snapshot !== \"string\" || !next.selection) && target && next.snapshot !== target"
+      },
+      {
+        "file": "crates/vizzi/web/controller.js",
+        "status": "Timeout",
+        "mutator": "ConditionalExpression",
+        "location": {
+          "end": {
+            "column": 132,
+            "line": 35
+          },
+          "start": {
+            "column": 98,
+            "line": 35
+          }
+        },
+        "replacement": "false"
+      },
+      {
+        "file": "crates/vizzi/web/controller.js",
+        "status": "Timeout",
+        "mutator": "EqualityOperator",
+        "location": {
+          "end": {
+            "column": 132,
+            "line": 35
+          },
+          "start": {
+            "column": 108,
+            "line": 35
+          }
+        },
+        "replacement": "next.snapshot === target"
+      },
+      {
+        "file": "crates/vizzi/web/controller.js",
+        "status": "Timeout",
+        "mutator": "ConditionalExpression",
+        "location": {
+          "end": {
+            "column": 53,
+            "line": 36
+          },
+          "start": {
+            "column": 11,
+            "line": 36
+          }
+        },
+        "replacement": "true"
+      },
+      {
+        "file": "crates/vizzi/web/controller.js",
+        "status": "Timeout",
+        "mutator": "LogicalOperator",
+        "location": {
+          "end": {
+            "column": 53,
+            "line": 36
+          },
+          "start": {
+            "column": 11,
+            "line": 36
+          }
+        },
+        "replacement": "target || latestStatus.snapshot !== target"
+      },
+      {
+        "file": "crates/vizzi/web/controller.js",
+        "status": "Timeout",
+        "mutator": "ConditionalExpression",
+        "location": {
+          "end": {
+            "column": 53,
+            "line": 36
+          },
+          "start": {
+            "column": 21,
+            "line": 36
+          }
+        },
+        "replacement": "true"
+      },
+      {
+        "file": "crates/vizzi/web/controller.js",
+        "status": "Timeout",
+        "mutator": "EqualityOperator",
+        "location": {
+          "end": {
+            "column": 53,
+            "line": 36
+          },
+          "start": {
+            "column": 21,
+            "line": 36
+          }
+        },
+        "replacement": "latestStatus.snapshot === target"
+      },
+      {
+        "file": "crates/vizzi/web/controller.js",
+        "status": "Timeout",
+        "mutator": "ConditionalExpression",
+        "location": {
+          "end": {
+            "column": 94,
+            "line": 46
+          },
+          "start": {
+            "column": 13,
+            "line": 46
+          }
+        },
+        "replacement": "true"
+      },
+      {
+        "file": "crates/vizzi/web/controller.js",
+        "status": "Timeout",
+        "mutator": "LogicalOperator",
+        "location": {
+          "end": {
+            "column": 94,
+            "line": 46
+          },
+          "start": {
+            "column": 13,
+            "line": 46
+          }
+        },
+        "replacement": "accepted && latestStatus?.snapshot || latestStatus.snapshot !== displayedSnapshot"
+      },
+      {
+        "file": "crates/vizzi/web/controller.js",
+        "status": "Timeout",
+        "mutator": "ConditionalExpression",
+        "location": {
+          "end": {
+            "column": 47,
+            "line": 46
+          },
+          "start": {
+            "column": 13,
+            "line": 46
+          }
+        },
+        "replacement": "true"
+      },
+      {
+        "file": "crates/vizzi/web/controller.js",
+        "status": "Timeout",
+        "mutator": "LogicalOperator",
+        "location": {
+          "end": {
+            "column": 47,
+            "line": 46
+          },
+          "start": {
+            "column": 13,
+            "line": 46
+          }
+        },
+        "replacement": "accepted || latestStatus?.snapshot"
+      },
+      {
+        "file": "crates/vizzi/web/controller.js",
+        "status": "Timeout",
+        "mutator": "ConditionalExpression",
+        "location": {
+          "end": {
+            "column": 94,
+            "line": 46
+          },
+          "start": {
+            "column": 51,
+            "line": 46
+          }
+        },
+        "replacement": "true"
+      },
+      {
+        "file": "crates/vizzi/web/controller.js",
+        "status": "Timeout",
+        "mutator": "EqualityOperator",
+        "location": {
+          "end": {
+            "column": 94,
+            "line": 46
+          },
+          "start": {
+            "column": 51,
+            "line": 46
+          }
+        },
+        "replacement": "latestStatus.snapshot === displayedSnapshot"
+      },
+      {
+        "file": "crates/vizzi/web/updates.js",
+        "status": "Timeout",
+        "mutator": "ArrowFunction",
+        "location": {
+          "end": {
+            "column": 84,
+            "line": 1
+          },
+          "start": {
+            "column": 57,
+            "line": 1
+          }
+        },
+        "replacement": "() => undefined"
+      }
+    ]
+  },
+  "investigated_initial_survivors": [
+    "Added tests for --port, --help/-h, explicit C assignments, and unknown-file filtering.",
+    "Removed redundant pre-normalization checks; normalized-path validation already rejects backslashes/traversal, producing an equivalent initial mutation.",
+    "Added presentation tests for empty diagnostics, multiple-outline separators, and existing UTF-8 diagnostics mixed with other warnings."
+  ],
+  "limitations": [
+    "Timeouts and unviable builds are separate from assertion-detected mutations.",
+    "Three Rust timeouts suppress initial publication and leave startup tests waiting.",
+    "The 16 JavaScript timeouts are in controller/update asynchronous state handling.",
+    "Identity macro expansion, dependency internals, native filesystem delivery, canvas painting and application glue are outside mutation scope."
+  ],
+  "production_sha256": {
+    "crates/vizzi-core/src/policy.rs": "53cb6477e74ef0219b668cb725b76d97b4178dee8fdc14da857a36572045970a",
+    "crates/vizzi-core/src/model.rs": "20aedb5364d3ce667e952e4472f627e6a8f8be5487bc87f5d4e7e637400e94a8",
+    "crates/vizzi-core/src/query.rs": "a3b11cdcd631f1adc4238409b11a6254d081a229105f74a2c6d4ec3e02e7ecb4",
+    "crates/vizzi-core/src/analysis.rs": "8a352ba71e59138c8c9c8b024f8905e64e0736102f8c8a2067b83022d1617801",
+    "crates/vizzi/src/source.rs": "fb9d2e972ac1fe044e1312c643af560a7b29f8b477b2f6cd181b45000c3ab792",
+    "crates/vizzi/src/engine.rs": "f4f3aebbde4a4aa1a9f8898ec166b72691207ee35fbaaa18e1a3af83d5b8dbab",
+    "crates/vizzi/src/invalidation.rs": "c582c611411355f9df61d8de1a98907dc3a6d99deed3acef151919bd543a170a",
+    "crates/vizzi/src/main.rs": "8822330e49ec2ec7a21485bf3ecbffb829bb802ca68255dc7b7a9290d4454cd8",
+    "crates/vizzi/src/server.rs": "2b746c265ea8083b26a5d94972aafb51b44894adde66f99d00cc2c43a9027406",
+    "crates/vizzi/web/controller.js": "408c35d41e9e49e1aa1d570b44920572149528969eadeee0f1537df54230ded6",
+    "crates/vizzi/web/source-description.js": "99979af563fee0cfb4975eaadc6c3136855484318b6ea8ce8c5b2fc610ec8ec6",
+    "crates/vizzi/web/updates.js": "34d6ef0db933208aa4b6d4b5b9f88732da59215a31434a51a91becfb399112fd"
+  }
+}

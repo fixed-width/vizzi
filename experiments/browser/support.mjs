@@ -10,7 +10,7 @@ export function buildHost() {
   if (result.status !== 0) throw new Error("Cannot build the native browser host");
 }
 
-export async function workspace({ files, source, name = "source" } = {}) {
+export async function workspace({ files, source, name = "source", sourceArguments = [] } = {}) {
   const temporary = await mkdtemp(join(tmpdir(), "vizzi-browser-"));
   const root = join(temporary, name), cache = join(temporary, "cache");
   if (source) await cp(resolve(source), root, { recursive: true, dereference: false });
@@ -20,11 +20,11 @@ export async function workspace({ files, source, name = "source" } = {}) {
     await mkdir(resolve(target, ".."), { recursive: true });
     await writeFile(target, text);
   }
-  return { root, cache, close: () => rm(temporary, { recursive: true, force: true }) };
+  return { root, cache, sourceArguments, close: () => rm(temporary, { recursive: true, force: true }) };
 }
 
 export async function startHost(input, workers = 4, port = 0) {
-  const child = spawn(resolve("target/release/vizzi"), ["--root", input.root, "--cache", input.cache, "--port", String(port), "--workers", String(workers)], { stdio: ["ignore", "ignore", "pipe"] });
+  const child = spawn(resolve("target/release/vizzi"), ["--root", input.root, "--cache", input.cache, "--port", String(port), "--workers", String(workers), ...(input.sourceArguments ?? [])], { stdio: ["ignore", "ignore", "pipe"] });
   let stderr = "";
   const url = await new Promise((accept, reject) => {
     const timeout = setTimeout(() => { child.kill("SIGKILL"); reject(new Error(`Host startup timed out: ${stderr}`)); }, 30000);

@@ -87,12 +87,17 @@ impl Publication {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::model::{Document, WorkspaceId};
+    use crate::model::WorkspaceId;
     fn snapshot(text: &str) -> Arc<Snapshot> {
         let workspace = WorkspaceId::derive(&[b"test"]);
-        let file =
-            Document::capture(workspace.clone(), "a.rs".into(), text.as_bytes(), vec![]).unwrap();
-        Arc::new(Snapshot::new(workspace, vec![Arc::new(file)]).unwrap())
+        let file = crate::model::fixture_document(
+            workspace.clone(),
+            "a.rs".into(),
+            text.as_bytes(),
+            vec![],
+        )
+        .unwrap();
+        Arc::new(crate::model::fixture_snapshot(workspace, vec![Arc::new(file)]).unwrap())
     }
     #[test]
     fn obsolete_work_cannot_replace_newer_request() {

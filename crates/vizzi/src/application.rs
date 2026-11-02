@@ -153,7 +153,14 @@ mod tests {
     use vizzi_core::model::WorkspaceId;
     fn refresh(parsed: usize) -> Refresh {
         Refresh {
-            snapshot: Arc::new(Snapshot::new(WorkspaceId::derive(&[b"test"]), vec![]).unwrap()),
+            snapshot: Arc::new(
+                Snapshot::new(
+                    WorkspaceId::derive(&[b"test"]),
+                    vec![],
+                    vizzi_core::model::CapturePolicyId::derive(&[b"test"]),
+                )
+                .unwrap(),
+            ),
             directories: Some(vec![]),
             measurements: Measurements {
                 parsed,

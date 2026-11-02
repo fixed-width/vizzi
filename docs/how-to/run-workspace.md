@@ -33,6 +33,36 @@ It shares four parsing workers across both languages by default; choose 1–32 w
 The overview
 returns at most 2,000 files per filtered query. Use a path filter to narrow larger scopes.
 
+## Show C-family source
+
+Enable candidate capture for a relative subtree with repeatable `--c-family-root`:
+
+```sh
+cargo run --release -p vizzi -- \
+  --root ../pytorch --cache /tmp/vizzi-cache/pytorch \
+  --c-family-root c10 \
+  --syntax-language c10/util=cpp \
+  --exclude-source c10/vendor
+```
+
+Use `.` for the whole workspace. `--syntax-language SCOPE=c|cpp` records an explicit
+raw-language request; more specific scopes win and conflicting assignments at one
+scope fail startup. `--exclude-source SCOPE` removes that path/subtree from all capture,
+including default Rust/Python inputs. Paths are relative to `--root`; traversal and
+absolute scopes are rejected. Options can be repeated and do not depend on ordering.
+
+The current host has no C/C++ analyzers, so these candidates remain source-only.
+Unassigned `.h` files explain their ambiguity; requested C/C++ and CUDA inputs explain
+the unavailable analyzer/dialect. Source remains readable when UTF-8. The inspector
+shows the assignment evidence, and overview counts separate captured files from files
+with analysis. Raw Rust/Python outlines state that configuration coverage is unknown.
+No compilation database, compiler, build, or project script is invoked.
+
+Keep C-family capture disabled for lpc-rs: its LPC fixtures also use `.c`/`.h` suffixes.
+Use explicit exclusions for known LPC subtrees in mixed repositories. See the
+[source-policy reference](../prototype/SOURCE_POLICY.md) for candidate suffixes,
+normalization, availability, and identity rules.
+
 ## Inspect without a browser
 
 For a single capture and JSON status report:

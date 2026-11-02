@@ -1,9 +1,9 @@
 # Local host API reference
 
-Schema version **1**. These are prototype contracts, independent of Git. Identities are
-opaque strings. `schema` appears in status, view, and pinned-source JSON responses.
-HTTP responses disable caching. The host serves `/`, `/app.js`, `/controller.js`, and
-`/app.css` and `/updates.js` without external assets.
+Views and pinned source use schema **2**; status and notification envelopes remain
+schema **1**. These prototype contracts are independent of Git. Identities are opaque
+strings. HTTP responses disable caching. The host serves `/`, `/app.js`, `/controller.js`,
+`/updates.js`, `/source-description.js`, and `/app.css` without external assets.
 
 | Request | Parameters | Response |
 | --- | --- | --- |
@@ -15,8 +15,21 @@ HTTP responses disable caching. The host serves `/`, `/app.js`, `/controller.js`
 `filter` is a case-insensitive path substring. `limit` defaults to 2,000 and is clamped
 to 1–2,000. `total` counts all discovered supported source files; `matching` counts matches before
 limiting. The view includes world-space tile rectangles, directory labels, and height.
+`policy` identifies capture policy, including empty snapshots. `analyzed` counts all
+captured files with analysis records; `source_only` counts those without records.
+These counts describe the entire snapshot, independently of filtering/overview bounds.
 Tile coverage combines all configured analysis contexts. Source outlines retain each
 context's identity, coverage, diagnostics, and declarations separately.
+
+Every tile and selected source includes `classification`: `kind` is `assigned` or
+`source_only`, `language` names the assigned/requested language (nullable for source-only),
+and `provenance` is an `extension` or `explicit_scope` record. Source-only records also
+contain a structured `reason`; see [SOURCE_POLICY.md](SOURCE_POLICY.md).
+Selected source includes `encoding` (`utf8` or `unsupported`). Grammar recovery,
+assignment, and encoding are separate facts. Current outlines carry `mode: "raw_syntax"`
+and `configuration_coverage: "unknown"`; a clean grammar parse is not compiler coverage.
+Pinned `/api/source` replies include `policy`, `classification`, and `encoding` from
+the retained snapshot along with the existing file/path/text fields.
 
 An existing selected file remains selected even if it is outside the overview filter.
 An absent selected file falls back to the first filtered file; an empty result has null
@@ -43,6 +56,10 @@ resynchronises from current state, including after a server restart. See the
 Coverage values are `syntax` (parsed without grammar recovery), `partial` (recovery
 occurred), and `unavailable`. None claims compiler-level resolution or complete build
 configuration coverage.
+
+Schema-1 view/source consumers need to upgrade and reload when connecting to this
+host version. No downgrade endpoint is provided; browser validation explicitly rejects
+the old view schema. Status/SSE consumers retain their existing envelope contract.
 
 Measurements count total indexed `files`, actual read `bytes`, parsed files, in-memory
 reuse, persisted cache hits, and cache write warnings. `read_files` counts reopened

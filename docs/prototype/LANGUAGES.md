@@ -5,16 +5,16 @@ the native prototype. The core interfaces live in `vizzi_core::analysis`.
 
 ## Registered languages
 
-`LanguageAdapter` supplies exact source extensions, an immutable analysis context, and
+`LanguageAdapter` supplies an immutable analysis context and
 a factory for worker-owned `Analyzer` values. `Analyzer::analyze` consumes captured
 bytes and returns path-independent analysis. Adapters must not execute project tooling.
 They report unsupported encoding and syntax recovery through coverage and diagnostics.
 
-`Languages::new` freezes each registered context. Empty/invalid extension claims,
-conflicting extensions, and repeated context identities fail registration. An empty
-registry is valid. Extensions are case-sensitive ASCII letters/digits without dots;
-one adapter may claim several extensions. There is one configured context per selected
-file in this host; the immutable document model also permits multiple analyses.
+`Languages::new` freezes each registered context. Empty/duplicate language names and
+repeated context identities fail registration. An empty registry is valid. Registration
+does not select source extensions; the [portable source policy](SOURCE_POLICY.md) does.
+There is one configured raw context per assigned file in this host; the immutable
+document model also permits multiple analyses.
 
 `Languages::builtin` registers:
 
@@ -29,21 +29,21 @@ remains a captured file. `syntax` describes grammar acceptance, not runtime vali
 Shared traversal generates lexical qualification, byte spans, and duplicate ambiguity.
 Unique declaration identities survive position changes in either language.
 
-The default host omits other extensions, including C/C++ sources, ambiguous headers,
-CUDA, Python stubs, notebooks, and LPC. Counts describe this selected scope, not all
-repository files. C/C++ integration still needs a policy for dialects, compilation
-contexts, preprocessor configurations, and headers. There is no extension guessing.
+The default host omits other extensions. Explicit C-family scopes capture C/C++
+candidates, ambiguous headers, fragments, and CUDA source without inventing analysis.
+C/C++ analyzers are the next delivery; Python stubs, notebooks, and LPC remain outside
+scope. Counts describe selected capture scope, not every repository file.
 
-The [C/C++ policy](C_FAMILY_POLICY.md) now defines the next extension, including scoped
-enablement and source-only ambiguous headers. It is a design contract, not implemented
-behavior. Its [delivery plan](../plans/c-family.md) starts by separating source policy
-from analyzer registration and enforcing snapshot-level capture-policy validity.
+The [C/C++ policy](C_FAMILY_POLICY.md) distinguishes implemented source selection from
+future raw adapters and configured analysis. Its [delivery plan](../plans/c-family.md)
+records the remaining stages.
 
 ## Native source policy
 
-`Directory::open` uses the built-in registry. `Directory::with_languages` accepts a
-shared `Arc<Languages>` for explicit configuration in native callers. There is no CLI
-or browser language-configuration interface yet.
+`Directory::open` uses default source policy and the built-in registry.
+`with_languages` accepts a shared `Arc<Languages>` with default capture rules;
+`with_policy` also accepts explicit policy configuration. The CLI accepts source
+scopes, exclusions, and raw C/C++ assignments. Browser configuration is not implemented.
 
 Full discovery, targeted capture, event classification, and job dispatch use that same
 directory policy. Root exclusions and symlink rules remain as specified by
@@ -52,11 +52,11 @@ no longer supported or whose context differs forces full reconciliation before u
 documents can be retained. Explicit extension changes through rename remove the old
 document and select the new adapter.
 
-A host's registry is immutable for its lifetime, and startup always reconciles. Native
-callers replacing a registry must start with `Engine::refresh` for complete discovery
-before supplying path hints. Document-level context checks cannot detect files newly
-admitted by a broader policy but absent from the old snapshot. Dynamic configuration
-and a persisted capture-policy identity are outside this host's current contract.
+A host's policy/registry is immutable for its lifetime, and startup always reconciles.
+Snapshots retain capture-policy identity; a mismatch enforces complete discovery even
+with an empty baseline. Native callers no longer need to manually request a full pass
+after changing policy. Dynamic configuration reload and persisted snapshots remain
+outside this host's current contract.
 
 ## Shared worker budget
 
@@ -78,8 +78,9 @@ remain open. Cancellation is checked between jobs; an individual parse is not in
 Cache keys combine captured content and context identities. Context fingerprints
 include the adapter implementation, shared traversal/registration/model sources, and
 the dependency lockfile. This conservatively invalidates old contexts when those
-inputs change. File selection/configuration changes must be represented by the registry
-and context; timestamps and file extensions alone do not establish analysis validity.
+inputs change. Selection changes belong to capture policy; analyzer configuration and
+implementation changes belong to context. Timestamps and suffixes alone do not establish
+analysis validity.
 
 Both cached and newly computed analysis must match the complete registered context.
 `Document::capture` validates content identity, ranges, and fact keys before publication;
@@ -88,6 +89,7 @@ analysis, and validation errors fail the attempt; the host retains its previous
 snapshot. Cache write errors remain nonfatal warnings. Valid content-addressed cache
 entries produced during cancelled attempts can be reused later.
 
-Source and host response schemas are unchanged. Outlines already carry language,
-context identity, diagnostics, and coverage. The browser displays the selected
-outline's language alongside its coverage and labels overview counts as source files.
+View and pinned-source responses use schema 2 for classification, policy identity,
+encoding, and capture/analysis counts. Status/notifications remain schema 1. The browser
+shows source-only reasons separately from encoding and grammar recovery; raw outlines
+state that build-configuration coverage is unknown. See [API.md](API.md).
