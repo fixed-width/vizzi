@@ -57,3 +57,8 @@ previously unseen files, cancellation, concurrent replacement, and exact quota l
 Do not imply that adaptive allowances preserve the whole PyTorch working set at 512 MiB:
 observed old/new primary-header overlap alone exceeds that budget with the other states.
 Capture/parse input admission and whole-process enforcement remain separate decisions.
+
+The next stage is delivered through [replacement allowances](replacement-allowances.md),
+which selects headroom from actual retained state without adding demand history or
+changing the disabled default. Unknown state, unexpectedly large growth and true
+old/new overlap retain conservative fallback behaviour.

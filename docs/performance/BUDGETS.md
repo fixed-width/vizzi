@@ -80,6 +80,14 @@ preserving accounting; increasing the default has not been justified. This direc
 engine probe includes correctness verification in its process peaks and does not
 repeat browser or baseline-laptop qualification.
 
+The [replacement-allowance follow-up](../../experiments/allowances/RESULTS.md) now
+selects known-state headroom from observed weight. Both 1 GiB three-file batches reuse
+all three trees without bypass, with observed Linux/PyTorch times of 180/675 ms.
+At 512 MiB, bypasses fall from two to one but Perfetto's final edit remains cold at
+1.50 s. The growth margin is provisional; first-use admission, real old/new overlap,
+whole-process limits and baseline hardware remain unresolved. Retention stays disabled
+by default and its quota/maxima are unchanged.
+
 Do not replace semantic correctness checks with these performance targets. Language
 assignments, partial grammar coverage, source-only cases, cancellation, cache validity,
 and immutable publication must remain explicit and independently tested.

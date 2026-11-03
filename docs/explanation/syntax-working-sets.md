@@ -13,7 +13,7 @@ exclusive lease. The state's own exact source determines how to edit its tree.
 
 ## Reservations create a working-set cost
 
-The initial policy reserves the maximum new-state allowance for every admitted parse.
+The initial policy reserved the maximum new-state allowance for every admitted parse.
 The old state remains charged while its replacement is built. If the aggregate charge
 would exceed the budget, the cache first evicts least-recently-used idle entries.
 Active reservations cannot be evicted. If they leave insufficient room, the request
@@ -33,6 +33,17 @@ fewer entries than the count ceiling. Parser scratch space and ordinary source b
 remain outside this accounting; falling back to a full parse is not a process-memory
 limit.
 
+The current policy reduces this excess for known state by reserving its observed weight
+plus 25% or 4 KiB of headroom, capped by the entry maximum. Previously unseen state
+still uses the maximum, so initial admission can retain this cost. The headroom is a
+provisional policy choice. Syntax can grow by more than that margin even when input
+byte growth is small; returned state must still fit the selected reservation.
+
+When growth exceeds it, complete facts remain usable and the old lease is consumed.
+A later targeted attempt can request the full maximum and retain a fresh tree. The
+current attempt does not parse twice to warm the cache. True old/new overlap remains:
+choosing a smaller allowance cannot make every working set fit every quota.
+
 ## What observations can establish
 
 Per-key inspection can show an absent, idle or leased entry without changing its
@@ -48,11 +59,11 @@ cases on the reference repositories. They complement the
 observations prevents reconstructing the exact cause of its cold Perfetto edit.
 A larger quota is a diagnostic comparison, not evidence for changing the default.
 
-A future admission policy can reduce unnecessary reservation pressure by choosing a
-smaller replacement allowance when justified by observed demand. It must still account
-for old/new overlap, release on cancellation, reject over-allowance returns, and fall
-back correctly when source growth or a different file shape exceeds that allowance.
-Choosing and validating those allowances is separate from enforcing limits on parser
-inputs, scratch space, or the whole process. The
-[retention reference](../prototype/SYNTAX_RETENTION.md) defines the current contract;
-the [investigation plan](../plans/working-set-admission.md) records the decision criteria.
+The [replacement measurements](../../experiments/allowances/RESULTS.md) evaluate the
+current allowance policy on the same workload. Its growth headroom needs further
+calibration across edits and source shapes. Old/new overlap, release on cancellation,
+and rejection of oversized or mismatched returned state remain required. Choosing
+replacement allowances is separate from enforcing limits on parser inputs, scratch
+space, or the whole process. The [retention reference](../prototype/SYNTAX_RETENTION.md)
+defines the current contract, and the [delivery plan](../plans/replacement-allowances.md)
+records the implementation and validation criteria.

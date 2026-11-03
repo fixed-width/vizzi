@@ -336,3 +336,147 @@ fn maximum_new_state_reservations_can_evict_a_large_idle_tree_for_a_small_edit()
     assert_eq!(cache.stats().idle_entries, 2);
     assert!(cache.stats().peak_charged_weight <= 2 * weight);
 }
+
+fn rust_state(source: &str) -> SyntaxState {
+    Languages::builtin()
+        .unwrap()
+        .select("rust")
+        .unwrap()
+        .create()
+        .unwrap()
+        .analyze_with_state(source.as_bytes(), None, usize::MAX, &|| false)
+        .unwrap()
+        .unwrap()
+        .state
+        .unwrap()
+}
+
+#[test]
+fn replacement_leases_use_observed_weight_and_preserve_other_idle_trees() {
+    let source: String = (0..100).map(|i| format!("fn known_{i}() {{}}\n")).collect();
+    let value = rust_state(&source);
+    let weight = value.weight();
+    let cap = 4 * weight;
+    let cache = SyntaxCache::new(2 * cap, cap, 8).unwrap();
+    let content = value.content().clone();
+    let keys: Vec<_> = ["a.rs", "b.rs", "c.rs"]
+        .iter()
+        .map(|path| key(path, &value))
+        .collect();
+    for requested in &keys {
+        let lease = cache.lease(requested.clone(), true).unwrap();
+        assert_eq!(
+            lease.allowance(),
+            cap,
+            "unseen keys need a full initial allowance"
+        );
+        assert!(lease.finish(Some(rust_state(&source)), &content));
+    }
+    let allowance = weight + weight / 4;
+    let mut leases = Vec::new();
+    for requested in &keys {
+        let lease = cache.lease(requested.clone(), false).unwrap();
+        assert_eq!(lease.allowance(), allowance);
+        leases.push(lease);
+    }
+    assert_eq!(cache.stats().evicted, 0);
+    assert_eq!(cache.stats().bypassed, 0);
+    assert_eq!(cache.stats().charged_weight, 3 * (weight + allowance));
+    for mut lease in leases {
+        let previous = lease.take_previous();
+        assert!(lease.finish(previous, &content));
+    }
+    assert_eq!(cache.stats().charged_weight, 3 * weight);
+    assert!(cache.stats().peak_charged_weight <= 2 * cap);
+}
+
+#[test]
+fn small_replacements_have_growth_headroom_and_drop_the_exact_reservation() {
+    let value = state();
+    let weight = value.weight();
+    let cap = 16 * weight;
+    let cache = SyntaxCache::new(2 * cap, cap, 8).unwrap();
+    let requested = key("a.rs", &value);
+    let content = value.content().clone();
+    cache
+        .lease(requested.clone(), true)
+        .unwrap()
+        .finish(Some(value), &content);
+    let lease = cache.lease(requested.clone(), false).unwrap();
+    assert_eq!(lease.allowance(), weight + 4096);
+    assert_eq!(cache.stats().charged_weight, weight + lease.allowance());
+    drop(lease);
+    assert_eq!(cache.stats().charged_weight, 0);
+    assert_eq!(cache.stats().active_leases, 0);
+    assert_eq!(cache.entry(&requested), None);
+    assert_eq!(cache.lease(requested, true).unwrap().allowance(), cap);
+}
+
+#[test]
+fn returned_state_must_fit_the_selected_allowance_even_when_the_entry_cap_is_larger() {
+    let source = " ".repeat(100);
+    let value = rust_state(&source);
+    let weight = value.weight();
+    let cap = 16 * weight;
+    let cache = SyntaxCache::new(2 * cap, cap, 8).unwrap();
+    let requested = key("a.rs", &value);
+    let content = value.content().clone();
+    cache
+        .lease(requested.clone(), true)
+        .unwrap()
+        .finish(Some(value), &content);
+    let lease = cache.lease(requested.clone(), false).unwrap();
+    let allowance = lease.allowance();
+    assert!(allowance < cap);
+    let larger = rust_state(&" ".repeat(source.len() + allowance - weight + 1));
+    assert_eq!(larger.weight(), allowance + 1);
+    let expected = larger.content().clone();
+    assert!(!lease.finish(Some(larger), &expected));
+    assert_eq!(cache.stats().charged_weight, 0);
+    assert_eq!(cache.entry(&requested), None);
+    assert_eq!(cache.lease(requested, true).unwrap().allowance(), cap);
+}
+
+#[test]
+fn exact_replacement_limit_and_invalidation_release_the_selected_old_new_charge() {
+    let source = " ".repeat(100);
+    let value = rust_state(&source);
+    let weight = value.weight();
+    let cap = 16 * weight;
+    let cache = SyntaxCache::new(2 * cap, cap, 8).unwrap();
+    let requested = key("a.rs", &value);
+    let content = value.content().clone();
+    cache
+        .lease(requested.clone(), true)
+        .unwrap()
+        .finish(Some(value), &content);
+    let mut lease = cache.lease(requested.clone(), false).unwrap();
+    let allowance = lease.allowance();
+    let next_source = " ".repeat(source.len() + allowance - weight);
+    let result = Languages::builtin()
+        .unwrap()
+        .select("rust")
+        .unwrap()
+        .create()
+        .unwrap()
+        .analyze_with_state(
+            next_source.as_bytes(),
+            lease.take_previous(),
+            allowance,
+            &|| false,
+        )
+        .unwrap()
+        .unwrap();
+    assert!(result.tree_reused);
+    assert_eq!(result.state.as_ref().unwrap().weight(), allowance);
+    let expected = result.analysis.content.clone();
+    assert!(lease.finish(result.state, &expected));
+    assert_eq!(cache.stats().charged_weight, allowance);
+    let mut lease = cache.lease(requested.clone(), false).unwrap();
+    assert_eq!(cache.stats().charged_weight, allowance + lease.allowance());
+    cache.invalidate(&WorkspaceId::derive(&[b"cache fixture"]), "a.rs");
+    let previous = lease.take_previous();
+    assert!(!lease.finish(previous, &expected));
+    assert_eq!(cache.stats().charged_weight, 0);
+    assert_eq!(cache.entry(&requested), None);
+}

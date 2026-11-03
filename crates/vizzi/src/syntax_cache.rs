@@ -161,9 +161,13 @@ impl SyntaxCache {
             .and_then(|index| inner.idle.remove(index))
             .map(|(_, state)| state);
         let old_weight = previous.as_ref().map_or(0, SyntaxState::weight);
+        let allowance = if previous.is_some() {
+            (old_weight + (old_weight / 4).max(4096)).min(self.entry)
+        } else {
+            self.entry
+        };
         let evictable: usize = inner.idle.iter().map(|(_, state)| state.weight()).sum();
-        if inner.active.len() >= self.count || inner.charged - evictable > self.budget - self.entry
-        {
+        if inner.active.len() >= self.count || inner.charged - evictable > self.budget - allowance {
             if let Some(state) = previous {
                 inner.idle.push_back((key, state));
             }
@@ -171,7 +175,7 @@ impl SyntaxCache {
             return None;
         }
         let mut evicted = Vec::new();
-        while inner.charged > self.budget - self.entry
+        while inner.charged > self.budget - allowance
             || inner.idle.len() + inner.active.len() >= self.count
         {
             if let Some((_, state)) = inner.idle.pop_front() {
@@ -180,7 +184,7 @@ impl SyntaxCache {
                 evicted.push(state);
             }
         }
-        inner.charged += self.entry;
+        inner.charged += allowance;
         inner.peak = inner.peak.max(inner.charged);
         inner.active.insert(key.clone(), true);
         drop(inner);
@@ -189,7 +193,8 @@ impl SyntaxCache {
             cache: self,
             key,
             previous,
-            reserved: old_weight + self.entry,
+            reserved: old_weight + allowance,
+            allowance,
             finished: false,
         })
     }
@@ -257,6 +262,7 @@ pub struct SyntaxLease<'a> {
     key: SyntaxKey,
     previous: Option<SyntaxState>,
     reserved: usize,
+    allowance: usize,
     finished: bool,
 }
 impl SyntaxLease<'_> {
@@ -266,7 +272,7 @@ impl SyntaxLease<'_> {
     }
     /// Maximum admission weight for returned new state.
     pub fn allowance(&self) -> usize {
-        self.cache.entry
+        self.allowance
     }
     /// Admits only matching complete state, and releases the old/new reservation.
     pub fn finish(mut self, mut state: Option<SyntaxState>, expected: &ContentId) -> bool {
@@ -275,7 +281,7 @@ impl SyntaxLease<'_> {
         inner.charged -= self.reserved;
         let accepted = valid
             && state.as_ref().is_some_and(|state| {
-                state.weight() <= self.cache.entry
+                state.weight() <= self.allowance
                     && self.key.matches(state.context())
                     && state.content() == expected
             });

@@ -35,7 +35,14 @@ and `entry_weight <= total_weight / 2`. `SyntaxCache::for_budget` supplies host 
 engines using that cache. Unrelated library-created caches have independent quotas.
 
 Keys include workspace, captured path, and every context descriptor field. A lease
-exclusively removes idle state and charges its old weight plus the new-state allowance.
+exclusively removes idle state and charges its old weight plus the selected new-state allowance.
+For retained state of weight `W`, the selected replacement allowance is
+`min(entry maximum, W + max(W / 4, 4,096))`, using integer division. An absent state
+requests the full entry maximum. The 25% or 4 KiB growth margin is provisional policy,
+not a bound on syntax growth or real allocation. It uses only retained-state observations
+and keeps no separate demand history. `SyntaxLease::allowance()` returns that selected
+limit. Returned state must fit it even when the entry maximum is larger.
+
 Least-recently-used idle entries are evicted for weight/count limits. Active reservations
 cannot be evicted. Busy keys and unavailable quota immediately use ordinary analysis.
 
@@ -48,7 +55,11 @@ cannot reintroduce old entries.
 Targeted changes can promote new entries. Full scans reuse existing state without
 populating the cache with a whole repository. Unchanged documents and persisted hits
 do not parse just to warm trees. Complete superseded work may warm this private cache;
-publication independently checks its ticket.
+publication independently checks its ticket. If growth exceeds a replacement allowance,
+complete analysis remains usable without retained new state. The consumed old state is
+released, and the next targeted attempt may request the full entry maximum again. No
+extra parse is added solely to warm a replacement. Full scans still do not promote
+missing entries.
 
 ## Weights and observations
 
@@ -58,7 +69,7 @@ old/new retained state together. Parser scratch space, ordinary input buffers,
 immutable documents/facts, temporary over-limit trees, and allocator retention remain
 outside this quota. Admitted weights and entries are bounded; allocation is not exact.
 
-For host budget `N` MiB, each new-state allowance is `min(N MiB / 2, 256 MiB)` and
+For host budget `N` MiB, the entry maximum is `min(N MiB / 2, 256 MiB)` and
 the entry ceiling is eight. The [implementation plan](../plans/syntax-retention.md)
 records calibration and the remaining baseline-laptop qualification.
 
@@ -74,6 +85,8 @@ promote, copy source/tree state, or change LRU order. Availability may change im
 after return. This diagnostic interface does not alter admission or add host/status fields.
 The [mixed working-set procedure](../../experiments/working-set/README.md) uses it to
 distinguish isolated reuse from pressure across files. The
+[replacement follow-up](../../experiments/allowances/RESULTS.md) measures the selected-allowance
+policy against the earlier maximum-reservation conditions. The
 [working-set explanation](../explanation/syntax-working-sets.md) describes why fixed
 replacement reservations can evict useful state.
 

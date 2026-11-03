@@ -1,0 +1,20 @@
+{
+  "base_commit": "8ee38aad3f78b53bf565620d68f6a7cc3ff34729",
+  "note": "Working tree measured before commit; native cache admission changes only. Core analyzers/contexts, dependencies and workload driver unchanged.",
+  "sha256": {
+    "crates/vizzi/src/syntax_cache.rs": "68457a44c5efc804dadc32194d2b344bc786187f5baf001eeacd36151ab3a83a",
+    "crates/vizzi/src/engine.rs": "ebe35d0502dcc0697e0c8ed54b8abcf97b53ef72670b64931c8e0c9ea5c08c1c",
+    "crates/vizzi/src/working_set.rs": "55c70a2e687cd2f8e74581fbed2ee779e0a5596a1dafbd19fb6b27c155454818",
+    "crates/vizzi/examples/working_set.rs": "d335e2496e73e24240ad8f91a076c37a018372461df24fb63911095352b55aa8",
+    "crates/vizzi/tests/syntax_cache.rs": "7e723794c85dacc9f16c623e9632503036df3b180eade7a084582e3900d8bf99",
+    "crates/vizzi/tests/syntax_reuse.rs": "4f09c45975d178a6c3bd8312b2e47cd55b700fb05cb7a2760c5f64b5d88812b1",
+    "crates/vizzi/Cargo.toml": "206080c52656ba6ef4c59cc702cab4986c2a6a472f53d07f67eea6df82ccb2aa",
+    "crates/vizzi-core/src/analysis.rs": "04e94c44b8f3e1adb3b748e99903d118b8dc99162bef501b1f78256d1f3d0119",
+    "crates/vizzi-core/src/syntax_state.rs": "544118da4b5584be09294ec43fb37e009a64842b2b17ab0145aa6318b0b641ed",
+    "Cargo.lock": "032ea2295563c2354c3d92c54cf4be9943ad62eb1ed116d6267b7c2c0ee1456d",
+    "Cargo.toml": "b48edcbfd70277e9d0a58f7680b6ed414bc70108b279fdfba98dcd9a07092636",
+    "experiments/working-set/measure.py": "cde981c10876ba88681908a4515067ff91da4785ac8032a6bb6abcff71dd0953",
+    "experiments/qualification/native.py": "e637e001eff0f81059c10e02f5381c00ef44e45efbd79348f94b792203ef924a",
+    "experiments/qualification/profiles.json": "fe3443645d36e1749ab6f360cecc52c667269e0504326155ed89e1baf98af260"
+  }
+}

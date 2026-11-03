@@ -1,0 +1,93 @@
+{
+  "base_commit": "8ee38aad3f78b53bf565620d68f6a7cc3ff34729",
+  "tool": "cargo-mutants 27.1.0",
+  "baseline": "passed",
+  "scope": [
+    "crates/vizzi/src/syntax_cache.rs"
+  ],
+  "tested": 98,
+  "counts": {
+    "CaughtMutant": 82,
+    "Unviable": 10,
+    "Timeout": 6
+  },
+  "non_caught": [
+    {
+      "name": "crates/vizzi/src/syntax_cache.rs:100:9: replace SyntaxCache::for_budget -> Result<Self, ModelError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/syntax_cache.rs:124:9: replace SyntaxCache::lock -> MutexGuard<'_, Inner> with MutexGuard::new()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/syntax_cache.rs:124:9: replace SyntaxCache::lock -> MutexGuard<'_, Inner> with MutexGuard::from_iter([Default::default()])",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/syntax_cache.rs:124:9: replace SyntaxCache::lock -> MutexGuard<'_, Inner> with MutexGuard::new(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/syntax_cache.rs:124:9: replace SyntaxCache::lock -> MutexGuard<'_, Inner> with MutexGuard::from(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/syntax_cache.rs:131:9: replace SyntaxCache::entry -> Option<SyntaxEntry> with Some(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/syntax_cache.rs:148:9: replace SyntaxCache::lease -> Option<SyntaxLease<'_>> with Some(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/syntax_cache.rs:170:45: replace || with && in SyntaxCache::lease",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/syntax_cache.rs:170:74: replace > with == in SyntaxCache::lease",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/syntax_cache.rs:170:88: replace - with + in SyntaxCache::lease",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/syntax_cache.rs:178:29: replace > with == in SyntaxCache::lease",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/syntax_cache.rs:178:29: replace > with >= in SyntaxCache::lease",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/syntax_cache.rs:182:31: replace -= with += in SyntaxCache::lease",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/syntax_cache.rs:239:9: replace SyntaxCache::stats -> SyntaxCacheStats with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/syntax_cache.rs:271:9: replace SyntaxLease<'_>::take_previous -> Option<SyntaxState> with Some(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/syntax_cache.rs:288:21: replace && with || in SyntaxLease<'_>::finish",
+      "outcome": "Unviable"
+    }
+  ],
+  "command": "cargo mutants -p vizzi --all-features --no-config -f crates/vizzi/src/syntax_cache.rs -j 4 --timeout 20 --build-timeout 180 -C --offline",
+  "exclusions": [],
+  "source_sha256": {
+    "crates/vizzi/src/syntax_cache.rs": "68457a44c5efc804dadc32194d2b344bc786187f5baf001eeacd36151ab3a83a"
+  },
+  "development_notes": [
+    "Two replacement-allowance tests first failed against fixed maximum reservations, then passed after selecting observed weight plus bounded headroom.",
+    "The complete cache module was tested after all source/growth/allowance validation tests were added. No survivors or exclusions."
+  ],
+  "limits": [
+    "Six timeouts break admission/eviction progress; they are separate from assertion catches. Ten unviable substitutions are build failures.",
+    "Grammar/dependency internals, serialization macro bodies, optional benchmark orchestration, OS facilities and browser execution are outside this mutation scope."
+  ]
+}
