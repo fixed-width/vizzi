@@ -1,0 +1,20 @@
+{
+  "base_commit": "1448dae06571e380f60c00415a98c9ceda75931f",
+  "note": "Measured final working tree before commit. Production code and release probe frozen before timing; no dependency changes.",
+  "sha256": {
+    "Cargo.toml": "b48edcbfd70277e9d0a58f7680b6ed414bc70108b279fdfba98dcd9a07092636",
+    "Cargo.lock": "032ea2295563c2354c3d92c54cf4be9943ad62eb1ed116d6267b7c2c0ee1456d",
+    "crates/vizzi/src/source_spool.rs": "17e7768ad8b01c36c78968a457b070674743d7a687ce32f4a3e0ea50eddc846b",
+    "crates/vizzi/src/source_spool/extents.rs": "68654c6afb42bd46dc22d0203db170c473b1ac8c5b79a177e4d43a28f0bee66f",
+    "crates/vizzi/src/source.rs": "09970b251d1526440a4aafa9f91cc1c0d807a9b17c895da4d5005ec321f543f8",
+    "crates/vizzi/src/source_storage_probe.rs": "b6f54c21951995be775cb9ba2cd20d141670072f72f3ae4f700bc4d51dbab96a",
+    "crates/vizzi/tests/spool_reclamation.rs": "3d0773b1cf6067c2dc8f1be95343a8dd964e80b738c353e2b9afa1acbe272155",
+    "crates/vizzi/tests/source_spool.rs": "031eba1c240c2435127bc74c4175550a8b3c21bb815f218b771f0a1214adf7bd",
+    "crates/vizzi/tests/stream_capture.rs": "c501f86aeaf1023d65133a12956bb640296451304e08509c9a1362925f8e803e",
+    "crates/vizzi-core/src/captured_source.rs": "fb864c2df08edc3025c21797575572b2bcab9b8c35cfc4108d48b575b19a059a",
+    "experiments/reclamation/measure.py": "b87c71704ed8b68bc9ef76e1c78963cca2d334914914e7054a1d2156d35692b9",
+    "experiments/qualification/native.py": "e637e001eff0f81059c10e02f5381c00ef44e45efbd79348f94b792203ef924a",
+    "experiments/qualification/profiles.json": "fe3443645d36e1749ab6f360cecc52c667269e0504326155ed89e1baf98af260",
+    "experiments/admission/limit.py": "fdabefbcaa734cb366b6bcc87306a480bccac672bf5d41dd5592982eb8c08785"
+  }
+}

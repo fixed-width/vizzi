@@ -77,7 +77,7 @@ All successful replies remain bound to the requested snapshot/file/version.
 ## Private session spool
 
 `SourceSpool::new(directory, capacity)` creates private anonymous committed and staging
-files. `persist` appends resident captured bytes and moves metadata onto a read-only descriptor.
+files. `persist` stores resident captured bytes in an owned range and moves metadata onto a read-only descriptor.
 The descriptor exposes no project filename or writable file handle. Concurrent readers
 use serialized seek/read operations, so file-cursor sharing cannot mix captured ranges.
 Already-backed sources passed to `persist` keep their original backing.
@@ -96,20 +96,38 @@ operations. Capture and reads use no publication lock.
 
 `Directory::with_spool` rejects a spool inside the analysed root. CLI
 `--source-spool-mib N` creates it in the required external cache directory; `0` disables
-it and is the default. Capacity conversion is checked. This capacity bounds cumulative
-committed session appends, including old/cancelled captures, rather than live-source bytes.
+it and is the default. Capacity conversion is checked. This capacity bounds the reserved
+backing address span, including active reservations and reusable interior gaps.
 The reusable staging file is separately bounded by the same capacity, so combined file
 lengths can reach twice the configured value. Unchanged verification needs staging space
 but consumes no committed quota. Failure aborts capture, preserving the last published
-observation and dirty hints. There is no per-version disk reclamation or automatic
-compaction in this adapter.
+observation and dirty hints. Free ranges use best-fit allocation, split remainders and
+coalesce adjacent retirements. Fragmentation can refuse a contiguous capture despite
+sufficient total free bytes. Live ranges never move; compaction is not implemented.
 
-Observed cancellation/read failure discards staged candidates; incomplete append tails
-are truncated without changing earlier committed ranges. Cleanup is best effort if
-truncation itself fails. Cancellation after commit may leave an unreferenced committed
-capture. Blocking IO, mutex waits and cleanup have no hard cancellation deadline.
-`SpoolStats` reports committed bytes, stores, backing reads/bytes, current and peak staging
-length and maximum input read request. These observations are separate from resident memory.
+Each backing descriptor owns its range. The final descriptor release queues retirement
+using a separate memory-only lock, without acquiring the backing IO lock or writer gate.
+Publication expiration alone does not free an externally pinned source. Capture/commit
+drain retirements before allocating. `SourceSpool::reclaim()` provides explicit maintenance
+for idle callers; it runs outside publication locks. It releases queued allocations and
+truncates a free tail once per batch. Interior holes become reusable without immediately
+reducing file length. An unfinished copy keeps its range reserved during concurrent
+maintenance. Reclamation is deferred until maintenance or final backing closure.
+
+Observed cancellation/read failure discards staged candidates. Failed/cancelled copies
+retire their reservations and run maintenance before returning; neighboring live ranges
+remain intact. Maintenance errors are reported and a failed physical truncation is retried.
+Staging cleanup remains best effort if truncation fails. Late cancellation may retire a
+completed private capture; its space returns on subsequent maintenance. Blocking IO,
+mutex waits and cleanup have no hard cancellation deadline.
+
+`SpoolStats::written_bytes` remains cumulative committed bytes and can exceed capacity
+after reuse. `allocated_bytes` includes in-flight reservations and queued retirements;
+`extent_bytes` is their address span plus free gaps, `free_bytes` counts those gaps, and
+`peak_extent_bytes` is the largest span. `file_bytes` reports actual file length or `None`
+on metadata IO failure. `pending_retirements` counts queued descriptors. Store/read counters,
+staging lengths and maximum input request remain separate. File lengths are not filesystem
+block allocation, resident memory or process caps; index/retirement-queue memory also scales.
 
 Backing lifetime follows its directory/store handle and all captured descriptors. Dropping
 the engine, deleting/rewriting project files, or expiring publication history cannot
@@ -130,5 +148,6 @@ See [reader validation](../../experiments/source-reads/RESULTS.md),
 [verified reuse measurements](../../experiments/verified-reuse/RESULTS.md). The
 [capture design](../plans/streaming-source-capture.md) and
 [reuse design](../plans/verified-source-reuse.md) record the implementation rationale.
-Reclamation and a calibrated
-resident/process envelope remain subsequent work.
+The [reclamation report](../../experiments/reclamation/RESULTS.md) and
+[design](../plans/spool-reclamation.md) describe owned ranges and maintenance. Compaction,
+metadata admission and a calibrated resident/process envelope remain subsequent work.

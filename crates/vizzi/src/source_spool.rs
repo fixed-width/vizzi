@@ -1,4 +1,7 @@
-//! Private append-only captured-source backing, with session-scoped disk capacity.
+//! Private captured-source backing with owned extents and deferred retirement.
+
+mod extents;
+use extents::{Extent, Extents};
 
 use serde::Serialize;
 use std::{
@@ -12,6 +15,8 @@ const CAPTURE_CHUNK: usize = 64 * 1024;
 #[derive(Debug)]
 struct State {
     file: File,
+    extents: Extents,
+    cleanup_pending: bool,
     written: usize,
     stores: usize,
     reads: usize,
@@ -26,6 +31,7 @@ struct Inner {
     capacity: usize,
     writer: Mutex<()>,
     stage: Arc<Mutex<File>>,
+    retired: Mutex<Vec<Extent>>,
 }
 impl Inner {
     fn lock(&self) -> MutexGuard<'_, State> {
@@ -38,6 +44,11 @@ impl Inner {
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner)
     }
+    fn retired(&self) -> MutexGuard<'_, Vec<Extent>> {
+        self.retired
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
+    }
 }
 /// Private committed backing and reusable staging; project paths are never backing.
 #[derive(Debug)]
@@ -45,13 +56,25 @@ pub struct SourceSpool {
     directory: PathBuf,
     inner: Arc<Inner>,
 }
-/// Cumulative session disk/IO observations, not live bytes or resident memory.
+/// Backing allocation and cumulative IO observations, separate from resident memory.
 #[derive(Clone, Debug, Serialize)]
 pub struct SpoolStats {
-    /// Maximum bytes appendable in this session.
+    /// Maximum reserved backing address span; staging has a separate equal bound.
     pub capacity_bytes: usize,
-    /// Committed appended bytes, including older/cancelled capture versions.
+    /// Cumulative committed bytes; may exceed capacity as ranges are reused.
     pub written_bytes: usize,
+    /// Charged bytes, including unfinished writes and queued retirements.
+    pub allocated_bytes: usize,
+    /// Current reserved address span, including reusable gaps.
+    pub extent_bytes: usize,
+    /// Free bytes in reusable gaps inside that span.
+    pub free_bytes: usize,
+    /// Largest reserved address span observed.
+    pub peak_extent_bytes: usize,
+    /// Actual backing length, absent if metadata IO fails.
+    pub file_bytes: Option<u64>,
+    /// Descriptor retirements awaiting maintenance.
+    pub pending_retirements: usize,
     /// Captures committed to backing.
     pub stores: usize,
     /// Backing range calls.
@@ -85,6 +108,8 @@ impl SourceSpool {
             inner: Arc::new(Inner {
                 state: Mutex::new(State {
                     file,
+                    extents: Extents::default(),
+                    cleanup_pending: false,
                     written: 0,
                     stores: 0,
                     reads: 0,
@@ -96,6 +121,7 @@ impl SourceSpool {
                 capacity,
                 writer: Mutex::new(()),
                 stage: Arc::new(Mutex::new(stage)),
+                retired: Mutex::new(Vec::new()),
             }),
         })
     }
@@ -104,7 +130,7 @@ impl SourceSpool {
         &self.directory
     }
     /// Persists a resident capture and moves its metadata onto private immutable backing.
-    /// Already-backed captures are unchanged. This prototype reclaims disk at session end.
+    /// Already-backed captures are unchanged; retired ranges are reclaimed before allocation.
     pub fn persist(
         &self,
         source: Arc<CapturedSource>,
@@ -114,7 +140,7 @@ impl SourceSpool {
         };
         let len = bytes.len();
         let _writer = self.inner.writer();
-        let start = self
+        let backing = self
             .append(
                 len,
                 |offset, target| {
@@ -124,11 +150,7 @@ impl SourceSpool {
                 &|| false,
             )?
             .ok_or(SourceReadError::Integrity)?;
-        Ok(source.with_backing(Arc::new(Blob {
-            inner: self.inner.clone(),
-            start,
-            len,
-        })))
+        Ok(source.with_backing(backing))
     }
     /// Stages actual input, reuses verified previous content or builds and commits new metadata.
     /// Input/staging/copy requests are bounded; metadata still scales with input lines/blocks.
@@ -140,6 +162,7 @@ impl SourceSpool {
     ) -> Result<Option<Arc<CapturedSource>>, SourceReadError> {
         let _writer = self.inner.writer();
         let _reset = StageReset { inner: &self.inner };
+        self.reclaim()?;
         self.inner
             .stage
             .lock()
@@ -204,7 +227,7 @@ impl SourceSpool {
         let Some(source) = CapturedSource::capture_reader(len, staged.clone(), cancelled)? else {
             return Ok(None);
         };
-        let Some(start) = self.append(
+        let Some(backing) = self.append(
             len,
             |offset, target| staged.read_at(offset, target),
             cancelled,
@@ -212,40 +235,59 @@ impl SourceSpool {
         else {
             return Ok(None);
         };
-        Ok(Some(source.with_backing(Arc::new(Blob {
-            inner: self.inner.clone(),
-            start,
-            len,
-        }))))
+        Ok(Some(source.with_backing(backing)))
     }
     fn append(
         &self,
         len: usize,
+        read: impl FnMut(usize, &mut [u8]) -> Result<(), SourceReadError>,
+        cancelled: &dyn Fn() -> bool,
+    ) -> Result<Option<Arc<Blob>>, SourceReadError> {
+        self.reclaim()?;
+        let extent = self
+            .inner
+            .lock()
+            .extents
+            .reserve(len, self.inner.capacity)
+            .ok_or(SourceReadError::Capacity)?;
+        let start = extent.start;
+        let backing = Arc::new(Blob {
+            inner: self.inner.clone(),
+            extent: Some(extent),
+        });
+        match self.write_range(start, len, read, cancelled) {
+            Ok(true) => {
+                let mut state = self.inner.lock();
+                state.written = state.written.saturating_add(len);
+                state.stores += 1;
+                Ok(Some(backing))
+            }
+            result => {
+                drop(backing);
+                let cleanup = self.reclaim();
+                result?;
+                cleanup?;
+                Ok(None)
+            }
+        }
+    }
+    fn write_range(
+        &self,
+        start: usize,
+        len: usize,
         mut read: impl FnMut(usize, &mut [u8]) -> Result<(), SourceReadError>,
         cancelled: &dyn Fn() -> bool,
-    ) -> Result<Option<usize>, SourceReadError> {
-        let start = {
-            let state = self.inner.lock();
-            if len > self.inner.capacity - state.written {
-                return Err(SourceReadError::Capacity);
-            }
-            state.written
-        };
-        let mut tail = AppendTail {
-            inner: &self.inner,
-            start,
-            committed: false,
-        };
+    ) -> Result<bool, SourceReadError> {
         let mut buffer = vec![0u8; len.min(CAPTURE_CHUNK)];
         let mut at = 0;
         while at < len {
             if cancelled() {
-                return Ok(None);
+                return Ok(false);
             }
             let count = (len - at).min(CAPTURE_CHUNK);
             read(at, &mut buffer[..count])?;
             if cancelled() {
-                return Ok(None);
+                return Ok(false);
             }
             {
                 let mut state = self.inner.lock();
@@ -261,20 +303,51 @@ impl SourceSpool {
             at += count;
         }
         if cancelled() {
-            return Ok(None);
+            return Ok(false);
         }
+        Ok(true)
+    }
+    /// Reclaims queued descriptor retirements and truncates a free tail outside publication locks.
+    /// Failed physical truncation is reported and retried by the next maintenance call.
+    pub fn reclaim(&self) -> Result<(), SourceReadError> {
+        let retired = std::mem::take(&mut *self.inner.retired());
         let mut state = self.inner.lock();
-        state.written += len;
-        state.stores += 1;
-        tail.committed = true;
-        Ok(Some(start))
+        for extent in retired {
+            if state.extents.release(extent) {
+                state.cleanup_pending = true;
+            }
+        }
+        if state.cleanup_pending {
+            let end = state.extents.end as u64;
+            if state
+                .file
+                .metadata()
+                .map_err(|e| SourceReadError::Io(e.to_string()))?
+                .len()
+                > end
+            {
+                state
+                    .file
+                    .set_len(end)
+                    .map_err(|e| SourceReadError::Io(e.to_string()))?;
+            }
+            state.cleanup_pending = false;
+        }
+        Ok(())
     }
     /// Reads session accounting without loading captured source.
     pub fn stats(&self) -> SpoolStats {
+        let pending_retirements = self.inner.retired().len();
         let state = self.inner.lock();
         SpoolStats {
             capacity_bytes: self.inner.capacity,
             written_bytes: state.written,
+            allocated_bytes: state.extents.allocated,
+            extent_bytes: state.extents.end,
+            free_bytes: state.extents.end - state.extents.allocated,
+            peak_extent_bytes: state.extents.peak,
+            file_bytes: state.file.metadata().ok().map(|meta| meta.len()),
+            pending_retirements,
             stores: state.stores,
             reads: state.reads,
             read_bytes: state.read_bytes,
@@ -301,19 +374,6 @@ impl Drop for StageReset<'_> {
             .unwrap_or(0);
         drop(stage);
         self.inner.lock().staging_bytes = remaining;
-    }
-}
-struct AppendTail<'a> {
-    inner: &'a Inner,
-    start: usize,
-    committed: bool,
-}
-impl Drop for AppendTail<'_> {
-    fn drop(&mut self) {
-        if !self.committed {
-            let state = self.inner.lock();
-            let _ = state.file.set_len(self.start as u64);
-        }
     }
 }
 #[derive(Debug)]
@@ -347,18 +407,27 @@ impl SourceReader for Staged {
 #[derive(Debug)]
 struct Blob {
     inner: Arc<Inner>,
-    start: usize,
-    len: usize,
+    extent: Option<Extent>,
+}
+impl Drop for Blob {
+    fn drop(&mut self) {
+        if let Some(extent) = self.extent.take()
+            && extent.len != 0
+        {
+            self.inner.retired().push(extent);
+        }
+    }
 }
 impl SourceReader for Blob {
     fn read_at(&self, offset: usize, target: &mut [u8]) -> Result<(), SourceReadError> {
+        let extent = self.extent.as_ref().ok_or(SourceReadError::Integrity)?;
         let end = offset
             .checked_add(target.len())
             .ok_or(SourceReadError::InvalidRange)?;
-        if end > self.len {
+        if end > extent.len {
             return Err(SourceReadError::InvalidRange);
         }
-        let at = self
+        let at = extent
             .start
             .checked_add(offset)
             .ok_or(SourceReadError::InvalidRange)?;
@@ -469,5 +538,159 @@ mod tests {
             staged.read_at(9, &mut [0u8; 2]),
             Err(SourceReadError::InvalidRange)
         );
+    }
+    #[test]
+    fn descriptor_retirement_never_waits_for_the_backing_io_lock() {
+        use std::{sync::mpsc, time::Duration};
+        let root = tempfile::tempdir().unwrap();
+        let spool = SourceSpool::new(root.path(), 8).unwrap();
+        let source = spool
+            .persist(CapturedSource::capture(b"original".to_vec(), None))
+            .unwrap();
+        let guard = spool.inner.lock();
+        let (sent, received) = mpsc::channel();
+        let worker = std::thread::spawn(move || {
+            drop(source);
+            sent.send(()).unwrap();
+        });
+        let finished = received.recv_timeout(Duration::from_secs(2));
+        drop(guard);
+        worker.join().unwrap();
+        assert!(finished.is_ok());
+        assert_eq!(spool.stats().pending_retirements, 1);
+        spool.reclaim().unwrap();
+        assert_eq!(spool.stats().file_bytes, Some(0));
+    }
+    #[test]
+    fn maintenance_preserves_a_reserved_range_while_another_tail_retires() {
+        let root = tempfile::tempdir().unwrap();
+        let spool = SourceSpool::new(root.path(), 200000).unwrap();
+        let head = spool
+            .persist(CapturedSource::capture(vec![b'a'; 100000], None))
+            .unwrap();
+        let mut tail = Some(
+            spool
+                .persist(CapturedSource::capture(vec![b'b'; 100000], None))
+                .unwrap(),
+        );
+        drop(head);
+        spool.reclaim().unwrap();
+        let backing = spool
+            .append(
+                100000,
+                |_, target| {
+                    drop(tail.take());
+                    spool.reclaim().unwrap();
+                    assert_eq!(spool.stats().allocated_bytes, 100000);
+                    target.fill(b'c');
+                    Ok(())
+                },
+                &|| false,
+            )
+            .unwrap()
+            .unwrap();
+        let mut bytes = vec![0; 100000];
+        backing.read_at(0, &mut bytes).unwrap();
+        assert_eq!(bytes, vec![b'c'; 100000]);
+        assert_eq!(spool.stats().file_bytes, Some(100000));
+        drop(backing);
+        spool.reclaim().unwrap();
+        assert_eq!(spool.stats().file_bytes, Some(0));
+    }
+    #[test]
+    fn failed_or_cancelled_copy_returns_a_reused_hole_without_damaging_live_neighbors() {
+        use std::sync::atomic::{AtomicBool, Ordering};
+        for fail in [false, true] {
+            let root = tempfile::tempdir().unwrap();
+            let spool = SourceSpool::new(root.path(), 300000).unwrap();
+            let a = spool
+                .persist(CapturedSource::capture(vec![b'a'; 100000], None))
+                .unwrap();
+            let hole = spool
+                .persist(CapturedSource::capture(vec![b'b'; 100000], None))
+                .unwrap();
+            let c = spool
+                .persist(CapturedSource::capture(vec![b'c'; 100000], None))
+                .unwrap();
+            drop(hole);
+            let mut reads = 0;
+            let cancelled = AtomicBool::new(false);
+            let result = spool.append(
+                100000,
+                |_, target| {
+                    reads += 1;
+                    if reads == 2 {
+                        if fail {
+                            return Err(SourceReadError::Io("copy fixture".into()));
+                        }
+                        cancelled.store(true, Ordering::SeqCst);
+                    }
+                    target.fill(b'd');
+                    Ok(())
+                },
+                &|| cancelled.load(Ordering::SeqCst),
+            );
+            if fail {
+                assert!(result.is_err());
+            } else {
+                assert!(result.unwrap().is_none());
+            }
+            assert_eq!(spool.stats().allocated_bytes, 200000);
+            assert_eq!(spool.stats().free_bytes, 100000);
+            assert_eq!(spool.stats().file_bytes, Some(300000));
+            assert_eq!(a.read_all(100000).unwrap().bytes(), vec![b'a'; 100000]);
+            assert_eq!(c.read_all(100000).unwrap().bytes(), vec![b'c'; 100000]);
+            let replacement = spool
+                .persist(CapturedSource::capture(vec![b'e'; 100000], None))
+                .unwrap();
+            assert_eq!(
+                replacement.read_all(100000).unwrap().bytes(),
+                vec![b'e'; 100000]
+            );
+        }
+    }
+    #[test]
+    fn failed_tail_truncation_is_reported_and_retried_without_losing_retirement() {
+        let root = tempfile::tempdir().unwrap();
+        let spool = SourceSpool::new(root.path(), 8).unwrap();
+        let source = spool
+            .persist(CapturedSource::capture(b"original".to_vec(), None))
+            .unwrap();
+        drop(source);
+        let mut readonly = tempfile::NamedTempFile::new_in(root.path()).unwrap();
+        readonly.write_all(b"original").unwrap();
+        let original = std::mem::replace(
+            &mut spool.inner.lock().file,
+            File::open(readonly.path()).unwrap(),
+        );
+        assert!(matches!(spool.reclaim(), Err(SourceReadError::Io(_))));
+        assert_eq!(spool.stats().allocated_bytes, 0);
+        assert_eq!(spool.stats().extent_bytes, 0);
+        assert_eq!(spool.stats().file_bytes, Some(8));
+        spool.inner.lock().file = original;
+        spool.reclaim().unwrap();
+        assert_eq!(spool.stats().file_bytes, Some(0));
+    }
+    #[test]
+    fn failed_write_releases_a_reservation_without_truncating_an_unchanged_readonly_prefix() {
+        let root = tempfile::tempdir().unwrap();
+        let spool = SourceSpool::new(root.path(), 16).unwrap();
+        let source = spool
+            .persist(CapturedSource::capture(b"original".to_vec(), None))
+            .unwrap();
+        let mut readonly = tempfile::NamedTempFile::new_in(root.path()).unwrap();
+        readonly.write_all(b"original").unwrap();
+        let original = std::mem::replace(
+            &mut spool.inner.lock().file,
+            File::open(readonly.path()).unwrap(),
+        );
+        assert!(matches!(
+            spool.persist(CapturedSource::capture(b"new data".to_vec(), None)),
+            Err(SourceReadError::Io(_))
+        ));
+        spool.reclaim().unwrap();
+        assert_eq!(spool.stats().allocated_bytes, 8);
+        assert_eq!(source.read_text(8).unwrap().as_deref(), Some("original"));
+        spool.inner.lock().file = original;
     }
 }

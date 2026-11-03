@@ -129,6 +129,15 @@ with unchanged owned buffers and process peaks near 2.263 / 0.307 GiB. Opposite-
 inputs add speculative hashing; these finite samples do not qualify timing tails or
 baseline hardware. Reclamation and metadata/process budgets remain separate work.
 
+The [reclamation follow-up](../../experiments/reclamation/RESULTS.md) completes source
+history within 8 GiB Linux / 1 GiB PyTorch reserved backing spans despite cumulative writes
+of 9.018 / 1.124 GB. Peak spans are 7.006 / 0.873 GiB and final file lengths return to
+zero with the spools still open. External pins preserve their ranges; gaps are reused
+and free tails truncated. Maintenance is deferred outside publication locks, but the
+final large cleanup takes 801 / 122 ms and currently holds the backing IO mutex. Isolate
+or subdivide maintenance before claiming interactive read latency. Fragmentation,
+compaction, metadata/queue memory and the full process envelope remain open.
+
 Do not replace semantic correctness checks with these performance targets. Language
 assignments, partial grammar coverage, source-only cases, cancellation, cache validity,
 and immutable publication must remain explicit and independently tested.

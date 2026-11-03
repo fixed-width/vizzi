@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "recorded_after_measurement_utc": "2026-11-03T16:56:34.334807+00:00",
+  "machine": {
+    "platform": "Linux-6.8.0-147-lowlatency-x86_64-with-glibc2.39",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13700H",
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)"
+  },
+  "corpus": [
+    {
+      "profile": "linux",
+      "files": 66066,
+      "capacity_gib": 8.0,
+      "committed_gb": 9.017833632,
+      "peak_span_gib": 7.005733288824558,
+      "baseline_ms": 4202.994489,
+      "unchanged_ms": 2310.036985,
+      "edit4_ms": 9261.396122,
+      "release_pin_ms": 14.817666000000001,
+      "final_maintenance_ms": 800.653144,
+      "peak_rss_gib": 2.2672157287597656,
+      "final_file_bytes": 0,
+      "spool": {
+        "allocated_bytes": 0,
+        "capacity_bytes": 8589934592,
+        "extent_bytes": 0,
+        "file_bytes": 0,
+        "free_bytes": 0,
+        "max_read_request": 65536,
+        "peak_extent_bytes": 7522348840,
+        "peak_staging_bytes": 24009446,
+        "pending_retirements": 0,
+        "read_bytes": 27080455824,
+        "reads": 1404189,
+        "staging_bytes": 0,
+        "stores": 396396,
+        "written_bytes": 9017833632
+      }
+    },
+    {
+      "profile": "pytorch",
+      "files": 10578,
+      "capacity_gib": 1.0,
+      "committed_gb": 1.123749126,
+      "peak_span_gib": 0.8732606144621968,
+      "baseline_ms": 631.506679,
+      "unchanged_ms": 339.039976,
+      "edit4_ms": 1321.455612,
+      "release_pin_ms": 1.83288,
+      "final_maintenance_ms": 122.039254,
+      "peak_rss_gib": 0.3079414367675781,
+      "final_file_bytes": 0,
+      "spool": {
+        "allocated_bytes": 0,
+        "capacity_bytes": 1073741824,
+        "extent_bytes": 0,
+        "file_bytes": 0,
+        "free_bytes": 0,
+        "max_read_request": 65536,
+        "peak_extent_bytes": 937656445,
+        "peak_staging_bytes": 8416901,
+        "pending_retirements": 0,
+        "read_bytes": 3375563202,
+        "reads": 212015,
+        "staging_bytes": 0,
+        "stores": 63468,
+        "written_bytes": 1123749126
+      }
+    }
+  ],
+  "limits": [
+    "Source-only history; no facts/parsers/watchers/UI. Single sequential condition per profile, not timing tails or randomised speedups.",
+    "Maintenance before each phase inventory is recorded separately from the preceding capture/validation duration.",
+    "File lengths and reserved address spans are not filesystem block allocation or process-memory caps.",
+    "Interior gaps are reused, free tails truncated; fragmentation and external pins can still refuse allocations.",
+    "12 GiB RLIMIT_AS constrains virtual address space, not RSS/physical RAM or the baseline laptop envelope."
+  ]
+}

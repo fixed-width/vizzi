@@ -9,6 +9,8 @@ or unsafe-code exceptions.
 The [reference](../../docs/prototype/SOURCE_READS.md) defines the interface; the
 [design](../../docs/plans/verified-source-reuse.md) records the verification seam and
 staging trade-off. The [procedure](README.md) reproduces the measurements.
+The subsequent [reclamation report](../reclamation/RESULTS.md) adds owned range reuse;
+the measurements below describe the preceding cumulative append adapter.
 
 ## Capture observations
 

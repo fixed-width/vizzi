@@ -147,7 +147,15 @@ fn record(
     external: Option<&Arc<Snapshot>>,
     elapsed_ms: Option<f64>,
     shared: usize,
+    spool: Option<&crate::source_spool::SourceSpool>,
 ) -> Result<Value, Error> {
+    let reclaim_ms = if let Some(spool) = spool {
+        let started = Instant::now();
+        spool.reclaim()?;
+        Some(started.elapsed().as_secs_f64() * 1000.0)
+    } else {
+        None
+    };
     let current = publication.current().into_iter().collect::<Vec<_>>();
     let retained = ids
         .iter()
@@ -162,7 +170,7 @@ fn record(
     let including_external = inventory(&union)?;
     Ok(
         json!({"phase":phase,"elapsed_ms":elapsed_ms,"shared_reopened_sources":shared,"retained_snapshots":retained.len(),
-        "current":current_inventory,"publication":managed,"including_external":including_external,"rss_kib":rss()}),
+        "current":current_inventory,"publication":managed,"including_external":including_external,"rss_kib":rss(),"reclaim_ms":reclaim_ms,"spool":spool.map(|spool|spool.stats())}),
     )
 }
 fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Error> {
@@ -241,6 +249,7 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
         external.as_ref(),
         Some(started.elapsed().as_secs_f64() * 1000.0),
         0,
+        spool.as_deref(),
     )?);
     emit(json!({"event":"baseline_ready"}));
     {
@@ -270,6 +279,7 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
             external.as_ref(),
             Some(started.elapsed().as_secs_f64() * 1000.0),
             shared,
+            spool.as_deref(),
         )?);
     }
     let scope = match config.mode {
@@ -345,6 +355,7 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
             external.as_ref(),
             Some(started.elapsed().as_secs_f64() * 1000.0),
             shared,
+            spool.as_deref(),
         )?);
         emit(json!({"event":"phase_done","generation":generation}));
     }
@@ -363,6 +374,7 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
         None,
         None,
         0,
+        spool.as_deref(),
     )?);
     {
         let previous = publication.current().ok_or("missing current observation")?;
@@ -409,6 +421,7 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
             None,
             Some(started.elapsed().as_secs_f64() * 1000.0),
             0,
+            spool.as_deref(),
         )?);
     }
     publication = Publication::default();
@@ -417,7 +430,15 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
     {
         return Err("source or snapshot handles remain alive after releasing ownership".into());
     }
-    phases.push(record("released", &publication, &ids, None, None, 0)?);
+    phases.push(record(
+        "released",
+        &publication,
+        &ids,
+        None,
+        None,
+        0,
+        spool.as_deref(),
+    )?);
     Ok(
         json!({"spool":spool.as_ref().map(|spool|spool.stats()),"mode":"unanalysed_source_storage","files":files,"changed_files":changed.len(),"initial_snapshot":initial_id,"original_source_manifest":original_manifest,
         "phases":phases,"expired_from_publication":true,"external_pin_bytes_match":true,"restored_snapshot_matches":true,"released_handles_dead":true}),
