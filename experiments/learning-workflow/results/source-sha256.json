@@ -1,0 +1,34 @@
+{
+  "base_commit": "b83b95ce1bf04b3260af3f69c5f55dc3e42ca880",
+  "source_commit": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+  "note": "Guided UI replay with a new harness/dispatcher; application implementation is unchanged. Source archive and reference-file hashes are in observations.json.",
+  "sha256": {
+    "experiments/learning-workflow/run.mjs": "be195a18c993633554372067d43c5397d94a3cb79f04f0f9b26f35e232d044da",
+    "experiments/browser/run.mjs": "4f3d67db16ccbaeaa6da883a894797af9a918ca9c5f250e0bb18ecfb2435126a",
+    "experiments/browser/support.mjs": "df5a3e7f03a08374ef9cb89c19ad2026b324608ec356f9a88c9a131cb21665cd",
+    "crates/vizzi/web/app.js": "dac30ee78396b9c53f6d29d6995f500337c95519ddedf108728ace8871e34d0a",
+    "crates/vizzi/web/inspector.js": "6cc92de1793137a68d1c29604d2c1a58b8e92f2066d7a172cba1a18b64e23bf8",
+    "crates/vizzi/web/controller.js": "5bc29a5641feceec4a4f255c5d68dba9735ea83ce1bf125053e610a7703871a4",
+    "crates/vizzi/web/windows.js": "af30f90b28a22468dd6b8ed3586bc56b45308cb0d25fbeb6052c9dcb3316bd87",
+    "Cargo.lock": "032ea2295563c2354c3d92c54cf4be9943ad62eb1ed116d6267b7c2c0ee1456d"
+  },
+  "binary_sha256": "c8c5d87872b8817a06c4eb830ebcb2444e9a8336f55ac0b138482583ff14185d",
+  "artifact_sha256": {
+    "03-compile-entry.png": "15ee2e92c1b2886bd1c63da70bd934f2cb3d4c7ee2b6dbfa3e63387cdc8cf418",
+    "07-manual-return.png": "91866f3b92e19109f468e54add9db568e96c4cf6d39e2e0e6c8dbcfb123cae95",
+    "00-initial.png": "8d03e3d777bc878ce99c5866f21e98196a54851738e2526abcce22b87fdcd19e",
+    "10-regression-test.png": "254c30083f6f4cba82316068ec3ba2ea08924bc447f464591c73aa5eb5f2f0d4",
+    "12-browser-back.png": "cb9c3b8047859412e8abcaed51ad9ecefb4bd820c8849af4992e593d500d1836",
+    "04-read-policy.png": "fa61fefd3f3c8981e66afb1e5dac62333898eb3b1a28b33d8719123d0e7386d5",
+    "01-symbol-in-path-filter.png": "7818d5c1b86010fd16c11dd3c03da04d4e572d4454b91caa836ceba954ac4f5c",
+    "walkthrough.webm": "b6b1b431b1185bea7accb4518c27d9decba25b9b1a50d145c83c7148e2b9cb22",
+    "11-read-error-cases.png": "475807e68a5daf1a38b13e113469441ff71c89f393faa926ded2d7c7cda8f512",
+    "08-source-identity.png": "00e402fbc16d3a3c4e9ee8d014a7a65928a1c1357070f6c93ad7d771b3bb5081",
+    "06-disk-reader.png": "a31c9d410b6710d3a8b3051ea7c30c483456eec789d9d7d8fd4d54f61de36477",
+    "02-compiler-module.png": "c0af7f1968bb49b1c7bf66de0df94a3a294df22763c05727ace11ca2c82db0c3",
+    "09-diagnostic-name.png": "9c4c9793a3cf9df8e0c46ca7755b7a7d885c1930ab196dbdb8b58ec3c5e299cc",
+    "summary.json": "b2a7364bd6fa2423701650860015f9809c0c7201afa94cfe39c93df5b0b50cb1",
+    "observations.json": "a001a51019c39e0176c46e745ffc9dd8be90c611dfb76834e7f9dc023322ecc5",
+    "05-reader-contract.png": "193814a22dd4c3ad99adb49146425a193719659e055155b36b690623a489b8ed"
+  }
+}

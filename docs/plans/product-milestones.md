@@ -1,7 +1,7 @@
 # Product milestones: understand a subsystem, then review a change
 
-Status: planned, following the product-alignment checkpoint at commit 4e75d04.
-The existing map/source/outline prototype is the baseline, not delivery of these workflows.
+Status: baseline learning walkthrough delivered; milestone 1 navigation acceptance and
+milestone 2 remain open. This follows the product-alignment checkpoint at commit 4e75d04.
 
 The goal is coordinated views for learning unfamiliar code and reviewing changes, as
 defined in [DESIGN.md](../../DESIGN.md). The [research rationale](../explanation/task-driven-views.md)
@@ -49,11 +49,12 @@ compile entry point, find the reader/path contracts and test, and assemble the e
 Record missing navigation, lost context and unsupported questions. Source inspection for
 this plan is not that browser walkthrough.
 
-The first candidate extension is a focused Rust module/import view linked to source and
-outline, with a small session-local trail of visited anchors. Confirm that it addresses
-the recorded gaps before fixing the view design. Preserve readable labels and offer the
-same relationships through keyboard-accessible controls. Expansion is explicit and bounded.
-Existing CLI launch is sufficient for this milestone.
+The [baseline replay](../../experiments/learning-workflow/RESULTS.md) answers the question
+using existing views, but returning to an earlier file loses its declaration/reading
+position. The next candidate is a bounded session-local navigation trail using existing
+identities. Workspace declaration lookup is secondary; the originally proposed focused
+Rust module/import view remains deferred until a task requires it. Preserve keyboard
+access and explicit bounds. Existing CLI launch is sufficient for this milestone.
 
 Acceptance:
 
@@ -73,6 +74,10 @@ Deliver a reproducible task script, expected evidence and a recording/screenshot
 walkthrough, including unresolved friction. Functional acceptance does not claim a measured
 comprehension improvement. Record operator familiarity; human usability evaluation is
 separate from agent/maintainer replay.
+
+The recorded baseline is guided, reference-aware automation. Its successful source
+explanation is functional evidence, not independent-operator acceptance or a comprehension
+study. Milestone 1 remains open because return navigation does not preserve context.
 
 ## Milestone 2: a contextual local-change review
 
@@ -139,8 +144,8 @@ engine, a Git library or a complete graph API.
 
 | Step | Reviewable output |
 | --- | --- |
-| 1. Baseline learning walkthrough | Task script, correct source evidence and observed gaps using current views. |
-| 2. Choose the smallest useful extension | Interaction sketch and contracts justified by observed gaps and the literature; defer a graph if it adds no useful capability. |
+| 1. Baseline learning walkthrough — delivered | [Guided replay](../../experiments/learning-workflow/RESULTS.md), source evidence, recording and observed gaps using current views. |
+| 2. Choose the smallest useful extension — next | Specify bounded investigation navigation to address the observed return-context gap; keep a graph deferred. |
 | 3. Demonstrate milestone 1 | One complete learning workflow, with any required implementation and meaningful TDD/mutation evidence. |
 | 4. Freeze the review fixture/contracts | Good/bad patches, change semantics and source-provider/pinning boundaries. |
 | 5. Build and demonstrate milestone 2 | One complete Git-based review workflow plus provider-independent correctness tests. |

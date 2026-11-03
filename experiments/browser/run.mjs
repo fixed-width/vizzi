@@ -1,7 +1,9 @@
 import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 
-if (process.argv.includes("--envelope-matrix")) {
+if (process.argv.includes("--learning-walkthrough")) {
+  await import("../learning-workflow/run.mjs");
+} else if (process.argv.includes("--envelope-matrix")) {
   const args = process.argv.slice(2).filter(value => value !== "--envelope-matrix");
   const result = spawnSync("python3", ["-B", "experiments/memory-envelope/measure.py", ...args], { stdio: "inherit" });
   if (result.error) throw result.error;
