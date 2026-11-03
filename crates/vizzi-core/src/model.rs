@@ -1,5 +1,5 @@
 //! Captured source and immutable analysis identities.
-pub use crate::captured_source::CapturedSource;
+pub use crate::captured_source::{CapturedSource, SourceStorage};
 
 use crate::policy::Classification;
 use serde::{Deserialize, Serialize};

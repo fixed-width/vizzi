@@ -68,3 +68,23 @@ This change is not a byte-admission cap, a bounded analysis queue, a different r
 schedule, or paged source/outline transport. The opt-in syntax cache still owns its
 separate source/tree state and admission quota. See the
 [implementation plan](../plans/shared-source.md) for validation and measurement scope.
+
+## Owned-buffer accounting
+
+`CapturedSource::storage()` returns `SourceStorage` with logical `source_bytes`,
+`byte_capacity`, stored `index_entries`, allocated `index_capacity`, and `index_bytes`.
+It reads existing byte/string and line-index capacities without copying, hashing,
+changing recency or mutating source. Unsupported encoding retains the initial stored
+zero index even though its display line count is zero; empty UTF-8 has one display line.
+Index bytes currently use `index_capacity × size_of::<usize>()`.
+
+These values account only for owned buffers. Struct/Arc/document/fact overhead, parser
+allocations, allocator metadata and resident-page behaviour remain separate. Inventories
+across snapshots must deduplicate actual source allocation identity; equal content does
+not prove shared storage. An external query handle can own data after publication
+history expires its lookup identity, and releasing data does not force RSS to fall.
+
+The [source-storage investigation](../../experiments/source-storage/RESULTS.md) measures
+these sets. Production storage/retention remains unchanged. The
+[bounded-read proposal](../plans/bounded-source-reads.md) records the next interface step;
+this accounting operation does not impose a memory limit.

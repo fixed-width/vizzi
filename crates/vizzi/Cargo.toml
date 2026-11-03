@@ -42,3 +42,7 @@ required-features = ["qualification"]
 [[example]]
 name = "admit"
 required-features = ["qualification"]
+
+[[example]]
+name = "source_storage"
+required-features = ["qualification"]

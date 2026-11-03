@@ -96,6 +96,15 @@ Eligible deferrals recover without another edit. This input-volume bound and OS 
 limit do not enforce parser heap, capture/snapshot storage, physical RAM or a 16 GB
 laptop envelope. Keep input admission disabled by default pending broader calibration.
 
+The [source-storage investigation](../../experiments/source-storage/RESULTS.md) isolates
+buffers without analysis: one Linux source/index set is about 1.805 GiB; whole-source
+version churn retains 7.268 GiB in publication and 9.073 GiB with an expired external
+query handle. Churn across three selected files is much smaller. The next
+[bounded-read interface](../plans/bounded-source-reads.md) must preserve immutable backing
+and explicit read/load errors; history eviction alone cannot cap current data or active
+query handles. Buffer capacities and post-release RSS remain distinct, and no new
+production source-memory limit is enforced.
+
 Do not replace semantic correctness checks with these performance targets. Language
 assignments, partial grammar coverage, source-only cases, cancellation, cache validity,
 and immutable publication must remain explicit and independently tested.

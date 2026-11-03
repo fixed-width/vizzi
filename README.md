@@ -42,6 +42,7 @@ validating coordination; it does not qualify large-codebase GPU performance.
 - [Retained syntax across mixed working sets](experiments/working-set/RESULTS.md)
 - [Replacement-allowance validation and measurements](experiments/allowances/RESULTS.md)
 - [Source availability under input admission](experiments/admission/RESULTS.md)
+- [Captured-source storage and ownership measurements](experiments/source-storage/RESULTS.md)
 - [Earlier performance experiments](experiments/performance/README.md)
 - [Contributor guidance](AGENTS.md)
 

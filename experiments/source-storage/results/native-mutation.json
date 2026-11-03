@@ -1,0 +1,151 @@
+{
+  "base_commit": "b4b1f542f76e5baa3a57017d5e290822bf8fb944",
+  "tool": "cargo-mutants 27.1.0",
+  "baseline": "passed",
+  "scope": [
+    "crates/vizzi-core/src/captured_source.rs",
+    "crates/vizzi-core/src/publication.rs",
+    "crates/vizzi/src/qualification.rs"
+  ],
+  "tested": 125,
+  "counts": {
+    "Unviable": 27,
+    "CaughtMutant": 96,
+    "Timeout": 2
+  },
+  "non_caught": [
+    {
+      "name": "crates/vizzi/src/qualification.rs:74:9: replace <impl LanguageAdapter for Factory>::create -> Result<Box<dyn Analyzer>, ModelError> with Ok(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/qualification.rs:60:9: replace <impl LanguageAdapter for Factory>::context -> Context with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/qualification.rs:112:9: replace <impl Analyzer for Parser>::analyze -> Result<Analysis, ModelError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/qualification.rs:101:13: replace && with || in Parser::begin",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/qualification.rs:122:9: replace <impl Analyzer for Parser>::analyze_cancellable -> Result<Option<Analysis>, ModelError> with Ok(Some(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/qualification.rs:284:9: replace && with || in emit_parse_start",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:38:9: replace CapturedSource::storage -> SourceStorage with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:52:9: replace CapturedSource::capture -> Arc<Self> with Arc::new(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:76:9: replace CapturedSource::content -> &ContentId with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:94:9: replace CapturedSource::encoding -> SourceEncoding with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:109:9: replace CapturedSource::line_range -> Option<Range<usize>> with Some(Range::new())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:109:9: replace CapturedSource::line_range -> Option<Range<usize>> with Some(Range::from_iter([0]))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:109:9: replace CapturedSource::line_range -> Option<Range<usize>> with Some(Range::new(0))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:109:9: replace CapturedSource::line_range -> Option<Range<usize>> with Some(Range::from(0))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:109:9: replace CapturedSource::line_range -> Option<Range<usize>> with Some(Range::from_iter([1]))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:109:9: replace CapturedSource::line_range -> Option<Range<usize>> with Some(Range::new(1))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:109:9: replace CapturedSource::line_range -> Option<Range<usize>> with Some(Range::from(1))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:121:9: replace CapturedSource::lines -> Range<usize> with Range::new()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:121:9: replace CapturedSource::lines -> Range<usize> with Range::from_iter([0])",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:121:9: replace CapturedSource::lines -> Range<usize> with Range::new(0)",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:121:9: replace CapturedSource::lines -> Range<usize> with Range::from(0)",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:121:9: replace CapturedSource::lines -> Range<usize> with Range::from_iter([1])",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:121:9: replace CapturedSource::lines -> Range<usize> with Range::new(1)",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:121:9: replace CapturedSource::lines -> Range<usize> with Range::from(1)",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/publication.rs:47:9: replace Publication::current -> Option<Arc<Snapshot>> with Some(Arc::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/publication.rs:51:9: replace Publication::pinned -> Option<Arc<Snapshot>> with Some(Arc::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/publication.rs:29:9: replace Publication::request -> u64 with 1",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi-core/src/publication.rs:65:9: replace Publication::publish -> Outcome with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/publication.rs:65:19: replace != with == in Publication::publish",
+      "outcome": "Timeout"
+    }
+  ],
+  "command": "cargo mutants -p vizzi-core -p vizzi --all-features --no-config -f crates/vizzi-core/src/captured_source.rs -f crates/vizzi-core/src/publication.rs -f crates/vizzi/src/qualification.rs --test-workspace true -j 4 --timeout 20 --build-timeout 180 -C --offline",
+  "source_sha256": {
+    "crates/vizzi-core/src/captured_source.rs": "862ecbe25214cc78bd98b90ba9e0856d170dfde270868451ca3fd0e6f6ae5120",
+    "crates/vizzi-core/src/publication.rs": "82140c97db9449514b5e2eef32d02818befc8db8ed1f0bd8e5bca6e5d7c577e4",
+    "crates/vizzi/src/qualification.rs": "cd2011feebe04bb269f4509fbc7215771f90fad132691cff0ca6272b280509e9"
+  },
+  "exclusions": [],
+  "development_notes": [
+    "Initial full core source/publication scope: 78 tested, 55 caught, 21 unviable, 2 timeouts, no survivors. Its actual test command selected only core; it is superseded by the final complete scope explicitly testing the workspace.",
+    "A full normal workspace run exposed a progress-event race in the pre-existing qualification helper. A parse can start and finish between the final progress sample and worker completion check. Flush the recorded start after joining and test once-only delivery with the real timestamp.",
+    "Final complete source/publication/qualification scope uses --test-workspace true and has no survivors.",
+    "Final optional storage-probe additions verify weak snapshot/selected-source handles are dead after release. The final corpus matrix was repeated after those additions."
+  ],
+  "limits": [
+    "Two timeouts break publication/bootstrap progress and are separate from assertion catches. Unviable substitutions are build failures.",
+    "Grammar/dependency internals, serialization/hash macro bodies, optional storage-probe orchestration, Python driver, allocator internals, OS filesystem and browser execution are outside this mutation scope."
+  ]
+}

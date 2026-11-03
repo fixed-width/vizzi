@@ -1,0 +1,22 @@
+{
+  "base_commit": "b4b1f542f76e5baa3a57017d5e290822bf8fb944",
+  "note": "Working tree measured before commit; production source representation/retention unchanged, with read-only capacity accounting. Storage probe repeats final weak-lifetime checks.",
+  "sha256": {
+    "Cargo.lock": "032ea2295563c2354c3d92c54cf4be9943ad62eb1ed116d6267b7c2c0ee1456d",
+    "Cargo.toml": "b48edcbfd70277e9d0a58f7680b6ed414bc70108b279fdfba98dcd9a07092636",
+    "crates/vizzi-core/src/captured_source.rs": "862ecbe25214cc78bd98b90ba9e0856d170dfde270868451ca3fd0e6f6ae5120",
+    "crates/vizzi-core/src/model.rs": "5c59fdc86b6530456fda437006fc73e527b320973bc70909c5bfa051b67fa56f",
+    "crates/vizzi-core/src/publication.rs": "82140c97db9449514b5e2eef32d02818befc8db8ed1f0bd8e5bca6e5d7c577e4",
+    "crates/vizzi-core/tests/source_storage.rs": "4c2305f00fa3f604b24be8523166e31daaee5304e0ac31a5c2168e1071b62bdd",
+    "crates/vizzi/Cargo.toml": "1d773383609879746474d86dbc4923ccb6d5ef768d6e972a13f424f9fad43fbf",
+    "crates/vizzi/examples/source_storage.rs": "af6f1c7cb0296ec9676541593a3ca9cb6f0c858a2e243c508a7a071ccd154271",
+    "crates/vizzi/src/lib.rs": "cdcf9fdcaa40c49939276e67fbaeec2882c35465af7b052ccab816b7578c6889",
+    "crates/vizzi/src/qualification.rs": "cd2011feebe04bb269f4509fbc7215771f90fad132691cff0ca6272b280509e9",
+    "crates/vizzi/src/source_storage_probe.rs": "de69ca193d3ff2caccacd14aa3877d09e3b4fdf21c0f228e1df38e22b2609660",
+    "crates/vizzi/tests/source_storage_probe.rs": "39541f6d7a998256c672da0c2d18a21ad200898eae35f15c2ad32582d173495c",
+    "experiments/admission/limit.py": "fdabefbcaa734cb366b6bcc87306a480bccac672bf5d41dd5592982eb8c08785",
+    "experiments/qualification/native.py": "e637e001eff0f81059c10e02f5381c00ef44e45efbd79348f94b792203ef924a",
+    "experiments/qualification/profiles.json": "fe3443645d36e1749ab6f360cecc52c667269e0504326155ed89e1baf98af260",
+    "experiments/source-storage/measure.py": "727c46b3597dae3d84bac5d529abd52d373157938c6e33bb9d88b4e7d87821fe"
+  }
+}

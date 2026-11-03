@@ -225,12 +225,7 @@ fn qualify(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Error>
         let mut parse_seen = false;
         loop {
             let started = parse_time(first_parse.load(Ordering::Acquire));
-            if let Some(started) = started
-                && !parse_seen
-            {
-                emit(json!({"event":"parse_started", "elapsed_us":started.as_micros()}));
-                parse_seen = true;
-            }
+            emit_parse_start(started, &mut parse_seen, emit);
             if cancel_due(
                 config.mode,
                 started,
@@ -255,10 +250,13 @@ fn qualify(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Error>
             }
             std::thread::sleep(Duration::from_millis(config.query_interval_ms));
         }
-        worker
-            .join()
-            .map_err(|_| "qualification worker panicked")?
-            .map_err(Into::into)
+        let completed = worker.join().map_err(|_| "qualification worker panicked")?;
+        emit_parse_start(
+            parse_time(first_parse.load(Ordering::Acquire)),
+            &mut parse_seen,
+            emit,
+        );
+        completed.map_err(Into::into)
     })?;
     let pinned = app
         .pinned(old.id().as_str())
@@ -279,6 +277,15 @@ fn qualify(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Error>
         "cancel_requested_us":requested.map(|duration| duration.as_micros()),"worker_return_us":phase["worker_return_us"],"cancel_to_return_ms":cancellation_latency(requested, returned)});
     emit(json!({"event":"phase_done", "outcome":phase["outcome"]}));
     Ok(report)
+}
+
+fn emit_parse_start(started: Option<Duration>, seen: &mut bool, emit: &mut impl FnMut(Value)) {
+    if let Some(started) = started
+        && !*seen
+    {
+        emit(json!({"event":"parse_started","elapsed_us":started.as_micros()}));
+        *seen = true;
+    }
 }
 
 fn millis(duration: Duration) -> f64 {
@@ -588,5 +595,23 @@ mod tests {
                 }
             }
         }
+    }
+    #[test]
+    fn a_start_recorded_between_the_last_poll_and_join_is_emitted_once() {
+        let mut seen = false;
+        let mut events = Vec::new();
+        emit_parse_start(None, &mut seen, &mut |event| events.push(event));
+        assert!(events.is_empty());
+        emit_parse_start(Some(Duration::from_micros(17)), &mut seen, &mut |event| {
+            events.push(event)
+        });
+        emit_parse_start(Some(Duration::from_micros(17)), &mut seen, &mut |event| {
+            events.push(event)
+        });
+        assert_eq!(
+            events,
+            vec![json!({"event":"parse_started","elapsed_us":17})]
+        );
+        assert!(seen);
     }
 }

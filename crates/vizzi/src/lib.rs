@@ -17,4 +17,6 @@ pub mod qualification;
 #[cfg(feature = "qualification")]
 pub mod retention;
 #[cfg(feature = "qualification")]
+pub mod source_storage_probe;
+#[cfg(feature = "qualification")]
 pub mod working_set;

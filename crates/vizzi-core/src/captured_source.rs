@@ -1,7 +1,23 @@
 //! Immutable owned source and line indexing, independent of paths and analysis.
 
 use crate::model::{ContentId, SourceEncoding};
+use serde::Serialize;
 use std::{ops::Range, sync::Arc};
+
+/// Owned source/index buffer accounting, excluding objects and allocator overhead.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+pub struct SourceStorage {
+    /// Logical captured byte length.
+    pub source_bytes: usize,
+    /// Allocated byte/string capacity, including unused capacity.
+    pub byte_capacity: usize,
+    /// Stored line-index entries, including the initial zero for unsupported text.
+    pub index_entries: usize,
+    /// Allocated line-index entry capacity.
+    pub index_capacity: usize,
+    /// Line-index capacity multiplied by its element size.
+    pub index_bytes: usize,
+}
 
 #[derive(Debug)]
 enum Bytes {
@@ -17,6 +33,19 @@ pub struct CapturedSource {
     line_starts: Vec<usize>,
 }
 impl CapturedSource {
+    /// Observes existing buffer capacities without copying, hashing or changing storage.
+    pub fn storage(&self) -> SourceStorage {
+        SourceStorage {
+            source_bytes: self.bytes().len(),
+            byte_capacity: match &self.bytes {
+                Bytes::Text(text) => text.capacity(),
+                Bytes::Unsupported(bytes) => bytes.capacity(),
+            },
+            index_entries: self.line_starts.len(),
+            index_capacity: self.line_starts.capacity(),
+            index_bytes: self.line_starts.capacity() * std::mem::size_of::<usize>(),
+        }
+    }
     /// Takes ownership of freshly read bytes; matching contents reuse prior storage.
     /// Every call hashes its input. Neither timestamps nor caller metadata prove reuse.
     pub fn capture(bytes: Vec<u8>, previous: Option<&Arc<Self>>) -> Arc<Self> {
