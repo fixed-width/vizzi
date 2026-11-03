@@ -60,10 +60,12 @@ fn summary_omits_bulk_data_and_windows_bound_escaped_text_and_generated_names() 
         CapturePolicyId::derive(&[b"fixture"]),
     )
     .unwrap();
-    let view = snapshot.view(&ViewQuery {
-        projection: Some(Projection::Summary),
-        ..Default::default()
-    });
+    let view = snapshot
+        .view(&ViewQuery {
+            projection: Some(Projection::Summary),
+            ..Default::default()
+        })
+        .unwrap();
     assert_eq!(view.schema, 3);
     assert!(view.source.as_ref().unwrap().text.is_none());
     assert!(
@@ -81,14 +83,16 @@ fn summary_omits_bulk_data_and_windows_bound_escaped_text_and_generated_names() 
             .declarations,
         250
     );
-    let window = file.window(
-        &WindowQuery {
-            line_count: Some(usize::MAX),
-            outline_count: Some(usize::MAX),
-            ..Default::default()
-        },
-        None,
-    );
+    let window = file
+        .window(
+            &WindowQuery {
+                line_count: Some(usize::MAX),
+                outline_count: Some(usize::MAX),
+                ..Default::default()
+            },
+            None,
+        )
+        .unwrap();
     assert!(window.lines.len() <= 96);
     assert!(
         window
@@ -112,15 +116,17 @@ fn summary_omits_bulk_data_and_windows_bound_escaped_text_and_generated_names() 
 #[test]
 fn line_fragments_preserve_utf8_crlf_empty_rows_and_large_offset_clamping() {
     let file = document("α\r\nβ\n", &[]);
-    let window = file.window(
-        &WindowQuery {
-            line_start: Some(1),
-            column_line: Some(1),
-            column: Some(1),
-            ..Default::default()
-        },
-        None,
-    );
+    let window = file
+        .window(
+            &WindowQuery {
+                line_start: Some(1),
+                column_line: Some(1),
+                column: Some(1),
+                ..Default::default()
+            },
+            None,
+        )
+        .unwrap();
     assert_eq!(
         window
             .lines
@@ -131,13 +137,15 @@ fn line_fragments_preserve_utf8_crlf_empty_rows_and_large_offset_clamping() {
     );
     assert_eq!(window.lines[0].column, 0);
     assert_eq!(window.line_total, 3);
-    let last = file.window(
-        &WindowQuery {
-            line_start: Some(usize::MAX),
-            ..Default::default()
-        },
-        None,
-    );
+    let last = file
+        .window(
+            &WindowQuery {
+                line_start: Some(usize::MAX),
+                ..Default::default()
+            },
+            None,
+        )
+        .unwrap();
     assert_eq!(last.line_start, 3);
     assert_eq!(last.lines[0].text, "");
 }
@@ -145,25 +153,29 @@ fn line_fragments_preserve_utf8_crlf_empty_rows_and_large_offset_clamping() {
 fn identity_lookup_and_old_focus_recovery_do_not_depend_on_window_membership() {
     let names: Vec<_> = (0..1000).map(|i| format!("item {i}")).collect();
     let old = document("x", &names);
-    let end = old.window(
-        &WindowQuery {
-            outline_start: Some(990),
-            cursor_index: Some(999),
-            ..Default::default()
-        },
-        None,
-    );
+    let end = old
+        .window(
+            &WindowQuery {
+                outline_start: Some(990),
+                cursor_index: Some(999),
+                ..Default::default()
+            },
+            None,
+        )
+        .unwrap();
     assert_eq!(end.cursor.as_ref().unwrap().index, 999);
     let id = end.cursor.unwrap().id;
     let next = document("x", &names[..999]);
-    let result = next.window(
-        &WindowQuery {
-            cursor: Some(id.as_str().into()),
-            cursor_index: Some(999),
-            ..Default::default()
-        },
-        Some(&old),
-    );
+    let result = next
+        .window(
+            &WindowQuery {
+                cursor: Some(id.as_str().into()),
+                cursor_index: Some(999),
+                ..Default::default()
+            },
+            Some(&old),
+        )
+        .unwrap();
     assert_eq!(result.cursor.unwrap().index, 998);
 }
 
@@ -171,27 +183,31 @@ fn identity_lookup_and_old_focus_recovery_do_not_depend_on_window_membership() {
 fn anchors_and_selected_metadata_follow_identity_after_insertions_and_removals() {
     let names: Vec<_> = (0..20).map(|i| format!("item {i}")).collect();
     let old = document("x", &names);
-    let original = old.window(
-        &WindowQuery {
-            cursor_index: Some(10),
-            ..Default::default()
-        },
-        None,
-    );
+    let original = old
+        .window(
+            &WindowQuery {
+                cursor_index: Some(10),
+                ..Default::default()
+            },
+            None,
+        )
+        .unwrap();
     let focus = original.cursor.unwrap();
     let anchor = old.entry(8).unwrap();
     let mut inserted = vec!["inserted".into()];
     inserted.extend(names.clone());
     let next = document("x", &inserted);
-    let result = next.window(
-        &WindowQuery {
-            cursor: Some(focus.id.as_str().into()),
-            anchor: Some(anchor.id.as_str().into()),
-            anchor_offset: Some(2),
-            ..Default::default()
-        },
-        Some(&old),
-    );
+    let result = next
+        .window(
+            &WindowQuery {
+                cursor: Some(focus.id.as_str().into()),
+                anchor: Some(anchor.id.as_str().into()),
+                anchor_offset: Some(2),
+                ..Default::default()
+            },
+            Some(&old),
+        )
+        .unwrap();
     assert_eq!(result.cursor.unwrap().index, 11);
     assert_eq!(result.outline_start, 7);
     let snapshot = Snapshot::new(
@@ -200,11 +216,13 @@ fn anchors_and_selected_metadata_follow_identity_after_insertions_and_removals()
         CapturePolicyId::derive(&[b"fixture"]),
     )
     .unwrap();
-    let view = snapshot.view(&ViewQuery {
-        projection: Some(Projection::Summary),
-        entity: Some(focus.id.as_str().into()),
-        ..Default::default()
-    });
+    let view = snapshot
+        .view(&ViewQuery {
+            projection: Some(Projection::Summary),
+            entity: Some(focus.id.as_str().into()),
+            ..Default::default()
+        })
+        .unwrap();
     assert_eq!(view.selection.entity, Some(focus.id.clone()));
     assert_eq!(
         view.source.unwrap().summary.unwrap().active.unwrap().index,
@@ -218,19 +236,23 @@ fn anchors_and_selected_metadata_follow_identity_after_insertions_and_removals()
             .cloned()
             .collect::<Vec<_>>(),
     );
-    let result = removed.window(
-        &WindowQuery {
-            cursor: Some(focus.id.as_str().into()),
-            ..Default::default()
-        },
-        Some(&old),
-    );
+    let result = removed
+        .window(
+            &WindowQuery {
+                cursor: Some(focus.id.as_str().into()),
+                ..Default::default()
+            },
+            Some(&old),
+        )
+        .unwrap();
     assert_eq!(result.cursor.unwrap().name, "item 12");
 }
 
 #[test]
 fn empty_and_unsupported_documents_have_finite_windows_without_invented_rows() {
-    let empty = document("", &[]).window(&WindowQuery::default(), None);
+    let empty = document("", &[])
+        .window(&WindowQuery::default(), None)
+        .unwrap();
     assert_eq!(empty.lines.len(), 1);
     assert_eq!(empty.lines[0].text, "");
     assert!(empty.cursor.is_none());
@@ -248,26 +270,30 @@ fn empty_and_unsupported_documents_have_finite_windows_without_invented_rows() {
         },
     )
     .unwrap();
-    let window = binary.window(
-        &WindowQuery {
-            cursor: Some("missing".into()),
-            outline_start: Some(usize::MAX),
-            ..Default::default()
-        },
-        None,
-    );
+    let window = binary
+        .window(
+            &WindowQuery {
+                cursor: Some("missing".into()),
+                outline_start: Some(usize::MAX),
+                ..Default::default()
+            },
+            None,
+        )
+        .unwrap();
     assert_eq!(window.line_total, 0);
     assert!(window.lines.is_empty());
     assert!(window.outline.is_empty());
     assert!(window.cursor.is_none());
     let unicode = document(&format!("{}\nlast\n", "🙂".repeat(10000)), &[]);
-    let window = unicode.window(
-        &WindowQuery {
-            line_count: Some(96),
-            ..Default::default()
-        },
-        None,
-    );
+    let window = unicode
+        .window(
+            &WindowQuery {
+                line_count: Some(96),
+                ..Default::default()
+            },
+            None,
+        )
+        .unwrap();
     assert!(window.lines[0].right);
     assert_eq!(window.lines[0].text.len() % 4, 0);
 }
@@ -275,44 +301,52 @@ fn empty_and_unsupported_documents_have_finite_windows_without_invented_rows() {
 #[test]
 fn fragments_fill_their_allowance_and_flags_distinguish_start_end_and_other_lines() {
     let file = document(&"x".repeat(100000), &["visible".into()]);
-    let first = file.window(
-        &WindowQuery {
-            line_count: Some(1),
-            ..Default::default()
-        },
-        None,
-    );
+    let first = file
+        .window(
+            &WindowQuery {
+                line_count: Some(1),
+                ..Default::default()
+            },
+            None,
+        )
+        .unwrap();
     assert_eq!(first.lines[0].text.len(), 32768);
     assert!(!first.lines[0].left);
     assert!(first.lines[0].right);
     assert_eq!(first.outline[0].name, "visible");
     assert_eq!(first.outline[0].kind, "function");
-    let middle = file.window(
-        &WindowQuery {
-            line_count: Some(1),
-            column_line: Some(1),
-            column: Some(32768),
-            ..Default::default()
-        },
-        None,
-    );
+    let middle = file
+        .window(
+            &WindowQuery {
+                line_count: Some(1),
+                column_line: Some(1),
+                column: Some(32768),
+                ..Default::default()
+            },
+            None,
+        )
+        .unwrap();
     assert_eq!(middle.lines[0].column, 32768);
     assert_eq!(middle.lines[0].text.len(), 32768);
     assert!(middle.lines[0].left);
     assert!(middle.lines[0].right);
-    let lines = document("α\nβ\n", &[]).window(
-        &WindowQuery {
-            column_line: Some(2),
-            column: Some(2),
-            ..Default::default()
-        },
-        None,
-    );
+    let lines = document("α\nβ\n", &[])
+        .window(
+            &WindowQuery {
+                column_line: Some(2),
+                column: Some(2),
+                ..Default::default()
+            },
+            None,
+        )
+        .unwrap();
     assert_eq!(lines.lines[0].text, "α");
     assert_eq!(lines.lines[1].text, "");
     assert!(lines.lines[1].left);
     assert!(!lines.lines[1].right);
-    let blank = document("\n\r\n", &[]).window(&WindowQuery::default(), None);
+    let blank = document("\n\r\n", &[])
+        .window(&WindowQuery::default(), None)
+        .unwrap();
     assert_eq!(
         blank
             .lines
@@ -339,7 +373,7 @@ fn flattened_ranges_preserve_analysis_membership_and_exact_label_boundaries() {
         base.classification().clone(),
     )
     .unwrap();
-    let rows = file.window(&WindowQuery::default(), None);
+    let rows = file.window(&WindowQuery::default(), None).unwrap();
     assert_eq!(rows.outline.len(), 4);
     assert!(!rows.outline[0].name_truncated);
     assert!(!rows.outline[0].kind_truncated);
@@ -350,4 +384,24 @@ fn flattened_ranges_preserve_analysis_membership_and_exact_label_boundaries() {
     assert!(rows.outline[2].kind_truncated);
     assert_eq!(rows.outline[2].kind.len(), 32);
     assert_eq!(rows.outline[3].name, "short");
+}
+
+#[test]
+fn multibyte_labels_round_down_at_both_exact_display_boundaries() {
+    let base = document("x", &[format!("{}🙂", "a".repeat(127))]);
+    let mut analysis = base.analyses()[0].clone();
+    analysis.facts[0].kind = format!("{}🙂", "k".repeat(31));
+    let file = Document::capture_source(
+        WorkspaceId::derive(&[b"projection"]),
+        "a.rs".into(),
+        base.captured().clone(),
+        vec![analysis],
+        base.classification().clone(),
+    )
+    .unwrap();
+    let row = file.entry(0).unwrap();
+    assert_eq!(row.name, "a".repeat(127));
+    assert_eq!(row.kind, "k".repeat(31));
+    assert!(row.name_truncated);
+    assert!(row.kind_truncated);
 }

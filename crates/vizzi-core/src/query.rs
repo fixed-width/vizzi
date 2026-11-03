@@ -2,8 +2,8 @@
 
 use crate::{
     model::{
-        CapturePolicyId, Context, Coverage, DocumentVersion, EntityId, FileId, Snapshot,
-        SnapshotId, SourceEncoding,
+        BULK_SOURCE_LIMIT, CapturePolicyId, Context, Coverage, DocumentVersion, EntityId, FileId,
+        Snapshot, SnapshotId, SourceEncoding, SourceReadError,
     },
     policy::Classification,
 };
@@ -161,7 +161,15 @@ pub struct View {
 
 impl Snapshot {
     /// Computes a linked view without reading mutable source files.
-    pub fn view(&self, query: &ViewQuery) -> View {
+    pub fn view(&self, query: &ViewQuery) -> Result<View, SourceReadError> {
+        self.view_with_limit(query, BULK_SOURCE_LIMIT)
+    }
+    /// Computes a view with an explicit bulk-source allowance; summaries perform no source IO.
+    pub fn view_with_limit(
+        &self,
+        query: &ViewQuery,
+        source_limit: usize,
+    ) -> Result<View, SourceReadError> {
         let filter = query.filter.to_lowercase();
         let matching: Vec<_> = self
             .documents()
@@ -178,59 +186,65 @@ impl Snapshot {
             .as_ref()
             .and_then(|id| self.file(id))
             .or_else(|| limited.first().copied());
-        let source = selected.map(|file| SourceView {
-            summary: (query.projection == Some(Projection::Summary)).then(|| {
-                crate::projection::Summary {
-                    lines: file.captured().line_count(),
-                    declarations: file.declaration_count(),
-                    active: query
-                        .entity
-                        .as_deref()
-                        .and_then(|id| file.entity_position(id))
-                        .and_then(|index| file.entry(index)),
-                }
-            }),
-            version: file.version().clone(),
-            id: file.id().clone(),
-            path: file.path().into(),
-            text: if query.projection.is_some() {
-                None
-            } else {
-                file.source().map(str::to_owned)
-            },
-            encoding: file.encoding(),
-            classification: file.classification().clone(),
-            outlines: file
-                .analyses()
-                .iter()
-                .map(|analysis| Outline {
-                    mode: "raw_syntax",
-                    configuration_coverage: "unknown",
-                    context: analysis.context.clone(),
-                    coverage: analysis.coverage.clone(),
-                    diagnostics: analysis.diagnostics.clone(),
-                    declarations: analysis
-                        .facts
+        let source = selected
+            .map(|file| -> Result<SourceView, SourceReadError> {
+                Ok(SourceView {
+                    summary: (query.projection == Some(Projection::Summary)).then(|| {
+                        crate::projection::Summary {
+                            lines: file.captured().line_count(),
+                            declarations: file.declaration_count(),
+                            active: query
+                                .entity
+                                .as_deref()
+                                .and_then(|id| file.entity_position(id))
+                                .and_then(|index| file.entry(index)),
+                        }
+                    }),
+                    version: file.version().clone(),
+                    id: file.id().clone(),
+                    path: file.path().into(),
+                    text: if query.projection.is_some() {
+                        None
+                    } else {
+                        file.captured()
+                            .read_text(source_limit)?
+                            .map(|text| text.into_owned())
+                    },
+                    encoding: file.encoding(),
+                    classification: file.classification().clone(),
+                    outlines: file
+                        .analyses()
                         .iter()
-                        .take(if query.projection.is_none() {
-                            usize::MAX
-                        } else {
-                            0
-                        })
-                        .map(|fact| {
-                            let lines = file.lines(&fact.span);
-                            Declaration {
-                                id: file.entity_id(analysis, fact),
-                                name: fact.name.clone(),
-                                kind: fact.kind.clone(),
-                                start_line: lines.start,
-                                end_line: lines.end,
-                            }
+                        .map(|analysis| Outline {
+                            mode: "raw_syntax",
+                            configuration_coverage: "unknown",
+                            context: analysis.context.clone(),
+                            coverage: analysis.coverage.clone(),
+                            diagnostics: analysis.diagnostics.clone(),
+                            declarations: analysis
+                                .facts
+                                .iter()
+                                .take(if query.projection.is_none() {
+                                    usize::MAX
+                                } else {
+                                    0
+                                })
+                                .map(|fact| {
+                                    let lines = file.lines(&fact.span);
+                                    Declaration {
+                                        id: file.entity_id(analysis, fact),
+                                        name: fact.name.clone(),
+                                        kind: fact.kind.clone(),
+                                        start_line: lines.start,
+                                        end_line: lines.end,
+                                    }
+                                })
+                                .collect(),
                         })
                         .collect(),
                 })
-                .collect(),
-        });
+            })
+            .transpose()?;
         let entity = source
             .as_ref()
             .and_then(|source| source.summary.as_ref())
@@ -303,7 +317,7 @@ impl Snapshot {
             }
             y += documents.len().div_ceil(8) as f64 * 56.0 + 18.0;
         }
-        View {
+        Ok(View {
             deferred: self.deferred_files(),
             schema: if query.projection.is_some() { 3 } else { 2 },
             snapshot: self.id().clone(),
@@ -320,7 +334,7 @@ impl Snapshot {
                 entity,
             },
             source,
-        }
+        })
     }
 }
 
@@ -349,10 +363,12 @@ mod tests {
     #[test]
     fn selection_uses_frozen_source_and_survives_position_changes() {
         let first = snapshot("fn f() {}");
-        let view = first.view(&ViewQuery {
-            filter: "src".into(),
-            ..Default::default()
-        });
+        let view = first
+            .view(&ViewQuery {
+                filter: "src".into(),
+                ..Default::default()
+            })
+            .unwrap();
         let entity = view.source.as_ref().unwrap().outlines[0].declarations[0]
             .id
             .as_str()
@@ -362,7 +378,7 @@ mod tests {
             entity: Some(entity.clone()),
             ..Default::default()
         };
-        let next = snapshot("\nfn f() {}").view(&query);
+        let next = snapshot("\nfn f() {}").view(&query).unwrap();
         assert_eq!(
             next.selection.entity.as_ref().map(EntityId::as_str),
             Some(entity.as_str())
@@ -372,12 +388,13 @@ mod tests {
             2
         );
         assert_eq!(
-            first.view(&query).source.unwrap().text.as_deref(),
+            first.view(&query).unwrap().source.unwrap().text.as_deref(),
             Some("fn f() {}")
         );
         assert!(
             snapshot("fn g() {}")
                 .view(&query)
+                .unwrap()
                 .selection
                 .entity
                 .is_none()
@@ -385,10 +402,12 @@ mod tests {
     }
     #[test]
     fn duplicate_declaration_selection_falls_back_after_content_changes() {
-        let view = snapshot("fn f() {} fn f() {}").view(&ViewQuery {
-            filter: "src".into(),
-            ..Default::default()
-        });
+        let view = snapshot("fn f() {} fn f() {}")
+            .view(&ViewQuery {
+                filter: "src".into(),
+                ..Default::default()
+            })
+            .unwrap();
         let query = ViewQuery {
             file: Some(view.selection.file.unwrap().as_str().into()),
             entity: Some(
@@ -399,27 +418,31 @@ mod tests {
             ),
             ..Default::default()
         };
-        let next = snapshot("\nfn f() {} fn f() {}").view(&query);
+        let next = snapshot("\nfn f() {} fn f() {}").view(&query).unwrap();
         assert!(next.selection.file.is_some());
         assert!(next.selection.entity.is_none());
     }
     #[test]
     fn limits_filters_and_missing_selection_are_explicit() {
         let snapshot = snapshot("fn f() {}");
-        let view = snapshot.view(&ViewQuery {
-            file: Some("removed".into()),
-            filter: "SRC".into(),
-            limit: Some(0),
-            ..Default::default()
-        });
+        let view = snapshot
+            .view(&ViewQuery {
+                file: Some("removed".into()),
+                filter: "SRC".into(),
+                limit: Some(0),
+                ..Default::default()
+            })
+            .unwrap();
         assert_eq!(view.files.len(), 1);
         assert_eq!(view.matching, 1);
         assert_eq!(view.total, 2);
         assert_eq!(view.source.unwrap().path, "src/a.rs");
-        let view = snapshot.view(&ViewQuery {
-            filter: "absent".into(),
-            ..Default::default()
-        });
+        let view = snapshot
+            .view(&ViewQuery {
+                filter: "absent".into(),
+                ..Default::default()
+            })
+            .unwrap();
         assert!(view.source.is_none());
         assert!(view.selection.file.is_none());
         assert!(view.files.is_empty());
@@ -428,6 +451,7 @@ mod tests {
             crate::model::fixture_snapshot(workspace, vec![])
                 .unwrap()
                 .view(&ViewQuery::default())
+                .unwrap()
                 .source
                 .is_none()
         );
@@ -452,7 +476,8 @@ mod tests {
         }
         let view = crate::model::fixture_snapshot(workspace, files)
             .unwrap()
-            .view(&ViewQuery::default());
+            .view(&ViewQuery::default())
+            .unwrap();
         assert_eq!(view.groups.len(), 2);
         assert!(
             view.height < (view.files.len() + view.groups.len()) as f64 * 80.0,
@@ -512,7 +537,7 @@ mod tests {
             ));
         }
         let snapshot = crate::model::fixture_snapshot(workspace.clone(), files).unwrap();
-        let view = snapshot.view(&ViewQuery::default());
+        let view = snapshot.view(&ViewQuery::default()).unwrap();
         assert_eq!(
             view.files
                 .iter()
@@ -525,12 +550,14 @@ mod tests {
             ]
         );
         let selected = view.files[2].id.as_str().to_owned();
-        let limited = snapshot.view(&ViewQuery {
-            file: Some(selected),
-            filter: "good".into(),
-            limit: Some(1),
-            ..Default::default()
-        });
+        let limited = snapshot
+            .view(&ViewQuery {
+                file: Some(selected),
+                filter: "good".into(),
+                limit: Some(1),
+                ..Default::default()
+            })
+            .unwrap();
         assert_eq!(limited.source.unwrap().path, "partial.rs");
         let files = (0..2003)
             .map(|i| {
@@ -550,7 +577,8 @@ mod tests {
             .view(&ViewQuery {
                 limit: Some(usize::MAX),
                 ..Default::default()
-            });
+            })
+            .unwrap();
         assert_eq!(view.matching, 2003);
         assert_eq!(view.files.len(), 2000);
     }

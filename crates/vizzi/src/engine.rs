@@ -18,7 +18,7 @@ use std::{
 };
 use vizzi_core::{
     analysis::{AnalysisResult, Analyzer},
-    model::{Analysis, Coverage, Document, ModelError, Snapshot},
+    model::{Analysis, Coverage, Document, ModelError, Snapshot, SourceReadError},
 };
 
 /// Native source/analysis failure; the host retains its previous snapshot.
@@ -33,6 +33,9 @@ pub enum EngineError {
     /// Source/fact validation failed.
     #[error(transparent)]
     Model(#[from] ModelError),
+    /// Captured backing read/integrity/capacity failure.
+    #[error(transparent)]
+    Source(#[from] SourceReadError),
     /// Invalid configuration or a worker panic.
     #[error("{0}")]
     Configuration(String),
@@ -180,11 +183,7 @@ impl Engine {
         let mut measurements = Measurements {
             read_files: capture.files.len(),
             reconciled: capture.directories.is_some(),
-            bytes: capture
-                .files
-                .iter()
-                .map(|file| file.source.bytes().len())
-                .sum(),
+            bytes: capture.files.iter().map(|file| file.source.len()).sum(),
             capture_ms: milliseconds(started.elapsed()),
             ..Default::default()
         };
@@ -247,7 +246,7 @@ impl Engine {
                 )?));
             }
         }
-        jobs.sort_by_key(|job| std::cmp::Reverse(job.0.source.bytes().len()));
+        jobs.sort_by_key(|job| std::cmp::Reverse(job.0.source.len()));
         let next = AtomicUsize::new(0);
         let batches = std::thread::scope(|scope| {
             let handles: Vec<_> = (0..workers.min(jobs.len()))
@@ -266,12 +265,12 @@ impl Engine {
                             };
                             let context = language.context();
                             let content = file.source.content();
-                            let _permit = match self.admission.as_ref().map(|budget| budget.acquire(file.source.bytes().len(), priority)) {
+                            let _permit = match self.admission.as_ref().map(|budget| budget.acquire(file.source.len(), priority)) {
                                 Some(Ok(permit)) => Some(permit),
                                 Some(Err(reason)) => {
                                     let diagnostic = match reason {
                                         Refusal::Busy => "Analysis deferred: active input capacity is occupied or reserved for foreground work; source remains available".into(),
-                                        Refusal::FileLimit => format!("Analysis deferred: {} input bytes exceed the per-file admission limit; source remains available", file.source.bytes().len()),
+                                        Refusal::FileLimit => format!("Analysis deferred: {} input bytes exceed the per-file admission limit; source remains available", file.source.len()),
                                     };
                                     batch.push(Arc::new(Document::capture_source(
                                         self.directory.workspace().clone(), file.path.clone(), file.source.clone(),
@@ -282,15 +281,17 @@ impl Engine {
                                 }
                                 None => None,
                             };
+                            let input=file.source.read_all(file.source.len())?;
                             let cached = self
                                 .cache
                                 .load(&context.id, content)
                                 .filter(|analysis| analysis.context == *context)
                                 .and_then(|analysis| {
-                                    Document::capture_source(
+                                    Document::capture_loaded(
                                         self.directory.workspace().clone(),
                                         file.path.clone(),
                                         file.source.clone(),
+                                        &input,
                                         vec![analysis],
                                         file.classification.clone(),
                                     )
@@ -320,14 +321,14 @@ impl Engine {
                                 });
                                 let result = if let Some(lease) = &mut lease {
                                     parser.analyze_with_state(
-                                        file.source.bytes(),
+                                        input.bytes(),
                                         lease.take_previous(),
                                         lease.allowance(),
                                         cancelled,
                                     )?
                                 } else {
                                     parser
-                                        .analyze_cancellable(file.source.bytes(), cancelled)?
+                                        .analyze_cancellable(input.bytes(), cancelled)?
                                         .map(|analysis| AnalysisResult {
                                             analysis,
                                             state: None,
@@ -343,10 +344,11 @@ impl Engine {
                                         "analyzer returned an unregistered context".into(),
                                     ));
                                 }
-                                let document = Document::capture_source(
+                                let document = Document::capture_loaded(
                                     self.directory.workspace().clone(),
                                     file.path.clone(),
                                     file.source.clone(),
+                                    &input,
                                     vec![analysis],
                                     file.classification.clone(),
                                 )?;
@@ -581,7 +583,10 @@ mod tests {
         assert_eq!(edited.measurements.reused, 1);
         assert_eq!(edited.measurements.parsed, 1);
         assert_ne!(edited.snapshot.id(), second.snapshot.id());
-        assert_eq!(second.snapshot.documents()[0].source(), Some("fn a() {}"));
+        assert_eq!(
+            second.snapshot.documents()[0].resident_source(),
+            Some("fn a() {}")
+        );
         assert_eq!(
             edited.snapshot.documents()[0].analyses()[0].facts[0].name,
             "c"
@@ -658,7 +663,7 @@ mod tests {
             "c"
         );
         assert_eq!(
-            incremental.snapshot.documents()[1].source(),
+            incremental.snapshot.documents()[1].resident_source(),
             Some("fn b() {}")
         );
         assert!(Arc::ptr_eq(
@@ -671,7 +676,10 @@ mod tests {
             .unwrap();
         assert_eq!(complete.measurements.read_files, 2);
         assert!(complete.measurements.reconciled);
-        assert_eq!(complete.snapshot.documents()[1].source(), Some("fn d() {}"));
+        assert_eq!(
+            complete.snapshot.documents()[1].resident_source(),
+            Some("fn d() {}")
+        );
         let both = engine
             .refresh_scoped(
                 Some(&initial.snapshot),
@@ -791,7 +799,7 @@ mod tests {
                     Document::capture(
                         initial.snapshot.workspace().clone(),
                         document.path().into(),
-                        document.source().unwrap().as_bytes(),
+                        document.resident_source().unwrap().as_bytes(),
                         vec![analysis],
                         document.classification().clone(),
                     )

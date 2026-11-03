@@ -23,6 +23,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut once = false;
     let mut syntax_cache_mib = 0usize;
     let mut analysis_input_mib = 0usize;
+    let mut source_spool_mib = 0usize;
     let mut policy = PolicyConfig::default();
     let mut arguments = std::env::args().skip(1);
     while let Some(argument) = arguments.next() {
@@ -51,6 +52,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     .next()
                     .ok_or("--syntax-cache-mib needs a weight budget")?
                     .parse()?
+            }
+            "--source-spool-mib" => {
+                source_spool_mib = arguments
+                    .next()
+                    .ok_or("--source-spool-mib needs a disk capacity")?
+                    .parse()?;
             }
             "--analysis-input-mib" => {
                 analysis_input_mib = arguments
@@ -87,7 +94,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             "--help" | "-h" => {
                 println!(
-                    "vizzi --root DIR --cache DIR [--workers 1..32] [--port 7474] [--stdio | --once]\n  [--syntax-cache-mib N] (0 disables, default 0; weighted retention, not a heap cap)\n  [--analysis-input-mib N] (0 disables; active input volume, not a heap cap)\n  [--c-family-root SCOPE] [--exclude-source SCOPE] [--syntax-language SCOPE=c|cpp] (repeatable)"
+                    "vizzi --root DIR --cache DIR [--workers 1..32] [--port 7474] [--stdio | --once]\n  [--syntax-cache-mib N] (0 disables, default 0; weighted retention, not a heap cap)\n  [--analysis-input-mib N] (0 disables; active input volume, not a heap cap)\n  [--source-spool-mib N] (0 disables; private session disk capacity)\n  [--c-family-root SCOPE] [--exclude-source SCOPE] [--syntax-language SCOPE=c|cpp] (repeatable)"
                 );
                 return Ok(());
             }
@@ -97,7 +104,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     if once && stdio {
         return Err("choose either --once or --stdio".into());
     }
-    let directory = Directory::with_policy(
+    let mut directory = Directory::with_policy(
         &root.ok_or("--root is required")?,
         policy,
         Arc::new(Languages::builtin()?),
@@ -105,6 +112,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cache =
         cache.ok_or("--cache is required; choose a directory outside the analyzed workspace")?;
     let cache = vizzi::cache::external_path(&cache, directory.root())?;
+    if source_spool_mib != 0 {
+        let capacity = source_spool_mib
+            .checked_mul(1024 * 1024)
+            .ok_or("source spool capacity overflow")?;
+        directory = directory.with_spool(Arc::new(vizzi::source_spool::SourceSpool::new(
+            &cache, capacity,
+        )?))?;
+    }
     let mut engine = Engine::new(directory, Cache::new(cache), workers)?;
     if analysis_input_mib != 0 {
         let bytes = analysis_input_mib

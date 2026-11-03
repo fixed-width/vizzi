@@ -90,7 +90,7 @@ fn qualify(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Error>
         let file = baseline
             .file_by_path(target)
             .ok_or("target is outside captured scope")?;
-        let original = file.source().ok_or("target must be UTF-8")?;
+        let original = file.resident_source().ok_or("target must be UTF-8")?;
         let context = &file
             .analyses()
             .first()

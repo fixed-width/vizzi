@@ -520,7 +520,7 @@ mod tests {
                 .is_none()
         );
         assert_eq!(
-            app.snapshot().unwrap().documents()[0].source(),
+            app.snapshot().unwrap().documents()[0].resident_source(),
             Some("fn a() {}")
         );
     }

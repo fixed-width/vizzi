@@ -99,3 +99,11 @@ is the HTTP response body as text, including JSON encoding where applicable. Std
 uses the same router and live application, with no listener required. The unbounded
 `/api/events` endpoint returns **400** through diagnostics; use HTTP or the native
 subscription interface for streaming.
+
+Source access is fallible over either resident or private-backed data. Bulk view/source
+loading is limited to 32 MiB of source; excess returns **413**, while pinned windows
+retain complete logical access. Source-work concurrency saturation returns **429**;
+backing IO, short reads, integrity/internal range failures return **503**. Typed malformed
+HTTP queries remain **400**. Summaries do not load whole source. See
+[source reads](SOURCE_READS.md) for bounds and native error types. Source IO/projection
+runs in a bounded blocking pool outside the publication lock/async executor.

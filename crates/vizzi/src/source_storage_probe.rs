@@ -17,6 +17,8 @@ struct Config {
     root: PathBuf,
     policy: PolicyConfig,
     targets: Vec<String>,
+    #[serde(default)]
+    spool_mib: usize,
     owner: String,
     probe: String,
     mode: Mode,
@@ -35,6 +37,7 @@ struct Inventory {
     index_entries: usize,
     index_bytes: usize,
     buffer_bytes: usize,
+    integrity_bytes: usize,
 }
 fn inventory(snapshots: &[Arc<Snapshot>]) -> Result<Inventory, Error> {
     let mut seen = BTreeSet::new();
@@ -58,6 +61,10 @@ fn inventory(snapshots: &[Arc<Snapshot>]) -> Result<Inventory, Error> {
                 .index_entries
                 .checked_add(storage.index_entries)
                 .ok_or("entry accounting overflow")?;
+            result.integrity_bytes = result
+                .integrity_bytes
+                .checked_add(storage.integrity_bytes)
+                .ok_or("integrity accounting overflow")?;
             result.index_bytes = result
                 .index_bytes
                 .checked_add(storage.index_bytes)
@@ -68,6 +75,7 @@ fn inventory(snapshots: &[Arc<Snapshot>]) -> Result<Inventory, Error> {
     result.buffer_bytes = result
         .byte_capacity
         .checked_add(result.index_bytes)
+        .and_then(|total| total.checked_add(result.integrity_bytes))
         .ok_or("buffer accounting overflow")?;
     Ok(result)
 }
@@ -118,19 +126,19 @@ fn observation(
         directory.policy().id().clone(),
     )?))
 }
-fn source_manifest(snapshot: &Snapshot, rehash: bool) -> String {
+fn source_manifest(snapshot: &Snapshot, rehash: bool) -> Result<String, Error> {
     let mut digest = blake3::Hasher::new();
     for document in snapshot.documents() {
         digest.update(&(document.path().len() as u64).to_le_bytes());
         digest.update(document.path().as_bytes());
         let actual = if rehash {
-            ContentId::derive(&[document.captured().bytes()])
+            ContentId::derive(&[document.captured().read_all(usize::MAX)?.bytes()])
         } else {
             document.content().clone()
         };
         digest.update(actual.as_str().as_bytes());
     }
-    digest.finalize().to_hex().to_string()
+    Ok(digest.finalize().to_hex().to_string())
 }
 fn record(
     phase: &str,
@@ -168,8 +176,27 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
                 .into(),
         );
     }
-    let directory =
+    let mut directory =
         Directory::with_policy(&config.root, config.policy, Arc::new(Languages::builtin()?))?;
+    let spool = if config.spool_mib == 0 {
+        None
+    } else {
+        let path = config
+            .root
+            .parent()
+            .ok_or("missing owned-copy parent")?
+            .join("spool");
+        Some(Arc::new(crate::source_spool::SourceSpool::new(
+            &path,
+            config
+                .spool_mib
+                .checked_mul(1024 * 1024)
+                .ok_or("spool size overflow")?,
+        )?))
+    };
+    if let Some(spool) = &spool {
+        directory = directory.with_spool(spool.clone())?;
+    }
     let mut publication = Publication::default();
     let mut ids = Vec::new();
     let mut weak_snapshots = Vec::new();
@@ -184,7 +211,7 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
         }
     }
     let initial_id = initial.id().clone();
-    let original_manifest = source_manifest(&initial, false);
+    let original_manifest = source_manifest(&initial, false)?;
     let files = initial.documents().len();
     let changed: BTreeSet<String> = match config.mode {
         Mode::Headers => config.targets.iter().cloned().collect(),
@@ -264,7 +291,7 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
                 .ok_or("changed input disappeared")?;
             let mut file = std::fs::File::create(config.root.join(path))?;
             file.write_all(prefix.as_bytes())?;
-            file.write_all(source.captured().bytes())?;
+            file.write_all(source.captured().read_all(usize::MAX)?.bytes())?;
         }
         prefix_bytes += prefix.len();
         emit(json!({"event":"phase_start","generation":generation}));
@@ -275,8 +302,13 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
         for file in &capture.files {
             if let Some(old) = previous.file_by_path(&file.path) {
                 if changed.contains(&file.path) {
-                    if !file.source.bytes().starts_with(prefix.as_bytes())
-                        || &file.source.bytes()[prefix.len()..] != old.captured().bytes()
+                    if !file
+                        .source
+                        .read_all(usize::MAX)?
+                        .bytes()
+                        .starts_with(prefix.as_bytes())
+                        || &file.source.read_all(usize::MAX)?.bytes()[prefix.len()..]
+                            != old.captured().read_all(usize::MAX)?.bytes()
                     {
                         return Err("changed source bytes differ from expected prefix edit".into());
                     }
@@ -319,7 +351,7 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
     if publication.pinned(initial_id.as_str()).is_some() {
         return Err("initial pin did not expire from bounded publication history".into());
     }
-    if source_manifest(external.as_ref().ok_or("external pin missing")?, true) != original_manifest
+    if source_manifest(external.as_ref().ok_or("external pin missing")?, true)? != original_manifest
     {
         return Err("external pin source bytes changed".into());
     }
@@ -338,8 +370,8 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
             let source = previous
                 .file_by_path(path)
                 .ok_or("missing restoration source")?;
-            let bytes = source
-                .captured()
+            let input = source.captured().read_all(usize::MAX)?;
+            let bytes = input
                 .bytes()
                 .get(prefix_bytes..)
                 .ok_or("invalid restoration prefix")?;
@@ -353,7 +385,7 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
                 .ok_or("restoration cancelled")?,
             Some(&previous),
         )?;
-        if restored.id() != &initial_id || source_manifest(&restored, false) != original_manifest {
+        if restored.id() != &initial_id || source_manifest(&restored, false)? != original_manifest {
             return Err("restored source differs from baseline".into());
         }
         weak_snapshots.push(Arc::downgrade(&restored));
@@ -387,7 +419,7 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
     }
     phases.push(record("released", &publication, &ids, None, None, 0)?);
     Ok(
-        json!({"mode":"unanalysed_source_storage","files":files,"changed_files":changed.len(),"initial_snapshot":initial_id,"original_source_manifest":original_manifest,
+        json!({"spool":spool.as_ref().map(|spool|spool.stats()),"mode":"unanalysed_source_storage","files":files,"changed_files":changed.len(),"initial_snapshot":initial_id,"original_source_manifest":original_manifest,
         "phases":phases,"expired_from_publication":true,"external_pin_bytes_match":true,"restored_snapshot_matches":true,"released_handles_dead":true}),
     )
 }

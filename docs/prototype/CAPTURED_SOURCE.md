@@ -13,16 +13,18 @@ adopts the owned buffer and builds its UTF-8 line index once. Safe
 uses the vector's storage without copying its contents; invalid input keeps its original
 raw byte vector. No unsafe conversion, global interning, or metadata shortcut is used.
 
-`bytes` returns the captured bytes; `text` returns UTF-8 text or `None`; `encoding`
-distinguishes those cases. Unsupported input remains raw internally, while textual
-HTTP/view responses remain unavailable. This changes internal binary-source retention,
-without adding an encoding conversion or a binary transport endpoint.
+Whole-file access is explicit and fallible: `read_all(limit)` returns a verified input
+guard and `read_text(limit)` returns borrowed/owned UTF-8 or unsupported encoding.
+`reader().read(range, limit)` provides bounded integrity-checked access. `len`, `encoding`
+and line/declaration metadata do not load backing. Explicit `resident_bytes` and
+`resident_text` diagnostics describe resident availability rather than encoding.
+See [source reads/backing](SOURCE_READS.md) for errors, guards and spool lifetime.
 
-`Document::capture_source` binds a shared source to workspace/path, classification,
-and analyses. It validates content identity, contexts, ranges, keys, and encoding
-coverage using the same rules as the borrowed-byte constructor. `Document::capture`
-remains the convenience operation that copies its borrowed input into owned storage.
-`Document::captured` exposes a shared immutable handle for further verified capture.
+`Document::capture_loaded` binds facts using the same verified input held during
+analysis/cache validation. `capture_source` remains a resident convenience or a
+metadata-only binding path for empty facts. `Document::resident_source` is an explicit
+resident diagnostic; production inspection uses reads. `Document::captured` exposes
+immutable metadata/backing independently of classification and facts.
 
 Different analyses and classifications may share one source object. They still have
 their own document versions and facts. Document composition v2 and snapshot composition
@@ -72,11 +74,14 @@ separate source/tree state and admission quota. See the
 ## Owned-buffer accounting
 
 `CapturedSource::storage()` returns `SourceStorage` with logical `source_bytes`,
-`byte_capacity`, stored `index_entries`, allocated `index_capacity`, and `index_bytes`.
+`byte_capacity`, stored `index_entries`, allocated `index_capacity`, and `index_bytes`,
+plus compact CRLF `terminator_bytes` and block-digest `integrity_bytes`. Backed source has
+zero permanent byte capacity; its index/digest metadata remains resident.
 It reads existing byte/string and line-index capacities without copying, hashing,
 changing recency or mutating source. Unsupported encoding retains the initial stored
 zero index even though its display line count is zero; empty UTF-8 has one display line.
-Index bytes currently use `index_capacity × size_of::<usize>()`.
+Index bytes use `index_capacity × size_of::<usize>() + terminator_bytes`. Integrity
+capacity is separate; the current source-storage inventory includes all three buffers.
 
 These values account only for owned buffers. Struct/Arc/document/fact overhead, parser
 allocations, allocator metadata and resident-page behaviour remain separate. Inventories
@@ -85,6 +90,7 @@ not prove shared storage. An external query handle can own data after publicatio
 history expires its lookup identity, and releasing data does not force RSS to fall.
 
 The [source-storage investigation](../../experiments/source-storage/RESULTS.md) measures
-these sets. Production storage/retention remains unchanged. The
+these sets. Resident capture remains the default. The
 [bounded-read proposal](../plans/bounded-source-reads.md) records the next interface step;
-this accounting operation does not impose a memory limit.
+this accounting operation does not impose a memory limit. The
+[reader/spool follow-up](../../experiments/source-reads/RESULTS.md) evaluates opt-in backing.

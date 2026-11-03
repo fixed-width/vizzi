@@ -114,7 +114,7 @@ fn qualify(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Error>
         let file = baseline
             .file_by_path(target)
             .ok_or("target outside captured scope")?;
-        if file.source().is_none() || file.analyses().len() != 1 {
+        if file.resident_source().is_none() || file.analyses().len() != 1 {
             return Err("targets require UTF-8 and one assigned analysis".into());
         }
     }
@@ -142,7 +142,7 @@ fn qualify(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Error>
                 config.probe
             );
             let mut source = marker.into_bytes();
-            source.extend_from_slice(file.captured().bytes());
+            source.extend_from_slice(file.captured().read_all(usize::MAX)?.bytes());
             std::fs::write(config.root.join(path), source)?;
         }
         let scope = match step {
@@ -176,7 +176,7 @@ fn qualify(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Error>
                 .select(&context.language)
                 .ok_or("target language unavailable")?
                 .create()?
-                .analyze(file.captured().bytes())?;
+                .analyze(file.captured().read_all(usize::MAX)?.bytes())?;
             if file.analyses() != [fresh] {
                 return Err("working-set facts differ from independent fresh parse".into());
             }
@@ -199,6 +199,7 @@ fn qualify(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Error>
                 .file_by_path(path)
                 .ok_or("validated target disappeared")?
                 .captured()
+                .read_all(usize::MAX)?
                 .bytes(),
         )?;
     }

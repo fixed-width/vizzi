@@ -121,3 +121,11 @@ and 8 MiB reserved from recovery for foreground work. It does not cap parser hea
 captured source storage. Refused files stay readable with explicit deferred analysis;
 eligible jobs retry during recovery. `0` disables admission and is the default.
 See [the admission reference](../prototype/ADMISSION.md) for cache, retry and resource semantics.
+
+To prototype private source backing, add `--source-spool-mib 16384`. The anonymous
+spool is created in the external cache directory and can append at most 16 GiB during
+the session. Unchanged verified sources reuse backing; obsolete/cancelled versions still
+consume session disk capacity until the last store/source descriptor is released.
+Capacity failure keeps the previous published observation. `0` preserves resident
+capture and is the default. See [source reads](../prototype/SOURCE_READS.md) for lifetime,
+range/bulk limits, errors and the remaining transient-capture/parser/index limits.

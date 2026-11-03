@@ -96,6 +96,11 @@ deferred coverage and no stale facts. Deferred records are retried rather than p
 or reused as complete analysis. Input capacity does not bound captured source or parser
 heap; it complements worker and syntax-retention limits.
 
+[Source reads](SOURCE_READS.md) now expose verified loaded-input guards and bounded
+range sessions with explicit capacity/IO/integrity failures. Resident capture is the
+default; optional private spooling removes permanent source bodies from snapshots.
+Session disk quota, index metadata, transient capture and parser memory are distinct.
+
 ## Host interface
 
 - `GET /api/status` returns generation, snapshot identity, pending state, and last

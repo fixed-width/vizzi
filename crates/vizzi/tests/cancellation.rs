@@ -91,7 +91,7 @@ fn interrupted_attempt_keeps_pinned_source_and_does_not_cache_the_cancelled_file
     );
     assert_eq!(app.snapshot().unwrap().id(), old.id());
     assert_eq!(
-        app.pinned(old.id().as_str()).unwrap().documents()[0].source(),
+        app.pinned(old.id().as_str()).unwrap().documents()[0].resident_source(),
         Some("fn original() {}")
     );
     stop.store(false, Ordering::Release);

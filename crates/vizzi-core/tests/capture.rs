@@ -78,7 +78,7 @@ fn verified_updates_match_full_capture_and_share_unchanged_documents() {
         .id()
     );
     assert_eq!(
-        before.file_by_path("b.rs").unwrap().source(),
+        before.file_by_path("b.rs").unwrap().resident_source(),
         Some("fn b() {}")
     );
     assert!(before.file_by_path("missing.rs").is_none());

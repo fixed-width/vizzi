@@ -8,6 +8,7 @@ pub mod host;
 mod invalidation;
 pub mod server;
 pub mod source;
+pub mod source_spool;
 pub mod syntax_cache;
 
 #[cfg(feature = "qualification")]

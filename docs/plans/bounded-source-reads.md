@@ -1,9 +1,9 @@
-# Proposed next step: bounded reads over immutable captured source
+# Bounded reads over immutable captured source
 
 The [ownership investigation](../../experiments/source-storage/RESULTS.md) measures
 source/index buffers across unchanged capture, version churn and an external query pin.
-Use it to design the next storage interface. This is a proposal; the current source
-representation and retention policy remain unchanged.
+Use it to design the next storage interface. The first reader/backing adapters are implemented with resident capture as the default;
+opt-in spooling changes body storage while publication retention is unchanged.
 
 ## Required behaviour
 
@@ -83,3 +83,18 @@ Then repeat the source-ownership and admission workflows with independent stored
 checks and constrained child memory. Retain source reachability and explicit errors.
 Only after those pass should native capture move from resident whole-file buffers to
 the chosen backing. This proposal does not yet enforce a source or whole-process cap.
+
+## Implemented first increment
+
+The [reader reference](../prototype/SOURCE_READS.md) defines verified input guards,
+typed failures, bounded integrity-block sessions, metadata-only summary/line access,
+source-window preservation and native error handling. In native analysis, the job scope
+holds the input permit and loaded guard together, dropping bytes before the permit.
+This keeps portable input types independent of native scheduling.
+
+The first private backing is a mutex-serialized anonymous append-only session file.
+A configured cumulative disk cap fails capture safely. It has no per-version reclamation
+and is not the final durable storage choice. Capture still uses one transient whole-file
+read before spooling; metadata/index/integrity and parser/transport memory are separate.
+Default capture remains resident. [Validation and measurements](../../experiments/source-reads/RESULTS.md)
+compare current-code resident/backed storage and repeat the admitted workflows.

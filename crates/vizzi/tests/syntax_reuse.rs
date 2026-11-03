@@ -87,14 +87,14 @@ fn repeated_targeted_edits_reuse_trees_across_workers_and_match_clean_captures()
                 .unwrap()
                 .create()
                 .unwrap()
-                .analyze(file.source().unwrap().as_bytes())
+                .analyze(file.resident_source().unwrap().as_bytes())
                 .unwrap();
             assert_eq!(file.analyses(), [fresh]);
         }
         previous = result.snapshot;
     }
     assert_eq!(
-        original.file_by_path("a.rs").unwrap().source(),
+        original.file_by_path("a.rs").unwrap().resident_source(),
         Some("fn rust() {}")
     );
     std::fs::remove_file(root.path().join("c.c")).unwrap();
@@ -170,7 +170,7 @@ fn growth_beyond_the_replacement_allowance_keeps_facts_and_can_reprime_all_langu
                 .unwrap()
                 .create()
                 .unwrap()
-                .analyze(file.captured().bytes())
+                .analyze(file.captured().read_all(usize::MAX).unwrap().bytes())
                 .unwrap();
             assert_eq!(file.analyses(), [fresh]);
         }
@@ -186,7 +186,7 @@ fn growth_beyond_the_replacement_allowance_keeps_facts_and_can_reprime_all_langu
         previous = result.snapshot;
     }
     assert_eq!(
-        original.file_by_path("a.rs").unwrap().source(),
+        original.file_by_path("a.rs").unwrap().resident_source(),
         Some("fn original() {}")
     );
 }

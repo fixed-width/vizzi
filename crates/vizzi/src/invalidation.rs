@@ -385,7 +385,7 @@ mod tests {
         let expected = engine.refresh(None, &|| false).unwrap().unwrap();
         assert_eq!(app.snapshot().unwrap().id(), expected.snapshot.id());
         assert_eq!(
-            app.snapshot().unwrap().documents()[0].source(),
+            app.snapshot().unwrap().documents()[0].resident_source(),
             Some("fn changed_a() {}")
         );
         assert_eq!(queue.plan(&app).scope, CaptureScope::Reconcile);

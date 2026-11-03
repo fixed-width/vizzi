@@ -152,7 +152,7 @@ mod tests {
         )
         .unwrap();
         assert_eq!(
-            &doc.source().unwrap()[doc.analyses()[0].facts[1].span.clone()],
+            &doc.resident_source().unwrap()[doc.analyses()[0].facts[1].span.clone()],
             "fn same() {}"
         );
     }

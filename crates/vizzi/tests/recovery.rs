@@ -177,7 +177,7 @@ fn foreground_publishes_during_a_held_recovery_and_recovery_cannot_regress_it() 
             .unwrap()
             .file_by_path("a.rs")
             .unwrap()
-            .source()
+            .resident_source()
             == Some("fn foreground_a() {}")
     });
     activity.hold.store(false, Ordering::Release);
@@ -188,18 +188,18 @@ fn foreground_publishes_during_a_held_recovery_and_recovery_cannot_regress_it() 
             .unwrap()
             .file_by_path("b.rs")
             .unwrap()
-            .source()
+            .resident_source()
             == Some("fn slow_recovered() {}")));
     assert_eq!(
         app.snapshot()
             .unwrap()
             .file_by_path("a.rs")
             .unwrap()
-            .source(),
+            .resident_source(),
         Some("fn foreground_a() {}")
     );
     assert_eq!(
-        original.file_by_path("a.rs").unwrap().source(),
+        original.file_by_path("a.rs").unwrap().resident_source(),
         Some("fn original() {}")
     );
     assert!(activity.peak.load(Ordering::SeqCst) <= 2);
@@ -231,7 +231,7 @@ fn hard_discovery_cancels_held_recovery_and_shutdown_joins_it() {
             .unwrap()
             .file_by_path("b.rs")
             .unwrap()
-            .source()
+            .resident_source()
             == Some("fn replacement() {}")));
     fixture.activity.started.store(false, Ordering::Release);
     std::fs::write(
@@ -267,7 +267,7 @@ fn recovery_failure_retains_the_observation_and_retries_without_foreground_error
             .unwrap()
             .file_by_path("b.rs")
             .unwrap()
-            .source()
+            .resident_source()
             == Some("fn restored() {}")));
     assert_eq!(app.status().recovery.error, None);
 }
@@ -298,7 +298,7 @@ fn single_worker_recovers_silent_changes_serially_and_rejects_invalid_intervals(
         .unwrap()
         .file_by_path("b.rs")
         .unwrap()
-        .source()
+        .resident_source()
         == Some("fn recovered_serially() {}")));
     assert_eq!(app.status().recovery.completed, 0);
     assert!(!app.status().recovery.running);
@@ -339,7 +339,7 @@ fn a_finished_private_candidate_is_discarded_after_hard_invalidation() {
         .unwrap()
         .file_by_path("c.rs")
         .unwrap()
-        .source()
+        .resident_source()
         == Some("fn silent_after_discard() {}")));
 }
 
@@ -359,7 +359,7 @@ fn new_hints_interrupt_an_overlay_and_the_fresh_retry_recovers_a_later_silent_ed
         .unwrap()
         .file_by_path("a.rs")
         .unwrap()
-        .source()
+        .resident_source()
         == Some("fn foreground_a() {}")));
     activity.overlay_hold.store(true, Ordering::Release);
     std::fs::write(fixture.root.path().join("a.rs"), "fn slow_overlay() {}").unwrap();
@@ -372,7 +372,7 @@ fn new_hints_interrupt_an_overlay_and_the_fresh_retry_recovers_a_later_silent_ed
             .unwrap()
             .file_by_path("c.rs")
             .unwrap()
-            .source()
+            .resident_source()
             == Some("fn newest_c() {}")
     });
     activity.overlay_hold.store(false, Ordering::Release);
@@ -386,7 +386,7 @@ fn new_hints_interrupt_an_overlay_and_the_fresh_retry_recovers_a_later_silent_ed
             .unwrap()
             .file_by_path("a.rs")
             .unwrap()
-            .source()
+            .resident_source()
             == Some("fn slow_overlay() {}")));
     assert_eq!(
         app.snapshot().unwrap().id(),
@@ -446,7 +446,7 @@ fn foreground_discovery_registers_new_directories_before_the_next_periodic_pass(
         .unwrap()
         .file_by_path("new/fresh.rs")
         .unwrap()
-        .source()
+        .resident_source()
         == Some("fn changed_via_new_watch() {}")));
 }
 
@@ -485,7 +485,7 @@ fn recovery_input_admission_preserves_foreground_headroom_and_releases_on_shutdo
         .unwrap()
         .file_by_path("a.rs")
         .unwrap()
-        .source()
+        .resident_source()
         == Some(foreground.as_str())));
     drop(host);
     assert_eq!(budget.stats().active_bytes, 0);

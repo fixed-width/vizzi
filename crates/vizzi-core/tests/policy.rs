@@ -351,9 +351,9 @@ fn source_only_encoding_and_pinned_classification_do_not_require_fake_analysis()
         .unwrap(),
     );
     assert_eq!(a.encoding(), SourceEncoding::Unsupported);
-    assert!(a.source().is_none());
+    assert!(a.resident_source().is_none());
     let snapshot = Snapshot::new(workspace.clone(), vec![a.clone()], p.id().clone()).unwrap();
-    let view = snapshot.view(&Default::default());
+    let view = snapshot.view(&Default::default()).unwrap();
     assert_eq!(view.source_only, 1);
     assert_eq!(view.analyzed, 0);
     assert_eq!(view.total, 1);

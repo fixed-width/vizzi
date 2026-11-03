@@ -16,14 +16,16 @@ fn source_storage_reports_capacity_and_index_buffers_without_copying_or_touching
     assert!(observed.index_capacity >= observed.index_entries);
     assert_eq!(
         observed.index_bytes,
-        observed.index_capacity * std::mem::size_of::<usize>()
+        observed.index_capacity * std::mem::size_of::<usize>() + observed.terminator_bytes
     );
-    assert_eq!(source.text(), Some("α\r\nb\n"));
+    assert_eq!(source.resident_text(), Some("α\r\nb\n"));
     assert_eq!(source.storage(), observed);
-    let shared = CapturedSource::capture(source.bytes().to_vec(), Some(&source));
+    assert!(observed.integrity_bytes >= 32);
+    assert_eq!(observed.integrity_bytes % 32, 0);
+    let shared = CapturedSource::capture(source.resident_bytes().unwrap().to_vec(), Some(&source));
     assert!(Arc::ptr_eq(&source, &shared));
     assert_eq!(shared.storage(), observed);
-    let distinct = CapturedSource::capture(source.bytes().to_vec(), None);
+    let distinct = CapturedSource::capture(source.resident_bytes().unwrap().to_vec(), None);
     assert!(!Arc::ptr_eq(&source, &distinct));
     assert_eq!(source.content(), distinct.content());
 }
@@ -39,6 +41,7 @@ fn unsupported_and_empty_buffers_keep_their_existing_line_semantics() {
     assert_eq!(source.storage().index_entries, 1);
     assert_eq!(source.line_count(), 0);
     let empty = CapturedSource::capture(Vec::new(), None);
+    assert!(empty.is_empty());
     assert_eq!(empty.storage().source_bytes, 0);
     assert_eq!(empty.storage().byte_capacity, 0);
     assert_eq!(empty.storage().index_entries, 1);

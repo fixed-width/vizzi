@@ -1,0 +1,579 @@
+{
+  "base_commit": "8acfb4acfa37338fdbd44fc79375acaf233f6980",
+  "tool": "cargo-mutants 27.1.0",
+  "baseline": "passed for each contributing run",
+  "scope": [
+    "crates/vizzi-core/src/captured_source.rs",
+    "crates/vizzi-core/src/model.rs",
+    "crates/vizzi-core/src/projection.rs",
+    "crates/vizzi-core/src/query.rs",
+    "crates/vizzi/src/engine.rs",
+    "crates/vizzi/src/main.rs",
+    "crates/vizzi/src/server.rs",
+    "crates/vizzi/src/source.rs",
+    "crates/vizzi/src/source_spool.rs"
+  ],
+  "tested": 522,
+  "counts": {
+    "Unviable": 105,
+    "CaughtMutant": 402,
+    "Timeout": 15
+  },
+  "per_file": {
+    "crates/vizzi-core/src/captured_source.rs": {
+      "CaughtMutant": 140,
+      "Unviable": 23,
+      "Timeout": 5
+    },
+    "crates/vizzi-core/src/model.rs": {
+      "Unviable": 28,
+      "CaughtMutant": 45
+    },
+    "crates/vizzi-core/src/projection.rs": {
+      "CaughtMutant": 45,
+      "Unviable": 2,
+      "Timeout": 1
+    },
+    "crates/vizzi-core/src/query.rs": {
+      "Unviable": 2,
+      "CaughtMutant": 26
+    },
+    "crates/vizzi/src/engine.rs": {
+      "Unviable": 7,
+      "CaughtMutant": 63,
+      "Timeout": 4
+    },
+    "crates/vizzi/src/main.rs": {
+      "Unviable": 2,
+      "CaughtMutant": 24
+    },
+    "crates/vizzi/src/server.rs": {
+      "Unviable": 18,
+      "CaughtMutant": 10
+    },
+    "crates/vizzi/src/source.rs": {
+      "Unviable": 16,
+      "CaughtMutant": 31,
+      "Timeout": 5
+    },
+    "crates/vizzi/src/source_spool.rs": {
+      "Unviable": 7,
+      "CaughtMutant": 18
+    }
+  },
+  "non_caught": [
+    {
+      "name": "crates/vizzi/src/engine.rs:115:9: replace Engine::with_syntax_cache -> Self with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:120:9: replace Engine::with_admission -> Self with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:125:9: replace Engine::directory -> &Directory with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:136:9: replace Engine::refresh -> Result<Option<Refresh>, EngineError> with Ok(Some(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:147:9: replace Engine::refresh_scoped -> Result<Option<Refresh>, EngineError> with Ok(Some(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:128:9: replace Engine::workers -> usize with 0",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:163:9: replace Engine::refresh_budget -> Result<Option<Refresh>, EngineError> with Ok(Some(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:128:9: replace Engine::workers -> usize with 1",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:147:9: replace Engine::refresh_scoped -> Result<Option<Refresh>, EngineError> with Ok(None)",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:163:9: replace Engine::refresh_budget -> Result<Option<Refresh>, EngineError> with Ok(None)",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/engine.rs:438:17: replace && with || in Engine::can_capture_paths",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:72:9: replace Directory::open -> io::Result<Self> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:79:9: replace Directory::with_spool -> io::Result<Self> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:89:9: replace Directory::with_languages -> io::Result<Self> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:97:9: replace Directory::with_policy -> io::Result<Self> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:113:9: replace Directory::root -> &Path with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:117:9: replace Directory::workspace -> &WorkspaceId with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:128:9: replace Directory::capture -> io::Result<Capture> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:139:9: replace Directory::capture_reusing -> io::Result<Option<Capture>> with Ok(Some(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:149:9: replace Directory::capture_full -> io::Result<Option<Capture>> with Ok(Some(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:205:9: replace Directory::capture_paths -> io::Result<Capture> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:214:9: replace Directory::capture_hints -> io::Result<Option<Capture>> with Ok(Some(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:139:9: replace Directory::capture_reusing -> io::Result<Option<Capture>> with Ok(None)",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:149:9: replace Directory::capture_full -> io::Result<Option<Capture>> with Ok(None)",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:200:13: delete ! in Directory::capture_full",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:292:9: replace Directory::read_source -> io::Result<Option<Arc<CapturedSource>>> with Ok(Some(Arc::new(Default::default())))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:322:9: replace Directory::policy -> &SourcePolicy with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:326:9: replace Directory::plan -> &CapturePlan with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:332:9: replace Directory::classification -> io::Result<Option<Classification>> with Ok(Some(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:343:9: replace Directory::language -> Option<&Language> with Some(Box::leak(Box::new(Default::default())))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:292:9: replace Directory::read_source -> io::Result<Option<Arc<CapturedSource>>> with Ok(None)",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/source.rs:311:13: delete ! in Directory::read_source",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:158:9: replace Document::capture -> Result<Self, ModelError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:174:9: replace Document::capture_source -> Result<Self, ModelError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:185:9: replace Document::capture_loaded -> Result<Self, ModelError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:207:9: replace Document::capture_validated -> Result<Self, ModelError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:273:9: replace Document::id -> &FileId with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:281:9: replace Document::content -> &ContentId with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:285:9: replace Document::version -> &DocumentVersion with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:297:9: replace Document::encoding -> SourceEncoding with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:301:9: replace Document::captured -> &Arc<CapturedSource> with Box::leak(Box::new(Arc::new(Default::default())))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:305:9: replace Document::analyses -> &[Analysis] with Vec::leak(vec![Default::default()])",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:309:9: replace Document::classification -> &Classification with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:313:9: replace Document::entity_id -> EntityId with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:325:9: replace Document::lines -> Range<usize> with Range::new()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:325:9: replace Document::lines -> Range<usize> with Range::from_iter([0])",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:325:9: replace Document::lines -> Range<usize> with Range::new(0)",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:325:9: replace Document::lines -> Range<usize> with Range::from_iter([1])",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:325:9: replace Document::lines -> Range<usize> with Range::from(0)",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:325:9: replace Document::lines -> Range<usize> with Range::from(1)",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:325:9: replace Document::lines -> Range<usize> with Range::new(1)",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:356:9: replace Snapshot::verified -> Result<Self, ModelError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:364:9: replace Snapshot::build -> Result<Self, ModelError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:411:9: replace Snapshot::id -> &SnapshotId with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:415:9: replace Snapshot::workspace -> &WorkspaceId with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:419:9: replace Snapshot::policy -> &CapturePolicyId with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:423:9: replace Snapshot::capture_plan -> Option<&CapturePlanId> with Some(Box::leak(Box::new(Default::default())))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:435:9: replace Snapshot::file_by_path -> Option<&Arc<Document>> with Some(Box::leak(Box::new(Arc::new(Default::default()))))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:442:9: replace Snapshot::documents -> &[Arc<Document>] with Vec::leak(vec![Arc::new(Default::default())])",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/model.rs:446:9: replace Snapshot::file -> Option<&Arc<Document>> with Some(Box::leak(Box::new(Arc::new(Default::default()))))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/query.rs:165:9: replace Snapshot::view -> Result<View, SourceReadError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/query.rs:173:9: replace Snapshot::view_with_limit -> Result<View, SourceReadError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/main.rs:36:13: delete match arm \"--cache\" in main",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/main.rs:31:13: delete match arm \"--root\" in main",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:48:5: replace status -> Json<crate::application::Status> with Json::new()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:48:5: replace status -> Json<crate::application::Status> with Json::from_iter([Default::default()])",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:48:5: replace status -> Json<crate::application::Status> with Json::new(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:48:5: replace status -> Json<crate::application::Status> with Json::from(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:77:5: replace source_work -> Result<T, ApiError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:101:5: replace view -> Result<Json<View>, ApiError> with Ok(Json::new())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:101:5: replace view -> Result<Json<View>, ApiError> with Ok(Json::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:101:5: replace view -> Result<Json<View>, ApiError> with Ok(Json::from_iter([Default::default()]))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:101:5: replace view -> Result<Json<View>, ApiError> with Ok(Json::from(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:137:5: replace window -> Result<Json<PinnedWindow>, ApiError> with Ok(Json::new())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:137:5: replace window -> Result<Json<PinnedWindow>, ApiError> with Ok(Json::from_iter([Default::default()]))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:137:5: replace window -> Result<Json<PinnedWindow>, ApiError> with Ok(Json::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:137:5: replace window -> Result<Json<PinnedWindow>, ApiError> with Ok(Json::from(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:173:5: replace source -> Result<Json<serde_json::Value>, ApiError> with Ok(Json::new())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:173:5: replace source -> Result<Json<serde_json::Value>, ApiError> with Ok(Json::from_iter([Default::default()]))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:173:5: replace source -> Result<Json<serde_json::Value>, ApiError> with Ok(Json::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:173:5: replace source -> Result<Json<serde_json::Value>, ApiError> with Ok(Json::from(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/server.rs:209:5: replace diagnostic -> Result<DiagnosticResponse, Box<dyn std::error::Error>> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source_spool.rs:26:9: replace Inner::lock -> MutexGuard<'_, State> with MutexGuard::new()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source_spool.rs:26:9: replace Inner::lock -> MutexGuard<'_, State> with MutexGuard::from_iter([Default::default()])",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source_spool.rs:26:9: replace Inner::lock -> MutexGuard<'_, State> with MutexGuard::new(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source_spool.rs:26:9: replace Inner::lock -> MutexGuard<'_, State> with MutexGuard::from(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source_spool.rs:80:9: replace SourceSpool::directory -> &Path with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source_spool.rs:88:9: replace SourceSpool::persist -> Result<Arc<CapturedSource>, SourceReadError> with Ok(Arc::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/source_spool.rs:116:9: replace SourceSpool::stats -> SpoolStats with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/projection.rs:129:9: replace Document::entry -> Option<Entry> with Some(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/projection.rs:114:16: replace -= with /= in floor",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi-core/src/projection.rs:188:9: replace Document::window -> Result<Window, SourceReadError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:8:36: replace * with /",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:82:9: replace SourceInput<'a>::content -> &ContentId with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:98:9: replace CapturedSource::capture -> Arc<Self> with Arc::new(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:138:9: replace CapturedSource::with_backing -> Arc<Self> with Arc::new(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:155:9: replace CapturedSource::content -> &ContentId with Box::leak(Box::new(Default::default()))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:179:9: replace CapturedSource::encoding -> SourceEncoding with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:191:9: replace CapturedSource::reader -> SourceSession<'_> with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:198:9: replace CapturedSource::read_all -> Result<SourceInput<'_>, SourceReadError> with Ok(Default::default())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:222:9: replace CapturedSource::storage -> SourceStorage with Default::default()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:237:9: replace CapturedSource::line_range -> Option<Range<usize>> with Some(Range::new())",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:237:9: replace CapturedSource::line_range -> Option<Range<usize>> with Some(Range::from_iter([0]))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:237:9: replace CapturedSource::line_range -> Option<Range<usize>> with Some(Range::new(0))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:237:9: replace CapturedSource::line_range -> Option<Range<usize>> with Some(Range::from(0))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:237:9: replace CapturedSource::line_range -> Option<Range<usize>> with Some(Range::from_iter([1]))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:237:9: replace CapturedSource::line_range -> Option<Range<usize>> with Some(Range::new(1))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:237:9: replace CapturedSource::line_range -> Option<Range<usize>> with Some(Range::from(1))",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:256:9: replace CapturedSource::lines -> Range<usize> with Range::new()",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:256:9: replace CapturedSource::lines -> Range<usize> with Range::from_iter([0])",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:256:9: replace CapturedSource::lines -> Range<usize> with Range::from(0)",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:256:9: replace CapturedSource::lines -> Range<usize> with Range::new(0)",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:256:9: replace CapturedSource::lines -> Range<usize> with Range::from_iter([1])",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:256:9: replace CapturedSource::lines -> Range<usize> with Range::new(1)",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:256:9: replace CapturedSource::lines -> Range<usize> with Range::from(1)",
+      "outcome": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:289:18: replace < with <= in SourceSession<'a>::read",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:290:28: replace / with % in SourceSession<'a>::read",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:292:49: replace * with / in SourceSession<'a>::read",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:292:44: replace + with * in SourceSession<'a>::read",
+      "outcome": "Timeout"
+    },
+    {
+      "name": "crates/vizzi-core/src/captured_source.rs:342:20: replace -= with /= in SourceSession<'a>::floor",
+      "outcome": "Timeout"
+    }
+  ],
+  "commands": [
+    "cargo mutants -p vizzi-core -p vizzi --all-features --config experiments/incremental/mutants.toml -f crates/vizzi-core/src/captured_source.rs -f crates/vizzi-core/src/model.rs -f crates/vizzi-core/src/query.rs -f crates/vizzi-core/src/projection.rs -f crates/vizzi/src/source_spool.rs -f crates/vizzi/src/source.rs -f crates/vizzi/src/engine.rs -f crates/vizzi/src/server.rs -f crates/vizzi/src/main.rs --test-workspace true -j 4 --timeout 25 --build-timeout 180 -C --offline",
+    "cargo mutants -p vizzi-core -p vizzi --all-features --no-config -f crates/vizzi-core/src/captured_source.rs -f crates/vizzi/src/source_spool.rs -f crates/vizzi/src/server.rs -f crates/vizzi/src/main.rs --test-workspace true -j 4 --timeout 25 --build-timeout 180 -C --offline",
+    "cargo mutants -p vizzi-core --no-config -f crates/vizzi-core/src/captured_source.rs -f crates/vizzi-core/src/projection.rs --test-workspace false -j 4 --timeout 20 --build-timeout 180 -C --offline",
+    "cargo mutants -p vizzi-core --no-config -f crates/vizzi-core/src/captured_source.rs --test-workspace false -j 4 --timeout 20 --build-timeout 180 -C --offline",
+    "cargo mutants -p vizzi-core --no-config -f crates/vizzi-core/src/captured_source.rs --re 'replace / with \\* in CapturedSource::capture' --test-workspace false -j 1 --timeout 20 --build-timeout 180 -C --offline"
+  ],
+  "source_sha256": {
+    "crates/vizzi-core/src/captured_source.rs": "5461e23adb4eee7a23db79193786f6ea6c91b1ff36ea7d0f7509843008859035",
+    "crates/vizzi-core/src/model.rs": "067680560543fc143e97ccaad2a011d3c946775072b7f7db6078cb1d76f108f6",
+    "crates/vizzi-core/src/projection.rs": "f5395fe12279f9f172c073da7645f9d472a31a9d160f6cd22eb8e752dfe5c17f",
+    "crates/vizzi-core/src/query.rs": "3c2901659f7cf517ad065bd530d1e27218a2801526874a9531fba9f5b28e0165",
+    "crates/vizzi/src/engine.rs": "47336db32583f0a7facc74fc08c759c302bd4a676d24206ec3b67fffe40ac425",
+    "crates/vizzi/src/main.rs": "c671d70ecb2eb1214e887414ee16f70279c782079cd3f3d1aa30ba38766a458c",
+    "crates/vizzi/src/server.rs": "62cbe1044a53a60453773ccdc65a5146b5c81b72eed4df09419ac9433ddda892",
+    "crates/vizzi/src/source.rs": "6b35e3dd6bc40c6e10a90f0f602c98141f4c32b566c2eb0830108d074a4ba4e0",
+    "crates/vizzi/src/source_spool.rs": "ec881944b58a9e43436fd5fe7ecebeac08fcfe813925165c0f686aa7b2f866dc"
+  },
+  "exclusions": [
+    "Existing equivalent engine directory-prefix < versus <= comparison in the broad config; no new exclusions."
+  ],
+  "development_notes": [
+    "Initial complete nine-module run: 527 tested, 390 caught, 105 unviable, 13 timeouts, 19 survivors. Investigated CLI enable/conversion, exact spool/bulk limits, refusal/IO accounting, CRLF allocation and byte-boundary Unicode labels.",
+    "Removed a redundant UTF-8 floor bound; verified UTF-8 and three-byte lookbehind guarantee the preceding boundary. HTTP query ranges are clamped/validated; internal InvalidRange read failures are 503, so removed the unnecessary 400 mapping.",
+    "Complete updated native main/spool/server scopes resolve their survivors. Complete projection scope resolves Unicode label gap. Complete final reader scope has one retained CRLF allocation-overgrowth survivor, resolved by the compact-bitset capacity test and two-mutant verified rerun.",
+    "Aggregate selects unchanged model/query/source/engine from the broad run, main/spool/server from their complete rerun, projection from complete core rerun, and the final complete reader with the two verified CRLF outcomes replacing corresponding entries. No duplicate outcomes.",
+    "Other overlapping development capture-function and source/module reruns are not summed. Final production bodies match recorded hashes; later changes were tests/orchestration."
+  ],
+  "limits": [
+    "Caught counts are assertion/test-process failures; timeouts break progress and are separate. Unviable substitutions are build failures.",
+    "Complete affected production modules were exercised. Final reader/projection reruns use core tests; normal workspace/native HTTP/browser integration checks exercise the combined final implementation.",
+    "Dependency/grammar internals, serialization/hash macro bodies, optional benchmark orchestration, Python, allocator/filesystem internals, JS/CSS painting and browser internals are outside these native mutation scopes."
+  ]
+}

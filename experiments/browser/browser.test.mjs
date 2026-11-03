@@ -296,7 +296,7 @@ test("source text stays text, and syntax/encoding limits are visible", async () 
 
 test("deferred files stay readable and resume outlines after an admitted edit", async () => {
   const large = "// deferred source stays readable\nfn original() {}\n" + " ".repeat(800000);
-  const fixture = await workspace({files:{"a.rs":large},sourceArguments:["--analysis-input-mib","1"]});
+  const fixture = await workspace({files:{"a.rs":large},sourceArguments:["--analysis-input-mib","1","--source-spool-mib","16"]});
   let live,session;
   try {
     live=await startHost(fixture);session=await openWorkspace(chromium,live);const {page}=session;

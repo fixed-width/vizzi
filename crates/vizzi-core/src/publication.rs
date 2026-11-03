@@ -131,13 +131,13 @@ mod tests {
             publication.publish(ticket, snapshot(text));
         }
         assert_eq!(
-            publication.pinned(first.id().as_str()).unwrap().documents()[0].source(),
+            publication.pinned(first.id().as_str()).unwrap().documents()[0].resident_source(),
             Some("first")
         );
         let ticket = publication.request();
         publication.publish(ticket, snapshot("fifth"));
         assert!(publication.pinned(first.id().as_str()).is_none());
-        assert_eq!(first.documents()[0].source(), Some("first"));
+        assert_eq!(first.documents()[0].resident_source(), Some("first"));
     }
     #[test]
     fn failures_clear_only_the_latest_request_and_preserve_the_generation() {

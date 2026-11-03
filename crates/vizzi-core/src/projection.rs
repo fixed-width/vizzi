@@ -1,6 +1,6 @@
 //! Finite source/outline projections over an immutable captured document.
 
-use crate::model::{Document, DocumentVersion, EntityId, FileId};
+use crate::model::{Document, DocumentVersion, EntityId, FileId, SourceEncoding, SourceReadError};
 use serde::{Deserialize, Serialize};
 
 /// Limits count as well as unescaped UTF-8 text; JSON escaping has a finite multiplier.
@@ -180,7 +180,11 @@ impl Document {
             })
     }
     /// Returns bounded text/outline rows; old source is used only for identity recovery.
-    pub fn window(&self, query: &WindowQuery, previous: Option<&Document>) -> Window {
+    pub fn window(
+        &self,
+        query: &WindowQuery,
+        previous: Option<&Document>,
+    ) -> Result<Window, SourceReadError> {
         let line_total = self.captured().line_count();
         let line_start = query.line_start.unwrap_or(1).clamp(1, line_total.max(1));
         let count = query
@@ -190,27 +194,33 @@ impl Document {
             .min(line_total.saturating_sub(line_start - 1));
         let allowance = SOURCE_BYTES / count.max(1);
         let mut lines = Vec::new();
-        if let Some(source) = self.source() {
+        let mut reader = self.captured().reader();
+        if self.encoding() == SourceEncoding::Utf8 {
             for number in line_start..line_start.saturating_add(count) {
                 if let Some(range) = self.captured().line_range(number) {
-                    let text = &source[range];
-                    let column = floor(
-                        text,
+                    let column = reader.floor(
+                        &range,
                         if query.column_line == Some(number) {
                             query.column.unwrap_or(0)
                         } else {
                             0
                         },
-                    );
-                    let end = floor(text, column.saturating_add(allowance));
+                    )?;
+                    let end = reader.floor(&range, column.saturating_add(allowance))?;
+                    let text = String::from_utf8(
+                        reader
+                            .read(range.start + column..range.start + end, allowance)?
+                            .into_owned(),
+                    )
+                    .map_err(|_| SourceReadError::Integrity)?;
                     lines.push(Line {
                         number,
                         column,
                         end_column: end,
-                        line_bytes: text.len(),
-                        text: text[column..end].into(),
+                        line_bytes: range.len(),
+                        text,
                         left: column > 0,
-                        right: end < text.len(),
+                        right: end < range.len(),
                     });
                 }
             }
@@ -237,7 +247,7 @@ impl Document {
                     .clamp(1, OUTLINE_ROWS),
             )
             .min(total);
-        Window {
+        Ok(Window {
             schema: 1,
             file: self.id().clone(),
             version: self.version().clone(),
@@ -248,6 +258,6 @@ impl Document {
             outline_start: start,
             outline: (start..end).filter_map(|index| self.entry(index)).collect(),
             cursor: self.entry(cursor),
-        }
+        })
     }
 }

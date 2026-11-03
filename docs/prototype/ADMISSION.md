@@ -75,3 +75,7 @@ a separate storage/capture design.
 See the [measurement procedure](../../experiments/admission/README.md),
 [results](../../experiments/admission/RESULTS.md), and
 [delivery plan](../plans/indexing-admission.md) for resource checks and remaining limits.
+
+Analysis over backed source acquires its input permit before an explicit verified full
+load and holds it through cache/parser/fact validation. Pinned inspection uses bounded
+range sessions and remains available for deferred inputs. See [source reads](SOURCE_READS.md).

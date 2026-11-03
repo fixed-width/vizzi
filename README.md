@@ -18,6 +18,7 @@ validating coordination; it does not qualify large-codebase GPU performance.
 - [Incremental-capture contract](docs/prototype/INCREMENTAL_CAPTURE.md) and [periodic recovery](docs/prototype/RECOVERY.md)
 - [Captured document and snapshot identities](docs/prototype/IDENTITIES.md)
 - [Shared captured-source ownership](docs/prototype/CAPTURED_SOURCE.md)
+- [Fallible source reads and private backing](docs/prototype/SOURCE_READS.md)
 - [Language adapters and shared worker budget](docs/prototype/LANGUAGES.md)
 - [Cooperative analysis cancellation](docs/prototype/ANALYSIS_CANCELLATION.md)
 - [Bounded syntax retention](docs/prototype/SYNTAX_RETENTION.md)
@@ -43,6 +44,7 @@ validating coordination; it does not qualify large-codebase GPU performance.
 - [Replacement-allowance validation and measurements](experiments/allowances/RESULTS.md)
 - [Source availability under input admission](experiments/admission/RESULTS.md)
 - [Captured-source storage and ownership measurements](experiments/source-storage/RESULTS.md)
+- [Verified reads and immutable-backing measurements](experiments/source-reads/RESULTS.md)
 - [Earlier performance experiments](experiments/performance/README.md)
 - [Contributor guidance](AGENTS.md)
 

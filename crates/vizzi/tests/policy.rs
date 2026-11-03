@@ -49,7 +49,10 @@ fn expanding_an_empty_snapshot_discovers_unhinted_headers() {
     assert!(expanded.measurements.reconciled);
     assert_eq!(expanded.snapshot.documents().len(), 1);
     assert_eq!(expanded.measurements.parsed, 0);
-    assert_eq!(expanded.snapshot.documents()[0].source(), Some("struct A;"));
+    assert_eq!(
+        expanded.snapshot.documents()[0].resident_source(),
+        Some("struct A;")
+    );
     assert!(expanded.snapshot.documents()[0].analyses().is_empty());
     assert_ne!(initial.snapshot.id(), expanded.snapshot.id());
     assert_eq!(
@@ -108,7 +111,7 @@ fn changed_policy_keeps_raw_cache_and_file_identity_but_updates_pinned_metadata(
         first.snapshot.documents()[1].version(),
         changed.snapshot.documents()[1].version()
     );
-    let view = first.snapshot.view(&Default::default());
+    let view = first.snapshot.view(&Default::default()).unwrap();
     assert_eq!(view.schema, 2);
     assert_eq!(view.analyzed, 1);
     assert_eq!(view.source_only, 1);
@@ -141,7 +144,7 @@ fn changed_policy_keeps_raw_cache_and_file_identity_but_updates_pinned_metadata(
             .id()
     );
     assert_eq!(
-        first.snapshot.documents()[1].source(),
+        first.snapshot.documents()[1].resident_source(),
         Some("struct Header;")
     );
 }

@@ -71,12 +71,12 @@ fn busy_analysis_publishes_truthful_source_and_retries_without_an_edit() {
     let limited = make().with_admission(budget.clone());
     let deferred = limited.refresh(None, &|| false).unwrap().unwrap();
     let file = deferred.snapshot.file_by_path("a.rs").unwrap();
-    assert_eq!(file.source(), Some("fn original() {}"));
+    assert_eq!(file.resident_source(), Some("fn original() {}"));
     assert_eq!(file.analyses()[0].coverage, Coverage::Deferred);
     assert!(file.analyses()[0].facts.is_empty());
     assert_eq!(deferred.measurements.deferred, 1);
     assert_eq!(std::fs::read_dir(cache.path()).unwrap().count(), 0);
-    let view = deferred.snapshot.view(&Default::default());
+    let view = deferred.snapshot.view(&Default::default()).unwrap();
     assert_eq!(view.files[0].coverage, Coverage::Deferred);
     assert_eq!(
         view.source.unwrap().text.as_deref(),
@@ -134,7 +134,7 @@ fn oversized_inputs_keep_source_and_language_assignment_instead_of_stale_facts()
         .unwrap()
         .unwrap();
     let file = result.snapshot.file_by_path("a.rs").unwrap();
-    assert_eq!(file.source(), Some("fn changed() {}"));
+    assert_eq!(file.resident_source(), Some("fn changed() {}"));
     assert_eq!(file.classification().assigned_language(), Some("rust"));
     assert_eq!(file.analyses()[0].coverage, Coverage::Deferred);
     assert!(file.analyses()[0].diagnostics[0].contains("per-file"));

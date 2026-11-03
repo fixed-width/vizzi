@@ -343,3 +343,31 @@ fn admission_option_preserves_source_and_rejects_invalid_budgets() {
         assert!(!output.status.success());
     }
 }
+
+#[test]
+fn source_spool_cli_enforces_exact_disk_capacity_and_accepts_the_enable_flag() {
+    let root = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    let file = root.path().join("a.rs");
+    for bytes in [1024 * 1024, 1024 * 1024 + 1] {
+        std::fs::write(&file, " ".repeat(bytes)).unwrap();
+        let output = std::process::Command::new(env!("CARGO_BIN_EXE_vizzi"))
+            .args([
+                "--root",
+                root.path().to_str().unwrap(),
+                "--cache",
+                cache.path().to_str().unwrap(),
+                "--once",
+                "--source-spool-mib",
+                "1",
+            ])
+            .output()
+            .unwrap();
+        assert_eq!(
+            output.status.success(),
+            bytes == 1024 * 1024,
+            "{}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
+}

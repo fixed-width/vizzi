@@ -62,6 +62,37 @@ async fn events(State(app): State<Arc<Application>>) -> impl IntoResponse {
 struct VersionQuery {
     snapshot: Option<String>,
 }
+static SOURCE_READS: tokio::sync::Semaphore = tokio::sync::Semaphore::const_new(4);
+fn source_error(error: vizzi_core::model::SourceReadError) -> ApiError {
+    use vizzi_core::model::SourceReadError;
+    let status = match error {
+        SourceReadError::Capacity => StatusCode::PAYLOAD_TOO_LARGE,
+        _ => StatusCode::SERVICE_UNAVAILABLE,
+    };
+    (status, error.to_string())
+}
+async fn source_work<T: Send + 'static>(
+    work: impl FnOnce() -> Result<T, vizzi_core::model::SourceReadError> + Send + 'static,
+) -> Result<T, ApiError> {
+    let permit = SOURCE_READS.try_acquire().map_err(|_| {
+        (
+            StatusCode::TOO_MANY_REQUESTS,
+            "Source read capacity is busy; retry inspection".into(),
+        )
+    })?;
+    tokio::task::spawn_blocking(move || {
+        let _permit = permit;
+        work()
+    })
+    .await
+    .map_err(|_| {
+        (
+            StatusCode::SERVICE_UNAVAILABLE,
+            "Source read worker failed".into(),
+        )
+    })?
+    .map_err(source_error)
+}
 async fn view(
     State(app): State<Arc<Application>>,
     Query(version): Query<VersionQuery>,
@@ -78,7 +109,7 @@ async fn view(
             "Initial capture is not ready".into(),
         ))?
     };
-    Ok(Json(snapshot.view(&query)))
+    Ok(Json(source_work(move || snapshot.view(&query)).await?))
 }
 #[derive(Deserialize)]
 struct SourceQuery {
@@ -122,10 +153,18 @@ async fn window(
         .as_deref()
         .and_then(|id| app.pinned(id));
     let previous_file = previous.as_ref().and_then(|old| old.file(&pin.file));
-    Ok(Json(PinnedWindow {
-        snapshot: snapshot.id().clone(),
-        window: file.window(&query, previous_file.map(AsRef::as_ref)),
-    }))
+    let file = file.clone();
+    let previous_file = previous_file.cloned();
+    let snapshot_id = snapshot.id().clone();
+    Ok(Json(
+        source_work(move || {
+            Ok(PinnedWindow {
+                snapshot: snapshot_id,
+                window: file.window(&query, previous_file.as_deref())?,
+            })
+        })
+        .await?,
+    ))
 }
 async fn source(
     State(app): State<Arc<Application>>,
@@ -139,9 +178,11 @@ async fn source(
         StatusCode::NOT_FOUND,
         "File is absent from this snapshot".into(),
     ))?;
-    Ok(Json(
-        serde_json::json!({ "schema": 2, "snapshot": snapshot.id(), "policy": snapshot.policy(), "file": file.id(), "version": file.version(), "path": file.path(), "text": file.source(), "encoding": file.encoding(), "classification": file.classification() }),
-    ))
+    let file = file.clone();
+    Ok(Json(source_work(move|| {
+        let text=file.captured().read_text(vizzi_core::model::BULK_SOURCE_LIMIT)?.map(|text|text.into_owned());
+        Ok(serde_json::json!({ "schema": 2, "snapshot": snapshot.id(), "policy": snapshot.policy(), "file": file.id(), "version": file.version(), "path": file.path(), "text": text, "encoding": file.encoding(), "classification": file.classification() }))
+    }).await?))
 }
 fn asset(content_type: &'static str, text: &'static str) -> Response {
     ([(header::CONTENT_TYPE, content_type)], text).into_response()

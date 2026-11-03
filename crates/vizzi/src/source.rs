@@ -64,6 +64,7 @@ pub struct Directory {
     workspace: WorkspaceId,
     languages: Arc<Languages>,
     plan: CapturePlan,
+    spool: Option<Arc<crate::source_spool::SourceSpool>>,
 }
 impl Directory {
     /// Opens a directory; never executes project build scripts.
@@ -72,6 +73,16 @@ impl Directory {
             root,
             Arc::new(Languages::builtin().map_err(io::Error::other)?),
         )
+    }
+    /// Enables private source backing outside the analysed directory.
+    pub fn with_spool(mut self, spool: Arc<crate::source_spool::SourceSpool>) -> io::Result<Self> {
+        if spool.directory().starts_with(&self.root) {
+            return Err(io::Error::other(
+                "source spool must be outside analysed workspace",
+            ));
+        }
+        self.spool = Some(spool);
+        Ok(self)
     }
     /// Opens a directory with an explicit shared source and analysis policy.
     pub fn with_languages(root: &Path, languages: Arc<Languages>) -> io::Result<Self> {
@@ -94,6 +105,7 @@ impl Directory {
             workspace,
             languages,
             plan,
+            spool: None,
         })
     }
     /// Returns the canonical root.
@@ -288,6 +300,14 @@ impl Directory {
             .and_then(|snapshot| snapshot.file_by_path(key))
             .map(|file| file.captured());
         let source = CapturedSource::capture(bytes, old);
+        if cancelled() {
+            return Ok(None);
+        }
+        let source = if let Some(spool) = &self.spool {
+            spool.persist(source).map_err(io::Error::other)?
+        } else {
+            source
+        };
         Ok((!cancelled()).then_some(source))
     }
 
@@ -385,7 +405,14 @@ mod tests {
                 .collect::<Vec<_>>(),
             ["drivers/target/real.rs", "src/main.rs"]
         );
-        assert_eq!(capture.files[0].source.bytes(), b"fn f() {}");
+        assert_eq!(
+            capture.files[0]
+                .source
+                .read_all(usize::MAX)
+                .unwrap()
+                .bytes(),
+            b"fn f() {}"
+        );
         assert!(!directory.relevant(&temp.path().join("target/build.rs")));
         assert!(directory.relevant(&temp.path().join("drivers/target/real.rs")));
         assert!(!directory.relevant(Path::new("/elsewhere/a.rs")));
@@ -415,7 +442,14 @@ mod tests {
         assert!(capture.directories.is_none());
         assert_eq!(capture.files.len(), 1);
         assert_eq!(capture.files[0].path, "a.rs");
-        assert_eq!(capture.files[0].source.bytes(), b"fn a() {}");
+        assert_eq!(
+            capture.files[0]
+                .source
+                .read_all(usize::MAX)
+                .unwrap()
+                .bytes(),
+            b"fn a() {}"
+        );
         assert_eq!(capture.removed, ["gone.rs"]);
     }
 

@@ -33,11 +33,15 @@ fn capture_verifies_changed_bytes_and_shares_unchanged_sources() {
     let changed = engine.refresh(Some(&first), &|| false).unwrap().unwrap();
     assert_eq!(changed.measurements.shared_sources, 1);
     assert_eq!(
-        changed.snapshot.file_by_path("a.rs").unwrap().source(),
+        changed
+            .snapshot
+            .file_by_path("a.rs")
+            .unwrap()
+            .resident_source(),
         Some("fn delta() {}")
     );
     assert_eq!(
-        first.file_by_path("a.rs").unwrap().source(),
+        first.file_by_path("a.rs").unwrap().resident_source(),
         Some("fn alpha() {}")
     );
     assert_eq!(

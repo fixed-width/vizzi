@@ -241,10 +241,15 @@ fn qualify(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Error>
             let pending = app.status().pending;
             let snapshot = app.snapshot().ok_or("published snapshot disappeared")?;
             let at = Instant::now();
-            let view = snapshot.view(&query);
+            let view = snapshot.view(&query)?;
             let encoded = serde_json::to_vec(&view)?;
             queries.push(json!({"ms":millis(at.elapsed()), "encoded_bytes":encoded.len(), "pending":pending}));
-            validate_query(&view, snapshot.id(), &config.query_file, selected.source())?;
+            validate_query(
+                &view,
+                snapshot.id(),
+                &config.query_file,
+                selected.resident_source(),
+            )?;
             if worker.is_finished() {
                 break;
             }
@@ -263,7 +268,7 @@ fn qualify(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Error>
         .ok_or("previous snapshot was not retained")?;
     let pinned_matches = pinned
         .file(selected.id().as_str())
-        .is_some_and(|file| file.source() == selected.source());
+        .is_some_and(|file| file.resident_source() == selected.resident_source());
     if !pinned_matches {
         return Err("pinned source changed".into());
     }
@@ -504,7 +509,7 @@ mod tests {
         )
         .unwrap();
         let snapshot = engine.refresh(None, &|| false).unwrap().unwrap().snapshot;
-        let view = || snapshot.view(&ViewQuery::default());
+        let view = || snapshot.view(&ViewQuery::default()).unwrap();
         assert!(validate_query(&view(), snapshot.id(), "a.rs", Some("fn original() {}")).is_ok());
         assert!(
             validate_query(

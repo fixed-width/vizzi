@@ -105,6 +105,13 @@ and explicit read/load errors; history eviction alone cannot cap current data or
 query handles. Buffer capacities and post-release RSS remain distinct, and no new
 production source-memory limit is enforced.
 
+The [reader/backing follow-up](../../experiments/source-reads/RESULTS.md) implements
+fallible verified loads/windows and an opt-in anonymous session spool. Current-code
+whole-source history peaks change from 9.156 to 2.339 GiB Linux and 1.163 to 0.318 GiB
+PyTorch, with higher capture/validation IO cost. Source pins and admitted workflows pass.
+Default capture is still resident; transient whole-file capture, indexes, parser heap,
+response memory and cumulative disk reclamation remain separately unresolved.
+
 Do not replace semantic correctness checks with these performance targets. Language
 assignments, partial grammar coverage, source-only cases, cancellation, cache validity,
 and immutable publication must remain explicit and independently tested.

@@ -12,22 +12,25 @@ fn owned_capture_adopts_input_and_only_shares_after_matching_current_bytes() {
     let bytes = "α\r\nsecond\n".as_bytes().to_vec();
     let pointer = bytes.as_ptr();
     let source = CapturedSource::capture(bytes, None);
-    assert_eq!(source.bytes().as_ptr(), pointer);
-    assert_eq!(source.text(), Some("α\r\nsecond\n"));
+    assert_eq!(source.resident_bytes().unwrap().as_ptr(), pointer);
+    assert_eq!(source.resident_text(), Some("α\r\nsecond\n"));
     assert_eq!(source.encoding(), SourceEncoding::Utf8);
-    assert_eq!(source.content(), &ContentId::derive(&[source.bytes()]));
-    let same = CapturedSource::capture(source.bytes().to_vec(), Some(&source));
+    assert_eq!(
+        source.content(),
+        &ContentId::derive(&[source.resident_bytes().unwrap()])
+    );
+    let same = CapturedSource::capture(source.resident_bytes().unwrap().to_vec(), Some(&source));
     assert!(Arc::ptr_eq(&source, &same));
     let changed = CapturedSource::capture("β\r\nsecond\n".as_bytes().to_vec(), Some(&source));
     assert!(!Arc::ptr_eq(&source, &changed));
-    assert_eq!(changed.text(), Some("β\r\nsecond\n"));
-    assert_eq!(source.text(), Some("α\r\nsecond\n"));
+    assert_eq!(changed.resident_text(), Some("β\r\nsecond\n"));
+    assert_eq!(source.resident_text(), Some("α\r\nsecond\n"));
     let binary = vec![255, 0, 10];
     let pointer = binary.as_ptr();
     let binary = CapturedSource::capture(binary, None);
-    assert_eq!(binary.bytes().as_ptr(), pointer);
-    assert_eq!(binary.bytes(), &[255, 0, 10]);
-    assert_eq!(binary.text(), None);
+    assert_eq!(binary.resident_bytes().unwrap().as_ptr(), pointer);
+    assert_eq!(binary.resident_bytes().unwrap(), &[255, 0, 10]);
+    assert_eq!(binary.resident_text(), None);
     assert_eq!(binary.encoding(), SourceEncoding::Unsupported);
     assert!(Arc::ptr_eq(
         &binary,

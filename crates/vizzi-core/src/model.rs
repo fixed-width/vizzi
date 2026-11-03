@@ -1,5 +1,7 @@
 //! Captured source and immutable analysis identities.
-pub use crate::captured_source::{CapturedSource, SourceStorage};
+pub use crate::captured_source::{
+    BULK_SOURCE_LIMIT, CapturedSource, SourceInput, SourceReadError, SourceReader, SourceStorage,
+};
 
 use crate::policy::Classification;
 use serde::{Deserialize, Serialize};
@@ -169,6 +171,39 @@ impl Document {
         analyses: Vec<Analysis>,
         classification: Classification,
     ) -> Result<Self, ModelError> {
+        Self::capture_validated(workspace, path, source, analyses, classification, None)
+    }
+    /// Binds facts using the same verified whole input supplied to analysis/cache validation.
+    pub fn capture_loaded(
+        workspace: WorkspaceId,
+        path: String,
+        source: Arc<CapturedSource>,
+        input: &SourceInput<'_>,
+        analyses: Vec<Analysis>,
+        classification: Classification,
+    ) -> Result<Self, ModelError> {
+        if input.content() != source.content() {
+            return Err(ModelError(
+                "loaded input belongs to different captured source".into(),
+            ));
+        }
+        Self::capture_validated(
+            workspace,
+            path,
+            source,
+            analyses,
+            classification,
+            Some(input),
+        )
+    }
+    fn capture_validated(
+        workspace: WorkspaceId,
+        path: String,
+        source: Arc<CapturedSource>,
+        analyses: Vec<Analysis>,
+        classification: Classification,
+        input: Option<&SourceInput<'_>>,
+    ) -> Result<Self, ModelError> {
         if path.is_empty()
             || path.contains('\\')
             || path.split('/').any(|part| matches!(part, "" | "." | ".."))
@@ -181,7 +216,7 @@ impl Document {
                 "source-only documents cannot contain analysis".into(),
             ));
         }
-        let text = source.text();
+        let text = input.map_or_else(|| source.resident_text(), |input| input.text());
         let mut contexts = BTreeSet::new();
         for analysis in &analyses {
             if &analysis.content != content || !contexts.insert(&analysis.context.id) {
@@ -201,7 +236,7 @@ impl Document {
                     ));
                 }
             }
-            if text.is_none()
+            if source.encoding() == SourceEncoding::Unsupported
                 && !matches!(
                     analysis.coverage,
                     Coverage::Unavailable | Coverage::Deferred
@@ -251,11 +286,11 @@ impl Document {
     }
     /// Returns the captured byte count.
     pub fn bytes(&self) -> usize {
-        self.source.bytes().len()
+        self.source.len()
     }
-    /// Returns UTF-8 source, or none for non-UTF-8 input.
-    pub fn source(&self) -> Option<&str> {
-        self.source.text()
+    /// Returns resident UTF-8 source without IO; absence is not an encoding decision.
+    pub fn resident_source(&self) -> Option<&str> {
+        self.source.resident_text()
     }
     /// Returns captured encoding availability independently of classification.
     pub fn encoding(&self) -> SourceEncoding {
@@ -512,7 +547,7 @@ mod tests {
             new.entity_id(&new.analyses[0], &new.analyses[0].facts[0])
         );
         assert_eq!(new.lines(&new.analyses[0].facts[0].span), 2..2);
-        assert_eq!(old.source(), Some("fn f() {}"));
+        assert_eq!(old.resident_source(), Some("fn f() {}"));
     }
     #[test]
     fn rejects_traversal_duplicate_contexts_and_utf8_midpoints() {
@@ -597,7 +632,7 @@ mod tests {
         a.coverage = Coverage::Unavailable;
         let unsupported =
             crate::model::fixture_document(workspace(), "a.rs".into(), &[0xff], vec![a]).unwrap();
-        assert_eq!(unsupported.source(), None);
+        assert_eq!(unsupported.resident_source(), None);
         assert_eq!(unsupported.bytes(), 1);
         let a = crate::model::fixture_document(
             workspace(),
@@ -707,7 +742,7 @@ mod tests {
         .unwrap();
         assert_eq!(changed.id(), rebuilt.id());
         assert_ne!(changed.id(), original.id());
-        assert_eq!(original.documents()[0].source(), Some("fn f() {}"));
+        assert_eq!(original.documents()[0].resident_source(), Some("fn f() {}"));
     }
 
     #[test]

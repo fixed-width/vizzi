@@ -1,0 +1,176 @@
+{
+  "schema": 1,
+  "recorded_after_measurement_utc": "2026-11-03T04:49:04.510655+00:00",
+  "machine": {
+    "platform": "Linux-6.8.0-147-lowlatency-x86_64-with-glibc2.39",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13700H",
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)"
+  },
+  "storage": [
+    {
+      "profile": "linux",
+      "spool_mib": 0,
+      "baseline_ms": 3481.0351920000003,
+      "unchanged_ms": 1435.9505880000002,
+      "edit4_ms": 3816.919033,
+      "baseline_buffers_gib": 1.807215265929699,
+      "publication_edit4_gib": 7.277607962489128,
+      "external_union_edit4_gib": 9.084823228418827,
+      "sampled_peak_rss_gib": 9.155784606933594,
+      "spool": null
+    },
+    {
+      "profile": "linux",
+      "spool_mib": 16384,
+      "baseline_ms": 3905.468039,
+      "unchanged_ms": 1462.870394,
+      "edit4_ms": 7611.155442,
+      "baseline_buffers_gib": 0.4144365191459656,
+      "publication_edit4_gib": 1.6646534204483032,
+      "external_union_edit4_gib": 2.079089939594269,
+      "sampled_peak_rss_gib": 2.3387489318847656,
+      "spool": {
+        "capacity_bytes": 17179869184,
+        "read_bytes": 27080455824,
+        "reads": 1404189,
+        "stores": 396396,
+        "written_bytes": 9017833632
+      }
+    },
+    {
+      "profile": "pytorch",
+      "spool_mib": 0,
+      "baseline_ms": 523.179047,
+      "unchanged_ms": 235.940566,
+      "edit4_ms": 605.7516870000001,
+      "baseline_buffers_gib": 0.22628145013004541,
+      "publication_edit4_gib": 0.912871140986681,
+      "external_union_edit4_gib": 1.1391525911167264,
+      "sampled_peak_rss_gib": 1.1632041931152344,
+      "spool": null
+    },
+    {
+      "profile": "pytorch",
+      "spool_mib": 16384,
+      "baseline_ms": 534.689065,
+      "unchanged_ms": 217.01103,
+      "edit4_ms": 973.797239,
+      "baseline_buffers_gib": 0.05296913534402847,
+      "publication_edit4_gib": 0.2129228413105011,
+      "external_union_edit4_gib": 0.26589197665452957,
+      "sampled_peak_rss_gib": 0.3178825378417969,
+      "spool": {
+        "capacity_bytes": 17179869184,
+        "read_bytes": 3375563202,
+        "reads": 212015,
+        "stores": 63468,
+        "written_bytes": 1123749126
+      }
+    }
+  ],
+  "admission": [
+    {
+      "profile": "linux",
+      "kind": "structural",
+      "published_source_ms": 74.749421,
+      "observed_coverage": {
+        "kernel/locking/mutex.c": "partial"
+      },
+      "settled_coverage": {
+        "kernel/locking/mutex.c": "partial"
+      }
+    },
+    {
+      "profile": "linux",
+      "kind": "large_paste",
+      "published_source_ms": 141.833418,
+      "observed_coverage": {
+        "kernel/locking/mutex.c": "deferred"
+      },
+      "settled_coverage": {
+        "kernel/locking/mutex.c": "deferred"
+      }
+    },
+    {
+      "profile": "linux",
+      "kind": "unseen",
+      "published_source_ms": 905.651976,
+      "observed_coverage": {
+        "vizzi_admission_probe.c": "syntax"
+      },
+      "settled_coverage": {
+        "vizzi_admission_probe.c": "syntax"
+      }
+    },
+    {
+      "profile": "linux",
+      "kind": "batch",
+      "published_source_ms": 914.79765,
+      "observed_coverage": {
+        "drivers/gpu/drm/amd/include/asic_reg/dcn/dcn_3_2_0_sh_mask.h": "syntax",
+        "drivers/gpu/drm/amd/include/asic_reg/nbio/nbio_7_2_0_sh_mask.h": "deferred",
+        "drivers/gpu/drm/amd/include/asic_reg/nbio/nbio_7_7_0_sh_mask.h": "deferred"
+      },
+      "settled_coverage": {
+        "drivers/gpu/drm/amd/include/asic_reg/dcn/dcn_3_2_0_sh_mask.h": "syntax",
+        "drivers/gpu/drm/amd/include/asic_reg/nbio/nbio_7_2_0_sh_mask.h": "syntax",
+        "drivers/gpu/drm/amd/include/asic_reg/nbio/nbio_7_7_0_sh_mask.h": "syntax"
+      }
+    },
+    {
+      "profile": "pytorch",
+      "kind": "structural",
+      "published_source_ms": 45.617106,
+      "observed_coverage": {
+        "c10/core/Device.cpp": "syntax"
+      },
+      "settled_coverage": {
+        "c10/core/Device.cpp": "syntax"
+      }
+    },
+    {
+      "profile": "pytorch",
+      "kind": "large_paste",
+      "published_source_ms": 61.132085000000004,
+      "observed_coverage": {
+        "c10/core/Device.cpp": "deferred"
+      },
+      "settled_coverage": {
+        "c10/core/Device.cpp": "deferred"
+      }
+    },
+    {
+      "profile": "pytorch",
+      "kind": "unseen",
+      "published_source_ms": 2006.960385,
+      "observed_coverage": {
+        "vizzi_admission_probe.cpp": "partial"
+      },
+      "settled_coverage": {
+        "vizzi_admission_probe.cpp": "partial"
+      }
+    },
+    {
+      "profile": "pytorch",
+      "kind": "batch",
+      "published_source_ms": 1719.7624289999999,
+      "observed_coverage": {
+        "aten/src/ATen/native/SobolEngineOpsUtils.cpp": "deferred",
+        "third_party/perfetto/sdk/perfetto.cc": "partial",
+        "third_party/perfetto/sdk/perfetto.h": "partial"
+      },
+      "settled_coverage": {
+        "aten/src/ATen/native/SobolEngineOpsUtils.cpp": "syntax",
+        "third_party/perfetto/sdk/perfetto.cc": "partial",
+        "third_party/perfetto/sdk/perfetto.h": "partial"
+      }
+    }
+  ],
+  "limits": [
+    "Storage runs compare resident/backed current-code source-only workspace churn, omitting facts/parsers/UI; address-space limit 12 GiB.",
+    "Admission workflows use backed source with four workers, input quotas and periodic recovery; address-space limit 8 GiB.",
+    "Private spool capacity is cumulative per session, not live disk usage, residency, capture streaming or a process-memory cap.",
+    "No analysed project tooling. Copies/writes/preparation are excluded from capture/update timing. Peaks include independent verification/probe input construction.",
+    "Single sequential process per condition with unique prefixes; not randomized speedup, latency tails or baseline-laptop qualification."
+  ]
+}

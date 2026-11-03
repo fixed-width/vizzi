@@ -25,6 +25,8 @@ struct Config {
     cache: PathBuf,
     policy: PolicyConfig,
     targets: Vec<String>,
+    #[serde(default)]
+    spool_mib: usize,
     owner: String,
     probe: String,
     input_mib: usize,
@@ -81,6 +83,31 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
     };
     let syntax = Arc::new(SyntaxCache::for_budget(512 * 1024 * 1024)?);
     let mut live = engine(&config)?.with_syntax_cache(syntax.clone());
+    if config.spool_mib != 0 {
+        let path = config
+            .root
+            .parent()
+            .ok_or("missing owned-copy parent")?
+            .join("spool");
+        let spool = Arc::new(crate::source_spool::SourceSpool::new(
+            &path,
+            config
+                .spool_mib
+                .checked_mul(1024 * 1024)
+                .ok_or("spool size overflow")?,
+        )?);
+        live = Engine::new(
+            Directory::with_policy(
+                &config.root,
+                config.policy.clone(),
+                Arc::new(Languages::builtin()?),
+            )?
+            .with_spool(spool)?,
+            Cache::new(external_path(&config.cache, &config.root)?),
+            4,
+        )?
+        .with_syntax_cache(syntax.clone());
+    }
     if let Some(budget) = &admission {
         live = live.with_admission(budget.clone());
     }
@@ -107,7 +134,8 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
         let file = baseline
             .file_by_path(path)
             .ok_or("target outside captured scope")?;
-        if file.source().is_none() || file.analyses().len() != 1 {
+        if file.encoding() != vizzi_core::model::SourceEncoding::Utf8 || file.analyses().len() != 1
+        {
             return Err("targets require UTF-8 and assigned analysis".into());
         }
     }
@@ -118,7 +146,11 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
         .file_by_path(ordinary)
         .ok_or("missing ordinary input")?;
     let header = baseline.file_by_path(primary).ok_or("missing header")?;
-    let ordinary_original = ordinary_file.captured().bytes().to_vec();
+    let ordinary_original = ordinary_file
+        .captured()
+        .read_all(usize::MAX)?
+        .bytes()
+        .to_vec();
     let language = &ordinary_file.analyses()[0].context.language;
     let extension = match header.analyses()[0].context.language.as_str() {
         "c" => "c",
@@ -136,7 +168,7 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
         if kind == "structural" {
             let mut bytes =
                 format!("{} structural {}\n", marker(language), config.probe).into_bytes();
-            bytes.extend_from_slice(ordinary_file.captured().bytes());
+            bytes.extend_from_slice(ordinary_file.captured().read_all(usize::MAX)?.bytes());
             bytes.push(b'\n');
             for index in 0..1000 {
                 let declaration = match language.as_str() {
@@ -150,10 +182,10 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
         } else if kind == "large_paste" || kind == "unseen" {
             let mut bytes = format!("{} {kind} {}\n", marker(language), config.probe).into_bytes();
             if kind == "large_paste" {
-                bytes.extend_from_slice(ordinary_file.captured().bytes());
+                bytes.extend_from_slice(ordinary_file.captured().read_all(usize::MAX)?.bytes());
                 bytes.push(b'\n');
             }
-            bytes.extend_from_slice(header.captured().bytes());
+            bytes.extend_from_slice(header.captured().read_all(usize::MAX)?.bytes());
             if kind == "large_paste" {
                 bytes.extend(std::iter::repeat_n(b' ', 2 * 1024 * 1024));
             }
@@ -174,7 +206,7 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
                     config.probe
                 )
                 .into_bytes();
-                bytes.extend_from_slice(file.captured().bytes());
+                bytes.extend_from_slice(file.captured().read_all(usize::MAX)?.bytes());
                 writes.insert(path.clone(), bytes);
             }
         }
@@ -192,9 +224,9 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
             !app.status().pending
                 && app.snapshot().is_some_and(|snapshot| {
                     writes.iter().all(|(path, bytes)| {
-                        snapshot
-                            .file_by_path(path)
-                            .is_some_and(|file| file.captured().bytes() == bytes)
+                        snapshot.file_by_path(path).is_some_and(|file| {
+                            file.content() == &vizzi_core::model::ContentId::derive(&[bytes])
+                        })
                     })
                 })
         })?;
@@ -222,7 +254,7 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
                 && app.snapshot().is_some_and(|snapshot| {
                     writes.iter().all(|(path, bytes)| {
                         snapshot.file_by_path(path).is_some_and(|file| {
-                            file.captured().bytes() == bytes
+                            file.content() == &vizzi_core::model::ContentId::derive(&[bytes])
                                 && (bytes.len() > file_limit
                                     || file.analyses()[0].coverage != Coverage::Deferred)
                         })
@@ -246,7 +278,7 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
                     .select(&analysis.context.language)
                     .ok_or("language unavailable")?
                     .create()?
-                    .analyze(file.captured().bytes())?;
+                    .analyze(file.captured().read_all(usize::MAX)?.bytes())?;
                 if file.analyses() != [fresh] {
                     return Err("completed facts differ from independent fresh parse".into());
                 }
@@ -264,6 +296,7 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
                 .file_by_path(path)
                 .ok_or("missing original")?
                 .captured()
+                .read_all(usize::MAX)?
                 .bytes(),
         )?;
     }
@@ -284,7 +317,7 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
     drop(host);
     Ok(
         json!({"files":baseline.documents().len(),"analyzed":baseline.analyzed_files(),"baseline_snapshot":baseline.id(),"cases":cases,
-        "final_clean_matches":true,"old_pin_source_matches":baseline.file_by_path(ordinary).ok_or("missing pin")?.captured().bytes()==ordinary_original,
+        "final_clean_matches":true,"old_pin_source_matches":baseline.file_by_path(ordinary).ok_or("missing pin")?.captured().read_all(usize::MAX)?.bytes()==ordinary_original,
         "admission_final":admission.as_ref().map(|budget|budget.stats())}),
     )
 }
