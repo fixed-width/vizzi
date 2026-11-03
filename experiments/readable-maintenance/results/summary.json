@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "recorded_after_measurement_utc": "2026-11-03T17:35:54.925264+00:00",
+  "machine": {
+    "platform": "Linux-6.8.0-147-lowlatency-x86_64-with-glibc2.39",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13700H",
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)"
+  },
+  "corpus": [
+    {
+      "implementation": "before",
+      "profile": "linux",
+      "cleanup_ms": 738.607957,
+      "completed_during": 0,
+      "completed_before_midpoint": 0,
+      "overlap_samples": 1,
+      "overlap_p95_ms": 736.826367,
+      "overlap_max_ms": 736.826367,
+      "peak_span_gib": 7.005794323980808,
+      "peak_rss_gib": 2.2677268981933594,
+      "final_file_bytes": 0,
+      "binary_sha256": "ff68aa7a3a2cbf300489c7eb18c2bac36f395b016ef573f447613d27fbeffa0e"
+    },
+    {
+      "implementation": "before",
+      "profile": "pytorch",
+      "cleanup_ms": 110.348451,
+      "completed_during": 0,
+      "completed_before_midpoint": 0,
+      "overlap_samples": 1,
+      "overlap_p95_ms": 108.29318,
+      "overlap_max_ms": 108.29318,
+      "peak_span_gib": 0.8733216496184468,
+      "peak_rss_gib": 0.30808258056640625,
+      "final_file_bytes": 0,
+      "binary_sha256": "ff68aa7a3a2cbf300489c7eb18c2bac36f395b016ef573f447613d27fbeffa0e"
+    },
+    {
+      "implementation": "after",
+      "profile": "linux",
+      "cleanup_ms": 682.1412040000001,
+      "completed_during": 319,
+      "completed_before_midpoint": 159,
+      "overlap_samples": 319,
+      "overlap_p95_ms": 0.08967300000000478,
+      "overlap_max_ms": 0.11996200000004364,
+      "peak_span_gib": 7.005794323980808,
+      "peak_rss_gib": 2.2679901123046875,
+      "final_file_bytes": 0,
+      "binary_sha256": "c79b7a9f98bd7b92908714b826556c1572650b3533cae7a4b33b3522a7cec45e"
+    },
+    {
+      "implementation": "after",
+      "profile": "pytorch",
+      "cleanup_ms": 123.87353700000001,
+      "completed_during": 57,
+      "completed_before_midpoint": 28,
+      "overlap_samples": 57,
+      "overlap_p95_ms": 0.11316800000001592,
+      "overlap_max_ms": 0.13099799999999817,
+      "peak_span_gib": 0.8733216496184468,
+      "peak_rss_gib": 0.3080940246582031,
+      "final_file_bytes": 0,
+      "binary_sha256": "c79b7a9f98bd7b92908714b826556c1572650b3533cae7a4b33b3522a7cec45e"
+    }
+  ],
+  "limits": [
+    "Same read-sampling harness on both spool implementations; old first, new second, one child per profile/implementation.",
+    "A separate 64 KiB prefix pin stays alive while all corpus snapshots retire. It is released afterward; final backing length is zero.",
+    "Fresh verified 64 KiB backing reads sample about every 2 ms, at most 4096 per phase; ready handshake precedes maintenance.",
+    "Maintenance and read intervals share a monotonic clock. Scheduler/filesystem delays remain; finite observations do not prove latency tails or hard deadlines.",
+    "Source-only histories omit parsing, facts, watcher scheduling, HTTP and UI. Child AS limits are not RSS/physical-RAM limits."
+  ]
+}

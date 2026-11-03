@@ -14,20 +14,26 @@ use vizzi_core::model::{CapturedSource, SourceReadError, SourceReader};
 const CAPTURE_CHUNK: usize = 64 * 1024;
 #[derive(Debug)]
 struct State {
+    // Shared-cursor maintenance handle: metadata/set_len only; never seek through it.
     file: File,
     extents: Extents,
     cleanup_pending: bool,
     written: usize,
     stores: usize,
-    reads: usize,
-    read_bytes: usize,
     staging_bytes: usize,
     peak_staging_bytes: usize,
     max_read_request: usize,
 }
 #[derive(Debug)]
+struct Backing {
+    file: File,
+    reads: usize,
+    read_bytes: usize,
+}
+#[derive(Debug)]
 struct Inner {
     state: Mutex<State>,
+    backing: Mutex<Backing>,
     capacity: usize,
     writer: Mutex<()>,
     stage: Arc<Mutex<File>>,
@@ -36,6 +42,11 @@ struct Inner {
 impl Inner {
     fn lock(&self) -> MutexGuard<'_, State> {
         self.state
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
+    }
+    fn backing(&self) -> MutexGuard<'_, Backing> {
+        self.backing
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner)
     }
@@ -101,6 +112,9 @@ impl SourceSpool {
             .map_err(|error| SourceReadError::Io(error.to_string()))?;
         let file = tempfile::tempfile_in(&directory)
             .map_err(|error| SourceReadError::Io(error.to_string()))?;
+        let cursor = file
+            .try_clone()
+            .map_err(|error| SourceReadError::Io(error.to_string()))?;
         let stage = tempfile::tempfile_in(&directory)
             .map_err(|error| SourceReadError::Io(error.to_string()))?;
         Ok(Self {
@@ -112,11 +126,14 @@ impl SourceSpool {
                     cleanup_pending: false,
                     written: 0,
                     stores: 0,
-                    reads: 0,
-                    read_bytes: 0,
                     staging_bytes: 0,
                     peak_staging_bytes: 0,
                     max_read_request: 0,
+                }),
+                backing: Mutex::new(Backing {
+                    file: cursor,
+                    reads: 0,
+                    read_bytes: 0,
                 }),
                 capacity,
                 writer: Mutex::new(()),
@@ -290,12 +307,12 @@ impl SourceSpool {
                 return Ok(false);
             }
             {
-                let mut state = self.inner.lock();
-                state
+                let mut backing = self.inner.backing();
+                backing
                     .file
                     .seek(SeekFrom::Start((start + at) as u64))
                     .map_err(|error| SourceReadError::Io(error.to_string()))?;
-                state
+                backing
                     .file
                     .write_all(&buffer[..count])
                     .map_err(|error| SourceReadError::Io(error.to_string()))?;
@@ -310,6 +327,12 @@ impl SourceSpool {
     /// Reclaims queued descriptor retirements and truncates a free tail outside publication locks.
     /// Failed physical truncation is reported and retried by the next maintenance call.
     pub fn reclaim(&self) -> Result<(), SourceReadError> {
+        self.reclaim_with(File::set_len)
+    }
+    fn reclaim_with(
+        &self,
+        truncate: impl FnOnce(&File, u64) -> std::io::Result<()>,
+    ) -> Result<(), SourceReadError> {
         let retired = std::mem::take(&mut *self.inner.retired());
         let mut state = self.inner.lock();
         for extent in retired {
@@ -326,10 +349,7 @@ impl SourceSpool {
                 .len()
                 > end
             {
-                state
-                    .file
-                    .set_len(end)
-                    .map_err(|e| SourceReadError::Io(e.to_string()))?;
+                truncate(&state.file, end).map_err(|e| SourceReadError::Io(e.to_string()))?;
             }
             state.cleanup_pending = false;
         }
@@ -339,6 +359,7 @@ impl SourceSpool {
     pub fn stats(&self) -> SpoolStats {
         let pending_retirements = self.inner.retired().len();
         let state = self.inner.lock();
+        let backing = self.inner.backing();
         SpoolStats {
             capacity_bytes: self.inner.capacity,
             written_bytes: state.written,
@@ -349,8 +370,8 @@ impl SourceSpool {
             file_bytes: state.file.metadata().ok().map(|meta| meta.len()),
             pending_retirements,
             stores: state.stores,
-            reads: state.reads,
-            read_bytes: state.read_bytes,
+            reads: backing.reads,
+            read_bytes: backing.read_bytes,
             staging_bytes: state.staging_bytes,
             peak_staging_bytes: state.peak_staging_bytes,
             max_read_request: state.max_read_request,
@@ -431,20 +452,20 @@ impl SourceReader for Blob {
             .start
             .checked_add(offset)
             .ok_or(SourceReadError::InvalidRange)?;
-        let mut state = self.inner.lock();
-        state
+        let mut backing = self.inner.backing();
+        backing
             .file
             .seek(SeekFrom::Start(at as u64))
             .map_err(|error| SourceReadError::Io(error.to_string()))?;
-        state.file.read_exact(target).map_err(|error| {
+        backing.file.read_exact(target).map_err(|error| {
             if error.kind() == std::io::ErrorKind::UnexpectedEof {
                 SourceReadError::ShortRead
             } else {
                 SourceReadError::Io(error.to_string())
             }
         })?;
-        state.reads += 1;
-        state.read_bytes += target.len();
+        backing.reads += 1;
+        backing.read_bytes += target.len();
         Ok(())
     }
 }
@@ -453,6 +474,88 @@ impl SourceReader for Blob {
 mod tests {
     use super::*;
     #[test]
+    fn pinned_reads_continue_while_allocation_state_is_locked() {
+        use std::{sync::mpsc, time::Duration};
+        let root = tempfile::tempdir().unwrap();
+        let spool = SourceSpool::new(root.path(), 8).unwrap();
+        let source = spool
+            .persist(CapturedSource::capture(b"original".to_vec(), None))
+            .unwrap();
+        let guard = spool.inner.lock();
+        let (sent, received) = mpsc::channel();
+        let reader = std::thread::spawn(move || {
+            sent.send(source.read_text(8).unwrap().unwrap().into_owned())
+                .unwrap()
+        });
+        let read = received.recv_timeout(Duration::from_secs(2));
+        drop(guard);
+        reader.join().unwrap();
+        assert_eq!(read.unwrap(), "original");
+    }
+    #[test]
+    fn pinned_reads_finish_during_paused_truncation_and_new_allocations_wait() {
+        use std::{sync::mpsc, time::Duration};
+        for fail in [false, true] {
+            let root = tempfile::tempdir().unwrap();
+            let spool = Arc::new(SourceSpool::new(root.path(), 16).unwrap());
+            let source = spool
+                .persist(CapturedSource::capture(b"original".to_vec(), None))
+                .unwrap();
+            let tail = spool
+                .persist(CapturedSource::capture(b"old tail".to_vec(), None))
+                .unwrap();
+            drop(tail);
+            let (entered, at_cut) = mpsc::channel();
+            let (release, resume) = mpsc::channel();
+            let maintenance_spool = spool.clone();
+            let maintenance = std::thread::spawn(move || {
+                maintenance_spool.reclaim_with(|file, end| {
+                    entered.send(end).unwrap();
+                    resume
+                        .recv_timeout(Duration::from_secs(5))
+                        .map_err(std::io::Error::other)?;
+                    if fail {
+                        Err(std::io::Error::other("truncate fixture"))
+                    } else {
+                        file.set_len(end)
+                    }
+                })
+            });
+            assert_eq!(at_cut.recv_timeout(Duration::from_secs(2)).unwrap(), 8);
+            let pinned = source.clone();
+            let (read_sent, read_received) = mpsc::channel();
+            let reader = std::thread::spawn(move || {
+                read_sent
+                    .send(pinned.read_text(8).map(|s| s.unwrap().into_owned()))
+                    .unwrap()
+            });
+            let read = read_received.recv_timeout(Duration::from_secs(2));
+
+            let writer_spool = spool.clone();
+            let (attempted, attempting) = mpsc::channel();
+            let (written, finished) = mpsc::channel();
+            let writer = std::thread::spawn(move || {
+                attempted.send(()).unwrap();
+                let result =
+                    writer_spool.persist(CapturedSource::capture(b"new tail".to_vec(), None));
+                written.send(()).unwrap();
+                result
+            });
+            attempting.recv_timeout(Duration::from_secs(2)).unwrap();
+            let premature = finished.recv_timeout(Duration::from_millis(50));
+            release.send(()).unwrap();
+            let maintained = maintenance.join().unwrap();
+            reader.join().unwrap();
+            let next = writer.join().unwrap().unwrap();
+            assert_eq!(read.unwrap().unwrap(), "original");
+            assert!(premature.is_err());
+            assert_eq!(maintained.is_err(), fail);
+            assert_eq!(source.read_text(8).unwrap().as_deref(), Some("original"));
+            assert_eq!(next.read_text(8).unwrap().as_deref(), Some("new tail"));
+            assert_eq!(spool.stats().file_bytes, Some(16));
+        }
+    }
+    #[test]
     fn immutable_blob_reads_reject_corruption_and_truncation() {
         let root = tempfile::tempdir().unwrap();
         let spool = SourceSpool::new(root.path(), 100).unwrap();
@@ -460,9 +563,9 @@ mod tests {
             .persist(CapturedSource::capture(b"correct bytes".to_vec(), None))
             .unwrap();
         {
-            let mut state = spool.inner.lock();
-            state.file.seek(SeekFrom::Start(1)).unwrap();
-            state.file.write_all(b"X").unwrap();
+            let mut backing = spool.inner.backing();
+            backing.file.seek(SeekFrom::Start(1)).unwrap();
+            backing.file.write_all(b"X").unwrap();
         }
         assert_eq!(
             source.reader().read(0..1, 1).unwrap_err(),
@@ -547,7 +650,7 @@ mod tests {
         let source = spool
             .persist(CapturedSource::capture(b"original".to_vec(), None))
             .unwrap();
-        let guard = spool.inner.lock();
+        let guard = spool.inner.backing();
         let (sent, received) = mpsc::channel();
         let worker = std::thread::spawn(move || {
             drop(source);
@@ -680,8 +783,12 @@ mod tests {
             .unwrap();
         let mut readonly = tempfile::NamedTempFile::new_in(root.path()).unwrap();
         readonly.write_all(b"original").unwrap();
-        let original = std::mem::replace(
+        let maintenance_file = std::mem::replace(
             &mut spool.inner.lock().file,
+            File::open(readonly.path()).unwrap(),
+        );
+        let original = std::mem::replace(
+            &mut spool.inner.backing().file,
             File::open(readonly.path()).unwrap(),
         );
         assert!(matches!(
@@ -691,6 +798,7 @@ mod tests {
         spool.reclaim().unwrap();
         assert_eq!(spool.stats().allocated_bytes, 8);
         assert_eq!(source.read_text(8).unwrap().as_deref(), Some("original"));
-        spool.inner.lock().file = original;
+        spool.inner.backing().file = original;
+        spool.inner.lock().file = maintenance_file;
     }
 }

@@ -82,6 +82,18 @@ The descriptor exposes no project filename or writable file handle. Concurrent r
 use serialized seek/read operations, so file-cursor sharing cannot mix captured ranges.
 Already-backed sources passed to `persist` keep their original backing.
 
+Cursor reads/writes and read counters have a separate lock from allocation/maintenance
+state. Backing reads acquire only the cursor lock. Maintenance holds allocation state
+through coalescing and truncation, freezing new reservations above the selected cut point,
+and uses a safe cloned handle only for metadata and `set_len`. Those operations do not
+move the shared cursor. It never acquires the cursor lock. Already-reserved copies remain
+inside the retained span; each seek/read/write still holds the cursor lock for its chunk.
+One additional handle is opened per spool, not per captured source. No unsafe IO is used.
+
+Pinned reads can proceed during maintenance without waiting for the Rust allocation lock.
+The OS/filesystem can still delay or serialize their IO. Captures needing state, diagnostics
+and other maintenance may wait; this is not a hard read, capture or cleanup deadline.
+
 `capture` reads actual project input through EOF in requests of at most 64 KiB and stages
 all bytes. With a previous capture, it also verifies those actual input slices using its
 captured length as a candidate hash prefix. Reuse requires observed EOF, exact length,
@@ -151,3 +163,5 @@ See [reader validation](../../experiments/source-reads/RESULTS.md),
 The [reclamation report](../../experiments/reclamation/RESULTS.md) and
 [design](../plans/spool-reclamation.md) describe owned ranges and maintenance. Compaction,
 metadata admission and a calibrated resident/process envelope remain subsequent work.
+The [maintenance-read report](../../experiments/readable-maintenance/RESULTS.md) measures
+concurrent prefix reads and documents the remaining filesystem/scheduling limits.

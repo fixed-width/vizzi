@@ -48,6 +48,7 @@ validating coordination; it does not qualify large-codebase GPU performance.
 - [Streaming source capture measurements](experiments/stream-capture/RESULTS.md)
 - [Verified unchanged-source reuse measurements](experiments/verified-reuse/RESULTS.md)
 - [Retired-source reclamation measurements](experiments/reclamation/RESULTS.md)
+- [Pinned reads during maintenance](experiments/readable-maintenance/RESULTS.md)
 - [Earlier performance experiments](experiments/performance/README.md)
 - [Contributor guidance](AGENTS.md)
 

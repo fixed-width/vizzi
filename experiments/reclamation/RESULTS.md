@@ -11,6 +11,8 @@ versions are unchanged. No unsafe code was added. The [source reference](../../d
 defines capacity/maintenance diagnostics; the [design](../../docs/plans/spool-reclamation.md)
 records ownership and publication-lock constraints. The [procedure](README.md) reproduces
 the measurements.
+The subsequent [maintenance-read report](../readable-maintenance/RESULTS.md) separates
+cursor IO from allocation/cleanup; the figures below describe the preceding shared lock.
 
 ## Ownership and reclamation
 

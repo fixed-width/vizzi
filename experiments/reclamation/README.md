@@ -35,3 +35,8 @@ conditions are observations, not randomised speedups or latency tails. Historica
 use the previous implementation and are not repeated controls here.
 
 See [results](RESULTS.md) for observations and remaining costs.
+
+`--binary PATH` selects a preserved probe build. `--maintenance-reads` enables a retained
+64 KiB prefix and concurrent bounded reads during maintenance, adding a final prefix-release
+phase. See the [maintenance-read procedure](../readable-maintenance/README.md) for the
+before/after comparison and sampler limits. Defaults preserve the original workload.

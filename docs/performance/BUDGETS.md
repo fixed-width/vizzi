@@ -138,6 +138,13 @@ final large cleanup takes 801 / 122 ms and currently holds the backing IO mutex.
 or subdivide maintenance before claiming interactive read latency. Fragmentation,
 compaction, metadata/queue memory and the full process envelope remain open.
 
+The [maintenance-read follow-up](../../experiments/readable-maintenance/RESULTS.md) removes
+the allocation lock from pinned backing reads. During Linux/PyTorch real cleanup, 319 / 57
+bounded reads complete versus zero with the preceding locks. Maximum observed overlapping
+read latency changes from 737 / 108 ms to 0.120 / 0.131 ms. Cleanup still takes 682 / 124 ms
+and can block allocation/captures/diagnostics. These warm-prefix, finite source-only samples
+do not qualify browser latency, filesystem deadlines, other platforms or baseline hardware.
+
 Do not replace semantic correctness checks with these performance targets. Language
 assignments, partial grammar coverage, source-only cases, cancellation, cache validity,
 and immutable publication must remain explicit and independently tested.

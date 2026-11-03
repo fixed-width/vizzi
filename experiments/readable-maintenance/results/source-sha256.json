@@ -1,0 +1,22 @@
+{
+  "base_commit": "0d0e20e13b07f57cfbef6850a0c8702c5e36ed16",
+  "note": "Final measured working tree before commit. Before build uses the preceding committed spool with identical current measurement harness, built in an isolated Cargo target. After was rebuilt after clearing shared native outputs; hashes differ before timing. No dependencies changed.",
+  "before_spool_sha256": "17e7768ad8b01c36c78968a457b070674743d7a687ce32f4a3e0ea50eddc846b",
+  "sha256": {
+    "Cargo.toml": "b48edcbfd70277e9d0a58f7680b6ed414bc70108b279fdfba98dcd9a07092636",
+    "Cargo.lock": "032ea2295563c2354c3d92c54cf4be9943ad62eb1ed116d6267b7c2c0ee1456d",
+    "crates/vizzi/src/source_spool.rs": "20c1557c21c924f0d640d08c2a4a56b92ab402b280c3055fd7f330557e01fc50",
+    "crates/vizzi/src/source_spool/extents.rs": "68654c6afb42bd46dc22d0203db170c473b1ac8c5b79a177e4d43a28f0bee66f",
+    "crates/vizzi/src/source_storage_probe.rs": "e4e256e5de640dda2bf3835afce4044bc733ebc95ac8e03439c8ab859b5d1220",
+    "crates/vizzi/src/source_storage_probe/maintenance.rs": "506666defebac022f48322cd1cf7abebcfc51dd10c3b708bd2af3ebe444c098c",
+    "crates/vizzi/tests/source_storage_probe.rs": "3b54b9fc93843dfb6d9d0f43b67440518b25ca6efd8f83c86fdc6ea4b26e4010",
+    "crates/vizzi/tests/source_spool.rs": "031eba1c240c2435127bc74c4175550a8b3c21bb815f218b771f0a1214adf7bd",
+    "crates/vizzi/tests/spool_reclamation.rs": "3d0773b1cf6067c2dc8f1be95343a8dd964e80b738c353e2b9afa1acbe272155",
+    "crates/vizzi-core/src/captured_source.rs": "fb864c2df08edc3025c21797575572b2bcab9b8c35cfc4108d48b575b19a059a",
+    "experiments/reclamation/measure.py": "93b8db1745c40ac1e54a0d716b24f972f45555193bac63c0acbeb8c4c1df81ba",
+    "experiments/readable-maintenance/measure.py": "21bb03d0b8a104d4135573e8a959f81c8a60e9aae7b3d9e22c934fcf3f7195b8",
+    "experiments/qualification/native.py": "e637e001eff0f81059c10e02f5381c00ef44e45efbd79348f94b792203ef924a",
+    "experiments/qualification/profiles.json": "fe3443645d36e1749ab6f360cecc52c667269e0504326155ed89e1baf98af260",
+    "experiments/admission/limit.py": "fdabefbcaa734cb366b6bcc87306a480bccac672bf5d41dd5592982eb8c08785"
+  }
+}

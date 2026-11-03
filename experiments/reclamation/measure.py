@@ -17,11 +17,13 @@ from experiments.qualification.native import execute, policy
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=pathlib.Path, required=True)
+    parser.add_argument('--binary', type=pathlib.Path, default=pathlib.Path('target/release/examples/source_storage'))
+    parser.add_argument('--maintenance-reads', action='store_true')
     args = parser.parse_args()
     if args.output.exists():
         parser.error('output must be new')
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    binary = pathlib.Path('target/release/examples/source_storage').resolve()
+    binary = args.binary.resolve()
     previous = json.loads(pathlib.Path('experiments/verified-reuse/results/after.json').read_text())
     results = []
     for profile in json.loads(pathlib.Path('experiments/qualification/profiles.json').read_text()):
@@ -37,7 +39,7 @@ def main():
             hashes = {p: hashlib.sha256((root / p).read_bytes()).hexdigest() for p in targets}
             configuration = {'root': str(root), 'policy': policy(profile['source_arguments']),
                              'targets': targets, 'owner': owner, 'probe': str(uuid.uuid4()),
-                             'mode': 'workspace', 'spool_mib': quota}
+                             'mode': 'workspace', 'spool_mib': quota, 'maintenance_reads': args.maintenance_reads}
             stem = args.output.parent / f'{args.output.stem}-{name}'
             config = stem.with_suffix('.config.json')
             with config.open('x') as file:
@@ -49,7 +51,13 @@ def main():
             run['events'][-1]['data']['report_ref'] = 'report'
             assert report['restored_snapshot_matches'] and report['released_handles_dead'] and report['external_pin_bytes_match']
             assert report['original_source_manifest'] == old['report']['original_source_manifest']
-            assert report['spool']['written_bytes'] == old['report']['spool']['written_bytes']
+            anchor = report.get('reader_probe_bytes', 0)
+            assert report['spool']['written_bytes'] == old['report']['spool']['written_bytes'] + anchor
+            if args.maintenance_reads:
+                assert anchor == 65536 and report['reader_released']
+                samples = sum(len(p['maintenance_reads']['samples']) for p in report['phases'] if p.get('maintenance_reads'))
+                assert report['spool']['read_bytes'] == old['report']['spool']['read_bytes'] + samples * anchor
+                assert report['spool']['reads'] == old['report']['spool']['reads'] + samples
             assert report['spool']['written_bytes'] > report['spool']['capacity_bytes']
             for phase in report['phases']:
                 stats = phase['spool']

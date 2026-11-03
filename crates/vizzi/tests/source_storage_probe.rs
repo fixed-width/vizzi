@@ -48,3 +48,30 @@ fn source_storage_probe_deduplicates_shared_handles_and_releases_expired_pins() 
         );
     }
 }
+
+#[test]
+fn source_storage_maintenance_probe_reads_and_releases_an_independent_prefix_pin() {
+    let owned = tempfile::tempdir().unwrap();
+    let root = owned.path().join("source");
+    std::fs::create_dir(&root).unwrap();
+    std::fs::write(root.join(".vizzi-source-owned"), "owner").unwrap();
+    std::fs::write(root.join("a.rs"), "fn original() {}\n").unwrap();
+    let config = serde_json::json!({"root":root,"policy":vizzi_core::policy::PolicyConfig::default(),
+        "targets":["a.rs"],"owner":"owner","probe":"maintenance-fixture","mode":"workspace",
+        "spool_mib":1,"maintenance_reads":true});
+    let report =
+        vizzi::source_storage_probe::run(&serde_json::to_vec(&config).unwrap(), &mut |_| {})
+            .unwrap();
+    assert_eq!(report["reader_probe_bytes"], 65536);
+    assert_eq!(report["reader_released"], true);
+    assert_eq!(report["spool"]["file_bytes"], 0);
+    assert_eq!(report["spool"]["allocated_bytes"], 0);
+    assert_eq!(report["phases"][8]["spool"]["allocated_bytes"], 65536);
+    assert!(
+        !report["phases"][8]["maintenance_reads"]["samples"]
+            .as_array()
+            .unwrap()
+            .is_empty()
+    );
+    assert_eq!(report["phases"][9]["phase"], "reader_released");
+}

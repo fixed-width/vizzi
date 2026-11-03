@@ -1,12 +1,14 @@
 //! Optional source-only capture/history ownership probe; no analyser or cache work.
 
+mod maintenance;
 use crate::source::{Capture, CaptureScope, Directory};
+use maintenance::{Probe, READER_BYTES};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use std::{collections::BTreeSet, io::Write, path::PathBuf, sync::Arc, time::Instant};
 use vizzi_core::{
     analysis::Languages,
-    model::{ContentId, Document, Snapshot, SnapshotId},
+    model::{CapturedSource, ContentId, Document, Snapshot, SnapshotId},
     policy::PolicyConfig,
     publication::{Outcome, Publication},
 };
@@ -19,6 +21,8 @@ struct Config {
     targets: Vec<String>,
     #[serde(default)]
     spool_mib: usize,
+    #[serde(default)]
+    maintenance_reads: bool,
     owner: String,
     probe: String,
     mode: Mode,
@@ -147,15 +151,9 @@ fn record(
     external: Option<&Arc<Snapshot>>,
     elapsed_ms: Option<f64>,
     shared: usize,
-    spool: Option<&crate::source_spool::SourceSpool>,
+    probe: &Probe<'_>,
 ) -> Result<Value, Error> {
-    let reclaim_ms = if let Some(spool) = spool {
-        let started = Instant::now();
-        spool.reclaim()?;
-        Some(started.elapsed().as_secs_f64() * 1000.0)
-    } else {
-        None
-    };
+    let (reclaim_ms, maintenance_reads) = probe.measure()?;
     let current = publication.current().into_iter().collect::<Vec<_>>();
     let retained = ids
         .iter()
@@ -170,7 +168,7 @@ fn record(
     let including_external = inventory(&union)?;
     Ok(
         json!({"phase":phase,"elapsed_ms":elapsed_ms,"shared_reopened_sources":shared,"retained_snapshots":retained.len(),
-        "current":current_inventory,"publication":managed,"including_external":including_external,"rss_kib":rss(),"reclaim_ms":reclaim_ms,"spool":spool.map(|spool|spool.stats())}),
+        "current":current_inventory,"publication":managed,"including_external":including_external,"rss_kib":rss(),"reclaim_ms":reclaim_ms,"spool":probe.spool.map(|spool|spool.stats()),"maintenance_reads":maintenance_reads}),
     )
 }
 fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Error> {
@@ -205,6 +203,21 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
     if let Some(spool) = &spool {
         directory = directory.with_spool(spool.clone())?;
     }
+    let reader = if config.maintenance_reads {
+        Some(
+            spool
+                .as_ref()
+                .ok_or("maintenance reads require spooling")?
+                .persist(CapturedSource::capture(vec![b'p'; READER_BYTES], None))?,
+        )
+    } else {
+        None
+    };
+    let reader_weak = reader.as_ref().map(Arc::downgrade);
+    let mut probe = Probe {
+        spool: spool.as_deref(),
+        reader,
+    };
     let mut publication = Publication::default();
     let mut ids = Vec::new();
     let mut weak_snapshots = Vec::new();
@@ -249,7 +262,7 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
         external.as_ref(),
         Some(started.elapsed().as_secs_f64() * 1000.0),
         0,
-        spool.as_deref(),
+        &probe,
     )?);
     emit(json!({"event":"baseline_ready"}));
     {
@@ -279,7 +292,7 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
             external.as_ref(),
             Some(started.elapsed().as_secs_f64() * 1000.0),
             shared,
-            spool.as_deref(),
+            &probe,
         )?);
     }
     let scope = match config.mode {
@@ -355,7 +368,7 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
             external.as_ref(),
             Some(started.elapsed().as_secs_f64() * 1000.0),
             shared,
-            spool.as_deref(),
+            &probe,
         )?);
         emit(json!({"event":"phase_done","generation":generation}));
     }
@@ -374,7 +387,7 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
         None,
         None,
         0,
-        spool.as_deref(),
+        &probe,
     )?);
     {
         let previous = publication.current().ok_or("missing current observation")?;
@@ -421,7 +434,7 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
             None,
             Some(started.elapsed().as_secs_f64() * 1000.0),
             0,
-            spool.as_deref(),
+            &probe,
         )?);
     }
     publication = Publication::default();
@@ -437,10 +450,26 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
         None,
         None,
         0,
-        spool.as_deref(),
+        &probe,
     )?);
+    if config.maintenance_reads {
+        drop(probe.reader.take());
+        phases.push(record(
+            "reader_released",
+            &publication,
+            &ids,
+            None,
+            None,
+            0,
+            &probe,
+        )?);
+    }
+    let reader_released = reader_weak.is_none_or(|weak| weak.upgrade().is_none());
+    if !reader_released {
+        return Err("maintenance reader remains alive".into());
+    }
     Ok(
-        json!({"spool":spool.as_ref().map(|spool|spool.stats()),"mode":"unanalysed_source_storage","files":files,"changed_files":changed.len(),"initial_snapshot":initial_id,"original_source_manifest":original_manifest,
+        json!({"reader_probe_bytes":if config.maintenance_reads { READER_BYTES } else { 0 },"reader_released":reader_released,"spool":spool.as_ref().map(|spool|spool.stats()),"mode":"unanalysed_source_storage","files":files,"changed_files":changed.len(),"initial_snapshot":initial_id,"original_source_manifest":original_manifest,
         "phases":phases,"expired_from_publication":true,"external_pin_bytes_match":true,"restored_snapshot_matches":true,"released_handles_dead":true}),
     )
 }
