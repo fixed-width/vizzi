@@ -112,6 +112,8 @@ Retirements remain deferred until maintenance or final closure. Fragmentation, c
 metadata/queue memory, parser/fact/response allocations and the combined process envelope
 remain separate work. The equal staging allowance is still additional to backing capacity.
 Broader interactive workloads and baseline hardware are needed before choosing defaults.
+The subsequent [foreground edit report](../foreground-maintenance/RESULTS.md) measures
+capture/publication delay at the allocation gate while real cleanup is active.
 
 [Raw observations](results/observations.json), [summary](results/summary.json),
 [read CSV](results/read-summary.csv), [mutation details](results/native-mutation.json)

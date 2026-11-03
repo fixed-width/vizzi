@@ -1,0 +1,81 @@
+{
+  "host_sha256": "1110e9995728d243da1f44a4733528ff84a31ff829d257e9a29826679ce9a9cf",
+  "preparation": [
+    {
+      "profile": "linux",
+      "status": {
+        "recovery": {
+          "running": false,
+          "completed": 0,
+          "discarded": 0,
+          "verification": null,
+          "overlay": null,
+          "error": null
+        },
+        "schema": 1,
+        "name": "/tmp/vizzi-perf-corpus/linux-cbbddb6b",
+        "generation": 1,
+        "snapshot": "b9ab2a09e39c5594b2beb24abcf6b22731f38fd193a93f8ea3bf0c3298dd2625",
+        "pending": false,
+        "measurements": {
+          "deferred": 0,
+          "files": 66066,
+          "analyzed": 66066,
+          "source_only": 0,
+          "bytes": 1495484792,
+          "read_files": 66066,
+          "shared_sources": 0,
+          "retained": 0,
+          "reconciled": true,
+          "parsed": 65969,
+          "tree_reuses": 0,
+          "reused": 0,
+          "cache_hits": 97,
+          "cache_warnings": 0,
+          "capture_ms": 6018.548595,
+          "total_ms": 64487.48191200001
+        },
+        "error": null,
+        "observation": "one-shot capture"
+      }
+    },
+    {
+      "profile": "pytorch",
+      "status": {
+        "recovery": {
+          "running": false,
+          "completed": 0,
+          "discarded": 0,
+          "verification": null,
+          "overlay": null,
+          "error": null
+        },
+        "schema": 1,
+        "name": "/tmp/vizzi-perf-corpus/pytorch-1f4d2d5e",
+        "generation": 1,
+        "snapshot": "d79eeb72b9b054c3c1e200f317a74747bc73ec3c147e0585732a899aa537424c",
+        "pending": false,
+        "measurements": {
+          "deferred": 0,
+          "files": 10578,
+          "analyzed": 10147,
+          "source_only": 431,
+          "bytes": 186092681,
+          "read_files": 10578,
+          "shared_sources": 0,
+          "retained": 0,
+          "reconciled": true,
+          "parsed": 9980,
+          "tree_reuses": 0,
+          "reused": 0,
+          "cache_hits": 167,
+          "cache_warnings": 0,
+          "capture_ms": 447.323944,
+          "total_ms": 9223.706562
+        },
+        "error": null,
+        "observation": "one-shot capture"
+      }
+    }
+  ]
+}

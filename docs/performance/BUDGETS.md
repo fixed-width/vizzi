@@ -145,6 +145,15 @@ read latency changes from 737 / 108 ms to 0.120 / 0.131 ms. Cleanup still takes 
 and can block allocation/captures/diagnostics. These warm-prefix, finite source-only samples
 do not qualify browser latency, filesystem deadlines, other platforms or baseline hardware.
 
+The [foreground-cleanup measurement](../../experiments/foreground-maintenance/RESULTS.md)
+keeps scheduling unchanged and isolates ordinary explicit-hint edits. Median native
+publication latency rises from 58.8 / 33.2 ms after cleanup to 464.8 / 95.5 ms during
+generated-tail cleanup. Median writer/initial-maintenance gates take 409.5 / 64.1 ms,
+while parsing/merge and debounce remain similar. All six requested overlaps are observed.
+Design foreground capture independently of in-flight truncation while preserving reservation,
+pin and aggregate capacity safety. These three-sample conditions are not browser tails
+or a representative distribution of retired tails.
+
 Do not replace semantic correctness checks with these performance targets. Language
 assignments, partial grammar coverage, source-only cases, cancellation, cache validity,
 and immutable publication must remain explicit and independently tested.

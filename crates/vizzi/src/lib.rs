@@ -24,3 +24,6 @@ pub mod working_set;
 
 #[cfg(feature = "qualification")]
 pub mod stream_probe;
+
+#[cfg(feature = "qualification")]
+pub mod foreground_maintenance;

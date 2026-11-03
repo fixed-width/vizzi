@@ -1,0 +1,3359 @@
+{
+  "schema": 1,
+  "results": [
+    {
+      "profile": {
+        "name": "linux",
+        "source": "/tmp/vizzi-perf-corpus/linux-cbbddb6b",
+        "revision": "cbbddb6b08cc9900a87cccaa9b22bbe06aa4f50a",
+        "source_arguments": [
+          "--c-family-root",
+          ".",
+          "--syntax-language",
+          ".=c",
+          "--syntax-language",
+          "scripts/kconfig/qconf.cc=cpp",
+          "--syntax-language",
+          "tools/build/feature/test-cxa-demangle.cpp=cpp",
+          "--syntax-language",
+          "tools/build/feature/test-llvm-perf.cpp=cpp",
+          "--syntax-language",
+          "tools/build/feature/test-llvm.cpp=cpp",
+          "--syntax-language",
+          "tools/perf/util/demangle-cxx.cpp=cpp",
+          "--syntax-language",
+          "tools/perf/util/llvm-c-helpers.cpp=cpp",
+          "--syntax-language",
+          "tools/testing/selftests/bpf/progs/unwind_cxx.cpp=cpp",
+          "--syntax-language",
+          "tools/testing/selftests/bpf/test_cpp.cpp=cpp",
+          "--exclude-source",
+          "samples/check-exec/script-ask.inc",
+          "--exclude-source",
+          "samples/check-exec/script-exec.inc",
+          "--exclude-source",
+          "samples/check-exec/script-noexec.inc"
+        ],
+        "exception_count": 8,
+        "note": "Explicit raw root header assignment with source-suffix language exceptions; no compiler configuration; known Linux shell .inc fixtures excluded."
+      },
+      "configuration": {
+        "root": "/tmp/vizzi-foreground-owned-2fjg6ekv/source",
+        "cache": "/tmp/vizzi-foreground-facts/linux",
+        "policy": {
+          "c_family_roots": [
+            "."
+          ],
+          "exclusions": [
+            "samples/check-exec/script-ask.inc",
+            "samples/check-exec/script-exec.inc",
+            "samples/check-exec/script-noexec.inc"
+          ],
+          "assignments": [
+            {
+              "scope": ".",
+              "language": "c"
+            },
+            {
+              "scope": "scripts/kconfig/qconf.cc",
+              "language": "cpp"
+            },
+            {
+              "scope": "tools/build/feature/test-cxa-demangle.cpp",
+              "language": "cpp"
+            },
+            {
+              "scope": "tools/build/feature/test-llvm-perf.cpp",
+              "language": "cpp"
+            },
+            {
+              "scope": "tools/build/feature/test-llvm.cpp",
+              "language": "cpp"
+            },
+            {
+              "scope": "tools/perf/util/demangle-cxx.cpp",
+              "language": "cpp"
+            },
+            {
+              "scope": "tools/perf/util/llvm-c-helpers.cpp",
+              "language": "cpp"
+            },
+            {
+              "scope": "tools/testing/selftests/bpf/progs/unwind_cxx.cpp",
+              "language": "cpp"
+            },
+            {
+              "scope": "tools/testing/selftests/bpf/test_cpp.cpp",
+              "language": "cpp"
+            }
+          ]
+        },
+        "target": "kernel/locking/mutex.c",
+        "owner": "f1a008b5-c53b-4586-87be-d4741fcb5b0d",
+        "probe": "3a93a3ae-1ab0-44d0-86e2-a670dc768d85",
+        "pairs": 3,
+        "spool_mib": 8192,
+        "tail_mib": 4096
+      },
+      "original_target_sha256": "7029b01cdce9bcc86d640b9674bc51a6e810d4fbfae3b8cfa98f04f54a7bf00d",
+      "binary_sha256": "e0ca90864e11ed9c53e00dee38a7585fb204f471f025c77a4ef2830f5e3c83c2",
+      "run": {
+        "wall_s": 57.8751922280062,
+        "exit_code": 0,
+        "peaks_kib": {
+          "VmSize": 3298912,
+          "VmHWM": 2961440,
+          "VmRSS": 2961440,
+          "RssAnon": 2956880,
+          "RssFile": 4560
+        },
+        "phase_peaks_kib": {
+          "startup": {
+            "VmSize": 8252,
+            "VmHWM": 380,
+            "VmRSS": 380,
+            "RssAnon": 36,
+            "RssFile": 344
+          },
+          "baseline": {
+            "VmSize": 1037820,
+            "VmHWM": 781384,
+            "VmRSS": 781384,
+            "RssAnon": 777400,
+            "RssFile": 3984
+          },
+          "retained_idle": {
+            "VmSize": 1037820,
+            "VmHWM": 782428,
+            "VmRSS": 782428,
+            "RssAnon": 778444,
+            "RssFile": 3984
+          },
+          "capture_and_queries": {
+            "VmSize": 1037820,
+            "VmHWM": 785076,
+            "VmRSS": 785076,
+            "RssAnon": 780516,
+            "RssFile": 4560
+          },
+          "complete": {
+            "VmSize": 3298912,
+            "VmHWM": 2961440,
+            "VmRSS": 2961440,
+            "RssAnon": 2956880,
+            "RssFile": 4560
+          }
+        },
+        "samples_1s": [
+          {
+            "seconds": 0.0005002701655030251,
+            "phase": "startup",
+            "VmSize": 8252,
+            "VmHWM": 380,
+            "VmRSS": 380,
+            "RssAnon": 36,
+            "RssFile": 344
+          },
+          {
+            "seconds": 1.017658427124843,
+            "phase": "baseline",
+            "VmSize": 136108,
+            "VmHWM": 120580,
+            "VmRSS": 120580,
+            "RssAnon": 116788,
+            "RssFile": 3792
+          },
+          {
+            "seconds": 2.0241017402149737,
+            "phase": "baseline",
+            "VmSize": 286080,
+            "VmHWM": 258372,
+            "VmRSS": 258372,
+            "RssAnon": 254580,
+            "RssFile": 3792
+          },
+          {
+            "seconds": 3.030022799037397,
+            "phase": "baseline",
+            "VmSize": 373760,
+            "VmHWM": 334132,
+            "VmRSS": 334132,
+            "RssAnon": 330340,
+            "RssFile": 3792
+          },
+          {
+            "seconds": 4.035562318051234,
+            "phase": "baseline",
+            "VmSize": 493780,
+            "VmHWM": 437000,
+            "VmRSS": 437000,
+            "RssAnon": 433208,
+            "RssFile": 3792
+          },
+          {
+            "seconds": 5.042607065988705,
+            "phase": "baseline",
+            "VmSize": 1036468,
+            "VmHWM": 748496,
+            "VmRSS": 748496,
+            "RssAnon": 744640,
+            "RssFile": 3856
+          },
+          {
+            "seconds": 6.048492493107915,
+            "phase": "baseline",
+            "VmSize": 1025532,
+            "VmHWM": 769652,
+            "VmRSS": 769136,
+            "RssAnon": 765152,
+            "RssFile": 3984
+          },
+          {
+            "seconds": 7.0034325970336795,
+            "phase": "baseline",
+            "VmSize": 1025532,
+            "VmHWM": 774036,
+            "VmRSS": 774036,
+            "RssAnon": 770052,
+            "RssFile": 3984
+          },
+          {
+            "seconds": 8.044109569163993,
+            "phase": "retained_idle",
+            "VmSize": 1037808,
+            "VmHWM": 782428,
+            "VmRSS": 782428,
+            "RssAnon": 778444,
+            "RssFile": 3984
+          },
+          {
+            "seconds": 9.048762500053272,
+            "phase": "retained_idle",
+            "VmSize": 1037808,
+            "VmHWM": 782428,
+            "VmRSS": 782428,
+            "RssAnon": 778444,
+            "RssFile": 3984
+          },
+          {
+            "seconds": 10.003277310170233,
+            "phase": "retained_idle",
+            "VmSize": 1037808,
+            "VmHWM": 782428,
+            "VmRSS": 782428,
+            "RssAnon": 778444,
+            "RssFile": 3984
+          },
+          {
+            "seconds": 11.009354160167277,
+            "phase": "retained_idle",
+            "VmSize": 1037808,
+            "VmHWM": 782428,
+            "VmRSS": 782428,
+            "RssAnon": 778444,
+            "RssFile": 3984
+          },
+          {
+            "seconds": 12.014431098010391,
+            "phase": "retained_idle",
+            "VmSize": 1037808,
+            "VmHWM": 782428,
+            "VmRSS": 782428,
+            "RssAnon": 778444,
+            "RssFile": 3984
+          },
+          {
+            "seconds": 13.019679113058373,
+            "phase": "retained_idle",
+            "VmSize": 1037808,
+            "VmHWM": 782428,
+            "VmRSS": 782428,
+            "RssAnon": 778444,
+            "RssFile": 3984
+          },
+          {
+            "seconds": 14.0392439852003,
+            "phase": "retained_idle",
+            "VmSize": 1037808,
+            "VmHWM": 782428,
+            "VmRSS": 782428,
+            "RssAnon": 778444,
+            "RssFile": 3984
+          },
+          {
+            "seconds": 15.032879028003663,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 783528,
+            "VmRSS": 783528,
+            "RssAnon": 778968,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 16.03962729102932,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 783528,
+            "VmRSS": 783528,
+            "RssAnon": 778968,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 17.045676193200052,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 783528,
+            "VmRSS": 783528,
+            "RssAnon": 778968,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 18.000571455108002,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 783528,
+            "VmRSS": 783528,
+            "RssAnon": 778968,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 19.00670461100526,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 783528,
+            "VmRSS": 783528,
+            "RssAnon": 778968,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 20.01378710800782,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 783528,
+            "VmRSS": 783528,
+            "RssAnon": 778968,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 21.020222218008712,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 783528,
+            "VmRSS": 783528,
+            "RssAnon": 778968,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 22.029020274989307,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 783528,
+            "VmRSS": 783528,
+            "RssAnon": 778968,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 23.03282865602523,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 784560,
+            "VmRSS": 784560,
+            "RssAnon": 780000,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 24.03903265320696,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 784560,
+            "VmRSS": 784560,
+            "RssAnon": 780000,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 25.04557217215188,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 784560,
+            "VmRSS": 784560,
+            "RssAnon": 780000,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 26.001473747193813,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 784560,
+            "VmRSS": 784560,
+            "RssAnon": 780000,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 27.00715078902431,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 784560,
+            "VmRSS": 784560,
+            "RssAnon": 780000,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 28.0124246571213,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 784560,
+            "VmRSS": 784560,
+            "RssAnon": 780000,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 29.00033873412758,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 784560,
+            "VmRSS": 784560,
+            "RssAnon": 780000,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 30.010066708084196,
+            "phase": "capture_and_queries",
+            "VmSize": 1037820,
+            "VmHWM": 784560,
+            "VmRSS": 784560,
+            "RssAnon": 780000,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 31.037308070110157,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 785076,
+            "VmRSS": 785076,
+            "RssAnon": 780516,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 32.04520939802751,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 785076,
+            "VmRSS": 785076,
+            "RssAnon": 780516,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 33.00255926721729,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 785076,
+            "VmRSS": 785076,
+            "RssAnon": 780516,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 34.01039451221004,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 785076,
+            "VmRSS": 785076,
+            "RssAnon": 780516,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 35.015297022182494,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 785076,
+            "VmRSS": 785076,
+            "RssAnon": 780516,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 36.034514447208494,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 785076,
+            "VmRSS": 785076,
+            "RssAnon": 780516,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 37.0408327751793,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 785076,
+            "VmRSS": 785076,
+            "RssAnon": 780516,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 38.006451222114265,
+            "phase": "complete",
+            "VmSize": 1037820,
+            "VmHWM": 785076,
+            "VmRSS": 785076,
+            "RssAnon": 780516,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 39.04124973807484,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 785076,
+            "VmRSS": 785076,
+            "RssAnon": 780516,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 40.0474932200741,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 785076,
+            "VmRSS": 785076,
+            "RssAnon": 780516,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 41.002404312137514,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 785076,
+            "VmRSS": 785076,
+            "RssAnon": 780516,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 42.00932650920004,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 785076,
+            "VmRSS": 785076,
+            "RssAnon": 780516,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 43.01503108511679,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 785076,
+            "VmRSS": 785076,
+            "RssAnon": 780516,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 44.02314252406359,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 785076,
+            "VmRSS": 785076,
+            "RssAnon": 780516,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 45.04625838412903,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 785076,
+            "VmRSS": 785076,
+            "RssAnon": 780516,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 46.01853690599091,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 785076,
+            "VmRSS": 785076,
+            "RssAnon": 780516,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 47.02605215716176,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 785076,
+            "VmRSS": 785076,
+            "RssAnon": 780516,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 48.03087153402157,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 785076,
+            "VmRSS": 785076,
+            "RssAnon": 780516,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 49.036144874989986,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 785076,
+            "VmRSS": 785076,
+            "RssAnon": 780516,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 50.04222123208456,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 785076,
+            "VmRSS": 785076,
+            "RssAnon": 780516,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 51.04751111404039,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 785076,
+            "VmRSS": 785076,
+            "RssAnon": 780516,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 52.01719278516248,
+            "phase": "complete",
+            "VmSize": 1037808,
+            "VmHWM": 785076,
+            "VmRSS": 785076,
+            "RssAnon": 780516,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 53.00812648702413,
+            "phase": "capture_and_queries",
+            "VmSize": 1037820,
+            "VmHWM": 785076,
+            "VmRSS": 785076,
+            "RssAnon": 780516,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 54.01925659016706,
+            "phase": "complete",
+            "VmSize": 1355608,
+            "VmHWM": 1104640,
+            "VmRSS": 1104640,
+            "RssAnon": 1100080,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 55.02633679518476,
+            "phase": "complete",
+            "VmSize": 1933128,
+            "VmHWM": 1664008,
+            "VmRSS": 1664008,
+            "RssAnon": 1659448,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 56.03191766911186,
+            "phase": "complete",
+            "VmSize": 2695144,
+            "VmHWM": 2407092,
+            "VmRSS": 2407092,
+            "RssAnon": 2402532,
+            "RssFile": 4560
+          },
+          {
+            "seconds": 57.037609780207276,
+            "phase": "complete",
+            "VmSize": 3298864,
+            "VmHWM": 2961440,
+            "VmRSS": 2961440,
+            "RssAnon": 2956880,
+            "RssFile": 4560
+          }
+        ],
+        "events": [
+          {
+            "observed_s": 0.012937251012772322,
+            "data": {
+              "event": "baseline_start"
+            }
+          },
+          {
+            "observed_s": 7.28891966608353,
+            "data": {
+              "event": "baseline_ready",
+              "files": 66066
+            }
+          },
+          {
+            "observed_s": 7.288934135111049,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "pressure_start",
+              "sample": 0
+            }
+          },
+          {
+            "observed_s": 14.561320960056037,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "phase_start",
+              "sample": 0
+            }
+          },
+          {
+            "observed_s": 14.626529244007543,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "phase_done",
+              "sample": 0
+            }
+          },
+          {
+            "observed_s": 14.681021439144388,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "pressure_start",
+              "sample": 1
+            }
+          },
+          {
+            "observed_s": 22.113823804073036,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "phase_start",
+              "sample": 1
+            }
+          },
+          {
+            "observed_s": 22.576548482989892,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "phase_done",
+              "sample": 1
+            }
+          },
+          {
+            "observed_s": 22.63041309802793,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "pressure_start",
+              "sample": 2
+            }
+          },
+          {
+            "observed_s": 29.758305935189128,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "phase_start",
+              "sample": 2
+            }
+          },
+          {
+            "observed_s": 30.230176406214014,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "phase_done",
+              "sample": 2
+            }
+          },
+          {
+            "observed_s": 30.280261705163866,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "pressure_start",
+              "sample": 3
+            }
+          },
+          {
+            "observed_s": 38.327204797184095,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "phase_start",
+              "sample": 3
+            }
+          },
+          {
+            "observed_s": 38.385652497177944,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "phase_done",
+              "sample": 3
+            }
+          },
+          {
+            "observed_s": 38.43762736604549,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "pressure_start",
+              "sample": 4
+            }
+          },
+          {
+            "observed_s": 45.752601811196655,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "phase_start",
+              "sample": 4
+            }
+          },
+          {
+            "observed_s": 45.81726878718473,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "phase_done",
+              "sample": 4
+            }
+          },
+          {
+            "observed_s": 45.86746825603768,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "pressure_start",
+              "sample": 5
+            }
+          },
+          {
+            "observed_s": 52.806851078988984,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "phase_start",
+              "sample": 5
+            }
+          },
+          {
+            "observed_s": 53.31584247900173,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "phase_done",
+              "sample": 5
+            }
+          },
+          {
+            "observed_s": 57.74943501409143,
+            "data": {
+              "report_ref": "report"
+            }
+          }
+        ],
+        "stderr": ""
+      },
+      "report": {
+        "baseline_snapshot": "6281fc3687d262b28b74c321f3f269738ceeb1449e837e0d3c8d2506917a045b",
+        "cases": [
+          {
+            "capture_marks": [
+              {
+                "entered_ms": 487.96216599999997,
+                "gate_ms": 0.0006320000000000001,
+                "ready_ms": 487.96279799999996
+              }
+            ],
+            "capture_overlaps_cleanup": false,
+            "cleanup_end_ms": 462.270999,
+            "cleanup_ms": 462.183133,
+            "cleanup_start_ms": 0.087866,
+            "condition": "after_cleanup",
+            "cut_bytes": 1495484792,
+            "expected_declaration": true,
+            "fresh_facts_match": true,
+            "hint_ms": 462.54507099999995,
+            "measurements": {
+              "analyzed": 66066,
+              "bytes": 34384,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 0.23087300000000002,
+              "deferred": 0,
+              "files": 66066,
+              "parsed": 1,
+              "read_files": 1,
+              "reconciled": false,
+              "retained": 66065,
+              "reused": 66065,
+              "shared_sources": 0,
+              "source_only": 0,
+              "total_ms": 32.528951,
+              "tree_reuses": 0
+            },
+            "observed_cut_bytes": 1495484792,
+            "old_pin_matches": true,
+            "pair": 0,
+            "published_ms": 521.338206,
+            "sample": 0,
+            "source_matches": true,
+            "spool_after": {
+              "allocated_bytes": 1495519176,
+              "capacity_bytes": 8589934592,
+              "extent_bytes": 1495519176,
+              "file_bytes": 1495519176,
+              "free_bytes": 0,
+              "max_read_request": 65536,
+              "peak_extent_bytes": 5790452088,
+              "peak_staging_bytes": 4294967296,
+              "pending_retirements": 0,
+              "read_bytes": 1495687656,
+              "reads": 77970,
+              "staging_bytes": 0,
+              "stores": 66068,
+              "written_bytes": 5790486472
+            },
+            "spool_before": {
+              "allocated_bytes": 5790452088,
+              "capacity_bytes": 8589934592,
+              "extent_bytes": 5790452088,
+              "file_bytes": 5790452088,
+              "free_bytes": 0,
+              "max_read_request": 65536,
+              "peak_extent_bytes": 5790452088,
+              "peak_staging_bytes": 4294967296,
+              "pending_retirements": 0,
+              "read_bytes": 1495584608,
+              "reads": 77967,
+              "staging_bytes": 0,
+              "stores": 66067,
+              "written_bytes": 5790452088
+            },
+            "tail_bytes": 4294967296,
+            "write_overlaps_cleanup": false,
+            "write_start_ms": 462.395575,
+            "write_to_published_ms": 58.942631000000006
+          },
+          {
+            "capture_marks": [
+              {
+                "entered_ms": 25.621943,
+                "gate_ms": 403.016223,
+                "ready_ms": 428.638166
+              }
+            ],
+            "capture_overlaps_cleanup": true,
+            "cleanup_end_ms": 428.595829,
+            "cleanup_ms": 428.474886,
+            "cleanup_start_ms": 0.120943,
+            "condition": "during_cleanup",
+            "cut_bytes": 1495553456,
+            "expected_declaration": true,
+            "fresh_facts_match": true,
+            "hint_ms": 0.365477,
+            "measurements": {
+              "analyzed": 66066,
+              "bytes": 34384,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 403.27247,
+              "deferred": 0,
+              "files": 66066,
+              "parsed": 1,
+              "read_files": 1,
+              "reconciled": false,
+              "retained": 66065,
+              "reused": 66065,
+              "shared_sources": 0,
+              "source_only": 0,
+              "total_ms": 430.880583,
+              "tree_reuses": 0
+            },
+            "observed_cut_bytes": 1495553456,
+            "old_pin_matches": true,
+            "pair": 0,
+            "published_ms": 456.773147,
+            "sample": 1,
+            "source_matches": true,
+            "spool_after": {
+              "allocated_bytes": 1495587840,
+              "capacity_bytes": 8589934592,
+              "extent_bytes": 1495587840,
+              "file_bytes": 1495587840,
+              "free_bytes": 0,
+              "max_read_request": 65536,
+              "peak_extent_bytes": 5790520752,
+              "peak_staging_bytes": 4294967296,
+              "pending_retirements": 0,
+              "read_bytes": 1495890520,
+              "reads": 77975,
+              "staging_bytes": 0,
+              "stores": 66071,
+              "written_bytes": 10085522432
+            },
+            "spool_before": {
+              "allocated_bytes": 5790520752,
+              "capacity_bytes": 8589934592,
+              "extent_bytes": 5790520752,
+              "file_bytes": 5790520752,
+              "free_bytes": 0,
+              "max_read_request": 65536,
+              "peak_extent_bytes": 5790520752,
+              "peak_staging_bytes": 4294967296,
+              "pending_retirements": 0,
+              "read_bytes": 1495787472,
+              "reads": 77972,
+              "staging_bytes": 0,
+              "stores": 66070,
+              "written_bytes": 10085488048
+            },
+            "tail_bytes": 4294967296,
+            "write_overlaps_cleanup": true,
+            "write_start_ms": 0.28048100000000004,
+            "write_to_published_ms": 456.492666
+          },
+          {
+            "capture_marks": [
+              {
+                "entered_ms": 25.622897,
+                "gate_ms": 409.51196,
+                "ready_ms": 435.134857
+              }
+            ],
+            "capture_overlaps_cleanup": true,
+            "cleanup_end_ms": 435.120564,
+            "cleanup_ms": 434.83879199999996,
+            "cleanup_start_ms": 0.281772,
+            "condition": "during_cleanup",
+            "cut_bytes": 1495622120,
+            "expected_declaration": true,
+            "fresh_facts_match": true,
+            "hint_ms": 0.511094,
+            "measurements": {
+              "analyzed": 66066,
+              "bytes": 34384,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 409.734685,
+              "deferred": 0,
+              "files": 66066,
+              "parsed": 1,
+              "read_files": 1,
+              "reconciled": false,
+              "retained": 66065,
+              "reused": 66065,
+              "shared_sources": 0,
+              "source_only": 0,
+              "total_ms": 438.931593,
+              "tree_reuses": 0
+            },
+            "observed_cut_bytes": 1495622120,
+            "old_pin_matches": true,
+            "pair": 1,
+            "published_ms": 465.205168,
+            "sample": 2,
+            "source_matches": true,
+            "spool_after": {
+              "allocated_bytes": 1495656504,
+              "capacity_bytes": 8589934592,
+              "extent_bytes": 1495656504,
+              "file_bytes": 1495656504,
+              "free_bytes": 0,
+              "max_read_request": 65536,
+              "peak_extent_bytes": 5790589416,
+              "peak_staging_bytes": 4294967296,
+              "pending_retirements": 1,
+              "read_bytes": 1496093384,
+              "reads": 77980,
+              "staging_bytes": 0,
+              "stores": 66074,
+              "written_bytes": 14380558392
+            },
+            "spool_before": {
+              "allocated_bytes": 5790589416,
+              "capacity_bytes": 8589934592,
+              "extent_bytes": 5790589416,
+              "file_bytes": 5790589416,
+              "free_bytes": 0,
+              "max_read_request": 65536,
+              "peak_extent_bytes": 5790589416,
+              "peak_staging_bytes": 4294967296,
+              "pending_retirements": 0,
+              "read_bytes": 1495990336,
+              "reads": 77977,
+              "staging_bytes": 0,
+              "stores": 66073,
+              "written_bytes": 14380524008
+            },
+            "tail_bytes": 4294967296,
+            "write_overlaps_cleanup": true,
+            "write_start_ms": 0.379891,
+            "write_to_published_ms": 464.82527699999997
+          },
+          {
+            "capture_marks": [
+              {
+                "entered_ms": 435.389701,
+                "gate_ms": 0.000379,
+                "ready_ms": 435.39008
+              }
+            ],
+            "capture_overlaps_cleanup": false,
+            "cleanup_end_ms": 409.800661,
+            "cleanup_ms": 409.578483,
+            "cleanup_start_ms": 0.22217800000000001,
+            "condition": "after_cleanup",
+            "cut_bytes": 1495656504,
+            "expected_declaration": true,
+            "fresh_facts_match": true,
+            "hint_ms": 410.094584,
+            "measurements": {
+              "analyzed": 66066,
+              "bytes": 34384,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 0.153994,
+              "deferred": 0,
+              "files": 66066,
+              "parsed": 1,
+              "read_files": 1,
+              "reconciled": false,
+              "retained": 66065,
+              "reused": 66065,
+              "shared_sources": 0,
+              "source_only": 0,
+              "total_ms": 26.845663,
+              "tree_reuses": 0
+            },
+            "observed_cut_bytes": 1495656504,
+            "old_pin_matches": true,
+            "pair": 1,
+            "published_ms": 462.917324,
+            "sample": 3,
+            "source_matches": true,
+            "spool_after": {
+              "allocated_bytes": 1495656504,
+              "capacity_bytes": 8589934592,
+              "extent_bytes": 1495656504,
+              "file_bytes": 1495656504,
+              "free_bytes": 0,
+              "max_read_request": 65536,
+              "peak_extent_bytes": 5790623800,
+              "peak_staging_bytes": 4294967296,
+              "pending_retirements": 1,
+              "read_bytes": 1496296248,
+              "reads": 77985,
+              "staging_bytes": 0,
+              "stores": 66077,
+              "written_bytes": 18675594352
+            },
+            "spool_before": {
+              "allocated_bytes": 5790589416,
+              "capacity_bytes": 8589934592,
+              "extent_bytes": 5790623800,
+              "file_bytes": 5790623800,
+              "free_bytes": 34384,
+              "max_read_request": 65536,
+              "peak_extent_bytes": 5790623800,
+              "peak_staging_bytes": 4294967296,
+              "pending_retirements": 0,
+              "read_bytes": 1496193200,
+              "reads": 77982,
+              "staging_bytes": 0,
+              "stores": 66076,
+              "written_bytes": 18675559968
+            },
+            "tail_bytes": 4294967296,
+            "write_overlaps_cleanup": false,
+            "write_start_ms": 410.004027,
+            "write_to_published_ms": 52.913297
+          },
+          {
+            "capture_marks": [
+              {
+                "entered_ms": 408.262944,
+                "gate_ms": 0.00051,
+                "ready_ms": 408.263454
+              }
+            ],
+            "capture_overlaps_cleanup": false,
+            "cleanup_end_ms": 382.753982,
+            "cleanup_ms": 382.54328599999997,
+            "cleanup_start_ms": 0.210696,
+            "condition": "after_cleanup",
+            "cut_bytes": 1495656504,
+            "expected_declaration": true,
+            "fresh_facts_match": true,
+            "hint_ms": 382.943425,
+            "measurements": {
+              "analyzed": 66066,
+              "bytes": 34384,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 0.15639,
+              "deferred": 0,
+              "files": 66066,
+              "parsed": 1,
+              "read_files": 1,
+              "reconciled": false,
+              "retained": 66065,
+              "reused": 66065,
+              "shared_sources": 0,
+              "source_only": 0,
+              "total_ms": 31.413076999999998,
+              "tree_reuses": 0
+            },
+            "observed_cut_bytes": 1495656504,
+            "old_pin_matches": true,
+            "pair": 2,
+            "published_ms": 441.624262,
+            "sample": 4,
+            "source_matches": true,
+            "spool_after": {
+              "allocated_bytes": 1495656504,
+              "capacity_bytes": 8589934592,
+              "extent_bytes": 1495656504,
+              "file_bytes": 1495656504,
+              "free_bytes": 0,
+              "max_read_request": 65536,
+              "peak_extent_bytes": 5790623800,
+              "peak_staging_bytes": 4294967296,
+              "pending_retirements": 1,
+              "read_bytes": 1496499112,
+              "reads": 77990,
+              "staging_bytes": 0,
+              "stores": 66080,
+              "written_bytes": 22970630312
+            },
+            "spool_before": {
+              "allocated_bytes": 5790589416,
+              "capacity_bytes": 8589934592,
+              "extent_bytes": 5790623800,
+              "file_bytes": 5790623800,
+              "free_bytes": 34384,
+              "max_read_request": 65536,
+              "peak_extent_bytes": 5790623800,
+              "peak_staging_bytes": 4294967296,
+              "pending_retirements": 0,
+              "read_bytes": 1496396064,
+              "reads": 77987,
+              "staging_bytes": 0,
+              "stores": 66079,
+              "written_bytes": 22970595928
+            },
+            "tail_bytes": 4294967296,
+            "write_overlaps_cleanup": false,
+            "write_start_ms": 382.849232,
+            "write_to_published_ms": 58.77503
+          },
+          {
+            "capture_marks": [
+              {
+                "entered_ms": 27.772391,
+                "gate_ms": 442.46360699999997,
+                "ready_ms": 470.235998
+              }
+            ],
+            "capture_overlaps_cleanup": true,
+            "cleanup_end_ms": 470.224633,
+            "cleanup_ms": 470.064692,
+            "cleanup_start_ms": 0.159941,
+            "condition": "during_cleanup",
+            "cut_bytes": 1495656400,
+            "expected_declaration": true,
+            "fresh_facts_match": true,
+            "hint_ms": 2.4680370000000003,
+            "measurements": {
+              "analyzed": 66066,
+              "bytes": 34384,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 442.672032,
+              "deferred": 0,
+              "files": 66066,
+              "parsed": 1,
+              "read_files": 1,
+              "reconciled": false,
+              "retained": 66065,
+              "reused": 66065,
+              "shared_sources": 0,
+              "source_only": 0,
+              "total_ms": 473.048547,
+              "tree_reuses": 0
+            },
+            "observed_cut_bytes": 1495656400,
+            "old_pin_matches": true,
+            "pair": 2,
+            "published_ms": 502.14640499999996,
+            "sample": 5,
+            "source_matches": true,
+            "spool_after": {
+              "allocated_bytes": 1495656504,
+              "capacity_bytes": 8589934592,
+              "extent_bytes": 1495690784,
+              "file_bytes": 1495690784,
+              "free_bytes": 34280,
+              "max_read_request": 65536,
+              "peak_extent_bytes": 5790623800,
+              "peak_staging_bytes": 4294967296,
+              "pending_retirements": 1,
+              "read_bytes": 1496701976,
+              "reads": 77995,
+              "staging_bytes": 0,
+              "stores": 66083,
+              "written_bytes": 27265666272
+            },
+            "spool_before": {
+              "allocated_bytes": 5790589416,
+              "capacity_bytes": 8589934592,
+              "extent_bytes": 5790623696,
+              "file_bytes": 5790623696,
+              "free_bytes": 34280,
+              "max_read_request": 65536,
+              "peak_extent_bytes": 5790623800,
+              "peak_staging_bytes": 4294967296,
+              "pending_retirements": 0,
+              "read_bytes": 1496598928,
+              "reads": 77992,
+              "staging_bytes": 0,
+              "stores": 66082,
+              "written_bytes": 27265631888
+            },
+            "tail_bytes": 4294967296,
+            "write_overlaps_cleanup": true,
+            "write_start_ms": 0.206475,
+            "write_to_published_ms": 501.93993000000006
+          }
+        ],
+        "files": 66066,
+        "final_clean_matches": true,
+        "restored_matches": true,
+        "spool": {
+          "allocated_bytes": 0,
+          "capacity_bytes": 8589934592,
+          "extent_bytes": 0,
+          "file_bytes": 0,
+          "free_bytes": 0,
+          "max_read_request": 65536,
+          "peak_extent_bytes": 5790623800,
+          "peak_staging_bytes": 4294967296,
+          "pending_retirements": 0,
+          "read_bytes": 1496736256,
+          "reads": 77996,
+          "staging_bytes": 0,
+          "stores": 66084,
+          "written_bytes": 27265700552
+        }
+      }
+    },
+    {
+      "profile": {
+        "name": "pytorch",
+        "source": "/tmp/vizzi-perf-corpus/pytorch-1f4d2d5e",
+        "revision": "1f4d2d5e820dd870626dca4f9603e3a49879dbde",
+        "source_arguments": [
+          "--c-family-root",
+          ".",
+          "--syntax-language",
+          ".=cpp",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/deps/clog/src/clog.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/add.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/average-pooling.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/channel-shuffle.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/clamp.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/convolution.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/deconvolution.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/fully-connected-sparse.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/fully-connected.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/global-average-pooling.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/hardsigmoid.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/hardswish.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/hgemm/8x8-neonfp16arith.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/indirection.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/init.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/leaky-relu.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/max-pooling.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/operator-delete.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/operator-run.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8avgpool/mp8x9p8q-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8avgpool/mp8x9p8q-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8avgpool/up8x9-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8avgpool/up8x9-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8avgpool/up8xm-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8avgpool/up8xm-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8conv/4x4c2-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8conv/4x8-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8conv/8x8-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/mp8x25-neon-per-channel.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/mp8x25-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/mp8x25-sse2-per-channel.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/mp8x25-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/mp8x27-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/mp8x27-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/up8x9-neon-per-channel.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/up8x9-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/up8x9-sse2-per-channel.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/up8x9-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gavgpool/mp8x7p7q-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gavgpool/mp8x7p7q-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gavgpool/up8x7-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gavgpool/up8x7-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gavgpool/up8xm-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gavgpool/up8xm-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/2x4c8-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/4x-sumrows-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/4x4c2-dq-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/4x4c2-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/4x8-dq-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/4x8-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/4x8c2-xzp-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/6x4-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/8x8-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm_sparse/8x4-packA-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm_sparse/8x4c1x4-dq-packedA-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8vadd/neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8vadd/sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/fp32-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/fp32-psimd.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/fp32-scalar.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/fp32-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/gemmlowp-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/gemmlowp-scalar.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/gemmlowp-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/gemmlowp-sse4.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/gemmlowp-ssse3.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/precise-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/precise-psimd.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/precise-scalar.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/precise-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/precise-sse4.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/precise-ssse3.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/q31-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/q31-scalar.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/q31-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/q31-sse4.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/q31-ssse3.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/sconv/6x8-psimd.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/sdwconv/up4x9-psimd.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/sgemm/5x8-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/sgemm/6x8-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/sgemm/6x8-psimd.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/sigmoid.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/softargmax.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/tanh.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8clamp/neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8clamp/sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8lut32norm/scalar.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8maxpool/16x9p8q-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8maxpool/16x9p8q-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8maxpool/sub16-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8maxpool/sub16-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8rmax/neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8rmax/sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8lut/scalar.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/x2-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/x2-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/x3-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/x3-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/x4-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/x4-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/xm-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/xm-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8avgpool/mp8x9p8q-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8avgpool/mp8x9p8q-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8avgpool/up8x9-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8avgpool/up8x9-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8avgpool/up8xm-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8avgpool/up8xm-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8conv/4x4c2-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8conv/4x8-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8conv/8x8-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/mp8x25-neon-per-channel.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/mp8x25-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/mp8x25-sse2-per-channel.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/mp8x25-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/mp8x27-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/mp8x27-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/up8x9-neon-per-channel.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/up8x9-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/up8x9-sse2-per-channel.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/up8x9-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gavgpool/mp8x7p7q-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gavgpool/mp8x7p7q-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gavgpool/up8x7-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gavgpool/up8x7-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gavgpool/up8xm-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gavgpool/up8xm-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/2x4c8-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/4x-sumrows-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/4x4c2-dq-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/4x4c2-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/4x8-dq-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/4x8-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/4x8c2-xzp-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/6x4-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/8x8-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm_sparse/8x4c1x4-packed-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8vadd/neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8vadd/sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/fp32-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/fp32-psimd.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/fp32-scalar.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/fp32-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/gemmlowp-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/gemmlowp-scalar.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/gemmlowp-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/gemmlowp-sse4.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/gemmlowp-ssse3.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/precise-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/precise-psimd.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/precise-scalar.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/precise-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/precise-sse4.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/precise-ssse3.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/q31-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/q31-scalar.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/q31-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/q31-sse4.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/q31-ssse3.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/sgemm/5x8-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/sgemm/6x8-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/sgemm/6x8-psimd.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8clamp/neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8clamp/sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8lut32norm/scalar.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8maxpool/16x9p8q-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8maxpool/16x9p8q-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8maxpool/sub16-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8maxpool/sub16-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8rmax/neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8rmax/sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8lut/scalar.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/x2-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/x2-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/x3-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/x3-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/x4-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/x4-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/xm-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/xm-sse2.c=c",
+          "--syntax-language",
+          "test/cpp_extensions/open_registration_extension/torch_openreg/torch_openreg/csrc/stub.c=c",
+          "--syntax-language",
+          "third_party/miniz-3.0.2/examples/example1.c=c",
+          "--syntax-language",
+          "third_party/miniz-3.0.2/examples/example2.c=c",
+          "--syntax-language",
+          "third_party/miniz-3.0.2/examples/example3.c=c",
+          "--syntax-language",
+          "third_party/miniz-3.0.2/examples/example4.c=c",
+          "--syntax-language",
+          "third_party/miniz-3.0.2/examples/example5.c=c",
+          "--syntax-language",
+          "third_party/miniz-3.0.2/examples/example6.c=c",
+          "--syntax-language",
+          "third_party/miniz-3.0.2/miniz.c=c",
+          "--syntax-language",
+          "torch/csrc/dynamo/cpython_defs.c=c",
+          "--syntax-language",
+          "torch/csrc/dynamo/eval_frame.c=c",
+          "--syntax-language",
+          "torch/csrc/dynamo/stackref_bridge.c=c",
+          "--syntax-language",
+          "torch/csrc/empty.c=c",
+          "--syntax-language",
+          "torch/csrc/stub.c=c"
+        ],
+        "exception_count": 194,
+        "note": "Explicit raw root header assignment with source-suffix language exceptions; no compiler configuration; known Linux shell .inc fixtures excluded."
+      },
+      "configuration": {
+        "root": "/tmp/vizzi-foreground-owned-hzn8t3ug/source",
+        "cache": "/tmp/vizzi-foreground-facts/pytorch",
+        "policy": {
+          "c_family_roots": [
+            "."
+          ],
+          "exclusions": [],
+          "assignments": [
+            {
+              "scope": ".",
+              "language": "cpp"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/deps/clog/src/clog.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/add.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/average-pooling.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/channel-shuffle.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/clamp.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/convolution.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/deconvolution.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/fully-connected-sparse.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/fully-connected.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/global-average-pooling.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/hardsigmoid.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/hardswish.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/hgemm/8x8-neonfp16arith.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/indirection.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/init.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/leaky-relu.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/max-pooling.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/operator-delete.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/operator-run.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8avgpool/mp8x9p8q-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8avgpool/mp8x9p8q-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8avgpool/up8x9-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8avgpool/up8x9-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8avgpool/up8xm-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8avgpool/up8xm-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8conv/4x4c2-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8conv/4x8-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8conv/8x8-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/mp8x25-neon-per-channel.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/mp8x25-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/mp8x25-sse2-per-channel.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/mp8x25-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/mp8x27-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/mp8x27-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/up8x9-neon-per-channel.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/up8x9-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/up8x9-sse2-per-channel.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/up8x9-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gavgpool/mp8x7p7q-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gavgpool/mp8x7p7q-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gavgpool/up8x7-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gavgpool/up8x7-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gavgpool/up8xm-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gavgpool/up8xm-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/2x4c8-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/4x-sumrows-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/4x4c2-dq-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/4x4c2-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/4x8-dq-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/4x8-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/4x8c2-xzp-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/6x4-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/8x8-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm_sparse/8x4-packA-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm_sparse/8x4c1x4-dq-packedA-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8vadd/neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8vadd/sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/fp32-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/fp32-psimd.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/fp32-scalar.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/fp32-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/gemmlowp-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/gemmlowp-scalar.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/gemmlowp-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/gemmlowp-sse4.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/gemmlowp-ssse3.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/precise-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/precise-psimd.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/precise-scalar.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/precise-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/precise-sse4.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/precise-ssse3.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/q31-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/q31-scalar.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/q31-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/q31-sse4.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/q31-ssse3.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/sconv/6x8-psimd.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/sdwconv/up4x9-psimd.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/sgemm/5x8-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/sgemm/6x8-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/sgemm/6x8-psimd.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/sigmoid.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/softargmax.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/tanh.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8clamp/neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8clamp/sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8lut32norm/scalar.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8maxpool/16x9p8q-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8maxpool/16x9p8q-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8maxpool/sub16-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8maxpool/sub16-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8rmax/neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8rmax/sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8lut/scalar.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/x2-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/x2-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/x3-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/x3-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/x4-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/x4-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/xm-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/xm-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8avgpool/mp8x9p8q-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8avgpool/mp8x9p8q-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8avgpool/up8x9-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8avgpool/up8x9-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8avgpool/up8xm-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8avgpool/up8xm-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8conv/4x4c2-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8conv/4x8-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8conv/8x8-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/mp8x25-neon-per-channel.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/mp8x25-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/mp8x25-sse2-per-channel.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/mp8x25-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/mp8x27-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/mp8x27-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/up8x9-neon-per-channel.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/up8x9-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/up8x9-sse2-per-channel.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/up8x9-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gavgpool/mp8x7p7q-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gavgpool/mp8x7p7q-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gavgpool/up8x7-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gavgpool/up8x7-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gavgpool/up8xm-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gavgpool/up8xm-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/2x4c8-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/4x-sumrows-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/4x4c2-dq-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/4x4c2-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/4x8-dq-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/4x8-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/4x8c2-xzp-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/6x4-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/8x8-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm_sparse/8x4c1x4-packed-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8vadd/neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8vadd/sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/fp32-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/fp32-psimd.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/fp32-scalar.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/fp32-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/gemmlowp-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/gemmlowp-scalar.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/gemmlowp-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/gemmlowp-sse4.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/gemmlowp-ssse3.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/precise-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/precise-psimd.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/precise-scalar.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/precise-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/precise-sse4.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/precise-ssse3.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/q31-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/q31-scalar.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/q31-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/q31-sse4.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/q31-ssse3.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/sgemm/5x8-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/sgemm/6x8-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/sgemm/6x8-psimd.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8clamp/neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8clamp/sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8lut32norm/scalar.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8maxpool/16x9p8q-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8maxpool/16x9p8q-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8maxpool/sub16-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8maxpool/sub16-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8rmax/neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8rmax/sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8lut/scalar.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/x2-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/x2-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/x3-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/x3-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/x4-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/x4-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/xm-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/xm-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "test/cpp_extensions/open_registration_extension/torch_openreg/torch_openreg/csrc/stub.c",
+              "language": "c"
+            },
+            {
+              "scope": "third_party/miniz-3.0.2/examples/example1.c",
+              "language": "c"
+            },
+            {
+              "scope": "third_party/miniz-3.0.2/examples/example2.c",
+              "language": "c"
+            },
+            {
+              "scope": "third_party/miniz-3.0.2/examples/example3.c",
+              "language": "c"
+            },
+            {
+              "scope": "third_party/miniz-3.0.2/examples/example4.c",
+              "language": "c"
+            },
+            {
+              "scope": "third_party/miniz-3.0.2/examples/example5.c",
+              "language": "c"
+            },
+            {
+              "scope": "third_party/miniz-3.0.2/examples/example6.c",
+              "language": "c"
+            },
+            {
+              "scope": "third_party/miniz-3.0.2/miniz.c",
+              "language": "c"
+            },
+            {
+              "scope": "torch/csrc/dynamo/cpython_defs.c",
+              "language": "c"
+            },
+            {
+              "scope": "torch/csrc/dynamo/eval_frame.c",
+              "language": "c"
+            },
+            {
+              "scope": "torch/csrc/dynamo/stackref_bridge.c",
+              "language": "c"
+            },
+            {
+              "scope": "torch/csrc/empty.c",
+              "language": "c"
+            },
+            {
+              "scope": "torch/csrc/stub.c",
+              "language": "c"
+            }
+          ]
+        },
+        "target": "c10/core/Device.cpp",
+        "owner": "4e226ca2-7289-4312-a2a2-2c84d179c4fd",
+        "probe": "61d1f5c2-f5ea-4303-a59c-5f9ef863f526",
+        "pairs": 3,
+        "spool_mib": 1024,
+        "tail_mib": 768
+      },
+      "original_target_sha256": "6566f28edc0b7afdfee492a03c029e9a372db728b9b77af7c1ffc1c1e1ed9c24",
+      "binary_sha256": "e0ca90864e11ed9c53e00dee38a7585fb204f471f025c77a4ef2830f5e3c83c2",
+      "run": {
+        "wall_s": 11.407120310002938,
+        "exit_code": 0,
+        "peaks_kib": {
+          "VmSize": 678620,
+          "VmHWM": 528244,
+          "VmRSS": 528244,
+          "RssAnon": 521308,
+          "RssFile": 6936
+        },
+        "phase_peaks_kib": {
+          "startup": {
+            "VmSize": 9440,
+            "VmHWM": 676,
+            "VmRSS": 676,
+            "RssAnon": 60,
+            "RssFile": 616
+          },
+          "baseline": {
+            "VmSize": 380148,
+            "VmHWM": 170128,
+            "VmRSS": 170128,
+            "RssAnon": 166340,
+            "RssFile": 3788
+          },
+          "retained_idle": {
+            "VmSize": 351148,
+            "VmHWM": 171232,
+            "VmRSS": 171232,
+            "RssAnon": 167444,
+            "RssFile": 3788
+          },
+          "capture_and_queries": {
+            "VmSize": 351148,
+            "VmHWM": 174800,
+            "VmRSS": 174800,
+            "RssAnon": 167864,
+            "RssFile": 6936
+          },
+          "complete": {
+            "VmSize": 678620,
+            "VmHWM": 528244,
+            "VmRSS": 528244,
+            "RssAnon": 521308,
+            "RssFile": 6936
+          }
+        },
+        "samples_1s": [
+          {
+            "seconds": 0.0005857441574335098,
+            "phase": "startup",
+            "VmSize": 9440,
+            "VmHWM": 676,
+            "VmRSS": 676,
+            "RssAnon": 60,
+            "RssFile": 616
+          },
+          {
+            "seconds": 1.0173976400401443,
+            "phase": "baseline",
+            "VmSize": 351148,
+            "VmHWM": 168252,
+            "VmRSS": 168252,
+            "RssAnon": 164464,
+            "RssFile": 3788
+          },
+          {
+            "seconds": 2.0071561911609024,
+            "phase": "retained_idle",
+            "VmSize": 351136,
+            "VmHWM": 171232,
+            "VmRSS": 171232,
+            "RssAnon": 167444,
+            "RssFile": 3788
+          },
+          {
+            "seconds": 3.0370630081743,
+            "phase": "complete",
+            "VmSize": 351136,
+            "VmHWM": 174548,
+            "VmRSS": 174548,
+            "RssAnon": 167612,
+            "RssFile": 6936
+          },
+          {
+            "seconds": 4.043129137950018,
+            "phase": "complete",
+            "VmSize": 351136,
+            "VmHWM": 174548,
+            "VmRSS": 174548,
+            "RssAnon": 167612,
+            "RssFile": 6936
+          },
+          {
+            "seconds": 5.0165224119555205,
+            "phase": "complete",
+            "VmSize": 351136,
+            "VmHWM": 174716,
+            "VmRSS": 174716,
+            "RssAnon": 167780,
+            "RssFile": 6936
+          },
+          {
+            "seconds": 6.027410718146712,
+            "phase": "complete",
+            "VmSize": 351136,
+            "VmHWM": 174796,
+            "VmRSS": 174796,
+            "RssAnon": 167860,
+            "RssFile": 6936
+          },
+          {
+            "seconds": 7.033813694026321,
+            "phase": "complete",
+            "VmSize": 351136,
+            "VmHWM": 174796,
+            "VmRSS": 174796,
+            "RssAnon": 167860,
+            "RssFile": 6936
+          },
+          {
+            "seconds": 8.024772111093625,
+            "phase": "complete",
+            "VmSize": 351136,
+            "VmHWM": 174796,
+            "VmRSS": 174796,
+            "RssAnon": 167860,
+            "RssFile": 6936
+          },
+          {
+            "seconds": 9.030379188014194,
+            "phase": "complete",
+            "VmSize": 351148,
+            "VmHWM": 174796,
+            "VmRSS": 174796,
+            "RssAnon": 167860,
+            "RssFile": 6936
+          },
+          {
+            "seconds": 10.032527008093894,
+            "phase": "complete",
+            "VmSize": 351136,
+            "VmHWM": 174800,
+            "VmRSS": 174800,
+            "RssAnon": 167864,
+            "RssFile": 6936
+          },
+          {
+            "seconds": 11.01621590508148,
+            "phase": "complete",
+            "VmSize": 560100,
+            "VmHWM": 377272,
+            "VmRSS": 377272,
+            "RssAnon": 370336,
+            "RssFile": 6936
+          }
+        ],
+        "events": [
+          {
+            "observed_s": 0.01144474116154015,
+            "data": {
+              "event": "baseline_start"
+            }
+          },
+          {
+            "observed_s": 1.2020045300014317,
+            "data": {
+              "event": "baseline_ready",
+              "files": 10578
+            }
+          },
+          {
+            "observed_s": 1.202013046015054,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "pressure_start",
+              "sample": 0
+            }
+          },
+          {
+            "observed_s": 2.7235762821510434,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "phase_start",
+              "sample": 0
+            }
+          },
+          {
+            "observed_s": 2.756018263986334,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "phase_done",
+              "sample": 0
+            }
+          },
+          {
+            "observed_s": 2.7854038879740983,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "pressure_start",
+              "sample": 1
+            }
+          },
+          {
+            "observed_s": 4.190437756013125,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "phase_start",
+              "sample": 1
+            }
+          },
+          {
+            "observed_s": 4.283029268030077,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "phase_done",
+              "sample": 1
+            }
+          },
+          {
+            "observed_s": 4.312544729094952,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "pressure_start",
+              "sample": 2
+            }
+          },
+          {
+            "observed_s": 5.697551836958155,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "phase_start",
+              "sample": 2
+            }
+          },
+          {
+            "observed_s": 5.794713180977851,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "phase_done",
+              "sample": 2
+            }
+          },
+          {
+            "observed_s": 5.826273265993223,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "pressure_start",
+              "sample": 3
+            }
+          },
+          {
+            "observed_s": 7.405505186179653,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "phase_start",
+              "sample": 3
+            }
+          },
+          {
+            "observed_s": 7.4401574190706015,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "phase_done",
+              "sample": 3
+            }
+          },
+          {
+            "observed_s": 7.471436107996851,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "pressure_start",
+              "sample": 4
+            }
+          },
+          {
+            "observed_s": 9.057999182958156,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "phase_start",
+              "sample": 4
+            }
+          },
+          {
+            "observed_s": 9.093058844096959,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "phase_done",
+              "sample": 4
+            }
+          },
+          {
+            "observed_s": 9.125017882091925,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "pressure_start",
+              "sample": 5
+            }
+          },
+          {
+            "observed_s": 10.512287474004552,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "phase_start",
+              "sample": 5
+            }
+          },
+          {
+            "observed_s": 10.614094106014818,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "phase_done",
+              "sample": 5
+            }
+          },
+          {
+            "observed_s": 11.375997164985165,
+            "data": {
+              "report_ref": "report"
+            }
+          }
+        ],
+        "stderr": ""
+      },
+      "report": {
+        "baseline_snapshot": "7fc3fff9e3800498ddd28a97316833878b828892afe15778ea31deabc5f80cee",
+        "cases": [
+          {
+            "capture_marks": [
+              {
+                "entered_ms": 134.60412,
+                "gate_ms": 0.000414,
+                "ready_ms": 134.604534
+              }
+            ],
+            "capture_overlaps_cleanup": false,
+            "cleanup_end_ms": 109.25151,
+            "cleanup_ms": 109.11955499999999,
+            "cleanup_start_ms": 0.13195500000000002,
+            "condition": "after_cleanup",
+            "cut_bytes": 186092681,
+            "expected_declaration": true,
+            "fresh_facts_match": true,
+            "hint_ms": 109.439812,
+            "measurements": {
+              "analyzed": 10147,
+              "bytes": 5368,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 0.11702800000000001,
+              "deferred": 0,
+              "files": 10578,
+              "parsed": 1,
+              "read_files": 1,
+              "reconciled": false,
+              "retained": 10577,
+              "reused": 10577,
+              "shared_sources": 0,
+              "source_only": 431,
+              "total_ms": 4.948753999999999,
+              "tree_reuses": 0
+            },
+            "observed_cut_bytes": 186092681,
+            "old_pin_matches": true,
+            "pair": 0,
+            "published_ms": 140.62426,
+            "sample": 0,
+            "source_matches": true,
+            "spool_after": {
+              "allocated_bytes": 186098049,
+              "capacity_bytes": 1073741824,
+              "extent_bytes": 186098049,
+              "file_bytes": 186098049,
+              "free_bytes": 0,
+              "max_read_request": 65536,
+              "peak_extent_bytes": 991399049,
+              "peak_staging_bytes": 805306368,
+              "pending_retirements": 0,
+              "read_bytes": 181799335,
+              "reads": 11207,
+              "staging_bytes": 0,
+              "stores": 10580,
+              "written_bytes": 991404417
+            },
+            "spool_before": {
+              "allocated_bytes": 991399049,
+              "capacity_bytes": 1073741824,
+              "extent_bytes": 991399049,
+              "file_bytes": 991399049,
+              "free_bytes": 0,
+              "max_read_request": 65536,
+              "peak_extent_bytes": 991399049,
+              "peak_staging_bytes": 805306368,
+              "pending_retirements": 0,
+              "read_bytes": 181783335,
+              "reads": 11204,
+              "staging_bytes": 0,
+              "stores": 10579,
+              "written_bytes": 991399049
+            },
+            "tail_bytes": 805306368,
+            "write_overlaps_cleanup": false,
+            "write_start_ms": 109.36093500000001,
+            "write_to_published_ms": 31.263325000000002
+          },
+          {
+            "capture_marks": [
+              {
+                "entered_ms": 25.682514,
+                "gate_ms": 60.288432,
+                "ready_ms": 85.97094600000001
+              }
+            ],
+            "capture_overlaps_cleanup": true,
+            "cleanup_end_ms": 85.964106,
+            "cleanup_ms": 85.774761,
+            "cleanup_start_ms": 0.18934499999999999,
+            "condition": "during_cleanup",
+            "cut_bytes": 186103313,
+            "expected_declaration": true,
+            "fresh_facts_match": true,
+            "hint_ms": 0.35081100000000004,
+            "measurements": {
+              "analyzed": 10147,
+              "bytes": 5368,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 60.412298,
+              "deferred": 0,
+              "files": 10578,
+              "parsed": 1,
+              "read_files": 1,
+              "reconciled": false,
+              "retained": 10577,
+              "reused": 10577,
+              "shared_sources": 0,
+              "source_only": 431,
+              "total_ms": 65.64600499999999,
+              "tree_reuses": 0
+            },
+            "observed_cut_bytes": 186103313,
+            "old_pin_matches": true,
+            "pair": 0,
+            "published_ms": 91.87430400000001,
+            "sample": 1,
+            "source_matches": true,
+            "spool_after": {
+              "allocated_bytes": 186108681,
+              "capacity_bytes": 1073741824,
+              "extent_bytes": 186108681,
+              "file_bytes": 186108681,
+              "free_bytes": 0,
+              "max_read_request": 65536,
+              "peak_extent_bytes": 991409681,
+              "peak_staging_bytes": 805306368,
+              "pending_retirements": 0,
+              "read_bytes": 181886135,
+              "reads": 11212,
+              "staging_bytes": 0,
+              "stores": 10583,
+              "written_bytes": 1796721417
+            },
+            "spool_before": {
+              "allocated_bytes": 991409681,
+              "capacity_bytes": 1073741824,
+              "extent_bytes": 991409681,
+              "file_bytes": 991409681,
+              "free_bytes": 0,
+              "max_read_request": 65536,
+              "peak_extent_bytes": 991409681,
+              "peak_staging_bytes": 805306368,
+              "pending_retirements": 0,
+              "read_bytes": 181870135,
+              "reads": 11209,
+              "staging_bytes": 0,
+              "stores": 10582,
+              "written_bytes": 1796716049
+            },
+            "tail_bytes": 805306368,
+            "write_overlaps_cleanup": true,
+            "write_start_ms": 0.276482,
+            "write_to_published_ms": 91.597822
+          },
+          {
+            "capture_marks": [
+              {
+                "entered_ms": 25.450743000000003,
+                "gate_ms": 64.095076,
+                "ready_ms": 89.545819
+              }
+            ],
+            "capture_overlaps_cleanup": true,
+            "cleanup_end_ms": 89.505595,
+            "cleanup_ms": 89.371938,
+            "cleanup_start_ms": 0.133657,
+            "condition": "during_cleanup",
+            "cut_bytes": 186113945,
+            "expected_declaration": true,
+            "fresh_facts_match": true,
+            "hint_ms": 0.294458,
+            "measurements": {
+              "analyzed": 10147,
+              "bytes": 5368,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 64.268019,
+              "deferred": 0,
+              "files": 10578,
+              "parsed": 1,
+              "read_files": 1,
+              "reconciled": false,
+              "retained": 10577,
+              "reused": 10577,
+              "shared_sources": 0,
+              "source_only": 431,
+              "total_ms": 69.236142,
+              "tree_reuses": 0
+            },
+            "observed_cut_bytes": 186113945,
+            "old_pin_matches": true,
+            "pair": 1,
+            "published_ms": 95.683464,
+            "sample": 2,
+            "source_matches": true,
+            "spool_after": {
+              "allocated_bytes": 186119313,
+              "capacity_bytes": 1073741824,
+              "extent_bytes": 186119313,
+              "file_bytes": 186119313,
+              "free_bytes": 0,
+              "max_read_request": 65536,
+              "peak_extent_bytes": 991420313,
+              "peak_staging_bytes": 805306368,
+              "pending_retirements": 1,
+              "read_bytes": 181972935,
+              "reads": 11217,
+              "staging_bytes": 0,
+              "stores": 10586,
+              "written_bytes": 2602038417
+            },
+            "spool_before": {
+              "allocated_bytes": 991420313,
+              "capacity_bytes": 1073741824,
+              "extent_bytes": 991420313,
+              "file_bytes": 991420313,
+              "free_bytes": 0,
+              "max_read_request": 65536,
+              "peak_extent_bytes": 991420313,
+              "peak_staging_bytes": 805306368,
+              "pending_retirements": 0,
+              "read_bytes": 181956935,
+              "reads": 11214,
+              "staging_bytes": 0,
+              "stores": 10585,
+              "written_bytes": 2602033049
+            },
+            "tail_bytes": 805306368,
+            "write_overlaps_cleanup": true,
+            "write_start_ms": 0.197522,
+            "write_to_published_ms": 95.48594200000001
+          },
+          {
+            "capture_marks": [
+              {
+                "entered_ms": 112.48364199999999,
+                "gate_ms": 0.001308,
+                "ready_ms": 112.48495
+              }
+            ],
+            "capture_overlaps_cleanup": false,
+            "cleanup_end_ms": 87.08306400000001,
+            "cleanup_ms": 86.941259,
+            "cleanup_start_ms": 0.14180500000000001,
+            "condition": "after_cleanup",
+            "cut_bytes": 186119313,
+            "expected_declaration": true,
+            "fresh_facts_match": true,
+            "hint_ms": 87.23961,
+            "measurements": {
+              "analyzed": 10147,
+              "bytes": 5368,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 0.196722,
+              "deferred": 0,
+              "files": 10578,
+              "parsed": 1,
+              "read_files": 1,
+              "reconciled": false,
+              "retained": 10577,
+              "reused": 10577,
+              "shared_sources": 0,
+              "source_only": 431,
+              "total_ms": 6.408133,
+              "tree_reuses": 0
+            },
+            "observed_cut_bytes": 186119313,
+            "old_pin_matches": true,
+            "pair": 1,
+            "published_ms": 120.647121,
+            "sample": 3,
+            "source_matches": true,
+            "spool_after": {
+              "allocated_bytes": 186119313,
+              "capacity_bytes": 1073741824,
+              "extent_bytes": 186119313,
+              "file_bytes": 186119313,
+              "free_bytes": 0,
+              "max_read_request": 65536,
+              "peak_extent_bytes": 991425681,
+              "peak_staging_bytes": 805306368,
+              "pending_retirements": 1,
+              "read_bytes": 182059735,
+              "reads": 11222,
+              "staging_bytes": 0,
+              "stores": 10589,
+              "written_bytes": 3407355417
+            },
+            "spool_before": {
+              "allocated_bytes": 991420313,
+              "capacity_bytes": 1073741824,
+              "extent_bytes": 991425681,
+              "file_bytes": 991425681,
+              "free_bytes": 5368,
+              "max_read_request": 65536,
+              "peak_extent_bytes": 991425681,
+              "peak_staging_bytes": 805306368,
+              "pending_retirements": 0,
+              "read_bytes": 182043735,
+              "reads": 11219,
+              "staging_bytes": 0,
+              "stores": 10588,
+              "written_bytes": 3407350049
+            },
+            "tail_bytes": 805306368,
+            "write_overlaps_cleanup": false,
+            "write_start_ms": 87.161477,
+            "write_to_published_ms": 33.485644
+          },
+          {
+            "capture_marks": [
+              {
+                "entered_ms": 122.700457,
+                "gate_ms": 0.000603,
+                "ready_ms": 122.70106
+              }
+            ],
+            "capture_overlaps_cleanup": false,
+            "cleanup_end_ms": 97.298141,
+            "cleanup_ms": 97.223534,
+            "cleanup_start_ms": 0.07460699999999999,
+            "condition": "after_cleanup",
+            "cut_bytes": 186119313,
+            "expected_declaration": true,
+            "fresh_facts_match": true,
+            "hint_ms": 97.506894,
+            "measurements": {
+              "analyzed": 10147,
+              "bytes": 5368,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 0.145554,
+              "deferred": 0,
+              "files": 10578,
+              "parsed": 1,
+              "read_files": 1,
+              "reconciled": false,
+              "retained": 10577,
+              "reused": 10577,
+              "shared_sources": 0,
+              "source_only": 431,
+              "total_ms": 7.442986,
+              "tree_reuses": 0
+            },
+            "observed_cut_bytes": 186119313,
+            "old_pin_matches": true,
+            "pair": 2,
+            "published_ms": 130.609387,
+            "sample": 4,
+            "source_matches": true,
+            "spool_after": {
+              "allocated_bytes": 186119313,
+              "capacity_bytes": 1073741824,
+              "extent_bytes": 186119313,
+              "file_bytes": 186119313,
+              "free_bytes": 0,
+              "max_read_request": 65536,
+              "peak_extent_bytes": 991425681,
+              "peak_staging_bytes": 805306368,
+              "pending_retirements": 1,
+              "read_bytes": 182146535,
+              "reads": 11227,
+              "staging_bytes": 0,
+              "stores": 10592,
+              "written_bytes": 4212672417
+            },
+            "spool_before": {
+              "allocated_bytes": 991420313,
+              "capacity_bytes": 1073741824,
+              "extent_bytes": 991425681,
+              "file_bytes": 991425681,
+              "free_bytes": 5368,
+              "max_read_request": 65536,
+              "peak_extent_bytes": 991425681,
+              "peak_staging_bytes": 805306368,
+              "pending_retirements": 0,
+              "read_bytes": 182130535,
+              "reads": 11224,
+              "staging_bytes": 0,
+              "stores": 10591,
+              "written_bytes": 4212667049
+            },
+            "tail_bytes": 805306368,
+            "write_overlaps_cleanup": false,
+            "write_start_ms": 97.421425,
+            "write_to_published_ms": 33.187962
+          },
+          {
+            "capture_marks": [
+              {
+                "entered_ms": 25.486579,
+                "gate_ms": 70.62483999999999,
+                "ready_ms": 96.111419
+              }
+            ],
+            "capture_overlaps_cleanup": true,
+            "cleanup_end_ms": 96.106166,
+            "cleanup_ms": 96.014668,
+            "cleanup_start_ms": 0.091498,
+            "condition": "during_cleanup",
+            "cut_bytes": 186119209,
+            "expected_declaration": true,
+            "fresh_facts_match": true,
+            "hint_ms": 0.270144,
+            "measurements": {
+              "analyzed": 10147,
+              "bytes": 5368,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 70.784598,
+              "deferred": 0,
+              "files": 10578,
+              "parsed": 1,
+              "read_files": 1,
+              "reconciled": false,
+              "retained": 10577,
+              "reused": 10577,
+              "shared_sources": 0,
+              "source_only": 431,
+              "total_ms": 74.798258,
+              "tree_reuses": 0
+            },
+            "observed_cut_bytes": 186119209,
+            "old_pin_matches": true,
+            "pair": 2,
+            "published_ms": 100.892852,
+            "sample": 5,
+            "source_matches": true,
+            "spool_after": {
+              "allocated_bytes": 186119313,
+              "capacity_bytes": 1073741824,
+              "extent_bytes": 186124577,
+              "file_bytes": 186124577,
+              "free_bytes": 5264,
+              "max_read_request": 65536,
+              "peak_extent_bytes": 991425681,
+              "peak_staging_bytes": 805306368,
+              "pending_retirements": 1,
+              "read_bytes": 182233335,
+              "reads": 11232,
+              "staging_bytes": 0,
+              "stores": 10595,
+              "written_bytes": 5017989417
+            },
+            "spool_before": {
+              "allocated_bytes": 991420313,
+              "capacity_bytes": 1073741824,
+              "extent_bytes": 991425577,
+              "file_bytes": 991425577,
+              "free_bytes": 5264,
+              "max_read_request": 65536,
+              "peak_extent_bytes": 991425681,
+              "peak_staging_bytes": 805306368,
+              "pending_retirements": 0,
+              "read_bytes": 182217335,
+              "reads": 11229,
+              "staging_bytes": 0,
+              "stores": 10594,
+              "written_bytes": 5017984049
+            },
+            "tail_bytes": 805306368,
+            "write_overlaps_cleanup": true,
+            "write_start_ms": 0.17917,
+            "write_to_published_ms": 100.713682
+          }
+        ],
+        "files": 10578,
+        "final_clean_matches": true,
+        "restored_matches": true,
+        "spool": {
+          "allocated_bytes": 0,
+          "capacity_bytes": 1073741824,
+          "extent_bytes": 0,
+          "file_bytes": 0,
+          "free_bytes": 0,
+          "max_read_request": 65536,
+          "peak_extent_bytes": 991425681,
+          "peak_staging_bytes": 805306368,
+          "pending_retirements": 0,
+          "read_bytes": 182238599,
+          "reads": 11233,
+          "staging_bytes": 0,
+          "stores": 10596,
+          "written_bytes": 5017994681
+        }
+      }
+    }
+  ],
+  "limits": [
+    "Explicit host path hints, watcher disabled; initial recovery completes before an hour-long recovery interval isolates cleanup.",
+    "Generated streamed tail is controlled allocation pressure outside project source; it is not representative repository code.",
+    "Three samples per condition/profile; finite observations, not browser latency tails or randomised speedups.",
+    "Writer plus initial maintenance gate is traced; engine capture/total durations and observed publication include distinct work.",
+    "Compatible cache preparation, pressure setup and independent verification are outside write-to-publication timing, but affect process peaks.",
+    "Child 12 GiB virtual-address-space limit is not RSS/physical-RAM enforcement or baseline-laptop qualification."
+  ]
+}

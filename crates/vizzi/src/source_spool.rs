@@ -4,6 +4,8 @@ mod extents;
 use extents::{Extent, Extents};
 
 use serde::Serialize;
+#[cfg(feature = "qualification")]
+use std::time::Instant;
 use std::{
     fs::File,
     io::{Read, Seek, SeekFrom, Write},
@@ -11,6 +13,15 @@ use std::{
     sync::{Arc, Mutex, MutexGuard},
 };
 use vizzi_core::model::{CapturedSource, SourceReadError, SourceReader};
+/// Qualification-only entry/readiness marks; default builds have no observer state.
+#[cfg(feature = "qualification")]
+pub(crate) type CaptureTrace = Mutex<Vec<(Instant, Instant)>>;
+#[cfg(feature = "qualification")]
+pub(crate) struct ReclaimSpan {
+    pub started: Instant,
+    pub finished: Instant,
+    pub cut_bytes: u64,
+}
 const CAPTURE_CHUNK: usize = 64 * 1024;
 #[derive(Debug)]
 struct State {
@@ -38,6 +49,8 @@ struct Inner {
     writer: Mutex<()>,
     stage: Arc<Mutex<File>>,
     retired: Mutex<Vec<Extent>>,
+    #[cfg(feature = "qualification")]
+    trace: Mutex<Option<Arc<CaptureTrace>>>,
 }
 impl Inner {
     fn lock(&self) -> MutexGuard<'_, State> {
@@ -139,6 +152,8 @@ impl SourceSpool {
                 writer: Mutex::new(()),
                 stage: Arc::new(Mutex::new(stage)),
                 retired: Mutex::new(Vec::new()),
+                #[cfg(feature = "qualification")]
+                trace: Mutex::new(None),
             }),
         })
     }
@@ -177,9 +192,28 @@ impl SourceSpool {
         previous: Option<&Arc<CapturedSource>>,
         cancelled: &dyn Fn() -> bool,
     ) -> Result<Option<Arc<CapturedSource>>, SourceReadError> {
+        #[cfg(feature = "qualification")]
+        let entered = Instant::now();
+        #[cfg(feature = "qualification")]
+        let trace = self
+            .inner
+            .trace
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
+            .clone();
         let _writer = self.inner.writer();
         let _reset = StageReset { inner: &self.inner };
         self.reclaim()?;
+        #[cfg(feature = "qualification")]
+        if let Some(trace) = trace {
+            let ready = Instant::now();
+            let mut marks = trace
+                .lock()
+                .unwrap_or_else(std::sync::PoisonError::into_inner);
+            if marks.len() < 64 {
+                marks.push((entered, ready));
+            }
+        }
         self.inner
             .stage
             .lock()
@@ -329,6 +363,33 @@ impl SourceSpool {
     pub fn reclaim(&self) -> Result<(), SourceReadError> {
         self.reclaim_with(File::set_len)
     }
+    #[cfg(feature = "qualification")]
+    pub(crate) fn observe_reclaim(
+        &self,
+        on_cut: impl FnOnce(u64),
+    ) -> Result<Option<ReclaimSpan>, SourceReadError> {
+        let mut span = None;
+        self.reclaim_with(|file, end| {
+            let started = Instant::now();
+            on_cut(end);
+            let result = file.set_len(end);
+            span = Some(ReclaimSpan {
+                started,
+                finished: Instant::now(),
+                cut_bytes: end,
+            });
+            result
+        })?;
+        Ok(span)
+    }
+    #[cfg(feature = "qualification")]
+    pub(crate) fn trace_capture(&self, trace: Option<Arc<CaptureTrace>>) {
+        *self
+            .inner
+            .trace
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner) = trace;
+    }
     fn reclaim_with(
         &self,
         truncate: impl FnOnce(&File, u64) -> std::io::Result<()>,
@@ -473,6 +534,71 @@ impl SourceReader for Blob {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[cfg(feature = "qualification")]
+    #[test]
+    fn capture_trace_is_bounded_and_can_be_disabled() {
+        let root = tempfile::tempdir().unwrap();
+        let spool = SourceSpool::new(root.path(), 1).unwrap();
+        let trace = Arc::new(CaptureTrace::default());
+        spool.trace_capture(Some(trace.clone()));
+        for _ in 0..70 {
+            spool
+                .capture(&mut std::io::empty(), None, &|| false)
+                .unwrap();
+        }
+        assert_eq!(trace.lock().unwrap().len(), 64);
+        spool.trace_capture(None);
+        trace.lock().unwrap().clear();
+        spool
+            .capture(&mut std::io::empty(), None, &|| false)
+            .unwrap();
+        assert!(trace.lock().unwrap().is_empty());
+    }
+    #[cfg(feature = "qualification")]
+    #[test]
+    fn capture_trace_spans_the_gate_during_a_paused_real_cut() {
+        use std::{sync::mpsc, time::Duration};
+        let root = tempfile::tempdir().unwrap();
+        let spool = Arc::new(SourceSpool::new(root.path(), 16).unwrap());
+        let old = spool
+            .persist(CapturedSource::capture(b"original".to_vec(), None))
+            .unwrap();
+        let tail = spool
+            .persist(CapturedSource::capture(b"old tail".to_vec(), None))
+            .unwrap();
+        drop(tail);
+        let (cut, entered) = mpsc::channel();
+        let (release, resume) = mpsc::channel();
+        let maintenance_spool = spool.clone();
+        let maintenance = std::thread::spawn(move || {
+            maintenance_spool.observe_reclaim(|end| {
+                cut.send(end).unwrap();
+                resume.recv_timeout(Duration::from_secs(5)).unwrap();
+            })
+        });
+        assert_eq!(entered.recv_timeout(Duration::from_secs(2)).unwrap(), 8);
+        let trace = Arc::new(CaptureTrace::default());
+        spool.trace_capture(Some(trace.clone()));
+        let capturing = spool.clone();
+        let writer = std::thread::spawn(move || {
+            capturing.capture(&mut std::io::Cursor::new(b"new tail"), None, &|| false)
+        });
+        let waiting = Instant::now();
+        while spool.inner.writer.try_lock().is_ok() && waiting.elapsed() < Duration::from_secs(2) {
+            std::thread::sleep(Duration::from_millis(1));
+        }
+        let released = Instant::now();
+        release.send(()).unwrap();
+        maintenance.join().unwrap().unwrap();
+        let next = writer.join().unwrap().unwrap().unwrap();
+        let marks = trace.lock().unwrap();
+        assert_eq!(marks.len(), 1);
+        assert!(marks[0].0 < released && marks[0].1 >= released);
+        assert_eq!(old.read_text(8).unwrap().as_deref(), Some("original"));
+        assert_eq!(next.read_text(8).unwrap().as_deref(), Some("new tail"));
+        drop(marks);
+        spool.trace_capture(None);
+    }
     #[test]
     fn pinned_reads_continue_while_allocation_state_is_locked() {
         use std::{sync::mpsc, time::Duration};

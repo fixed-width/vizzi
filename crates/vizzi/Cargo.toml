@@ -50,3 +50,7 @@ required-features = ["qualification"]
 [[example]]
 name = "stream_capture"
 required-features = ["qualification"]
+
+[[example]]
+name = "foreground_maintenance"
+required-features = ["qualification"]

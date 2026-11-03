@@ -1,0 +1,22 @@
+{
+  "base_commit": "5a5161b60d5917f227f793ef2a1f4138b043a192",
+  "note": "Final qualified measurement working tree before commit. Default builds omit capture trace/truncation observer; no production scheduling/retention/quota or dependency changes. Release probes frozen before timing.",
+  "sha256": {
+    "Cargo.toml": "b48edcbfd70277e9d0a58f7680b6ed414bc70108b279fdfba98dcd9a07092636",
+    "Cargo.lock": "032ea2295563c2354c3d92c54cf4be9943ad62eb1ed116d6267b7c2c0ee1456d",
+    "crates/vizzi/Cargo.toml": "a74e2b1c9abfa3b09663db7e507cbf8e72a232739ac7171bea71105773f441b3",
+    "crates/vizzi/src/lib.rs": "de1f73138332b4003cba0d48e6e6a1aae2088e88d1236e1fa40bfd688638e45b",
+    "crates/vizzi/src/source_spool.rs": "c38acec8b449ea0f2759fa8fb1a7a42a9f7c637754fc1cc9f73439d15205d550",
+    "crates/vizzi/src/foreground_maintenance.rs": "7235f06e06d776ac0665654bdf6381405aa83987a32279ff4828b4626efb8897",
+    "crates/vizzi/src/host.rs": "522193d1f18a0dc304d409d12a991eae35f70575672d58fb732f552894792004",
+    "crates/vizzi/src/engine.rs": "47336db32583f0a7facc74fc08c759c302bd4a676d24206ec3b67fffe40ac425",
+    "crates/vizzi/src/invalidation.rs": "3d4952d18abde7ad12ba43be67d5b20935511ecc237933f8faebcc538697e691",
+    "crates/vizzi/tests/foreground_maintenance.rs": "880cff3a40287cca191bcf9aff1fcbff8bc118d27864d63de9e89b1c0e2de618",
+    "crates/vizzi/examples/foreground_maintenance.rs": "7c7f49c0822b2df116d5772a7a5827c2d5e7a42542cf26687d2e7e5eb25115fa",
+    "experiments/foreground-maintenance/measure.py": "89c646b4a0a2f2495a207a1a5dc9951ce985232e7332dac518d1bb24b70e71b9",
+    "experiments/qualification/native.py": "e637e001eff0f81059c10e02f5381c00ef44e45efbd79348f94b792203ef924a",
+    "experiments/qualification/profiles.json": "fe3443645d36e1749ab6f360cecc52c667269e0504326155ed89e1baf98af260",
+    "experiments/admission/limit.py": "fdabefbcaa734cb366b6bcc87306a480bccac672bf5d41dd5592982eb8c08785",
+    "experiments/foreground-maintenance/plot.py": "2abe1ff7ed197a53c1e2e31de1987e792856241b574361c760786953d3842388"
+  }
+}
