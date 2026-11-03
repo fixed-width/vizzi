@@ -52,8 +52,9 @@ export async function startHost(input, workers = 4, port = 0) {
   };
 }
 
-export async function browser() {
-  return chromium.launch({ headless: !process.argv.includes("--headed") });
+export async function browser({ desktopBus = true } = {}) {
+  return chromium.launch({ headless: !process.argv.includes("--headed"),
+    env: desktopBus ? undefined : { ...process.env, DBUS_SESSION_BUS_ADDRESS: "unix:path=/dev/null" } });
 }
 
 export async function openWorkspace(browser, host, viewport = { width: 1440, height: 900 }) {

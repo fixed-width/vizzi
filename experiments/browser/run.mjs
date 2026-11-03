@@ -1,6 +1,23 @@
 import { spawnSync } from "node:child_process";
+import { resolve } from "node:path";
 
-if (process.argv.includes("--install-browser")) {
+if (process.argv.includes("--envelope-matrix")) {
+  const args = process.argv.slice(2).filter(value => value !== "--envelope-matrix");
+  const result = spawnSync("python3", ["-B", "experiments/memory-envelope/measure.py", ...args], { stdio: "inherit" });
+  if (result.error) throw result.error;
+  process.exit(result.status ?? 1);
+} else if (process.argv.includes("--envelope")) {
+  const observe = process.argv.includes("--observe-only");
+  const args = process.argv.slice(2).filter(value => !["--envelope", "--observe-only"].includes(value));
+  const output = args[args.indexOf("--output") + 1];
+  if (!args.includes("--output") || !output) throw new Error("--envelope needs --output");
+  const result = spawnSync(resolve("target/release/vizzi-envelope"), [
+    ...(observe ? ["--observe-only"] : []), output + ".memory.json", "--",
+    process.execPath, resolve("experiments/browser/run.mjs"), "--measure", "--no-build", "--no-desktop-bus", ...args,
+  ], { stdio: "inherit" });
+  if (result.error) throw result.error;
+  process.exit(result.status ?? 1);
+} else if (process.argv.includes("--install-browser")) {
   const result = spawnSync(process.execPath, ["node_modules/playwright/cli.js", "install", "chromium"], { stdio: "inherit" });
   process.exit(result.status ?? 1);
 } else if (process.argv.includes("--capabilities")) {

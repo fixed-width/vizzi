@@ -1,5 +1,7 @@
 //! Experimental measurements, independent of the eventual application interfaces.
 
+#[cfg(target_os = "linux")]
+pub mod envelope;
 pub mod scene;
 pub mod snapshot;
 pub mod source;

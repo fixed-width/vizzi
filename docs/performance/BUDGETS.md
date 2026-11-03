@@ -180,6 +180,14 @@ Each burst shares one recovery cycle. Cleanup admission takes 2.49–2.70 s Linu
 68–621 ms PyTorch; these are not cleanup deadlines. Warm finite native samples preserve
 the physical-RAM, sustained-pressure and browser/baseline qualification gaps.
 
+The [combined memory qualification](../../experiments/memory-envelope/RESULTS.md) runs
+resident/spooled policies inside fresh 12 GiB cgroups with swap disabled. Controller
+peaks, including concurrent clean verification, are 7.016 / 7.226 GiB Linux and
+1.919 / 1.976 GiB PyTorch. Process PSS falls with spooling, but controller peaks do not.
+Forty capped ordinary edits reach the DOM within 139.2 ms; matching controls and final
+clean captures pass. No OOM or controller limit event occurs, so pressure behaviour,
+loaded-editor/physical-laptop evidence and default-policy selection remain open.
+
 Do not replace semantic correctness checks with these performance targets. Language
 assignments, partial grammar coverage, source-only cases, cancellation, cache validity,
 and immutable publication must remain explicit and independently tested.

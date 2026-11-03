@@ -1,0 +1,122 @@
+{
+  "schema": 1,
+  "mode": "cgroup",
+  "binary_sha256": {
+    "target/release/vizzi": "c8c5d87872b8817a06c4eb830ebcb2444e9a8336f55ac0b138482583ff14185d",
+    "target/release/vizzi-envelope": "4348433c09b341418ca0f8b87df36fedf1a872d00b0d9eb3ebf93b622548b537"
+  },
+  "results": [
+    {
+      "profile": "linux",
+      "backing": "resident",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--property=MemoryMax=12G",
+        "--property=MemorySwapMax=0",
+        "--property=MemoryAccounting=yes",
+        "--unit=vizzi-envelope-c8a489c3-e012-47be-8467-aa0e7dc59fea",
+        "npm",
+        "test",
+        "--",
+        "--envelope",
+        "--reference-only",
+        "--during-recovery",
+        "--profile",
+        "/tmp/vizzi-memory-envelope-final-capped/linux-resident.profile.json",
+        "--output",
+        "/tmp/vizzi-memory-envelope-final-capped/linux-resident.json"
+      ],
+      "browser": "linux-resident.json",
+      "memory": "linux-resident.json.memory.json",
+      "cap_verified": true,
+      "peak_pss_kib": 5378772,
+      "peak_rss_kib": 5696260
+    },
+    {
+      "profile": "linux",
+      "backing": "spooled",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--property=MemoryMax=12G",
+        "--property=MemorySwapMax=0",
+        "--property=MemoryAccounting=yes",
+        "--unit=vizzi-envelope-93c1c6ea-dd96-4177-8b51-bc3a77e9c1f9",
+        "npm",
+        "test",
+        "--",
+        "--envelope",
+        "--reference-only",
+        "--during-recovery",
+        "--profile",
+        "/tmp/vizzi-memory-envelope-final-capped/linux-spooled.profile.json",
+        "--output",
+        "/tmp/vizzi-memory-envelope-final-capped/linux-spooled.json"
+      ],
+      "browser": "linux-spooled.json",
+      "memory": "linux-spooled.json.memory.json",
+      "cap_verified": true,
+      "peak_pss_kib": 2417989,
+      "peak_rss_kib": 2727212
+    },
+    {
+      "profile": "pytorch",
+      "backing": "spooled",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--property=MemoryMax=12G",
+        "--property=MemorySwapMax=0",
+        "--property=MemoryAccounting=yes",
+        "--unit=vizzi-envelope-44e2a546-27ca-42ff-80f8-40965431daac",
+        "npm",
+        "test",
+        "--",
+        "--envelope",
+        "--reference-only",
+        "--during-recovery",
+        "--profile",
+        "/tmp/vizzi-memory-envelope-final-capped/pytorch-spooled.profile.json",
+        "--output",
+        "/tmp/vizzi-memory-envelope-final-capped/pytorch-spooled.json"
+      ],
+      "browser": "pytorch-spooled.json",
+      "memory": "pytorch-spooled.json.memory.json",
+      "cap_verified": true,
+      "peak_pss_kib": 1376273,
+      "peak_rss_kib": 1693152
+    },
+    {
+      "profile": "pytorch",
+      "backing": "resident",
+      "command": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "--property=MemoryMax=12G",
+        "--property=MemorySwapMax=0",
+        "--property=MemoryAccounting=yes",
+        "--unit=vizzi-envelope-87806434-ac86-447b-9099-90b30b6dd1eb",
+        "npm",
+        "test",
+        "--",
+        "--envelope",
+        "--reference-only",
+        "--during-recovery",
+        "--profile",
+        "/tmp/vizzi-memory-envelope-final-capped/pytorch-resident.profile.json",
+        "--output",
+        "/tmp/vizzi-memory-envelope-final-capped/pytorch-resident.json"
+      ],
+      "browser": "pytorch-resident.json",
+      "memory": "pytorch-resident.json.memory.json",
+      "cap_verified": true,
+      "peak_pss_kib": 1736102,
+      "peak_rss_kib": 2055096
+    }
+  ]
+}

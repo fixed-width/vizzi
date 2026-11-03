@@ -1,0 +1,58 @@
+{
+  "initial_direct_probe": {
+    "recorded_utc": "2026-11-03T21:09:06.426857+00:00",
+    "self_cgroup": "0::/user.slice/user-1000.slice/user@1000.service/app.slice/app-org.gnome.Terminal.slice/vte-spawn-63eb133b-01e1-47bf-92d1-56276ad49943.scope",
+    "cgroup_mount": [
+      "852 850 0:29 / /sys/fs/cgroup ro,nosuid,nodev,noexec,relatime master:9 - cgroup2 cgroup2 rw,nsdelegate,memory_recursiveprot"
+    ],
+    "controls": {
+      "memory.max": "max",
+      "memory.swap.max": "max"
+    },
+    "probes": [
+      {
+        "command": [
+          "systemctl",
+          "--user",
+          "show",
+          "-p",
+          "ControlGroup"
+        ],
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Failed to connect to bus: Operation not permitted\n"
+      },
+      {
+        "command": [
+          "target/release/vizzi-envelope",
+          "/tmp/vizzi-cap-probe-no-output.json",
+          "--",
+          "touch",
+          "/tmp/vizzi-cap-probe-must-not-launch"
+        ],
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Error: \"capped mode requires memory.max=12884901888 and memory.swap.max=0\"\n"
+      }
+    ],
+    "child_not_launched": true,
+    "constrained_qualification_completed": false
+  },
+  "approved_entrypoint": "npm test -- --envelope-matrix --cache /tmp/vizzi-foreground-facts --output NEW_DIRECTORY",
+  "scope_creation_succeeded": true,
+  "first_capped_attempt": {
+    "cap_verified": false,
+    "child_exit_code": 0,
+    "sample_errors": [
+      "PID 2065346: process escaped verified cgroup"
+    ],
+    "conclusion": "Rejected because Chromium main moved outside the scope; controller totals were incomplete for the full browser tree."
+  },
+  "final_capped_matrix_completed": true,
+  "final_scope_paths": [
+    "/user.slice/user-1000.slice/user@1000.service/app.slice/vizzi-envelope-c8a489c3-e012-47be-8467-aa0e7dc59fea.scope",
+    "/user.slice/user-1000.slice/user@1000.service/app.slice/vizzi-envelope-93c1c6ea-dd96-4177-8b51-bc3a77e9c1f9.scope",
+    "/user.slice/user-1000.slice/user@1000.service/app.slice/vizzi-envelope-44e2a546-27ca-42ff-80f8-40965431daac.scope",
+    "/user.slice/user-1000.slice/user@1000.service/app.slice/vizzi-envelope-87806434-ac86-447b-9099-90b30b6dd1eb.scope"
+  ]
+}

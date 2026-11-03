@@ -1,0 +1,13 @@
+Running as unit: vizzi-envelope-5ed0ddc9-9d82-4130-b60e-0c65bc42e39c.scope; invocation ID: a059592327884125b943d943d2f5c861
+
+> test
+> node experiments/browser/run.mjs --envelope --reference-only --during-recovery --profile /tmp/vizzi-memory-envelope-capped/linux-resident.profile.json --output /tmp/vizzi-memory-envelope-capped/linux-resident.json
+
+Starting linux
+linux steady 1: 245 rAF intervals; 0 pending observations
+linux refresh 1: 243 rAF intervals; 33 pending observations
+linux steady 2: 242 rAF intervals; 0 pending observations
+linux refresh 2: 242 rAF intervals; 31 pending observations
+linux steady 3: 243 rAF intervals; 0 pending observations
+linux refresh 3: 241 rAF intervals; 29 pending observations
+Saved /tmp/vizzi-memory-envelope-capped/linux-resident.json

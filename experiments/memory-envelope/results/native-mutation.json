@@ -1,0 +1,3003 @@
+{
+  "scope": "Complete Linux observer module and CLI; vizzi-perf tests, offline.",
+  "final_mutants": 83,
+  "final_outcomes": {
+    "CaughtMutant": 76,
+    "Unviable": 7
+  },
+  "commands": [
+    "cargo mutants -p vizzi-perf --test-package vizzi-perf -f crates/vizzi-perf/src/envelope.rs -f crates/vizzi-perf/src/bin/envelope.rs --config experiments/memory-envelope/mutants.toml -j 4 --timeout 12 --build-timeout 120 -C --offline"
+  ],
+  "exclusions": [
+    {
+      "mutation": "replace > with >= in process",
+      "reason": "The distinct opening and closing parenthesis searches cannot have the same byte position; changing only this equality boundary has no effect."
+    }
+  ],
+  "investigation": "The exploratory non-Linux stub was inactive on this target; consolidation into one conditional entry point removes that mutation. The other survivor is the documented equivalent delimiter boundary.",
+  "runs": [
+    {
+      "label": "exploratory",
+      "version": "27.1.0",
+      "baseline": "Success",
+      "summary": {
+        "total_mutants": 85,
+        "caught": 76,
+        "missed": 2,
+        "timeout": 0,
+        "unviable": 7
+      },
+      "outcomes": [
+        {
+          "name": "crates/vizzi-perf/src/bin/envelope.rs:4:5: replace main -> Result<(), Box<dyn std::error::Error>> with Ok(())",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.201202467,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.954184195,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/bin/envelope.rs:29:5: replace main -> Result<(), Box<dyn std::error::Error>> with Ok(())",
+          "outcome": "MissedMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.885862996,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 1.58264229,
+              "status": "Success"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:14:35: replace * with +",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.027795307,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 1.053993182,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:14:35: replace * with /",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.553552982,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 1.003142462,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:14:28: replace * with +",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.710421512,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 1.055005778,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:14:28: replace * with /",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.857723573,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 1.156683843,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/bin/envelope.rs:14:36: replace != with == in main",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 9.834107989,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 1.056111483,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/bin/envelope.rs:17:8: delete ! in main",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 10.034030987,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.902844346,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/bin/envelope.rs:8:30: replace == with != in main",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 10.449521019,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.902734896,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:14:21: replace * with /",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.502137994,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.555306256,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:14:21: replace * with +",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.501881605,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 1.003469616,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:17:5: replace milliseconds -> f64 with 0.0",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.603330654,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.402384733,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:17:5: replace milliseconds -> f64 with 1.0",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.553519831,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.40196883,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:28:5: replace process -> Result<Process> with Ok(Default::default())",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.457073429,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:17:28: replace * with + in milliseconds",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.708488969,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.402033071,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:17:5: replace milliseconds -> f64 with -1.0",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.754875941,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.453511441,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:17:28: replace * with / in milliseconds",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.662244709,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.452098379,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:31:28: replace > with == in process",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.502099183,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.506601694,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:31:28: replace > with < in process",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.703804031,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.501737645,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:33:37: replace + with - in process",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.656307665,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.454294735,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:33:37: replace + with * in process",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.50607209,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.401658017,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:31:28: replace > with >= in process",
+          "outcome": "MissedMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.705237294,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 1.005467707,
+              "status": "Success"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:38:25: replace + with * in process",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.552246332,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.402135297,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:38:25: replace + with - in process",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.602863662,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.502967893,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:42:5: replace tree -> BTreeSet<u32> with BTreeSet::from_iter([0])",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.20474823,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.452026713,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:42:5: replace tree -> BTreeSet<u32> with BTreeSet::new()",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.455384969,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.453309354,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:50:27: replace == with != in tree",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.757524037,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.451916963,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:64:13: replace && with || in usage",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.352035374,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:42:5: replace tree -> BTreeSet<u32> with BTreeSet::from_iter([1])",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.361744506,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.402227749,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:67:55: replace || with && in usage",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.502698902,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.451722469,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:61:5: replace usage -> Result<Usage> with Ok(Default::default())",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.203090528,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.606247795,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:67:47: replace != with == in usage",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.755812246,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.401928846,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:67:34: replace || with && in usage",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.511652984,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.40258251,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:67:29: replace != with == in usage",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.41404574,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.401904836,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:80:30: replace + with - in total",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.805806608,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.402567876,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:80:30: replace + with * in total",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.754646714,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.401863496,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:79:5: replace total -> Usage with Default::default()",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.305745263,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.401806533,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:81:30: replace + with - in total",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.756218402,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.402390019,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:81:30: replace + with * in total",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.504069408,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.507730879,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:88:7: replace || with && in gone",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.704637272,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.401907207,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:85:5: replace gone -> bool with false",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.760235371,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.351631318,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:85:5: replace gone -> bool with true",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.805099382,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.45206547,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:88:31: replace == with != in gone",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.552231114,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.607924734,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:97:9: replace || with && in scope",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.809967939,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.40188151,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:96:8: delete ! in scope",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.853254413,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.401655131,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:91:5: replace scope -> Result<PathBuf> with Ok(Default::default())",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.95405933,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.451850458,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:106:5: replace counters -> Result<BTreeMap<String, u64>> with Ok(BTreeMap::new())",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.522035948,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.452453444,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:106:5: replace counters -> Result<BTreeMap<String, u64>> with Ok(BTreeMap::from_iter([(String::new(), 0)]))",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.411465958,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.401904857,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:106:5: replace counters -> Result<BTreeMap<String, u64>> with Ok(BTreeMap::from_iter([(\"xyzzy\".into(), 0)]))",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.327789879,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.352818086,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:106:5: replace counters -> Result<BTreeMap<String, u64>> with Ok(BTreeMap::from_iter([(String::new(), 1)]))",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.460458523,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.351608024,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:129:9: replace Group::read -> Result<GroupSample> with Ok(Default::default())",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.351872263,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:106:5: replace counters -> Result<BTreeMap<String, u64>> with Ok(BTreeMap::from_iter([(\"xyzzy\".into(), 1)]))",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.316877547,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.453702579,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:109:29: replace != with == in counters",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.259393195,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.452576705,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:130:58: replace || with && in Group::read",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.359105182,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.402457195,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:130:39: replace != with == in Group::read",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.3072305690000001,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.401902222,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:134:40: replace || with && in Group::read",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.554583566,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.55401132,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:134:12: delete ! in Group::read",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.653348046,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.401684807,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:130:93: replace != with == in Group::read",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.11245221,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.401333722,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:134:43: delete ! in Group::read",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.657004451,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.401929059,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:145:9: replace Group::contains -> Result<bool> with Ok(true)",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.501691874,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.452649525,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:145:9: replace Group::contains -> Result<bool> with Ok(false)",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.552636669,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.552831408,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:149:5: replace oom_changed -> bool with true",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.853119945,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.451659927,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:149:5: replace oom_changed -> bool with false",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.90327781,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.453960177,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:151:43: replace != with == in oom_changed",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.602542318,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.452124531,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:174:5: replace evidence_valid -> bool with true",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.853149245,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.55241518,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:174:5: replace evidence_valid -> bool with false",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.905015078,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.40223016,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:177:9: replace && with || in evidence_valid",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.906217257,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.401926355,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:176:9: replace && with || in evidence_valid",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.706516135,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.403630711,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:175:9: replace && with || in evidence_valid",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.652106781,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.555095959,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:178:13: delete match arm (None, None) in evidence_valid",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.605929967,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.452330361,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:179:13: delete match arm (Some(before), Some(after)) in evidence_valid",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.753822405,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.401969851,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:174:5: delete ! in evidence_valid",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.954418752,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.40191865,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:184:5: replace sample -> Result<Sample> with Ok(Default::default())",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.301946941,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:190:13: replace && with || in sample",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.201466671,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:189:13: replace && with || in sample",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.201242457,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:213:17: replace && with || in sample",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.201698652,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:179:44: delete ! in evidence_valid",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.501887574,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.451833617,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:195:8: delete ! in sample",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.452765486,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.502783022,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:213:20: delete ! in sample",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.603400883,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.40932161,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:209:36: replace != with == in sample",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.802847923,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.452041788,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:224:27: replace match guard error.downcast_ref::<io::Error>().is_some_and(gone) with true in sample",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.753066571,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.454872488,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:224:27: replace match guard error.downcast_ref::<io::Error>().is_some_and(gone) with false in sample",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.653524612,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.554111687,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:248:5: replace run -> Result<bool> with Ok(false)",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.1576365530000001,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.401732174,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:248:5: replace run -> Result<bool> with Ok(true)",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.256808693,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.402113766,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:291:26: replace && with || in run",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.853815306,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.903720115,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "final",
+      "version": "27.1.0",
+      "baseline": "Success",
+      "summary": {
+        "total_mutants": 83,
+        "caught": 76,
+        "missed": 0,
+        "timeout": 0,
+        "unviable": 7
+      },
+      "outcomes": [
+        {
+          "name": "crates/vizzi-perf/src/bin/envelope.rs:3:5: replace main -> Result<(), Box<dyn std::error::Error>> with Ok(())",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.201222471,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.955597161,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:14:35: replace * with +",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.870065956,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 1.460210419,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:14:35: replace * with /",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.058373603,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 1.153980985,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:14:28: replace * with +",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.552988473,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.955305489,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:14:28: replace * with /",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.653622209,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 1.207919131,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/bin/envelope.rs:18:12: delete ! in main",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 9.814618878,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 1.003089533,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/bin/envelope.rs:15:40: replace != with == in main",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 9.848663546000001,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 1.002778964,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/bin/envelope.rs:9:34: replace == with != in main",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 10.02180871,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.952919648,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:14:21: replace * with +",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.653039853,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.85283852,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:14:21: replace * with /",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.553235074,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.502699423,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:17:5: replace milliseconds -> f64 with 0.0",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.758666255,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.402360022,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:17:5: replace milliseconds -> f64 with 1.0",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.704342629,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.401641067,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:17:5: replace milliseconds -> f64 with -1.0",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.75518981,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.351963636,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:28:5: replace process -> Result<Process> with Ok(Default::default())",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.402258055,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:17:28: replace * with + in milliseconds",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.554770146,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.453243195,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:17:28: replace * with / in milliseconds",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.602444936,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.503597178,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:31:28: replace > with == in process",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.654321777,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.508996845,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:31:28: replace > with < in process",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.603492691,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.452928159,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:33:37: replace + with - in process",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.552590195,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.552131765,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:33:37: replace + with * in process",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.654352101,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.452624658,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:38:25: replace + with - in process",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.603998977,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.455272037,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:38:25: replace + with * in process",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.603024701,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.401708264,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:50:27: replace == with != in tree",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.8553351,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.553330353,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:42:5: replace tree -> BTreeSet<u32> with BTreeSet::new()",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.6157336949999999,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.352002521,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:42:5: replace tree -> BTreeSet<u32> with BTreeSet::from_iter([0])",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.456734676,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.401999383,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:42:5: replace tree -> BTreeSet<u32> with BTreeSet::from_iter([1])",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.465072149,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.351938288,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:64:13: replace && with || in usage",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.401861892,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:61:5: replace usage -> Result<Usage> with Ok(Default::default())",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.484518235,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.453285178,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:67:55: replace || with && in usage",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.610491456,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.402983431,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:67:34: replace || with && in usage",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.509159827,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.452242589,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:67:29: replace != with == in usage",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.625878181,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.401692373,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:80:30: replace + with - in total",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.704469546,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.45273891,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:79:5: replace total -> Usage with Default::default()",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.904332002,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.401871369,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:67:47: replace != with == in usage",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.357194653,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.35167488,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:80:30: replace + with * in total",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.757476449,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.402068806,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:81:30: replace + with - in total",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.4529778,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.604353677,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:81:30: replace + with * in total",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.757231052,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.453550783,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:85:5: replace gone -> bool with false",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.808214809,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.402896127,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:85:5: replace gone -> bool with true",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.857783114,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.452050932,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:88:7: replace || with && in gone",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.553766196,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.556915218,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:88:31: replace == with != in gone",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.604667052,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.50187807,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:91:5: replace scope -> Result<PathBuf> with Ok(Default::default())",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.903630786,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.452141608,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:97:9: replace || with && in scope",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.806727101,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.501838819,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:96:8: delete ! in scope",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.5567706,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.401748794,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:106:5: replace counters -> Result<BTreeMap<String, u64>> with Ok(BTreeMap::new())",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.207540609,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.612467939,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:106:5: replace counters -> Result<BTreeMap<String, u64>> with Ok(BTreeMap::from_iter([(String::new(), 0)]))",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.354403204,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.351816785,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:106:5: replace counters -> Result<BTreeMap<String, u64>> with Ok(BTreeMap::from_iter([(String::new(), 1)]))",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.357474763,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.401827808,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:106:5: replace counters -> Result<BTreeMap<String, u64>> with Ok(BTreeMap::from_iter([(\"xyzzy\".into(), 0)]))",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.256894319,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.401828541,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:129:9: replace Group::read -> Result<GroupSample> with Ok(Default::default())",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.353415723,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:106:5: replace counters -> Result<BTreeMap<String, u64>> with Ok(BTreeMap::from_iter([(\"xyzzy\".into(), 1)]))",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.015878898,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.60790867,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:109:29: replace != with == in counters",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.2570194319999999,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.451966913,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:130:58: replace || with && in Group::read",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.207882782,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.453132614,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:130:39: replace != with == in Group::read",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.157217403,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.552312865,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:134:40: replace || with && in Group::read",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.655282931,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.452667404,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:134:12: delete ! in Group::read",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.603591536,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.402554595,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:130:93: replace != with == in Group::read",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.154827892,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.453393982,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:134:43: delete ! in Group::read",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.60440833,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.402527674,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:145:9: replace Group::contains -> Result<bool> with Ok(false)",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.703614569,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.402915333,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:145:9: replace Group::contains -> Result<bool> with Ok(true)",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.606155337,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.605421654,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:149:5: replace oom_changed -> bool with true",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.805792997,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.4524185,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:149:5: replace oom_changed -> bool with false",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.904684985,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.404219298,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:151:43: replace != with == in oom_changed",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.804129623,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.452114887,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:174:5: replace evidence_valid -> bool with true",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.954432524,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.452656773,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:174:5: replace evidence_valid -> bool with false",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.852222325,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.402578017,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:177:9: replace && with || in evidence_valid",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.812741922,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.401833446,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:176:9: replace && with || in evidence_valid",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.501973121,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.603317822,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:175:9: replace && with || in evidence_valid",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.908682553,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.402038275,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:174:5: delete ! in evidence_valid",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.904914755,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.402241238,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:178:13: delete match arm (None, None) in evidence_valid",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.70693248,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.40217307,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:190:13: replace && with || in sample",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.251452534,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:184:5: replace sample -> Result<Sample> with Ok(Default::default())",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.301479712,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:189:13: replace && with || in sample",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.30119446,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:179:13: delete match arm (Some(before), Some(after)) in evidence_valid",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.703400296,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.553696603,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:179:44: delete ! in evidence_valid",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.553163709,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.455017176,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:213:17: replace && with || in sample",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.252159617,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:195:8: delete ! in sample",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.602025973,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.452279372,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:209:36: replace != with == in sample",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.614087681,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.504886402,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:213:20: delete ! in sample",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.70357553,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.502338018,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:224:27: replace match guard error.downcast_ref::<io::Error>().is_some_and(gone) with true in sample",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.754556074,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.452838403,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:224:27: replace match guard error.downcast_ref::<io::Error>().is_some_and(gone) with false in sample",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.853361894,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.551779231,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:248:5: replace run -> Result<bool> with Ok(true)",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.306047563,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.402251841,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:248:5: replace run -> Result<bool> with Ok(false)",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.103546368,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.352304158,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi-perf/src/envelope.rs:291:26: replace && with || in run",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.853769801,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.852523715,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "File fixtures exercise cap, membership and OOM validation. The final live capped matrix verifies controller settings/membership; no OOM or limit-pressure events are induced.",
+    "Python/Node measurement orchestration, dependencies and procfs/cgroup/browser implementations are outside the mutation scope.",
+    "Unviable replacements do not compile and are separate from test catches."
+  ]
+}

@@ -119,3 +119,7 @@ samples do not justify tuning quiet/recovery constants.
 [Raw observations](results/observations.json), [summary](results/summary.json),
 [sample CSV](results/samples.csv), [mutation details](results/native-mutation.json)
 and [source hashes](results/source-sha256.json) retain code, binary and workload identity.
+
+The [memory follow-up](../memory-envelope/RESULTS.md) now measures the concurrent
+engine/browser/verification process tree within verified 12 GiB scopes. Sustained
+pressure and physical laptop qualification remain open.

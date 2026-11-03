@@ -1,0 +1,27 @@
+{
+  "base_commit": "9d605c98b1f067d6bf195cb0d4215cf5665c2e5d",
+  "note": "Preliminary observe-only configuration before browser session-bus isolation. Direct capability probes failed; the later approved entry point created a scope but the preliminary capped attempt was rejected for browser migration.",
+  "sha256": {
+    "Cargo.toml": "b48edcbfd70277e9d0a58f7680b6ed414bc70108b279fdfba98dcd9a07092636",
+    "Cargo.lock": "032ea2295563c2354c3d92c54cf4be9943ad62eb1ed116d6267b7c2c0ee1456d",
+    "crates/vizzi-perf/Cargo.toml": "b1cc714e57909226281aeede83e721c6174e6e8437df56a0929df17a230d39a0",
+    "crates/vizzi-perf/src/lib.rs": "b42fbf15852f17f5cc3d28edbc85b4fa5bcc9aa60464ee90737b4b7a9b40d49f",
+    "crates/vizzi-perf/src/envelope.rs": "8af9b22be473fff7fd245b8724c82c2814822994a559e47b1b4442f23ea181c0",
+    "crates/vizzi-perf/src/bin/envelope.rs": "efadec48e12136445d48d5fced3f4967d9cb420717fbeb523cad22e55166496b",
+    "crates/vizzi-perf/tests/envelope.rs": "8dd15b15003dad3c26d9eddd02a169602ebbf7686468c7a6509024c68a89717d",
+    "experiments/browser/measure.mjs": "11f0451349c60b041e65a2ff4a1fe5d801fbc3847a1b7d8143ce290c505b9c8e",
+    "experiments/browser/run.mjs": "0b6f2f10800d4093a66d9778a4ec487d1dd149a696fdaed0f51a2581d7c96ce0",
+    "experiments/browser/support.mjs": "0bf58cfa1795da31895235d6f52e904662a0c485ad9b06fa4ee47020287cc2a8",
+    "experiments/browser/statistics.mjs": "9446fcbd9eb13a55353478c5eb51f13027322233b29116d8627095d6fe527623",
+    "experiments/memory-envelope/measure.py": "e05703e78363891a4f19ff7858dd4332df6b4216ef90067dedcc4b95b430b386",
+    "experiments/memory-envelope/mutants.toml": "fc5caacb3ba7ec6747cef63b529dbe0f06357aeaf18273aed2faa222c024ddc2",
+    "experiments/qualification/profiles.json": "fe3443645d36e1749ab6f360cecc52c667269e0504326155ed89e1baf98af260"
+  },
+  "binary_sha256": {
+    "target/release/vizzi": "c8c5d87872b8817a06c4eb830ebcb2444e9a8336f55ac0b138482583ff14185d",
+    "target/release/vizzi-envelope": "4348433c09b341418ca0f8b87df36fedf1a872d00b0d9eb3ebf93b622548b537"
+  },
+  "postprocessing_sha256": {
+    "experiments/memory-envelope/archive.py": "9129beb3388c8a8ad37ada8c9e7d5c978cc446db39c6e545f01d6c90de240456"
+  }
+}

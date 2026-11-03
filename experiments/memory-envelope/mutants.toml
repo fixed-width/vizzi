@@ -1,0 +1,2 @@
+# The distinct '(' and ')' searches cannot return the same byte position.
+exclude_re = ['^crates/vizzi-perf/src/envelope\.rs:\d+:\d+: replace > with >= in process$']

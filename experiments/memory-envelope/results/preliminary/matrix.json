@@ -1,0 +1,98 @@
+{
+  "schema": 1,
+  "mode": "observe_only",
+  "binary_sha256": {
+    "target/release/vizzi": "c8c5d87872b8817a06c4eb830ebcb2444e9a8336f55ac0b138482583ff14185d",
+    "target/release/vizzi-envelope": "4348433c09b341418ca0f8b87df36fedf1a872d00b0d9eb3ebf93b622548b537"
+  },
+  "results": [
+    {
+      "profile": "linux",
+      "backing": "resident",
+      "command": [
+        "npm",
+        "test",
+        "--",
+        "--envelope",
+        "--reference-only",
+        "--during-recovery",
+        "--profile",
+        "/tmp/vizzi-memory-envelope-observed/linux-resident.profile.json",
+        "--output",
+        "/tmp/vizzi-memory-envelope-observed/linux-resident.json",
+        "--observe-only"
+      ],
+      "browser": "linux-resident.json",
+      "memory": "linux-resident.json.memory.json",
+      "cap_verified": false,
+      "peak_pss_kib": 5423671,
+      "peak_rss_kib": 5735500
+    },
+    {
+      "profile": "linux",
+      "backing": "spooled",
+      "command": [
+        "npm",
+        "test",
+        "--",
+        "--envelope",
+        "--reference-only",
+        "--during-recovery",
+        "--profile",
+        "/tmp/vizzi-memory-envelope-observed/linux-spooled.profile.json",
+        "--output",
+        "/tmp/vizzi-memory-envelope-observed/linux-spooled.json",
+        "--observe-only"
+      ],
+      "browser": "linux-spooled.json",
+      "memory": "linux-spooled.json.memory.json",
+      "cap_verified": false,
+      "peak_pss_kib": 2471119,
+      "peak_rss_kib": 2777708
+    },
+    {
+      "profile": "pytorch",
+      "backing": "spooled",
+      "command": [
+        "npm",
+        "test",
+        "--",
+        "--envelope",
+        "--reference-only",
+        "--during-recovery",
+        "--profile",
+        "/tmp/vizzi-memory-envelope-observed/pytorch-spooled.profile.json",
+        "--output",
+        "/tmp/vizzi-memory-envelope-observed/pytorch-spooled.json",
+        "--observe-only"
+      ],
+      "browser": "pytorch-spooled.json",
+      "memory": "pytorch-spooled.json.memory.json",
+      "cap_verified": false,
+      "peak_pss_kib": 1361140,
+      "peak_rss_kib": 1678676
+    },
+    {
+      "profile": "pytorch",
+      "backing": "resident",
+      "command": [
+        "npm",
+        "test",
+        "--",
+        "--envelope",
+        "--reference-only",
+        "--during-recovery",
+        "--profile",
+        "/tmp/vizzi-memory-envelope-observed/pytorch-resident.profile.json",
+        "--output",
+        "/tmp/vizzi-memory-envelope-observed/pytorch-resident.json",
+        "--observe-only"
+      ],
+      "browser": "pytorch-resident.json",
+      "memory": "pytorch-resident.json.memory.json",
+      "cap_verified": false,
+      "peak_pss_kib": 1754204,
+      "peak_rss_kib": 2072412
+    }
+  ]
+}

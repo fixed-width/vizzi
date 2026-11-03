@@ -1,6 +1,6 @@
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
-import { writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { buildHost, browser, workspace, startHost, openWorkspace, paint } from "./support.mjs";
 
@@ -14,6 +14,25 @@ before(async () => {
   chromium = await browser();
 });
 after(async () => { await chromium?.close(); await host?.close(); await input?.close(); });
+
+test("a benchmark browser can isolate its desktop bus and still load the workspace", { skip: process.platform !== "linux" }, async () => {
+  const parentBus = process.env.DBUS_SESSION_BUS_ADDRESS;
+  const isolated = await browser({ desktopBus: false });
+  let session;
+  try {
+    const cdp = await isolated.newBrowserCDPSession();
+    const info = await cdp.send("SystemInfo.getProcessInfo");
+    const pid = info.processInfo.find(item => item.type === "browser").id;
+    const expectedScope = await readFile("/proc/self/cgroup", "utf8");
+    assert.equal(await readFile(`/proc/${pid}/cgroup`, "utf8"), expectedScope);
+    assert.equal(process.env.DBUS_SESSION_BUS_ADDRESS, parentBus);
+    session = await openWorkspace(isolated, host);
+    await session.page.waitForFunction(() => document.querySelectorAll(".code-line").length > 0);
+    assert.ok((await session.page.locator("#file-title").textContent()).length > 0);
+    assert.deepEqual(session.errors, []);
+    assert.equal(await readFile(`/proc/${pid}/cgroup`, "utf8"), expectedScope);
+  } finally { await session?.close(); await isolated.close(); }
+});
 
 test("a large outline keeps bounded DOM and keyboard/source identity across edits", async () => {
   const session = await openWorkspace(chromium, host); const { page } = session;

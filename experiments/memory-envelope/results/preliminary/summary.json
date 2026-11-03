@@ -1,0 +1,804 @@
+{
+  "schema": 1,
+  "mode": "observe_only",
+  "conditions": [
+    {
+      "profile": "linux",
+      "backing": "resident",
+      "cap_verified": false,
+      "files": 66066,
+      "source_manifest_sha256": "3ce68aeb82a96fb6abd215437473d8eb18a81a6666e3835d4c190426763fcde7",
+      "pss_peak_gib": 5.172415733337402,
+      "rss_peak_gib": 5.469799041748047,
+      "peak_sample": {
+        "disappeared": [],
+        "elapsed_ms": 77838.086129,
+        "errors": [],
+        "group": null,
+        "processes": [
+          {
+            "process": {
+              "name": "vizzi-envelope",
+              "parent": 2059561,
+              "pid": 2059568,
+              "start_ticks": 179218315
+            },
+            "usage": {
+              "pss_kib": 1275,
+              "rss_kib": 3048
+            }
+          },
+          {
+            "process": {
+              "name": "node-MainThread",
+              "parent": 2059568,
+              "pid": 2059569,
+              "start_ticks": 179218315
+            },
+            "usage": {
+              "pss_kib": 371521,
+              "rss_kib": 408876
+            }
+          },
+          {
+            "process": {
+              "name": "chrome-headless",
+              "parent": 2059569,
+              "pid": 2059581,
+              "start_ticks": 179218344
+            },
+            "usage": {
+              "pss_kib": 45082,
+              "rss_kib": 103772
+            }
+          },
+          {
+            "process": {
+              "name": "chrome-headless",
+              "parent": 2059581,
+              "pid": 2059583,
+              "start_ticks": 179218345
+            },
+            "usage": {
+              "pss_kib": 11177,
+              "rss_kib": 44132
+            }
+          },
+          {
+            "process": {
+              "name": "chrome-headless",
+              "parent": 2059581,
+              "pid": 2059584,
+              "start_ticks": 179218345
+            },
+            "usage": {
+              "pss_kib": 11244,
+              "rss_kib": 44344
+            }
+          },
+          {
+            "process": {
+              "name": "chrome-headless",
+              "parent": 2059583,
+              "pid": 2059601,
+              "start_ticks": 179218347
+            },
+            "usage": {
+              "pss_kib": 43493,
+              "rss_kib": 86992
+            }
+          },
+          {
+            "process": {
+              "name": "chrome-headless",
+              "parent": 2059581,
+              "pid": 2059606,
+              "start_ticks": 179218347
+            },
+            "usage": {
+              "pss_kib": 25126,
+              "rss_kib": 71252
+            }
+          },
+          {
+            "process": {
+              "name": "vizzi",
+              "parent": 2059569,
+              "pid": 2059663,
+              "start_ticks": 179218612
+            },
+            "usage": {
+              "pss_kib": 2573204,
+              "rss_kib": 2576756
+            }
+          },
+          {
+            "process": {
+              "name": "chrome-headless",
+              "parent": 2059584,
+              "pid": 2059679,
+              "start_ticks": 179219057
+            },
+            "usage": {
+              "pss_kib": 130562,
+              "rss_kib": 181960
+            }
+          },
+          {
+            "process": {
+              "name": "vizzi",
+              "parent": 2059569,
+              "pid": 2059958,
+              "start_ticks": 179225691
+            },
+            "usage": {
+              "pss_kib": 2210987,
+              "rss_kib": 2214368
+            }
+          }
+        ],
+        "sampling_ms": 42.035349,
+        "usage": {
+          "pss_kib": 5423671,
+          "rss_kib": 5735500
+        }
+      },
+      "sample_count": 282,
+      "nominal_interval_ms": 250,
+      "sampling_ms": {
+        "median": 32.5823595,
+        "max": 69.860946
+      },
+      "wall_s": 79.467564533,
+      "disappeared_observations": 1,
+      "sample_errors": 0,
+      "observer_errors": [],
+      "ordinary_dom_ms": {
+        "count": 10,
+        "p50": 125.2538029999996,
+        "p95": 145.01618900000176,
+        "p99": 145.01618900000176,
+        "max": 145.01618900000176,
+        "over33ms": 10,
+        "over50ms": 10
+      },
+      "large_edit_dom_ms": 836.4122629999911,
+      "large_file": "drivers/gpu/drm/amd/include/asic_reg/dcn/dcn_3_2_0_sh_mask.h",
+      "large_bytes": 24009174,
+      "refresh_frame_p99_ms": [
+        16.80000000000001,
+        16.800000000000182,
+        16.799999999999955
+      ],
+      "max_observed_frame_ms": 66.69999999999999,
+      "native_observations": [
+        "native directory watches + periodic reconciliation",
+        "native directory watches + periodic reconciliation",
+        "native directory watches + periodic reconciliation"
+      ],
+      "clean_matches": true,
+      "screenshot": "linux-resident-linux-workspace.png",
+      "group_before": null,
+      "group_after": null
+    },
+    {
+      "profile": "linux",
+      "backing": "spooled",
+      "cap_verified": false,
+      "files": 66066,
+      "source_manifest_sha256": "3ce68aeb82a96fb6abd215437473d8eb18a81a6666e3835d4c190426763fcde7",
+      "pss_peak_gib": 2.356642723083496,
+      "rss_peak_gib": 2.649028778076172,
+      "peak_sample": {
+        "disappeared": [],
+        "elapsed_ms": 86979.866476,
+        "errors": [],
+        "group": null,
+        "processes": [
+          {
+            "process": {
+              "name": "vizzi-envelope",
+              "parent": 2060048,
+              "pid": 2060055,
+              "start_ticks": 179226291
+            },
+            "usage": {
+              "pss_kib": 1331,
+              "rss_kib": 3104
+            }
+          },
+          {
+            "process": {
+              "name": "node-MainThread",
+              "parent": 2060055,
+              "pid": 2060056,
+              "start_ticks": 179226291
+            },
+            "usage": {
+              "pss_kib": 372238,
+              "rss_kib": 409516
+            }
+          },
+          {
+            "process": {
+              "name": "chrome-headless",
+              "parent": 2060056,
+              "pid": 2060068,
+              "start_ticks": 179226318
+            },
+            "usage": {
+              "pss_kib": 45136,
+              "rss_kib": 103708
+            }
+          },
+          {
+            "process": {
+              "name": "chrome-headless",
+              "parent": 2060068,
+              "pid": 2060070,
+              "start_ticks": 179226319
+            },
+            "usage": {
+              "pss_kib": 11113,
+              "rss_kib": 44476
+            }
+          },
+          {
+            "process": {
+              "name": "chrome-headless",
+              "parent": 2060068,
+              "pid": 2060071,
+              "start_ticks": 179226319
+            },
+            "usage": {
+              "pss_kib": 11341,
+              "rss_kib": 44192
+            }
+          },
+          {
+            "process": {
+              "name": "chrome-headless",
+              "parent": 2060070,
+              "pid": 2060097,
+              "start_ticks": 179226321
+            },
+            "usage": {
+              "pss_kib": 36438,
+              "rss_kib": 78216
+            }
+          },
+          {
+            "process": {
+              "name": "chrome-headless",
+              "parent": 2060068,
+              "pid": 2060099,
+              "start_ticks": 179226321
+            },
+            "usage": {
+              "pss_kib": 24980,
+              "rss_kib": 70820
+            }
+          },
+          {
+            "process": {
+              "name": "vizzi",
+              "parent": 2060056,
+              "pid": 2060150,
+              "start_ticks": 179226550
+            },
+            "usage": {
+              "pss_kib": 1071888,
+              "rss_kib": 1075436
+            }
+          },
+          {
+            "process": {
+              "name": "chrome-headless",
+              "parent": 2060071,
+              "pid": 2060169,
+              "start_ticks": 179227108
+            },
+            "usage": {
+              "pss_kib": 128287,
+              "rss_kib": 176528
+            }
+          },
+          {
+            "process": {
+              "name": "vizzi",
+              "parent": 2060056,
+              "pid": 2060716,
+              "start_ticks": 179234302
+            },
+            "usage": {
+              "pss_kib": 768367,
+              "rss_kib": 771712
+            }
+          }
+        ],
+        "sampling_ms": 39.839876000000004,
+        "usage": {
+          "pss_kib": 2471119,
+          "rss_kib": 2777708
+        }
+      },
+      "sample_count": 324,
+      "nominal_interval_ms": 250,
+      "sampling_ms": {
+        "median": 24.5185965,
+        "max": 53.616057000000005
+      },
+      "wall_s": 88.886645735,
+      "disappeared_observations": 2,
+      "sample_errors": 0,
+      "observer_errors": [],
+      "ordinary_dom_ms": {
+        "count": 10,
+        "p50": 123.13110700000834,
+        "p95": 146.60052800000267,
+        "p99": 146.60052800000267,
+        "max": 146.60052800000267,
+        "over33ms": 10,
+        "over50ms": 10
+      },
+      "large_edit_dom_ms": 1047.342393999992,
+      "large_file": "drivers/gpu/drm/amd/include/asic_reg/dcn/dcn_3_2_0_sh_mask.h",
+      "large_bytes": 24009174,
+      "refresh_frame_p99_ms": [
+        16.800000000000182,
+        16.800000000000182,
+        16.800000000000182
+      ],
+      "max_observed_frame_ms": 16.800000000000182,
+      "native_observations": [
+        "native directory watches + periodic reconciliation",
+        "native directory watches + periodic reconciliation",
+        "native directory watches + periodic reconciliation"
+      ],
+      "clean_matches": true,
+      "screenshot": "linux-spooled-linux-workspace.png",
+      "group_before": null,
+      "group_after": null
+    },
+    {
+      "profile": "pytorch",
+      "backing": "spooled",
+      "cap_verified": false,
+      "files": 10578,
+      "source_manifest_sha256": "c3bdd251092c3957812b7336edddb88b755ac4582b0e82abd5374a4236d1b54d",
+      "pss_peak_gib": 1.2980842590332031,
+      "rss_peak_gib": 1.6009101867675781,
+      "peak_sample": {
+        "disappeared": [],
+        "elapsed_ms": 56653.357992,
+        "errors": [],
+        "group": null,
+        "processes": [
+          {
+            "process": {
+              "name": "vizzi-envelope",
+              "parent": 2060828,
+              "pid": 2060835,
+              "start_ticks": 179235213
+            },
+            "usage": {
+              "pss_kib": 1183,
+              "rss_kib": 2956
+            }
+          },
+          {
+            "process": {
+              "name": "node-MainThread",
+              "parent": 2060835,
+              "pid": 2060836,
+              "start_ticks": 179235213
+            },
+            "usage": {
+              "pss_kib": 273333,
+              "rss_kib": 310628
+            }
+          },
+          {
+            "process": {
+              "name": "chrome-headless",
+              "parent": 2060836,
+              "pid": 2060848,
+              "start_ticks": 179235236
+            },
+            "usage": {
+              "pss_kib": 46201,
+              "rss_kib": 104864
+            }
+          },
+          {
+            "process": {
+              "name": "chrome-headless",
+              "parent": 2060848,
+              "pid": 2060850,
+              "start_ticks": 179235238
+            },
+            "usage": {
+              "pss_kib": 11048,
+              "rss_kib": 44392
+            }
+          },
+          {
+            "process": {
+              "name": "chrome-headless",
+              "parent": 2060848,
+              "pid": 2060851,
+              "start_ticks": 179235238
+            },
+            "usage": {
+              "pss_kib": 11108,
+              "rss_kib": 44588
+            }
+          },
+          {
+            "process": {
+              "name": "chrome-headless",
+              "parent": 2060850,
+              "pid": 2060868,
+              "start_ticks": 179235240
+            },
+            "usage": {
+              "pss_kib": 41085,
+              "rss_kib": 86972
+            }
+          },
+          {
+            "process": {
+              "name": "chrome-headless",
+              "parent": 2060848,
+              "pid": 2060873,
+              "start_ticks": 179235240
+            },
+            "usage": {
+              "pss_kib": 25550,
+              "rss_kib": 71524
+            }
+          },
+          {
+            "process": {
+              "name": "vizzi",
+              "parent": 2060836,
+              "pid": 2060921,
+              "start_ticks": 179235297
+            },
+            "usage": {
+              "pss_kib": 679058,
+              "rss_kib": 682568
+            }
+          },
+          {
+            "process": {
+              "name": "chrome-headless",
+              "parent": 2060851,
+              "pid": 2060942,
+              "start_ticks": 179235393
+            },
+            "usage": {
+              "pss_kib": 139702,
+              "rss_kib": 194140
+            }
+          },
+          {
+            "process": {
+              "name": "vizzi",
+              "parent": 2060836,
+              "pid": 2061259,
+              "start_ticks": 179240784
+            },
+            "usage": {
+              "pss_kib": 132872,
+              "rss_kib": 136044
+            }
+          }
+        ],
+        "sampling_ms": 38.392137,
+        "usage": {
+          "pss_kib": 1361140,
+          "rss_kib": 1678676
+        }
+      },
+      "sample_count": 208,
+      "nominal_interval_ms": 250,
+      "sampling_ms": {
+        "median": 26.081400000000002,
+        "max": 61.916285
+      },
+      "wall_s": 57.45003454,
+      "disappeared_observations": 2,
+      "sample_errors": 0,
+      "observer_errors": [],
+      "ordinary_dom_ms": {
+        "count": 10,
+        "p50": 107.80502600000182,
+        "p95": 123.04509599999437,
+        "p99": 123.04509599999437,
+        "max": 123.04509599999437,
+        "over33ms": 10,
+        "over50ms": 10
+      },
+      "large_edit_dom_ms": 2094.6268610000043,
+      "large_file": "third_party/perfetto/sdk/perfetto.h",
+      "large_bytes": 8416629,
+      "refresh_frame_p99_ms": [
+        16.800000000000182,
+        16.800000000000182,
+        16.800000000000182
+      ],
+      "max_observed_frame_ms": 16.800000000000182,
+      "native_observations": [
+        "native directory watches + periodic reconciliation",
+        "native directory watches + periodic reconciliation",
+        "native directory watches + periodic reconciliation"
+      ],
+      "clean_matches": true,
+      "screenshot": "pytorch-spooled-pytorch-workspace.png",
+      "group_before": null,
+      "group_after": null
+    },
+    {
+      "profile": "pytorch",
+      "backing": "resident",
+      "cap_verified": false,
+      "files": 10578,
+      "source_manifest_sha256": "c3bdd251092c3957812b7336edddb88b755ac4582b0e82abd5374a4236d1b54d",
+      "pss_peak_gib": 1.6729393005371094,
+      "rss_peak_gib": 1.9764060974121094,
+      "peak_sample": {
+        "disappeared": [],
+        "elapsed_ms": 54166.924225,
+        "errors": [],
+        "group": null,
+        "processes": [
+          {
+            "process": {
+              "name": "vizzi-envelope",
+              "parent": 2061345,
+              "pid": 2061352,
+              "start_ticks": 179240985
+            },
+            "usage": {
+              "pss_kib": 1167,
+              "rss_kib": 2936
+            }
+          },
+          {
+            "process": {
+              "name": "node-MainThread",
+              "parent": 2061352,
+              "pid": 2061353,
+              "start_ticks": 179240986
+            },
+            "usage": {
+              "pss_kib": 267006,
+              "rss_kib": 304216
+            }
+          },
+          {
+            "process": {
+              "name": "chrome-headless",
+              "parent": 2061353,
+              "pid": 2061365,
+              "start_ticks": 179241016
+            },
+            "usage": {
+              "pss_kib": 46225,
+              "rss_kib": 104280
+            }
+          },
+          {
+            "process": {
+              "name": "chrome-headless",
+              "parent": 2061365,
+              "pid": 2061367,
+              "start_ticks": 179241017
+            },
+            "usage": {
+              "pss_kib": 11066,
+              "rss_kib": 44348
+            }
+          },
+          {
+            "process": {
+              "name": "chrome-headless",
+              "parent": 2061365,
+              "pid": 2061368,
+              "start_ticks": 179241017
+            },
+            "usage": {
+              "pss_kib": 11061,
+              "rss_kib": 44580
+            }
+          },
+          {
+            "process": {
+              "name": "chrome-headless",
+              "parent": 2061367,
+              "pid": 2061401,
+              "start_ticks": 179241019
+            },
+            "usage": {
+              "pss_kib": 41941,
+              "rss_kib": 88560
+            }
+          },
+          {
+            "process": {
+              "name": "chrome-headless",
+              "parent": 2061365,
+              "pid": 2061403,
+              "start_ticks": 179241019
+            },
+            "usage": {
+              "pss_kib": 25097,
+              "rss_kib": 71832
+            }
+          },
+          {
+            "process": {
+              "name": "vizzi",
+              "parent": 2061353,
+              "pid": 2061439,
+              "start_ticks": 179241079
+            },
+            "usage": {
+              "pss_kib": 881516,
+              "rss_kib": 885008
+            }
+          },
+          {
+            "process": {
+              "name": "chrome-headless",
+              "parent": 2061368,
+              "pid": 2061455,
+              "start_ticks": 179241157
+            },
+            "usage": {
+              "pss_kib": 146603,
+              "rss_kib": 200976
+            }
+          },
+          {
+            "process": {
+              "name": "vizzi",
+              "parent": 2061353,
+              "pid": 2062519,
+              "start_ticks": 179246336
+            },
+            "usage": {
+              "pss_kib": 322522,
+              "rss_kib": 325676
+            }
+          }
+        ],
+        "sampling_ms": 42.517952,
+        "usage": {
+          "pss_kib": 1754204,
+          "rss_kib": 2072412
+        }
+      },
+      "sample_count": 198,
+      "nominal_interval_ms": 250,
+      "sampling_ms": {
+        "median": 28.3345165,
+        "max": 51.97761
+      },
+      "wall_s": 54.947748933,
+      "disappeared_observations": 2,
+      "sample_errors": 0,
+      "observer_errors": [],
+      "ordinary_dom_ms": {
+        "count": 10,
+        "p50": 103.78939900000114,
+        "p95": 118.67527799999516,
+        "p99": 118.67527799999516,
+        "max": 118.67527799999516,
+        "over33ms": 10,
+        "over50ms": 10
+      },
+      "large_edit_dom_ms": 1894.8673869999984,
+      "large_file": "third_party/perfetto/sdk/perfetto.h",
+      "large_bytes": 8416629,
+      "refresh_frame_p99_ms": [
+        16.800000000000182,
+        16.800000000000182,
+        16.800000000000182
+      ],
+      "max_observed_frame_ms": 16.800000000000182,
+      "native_observations": [
+        "native directory watches + periodic reconciliation",
+        "native directory watches + periodic reconciliation",
+        "native directory watches + periodic reconciliation"
+      ],
+      "clean_matches": true,
+      "screenshot": "pytorch-resident-pytorch-workspace.png",
+      "group_before": null,
+      "group_after": null
+    }
+  ],
+  "raw_sha256": {
+    "linux-resident.browser.json.gz": "fd337a03e65660bffe8a8b35b65961490894d0afa8cf1e3b84d12e6325d5839a",
+    "linux-resident.memory.json.gz": "2e65bb4e2df2b3c7211c3ced1f0c2867237b2026ca7e37faa9fae1790af2ddbb",
+    "linux-spooled.browser.json.gz": "c6d1b5a7a1853e4e9f62f340a9f2e77e7fa4b255dd017a8a2aae1c088c9bfecd",
+    "linux-spooled.memory.json.gz": "2b9e279593ea7754547f44a9ab941636c89d0c2be87f1ea9e27f4b36ee11dd56",
+    "pytorch-spooled.browser.json.gz": "c7c2a5845b44c873930e428c9fe1cc0e8b559072294d8b5d75f0c77298ce2596",
+    "pytorch-spooled.memory.json.gz": "3cd76494bed627d25150ace7c8dad4b8abcbf92a0f1b8206f1d7149e3f6df15a",
+    "pytorch-resident.browser.json.gz": "62a1809ed77384d737921835d422adbd31a71c2d56219a0ea2ae0ecb8512809e",
+    "pytorch-resident.memory.json.gz": "4efb2ef48fb467c193fbbfff3f3a9b365a7e7e500ef99141dcf29c18ca371b1f"
+  },
+  "machine": {
+    "platform": "linux",
+    "release": "6.8.0-147-lowlatency",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13700H",
+    "logicalCpus": 20,
+    "memoryBytes": 67080241152
+  },
+  "browser": "156.0.8078.4",
+  "node": "v26.13.0",
+  "playwright": "1.64.1",
+  "gpu": {
+    "devices": [
+      {
+        "vendorId": 65535,
+        "deviceId": 65535,
+        "vendorString": "Google Inc. (Google)",
+        "deviceString": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0)",
+        "driverVendor": "SwANGLE",
+        "driverVersion": "5.0.0"
+      }
+    ],
+    "featureStatus": {
+      "2d_canvas": "unavailable_software",
+      "direct_rendering_display_compositor": "disabled_off_ok",
+      "gpu_compositing": "disabled_software",
+      "multiple_raster_threads": "enabled_on",
+      "opengl": "disabled_off",
+      "rasterization": "disabled_software",
+      "raw_draw": "disabled_off_ok",
+      "skia_graphite": "disabled_off",
+      "trees_in_viz": "disabled_off",
+      "video_decode": "disabled_software",
+      "video_encode": "disabled_software",
+      "vulkan": "disabled_off",
+      "webgl": "unavailable_software",
+      "webgpu": "unavailable_software",
+      "webgpu_on_vk_via_gl_interop": "disabled_off",
+      "webnn": "unavailable_software"
+    },
+    "auxAttributes": {
+      "amdSwitchable": false,
+      "canSupportThreadedTextureMailbox": false,
+      "directRenderingVersion": "",
+      "displayType": "ANGLE_SWIFTSHADER",
+      "glExtensions": "GL_AMD_performance_monitor GL_ANGLE_base_vertex_base_instance_shader_builtin GL_ANGLE_blob_cache GL_ANGLE_client_arrays GL_ANGLE_clip_cull_distance GL_ANGLE_compressed_texture_etc GL_ANGLE_copy_texture_3d GL_ANGLE_depth_texture GL_ANGLE_framebuffer_blit GL_ANGLE_framebuffer_multisample GL_ANGLE_get_image GL_ANGLE_get_serialized_context_string GL_ANGLE_get_tex_level_parameter GL_ANGLE_instanced_arrays GL_ANGLE_memory_object_flags GL_ANGLE_memory_size GL_ANGLE_multi_draw GL_ANGLE_pack_reverse_row_order GL_ANGLE_polygon_mode GL_ANGLE_program_binary_readiness_query GL_ANGLE_program_cache_control GL_ANGLE_read_only_depth_stencil_feedback_loops GL_ANGLE_relaxed_vertex_attribute_type GL_ANGLE_renderability_validation GL_ANGLE_request_extension GL_ANGLE_rgbx_internal_format GL_ANGLE_robust_client_memory GL_ANGLE_robust_fragment_shader_output GL_ANGLE_robust_resource_initialization GL_ANGLE_shader_pixel_local_storage GL_ANGLE_shader_pixel_local_storage_coherent GL_ANGLE_stencil_texturing GL_ANGLE_texture_compression_dxt3 GL_ANGLE_texture_compression_dxt5 GL_ANGLE_texture_multisample GL_ANGLE_texture_usage GL_ANGLE_translated_shader_source GL_ANGLE_vulkan_image GL_ANGLE_yuv_internal_format GL_APPLE_clip_distance GL_ARM_rgba8 GL_ARM_shader_framebuffer_fetch GL_CHROMIUM_bind_generates_resource GL_CHROMIUM_bind_uniform_location GL_CHROMIUM_copy_compressed_texture GL_CHROMIUM_copy_texture GL_CHROMIUM_lose_context GL_EXT_EGL_image_array GL_EXT_EGL_image_external_wrap_modes GL_EXT_EGL_image_storage GL_EXT_base_instance GL_EXT_blend_minmax GL_EXT_buffer_storage GL_EXT_clear_texture GL_EXT_clip_control GL_EXT_clip_cull_distance GL_EXT_color_buffer_float GL_EXT_color_buffer_half_float GL_EXT_compressed_ETC1_RGB8_sub_texture GL_EXT_conservative_depth GL_EXT_copy_image GL_EXT_debug_label GL_EXT_debug_marker GL_EXT_depth_clamp GL_EXT_discard_framebuffer GL_EXT_disjoint_timer_query GL_EXT_draw_buffers GL_EXT_draw_buffers_indexed GL_EXT_draw_elements_base_vertex GL_EXT_float_blend GL_EXT_frag_depth GL_EXT_instanced_arrays GL_EXT_map_buffer_range GL_EXT_memory_object GL_EXT_memory_object_fd GL_EXT_occlusion_query_boolean GL_EXT_polygon_offset_clamp GL_EXT_read_format_bgra GL_EXT_robustness GL_EXT_sRGB GL_EXT_sRGB_write_control GL_EXT_semaphore GL_EXT_semaphore_fd GL_EXT_separate_shader_objects GL_EXT_shader_framebuffer_fetch GL_EXT_shader_framebuffer_fetch_non_coherent GL_EXT_shader_non_constant_global_initializers GL_EXT_shader_texture_lod GL_EXT_shadow_samplers GL_EXT_texture_border_clamp GL_EXT_texture_compression_bptc GL_EXT_texture_compression_dxt1 GL_EXT_texture_compression_rgtc GL_EXT_texture_compression_s3tc_srgb GL_EXT_texture_filter_anisotropic GL_EXT_texture_format_BGRA8888 GL_EXT_texture_lod_bias GL_EXT_texture_mirror_clamp_to_edge GL_EXT_texture_rg GL_EXT_texture_sRGB_R8 GL_EXT_texture_sRGB_RG8 GL_EXT_texture_sRGB_decode GL_EXT_texture_shadow_lod GL_EXT_texture_storage GL_EXT_texture_type_2_10_10_10_REV GL_EXT_unpack_subimage GL_KHR_blend_equation_advanced GL_KHR_debug GL_KHR_robust_buffer_access_behavior GL_KHR_robustness GL_KHR_texture_compression_astc_ldr GL_NV_fence GL_NV_framebuffer_blit GL_NV_pack_subimage GL_NV_pixel_buffer_object GL_NV_polygon_mode GL_NV_read_depth GL_NV_read_depth_stencil GL_NV_read_stencil GL_NV_shader_noperspective_interpolation GL_OES_EGL_image GL_OES_EGL_image_external GL_OES_EGL_image_external_essl3 GL_OES_EGL_sync GL_OES_compressed_ETC1_RGB8_texture GL_OES_compressed_paletted_texture GL_OES_copy_image GL_OES_depth24 GL_OES_depth32 GL_OES_depth_texture GL_OES_depth_texture_cube_map GL_OES_draw_buffers_indexed GL_OES_draw_elements_base_vertex GL_OES_element_index_uint GL_OES_fbo_render_mipmap GL_OES_get_program_binary GL_OES_mapbuffer GL_OES_packed_depth_stencil GL_OES_required_internalformat GL_OES_rgb8_rgba8 GL_OES_sample_shading GL_OES_sample_variables GL_OES_shader_multisample_interpolation GL_OES_standard_derivatives GL_OES_surfaceless_context GL_OES_texture_3D GL_OES_texture_border_clamp GL_OES_texture_float GL_OES_texture_float_linear GL_OES_texture_half_float GL_OES_texture_half_float_linear GL_OES_texture_npot GL_OES_texture_stencil8 GL_OES_texture_storage_multisample_2d_array GL_OES_vertex_array_object GL_OES_vertex_half_float GL_OES_vertex_type_10_10_10_2 GL_OVR_multiview GL_OVR_multiview2 GL_QCOM_texture_lod_bias ",
+      "glImplementationParts": "(gl=egl-angle,angle=swiftshader)",
+      "glRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0)",
+      "glResetNotificationStrategy": 33362,
+      "glVendor": "Google Inc. (Google)",
+      "glVersion": "OpenGL ES 3.0 (ANGLE 2.1.28967 git hash: dfeede58b618)",
+      "glWsExtensions": "EGL_EXT_create_context_robustness EGL_ANGLE_surface_orientation EGL_KHR_create_context EGL_KHR_image EGL_KHR_image_base EGL_EXT_image_gl_colorspace EGL_KHR_gl_colorspace EGL_KHR_gl_texture_2D_image EGL_KHR_gl_texture_cubemap_image EGL_KHR_gl_renderbuffer_image EGL_KHR_get_all_proc_addresses EGL_KHR_fence_sync EGL_KHR_wait_sync EGL_ANGLE_create_context_webgl_compatibility EGL_CHROMIUM_create_context_bind_generates_resource EGL_KHR_swap_buffers_with_damage EGL_EXT_pixel_format_float EGL_KHR_surfaceless_context EGL_ANGLE_display_texture_share_group EGL_ANGLE_display_semaphore_share_group EGL_ANGLE_create_context_client_arrays EGL_ANGLE_program_cache_control EGL_ANGLE_robust_resource_initialization EGL_ANGLE_create_context_extensions_enabled EGL_ANDROID_blob_cache EGL_ANDROID_recordable EGL_ANGLE_create_context_backwards_compatible EGL_KHR_no_config_context EGL_IMG_context_priority EGL_KHR_create_context_no_error EGL_KHR_reusable_sync EGL_EXT_buffer_age EGL_ANGLE_create_surface_swap_interval EGL_ANGLE_vulkan_image EGL_KHR_partial_update EGL_ANGLE_global_fence_sync EGL_ANGLE_memory_usage_report ",
+      "glWsVendor": "Google Inc. (Google)",
+      "glWsVersion": "1.5 (ANGLE 2.1.28967 git hash: dfeede58b618)",
+      "hardwareSupportsVulkan": false,
+      "inProcessGpu": false,
+      "initializationTime": 0.017343,
+      "isAsan": false,
+      "isClangCoverage": false,
+      "jpegDecodeAcceleratorSupported": false,
+      "maxMsaaSamples": "4",
+      "optimus": false,
+      "passthroughCmdDecoder": true,
+      "pixelShaderVersion": "3.00",
+      "processCrashCount": 0,
+      "sandboxed": false,
+      "skiaBackendType": "None",
+      "subpixelFontRendering": true,
+      "targetCpuBits": 64,
+      "vertexShaderVersion": "3.00",
+      "visibilityCallbackCallCount": 0
+    }
+  }
+}

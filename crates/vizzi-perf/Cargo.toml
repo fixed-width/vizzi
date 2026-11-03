@@ -31,6 +31,10 @@ tree-sitter-cpp = { workspace = true, optional = true }
 tempfile.workspace = true
 
 [[bin]]
+name = "vizzi-envelope"
+path = "src/bin/envelope.rs"
+
+[[bin]]
 name = "vizzi-gpu"
 path = "src/bin/gpu.rs"
 required-features = ["gpu"]

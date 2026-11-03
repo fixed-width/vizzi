@@ -12,6 +12,8 @@ const options = { duration: 4000, samples: 3 };
 for (let i = 2; i < process.argv.length; i++) {
   const flag = process.argv[i];
   if (["--measure", "--headed"].includes(flag)) continue;
+  if (flag === "--no-build") { options.noBuild = true; continue; }
+  if (flag === "--no-desktop-bus") { options.noDesktopBus = true; continue; }
   if (flag === "--during-recovery") { options.duringRecovery = true; continue; }
   if (flag === "--reference-only") { options.referenceOnly = true; continue; }
   if (!["--source", "--revision", "--output", "--duration", "--samples", "--profile", "--probe-id"].includes(flag)) throw new Error(`Unknown argument ${flag}`);
@@ -319,8 +321,8 @@ async function qualify(chromium, definition) {
   } finally { await session?.close(); await host?.close(); await input.close(); }
 }
 
-buildHost();
-const chromium = await browser();
+if (!options.noBuild) buildHost();
+const chromium = await browser({ desktopBus: !options.noDesktopBus });
 try {
   const cdp = await chromium.newBrowserCDPSession();
   const system = await cdp.send("SystemInfo.getInfo");
