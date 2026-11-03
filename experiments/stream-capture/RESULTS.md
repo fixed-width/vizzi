@@ -8,6 +8,8 @@ remains the default. No dependencies or unsafe-code exceptions were added.
 The [source reference](../../docs/prototype/SOURCE_READS.md) defines the interface and
 limits; the [architecture plan](../../docs/plans/streaming-source-capture.md) explains the
 staging/commit boundary. The [procedure](README.md) reproduces these observations.
+The subsequent [verified reuse report](../verified-reuse/RESULTS.md) avoids candidate
+metadata work for unchanged inputs; the figures below describe the earlier implementation.
 
 ## Large-file capture
 

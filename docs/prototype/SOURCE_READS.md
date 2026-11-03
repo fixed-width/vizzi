@@ -36,6 +36,14 @@ for parsing/cache validation and rejects an input with another content identity.
 backed facts with spans require loaded input. Source class/context/content validation,
 coverage rules and immutable observation identity remain independent of representation.
 
+`CapturedSource::verifier()` returns a constant-space `SourceVerifier` over a captured
+identity/length. `update(bytes)` feeds ordered actual bytes without retaining them or
+reading backing. Consuming `matches()` at logical EOF requires the exact byte count and
+matching existing namespaced, length-prefixed identity. Callers must feed the complete
+input, including any suffix; reaching the expected count alone is not EOF. Oversized
+input permanently rejects reuse. Verification accepts binary input independently of
+captured text availability and does not rebuild metadata.
+
 ## Native analysis and HTTP
 
 The engine acquires its optional input-admission permit before loading bytes. It holds
@@ -74,12 +82,15 @@ The descriptor exposes no project filename or writable file handle. Concurrent r
 use serialized seek/read operations, so file-cursor sharing cannot mix captured ranges.
 Already-backed sources passed to `persist` keep their original backing.
 
-`capture` reads actual project input through EOF in requests of at most 64 KiB. It builds
-identity, encoding, line/CRLF and integrity metadata from private staged bytes with bounded
-scratch, preserving the existing identity algorithm. UTF-8 validation carries at most
-three incomplete bytes between chunks. A matching previous capture keeps its original
-source and backing, even at full committed quota. Changed captures append staged bytes
-in bounded chunks before returning an immutable descriptor. A separate writer gate
+`capture` reads actual project input through EOF in requests of at most 64 KiB and stages
+all bytes. With a previous capture, it also verifies those actual input slices using its
+captured length as a candidate hash prefix. Reuse requires observed EOF, exact length,
+matching identity and cancellation checks; project metadata alone never proves equality.
+A verified match keeps its original source/backing without scanning staged metadata or
+appending, even at full committed quota. Otherwise it builds identity, encoding, line/CRLF
+and integrity metadata from private staged bytes using actual length and bounded scratch.
+UTF-8 validation carries at most three incomplete bytes between chunks. Changed captures
+append staged bytes in bounded chunks before returning an immutable descriptor. A separate writer gate
 serialises staging/commit work; old sources remain readable between committed-file IO
 operations. Capture and reads use no publication lock.
 
@@ -90,8 +101,8 @@ committed session appends, including old/cancelled captures, rather than live-so
 The reusable staging file is separately bounded by the same capacity, so combined file
 lengths can reach twice the configured value. Unchanged verification needs staging space
 but consumes no committed quota. Failure aborts capture, preserving the last published
-observation and dirty hints. There is no
-per-version disk reclamation or automatic compaction in this adapter.
+observation and dirty hints. There is no per-version disk reclamation or automatic
+compaction in this adapter.
 
 Observed cancellation/read failure discards staged candidates; incomplete append tails
 are truncated without changing earlier committed ranges. Cleanup is best effort if
@@ -116,5 +127,8 @@ or whole-process RSS.
 
 See [reader validation](../../experiments/source-reads/RESULTS.md),
 [streaming capture measurements](../../experiments/stream-capture/RESULTS.md), and the
-[capture design](../plans/streaming-source-capture.md). Reclamation and a calibrated
+[verified reuse measurements](../../experiments/verified-reuse/RESULTS.md). The
+[capture design](../plans/streaming-source-capture.md) and
+[reuse design](../plans/verified-source-reuse.md) record the implementation rationale.
+Reclamation and a calibrated
 resident/process envelope remain subsequent work.

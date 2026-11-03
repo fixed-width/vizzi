@@ -66,6 +66,36 @@ pub struct CapturedSource {
     crlf: Vec<u8>,
     chunks: Vec<[u8; 32]>,
 }
+/// Constant-space verification of ordered input against a captured identity and length.
+/// Feed the complete input through EOF before consuming the result; backing is never read.
+#[derive(Debug)]
+pub struct SourceVerifier<'a> {
+    source: &'a CapturedSource,
+    hash: blake3::Hasher,
+    remaining: Option<usize>,
+}
+impl SourceVerifier<'_> {
+    /// Adds actual input bytes without retaining them. Excess length permanently rejects reuse.
+    pub fn update(&mut self, bytes: &[u8]) {
+        self.remaining = self
+            .remaining
+            .and_then(|left| left.checked_sub(bytes.len()));
+        if self.remaining.is_some() {
+            self.hash.update(bytes);
+        }
+    }
+    /// Consumes verification at logical EOF; both actual length and digest must match.
+    pub fn matches(self) -> bool {
+        self.remaining == Some(0)
+            && ContentId::from_digest(self.hash.finalize()) == self.source.content
+    }
+}
+fn content_hasher(len: usize) -> blake3::Hasher {
+    let mut hash = blake3::Hasher::new();
+    hash.update(b"ContentId");
+    hash.update(&(len as u64).to_le_bytes());
+    hash
+}
 /// A verified whole input, borrowing resident bytes or owning one backing load.
 #[derive(Debug)]
 pub struct SourceInput<'a> {
@@ -93,6 +123,14 @@ impl<'a> SourceInput<'a> {
     }
 }
 impl CapturedSource {
+    /// Verifies incoming bytes against this capture without rebuilding metadata or loading backing.
+    pub fn verifier(&self) -> SourceVerifier<'_> {
+        SourceVerifier {
+            source: self,
+            hash: content_hasher(self.len),
+            remaining: Some(self.len),
+        }
+    }
     /// Hashes actual supplied bytes on every call; equal content may reuse prior storage.
     pub fn capture(bytes: Vec<u8>, previous: Option<&Arc<Self>>) -> Arc<Self> {
         let content = ContentId::derive(&[&bytes]);
@@ -115,9 +153,7 @@ impl CapturedSource {
         if cancelled() {
             return Ok(None);
         }
-        let mut hash = blake3::Hasher::new();
-        hash.update(b"ContentId");
-        hash.update(&(len as u64).to_le_bytes());
+        let mut hash = content_hasher(len);
         let mut metadata = Metadata::new();
         let mut buffer = vec![0u8; len.min(SOURCE_CHUNK)];
         let mut at = 0;

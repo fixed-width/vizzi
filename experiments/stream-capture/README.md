@@ -15,6 +15,10 @@ python3 experiments/stream-capture/measure.py \
 Choose a new output path. The driver preserves per-condition configurations, stderr,
 progress and completed reports beside the final JSON. Fixture size accepts 1–1024 MiB.
 Only temporary directories made by the driver are edited or removed.
+`--binary-directory DIR` selects a directory containing the two probe executables for
+comparisons with preserved builds; the default is `target/release/examples`. Every
+condition records the executable hash. See the [verified reuse procedure](../verified-reuse/README.md)
+for the comparison with the preceding streaming implementation.
 
 The generated fixture is one large UTF-8 line of spaces. Separate sequential child
 processes compare whole-vector capture plus persistence with streaming staging, using

@@ -130,7 +130,7 @@ impl SourceSpool {
             len,
         })))
     }
-    /// Streams actual input to private staging, verifies metadata, then reuses or commits it.
+    /// Stages actual input, reuses verified previous content or builds and commits new metadata.
     /// Input/staging/copy requests are bounded; metadata still scales with input lines/blocks.
     pub fn capture(
         &self,
@@ -146,6 +146,7 @@ impl SourceSpool {
             .unwrap_or_else(std::sync::PoisonError::into_inner)
             .set_len(0)
             .map_err(|error| SourceReadError::Io(error.to_string()))?;
+        let mut verification = previous.map(|old| (old, old.verifier()));
         let len = {
             let mut len = 0usize;
             let mut buffer = vec![0u8; CAPTURE_CHUNK];
@@ -168,6 +169,9 @@ impl SourceSpool {
                 if count > self.inner.capacity - len {
                     return Err(SourceReadError::Capacity);
                 }
+                if let Some((_, verifier)) = &mut verification {
+                    verifier.update(&buffer[..count]);
+                }
                 {
                     let mut stage = self
                         .inner
@@ -188,6 +192,11 @@ impl SourceSpool {
             }
             len
         };
+        if let Some((old, verifier)) = verification
+            && verifier.matches()
+        {
+            return Ok((!cancelled()).then(|| old.clone()));
+        }
         let staged = Arc::new(Staged {
             file: self.inner.stage.clone(),
             len,
@@ -195,9 +204,6 @@ impl SourceSpool {
         let Some(source) = CapturedSource::capture_reader(len, staged.clone(), cancelled)? else {
             return Ok(None);
         };
-        if let Some(old) = previous.filter(|old| old.content() == source.content()) {
-            return Ok((!cancelled()).then(|| old.clone()));
-        }
         let Some(start) = self.append(
             len,
             |offset, target| staged.read_at(offset, target),

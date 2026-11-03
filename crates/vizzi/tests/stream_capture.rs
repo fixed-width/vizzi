@@ -233,3 +233,96 @@ fn changed_stream_cannot_append_beyond_a_full_committed_quota() {
     assert_eq!(spool.stats().staging_bytes, 0);
     assert_eq!(original.read_all(100).unwrap().bytes(), vec![b'a'; 100]);
 }
+
+#[test]
+fn previous_capture_does_not_hide_changed_shorter_or_longer_input() {
+    use vizzi_core::model::{ContentId, SourceEncoding};
+    let original = b"first\r\nlast\n";
+    for bytes in [
+        b"first\r\nlast!".as_slice(),
+        b"first\r\n".as_slice(),
+        b"first\r\nlast\nextra".as_slice(),
+        &[255; 12],
+        &[],
+    ] {
+        let root = tempfile::tempdir().unwrap();
+        let spool = SourceSpool::new(root.path(), 1000).unwrap();
+        let old = spool
+            .capture(&mut Cursor::new(original), None, &|| false)
+            .unwrap()
+            .unwrap();
+        let mut input = Fragmented {
+            inner: Cursor::new(bytes.to_vec()),
+            fragment: original.len(),
+            max_request: 0,
+        };
+        let changed = spool
+            .capture(&mut input, Some(&old), &|| false)
+            .unwrap()
+            .unwrap();
+        assert!(!Arc::ptr_eq(&old, &changed));
+        assert_eq!(changed.content(), &ContentId::derive(&[bytes]));
+        assert_eq!(changed.read_all(1000).unwrap().bytes(), bytes);
+        let text = std::str::from_utf8(bytes).ok();
+        assert_eq!(
+            changed.encoding(),
+            if text.is_some() {
+                SourceEncoding::Utf8
+            } else {
+                SourceEncoding::Unsupported
+            }
+        );
+        assert_eq!(
+            changed.line_count(),
+            text.map_or(0, |t| t.split('\n').count())
+        );
+        assert_eq!(old.read_all(1000).unwrap().bytes(), original);
+        assert_eq!(spool.stats().written_bytes, original.len() + bytes.len());
+        assert_eq!(spool.stats().staging_bytes, 0);
+    }
+}
+
+#[test]
+fn matching_bytes_before_eof_do_not_hide_a_read_failure_or_cancellation() {
+    use std::sync::atomic::{AtomicBool, Ordering};
+    struct End {
+        data: Cursor<&'static [u8]>,
+        cancelled: Arc<AtomicBool>,
+        fail: bool,
+    }
+    impl Read for End {
+        fn read(&mut self, target: &mut [u8]) -> io::Result<usize> {
+            let count = self.data.read(target)?;
+            if count == 0 {
+                if self.fail {
+                    return Err(io::Error::other("EOF fixture"));
+                }
+                self.cancelled.store(true, Ordering::SeqCst);
+            }
+            Ok(count)
+        }
+    }
+    for fail in [false, true] {
+        let root = tempfile::tempdir().unwrap();
+        let spool = SourceSpool::new(root.path(), 8).unwrap();
+        let old = spool
+            .capture(&mut Cursor::new(b"original"), None, &|| false)
+            .unwrap()
+            .unwrap();
+        let cancelled = Arc::new(AtomicBool::new(false));
+        let mut input = End {
+            data: Cursor::new(b"original"),
+            cancelled: cancelled.clone(),
+            fail,
+        };
+        let result = spool.capture(&mut input, Some(&old), &|| cancelled.load(Ordering::SeqCst));
+        if fail {
+            assert!(result.is_err());
+        } else {
+            assert!(result.unwrap().is_none());
+        }
+        assert_eq!(spool.stats().written_bytes, 8);
+        assert_eq!(spool.stats().staging_bytes, 0);
+        assert_eq!(old.read_text(8).unwrap().as_deref(), Some("original"));
+    }
+}

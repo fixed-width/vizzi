@@ -1,0 +1,166 @@
+{
+  "schema": 1,
+  "recorded_after_measurement_utc": "2026-11-03T07:04:38.096577+00:00",
+  "fixture": [
+    {
+      "mode": "whole",
+      "before": {
+        "first_capture_ms": 894.286162,
+        "unchanged_ms": 472.629662,
+        "sampled_peak_rss_mib": 514.9921875,
+        "binary_sha256": "bae2798f6cd0a6040232ef1c1e78c02ef96afc5c7cb07724c218db5bd780383e"
+      },
+      "after": {
+        "first_capture_ms": 753.738463,
+        "unchanged_ms": 345.383256,
+        "sampled_peak_rss_mib": 515.02734375,
+        "binary_sha256": "e067c2e44c2ec6d9ee8fc2dc0a9811b02dabf2eababad829ed332f723cabb189"
+      }
+    },
+    {
+      "mode": "stream",
+      "before": {
+        "first_capture_ms": 1133.3168389999998,
+        "unchanged_ms": 880.13951,
+        "sampled_peak_rss_mib": 3.22265625,
+        "binary_sha256": "bae2798f6cd0a6040232ef1c1e78c02ef96afc5c7cb07724c218db5bd780383e"
+      },
+      "after": {
+        "first_capture_ms": 878.68736,
+        "unchanged_ms": 427.704478,
+        "sampled_peak_rss_mib": 3.07421875,
+        "binary_sha256": "e067c2e44c2ec6d9ee8fc2dc0a9811b02dabf2eababad829ed332f723cabb189"
+      }
+    }
+  ],
+  "corpus": [
+    {
+      "profile": "linux",
+      "before": {
+        "files": 66066,
+        "source_bytes": 1495484792,
+        "baseline_ms": 4676.664621000001,
+        "unchanged_ms": 3673.966877,
+        "edit4_ms": 8655.292626,
+        "sampled_peak_rss_gib": 2.26263427734375,
+        "baseline_buffers_gib": 0.420308381319046,
+        "spool": {
+          "capacity_bytes": 17179869184,
+          "max_read_request": 65536,
+          "peak_staging_bytes": 24009446,
+          "read_bytes": 27080455824,
+          "reads": 1404189,
+          "staging_bytes": 0,
+          "stores": 396396,
+          "written_bytes": 9017833632
+        },
+        "binary_sha256": "a2a3c0a77ca80b8e12e9b3a1c12f5666dc7dafce2180038b0848350754b5e20b"
+      },
+      "after": {
+        "files": 66066,
+        "source_bytes": 1495484792,
+        "baseline_ms": 4681.752302999999,
+        "unchanged_ms": 2171.8157229999997,
+        "edit4_ms": 7502.75191,
+        "sampled_peak_rss_gib": 2.2626914978027344,
+        "baseline_buffers_gib": 0.420308381319046,
+        "spool": {
+          "capacity_bytes": 17179869184,
+          "max_read_request": 65536,
+          "peak_staging_bytes": 24009446,
+          "read_bytes": 27080455824,
+          "reads": 1404189,
+          "staging_bytes": 0,
+          "stores": 396396,
+          "written_bytes": 9017833632
+        },
+        "binary_sha256": "3de59984dafacbab2164e4759c7c1b3edae98b80b0ed873b54239431fa50f48d"
+      },
+      "unchanged_reduction_percent": 40.886355383437504
+    },
+    {
+      "profile": "pytorch",
+      "before": {
+        "files": 10578,
+        "source_bytes": 186092681,
+        "baseline_ms": 629.6101950000001,
+        "unchanged_ms": 569.1846149999999,
+        "edit4_ms": 1007.5740040000001,
+        "sampled_peak_rss_gib": 0.30724334716796875,
+        "baseline_buffers_gib": 0.05388662964105606,
+        "spool": {
+          "capacity_bytes": 17179869184,
+          "max_read_request": 65536,
+          "peak_staging_bytes": 8416901,
+          "read_bytes": 3375563202,
+          "reads": 212015,
+          "staging_bytes": 0,
+          "stores": 63468,
+          "written_bytes": 1123749126
+        },
+        "binary_sha256": "a2a3c0a77ca80b8e12e9b3a1c12f5666dc7dafce2180038b0848350754b5e20b"
+      },
+      "after": {
+        "files": 10578,
+        "source_bytes": 186092681,
+        "baseline_ms": 549.5869650000001,
+        "unchanged_ms": 262.649349,
+        "edit4_ms": 1075.294805,
+        "sampled_peak_rss_gib": 0.3071174621582031,
+        "baseline_buffers_gib": 0.05388662964105606,
+        "spool": {
+          "capacity_bytes": 17179869184,
+          "max_read_request": 65536,
+          "peak_staging_bytes": 8416901,
+          "read_bytes": 3375563202,
+          "reads": 212015,
+          "staging_bytes": 0,
+          "stores": 63468,
+          "written_bytes": 1123749126
+        },
+        "binary_sha256": "3de59984dafacbab2164e4759c7c1b3edae98b80b0ed873b54239431fa50f48d"
+      },
+      "unchanged_reduction_percent": 53.855156643684055
+    }
+  ],
+  "checks": "Before/after original source manifests, spool byte/store/read totals and every phase owned buffer inventory match exactly. Preserved before binaries match committed preceding observations.",
+  "limits": [
+    "Old implementation first, new second; finite sequential samples with unique prefixes, not randomised speedups or tails.",
+    "Whole-vector fixture reference also varies; added opposite-order streamed fixture repetitions are reported separately.",
+    "No competing builds/tests/mutations/benchmarks; virtual-address-space limits do not qualify physical RAM or baseline hardware."
+  ],
+  "opposite_order_fixture_pairs": [
+    {
+      "pair": 0,
+      "position": 0,
+      "implementation": "before",
+      "first_capture_ms": 1210.5175049999998,
+      "unchanged_ms": 829.024146,
+      "sampled_peak_rss_mib": 3.23046875
+    },
+    {
+      "pair": 0,
+      "position": 1,
+      "implementation": "after",
+      "first_capture_ms": 908.502738,
+      "unchanged_ms": 396.109019,
+      "sampled_peak_rss_mib": 3.046875
+    },
+    {
+      "pair": 1,
+      "position": 0,
+      "implementation": "after",
+      "first_capture_ms": 960.667433,
+      "unchanged_ms": 366.975175,
+      "sampled_peak_rss_mib": 3.07421875
+    },
+    {
+      "pair": 1,
+      "position": 1,
+      "implementation": "before",
+      "first_capture_ms": 865.472648,
+      "unchanged_ms": 721.559252,
+      "sampled_peak_rss_mib": 3.234375
+    }
+  ]
+}

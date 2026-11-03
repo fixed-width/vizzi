@@ -121,6 +121,14 @@ still verifying actual contents. Committed and staging files each have the confi
 allowance, so combined lengths may reach twice it. Resident indexes, parser heap,
 response memory, cumulative disk reclamation and baseline hardware remain unresolved.
 
+The [verified reuse follow-up](../../experiments/verified-reuse/RESULTS.md) now verifies
+incoming bytes and actual EOF before rebuilding metadata. In the repeated before/after
+history, unchanged capture falls from 3,674 to 2,172 ms Linux and 569 to 263 ms PyTorch,
+with unchanged owned buffers and process peaks near 2.263 / 0.307 GiB. Opposite-order
+512 MiB fixture pairs also improve unchanged capture. Full staged IO remains and changed
+inputs add speculative hashing; these finite samples do not qualify timing tails or
+baseline hardware. Reclamation and metadata/process budgets remain separate work.
+
 Do not replace semantic correctness checks with these performance targets. Language
 assignments, partial grammar coverage, source-only cases, cancellation, cache validity,
 and immutable publication must remain explicit and independently tested.

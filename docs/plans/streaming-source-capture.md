@@ -10,8 +10,10 @@ Read project input into a private reusable staging file in at most 64 KiB reques
 checking cancellation between operations. Observe EOF and actual length; metadata alone
 is never content proof. Build content identity, UTF-8 availability, line starts, CRLF bits
 and fixed-block integrity digests over those staged bytes with bounded scratch. Keep
-ContentId's existing namespace/length-prefix composition. The final actual length is
-known before hashing, so do not invent a different identity or trust a guessed length.
+ContentId's existing namespace/length-prefix composition. New metadata capture hashes
+using the final actual length. The subsequent [verified reuse](verified-source-reuse.md)
+path hashes speculatively with the previous captured length and accepts it only after EOF
+proves that exact observed count and digest. Never treat a guessed length as proof.
 
 Share metadata construction between resident and staged capture. UTF-8 validation must
 carry incomplete code points across blocks, including final truncation and invalid input.
@@ -66,4 +68,5 @@ old pins and actual-content verification while bounding transient byte buffers. 
 reduces the generated 512 MiB file's sampled peak RSS from 515.0 to 3.25 MiB. Representative
 history checks pass, but unchanged captures are slower because candidate metadata is
 rebuilt before identity comparison. Investigate verified unchanged-source metadata reuse
-next; disk reclamation and resident/index/process limits remain separate design work.
+through the [next stage](verified-source-reuse.md); disk reclamation and
+resident/index/process limits remain separate design work.

@@ -1,6 +1,7 @@
 //! Captured source and immutable analysis identities.
 pub use crate::captured_source::{
     BULK_SOURCE_LIMIT, CapturedSource, SourceInput, SourceReadError, SourceReader, SourceStorage,
+    SourceVerifier,
 };
 
 use crate::policy::Classification;

@@ -1,0 +1,26 @@
+{
+  "base_commit": "f901329cb54617ee7a0e512b46efaa0218b9fe8f",
+  "note": "Final current working tree before commit; production code frozen and release binaries built before measurements. Before executables match the committed preceding streaming observations; their sources are recorded in the preceding source-sha256.json.",
+  "before_source_manifest": "experiments/stream-capture/results/source-sha256.json",
+  "sha256": {
+    "Cargo.toml": "b48edcbfd70277e9d0a58f7680b6ed414bc70108b279fdfba98dcd9a07092636",
+    "Cargo.lock": "032ea2295563c2354c3d92c54cf4be9943ad62eb1ed116d6267b7c2c0ee1456d",
+    "crates/vizzi-core/src/captured_source.rs": "fb864c2df08edc3025c21797575572b2bcab9b8c35cfc4108d48b575b19a059a",
+    "crates/vizzi-core/src/model.rs": "a46a8810d3460f81daca79802f1e2c441b4c82c36020f7c6e3b55c66c5b3599c",
+    "crates/vizzi-core/tests/source_verification.rs": "25bbfed05d4592de59b8a31c22eb59210c419a073efc50dc8342b7fdf51d2722",
+    "crates/vizzi-core/tests/stream_metadata.rs": "13a66f58bb8e1cf0b6315c3aa9918d42bf69e89b6d2fc18daeb533da21034743",
+    "crates/vizzi-core/tests/source_reads.rs": "9e68bb4473ea9c7b055f8262a4e79017ea7f0a6a9782ad48070aea1503faa96e",
+    "crates/vizzi/src/source_spool.rs": "33a0ee5ee14f5e4ab7c62042dd068eb302e729b2bc2792d099002bcd5e3cdef3",
+    "crates/vizzi/src/source.rs": "09970b251d1526440a4aafa9f91cc1c0d807a9b17c895da4d5005ec321f543f8",
+    "crates/vizzi/src/stream_probe.rs": "a796dac4cfcc461cea925d708d6bf472cb30c1d0d383067d1262654de19e8d97",
+    "crates/vizzi/src/source_storage_probe.rs": "34785b403f3e0a07d67988080ea416346c672f5082592a88bf3b4cb875e6fbc5",
+    "crates/vizzi/tests/stream_capture.rs": "c501f86aeaf1023d65133a12956bb640296451304e08509c9a1362925f8e803e",
+    "crates/vizzi/tests/source_spool.rs": "031eba1c240c2435127bc74c4175550a8b3c21bb815f218b771f0a1214adf7bd",
+    "crates/vizzi/examples/stream_capture.rs": "2aa5aad72d5d2e1d6a719b101e475bd54eaaa2f50290855aae660db6a70fd37e",
+    "experiments/stream-capture/measure.py": "faa9f6ff8a6e5c7cea58107fbc258c8840ed67d84275373f1d6d852ada3d8297",
+    "experiments/qualification/native.py": "e637e001eff0f81059c10e02f5381c00ef44e45efbd79348f94b792203ef924a",
+    "experiments/qualification/profiles.json": "fe3443645d36e1749ab6f360cecc52c667269e0504326155ed89e1baf98af260",
+    "experiments/admission/limit.py": "fdabefbcaa734cb366b6bcc87306a480bccac672bf5d41dd5592982eb8c08785",
+    "experiments/verified-reuse/fixture_pairs.py": "119f707ee57367536617a6e771aac7f1e74647f5ccd98d47e9f2e88e27d25922"
+  }
+}

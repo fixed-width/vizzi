@@ -17,10 +17,11 @@ from experiments.qualification.native import execute,policy
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--output',type=pathlib.Path,required=True)
+    parser.add_argument('--binary-directory',type=pathlib.Path,default=pathlib.Path('target/release/examples'))
     parser.add_argument('--fixture-mib',type=int,default=512);args=parser.parse_args()
     if args.output.exists() or not 1<=args.fixture_mib<=1024:parser.error('output must be new; fixture must be 1..1024 MiB')
     args.output.parent.mkdir(parents=True,exist_ok=True)
-    fixture_binary=pathlib.Path('target/release/examples/stream_capture').resolve();storage_binary=pathlib.Path('target/release/examples/source_storage').resolve()
+    fixture_binary=(args.binary_directory/'stream_capture').resolve();storage_binary=(args.binary_directory/'source_storage').resolve()
     wrapper=pathlib.Path('experiments/admission/limit.py').resolve();results=[]
     for mode in ['whole','stream']:
         with tempfile.TemporaryDirectory(prefix='vizzi-stream-fixture-') as temporary:

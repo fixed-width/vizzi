@@ -1,0 +1,655 @@
+{
+  "schema": 1,
+  "fixture_bytes": 536870912,
+  "results": [
+    {
+      "pair": 0,
+      "position": 0,
+      "implementation": "before",
+      "binary_sha256": "bae2798f6cd0a6040232ef1c1e78c02ef96afc5c7cb07724c218db5bd780383e",
+      "run": {
+        "wall_s": 3.0915757978800684,
+        "exit_code": 0,
+        "peaks_kib": {
+          "VmSize": 8244,
+          "VmHWM": 3308,
+          "VmRSS": 3308,
+          "RssAnon": 788,
+          "RssFile": 2520
+        },
+        "phase_peaks_kib": {
+          "startup": {
+            "VmSize": 8244,
+            "VmHWM": 372,
+            "VmRSS": 372,
+            "RssAnon": 32,
+            "RssFile": 340
+          },
+          "capture_and_queries": {
+            "VmSize": 5032,
+            "VmHWM": 3308,
+            "VmRSS": 3308,
+            "RssAnon": 788,
+            "RssFile": 2520
+          },
+          "complete": {
+            "VmSize": 4964,
+            "VmHWM": 3188,
+            "VmRSS": 3188,
+            "RssAnon": 668,
+            "RssFile": 2520
+          }
+        },
+        "samples_1s": [
+          {
+            "seconds": 0.0004856809973716736,
+            "phase": "startup",
+            "VmSize": 8244,
+            "VmHWM": 372,
+            "VmRSS": 372,
+            "RssAnon": 32,
+            "RssFile": 340
+          },
+          {
+            "seconds": 1.0212462667841464,
+            "phase": "capture_and_queries",
+            "VmSize": 4772,
+            "VmHWM": 3060,
+            "VmRSS": 3060,
+            "RssAnon": 540,
+            "RssFile": 2520
+          },
+          {
+            "seconds": 2.0398542219772935,
+            "phase": "capture_and_queries",
+            "VmSize": 4772,
+            "VmHWM": 3060,
+            "VmRSS": 3060,
+            "RssAnon": 540,
+            "RssFile": 2520
+          },
+          {
+            "seconds": 3.0197939979843795,
+            "phase": "complete",
+            "VmSize": 4964,
+            "VmHWM": 3188,
+            "VmRSS": 3188,
+            "RssAnon": 668,
+            "RssFile": 2520
+          }
+        ],
+        "events": [
+          {
+            "observed_s": 0.01503663882613182,
+            "data": {
+              "event": "phase_start",
+              "sample": 0
+            }
+          },
+          {
+            "observed_s": 1.2256393898278475,
+            "data": {
+              "event": "phase_done",
+              "sample": 0
+            }
+          },
+          {
+            "observed_s": 1.738575744908303,
+            "data": {
+              "event": "phase_start",
+              "sample": 1
+            }
+          },
+          {
+            "observed_s": 2.5676604679320008,
+            "data": {
+              "event": "phase_done",
+              "sample": 1
+            }
+          },
+          {
+            "observed_s": 3.0914247599430382,
+            "data": {
+              "report_ref": "report"
+            }
+          }
+        ],
+        "stderr": ""
+      },
+      "report": {
+        "bounded_bytes_match": true,
+        "bytes": 536870912,
+        "final_spool": {
+          "capacity_bytes": 536870912,
+          "max_read_request": 65536,
+          "peak_staging_bytes": 536870912,
+          "read_bytes": 1073741824,
+          "reads": 16384,
+          "staging_bytes": 0,
+          "stores": 1,
+          "written_bytes": 536870912
+        },
+        "phases": [
+          {
+            "capture_ms": 1210.5175049999998,
+            "memory_after_capture": {
+              "hwm_kib": 3060,
+              "rss_kib": 3060
+            },
+            "sample": 0,
+            "spool": {
+              "capacity_bytes": 536870912,
+              "max_read_request": 65536,
+              "peak_staging_bytes": 536870912,
+              "read_bytes": 0,
+              "reads": 0,
+              "staging_bytes": 0,
+              "stores": 1,
+              "written_bytes": 536870912
+            }
+          },
+          {
+            "capture_ms": 829.024146,
+            "memory_after_capture": {
+              "hwm_kib": 3060,
+              "rss_kib": 3060
+            },
+            "sample": 1,
+            "spool": {
+              "capacity_bytes": 536870912,
+              "max_read_request": 65536,
+              "peak_staging_bytes": 536870912,
+              "read_bytes": 536870912,
+              "reads": 8192,
+              "staging_bytes": 0,
+              "stores": 1,
+              "written_bytes": 536870912
+            }
+          }
+        ],
+        "unchanged_shared": true
+      }
+    },
+    {
+      "pair": 0,
+      "position": 1,
+      "implementation": "after",
+      "binary_sha256": "e067c2e44c2ec6d9ee8fc2dc0a9811b02dabf2eababad829ed332f723cabb189",
+      "run": {
+        "wall_s": 2.2601475371047854,
+        "exit_code": 0,
+        "peaks_kib": {
+          "VmSize": 8244,
+          "VmHWM": 3120,
+          "VmRSS": 3120,
+          "RssAnon": 616,
+          "RssFile": 2504
+        },
+        "phase_peaks_kib": {
+          "startup": {
+            "VmSize": 8244,
+            "VmHWM": 84,
+            "VmRSS": 84,
+            "RssAnon": 20,
+            "RssFile": 64
+          },
+          "capture_and_queries": {
+            "VmSize": 4836,
+            "VmHWM": 3108,
+            "VmRSS": 3108,
+            "RssAnon": 604,
+            "RssFile": 2504
+          },
+          "complete": {
+            "VmSize": 4964,
+            "VmHWM": 3120,
+            "VmRSS": 3120,
+            "RssAnon": 616,
+            "RssFile": 2504
+          }
+        },
+        "samples_1s": [
+          {
+            "seconds": 0.00041540595702826977,
+            "phase": "startup",
+            "VmSize": 8244,
+            "VmHWM": 84,
+            "VmRSS": 84,
+            "RssAnon": 20,
+            "RssFile": 64
+          },
+          {
+            "seconds": 1.0192875401116908,
+            "phase": "complete",
+            "VmSize": 4900,
+            "VmHWM": 3116,
+            "VmRSS": 3116,
+            "RssAnon": 612,
+            "RssFile": 2504
+          },
+          {
+            "seconds": 2.0054391911253333,
+            "phase": "complete",
+            "VmSize": 4904,
+            "VmHWM": 3120,
+            "VmRSS": 3120,
+            "RssAnon": 616,
+            "RssFile": 2504
+          }
+        ],
+        "events": [
+          {
+            "observed_s": 0.010200090007856488,
+            "data": {
+              "event": "phase_start",
+              "sample": 0
+            }
+          },
+          {
+            "observed_s": 0.9186800881288946,
+            "data": {
+              "event": "phase_done",
+              "sample": 0
+            }
+          },
+          {
+            "observed_s": 1.3578457371331751,
+            "data": {
+              "event": "phase_start",
+              "sample": 1
+            }
+          },
+          {
+            "observed_s": 1.7541012379806489,
+            "data": {
+              "event": "phase_done",
+              "sample": 1
+            }
+          },
+          {
+            "observed_s": 2.260024524992332,
+            "data": {
+              "report_ref": "report"
+            }
+          }
+        ],
+        "stderr": ""
+      },
+      "report": {
+        "bounded_bytes_match": true,
+        "bytes": 536870912,
+        "final_spool": {
+          "capacity_bytes": 536870912,
+          "max_read_request": 65536,
+          "peak_staging_bytes": 536870912,
+          "read_bytes": 1073741824,
+          "reads": 16384,
+          "staging_bytes": 0,
+          "stores": 1,
+          "written_bytes": 536870912
+        },
+        "phases": [
+          {
+            "capture_ms": 908.502738,
+            "memory_after_capture": {
+              "hwm_kib": 3052,
+              "rss_kib": 3052
+            },
+            "sample": 0,
+            "spool": {
+              "capacity_bytes": 536870912,
+              "max_read_request": 65536,
+              "peak_staging_bytes": 536870912,
+              "read_bytes": 0,
+              "reads": 0,
+              "staging_bytes": 0,
+              "stores": 1,
+              "written_bytes": 536870912
+            }
+          },
+          {
+            "capture_ms": 396.109019,
+            "memory_after_capture": {
+              "hwm_kib": 3052,
+              "rss_kib": 3052
+            },
+            "sample": 1,
+            "spool": {
+              "capacity_bytes": 536870912,
+              "max_read_request": 65536,
+              "peak_staging_bytes": 536870912,
+              "read_bytes": 536870912,
+              "reads": 8192,
+              "staging_bytes": 0,
+              "stores": 1,
+              "written_bytes": 536870912
+            }
+          }
+        ],
+        "unchanged_shared": true
+      }
+    },
+    {
+      "pair": 1,
+      "position": 0,
+      "implementation": "after",
+      "binary_sha256": "e067c2e44c2ec6d9ee8fc2dc0a9811b02dabf2eababad829ed332f723cabb189",
+      "run": {
+        "wall_s": 2.3246410791762173,
+        "exit_code": 0,
+        "peaks_kib": {
+          "VmSize": 8244,
+          "VmHWM": 3148,
+          "VmRSS": 3148,
+          "RssAnon": 616,
+          "RssFile": 2532
+        },
+        "phase_peaks_kib": {
+          "startup": {
+            "VmSize": 8244,
+            "VmHWM": 24,
+            "VmRSS": 24,
+            "RssAnon": 24,
+            "RssFile": 0
+          },
+          "capture_and_queries": {
+            "VmSize": 4836,
+            "VmHWM": 3128,
+            "VmRSS": 3128,
+            "RssAnon": 596,
+            "RssFile": 2532
+          },
+          "complete": {
+            "VmSize": 4964,
+            "VmHWM": 3148,
+            "VmRSS": 3148,
+            "RssAnon": 616,
+            "RssFile": 2532
+          }
+        },
+        "samples_1s": [
+          {
+            "seconds": 0.0003418021369725466,
+            "phase": "startup",
+            "VmSize": 8244,
+            "VmHWM": 24,
+            "VmRSS": 24,
+            "RssAnon": 24,
+            "RssFile": 0
+          },
+          {
+            "seconds": 1.0212627369910479,
+            "phase": "complete",
+            "VmSize": 4900,
+            "VmHWM": 3144,
+            "VmRSS": 3144,
+            "RssAnon": 612,
+            "RssFile": 2532
+          },
+          {
+            "seconds": 2.0319291839841753,
+            "phase": "complete",
+            "VmSize": 4904,
+            "VmHWM": 3148,
+            "VmRSS": 3148,
+            "RssAnon": 616,
+            "RssFile": 2532
+          }
+        ],
+        "events": [
+          {
+            "observed_s": 0.010434437077492476,
+            "data": {
+              "event": "phase_start",
+              "sample": 0
+            }
+          },
+          {
+            "observed_s": 0.9710971871390939,
+            "data": {
+              "event": "phase_done",
+              "sample": 0
+            }
+          },
+          {
+            "observed_s": 1.4138496371451765,
+            "data": {
+              "event": "phase_start",
+              "sample": 1
+            }
+          },
+          {
+            "observed_s": 1.780743552139029,
+            "data": {
+              "event": "phase_done",
+              "sample": 1
+            }
+          },
+          {
+            "observed_s": 2.3245003460906446,
+            "data": {
+              "report_ref": "report"
+            }
+          }
+        ],
+        "stderr": ""
+      },
+      "report": {
+        "bounded_bytes_match": true,
+        "bytes": 536870912,
+        "final_spool": {
+          "capacity_bytes": 536870912,
+          "max_read_request": 65536,
+          "peak_staging_bytes": 536870912,
+          "read_bytes": 1073741824,
+          "reads": 16384,
+          "staging_bytes": 0,
+          "stores": 1,
+          "written_bytes": 536870912
+        },
+        "phases": [
+          {
+            "capture_ms": 960.667433,
+            "memory_after_capture": {
+              "hwm_kib": 3080,
+              "rss_kib": 3080
+            },
+            "sample": 0,
+            "spool": {
+              "capacity_bytes": 536870912,
+              "max_read_request": 65536,
+              "peak_staging_bytes": 536870912,
+              "read_bytes": 0,
+              "reads": 0,
+              "staging_bytes": 0,
+              "stores": 1,
+              "written_bytes": 536870912
+            }
+          },
+          {
+            "capture_ms": 366.975175,
+            "memory_after_capture": {
+              "hwm_kib": 3080,
+              "rss_kib": 3080
+            },
+            "sample": 1,
+            "spool": {
+              "capacity_bytes": 536870912,
+              "max_read_request": 65536,
+              "peak_staging_bytes": 536870912,
+              "read_bytes": 536870912,
+              "reads": 8192,
+              "staging_bytes": 0,
+              "stores": 1,
+              "written_bytes": 536870912
+            }
+          }
+        ],
+        "unchanged_shared": true
+      }
+    },
+    {
+      "pair": 1,
+      "position": 1,
+      "implementation": "before",
+      "binary_sha256": "bae2798f6cd0a6040232ef1c1e78c02ef96afc5c7cb07724c218db5bd780383e",
+      "run": {
+        "wall_s": 2.6619202059227973,
+        "exit_code": 0,
+        "peaks_kib": {
+          "VmSize": 9328,
+          "VmHWM": 3312,
+          "VmRSS": 3312,
+          "RssAnon": 800,
+          "RssFile": 2512
+        },
+        "phase_peaks_kib": {
+          "startup": {
+            "VmSize": 9328,
+            "VmHWM": 668,
+            "VmRSS": 668,
+            "RssAnon": 52,
+            "RssFile": 616
+          },
+          "capture_and_queries": {
+            "VmSize": 5032,
+            "VmHWM": 3312,
+            "VmRSS": 3312,
+            "RssAnon": 800,
+            "RssFile": 2512
+          },
+          "complete": {
+            "VmSize": 4964,
+            "VmHWM": 3184,
+            "VmRSS": 3184,
+            "RssAnon": 672,
+            "RssFile": 2512
+          }
+        },
+        "samples_1s": [
+          {
+            "seconds": 0.0005084439180791378,
+            "phase": "startup",
+            "VmSize": 9328,
+            "VmHWM": 668,
+            "VmRSS": 668,
+            "RssAnon": 52,
+            "RssFile": 616
+          },
+          {
+            "seconds": 1.0271258580032736,
+            "phase": "complete",
+            "VmSize": 4900,
+            "VmHWM": 3120,
+            "VmRSS": 3120,
+            "RssAnon": 608,
+            "RssFile": 2512
+          },
+          {
+            "seconds": 2.04739798582159,
+            "phase": "capture_and_queries",
+            "VmSize": 4772,
+            "VmHWM": 3056,
+            "VmRSS": 3056,
+            "RssAnon": 544,
+            "RssFile": 2512
+          }
+        ],
+        "events": [
+          {
+            "observed_s": 0.010721350787207484,
+            "data": {
+              "event": "phase_start",
+              "sample": 0
+            }
+          },
+          {
+            "observed_s": 0.8763496838510036,
+            "data": {
+              "event": "phase_done",
+              "sample": 0
+            }
+          },
+          {
+            "observed_s": 1.3440172898117453,
+            "data": {
+              "event": "phase_start",
+              "sample": 1
+            }
+          },
+          {
+            "observed_s": 2.0655412569176406,
+            "data": {
+              "event": "phase_done",
+              "sample": 1
+            }
+          },
+          {
+            "observed_s": 2.661740219919011,
+            "data": {
+              "report_ref": "report"
+            }
+          }
+        ],
+        "stderr": ""
+      },
+      "report": {
+        "bounded_bytes_match": true,
+        "bytes": 536870912,
+        "final_spool": {
+          "capacity_bytes": 536870912,
+          "max_read_request": 65536,
+          "peak_staging_bytes": 536870912,
+          "read_bytes": 1073741824,
+          "reads": 16384,
+          "staging_bytes": 0,
+          "stores": 1,
+          "written_bytes": 536870912
+        },
+        "phases": [
+          {
+            "capture_ms": 865.472648,
+            "memory_after_capture": {
+              "hwm_kib": 3056,
+              "rss_kib": 3056
+            },
+            "sample": 0,
+            "spool": {
+              "capacity_bytes": 536870912,
+              "max_read_request": 65536,
+              "peak_staging_bytes": 536870912,
+              "read_bytes": 0,
+              "reads": 0,
+              "staging_bytes": 0,
+              "stores": 1,
+              "written_bytes": 536870912
+            }
+          },
+          {
+            "capture_ms": 721.559252,
+            "memory_after_capture": {
+              "hwm_kib": 3056,
+              "rss_kib": 3056
+            },
+            "sample": 1,
+            "spool": {
+              "capacity_bytes": 536870912,
+              "max_read_request": 65536,
+              "peak_staging_bytes": 536870912,
+              "read_bytes": 536870912,
+              "reads": 8192,
+              "staging_bytes": 0,
+              "stores": 1,
+              "written_bytes": 536870912
+            }
+          }
+        ],
+        "unchanged_shared": true
+      }
+    }
+  ],
+  "limits": [
+    "Two opposite-order pairs, one capture/unchanged sample per child; finite observations, not timing tails.",
+    "Same owned 512 MiB input; independent bounded verification; 2 GiB child virtual-address-space limit."
+  ]
+}
