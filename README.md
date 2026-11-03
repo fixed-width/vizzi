@@ -9,7 +9,14 @@ The production renderer, compiler-backed language integrations, review workflow,
 storage engine remain open decisions. The Canvas2D overview is a reference view for
 validating coordination; it does not qualify large-codebase GPU performance.
 
+Next delivery follows the [product milestones](docs/plans/product-milestones.md):
+explain a real subsystem, then review a local change with surrounding context.
+The [view-selection rationale](docs/explanation/task-driven-views.md) connects these
+tasks to the literature. Further performance work is conditional on a workflow blocker.
+
 - [Run the workspace](docs/how-to/run-workspace.md)
+- [Next product milestones](docs/plans/product-milestones.md)
+- [Why these coordinated views](docs/explanation/task-driven-views.md)
 - [Architecture and scope](DESIGN.md)
 - [First-slice behaviour](docs/prototype/PRODUCT.md) and [technical contract](docs/prototype/TECH.md)
 - [Host API reference](docs/prototype/API.md)

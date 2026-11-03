@@ -1,5 +1,9 @@
 # Provisional interactive resource budgets
 
+Delivery priority follows the [product milestones](../plans/product-milestones.md).
+Remaining experiments below are conditional follow-ups, not the active delivery queue.
+Resume infrastructure work when an accepted user task exposes a concrete blocker.
+
 These are proposed engineering targets informed by
 [full-repository measurements](../../experiments/qualification/RESULTS.md). They are
 not predeclared acceptance criteria, enforced limits, or proof of the 16 GB laptop

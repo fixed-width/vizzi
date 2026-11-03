@@ -75,3 +75,7 @@ one is needed.
 
 The first end-to-end slice is specified in [the workspace behaviour contract](docs/prototype/PRODUCT.md)
 and [the technical contract](docs/prototype/TECH.md).
+
+The [product milestone plan](docs/plans/product-milestones.md) sets the next delivery
+order. Its [research rationale](docs/explanation/task-driven-views.md) connects proposed
+views to concrete learning/review tasks and distinguishes hypotheses from evidence.
