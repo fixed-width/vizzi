@@ -1,0 +1,5411 @@
+{
+  "schema": 1,
+  "results": [
+    {
+      "profile": {
+        "name": "linux",
+        "source": "/tmp/vizzi-perf-corpus/linux-cbbddb6b",
+        "revision": "cbbddb6b08cc9900a87cccaa9b22bbe06aa4f50a",
+        "source_arguments": [
+          "--c-family-root",
+          ".",
+          "--syntax-language",
+          ".=c",
+          "--syntax-language",
+          "scripts/kconfig/qconf.cc=cpp",
+          "--syntax-language",
+          "tools/build/feature/test-cxa-demangle.cpp=cpp",
+          "--syntax-language",
+          "tools/build/feature/test-llvm-perf.cpp=cpp",
+          "--syntax-language",
+          "tools/build/feature/test-llvm.cpp=cpp",
+          "--syntax-language",
+          "tools/perf/util/demangle-cxx.cpp=cpp",
+          "--syntax-language",
+          "tools/perf/util/llvm-c-helpers.cpp=cpp",
+          "--syntax-language",
+          "tools/testing/selftests/bpf/progs/unwind_cxx.cpp=cpp",
+          "--syntax-language",
+          "tools/testing/selftests/bpf/test_cpp.cpp=cpp",
+          "--exclude-source",
+          "samples/check-exec/script-ask.inc",
+          "--exclude-source",
+          "samples/check-exec/script-exec.inc",
+          "--exclude-source",
+          "samples/check-exec/script-noexec.inc"
+        ],
+        "exception_count": 8,
+        "note": "Explicit raw root header assignment with source-suffix language exceptions; no compiler configuration; known Linux shell .inc fixtures excluded."
+      },
+      "configuration": {
+        "root": "/tmp/vizzi-foreground-owned-jxxvc75m/source",
+        "cache": "/tmp/vizzi-foreground-facts/linux",
+        "policy": {
+          "c_family_roots": [
+            "."
+          ],
+          "exclusions": [
+            "samples/check-exec/script-ask.inc",
+            "samples/check-exec/script-exec.inc",
+            "samples/check-exec/script-noexec.inc"
+          ],
+          "assignments": [
+            {
+              "scope": ".",
+              "language": "c"
+            },
+            {
+              "scope": "scripts/kconfig/qconf.cc",
+              "language": "cpp"
+            },
+            {
+              "scope": "tools/build/feature/test-cxa-demangle.cpp",
+              "language": "cpp"
+            },
+            {
+              "scope": "tools/build/feature/test-llvm-perf.cpp",
+              "language": "cpp"
+            },
+            {
+              "scope": "tools/build/feature/test-llvm.cpp",
+              "language": "cpp"
+            },
+            {
+              "scope": "tools/perf/util/demangle-cxx.cpp",
+              "language": "cpp"
+            },
+            {
+              "scope": "tools/perf/util/llvm-c-helpers.cpp",
+              "language": "cpp"
+            },
+            {
+              "scope": "tools/testing/selftests/bpf/progs/unwind_cxx.cpp",
+              "language": "cpp"
+            },
+            {
+              "scope": "tools/testing/selftests/bpf/test_cpp.cpp",
+              "language": "cpp"
+            }
+          ]
+        },
+        "target": "kernel/locking/mutex.c",
+        "owner": "0628b49f-40da-4423-931b-734978cae7ec",
+        "probe": "cef6fee5-fd04-4c6e-ba0e-e34d042bfd19",
+        "pairs": 3,
+        "spool_mib": 8192,
+        "tail_mib": 4096,
+        "watch": true,
+        "recovery_ms": 2000,
+        "recovery_samples": 3
+      },
+      "original_target_sha256": "7029b01cdce9bcc86d640b9674bc51a6e810d4fbfae3b8cfa98f04f54a7bf00d",
+      "binary_sha256": "5910dd05c45b4f0b99f762f7c7394b5f635dde3821b8475c6bfb32e0de87e484",
+      "run": {
+        "wall_s": 75.83387637115084,
+        "exit_code": 0,
+        "peaks_kib": {
+          "VmSize": 3367444,
+          "VmHWM": 2972680,
+          "VmRSS": 2972680,
+          "RssAnon": 2968160,
+          "RssFile": 4520
+        },
+        "phase_peaks_kib": {
+          "startup": {
+            "VmSize": 9328,
+            "VmHWM": 592,
+            "VmRSS": 592,
+            "RssAnon": 40,
+            "RssFile": 552
+          },
+          "baseline": {
+            "VmSize": 1105916,
+            "VmHWM": 783308,
+            "VmRSS": 783308,
+            "RssAnon": 779428,
+            "RssFile": 3880
+          },
+          "retained_idle": {
+            "VmSize": 1105916,
+            "VmHWM": 797424,
+            "VmRSS": 797424,
+            "RssAnon": 793544,
+            "RssFile": 3880
+          },
+          "capture_and_queries": {
+            "VmSize": 1105916,
+            "VmHWM": 803452,
+            "VmRSS": 803452,
+            "RssAnon": 798932,
+            "RssFile": 4520
+          },
+          "complete": {
+            "VmSize": 3367444,
+            "VmHWM": 2972680,
+            "VmRSS": 2972680,
+            "RssAnon": 2968160,
+            "RssFile": 4520
+          }
+        },
+        "samples_1s": [
+          {
+            "seconds": 0.0005486661102622747,
+            "phase": "startup",
+            "VmSize": 9328,
+            "VmHWM": 592,
+            "VmRSS": 592,
+            "RssAnon": 40,
+            "RssFile": 552
+          },
+          {
+            "seconds": 1.0208761971443892,
+            "phase": "baseline",
+            "VmSize": 194556,
+            "VmHWM": 111588,
+            "VmRSS": 111588,
+            "RssAnon": 107836,
+            "RssFile": 3752
+          },
+          {
+            "seconds": 2.028113977983594,
+            "phase": "baseline",
+            "VmSize": 307820,
+            "VmHWM": 214588,
+            "VmRSS": 214588,
+            "RssAnon": 210836,
+            "RssFile": 3752
+          },
+          {
+            "seconds": 3.0342033421620727,
+            "phase": "baseline",
+            "VmSize": 418324,
+            "VmHWM": 316932,
+            "VmRSS": 316932,
+            "RssAnon": 313180,
+            "RssFile": 3752
+          },
+          {
+            "seconds": 4.039875917136669,
+            "phase": "baseline",
+            "VmSize": 475944,
+            "VmHWM": 362204,
+            "VmRSS": 362204,
+            "RssAnon": 358452,
+            "RssFile": 3752
+          },
+          {
+            "seconds": 5.045238298131153,
+            "phase": "baseline",
+            "VmSize": 841976,
+            "VmHWM": 571064,
+            "VmRSS": 571064,
+            "RssAnon": 567312,
+            "RssFile": 3752
+          },
+          {
+            "seconds": 6.000815401086584,
+            "phase": "baseline",
+            "VmSize": 1090584,
+            "VmHWM": 769464,
+            "VmRSS": 767068,
+            "RssAnon": 763188,
+            "RssFile": 3880
+          },
+          {
+            "seconds": 7.005791099043563,
+            "phase": "baseline",
+            "VmSize": 1093628,
+            "VmHWM": 773176,
+            "VmRSS": 773176,
+            "RssAnon": 769296,
+            "RssFile": 3880
+          },
+          {
+            "seconds": 8.011342450976372,
+            "phase": "baseline",
+            "VmSize": 1105916,
+            "VmHWM": 783308,
+            "VmRSS": 783308,
+            "RssAnon": 779428,
+            "RssFile": 3880
+          },
+          {
+            "seconds": 9.031575598055497,
+            "phase": "retained_idle",
+            "VmSize": 1105904,
+            "VmHWM": 784896,
+            "VmRSS": 784896,
+            "RssAnon": 781016,
+            "RssFile": 3880
+          },
+          {
+            "seconds": 10.036742344032973,
+            "phase": "retained_idle",
+            "VmSize": 1105916,
+            "VmHWM": 784896,
+            "VmRSS": 784896,
+            "RssAnon": 781016,
+            "RssFile": 3880
+          },
+          {
+            "seconds": 11.004240587120876,
+            "phase": "retained_idle",
+            "VmSize": 1105916,
+            "VmHWM": 784896,
+            "VmRSS": 784896,
+            "RssAnon": 781016,
+            "RssFile": 3880
+          },
+          {
+            "seconds": 12.039073514053598,
+            "phase": "retained_idle",
+            "VmSize": 1105916,
+            "VmHWM": 784896,
+            "VmRSS": 784896,
+            "RssAnon": 781016,
+            "RssFile": 3880
+          },
+          {
+            "seconds": 13.044210258172825,
+            "phase": "retained_idle",
+            "VmSize": 1105916,
+            "VmHWM": 784896,
+            "VmRSS": 784896,
+            "RssAnon": 781016,
+            "RssFile": 3880
+          },
+          {
+            "seconds": 14.04927244107239,
+            "phase": "retained_idle",
+            "VmSize": 1105916,
+            "VmHWM": 784896,
+            "VmRSS": 784896,
+            "RssAnon": 781016,
+            "RssFile": 3880
+          },
+          {
+            "seconds": 15.004360204096884,
+            "phase": "retained_idle",
+            "VmSize": 1105916,
+            "VmHWM": 784896,
+            "VmRSS": 784896,
+            "RssAnon": 781016,
+            "RssFile": 3880
+          },
+          {
+            "seconds": 16.0218952849973,
+            "phase": "retained_idle",
+            "VmSize": 1105916,
+            "VmHWM": 784896,
+            "VmRSS": 784896,
+            "RssAnon": 781016,
+            "RssFile": 3880
+          },
+          {
+            "seconds": 17.05003008712083,
+            "phase": "retained_idle",
+            "VmSize": 1105916,
+            "VmHWM": 784896,
+            "VmRSS": 784896,
+            "RssAnon": 781016,
+            "RssFile": 3880
+          },
+          {
+            "seconds": 18.039521540049464,
+            "phase": "retained_idle",
+            "VmSize": 1105916,
+            "VmHWM": 797424,
+            "VmRSS": 797424,
+            "RssAnon": 793544,
+            "RssFile": 3880
+          },
+          {
+            "seconds": 19.000353964045644,
+            "phase": "complete",
+            "VmSize": 1105904,
+            "VmHWM": 799104,
+            "VmRSS": 799104,
+            "RssAnon": 794584,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 20.005485482979566,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 799104,
+            "VmRSS": 799104,
+            "RssAnon": 794584,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 21.010197817115113,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 799104,
+            "VmRSS": 799104,
+            "RssAnon": 794584,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 22.015902701066807,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 799104,
+            "VmRSS": 799104,
+            "RssAnon": 794584,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 23.020867637125775,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 799104,
+            "VmRSS": 799104,
+            "RssAnon": 794584,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 24.026203765999526,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 799104,
+            "VmRSS": 799104,
+            "RssAnon": 794584,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 25.01558287302032,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 799104,
+            "VmRSS": 799104,
+            "RssAnon": 794584,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 26.02100977813825,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 799104,
+            "VmRSS": 799104,
+            "RssAnon": 794584,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 27.026495464146137,
+            "phase": "complete",
+            "VmSize": 1105904,
+            "VmHWM": 799224,
+            "VmRSS": 799224,
+            "RssAnon": 794704,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 28.032292176038027,
+            "phase": "complete",
+            "VmSize": 1105904,
+            "VmHWM": 800600,
+            "VmRSS": 800600,
+            "RssAnon": 796080,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 29.03764633508399,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 800600,
+            "VmRSS": 800600,
+            "RssAnon": 796080,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 30.042762757046148,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 800600,
+            "VmRSS": 800600,
+            "RssAnon": 796080,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 31.04824301204644,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 800600,
+            "VmRSS": 800600,
+            "RssAnon": 796080,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 32.0040241710376,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 800600,
+            "VmRSS": 800600,
+            "RssAnon": 796080,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 33.009932046057656,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 800600,
+            "VmRSS": 800600,
+            "RssAnon": 796080,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 34.01560306013562,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 800600,
+            "VmRSS": 800600,
+            "RssAnon": 796080,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 35.04019539710134,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 800600,
+            "VmRSS": 800600,
+            "RssAnon": 796080,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 36.04520325618796,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 800600,
+            "VmRSS": 800600,
+            "RssAnon": 796080,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 37.000177012057975,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 800600,
+            "VmRSS": 800600,
+            "RssAnon": 796080,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 38.049915976123884,
+            "phase": "complete",
+            "VmSize": 1105904,
+            "VmHWM": 801196,
+            "VmRSS": 801196,
+            "RssAnon": 796676,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 39.00467821606435,
+            "phase": "complete",
+            "VmSize": 1105904,
+            "VmHWM": 801196,
+            "VmRSS": 801196,
+            "RssAnon": 796676,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 40.00954108405858,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 801196,
+            "VmRSS": 801196,
+            "RssAnon": 796676,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 41.01475905301049,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 801196,
+            "VmRSS": 801196,
+            "RssAnon": 796676,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 42.02066477108747,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 801196,
+            "VmRSS": 801196,
+            "RssAnon": 796676,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 43.026137916138396,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 801196,
+            "VmRSS": 801196,
+            "RssAnon": 796676,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 44.01777515816502,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 801196,
+            "VmRSS": 801196,
+            "RssAnon": 796676,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 45.03500076709315,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 801196,
+            "VmRSS": 801196,
+            "RssAnon": 796676,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 46.03978847619146,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 801196,
+            "VmRSS": 801196,
+            "RssAnon": 796676,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 47.04503607098013,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 801196,
+            "VmRSS": 801196,
+            "RssAnon": 796676,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 48.034765996038914,
+            "phase": "capture_and_queries",
+            "VmSize": 1105904,
+            "VmHWM": 801712,
+            "VmRSS": 801712,
+            "RssAnon": 797192,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 49.04996442515403,
+            "phase": "complete",
+            "VmSize": 1105904,
+            "VmHWM": 801712,
+            "VmRSS": 801712,
+            "RssAnon": 797192,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 50.00498501607217,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 801712,
+            "VmRSS": 801712,
+            "RssAnon": 797192,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 51.01038383808918,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 801712,
+            "VmRSS": 801712,
+            "RssAnon": 797192,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 52.03206680598669,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 801712,
+            "VmRSS": 801712,
+            "RssAnon": 797192,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 53.04854955105111,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 801712,
+            "VmRSS": 801712,
+            "RssAnon": 797192,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 54.00260908319615,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 801712,
+            "VmRSS": 801712,
+            "RssAnon": 797192,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 55.010377389146015,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 801712,
+            "VmRSS": 801712,
+            "RssAnon": 797192,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 56.01645599701442,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 801712,
+            "VmRSS": 801712,
+            "RssAnon": 797192,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 57.02215015515685,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 801712,
+            "VmRSS": 801712,
+            "RssAnon": 797192,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 58.02791883214377,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 801712,
+            "VmRSS": 801712,
+            "RssAnon": 797192,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 59.044415466021746,
+            "phase": "complete",
+            "VmSize": 1105904,
+            "VmHWM": 801712,
+            "VmRSS": 801712,
+            "RssAnon": 797192,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 60.049368913983926,
+            "phase": "complete",
+            "VmSize": 1105904,
+            "VmHWM": 801712,
+            "VmRSS": 801712,
+            "RssAnon": 797192,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 61.00406387401745,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 801712,
+            "VmRSS": 801712,
+            "RssAnon": 797192,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 62.00930686108768,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 801712,
+            "VmRSS": 801712,
+            "RssAnon": 797192,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 63.01484997314401,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 801712,
+            "VmRSS": 801712,
+            "RssAnon": 797192,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 64.02038699598052,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 801712,
+            "VmRSS": 801712,
+            "RssAnon": 797192,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 65.0261170011945,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 801712,
+            "VmRSS": 801712,
+            "RssAnon": 797192,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 66.01216132403351,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 801712,
+            "VmRSS": 801712,
+            "RssAnon": 797192,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 67.02206565300003,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 801712,
+            "VmRSS": 801712,
+            "RssAnon": 797192,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 68.02728038607165,
+            "phase": "complete",
+            "VmSize": 1105916,
+            "VmHWM": 801712,
+            "VmRSS": 801712,
+            "RssAnon": 797192,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 69.03235249500722,
+            "phase": "complete",
+            "VmSize": 1105904,
+            "VmHWM": 801752,
+            "VmRSS": 801752,
+            "RssAnon": 797232,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 70.01074422616512,
+            "phase": "complete",
+            "VmSize": 1105904,
+            "VmHWM": 801756,
+            "VmRSS": 801756,
+            "RssAnon": 797236,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 71.02575952908956,
+            "phase": "capture_and_queries",
+            "VmSize": 1105916,
+            "VmHWM": 802956,
+            "VmRSS": 802956,
+            "RssAnon": 798436,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 72.0131747671403,
+            "phase": "complete",
+            "VmSize": 1454764,
+            "VmHWM": 1156716,
+            "VmRSS": 1156716,
+            "RssAnon": 1152196,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 73.01800134498626,
+            "phase": "complete",
+            "VmSize": 1998280,
+            "VmHWM": 1684428,
+            "VmRSS": 1684428,
+            "RssAnon": 1679908,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 74.0231498379726,
+            "phase": "complete",
+            "VmSize": 2713552,
+            "VmHWM": 2381992,
+            "VmRSS": 2381992,
+            "RssAnon": 2377472,
+            "RssFile": 4520
+          },
+          {
+            "seconds": 75.02828998514451,
+            "phase": "complete",
+            "VmSize": 3367444,
+            "VmHWM": 2951112,
+            "VmRSS": 2951112,
+            "RssAnon": 2946592,
+            "RssFile": 4520
+          }
+        ],
+        "events": [
+          {
+            "observed_s": 0.014592495048418641,
+            "data": {
+              "event": "baseline_start"
+            }
+          },
+          {
+            "observed_s": 8.026486942078918,
+            "data": {
+              "event": "baseline_ready",
+              "files": 66066
+            }
+          },
+          {
+            "observed_s": 8.026493937009946,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "pressure_start",
+              "sample": 0
+            }
+          },
+          {
+            "observed_s": 18.185137731023133,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "phase_start",
+              "sample": 0
+            }
+          },
+          {
+            "observed_s": 18.24646259797737,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "phase_done",
+              "sample": 0
+            }
+          },
+          {
+            "observed_s": 18.296453112037852,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "pressure_start",
+              "sample": 1
+            }
+          },
+          {
+            "observed_s": 27.26907104300335,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "phase_start",
+              "sample": 1
+            }
+          },
+          {
+            "observed_s": 27.68091116612777,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "phase_done",
+              "sample": 1
+            }
+          },
+          {
+            "observed_s": 27.73086644313298,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "pressure_start",
+              "sample": 2
+            }
+          },
+          {
+            "observed_s": 37.531424997141585,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "phase_start",
+              "sample": 2
+            }
+          },
+          {
+            "observed_s": 37.9014473319985,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "phase_done",
+              "sample": 2
+            }
+          },
+          {
+            "observed_s": 37.94942854112014,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "pressure_start",
+              "sample": 3
+            }
+          },
+          {
+            "observed_s": 47.984249636065215,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "phase_start",
+              "sample": 3
+            }
+          },
+          {
+            "observed_s": 48.04459110717289,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "phase_done",
+              "sample": 3
+            }
+          },
+          {
+            "observed_s": 48.094742220127955,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "pressure_start",
+              "sample": 4
+            }
+          },
+          {
+            "observed_s": 58.93685992015526,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "phase_start",
+              "sample": 4
+            }
+          },
+          {
+            "observed_s": 58.99463590700179,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "phase_done",
+              "sample": 4
+            }
+          },
+          {
+            "observed_s": 59.04440632998012,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "pressure_start",
+              "sample": 5
+            }
+          },
+          {
+            "observed_s": 69.22121466207318,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "phase_start",
+              "sample": 5
+            }
+          },
+          {
+            "observed_s": 69.6591632021591,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "phase_done",
+              "sample": 5
+            }
+          },
+          {
+            "observed_s": 70.8627105311025,
+            "data": {
+              "condition": "recovery_observed",
+              "event": "phase_start",
+              "sample": 6
+            }
+          },
+          {
+            "observed_s": 70.92386845801957,
+            "data": {
+              "condition": "recovery_observed",
+              "event": "phase_done",
+              "sample": 6
+            }
+          },
+          {
+            "observed_s": 70.9755908800289,
+            "data": {
+              "condition": "recovery_observed",
+              "event": "phase_start",
+              "sample": 7
+            }
+          },
+          {
+            "observed_s": 71.04014252708293,
+            "data": {
+              "condition": "recovery_observed",
+              "event": "phase_done",
+              "sample": 7
+            }
+          },
+          {
+            "observed_s": 71.09392940811813,
+            "data": {
+              "condition": "recovery_observed",
+              "event": "phase_start",
+              "sample": 8
+            }
+          },
+          {
+            "observed_s": 71.15902912802994,
+            "data": {
+              "condition": "recovery_observed",
+              "event": "phase_done",
+              "sample": 8
+            }
+          },
+          {
+            "observed_s": 75.69385874806903,
+            "data": {
+              "report_ref": "report"
+            }
+          }
+        ],
+        "stderr": ""
+      },
+      "report": {
+        "baseline_snapshot": "2797c3e0197d5ad5c45e3bc8d2c57e0dee0d08c5a663a1a120b61aaa234b8460",
+        "cases": [
+          {
+            "admission_ms": 2624.1956760000003,
+            "capture_marks": [],
+            "capture_overlaps_cleanup": null,
+            "cleanup_end_ms": 2958.478877,
+            "cleanup_ms": 334.283173,
+            "cleanup_start_ms": 2624.1957039999998,
+            "condition": "after_cleanup",
+            "expected_declaration": true,
+            "explicit_hint": false,
+            "fresh_facts_match": true,
+            "hint_ms": 2960.8659350000003,
+            "maintenance_before": {
+              "attempts": 0,
+              "completed": 0,
+              "error": null,
+              "failed": 0,
+              "running": false
+            },
+            "maintenance_observed": {
+              "attempts": 1,
+              "completed": 1,
+              "error": null,
+              "failed": 0,
+              "running": false
+            },
+            "measurements": {
+              "analyzed": 66066,
+              "bytes": 34384,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 0.300211,
+              "deferred": 0,
+              "files": 66066,
+              "parsed": 1,
+              "read_files": 1,
+              "reconciled": false,
+              "retained": 66065,
+              "reused": 66065,
+              "shared_sources": 0,
+              "source_only": 0,
+              "total_ms": 30.271065,
+              "tree_reuses": 0
+            },
+            "old_pin_matches": true,
+            "pair": 0,
+            "published_during_cleanup": false,
+            "published_ms": 3016.718977,
+            "retired_ms": 2.8e-05,
+            "sample": 0,
+            "source_matches": true,
+            "status_after": {
+              "error": null,
+              "generation": 2,
+              "measurements": {
+                "analyzed": 66066,
+                "bytes": 34384,
+                "cache_hits": 0,
+                "cache_warnings": 0,
+                "capture_ms": 0.300211,
+                "deferred": 0,
+                "files": 66066,
+                "parsed": 1,
+                "read_files": 1,
+                "reconciled": false,
+                "retained": 66065,
+                "reused": 66065,
+                "shared_sources": 0,
+                "source_only": 0,
+                "total_ms": 30.271065,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 2,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": false,
+                "verification": {
+                  "analyzed": 66066,
+                  "bytes": 1495484792,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 7353.057259,
+                  "deferred": 0,
+                  "files": 66066,
+                  "parsed": 0,
+                  "read_files": 66066,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 66066,
+                  "shared_sources": 66066,
+                  "source_only": 0,
+                  "total_ms": 7441.474037,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "7341477d16e33ae2e26b72c45d1061607fc8b4af035970e27cd78de83bcf0903"
+            },
+            "status_before": {
+              "error": null,
+              "generation": 1,
+              "measurements": {
+                "analyzed": 66066,
+                "bytes": 1495484792,
+                "cache_hits": 0,
+                "cache_warnings": 0,
+                "capture_ms": 7353.057259,
+                "deferred": 0,
+                "files": 66066,
+                "parsed": 0,
+                "read_files": 66066,
+                "reconciled": true,
+                "retained": 0,
+                "reused": 66066,
+                "shared_sources": 66066,
+                "source_only": 0,
+                "total_ms": 7441.474037,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 2,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": false,
+                "verification": {
+                  "analyzed": 66066,
+                  "bytes": 1495484792,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 7353.057259,
+                  "deferred": 0,
+                  "files": 66066,
+                  "parsed": 0,
+                  "read_files": 66066,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 66066,
+                  "shared_sources": 66066,
+                  "source_only": 0,
+                  "total_ms": 7441.474037,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "2797c3e0197d5ad5c45e3bc8d2c57e0dee0d08c5a663a1a120b61aaa234b8460"
+            },
+            "tail_bytes": 4294967296,
+            "write_overlaps_cleanup": false,
+            "write_start_ms": 2960.752282,
+            "write_to_published_ms": 55.966694999999994
+          },
+          {
+            "admission_ms": 2486.424206,
+            "capture_marks": [],
+            "capture_overlaps_cleanup": null,
+            "cleanup_end_ms": 2892.760764,
+            "cleanup_ms": 406.336517,
+            "cleanup_start_ms": 2486.424247,
+            "condition": "during_cleanup",
+            "expected_declaration": true,
+            "explicit_hint": false,
+            "fresh_facts_match": true,
+            "hint_ms": 2488.083328,
+            "maintenance_before": {
+              "attempts": 1,
+              "completed": 1,
+              "error": null,
+              "failed": 0,
+              "running": false
+            },
+            "maintenance_observed": {
+              "attempts": 2,
+              "completed": 1,
+              "error": null,
+              "failed": 0,
+              "running": true
+            },
+            "measurements": {
+              "analyzed": 66066,
+              "bytes": 34384,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 2.140351,
+              "deferred": 0,
+              "files": 66066,
+              "parsed": 1,
+              "read_files": 1,
+              "reconciled": false,
+              "retained": 66065,
+              "reused": 66065,
+              "shared_sources": 0,
+              "source_only": 0,
+              "total_ms": 31.620906999999995,
+              "tree_reuses": 0
+            },
+            "old_pin_matches": true,
+            "pair": 0,
+            "published_during_cleanup": true,
+            "published_ms": 2546.0622200000003,
+            "retired_ms": 4.1e-05,
+            "sample": 1,
+            "source_matches": true,
+            "status_after": {
+              "error": null,
+              "generation": 4,
+              "measurements": {
+                "analyzed": 66066,
+                "bytes": 34384,
+                "cache_hits": 0,
+                "cache_warnings": 0,
+                "capture_ms": 2.140351,
+                "deferred": 0,
+                "files": 66066,
+                "parsed": 1,
+                "read_files": 1,
+                "reconciled": false,
+                "retained": 66065,
+                "reused": 66065,
+                "shared_sources": 0,
+                "source_only": 0,
+                "total_ms": 31.620906999999995,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 3,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": false,
+                "verification": {
+                  "analyzed": 66066,
+                  "bytes": 1495484792,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 7324.162179,
+                  "deferred": 0,
+                  "files": 66066,
+                  "parsed": 0,
+                  "read_files": 66066,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 66066,
+                  "shared_sources": 66066,
+                  "source_only": 0,
+                  "total_ms": 7415.910192,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "ec989d038356ec27fd0b4f8427331ccff602ed6fbcc57b0b994b82a9eb6d37f5"
+            },
+            "status_before": {
+              "error": null,
+              "generation": 3,
+              "measurements": {
+                "analyzed": 66066,
+                "bytes": 1495484792,
+                "cache_hits": 0,
+                "cache_warnings": 0,
+                "capture_ms": 7324.162179,
+                "deferred": 0,
+                "files": 66066,
+                "parsed": 0,
+                "read_files": 66066,
+                "reconciled": true,
+                "retained": 0,
+                "reused": 66066,
+                "shared_sources": 66066,
+                "source_only": 0,
+                "total_ms": 7415.910192,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 3,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": false,
+                "verification": {
+                  "analyzed": 66066,
+                  "bytes": 1495484792,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 7324.162179,
+                  "deferred": 0,
+                  "files": 66066,
+                  "parsed": 0,
+                  "read_files": 66066,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 66066,
+                  "shared_sources": 66066,
+                  "source_only": 0,
+                  "total_ms": 7415.910192,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "2797c3e0197d5ad5c45e3bc8d2c57e0dee0d08c5a663a1a120b61aaa234b8460"
+            },
+            "tail_bytes": 4294967296,
+            "write_overlaps_cleanup": true,
+            "write_start_ms": 2487.941029,
+            "write_to_published_ms": 58.121191
+          },
+          {
+            "admission_ms": 2559.4118209999997,
+            "capture_marks": [],
+            "capture_overlaps_cleanup": null,
+            "cleanup_end_ms": 2923.3847819999996,
+            "cleanup_ms": 363.972931,
+            "cleanup_start_ms": 2559.4118510000003,
+            "condition": "during_cleanup",
+            "expected_declaration": true,
+            "explicit_hint": false,
+            "fresh_facts_match": true,
+            "hint_ms": 2560.269934,
+            "maintenance_before": {
+              "attempts": 2,
+              "completed": 2,
+              "error": null,
+              "failed": 0,
+              "running": false
+            },
+            "maintenance_observed": {
+              "attempts": 3,
+              "completed": 2,
+              "error": null,
+              "failed": 0,
+              "running": true
+            },
+            "measurements": {
+              "analyzed": 66066,
+              "bytes": 34384,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 0.244883,
+              "deferred": 0,
+              "files": 66066,
+              "parsed": 1,
+              "read_files": 1,
+              "reconciled": false,
+              "retained": 66065,
+              "reused": 66065,
+              "shared_sources": 0,
+              "source_only": 0,
+              "total_ms": 27.197830999999997,
+              "tree_reuses": 0
+            },
+            "old_pin_matches": true,
+            "pair": 1,
+            "published_during_cleanup": true,
+            "published_ms": 2613.96265,
+            "retired_ms": 2.9999999999999997e-05,
+            "sample": 2,
+            "source_matches": true,
+            "status_after": {
+              "error": null,
+              "generation": 6,
+              "measurements": {
+                "analyzed": 66066,
+                "bytes": 34384,
+                "cache_hits": 0,
+                "cache_warnings": 0,
+                "capture_ms": 0.244883,
+                "deferred": 0,
+                "files": 66066,
+                "parsed": 1,
+                "read_files": 1,
+                "reconciled": false,
+                "retained": 66065,
+                "reused": 66065,
+                "shared_sources": 0,
+                "source_only": 0,
+                "total_ms": 27.197830999999997,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 4,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": false,
+                "verification": {
+                  "analyzed": 66066,
+                  "bytes": 1495484792,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 8172.063782,
+                  "deferred": 0,
+                  "files": 66066,
+                  "parsed": 0,
+                  "read_files": 66066,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 66066,
+                  "shared_sources": 66066,
+                  "source_only": 0,
+                  "total_ms": 8265.764709000001,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "ca6ac70b2c0ccf83ccfb26039dd1be35b032e8e82f0d580dd77f54bd19c7ab29"
+            },
+            "status_before": {
+              "error": null,
+              "generation": 5,
+              "measurements": {
+                "analyzed": 66066,
+                "bytes": 1495484792,
+                "cache_hits": 0,
+                "cache_warnings": 0,
+                "capture_ms": 8172.063782,
+                "deferred": 0,
+                "files": 66066,
+                "parsed": 0,
+                "read_files": 66066,
+                "reconciled": true,
+                "retained": 0,
+                "reused": 66066,
+                "shared_sources": 66066,
+                "source_only": 0,
+                "total_ms": 8265.764709000001,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 4,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": false,
+                "verification": {
+                  "analyzed": 66066,
+                  "bytes": 1495484792,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 8172.063782,
+                  "deferred": 0,
+                  "files": 66066,
+                  "parsed": 0,
+                  "read_files": 66066,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 66066,
+                  "shared_sources": 66066,
+                  "source_only": 0,
+                  "total_ms": 8265.764709000001,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "2797c3e0197d5ad5c45e3bc8d2c57e0dee0d08c5a663a1a120b61aaa234b8460"
+            },
+            "tail_bytes": 4294967296,
+            "write_overlaps_cleanup": true,
+            "write_start_ms": 2560.1455570000003,
+            "write_to_published_ms": 53.817093
+          },
+          {
+            "admission_ms": 2661.6057829999995,
+            "capture_marks": [],
+            "capture_overlaps_cleanup": null,
+            "cleanup_end_ms": 3113.7684339999996,
+            "cleanup_ms": 452.16261299999996,
+            "cleanup_start_ms": 2661.605821,
+            "condition": "after_cleanup",
+            "expected_declaration": true,
+            "explicit_hint": false,
+            "fresh_facts_match": true,
+            "hint_ms": 3115.721047,
+            "maintenance_before": {
+              "attempts": 3,
+              "completed": 3,
+              "error": null,
+              "failed": 0,
+              "running": false
+            },
+            "maintenance_observed": {
+              "attempts": 4,
+              "completed": 4,
+              "error": null,
+              "failed": 0,
+              "running": false
+            },
+            "measurements": {
+              "analyzed": 66066,
+              "bytes": 34384,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 0.220333,
+              "deferred": 0,
+              "files": 66066,
+              "parsed": 1,
+              "read_files": 1,
+              "reconciled": false,
+              "retained": 66065,
+              "reused": 66065,
+              "shared_sources": 0,
+              "source_only": 0,
+              "total_ms": 27.257546,
+              "tree_reuses": 0
+            },
+            "old_pin_matches": true,
+            "pair": 1,
+            "published_during_cleanup": false,
+            "published_ms": 3169.674884,
+            "retired_ms": 3.8e-05,
+            "sample": 3,
+            "source_matches": true,
+            "status_after": {
+              "error": null,
+              "generation": 8,
+              "measurements": {
+                "analyzed": 66066,
+                "bytes": 34384,
+                "cache_hits": 0,
+                "cache_warnings": 0,
+                "capture_ms": 0.220333,
+                "deferred": 0,
+                "files": 66066,
+                "parsed": 1,
+                "read_files": 1,
+                "reconciled": false,
+                "retained": 66065,
+                "reused": 66065,
+                "shared_sources": 0,
+                "source_only": 0,
+                "total_ms": 27.257546,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 5,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": false,
+                "verification": {
+                  "analyzed": 66066,
+                  "bytes": 1495484792,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 7882.510956,
+                  "deferred": 0,
+                  "files": 66066,
+                  "parsed": 0,
+                  "read_files": 66066,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 66066,
+                  "shared_sources": 66066,
+                  "source_only": 0,
+                  "total_ms": 7976.591174,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "aceea50127cb46bacf331cb956575ed58c2b6bac905074efccd7323f660e4de6"
+            },
+            "status_before": {
+              "error": null,
+              "generation": 7,
+              "measurements": {
+                "analyzed": 66066,
+                "bytes": 1495484792,
+                "cache_hits": 0,
+                "cache_warnings": 0,
+                "capture_ms": 7882.510956,
+                "deferred": 0,
+                "files": 66066,
+                "parsed": 0,
+                "read_files": 66066,
+                "reconciled": true,
+                "retained": 0,
+                "reused": 66066,
+                "shared_sources": 66066,
+                "source_only": 0,
+                "total_ms": 7976.591174,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 5,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": false,
+                "verification": {
+                  "analyzed": 66066,
+                  "bytes": 1495484792,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 7882.510956,
+                  "deferred": 0,
+                  "files": 66066,
+                  "parsed": 0,
+                  "read_files": 66066,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 66066,
+                  "shared_sources": 66066,
+                  "source_only": 0,
+                  "total_ms": 7976.591174,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "2797c3e0197d5ad5c45e3bc8d2c57e0dee0d08c5a663a1a120b61aaa234b8460"
+            },
+            "tail_bytes": 4294967296,
+            "write_overlaps_cleanup": false,
+            "write_start_ms": 3115.566002,
+            "write_to_published_ms": 54.108881999999994
+          },
+          {
+            "admission_ms": 2695.733158,
+            "capture_marks": [],
+            "capture_overlaps_cleanup": null,
+            "cleanup_end_ms": 3147.147509,
+            "cleanup_ms": 451.41430199999996,
+            "cleanup_start_ms": 2695.7332069999998,
+            "condition": "after_cleanup",
+            "expected_declaration": true,
+            "explicit_hint": false,
+            "fresh_facts_match": true,
+            "hint_ms": 3149.047995,
+            "maintenance_before": {
+              "attempts": 4,
+              "completed": 4,
+              "error": null,
+              "failed": 0,
+              "running": false
+            },
+            "maintenance_observed": {
+              "attempts": 5,
+              "completed": 5,
+              "error": null,
+              "failed": 0,
+              "running": false
+            },
+            "measurements": {
+              "analyzed": 66066,
+              "bytes": 34384,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 0.283022,
+              "deferred": 0,
+              "files": 66066,
+              "parsed": 1,
+              "read_files": 1,
+              "reconciled": false,
+              "retained": 66065,
+              "reused": 66065,
+              "shared_sources": 0,
+              "source_only": 0,
+              "total_ms": 24.354582,
+              "tree_reuses": 0
+            },
+            "old_pin_matches": true,
+            "pair": 2,
+            "published_during_cleanup": false,
+            "published_ms": 3199.27625,
+            "retired_ms": 4.9000000000000005e-05,
+            "sample": 4,
+            "source_matches": true,
+            "status_after": {
+              "error": null,
+              "generation": 10,
+              "measurements": {
+                "analyzed": 66066,
+                "bytes": 34384,
+                "cache_hits": 0,
+                "cache_warnings": 0,
+                "capture_ms": 0.283022,
+                "deferred": 0,
+                "files": 66066,
+                "parsed": 1,
+                "read_files": 1,
+                "reconciled": false,
+                "retained": 66065,
+                "reused": 66065,
+                "shared_sources": 0,
+                "source_only": 0,
+                "total_ms": 24.354582,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 6,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": false,
+                "verification": {
+                  "analyzed": 66066,
+                  "bytes": 1495484792,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 8862.847609999999,
+                  "deferred": 0,
+                  "files": 66066,
+                  "parsed": 0,
+                  "read_files": 66066,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 66066,
+                  "shared_sources": 66066,
+                  "source_only": 0,
+                  "total_ms": 8953.210003,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "2267b5cff60f744462d88c3a1a44f498fb0764ae0753f28c2d42a6884be87cc5"
+            },
+            "status_before": {
+              "error": null,
+              "generation": 9,
+              "measurements": {
+                "analyzed": 66066,
+                "bytes": 1495484792,
+                "cache_hits": 0,
+                "cache_warnings": 0,
+                "capture_ms": 8862.847609999999,
+                "deferred": 0,
+                "files": 66066,
+                "parsed": 0,
+                "read_files": 66066,
+                "reconciled": true,
+                "retained": 0,
+                "reused": 66066,
+                "shared_sources": 66066,
+                "source_only": 0,
+                "total_ms": 8953.210003,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 6,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": false,
+                "verification": {
+                  "analyzed": 66066,
+                  "bytes": 1495484792,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 8862.847609999999,
+                  "deferred": 0,
+                  "files": 66066,
+                  "parsed": 0,
+                  "read_files": 66066,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 66066,
+                  "shared_sources": 66066,
+                  "source_only": 0,
+                  "total_ms": 8953.210003,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "2797c3e0197d5ad5c45e3bc8d2c57e0dee0d08c5a663a1a120b61aaa234b8460"
+            },
+            "tail_bytes": 4294967296,
+            "write_overlaps_cleanup": false,
+            "write_start_ms": 3148.928037,
+            "write_to_published_ms": 50.348213
+          },
+          {
+            "admission_ms": 2608.195217,
+            "capture_marks": [],
+            "capture_overlaps_cleanup": null,
+            "cleanup_end_ms": 3040.257094,
+            "cleanup_ms": 432.061847,
+            "cleanup_start_ms": 2608.195247,
+            "condition": "during_cleanup",
+            "expected_declaration": true,
+            "explicit_hint": false,
+            "fresh_facts_match": true,
+            "hint_ms": 2610.448856,
+            "maintenance_before": {
+              "attempts": 6,
+              "completed": 6,
+              "error": null,
+              "failed": 0,
+              "running": false
+            },
+            "maintenance_observed": {
+              "attempts": 7,
+              "completed": 6,
+              "error": null,
+              "failed": 0,
+              "running": true
+            },
+            "measurements": {
+              "analyzed": 66066,
+              "bytes": 34384,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 0.25837,
+              "deferred": 0,
+              "files": 66066,
+              "parsed": 1,
+              "read_files": 1,
+              "reconciled": false,
+              "retained": 66065,
+              "reused": 66065,
+              "shared_sources": 0,
+              "source_only": 0,
+              "total_ms": 29.454131,
+              "tree_reuses": 0
+            },
+            "old_pin_matches": true,
+            "pair": 2,
+            "published_during_cleanup": true,
+            "published_ms": 2666.3098339999997,
+            "retired_ms": 2.9999999999999997e-05,
+            "sample": 5,
+            "source_matches": true,
+            "status_after": {
+              "error": null,
+              "generation": 12,
+              "measurements": {
+                "analyzed": 66066,
+                "bytes": 34384,
+                "cache_hits": 0,
+                "cache_warnings": 0,
+                "capture_ms": 0.25837,
+                "deferred": 0,
+                "files": 66066,
+                "parsed": 1,
+                "read_files": 1,
+                "reconciled": false,
+                "retained": 66065,
+                "reused": 66065,
+                "shared_sources": 0,
+                "source_only": 0,
+                "total_ms": 29.454131,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 7,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": false,
+                "verification": {
+                  "analyzed": 66066,
+                  "bytes": 1495484792,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 8637.478142,
+                  "deferred": 0,
+                  "files": 66066,
+                  "parsed": 0,
+                  "read_files": 66066,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 66066,
+                  "shared_sources": 66066,
+                  "source_only": 0,
+                  "total_ms": 8730.025554000002,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "94a8b4cf7d660b06db74e859918dcb09db75ed8b82603179c7962ec98dc7a191"
+            },
+            "status_before": {
+              "error": null,
+              "generation": 11,
+              "measurements": {
+                "analyzed": 66066,
+                "bytes": 1495484792,
+                "cache_hits": 0,
+                "cache_warnings": 0,
+                "capture_ms": 8637.478142,
+                "deferred": 0,
+                "files": 66066,
+                "parsed": 0,
+                "read_files": 66066,
+                "reconciled": true,
+                "retained": 0,
+                "reused": 66066,
+                "shared_sources": 66066,
+                "source_only": 0,
+                "total_ms": 8730.025554000002,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 7,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": false,
+                "verification": {
+                  "analyzed": 66066,
+                  "bytes": 1495484792,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 8637.478142,
+                  "deferred": 0,
+                  "files": 66066,
+                  "parsed": 0,
+                  "read_files": 66066,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 66066,
+                  "shared_sources": 66066,
+                  "source_only": 0,
+                  "total_ms": 8730.025554000002,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "2797c3e0197d5ad5c45e3bc8d2c57e0dee0d08c5a663a1a120b61aaa234b8460"
+            },
+            "tail_bytes": 4294967296,
+            "write_overlaps_cleanup": true,
+            "write_start_ms": 2610.346125,
+            "write_to_published_ms": 55.963709
+          },
+          {
+            "condition": "recovery_observed",
+            "expected_declaration": true,
+            "explicit_hint": false,
+            "fresh_facts_match": true,
+            "maintenance_observed": {
+              "attempts": 8,
+              "completed": 8,
+              "error": null,
+              "failed": 0,
+              "running": false
+            },
+            "old_pin_matches": true,
+            "published_ms": 53.814927,
+            "sample": 6,
+            "source_matches": true,
+            "status_after": {
+              "error": null,
+              "generation": 14,
+              "measurements": {
+                "analyzed": 66066,
+                "bytes": 34384,
+                "cache_hits": 0,
+                "cache_warnings": 0,
+                "capture_ms": 0.27132,
+                "deferred": 0,
+                "files": 66066,
+                "parsed": 1,
+                "read_files": 1,
+                "reconciled": false,
+                "retained": 66065,
+                "reused": 66065,
+                "shared_sources": 0,
+                "source_only": 0,
+                "total_ms": 27.928422,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 7,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": true,
+                "verification": {
+                  "analyzed": 66066,
+                  "bytes": 1495484792,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 8637.478142,
+                  "deferred": 0,
+                  "files": 66066,
+                  "parsed": 0,
+                  "read_files": 66066,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 66066,
+                  "shared_sources": 66066,
+                  "source_only": 0,
+                  "total_ms": 8730.025554000002,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "1d6c00c4ca492d3aba7fd2c694ea052e654fbf1e76a7d22c68ff8745bc22a028"
+            },
+            "status_before": {
+              "error": null,
+              "generation": 13,
+              "measurements": {
+                "analyzed": 66066,
+                "bytes": 34280,
+                "cache_hits": 1,
+                "cache_warnings": 0,
+                "capture_ms": 0.181945,
+                "deferred": 0,
+                "files": 66066,
+                "parsed": 0,
+                "read_files": 1,
+                "reconciled": false,
+                "retained": 66065,
+                "reused": 66065,
+                "shared_sources": 0,
+                "source_only": 0,
+                "total_ms": 21.039055,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 7,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": true,
+                "verification": {
+                  "analyzed": 66066,
+                  "bytes": 1495484792,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 8637.478142,
+                  "deferred": 0,
+                  "files": 66066,
+                  "parsed": 0,
+                  "read_files": 66066,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 66066,
+                  "shared_sources": 66066,
+                  "source_only": 0,
+                  "total_ms": 8730.025554000002,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "2797c3e0197d5ad5c45e3bc8d2c57e0dee0d08c5a663a1a120b61aaa234b8460"
+            },
+            "write_finished_ms": 0.10302800000000001,
+            "write_start_ms": 0.008148,
+            "write_to_published_ms": 53.806779
+          },
+          {
+            "condition": "recovery_observed",
+            "expected_declaration": true,
+            "explicit_hint": false,
+            "fresh_facts_match": true,
+            "maintenance_observed": {
+              "attempts": 8,
+              "completed": 8,
+              "error": null,
+              "failed": 0,
+              "running": false
+            },
+            "old_pin_matches": true,
+            "published_ms": 57.570755,
+            "sample": 7,
+            "source_matches": true,
+            "status_after": {
+              "error": null,
+              "generation": 16,
+              "measurements": {
+                "analyzed": 66066,
+                "bytes": 34384,
+                "cache_hits": 0,
+                "cache_warnings": 0,
+                "capture_ms": 0.229353,
+                "deferred": 0,
+                "files": 66066,
+                "parsed": 1,
+                "read_files": 1,
+                "reconciled": false,
+                "retained": 66065,
+                "reused": 66065,
+                "shared_sources": 0,
+                "source_only": 0,
+                "total_ms": 30.739674,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 7,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": true,
+                "verification": {
+                  "analyzed": 66066,
+                  "bytes": 1495484792,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 8637.478142,
+                  "deferred": 0,
+                  "files": 66066,
+                  "parsed": 0,
+                  "read_files": 66066,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 66066,
+                  "shared_sources": 66066,
+                  "source_only": 0,
+                  "total_ms": 8730.025554000002,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "2fdd9db54e2ba714481b6d534a0a013964ce80d3eceb1ed431b7157b70f54275"
+            },
+            "status_before": {
+              "error": null,
+              "generation": 15,
+              "measurements": {
+                "analyzed": 66066,
+                "bytes": 34280,
+                "cache_hits": 1,
+                "cache_warnings": 0,
+                "capture_ms": 0.19295,
+                "deferred": 0,
+                "files": 66066,
+                "parsed": 0,
+                "read_files": 1,
+                "reconciled": false,
+                "retained": 66065,
+                "reused": 66065,
+                "shared_sources": 0,
+                "source_only": 0,
+                "total_ms": 24.680921,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 7,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": true,
+                "verification": {
+                  "analyzed": 66066,
+                  "bytes": 1495484792,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 8637.478142,
+                  "deferred": 0,
+                  "files": 66066,
+                  "parsed": 0,
+                  "read_files": 66066,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 66066,
+                  "shared_sources": 66066,
+                  "source_only": 0,
+                  "total_ms": 8730.025554000002,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "2797c3e0197d5ad5c45e3bc8d2c57e0dee0d08c5a663a1a120b61aaa234b8460"
+            },
+            "write_finished_ms": 0.076852,
+            "write_start_ms": 0.0068909999999999996,
+            "write_to_published_ms": 57.563864
+          },
+          {
+            "condition": "recovery_observed",
+            "expected_declaration": true,
+            "explicit_hint": false,
+            "fresh_facts_match": true,
+            "maintenance_observed": {
+              "attempts": 8,
+              "completed": 8,
+              "error": null,
+              "failed": 0,
+              "running": false
+            },
+            "old_pin_matches": true,
+            "published_ms": 58.217401,
+            "sample": 8,
+            "source_matches": true,
+            "status_after": {
+              "error": null,
+              "generation": 18,
+              "measurements": {
+                "analyzed": 66066,
+                "bytes": 34384,
+                "cache_hits": 0,
+                "cache_warnings": 0,
+                "capture_ms": 0.207597,
+                "deferred": 0,
+                "files": 66066,
+                "parsed": 1,
+                "read_files": 1,
+                "reconciled": false,
+                "retained": 66065,
+                "reused": 66065,
+                "shared_sources": 0,
+                "source_only": 0,
+                "total_ms": 32.243183,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 7,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": true,
+                "verification": {
+                  "analyzed": 66066,
+                  "bytes": 1495484792,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 8637.478142,
+                  "deferred": 0,
+                  "files": 66066,
+                  "parsed": 0,
+                  "read_files": 66066,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 66066,
+                  "shared_sources": 66066,
+                  "source_only": 0,
+                  "total_ms": 8730.025554000002,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "dbd0d02a4cadc17fd757d6aed1d3bc6c15a97af68aab31b8e662df1f04c70761"
+            },
+            "status_before": {
+              "error": null,
+              "generation": 17,
+              "measurements": {
+                "analyzed": 66066,
+                "bytes": 34280,
+                "cache_hits": 1,
+                "cache_warnings": 0,
+                "capture_ms": 0.195856,
+                "deferred": 0,
+                "files": 66066,
+                "parsed": 0,
+                "read_files": 1,
+                "reconciled": false,
+                "retained": 66065,
+                "reused": 66065,
+                "shared_sources": 0,
+                "source_only": 0,
+                "total_ms": 28.205711,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 7,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": true,
+                "verification": {
+                  "analyzed": 66066,
+                  "bytes": 1495484792,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 8637.478142,
+                  "deferred": 0,
+                  "files": 66066,
+                  "parsed": 0,
+                  "read_files": 66066,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 66066,
+                  "shared_sources": 66066,
+                  "source_only": 0,
+                  "total_ms": 8730.025554000002,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "2797c3e0197d5ad5c45e3bc8d2c57e0dee0d08c5a663a1a120b61aaa234b8460"
+            },
+            "write_finished_ms": 0.11529800000000001,
+            "write_start_ms": 0.010476,
+            "write_to_published_ms": 58.206925
+          }
+        ],
+        "explicit_hints": false,
+        "files": 66066,
+        "final_clean_matches": true,
+        "maintenance": {
+          "attempts": 9,
+          "completed": 9,
+          "error": null,
+          "failed": 0,
+          "running": false
+        },
+        "recovery_ms": 2000,
+        "released_ms": 7.10895,
+        "restored_matches": true,
+        "shutdown_ms": 0.7964279999999999,
+        "spool": {
+          "allocated_bytes": 0,
+          "capacity_bytes": 8589934592,
+          "cleaning_bytes": 0,
+          "cleaning_files": 0,
+          "extent_bytes": 0,
+          "file_bytes": 0,
+          "free_bytes": 0,
+          "max_read_request": 65536,
+          "peak_extent_bytes": 5790692464,
+          "peak_staging_bytes": 4294967296,
+          "pending_retirements": 0,
+          "read_bytes": 1497148240,
+          "reads": 78008,
+          "staging_bytes": 0,
+          "stores": 66090,
+          "written_bytes": 27265906544
+        },
+        "watching": true
+      }
+    },
+    {
+      "profile": {
+        "name": "pytorch",
+        "source": "/tmp/vizzi-perf-corpus/pytorch-1f4d2d5e",
+        "revision": "1f4d2d5e820dd870626dca4f9603e3a49879dbde",
+        "source_arguments": [
+          "--c-family-root",
+          ".",
+          "--syntax-language",
+          ".=cpp",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/deps/clog/src/clog.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/add.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/average-pooling.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/channel-shuffle.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/clamp.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/convolution.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/deconvolution.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/fully-connected-sparse.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/fully-connected.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/global-average-pooling.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/hardsigmoid.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/hardswish.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/hgemm/8x8-neonfp16arith.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/indirection.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/init.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/leaky-relu.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/max-pooling.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/operator-delete.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/operator-run.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8avgpool/mp8x9p8q-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8avgpool/mp8x9p8q-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8avgpool/up8x9-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8avgpool/up8x9-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8avgpool/up8xm-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8avgpool/up8xm-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8conv/4x4c2-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8conv/4x8-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8conv/8x8-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/mp8x25-neon-per-channel.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/mp8x25-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/mp8x25-sse2-per-channel.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/mp8x25-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/mp8x27-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/mp8x27-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/up8x9-neon-per-channel.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/up8x9-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/up8x9-sse2-per-channel.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/up8x9-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gavgpool/mp8x7p7q-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gavgpool/mp8x7p7q-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gavgpool/up8x7-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gavgpool/up8x7-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gavgpool/up8xm-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gavgpool/up8xm-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/2x4c8-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/4x-sumrows-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/4x4c2-dq-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/4x4c2-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/4x8-dq-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/4x8-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/4x8c2-xzp-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/6x4-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/8x8-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm_sparse/8x4-packA-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm_sparse/8x4c1x4-dq-packedA-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8vadd/neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8vadd/sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/fp32-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/fp32-psimd.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/fp32-scalar.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/fp32-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/gemmlowp-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/gemmlowp-scalar.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/gemmlowp-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/gemmlowp-sse4.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/gemmlowp-ssse3.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/precise-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/precise-psimd.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/precise-scalar.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/precise-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/precise-sse4.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/precise-ssse3.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/q31-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/q31-scalar.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/q31-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/q31-sse4.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/q31-ssse3.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/sconv/6x8-psimd.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/sdwconv/up4x9-psimd.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/sgemm/5x8-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/sgemm/6x8-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/sgemm/6x8-psimd.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/sigmoid.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/softargmax.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/tanh.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8clamp/neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8clamp/sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8lut32norm/scalar.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8maxpool/16x9p8q-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8maxpool/16x9p8q-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8maxpool/sub16-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8maxpool/sub16-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8rmax/neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8rmax/sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8lut/scalar.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/x2-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/x2-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/x3-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/x3-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/x4-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/x4-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/xm-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/xm-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8avgpool/mp8x9p8q-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8avgpool/mp8x9p8q-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8avgpool/up8x9-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8avgpool/up8x9-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8avgpool/up8xm-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8avgpool/up8xm-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8conv/4x4c2-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8conv/4x8-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8conv/8x8-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/mp8x25-neon-per-channel.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/mp8x25-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/mp8x25-sse2-per-channel.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/mp8x25-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/mp8x27-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/mp8x27-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/up8x9-neon-per-channel.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/up8x9-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/up8x9-sse2-per-channel.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/up8x9-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gavgpool/mp8x7p7q-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gavgpool/mp8x7p7q-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gavgpool/up8x7-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gavgpool/up8x7-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gavgpool/up8xm-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gavgpool/up8xm-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/2x4c8-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/4x-sumrows-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/4x4c2-dq-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/4x4c2-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/4x8-dq-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/4x8-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/4x8c2-xzp-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/6x4-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/8x8-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm_sparse/8x4c1x4-packed-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8vadd/neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8vadd/sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/fp32-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/fp32-psimd.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/fp32-scalar.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/fp32-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/gemmlowp-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/gemmlowp-scalar.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/gemmlowp-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/gemmlowp-sse4.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/gemmlowp-ssse3.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/precise-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/precise-psimd.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/precise-scalar.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/precise-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/precise-sse4.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/precise-ssse3.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/q31-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/q31-scalar.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/q31-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/q31-sse4.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/q31-ssse3.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/sgemm/5x8-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/sgemm/6x8-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/sgemm/6x8-psimd.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8clamp/neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8clamp/sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8lut32norm/scalar.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8maxpool/16x9p8q-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8maxpool/16x9p8q-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8maxpool/sub16-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8maxpool/sub16-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8rmax/neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8rmax/sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8lut/scalar.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/x2-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/x2-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/x3-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/x3-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/x4-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/x4-sse2.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/xm-neon.c=c",
+          "--syntax-language",
+          "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/xm-sse2.c=c",
+          "--syntax-language",
+          "test/cpp_extensions/open_registration_extension/torch_openreg/torch_openreg/csrc/stub.c=c",
+          "--syntax-language",
+          "third_party/miniz-3.0.2/examples/example1.c=c",
+          "--syntax-language",
+          "third_party/miniz-3.0.2/examples/example2.c=c",
+          "--syntax-language",
+          "third_party/miniz-3.0.2/examples/example3.c=c",
+          "--syntax-language",
+          "third_party/miniz-3.0.2/examples/example4.c=c",
+          "--syntax-language",
+          "third_party/miniz-3.0.2/examples/example5.c=c",
+          "--syntax-language",
+          "third_party/miniz-3.0.2/examples/example6.c=c",
+          "--syntax-language",
+          "third_party/miniz-3.0.2/miniz.c=c",
+          "--syntax-language",
+          "torch/csrc/dynamo/cpython_defs.c=c",
+          "--syntax-language",
+          "torch/csrc/dynamo/eval_frame.c=c",
+          "--syntax-language",
+          "torch/csrc/dynamo/stackref_bridge.c=c",
+          "--syntax-language",
+          "torch/csrc/empty.c=c",
+          "--syntax-language",
+          "torch/csrc/stub.c=c"
+        ],
+        "exception_count": 194,
+        "note": "Explicit raw root header assignment with source-suffix language exceptions; no compiler configuration; known Linux shell .inc fixtures excluded."
+      },
+      "configuration": {
+        "root": "/tmp/vizzi-foreground-owned-z75rtoqf/source",
+        "cache": "/tmp/vizzi-foreground-facts/pytorch",
+        "policy": {
+          "c_family_roots": [
+            "."
+          ],
+          "exclusions": [],
+          "assignments": [
+            {
+              "scope": ".",
+              "language": "cpp"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/deps/clog/src/clog.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/add.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/average-pooling.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/channel-shuffle.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/clamp.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/convolution.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/deconvolution.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/fully-connected-sparse.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/fully-connected.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/global-average-pooling.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/hardsigmoid.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/hardswish.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/hgemm/8x8-neonfp16arith.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/indirection.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/init.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/leaky-relu.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/max-pooling.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/operator-delete.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/operator-run.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8avgpool/mp8x9p8q-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8avgpool/mp8x9p8q-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8avgpool/up8x9-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8avgpool/up8x9-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8avgpool/up8xm-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8avgpool/up8xm-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8conv/4x4c2-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8conv/4x8-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8conv/8x8-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/mp8x25-neon-per-channel.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/mp8x25-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/mp8x25-sse2-per-channel.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/mp8x25-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/mp8x27-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/mp8x27-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/up8x9-neon-per-channel.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/up8x9-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/up8x9-sse2-per-channel.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8dwconv/up8x9-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gavgpool/mp8x7p7q-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gavgpool/mp8x7p7q-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gavgpool/up8x7-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gavgpool/up8x7-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gavgpool/up8xm-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gavgpool/up8xm-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/2x4c8-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/4x-sumrows-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/4x4c2-dq-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/4x4c2-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/4x8-dq-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/4x8-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/4x8c2-xzp-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/6x4-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm/8x8-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm_sparse/8x4-packA-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8gemm_sparse/8x4c1x4-dq-packedA-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8vadd/neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/q8vadd/sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/fp32-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/fp32-psimd.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/fp32-scalar.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/fp32-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/gemmlowp-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/gemmlowp-scalar.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/gemmlowp-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/gemmlowp-sse4.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/gemmlowp-ssse3.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/precise-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/precise-psimd.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/precise-scalar.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/precise-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/precise-sse4.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/precise-ssse3.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/q31-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/q31-scalar.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/q31-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/q31-sse4.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/requantization/q31-ssse3.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/sconv/6x8-psimd.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/sdwconv/up4x9-psimd.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/sgemm/5x8-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/sgemm/6x8-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/sgemm/6x8-psimd.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/sigmoid.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/softargmax.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/tanh.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8clamp/neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8clamp/sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8lut32norm/scalar.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8maxpool/16x9p8q-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8maxpool/16x9p8q-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8maxpool/sub16-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8maxpool/sub16-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8rmax/neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/u8rmax/sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8lut/scalar.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/x2-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/x2-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/x3-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/x3-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/x4-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/x4-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/xm-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/src/x8zip/xm-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8avgpool/mp8x9p8q-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8avgpool/mp8x9p8q-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8avgpool/up8x9-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8avgpool/up8x9-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8avgpool/up8xm-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8avgpool/up8xm-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8conv/4x4c2-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8conv/4x8-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8conv/8x8-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/mp8x25-neon-per-channel.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/mp8x25-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/mp8x25-sse2-per-channel.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/mp8x25-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/mp8x27-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/mp8x27-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/up8x9-neon-per-channel.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/up8x9-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/up8x9-sse2-per-channel.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8dwconv/up8x9-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gavgpool/mp8x7p7q-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gavgpool/mp8x7p7q-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gavgpool/up8x7-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gavgpool/up8x7-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gavgpool/up8xm-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gavgpool/up8xm-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/2x4c8-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/4x-sumrows-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/4x4c2-dq-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/4x4c2-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/4x8-dq-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/4x8-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/4x8c2-xzp-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/6x4-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm/8x8-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8gemm_sparse/8x4c1x4-packed-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8vadd/neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/q8vadd/sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/fp32-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/fp32-psimd.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/fp32-scalar.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/fp32-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/gemmlowp-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/gemmlowp-scalar.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/gemmlowp-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/gemmlowp-sse4.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/gemmlowp-ssse3.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/precise-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/precise-psimd.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/precise-scalar.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/precise-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/precise-sse4.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/precise-ssse3.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/q31-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/q31-scalar.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/q31-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/q31-sse4.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/requantization/q31-ssse3.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/sgemm/5x8-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/sgemm/6x8-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/sgemm/6x8-psimd.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8clamp/neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8clamp/sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8lut32norm/scalar.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8maxpool/16x9p8q-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8maxpool/16x9p8q-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8maxpool/sub16-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8maxpool/sub16-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8rmax/neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/u8rmax/sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8lut/scalar.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/x2-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/x2-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/x3-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/x3-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/x4-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/x4-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/xm-neon.c",
+              "language": "c"
+            },
+            {
+              "scope": "aten/src/ATen/native/quantized/cpu/qnnpack/wrappers/x8zip/xm-sse2.c",
+              "language": "c"
+            },
+            {
+              "scope": "test/cpp_extensions/open_registration_extension/torch_openreg/torch_openreg/csrc/stub.c",
+              "language": "c"
+            },
+            {
+              "scope": "third_party/miniz-3.0.2/examples/example1.c",
+              "language": "c"
+            },
+            {
+              "scope": "third_party/miniz-3.0.2/examples/example2.c",
+              "language": "c"
+            },
+            {
+              "scope": "third_party/miniz-3.0.2/examples/example3.c",
+              "language": "c"
+            },
+            {
+              "scope": "third_party/miniz-3.0.2/examples/example4.c",
+              "language": "c"
+            },
+            {
+              "scope": "third_party/miniz-3.0.2/examples/example5.c",
+              "language": "c"
+            },
+            {
+              "scope": "third_party/miniz-3.0.2/examples/example6.c",
+              "language": "c"
+            },
+            {
+              "scope": "third_party/miniz-3.0.2/miniz.c",
+              "language": "c"
+            },
+            {
+              "scope": "torch/csrc/dynamo/cpython_defs.c",
+              "language": "c"
+            },
+            {
+              "scope": "torch/csrc/dynamo/eval_frame.c",
+              "language": "c"
+            },
+            {
+              "scope": "torch/csrc/dynamo/stackref_bridge.c",
+              "language": "c"
+            },
+            {
+              "scope": "torch/csrc/empty.c",
+              "language": "c"
+            },
+            {
+              "scope": "torch/csrc/stub.c",
+              "language": "c"
+            }
+          ]
+        },
+        "target": "c10/core/Device.cpp",
+        "owner": "5c76328d-b09a-4b11-ba80-ce79156680c1",
+        "probe": "71be2329-7d7b-4b02-a225-37acd3043d50",
+        "pairs": 3,
+        "spool_mib": 1024,
+        "tail_mib": 768,
+        "watch": true,
+        "recovery_ms": 2000,
+        "recovery_samples": 3
+      },
+      "original_target_sha256": "6566f28edc0b7afdfee492a03c029e9a372db728b9b77af7c1ffc1c1e1ed9c24",
+      "binary_sha256": "5910dd05c45b4f0b99f762f7c7394b5f635dde3821b8475c6bfb32e0de87e484",
+      "run": {
+        "wall_s": 14.333060181932524,
+        "exit_code": 0,
+        "peaks_kib": {
+          "VmSize": 756792,
+          "VmHWM": 531960,
+          "VmRSS": 531960,
+          "RssAnon": 524816,
+          "RssFile": 7144
+        },
+        "phase_peaks_kib": {
+          "startup": {
+            "VmSize": 9328,
+            "VmHWM": 664,
+            "VmRSS": 664,
+            "RssAnon": 56,
+            "RssFile": 608
+          },
+          "baseline": {
+            "VmSize": 433444,
+            "VmHWM": 170816,
+            "VmRSS": 170816,
+            "RssAnon": 166884,
+            "RssFile": 3932
+          },
+          "retained_idle": {
+            "VmSize": 418788,
+            "VmHWM": 172040,
+            "VmRSS": 172040,
+            "RssAnon": 168108,
+            "RssFile": 3932
+          },
+          "capture_and_queries": {
+            "VmSize": 418788,
+            "VmHWM": 176296,
+            "VmRSS": 176296,
+            "RssAnon": 169152,
+            "RssFile": 7144
+          },
+          "complete": {
+            "VmSize": 756792,
+            "VmHWM": 531960,
+            "VmRSS": 531960,
+            "RssAnon": 524816,
+            "RssFile": 7144
+          }
+        },
+        "samples_1s": [
+          {
+            "seconds": 0.0006295989733189344,
+            "phase": "startup",
+            "VmSize": 9328,
+            "VmHWM": 664,
+            "VmRSS": 664,
+            "RssAnon": 56,
+            "RssFile": 608
+          },
+          {
+            "seconds": 1.0188667150214314,
+            "phase": "baseline",
+            "VmSize": 418788,
+            "VmHWM": 169428,
+            "VmRSS": 169428,
+            "RssAnon": 165496,
+            "RssFile": 3932
+          },
+          {
+            "seconds": 2.049601102946326,
+            "phase": "retained_idle",
+            "VmSize": 418776,
+            "VmHWM": 172040,
+            "VmRSS": 172040,
+            "RssAnon": 168108,
+            "RssFile": 3932
+          },
+          {
+            "seconds": 3.0218025271315128,
+            "phase": "complete",
+            "VmSize": 418776,
+            "VmHWM": 175420,
+            "VmRSS": 175420,
+            "RssAnon": 168276,
+            "RssFile": 7144
+          },
+          {
+            "seconds": 4.027279912959784,
+            "phase": "complete",
+            "VmSize": 418788,
+            "VmHWM": 175420,
+            "VmRSS": 175420,
+            "RssAnon": 168276,
+            "RssFile": 7144
+          },
+          {
+            "seconds": 5.024327228078619,
+            "phase": "complete",
+            "VmSize": 418776,
+            "VmHWM": 176124,
+            "VmRSS": 176124,
+            "RssAnon": 168980,
+            "RssFile": 7144
+          },
+          {
+            "seconds": 6.029070266988128,
+            "phase": "complete",
+            "VmSize": 418776,
+            "VmHWM": 176124,
+            "VmRSS": 176124,
+            "RssAnon": 168980,
+            "RssFile": 7144
+          },
+          {
+            "seconds": 7.045134770916775,
+            "phase": "complete",
+            "VmSize": 418788,
+            "VmHWM": 176208,
+            "VmRSS": 176208,
+            "RssAnon": 169064,
+            "RssFile": 7144
+          },
+          {
+            "seconds": 8.04990018112585,
+            "phase": "complete",
+            "VmSize": 418776,
+            "VmHWM": 176208,
+            "VmRSS": 176208,
+            "RssAnon": 169064,
+            "RssFile": 7144
+          },
+          {
+            "seconds": 9.044691188028082,
+            "phase": "complete",
+            "VmSize": 418776,
+            "VmHWM": 176292,
+            "VmRSS": 176292,
+            "RssAnon": 169148,
+            "RssFile": 7144
+          },
+          {
+            "seconds": 10.003523963037878,
+            "phase": "complete",
+            "VmSize": 418788,
+            "VmHWM": 176292,
+            "VmRSS": 176292,
+            "RssAnon": 169148,
+            "RssFile": 7144
+          },
+          {
+            "seconds": 11.00821536500007,
+            "phase": "complete",
+            "VmSize": 418788,
+            "VmHWM": 176292,
+            "VmRSS": 176292,
+            "RssAnon": 169148,
+            "RssFile": 7144
+          },
+          {
+            "seconds": 12.031296666013077,
+            "phase": "complete",
+            "VmSize": 418776,
+            "VmHWM": 176296,
+            "VmRSS": 176296,
+            "RssAnon": 169152,
+            "RssFile": 7144
+          },
+          {
+            "seconds": 13.035690477117896,
+            "phase": "complete",
+            "VmSize": 418776,
+            "VmHWM": 176296,
+            "VmRSS": 176296,
+            "RssAnon": 169152,
+            "RssFile": 7144
+          },
+          {
+            "seconds": 14.027887105941772,
+            "phase": "complete",
+            "VmSize": 661600,
+            "VmHWM": 412180,
+            "VmRSS": 412180,
+            "RssAnon": 405036,
+            "RssFile": 7144
+          }
+        ],
+        "events": [
+          {
+            "observed_s": 0.012901623034849763,
+            "data": {
+              "event": "baseline_start"
+            }
+          },
+          {
+            "observed_s": 1.1431041499599814,
+            "data": {
+              "event": "baseline_ready",
+              "files": 10578
+            }
+          },
+          {
+            "observed_s": 1.1431159570347518,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "pressure_start",
+              "sample": 0
+            }
+          },
+          {
+            "observed_s": 2.758630530908704,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "phase_start",
+              "sample": 0
+            }
+          },
+          {
+            "observed_s": 2.791041102958843,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "phase_done",
+              "sample": 0
+            }
+          },
+          {
+            "observed_s": 2.820788220036775,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "pressure_start",
+              "sample": 1
+            }
+          },
+          {
+            "observed_s": 4.75551118911244,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "phase_start",
+              "sample": 1
+            }
+          },
+          {
+            "observed_s": 4.844754318939522,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "phase_done",
+              "sample": 1
+            }
+          },
+          {
+            "observed_s": 4.873708751052618,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "pressure_start",
+              "sample": 2
+            }
+          },
+          {
+            "observed_s": 6.176720537012443,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "phase_start",
+              "sample": 2
+            }
+          },
+          {
+            "observed_s": 6.262754675932229,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "phase_done",
+              "sample": 2
+            }
+          },
+          {
+            "observed_s": 6.291727682109922,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "pressure_start",
+              "sample": 3
+            }
+          },
+          {
+            "observed_s": 8.230287989135832,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "phase_start",
+              "sample": 3
+            }
+          },
+          {
+            "observed_s": 8.262476613046601,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "phase_done",
+              "sample": 3
+            }
+          },
+          {
+            "observed_s": 8.291486432077363,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "pressure_start",
+              "sample": 4
+            }
+          },
+          {
+            "observed_s": 9.69120466709137,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "phase_start",
+              "sample": 4
+            }
+          },
+          {
+            "observed_s": 9.723431247053668,
+            "data": {
+              "condition": "after_cleanup",
+              "event": "phase_done",
+              "sample": 4
+            }
+          },
+          {
+            "observed_s": 9.752361957915127,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "pressure_start",
+              "sample": 5
+            }
+          },
+          {
+            "observed_s": 11.737348101101816,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "phase_start",
+              "sample": 5
+            }
+          },
+          {
+            "observed_s": 11.8303771330975,
+            "data": {
+              "condition": "during_cleanup",
+              "event": "phase_done",
+              "sample": 5
+            }
+          },
+          {
+            "observed_s": 13.417491585947573,
+            "data": {
+              "condition": "recovery_observed",
+              "event": "phase_start",
+              "sample": 6
+            }
+          },
+          {
+            "observed_s": 13.450264001032338,
+            "data": {
+              "condition": "recovery_observed",
+              "event": "phase_done",
+              "sample": 6
+            }
+          },
+          {
+            "observed_s": 13.481256702914834,
+            "data": {
+              "condition": "recovery_observed",
+              "event": "phase_start",
+              "sample": 7
+            }
+          },
+          {
+            "observed_s": 13.513947593979537,
+            "data": {
+              "condition": "recovery_observed",
+              "event": "phase_done",
+              "sample": 7
+            }
+          },
+          {
+            "observed_s": 13.542945662047714,
+            "data": {
+              "condition": "recovery_observed",
+              "event": "phase_start",
+              "sample": 8
+            }
+          },
+          {
+            "observed_s": 13.57564326794818,
+            "data": {
+              "condition": "recovery_observed",
+              "event": "phase_done",
+              "sample": 8
+            }
+          },
+          {
+            "observed_s": 14.310723914997652,
+            "data": {
+              "report_ref": "report"
+            }
+          }
+        ],
+        "stderr": ""
+      },
+      "report": {
+        "baseline_snapshot": "69878dec8170a7ec250c3fa4f9e3685cca9fcb64e0bf71cd82ae99e4a7077b50",
+        "cases": [
+          {
+            "admission_ms": 68.38776,
+            "capture_marks": [],
+            "capture_overlaps_cleanup": null,
+            "cleanup_end_ms": 163.089285,
+            "cleanup_ms": 94.701487,
+            "cleanup_start_ms": 68.387798,
+            "condition": "after_cleanup",
+            "expected_declaration": true,
+            "explicit_hint": false,
+            "fresh_facts_match": true,
+            "hint_ms": 164.065183,
+            "maintenance_before": {
+              "attempts": 0,
+              "completed": 0,
+              "error": null,
+              "failed": 0,
+              "running": false
+            },
+            "maintenance_observed": {
+              "attempts": 1,
+              "completed": 1,
+              "error": null,
+              "failed": 0,
+              "running": false
+            },
+            "measurements": {
+              "analyzed": 10147,
+              "bytes": 5368,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 0.33454,
+              "deferred": 0,
+              "files": 10578,
+              "parsed": 1,
+              "read_files": 1,
+              "reconciled": false,
+              "retained": 10577,
+              "reused": 10577,
+              "shared_sources": 0,
+              "source_only": 431,
+              "total_ms": 5.343214,
+              "tree_reuses": 0
+            },
+            "old_pin_matches": true,
+            "pair": 0,
+            "published_during_cleanup": false,
+            "published_ms": 195.078869,
+            "retired_ms": 3.8e-05,
+            "sample": 0,
+            "source_matches": true,
+            "status_after": {
+              "error": null,
+              "generation": 2,
+              "measurements": {
+                "analyzed": 10147,
+                "bytes": 5368,
+                "cache_hits": 0,
+                "cache_warnings": 0,
+                "capture_ms": 0.33454,
+                "deferred": 0,
+                "files": 10578,
+                "parsed": 1,
+                "read_files": 1,
+                "reconciled": false,
+                "retained": 10577,
+                "reused": 10577,
+                "shared_sources": 0,
+                "source_only": 431,
+                "total_ms": 5.343214,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 1,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": false,
+                "verification": {
+                  "analyzed": 10147,
+                  "bytes": 186092681,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 275.603366,
+                  "deferred": 0,
+                  "files": 10578,
+                  "parsed": 0,
+                  "read_files": 10578,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 10578,
+                  "shared_sources": 10578,
+                  "source_only": 431,
+                  "total_ms": 291.415605,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "220ea959abc103a896ed924236b92d429502d6786d7f80dee784f9a5daa11ad7"
+            },
+            "status_before": {
+              "error": null,
+              "generation": 1,
+              "measurements": {
+                "analyzed": 10147,
+                "bytes": 186092681,
+                "cache_hits": 0,
+                "cache_warnings": 0,
+                "capture_ms": 275.603366,
+                "deferred": 0,
+                "files": 10578,
+                "parsed": 0,
+                "read_files": 10578,
+                "reconciled": true,
+                "retained": 0,
+                "reused": 10578,
+                "shared_sources": 10578,
+                "source_only": 431,
+                "total_ms": 291.415605,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 1,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": false,
+                "verification": {
+                  "analyzed": 10147,
+                  "bytes": 186092681,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 275.603366,
+                  "deferred": 0,
+                  "files": 10578,
+                  "parsed": 0,
+                  "read_files": 10578,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 10578,
+                  "shared_sources": 10578,
+                  "source_only": 431,
+                  "total_ms": 291.415605,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "69878dec8170a7ec250c3fa4f9e3685cca9fcb64e0bf71cd82ae99e4a7077b50"
+            },
+            "tail_bytes": 805306368,
+            "write_overlaps_cleanup": false,
+            "write_start_ms": 163.883726,
+            "write_to_published_ms": 31.195143
+          },
+          {
+            "admission_ms": 592.277302,
+            "capture_marks": [],
+            "capture_overlaps_cleanup": null,
+            "cleanup_end_ms": 678.293461,
+            "cleanup_ms": 86.016131,
+            "cleanup_start_ms": 592.27733,
+            "condition": "during_cleanup",
+            "expected_declaration": true,
+            "explicit_hint": false,
+            "fresh_facts_match": true,
+            "hint_ms": 593.018107,
+            "maintenance_before": {
+              "attempts": 1,
+              "completed": 1,
+              "error": null,
+              "failed": 0,
+              "running": false
+            },
+            "maintenance_observed": {
+              "attempts": 2,
+              "completed": 1,
+              "error": null,
+              "failed": 0,
+              "running": true
+            },
+            "measurements": {
+              "analyzed": 10147,
+              "bytes": 5368,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 0.216023,
+              "deferred": 0,
+              "files": 10578,
+              "parsed": 1,
+              "read_files": 1,
+              "reconciled": false,
+              "retained": 10577,
+              "reused": 10577,
+              "shared_sources": 0,
+              "source_only": 431,
+              "total_ms": 4.825822,
+              "tree_reuses": 0
+            },
+            "old_pin_matches": true,
+            "pair": 0,
+            "published_during_cleanup": true,
+            "published_ms": 624.122029,
+            "retired_ms": 2.8e-05,
+            "sample": 1,
+            "source_matches": true,
+            "status_after": {
+              "error": null,
+              "generation": 4,
+              "measurements": {
+                "analyzed": 10147,
+                "bytes": 5368,
+                "cache_hits": 0,
+                "cache_warnings": 0,
+                "capture_ms": 0.216023,
+                "deferred": 0,
+                "files": 10578,
+                "parsed": 1,
+                "read_files": 1,
+                "reconciled": false,
+                "retained": 10577,
+                "reused": 10577,
+                "shared_sources": 0,
+                "source_only": 431,
+                "total_ms": 4.825822,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 2,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": false,
+                "verification": {
+                  "analyzed": 10147,
+                  "bytes": 186092681,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 1277.2738399999998,
+                  "deferred": 0,
+                  "files": 10578,
+                  "parsed": 0,
+                  "read_files": 10578,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 10578,
+                  "shared_sources": 10578,
+                  "source_only": 431,
+                  "total_ms": 1291.8249130000002,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "13904fc997998e7c960709575a74f1372c8ede91ddf14355a08c4a68a31fa692"
+            },
+            "status_before": {
+              "error": null,
+              "generation": 3,
+              "measurements": {
+                "analyzed": 10147,
+                "bytes": 186092681,
+                "cache_hits": 0,
+                "cache_warnings": 0,
+                "capture_ms": 1277.2738399999998,
+                "deferred": 0,
+                "files": 10578,
+                "parsed": 0,
+                "read_files": 10578,
+                "reconciled": true,
+                "retained": 0,
+                "reused": 10578,
+                "shared_sources": 10578,
+                "source_only": 431,
+                "total_ms": 1291.8249130000002,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 2,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": false,
+                "verification": {
+                  "analyzed": 10147,
+                  "bytes": 186092681,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 1277.2738399999998,
+                  "deferred": 0,
+                  "files": 10578,
+                  "parsed": 0,
+                  "read_files": 10578,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 10578,
+                  "shared_sources": 10578,
+                  "source_only": 431,
+                  "total_ms": 1291.8249130000002,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "69878dec8170a7ec250c3fa4f9e3685cca9fcb64e0bf71cd82ae99e4a7077b50"
+            },
+            "tail_bytes": 805306368,
+            "write_overlaps_cleanup": true,
+            "write_start_ms": 592.9190050000001,
+            "write_to_published_ms": 31.203024
+          },
+          {
+            "admission_ms": 82.920252,
+            "capture_marks": [],
+            "capture_overlaps_cleanup": null,
+            "cleanup_end_ms": 169.081488,
+            "cleanup_ms": 86.161208,
+            "cleanup_start_ms": 82.92028,
+            "condition": "during_cleanup",
+            "expected_declaration": true,
+            "explicit_hint": false,
+            "fresh_facts_match": true,
+            "hint_ms": 84.85470600000001,
+            "maintenance_before": {
+              "attempts": 2,
+              "completed": 2,
+              "error": null,
+              "failed": 0,
+              "running": false
+            },
+            "maintenance_observed": {
+              "attempts": 3,
+              "completed": 2,
+              "error": null,
+              "failed": 0,
+              "running": true
+            },
+            "measurements": {
+              "analyzed": 10147,
+              "bytes": 5368,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 0.118488,
+              "deferred": 0,
+              "files": 10578,
+              "parsed": 1,
+              "read_files": 1,
+              "reconciled": false,
+              "retained": 10577,
+              "reused": 10577,
+              "shared_sources": 0,
+              "source_only": 431,
+              "total_ms": 4.207553,
+              "tree_reuses": 0
+            },
+            "old_pin_matches": true,
+            "pair": 1,
+            "published_during_cleanup": true,
+            "published_ms": 115.91703000000001,
+            "retired_ms": 2.8e-05,
+            "sample": 2,
+            "source_matches": true,
+            "status_after": {
+              "error": null,
+              "generation": 6,
+              "measurements": {
+                "analyzed": 10147,
+                "bytes": 5368,
+                "cache_hits": 0,
+                "cache_warnings": 0,
+                "capture_ms": 0.118488,
+                "deferred": 0,
+                "files": 10578,
+                "parsed": 1,
+                "read_files": 1,
+                "reconciled": false,
+                "retained": 10577,
+                "reused": 10577,
+                "shared_sources": 0,
+                "source_only": 431,
+                "total_ms": 4.207553,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 2,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": false,
+                "verification": {
+                  "analyzed": 10147,
+                  "bytes": 186092681,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 1277.2738399999998,
+                  "deferred": 0,
+                  "files": 10578,
+                  "parsed": 0,
+                  "read_files": 10578,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 10578,
+                  "shared_sources": 10578,
+                  "source_only": 431,
+                  "total_ms": 1291.8249130000002,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "37121a9e749b6ff44a52f4d87a07dc714efdbcf28c644f175b7cbb2ec7d04236"
+            },
+            "status_before": {
+              "error": null,
+              "generation": 5,
+              "measurements": {
+                "analyzed": 10147,
+                "bytes": 5264,
+                "cache_hits": 1,
+                "cache_warnings": 0,
+                "capture_ms": 0.169672,
+                "deferred": 0,
+                "files": 10578,
+                "parsed": 0,
+                "read_files": 1,
+                "reconciled": false,
+                "retained": 10577,
+                "reused": 10577,
+                "shared_sources": 0,
+                "source_only": 431,
+                "total_ms": 3.351824,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 2,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": false,
+                "verification": {
+                  "analyzed": 10147,
+                  "bytes": 186092681,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 1277.2738399999998,
+                  "deferred": 0,
+                  "files": 10578,
+                  "parsed": 0,
+                  "read_files": 10578,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 10578,
+                  "shared_sources": 10578,
+                  "source_only": 431,
+                  "total_ms": 1291.8249130000002,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "69878dec8170a7ec250c3fa4f9e3685cca9fcb64e0bf71cd82ae99e4a7077b50"
+            },
+            "tail_bytes": 805306368,
+            "write_overlaps_cleanup": true,
+            "write_start_ms": 84.759768,
+            "write_to_published_ms": 31.157262000000003
+          },
+          {
+            "admission_ms": 621.01426,
+            "capture_marks": [],
+            "capture_overlaps_cleanup": null,
+            "cleanup_end_ms": 707.4402220000001,
+            "cleanup_ms": 86.425932,
+            "cleanup_start_ms": 621.01429,
+            "condition": "after_cleanup",
+            "expected_declaration": true,
+            "explicit_hint": false,
+            "fresh_facts_match": true,
+            "hint_ms": 708.0527450000001,
+            "maintenance_before": {
+              "attempts": 3,
+              "completed": 3,
+              "error": null,
+              "failed": 0,
+              "running": false
+            },
+            "maintenance_observed": {
+              "attempts": 4,
+              "completed": 4,
+              "error": null,
+              "failed": 0,
+              "running": false
+            },
+            "measurements": {
+              "analyzed": 10147,
+              "bytes": 5368,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 0.2682,
+              "deferred": 0,
+              "files": 10578,
+              "parsed": 1,
+              "read_files": 1,
+              "reconciled": false,
+              "retained": 10577,
+              "reused": 10577,
+              "shared_sources": 0,
+              "source_only": 431,
+              "total_ms": 4.320272,
+              "tree_reuses": 0
+            },
+            "old_pin_matches": true,
+            "pair": 1,
+            "published_during_cleanup": false,
+            "published_ms": 739.0146319999999,
+            "retired_ms": 2.9999999999999997e-05,
+            "sample": 3,
+            "source_matches": true,
+            "status_after": {
+              "error": null,
+              "generation": 8,
+              "measurements": {
+                "analyzed": 10147,
+                "bytes": 5368,
+                "cache_hits": 0,
+                "cache_warnings": 0,
+                "capture_ms": 0.2682,
+                "deferred": 0,
+                "files": 10578,
+                "parsed": 1,
+                "read_files": 1,
+                "reconciled": false,
+                "retained": 10577,
+                "reused": 10577,
+                "shared_sources": 0,
+                "source_only": 431,
+                "total_ms": 4.320272,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 3,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": false,
+                "verification": {
+                  "analyzed": 10147,
+                  "bytes": 186092681,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 1371.4491090000001,
+                  "deferred": 0,
+                  "files": 10578,
+                  "parsed": 0,
+                  "read_files": 10578,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 10578,
+                  "shared_sources": 10578,
+                  "source_only": 431,
+                  "total_ms": 1386.5073830000001,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "d5032ca130d80dfc9bfdca8d0ea43b89f68850ecfb2e0430822963da25e236bb"
+            },
+            "status_before": {
+              "error": null,
+              "generation": 7,
+              "measurements": {
+                "analyzed": 10147,
+                "bytes": 186092681,
+                "cache_hits": 0,
+                "cache_warnings": 0,
+                "capture_ms": 1371.4491090000001,
+                "deferred": 0,
+                "files": 10578,
+                "parsed": 0,
+                "read_files": 10578,
+                "reconciled": true,
+                "retained": 0,
+                "reused": 10578,
+                "shared_sources": 10578,
+                "source_only": 431,
+                "total_ms": 1386.5073830000001,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 3,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": false,
+                "verification": {
+                  "analyzed": 10147,
+                  "bytes": 186092681,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 1371.4491090000001,
+                  "deferred": 0,
+                  "files": 10578,
+                  "parsed": 0,
+                  "read_files": 10578,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 10578,
+                  "shared_sources": 10578,
+                  "source_only": 431,
+                  "total_ms": 1386.5073830000001,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "69878dec8170a7ec250c3fa4f9e3685cca9fcb64e0bf71cd82ae99e4a7077b50"
+            },
+            "tail_bytes": 805306368,
+            "write_overlaps_cleanup": false,
+            "write_start_ms": 707.971499,
+            "write_to_published_ms": 31.043133
+          },
+          {
+            "admission_ms": 74.78594500000001,
+            "capture_marks": [],
+            "capture_overlaps_cleanup": null,
+            "cleanup_end_ms": 172.111603,
+            "cleanup_ms": 97.325631,
+            "cleanup_start_ms": 74.785972,
+            "condition": "after_cleanup",
+            "expected_declaration": true,
+            "explicit_hint": false,
+            "fresh_facts_match": true,
+            "hint_ms": 173.777889,
+            "maintenance_before": {
+              "attempts": 4,
+              "completed": 4,
+              "error": null,
+              "failed": 0,
+              "running": false
+            },
+            "maintenance_observed": {
+              "attempts": 5,
+              "completed": 5,
+              "error": null,
+              "failed": 0,
+              "running": false
+            },
+            "measurements": {
+              "analyzed": 10147,
+              "bytes": 5368,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 0.125176,
+              "deferred": 0,
+              "files": 10578,
+              "parsed": 1,
+              "read_files": 1,
+              "reconciled": false,
+              "retained": 10577,
+              "reused": 10577,
+              "shared_sources": 0,
+              "source_only": 431,
+              "total_ms": 4.015216000000001,
+              "tree_reuses": 0
+            },
+            "old_pin_matches": true,
+            "pair": 2,
+            "published_during_cleanup": false,
+            "published_ms": 204.76824599999998,
+            "retired_ms": 2.7e-05,
+            "sample": 4,
+            "source_matches": true,
+            "status_after": {
+              "error": null,
+              "generation": 10,
+              "measurements": {
+                "analyzed": 10147,
+                "bytes": 5368,
+                "cache_hits": 0,
+                "cache_warnings": 0,
+                "capture_ms": 0.125176,
+                "deferred": 0,
+                "files": 10578,
+                "parsed": 1,
+                "read_files": 1,
+                "reconciled": false,
+                "retained": 10577,
+                "reused": 10577,
+                "shared_sources": 0,
+                "source_only": 431,
+                "total_ms": 4.015216000000001,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 3,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": false,
+                "verification": {
+                  "analyzed": 10147,
+                  "bytes": 186092681,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 1371.4491090000001,
+                  "deferred": 0,
+                  "files": 10578,
+                  "parsed": 0,
+                  "read_files": 10578,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 10578,
+                  "shared_sources": 10578,
+                  "source_only": 431,
+                  "total_ms": 1386.5073830000001,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "f8aced2a35b97347cae631774727b1d43eb71d8d52d5fe796bfd1cf990e761bd"
+            },
+            "status_before": {
+              "error": null,
+              "generation": 9,
+              "measurements": {
+                "analyzed": 10147,
+                "bytes": 5264,
+                "cache_hits": 1,
+                "cache_warnings": 0,
+                "capture_ms": 0.14159,
+                "deferred": 0,
+                "files": 10578,
+                "parsed": 0,
+                "read_files": 1,
+                "reconciled": false,
+                "retained": 10577,
+                "reused": 10577,
+                "shared_sources": 0,
+                "source_only": 431,
+                "total_ms": 3.245859,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 3,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": false,
+                "verification": {
+                  "analyzed": 10147,
+                  "bytes": 186092681,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 1371.4491090000001,
+                  "deferred": 0,
+                  "files": 10578,
+                  "parsed": 0,
+                  "read_files": 10578,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 10578,
+                  "shared_sources": 10578,
+                  "source_only": 431,
+                  "total_ms": 1386.5073830000001,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "69878dec8170a7ec250c3fa4f9e3685cca9fcb64e0bf71cd82ae99e4a7077b50"
+            },
+            "tail_bytes": 805306368,
+            "write_overlaps_cleanup": false,
+            "write_start_ms": 173.697101,
+            "write_to_published_ms": 31.071145
+          },
+          {
+            "admission_ms": 612.928358,
+            "capture_marks": [],
+            "capture_overlaps_cleanup": null,
+            "cleanup_end_ms": 704.225464,
+            "cleanup_ms": 91.297066,
+            "cleanup_start_ms": 612.928398,
+            "condition": "during_cleanup",
+            "expected_declaration": true,
+            "explicit_hint": false,
+            "fresh_facts_match": true,
+            "hint_ms": 613.7414960000001,
+            "maintenance_before": {
+              "attempts": 5,
+              "completed": 5,
+              "error": null,
+              "failed": 0,
+              "running": false
+            },
+            "maintenance_observed": {
+              "attempts": 6,
+              "completed": 5,
+              "error": null,
+              "failed": 0,
+              "running": true
+            },
+            "measurements": {
+              "analyzed": 10147,
+              "bytes": 5368,
+              "cache_hits": 0,
+              "cache_warnings": 0,
+              "capture_ms": 0.20332,
+              "deferred": 0,
+              "files": 10578,
+              "parsed": 1,
+              "read_files": 1,
+              "reconciled": false,
+              "retained": 10577,
+              "reused": 10577,
+              "shared_sources": 0,
+              "source_only": 431,
+              "total_ms": 5.056871999999999,
+              "tree_reuses": 0
+            },
+            "old_pin_matches": true,
+            "pair": 2,
+            "published_during_cleanup": true,
+            "published_ms": 644.7335119999999,
+            "retired_ms": 4e-05,
+            "sample": 5,
+            "source_matches": true,
+            "status_after": {
+              "error": null,
+              "generation": 12,
+              "measurements": {
+                "analyzed": 10147,
+                "bytes": 5368,
+                "cache_hits": 0,
+                "cache_warnings": 0,
+                "capture_ms": 0.20332,
+                "deferred": 0,
+                "files": 10578,
+                "parsed": 1,
+                "read_files": 1,
+                "reconciled": false,
+                "retained": 10577,
+                "reused": 10577,
+                "shared_sources": 0,
+                "source_only": 431,
+                "total_ms": 5.056871999999999,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 4,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": false,
+                "verification": {
+                  "analyzed": 10147,
+                  "bytes": 186092681,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 1560.433258,
+                  "deferred": 0,
+                  "files": 10578,
+                  "parsed": 0,
+                  "read_files": 10578,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 10578,
+                  "shared_sources": 10578,
+                  "source_only": 431,
+                  "total_ms": 1575.283051,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "a3c69cd4e44b2e444f45f80c8b3f35c3c6912ca1ef75089400bc2c04e69893c2"
+            },
+            "status_before": {
+              "error": null,
+              "generation": 11,
+              "measurements": {
+                "analyzed": 10147,
+                "bytes": 186092681,
+                "cache_hits": 0,
+                "cache_warnings": 0,
+                "capture_ms": 1560.433258,
+                "deferred": 0,
+                "files": 10578,
+                "parsed": 0,
+                "read_files": 10578,
+                "reconciled": true,
+                "retained": 0,
+                "reused": 10578,
+                "shared_sources": 10578,
+                "source_only": 431,
+                "total_ms": 1575.283051,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 4,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": false,
+                "verification": {
+                  "analyzed": 10147,
+                  "bytes": 186092681,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 1560.433258,
+                  "deferred": 0,
+                  "files": 10578,
+                  "parsed": 0,
+                  "read_files": 10578,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 10578,
+                  "shared_sources": 10578,
+                  "source_only": 431,
+                  "total_ms": 1575.283051,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "69878dec8170a7ec250c3fa4f9e3685cca9fcb64e0bf71cd82ae99e4a7077b50"
+            },
+            "tail_bytes": 805306368,
+            "write_overlaps_cleanup": true,
+            "write_start_ms": 613.6209809999999,
+            "write_to_published_ms": 31.112530999999997
+          },
+          {
+            "condition": "recovery_observed",
+            "expected_declaration": true,
+            "explicit_hint": false,
+            "fresh_facts_match": true,
+            "maintenance_observed": {
+              "attempts": 7,
+              "completed": 7,
+              "error": null,
+              "failed": 0,
+              "running": false
+            },
+            "old_pin_matches": true,
+            "published_ms": 31.082558,
+            "sample": 6,
+            "source_matches": true,
+            "status_after": {
+              "error": null,
+              "generation": 14,
+              "measurements": {
+                "analyzed": 10147,
+                "bytes": 5368,
+                "cache_hits": 0,
+                "cache_warnings": 0,
+                "capture_ms": 0.109975,
+                "deferred": 0,
+                "files": 10578,
+                "parsed": 1,
+                "read_files": 1,
+                "reconciled": false,
+                "retained": 10577,
+                "reused": 10577,
+                "shared_sources": 0,
+                "source_only": 431,
+                "total_ms": 4.3681149999999995,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 4,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": true,
+                "verification": {
+                  "analyzed": 10147,
+                  "bytes": 186092681,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 1560.433258,
+                  "deferred": 0,
+                  "files": 10578,
+                  "parsed": 0,
+                  "read_files": 10578,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 10578,
+                  "shared_sources": 10578,
+                  "source_only": 431,
+                  "total_ms": 1575.283051,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "62c96eb96855e33f5ab9c780efeeb9d56b7d22115c212c86b81ab42de05a630e"
+            },
+            "status_before": {
+              "error": null,
+              "generation": 13,
+              "measurements": {
+                "analyzed": 10147,
+                "bytes": 5264,
+                "cache_hits": 1,
+                "cache_warnings": 0,
+                "capture_ms": 0.17397300000000002,
+                "deferred": 0,
+                "files": 10578,
+                "parsed": 0,
+                "read_files": 1,
+                "reconciled": false,
+                "retained": 10577,
+                "reused": 10577,
+                "shared_sources": 0,
+                "source_only": 431,
+                "total_ms": 3.775526,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 4,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": true,
+                "verification": {
+                  "analyzed": 10147,
+                  "bytes": 186092681,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 1560.433258,
+                  "deferred": 0,
+                  "files": 10578,
+                  "parsed": 0,
+                  "read_files": 10578,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 10578,
+                  "shared_sources": 10578,
+                  "source_only": 431,
+                  "total_ms": 1575.283051,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "69878dec8170a7ec250c3fa4f9e3685cca9fcb64e0bf71cd82ae99e4a7077b50"
+            },
+            "write_finished_ms": 0.06629700000000001,
+            "write_start_ms": 0.008396,
+            "write_to_published_ms": 31.074161999999998
+          },
+          {
+            "condition": "recovery_observed",
+            "expected_declaration": true,
+            "explicit_hint": false,
+            "fresh_facts_match": true,
+            "maintenance_observed": {
+              "attempts": 7,
+              "completed": 7,
+              "error": null,
+              "failed": 0,
+              "running": false
+            },
+            "old_pin_matches": true,
+            "published_ms": 30.979447,
+            "sample": 7,
+            "source_matches": true,
+            "status_after": {
+              "error": null,
+              "generation": 16,
+              "measurements": {
+                "analyzed": 10147,
+                "bytes": 5368,
+                "cache_hits": 0,
+                "cache_warnings": 0,
+                "capture_ms": 0.08763800000000001,
+                "deferred": 0,
+                "files": 10578,
+                "parsed": 1,
+                "read_files": 1,
+                "reconciled": false,
+                "retained": 10577,
+                "reused": 10577,
+                "shared_sources": 0,
+                "source_only": 431,
+                "total_ms": 3.86924,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 4,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": true,
+                "verification": {
+                  "analyzed": 10147,
+                  "bytes": 186092681,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 1560.433258,
+                  "deferred": 0,
+                  "files": 10578,
+                  "parsed": 0,
+                  "read_files": 10578,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 10578,
+                  "shared_sources": 10578,
+                  "source_only": 431,
+                  "total_ms": 1575.283051,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "5fbad780f22badeda75e4765c0a32b2c20eceb9e1aeb7b43e205d8768c7ceb86"
+            },
+            "status_before": {
+              "error": null,
+              "generation": 15,
+              "measurements": {
+                "analyzed": 10147,
+                "bytes": 5264,
+                "cache_hits": 1,
+                "cache_warnings": 0,
+                "capture_ms": 0.324465,
+                "deferred": 0,
+                "files": 10578,
+                "parsed": 0,
+                "read_files": 1,
+                "reconciled": false,
+                "retained": 10577,
+                "reused": 10577,
+                "shared_sources": 0,
+                "source_only": 431,
+                "total_ms": 3.638111,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 4,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": true,
+                "verification": {
+                  "analyzed": 10147,
+                  "bytes": 186092681,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 1560.433258,
+                  "deferred": 0,
+                  "files": 10578,
+                  "parsed": 0,
+                  "read_files": 10578,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 10578,
+                  "shared_sources": 10578,
+                  "source_only": 431,
+                  "total_ms": 1575.283051,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "69878dec8170a7ec250c3fa4f9e3685cca9fcb64e0bf71cd82ae99e4a7077b50"
+            },
+            "write_finished_ms": 0.105253,
+            "write_start_ms": 0.011905,
+            "write_to_published_ms": 30.967542
+          },
+          {
+            "condition": "recovery_observed",
+            "expected_declaration": true,
+            "explicit_hint": false,
+            "fresh_facts_match": true,
+            "maintenance_observed": {
+              "attempts": 7,
+              "completed": 7,
+              "error": null,
+              "failed": 0,
+              "running": false
+            },
+            "old_pin_matches": true,
+            "published_ms": 30.960248999999997,
+            "sample": 8,
+            "source_matches": true,
+            "status_after": {
+              "error": null,
+              "generation": 18,
+              "measurements": {
+                "analyzed": 10147,
+                "bytes": 5368,
+                "cache_hits": 0,
+                "cache_warnings": 0,
+                "capture_ms": 0.13045400000000001,
+                "deferred": 0,
+                "files": 10578,
+                "parsed": 1,
+                "read_files": 1,
+                "reconciled": false,
+                "retained": 10577,
+                "reused": 10577,
+                "shared_sources": 0,
+                "source_only": 431,
+                "total_ms": 4.797407,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 4,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": true,
+                "verification": {
+                  "analyzed": 10147,
+                  "bytes": 186092681,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 1560.433258,
+                  "deferred": 0,
+                  "files": 10578,
+                  "parsed": 0,
+                  "read_files": 10578,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 10578,
+                  "shared_sources": 10578,
+                  "source_only": 431,
+                  "total_ms": 1575.283051,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "7662f38c59b12bd103e878840b66bcb085f884825f48d6a11cfbb1a4f0546077"
+            },
+            "status_before": {
+              "error": null,
+              "generation": 17,
+              "measurements": {
+                "analyzed": 10147,
+                "bytes": 5264,
+                "cache_hits": 1,
+                "cache_warnings": 0,
+                "capture_ms": 0.100422,
+                "deferred": 0,
+                "files": 10578,
+                "parsed": 0,
+                "read_files": 1,
+                "reconciled": false,
+                "retained": 10577,
+                "reused": 10577,
+                "shared_sources": 0,
+                "source_only": 431,
+                "total_ms": 3.267975,
+                "tree_reuses": 0
+              },
+              "name": "source",
+              "observation": "native directory watches + periodic reconciliation",
+              "pending": false,
+              "recovery": {
+                "completed": 4,
+                "discarded": 0,
+                "error": null,
+                "overlay": null,
+                "running": true,
+                "verification": {
+                  "analyzed": 10147,
+                  "bytes": 186092681,
+                  "cache_hits": 0,
+                  "cache_warnings": 0,
+                  "capture_ms": 1560.433258,
+                  "deferred": 0,
+                  "files": 10578,
+                  "parsed": 0,
+                  "read_files": 10578,
+                  "reconciled": true,
+                  "retained": 0,
+                  "reused": 10578,
+                  "shared_sources": 10578,
+                  "source_only": 431,
+                  "total_ms": 1575.283051,
+                  "tree_reuses": 0
+                }
+              },
+              "schema": 1,
+              "snapshot": "69878dec8170a7ec250c3fa4f9e3685cca9fcb64e0bf71cd82ae99e4a7077b50"
+            },
+            "write_finished_ms": 0.11439099999999999,
+            "write_start_ms": 0.009342,
+            "write_to_published_ms": 30.950907
+          }
+        ],
+        "explicit_hints": false,
+        "files": 10578,
+        "final_clean_matches": true,
+        "maintenance": {
+          "attempts": 8,
+          "completed": 8,
+          "error": null,
+          "failed": 0,
+          "running": false
+        },
+        "recovery_ms": 2000,
+        "released_ms": 6.674511,
+        "restored_matches": true,
+        "shutdown_ms": 0.21629700000000002,
+        "spool": {
+          "allocated_bytes": 0,
+          "capacity_bytes": 1073741824,
+          "cleaning_bytes": 0,
+          "cleaning_files": 0,
+          "extent_bytes": 0,
+          "file_bytes": 0,
+          "free_bytes": 0,
+          "max_read_request": 65536,
+          "peak_extent_bytes": 991431049,
+          "peak_staging_bytes": 805306368,
+          "pending_retirements": 0,
+          "read_bytes": 182302391,
+          "reads": 11245,
+          "staging_bytes": 0,
+          "stores": 10602,
+          "written_bytes": 5018026577
+        },
+        "watching": true
+      }
+    }
+  ],
+  "limits": [
+    "Watch/recovery options recorded in configuration; exact notification attribution and recovery overlap are not isolated.",
+    "Generated streamed tail is controlled allocation pressure outside project source; it is not representative repository code.",
+    "Three samples per condition/profile; finite observations, not browser latency tails or randomised speedups.",
+    "Unlabelled capture tracing disabled; latest operation measurements may describe recovery rather than the foreground edit.",
+    "Compatible cache preparation, pressure setup and independent verification are outside write-to-publication timing, but affect process peaks.",
+    "Child 12 GiB virtual-address-space limit is not RSS/physical-RAM enforcement or baseline-laptop qualification.",
+    "Actual idle scheduler admits cleanup and waits for recovery before admission; no three-way overlap is forced.",
+    "Only generated-tail cuts at least as large as the fixture signal cleanup entry; no artificial truncate delay.",
+    "Recovery-observed cases record running status before writing, not an instrumented capture or parse interval.",
+    "Native watcher callback release may outlast coordinator join; qualification waits for release before final storage checks.",
+    "Quiet time can elapse during pressure setup; unblocked shutdown observations do not establish a deadline."
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "base_commit": "8b413998c699853ef7b4526a3b21ff897c8c6d05",
+  "note": "Final qualification working tree before commit. No production scheduler/storage or dependency changes. Release probe frozen before timing.",
+  "sha256": {
+    "Cargo.toml": "b48edcbfd70277e9d0a58f7680b6ed414bc70108b279fdfba98dcd9a07092636",
+    "Cargo.lock": "032ea2295563c2354c3d92c54cf4be9943ad62eb1ed116d6267b7c2c0ee1456d",
+    "crates/vizzi/Cargo.toml": "84ffe4de6633d996c98d085060ab7afd8661c8d6031792fde465afd6e5fdc16a",
+    "crates/vizzi/src/lib.rs": "9df7c2ec70ac4b4bc27ff85f32d76d516ccd46cb13e942f1286f7e7ffaef0fbb",
+    "crates/vizzi/src/maintenance.rs": "6d33d1813bc29cd3d15ad2ffe530a927af691d8052bb3617bc3d6e22e1062c08",
+    "crates/vizzi/src/host.rs": "7da9d6155a139c47ed3164a561b2fbb44d30c963a6772f2c9588f46abc37ef39",
+    "crates/vizzi/src/source.rs": "73728a9fb35b95bdaa851da9268d95e0b2b9cc1af8c2dd86bc71049b226da255",
+    "crates/vizzi/src/source_spool.rs": "2999453b49e4adb6d6aa90c66509d118475a411873d1b3a2c46c760a1698457e",
+    "crates/vizzi/src/idle_probe.rs": "06eef1c64daef6a8083b38d0e2efa3c472dde5d4ffbef38ae4d32891a08e4706",
+    "crates/vizzi/src/foreground_maintenance.rs": "2f2e88d7c7ff44e2ec6e054dc4e4fa88cbd2ecc435ee3e40e549cef38e3a342d",
+    "crates/vizzi/tests/idle_maintenance.rs": "8ccef9941d1b688f955e0575de55b2e3c5408014a05ee4c2fa34d958a0053125",
+    "crates/vizzi/examples/idle_maintenance.rs": "603a756558f7314bb47733957df26e65c79938c1f183cf424a6e8e4f6c3fc90c",
+    "experiments/foreground-maintenance/measure.py": "b6f599f488bbe1a8f885e3220be5ca8bbc0a09e31b8523a6cf6dd2d7a7fbd2c7",
+    "experiments/qualification/native.py": "e637e001eff0f81059c10e02f5381c00ef44e45efbd79348f94b792203ef924a",
+    "experiments/qualification/profiles.json": "fe3443645d36e1749ab6f360cecc52c667269e0504326155ed89e1baf98af260",
+    "experiments/admission/limit.py": "fdabefbcaa734cb366b6bcc87306a480bccac672bf5d41dd5592982eb8c08785",
+    "crates/vizzi/src/engine.rs": "47336db32583f0a7facc74fc08c759c302bd4a676d24206ec3b67fffe40ac425",
+    "crates/vizzi/src/application.rs": "26e8a363ed9ecd859781a9e13fc3d518d1d3f81aee30195ee9c4a2e817362b6f",
+    "crates/vizzi/src/invalidation.rs": "3d4952d18abde7ad12ba43be67d5b20935511ecc237933f8faebcc538697e691",
+    "crates/vizzi/tests/interactive_maintenance.rs": "a3a9878697c3a67108171ef9bc19ce7832ee69b839c037923deade83c7591d6f",
+    "experiments/interactive-maintenance/measure.py": "d9293837f90b02d93654680e261b5cc42973139000934363527da216d41765ea"
+  },
+  "binary_sha256": "5910dd05c45b4f0b99f762f7c7394b5f635dde3821b8475c6bfb32e0de87e484"
+}

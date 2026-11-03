@@ -52,6 +52,7 @@ validating coordination; it does not qualify large-codebase GPU performance.
 - [Foreground edits during cleanup](experiments/foreground-maintenance/RESULTS.md)
 - [Independent capture during cleanup](experiments/independent-capture/RESULTS.md)
 - [Automatic idle maintenance](experiments/idle-maintenance/RESULTS.md)
+- [Watching, recovery and cleanup together](experiments/interactive-maintenance/RESULTS.md)
 - [Earlier performance experiments](experiments/performance/README.md)
 - [Contributor guidance](AGENTS.md)
 

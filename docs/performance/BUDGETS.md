@@ -172,6 +172,14 @@ retirement-to-entry observations follow already-idle pressure setup and do not c
 the quiet timeout. Generated tails, warm native samples and nonblocked shutdown do not
 qualify browser/recovery/cold-storage tails, physical RAM or baseline defaults.
 
+The [combined interactive qualification](../../experiments/interactive-maintenance/RESULTS.md)
+enables native watches and two-second recovery with automatic cleanup. All 18 edits pass
+source/fact/pin checks, and all six cleanup-overlap edits publish before truncation ends.
+During-cleanup medians are 56.0 / 31.2 ms; recovery-observed burst medians are 57.6 / 31.0 ms.
+Each burst shares one recovery cycle. Cleanup admission takes 2.49–2.70 s Linux and
+68–621 ms PyTorch; these are not cleanup deadlines. Warm finite native samples preserve
+the physical-RAM, sustained-pressure and browser/baseline qualification gaps.
+
 Do not replace semantic correctness checks with these performance targets. Language
 assignments, partial grammar coverage, source-only cases, cancellation, cache validity,
 and immutable publication must remain explicit and independently tested.

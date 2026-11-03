@@ -119,3 +119,7 @@ for source backing or memory policy change.
 [Raw observations](results/observations.json), [summary](results/summary.json),
 [sample CSV](results/samples.csv), [mutation details](results/native-mutation.json)
 and [source hashes](results/source-sha256.json) retain code, binary and workload identity.
+
+The [combined follow-up](../interactive-maintenance/RESULTS.md) now exercises native
+watching and active periodic recovery with this scheduler; baseline hardware and sustained
+pressure remain unqualified.

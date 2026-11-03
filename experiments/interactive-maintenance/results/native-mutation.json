@@ -1,0 +1,1732 @@
+{
+  "base_commit": "8b413998c699853ef7b4526a3b21ff897c8c6d05",
+  "scope": [
+    "Complete final qualification idle_probe.rs and shared foreground_maintenance::millis; vizzi/vizzi-core tests, all features, offline."
+  ],
+  "aggregation": "Final harness and shared timing outcomes only. Exploratory transient working-tree results are retained separately and superseded.",
+  "final_unique_mutants": 49,
+  "final_outcomes": {
+    "CaughtMutant": 43,
+    "Timeout": 6
+  },
+  "commands": {
+    "harness": "cargo mutants -p vizzi --all-features --test-package vizzi --test-package vizzi-core --config experiments/incremental/mutants.toml -f crates/vizzi/src/idle_probe.rs -j 4 --timeout 35 --build-timeout 180 -C --offline",
+    "shared_timing": "same command with -f crates/vizzi/src/foreground_maintenance.rs -F millis -j 2"
+  },
+  "runs": [
+    {
+      "label": "exploratory",
+      "version": "27.1.0",
+      "baseline": "Success",
+      "summary": {
+        "total_mutants": 47,
+        "caught": 22,
+        "missed": 12,
+        "timeout": 13,
+        "unviable": 0
+      },
+      "outcomes": [
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:32:5: replace default_recovery -> u64 with 0",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.654826358,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 5.6796611299999995,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:36:34: replace > with < in Mode::validate",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 8.661286162,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.654248922,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:36:34: replace > with >= in Mode::validate",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.122163764,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.552066226,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:42:9: replace Mode::combined -> bool with true",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.910916137,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.601971202,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:42:9: replace Mode::combined -> bool with false",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.232701734,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.710454211,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:42:62: replace || with && in Mode::combined",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 7.065185265,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.913105646,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:36:9: replace Mode::validate -> Result<(), Error> with Ok(())",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 42.921403305,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.605740177,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:36:34: replace > with == in Mode::validate",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 42.776400647,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.552009318,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:42:20: replace || with && in Mode::combined",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.077551231,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.551842733,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:42:87: replace != with == in Mode::combined",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.91403792,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.859208842,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:42:40: replace != with == in Mode::combined",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.6607175309999995,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.81318113,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:46:5: replace require_native -> Result<(), Error> with Ok(())",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 6.326631464,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.760089132,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:46:20: replace != with == in require_native",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.895796601,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.551772776,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:52:5: replace hint_scope -> Option<CaptureScope> with None",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.00412802,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.765485006,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:52:5: replace hint_scope -> Option<CaptureScope> with Some(Default::default())",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 6.649817677,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.768644281,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:32:5: replace default_recovery -> u64 with 1",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 36.462573458,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.043824649,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:77:9: replace <impl SourceMaintenance for Observed>::pending -> bool with true",
+          "outcome": "MissedMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.969905946,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 10.384936719,
+              "status": "Success"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:101:5: replace run -> Result<Value, Error> with Ok(Default::default())",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.383177362,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 4.409575241,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:136:30: replace != with == in run",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.018645909,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 4.357357151,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:61:5: replace submit with ()",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 7.058889541,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.051574262,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:77:9: replace <impl SourceMaintenance for Observed>::pending -> bool with false",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.864905664,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.017789188,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:145:33: replace == with != in run",
+          "outcome": "MissedMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.069789682,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 10.713423159,
+              "status": "Success"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:145:29: replace % with / in run",
+          "outcome": "MissedMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.02739814,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 12.191533648,
+              "status": "Success"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:80:9: replace <impl SourceMaintenance for Observed>::run -> Result<(), String> with Ok(())",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.224436571,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.005525649,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:145:29: replace % with + in run",
+          "outcome": "MissedMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.323266747,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 13.3834747,
+              "status": "Success"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:175:16: delete ! in run",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.362965349,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 5.990361581,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:187:57: replace > with < in run",
+          "outcome": "MissedMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.509916028,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 10.065936011,
+              "status": "Success"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:167:17: delete ! in run",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.462783763,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.046665452,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:189:49: replace > with == in run",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.215616469,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 4.708763432,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:187:21: replace || with && in run",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.385961072,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.05125239,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:187:57: replace > with == in run",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.365078901,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.021431222,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:189:49: replace > with >= in run",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.970721931,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 5.067714114,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:189:49: replace > with < in run",
+          "outcome": "MissedMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.314514435,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 11.035984681,
+              "status": "Success"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:192:16: delete ! in run",
+          "outcome": "MissedMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.461789198,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 9.73168151,
+              "status": "Success"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:187:57: replace > with >= in run",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.107530435,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.044309459,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:286:44: replace && with || in run",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.424758444,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 7.317418614,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:214:58: replace == with != in run",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.372242226,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.017238027,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:277:59: replace == with != in run",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.266864364,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.039644411,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:333:28: replace != with == in run",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.060092971,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 5.059410603,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:286:47: delete ! in run",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.873994281,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.031762464,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:326:55: replace == with != in run",
+          "outcome": "MissedMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.17226008,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 10.075642759,
+              "status": "Success"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:301:54: replace == with != in run",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.214212618,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.080274797,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:340:55: replace * with + in run",
+          "outcome": "MissedMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.267392763,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 12.558689467,
+              "status": "Success"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:340:55: replace * with / in run",
+          "outcome": "MissedMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.521068749,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 12.278175749,
+              "status": "Success"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:345:55: replace * with + in run",
+          "outcome": "MissedMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.601520365,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 11.475039069,
+              "status": "Success"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:345:55: replace * with / in run",
+          "outcome": "MissedMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.162652085,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 9.414336861,
+              "status": "Success"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:343:33: replace == with != in run",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.039572602,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.006807484,
+              "status": "Timeout"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "final_harness",
+      "version": "27.1.0",
+      "baseline": "Success",
+      "summary": {
+        "total_mutants": 44,
+        "caught": 38,
+        "missed": 0,
+        "timeout": 6,
+        "unviable": 0
+      },
+      "outcomes": [
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:35:5: replace default_recovery -> u64 with 0",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 14.043175087,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 1.02195951,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:39:34: replace > with < in Mode::validate",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 16.194538901,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.806005004,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:39:34: replace > with >= in Mode::validate",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.494047601,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.602450542,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:45:9: replace Mode::combined -> bool with true",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.170843835,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.658927535,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:45:9: replace Mode::combined -> bool with false",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 9.989916525,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.807643783,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:35:5: replace default_recovery -> u64 with 1",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 52.412647158,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.762340674,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:39:34: replace > with == in Mode::validate",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 56.372177369,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.860090394,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:39:9: replace Mode::validate -> Result<(), Error> with Ok(())",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 57.857096847,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.661882281,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:45:62: replace || with && in Mode::combined",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 6.755813893,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.763591596,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:45:20: replace || with && in Mode::combined",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 6.41631703,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.8221108,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:45:40: replace != with == in Mode::combined",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.886407955,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.971411366,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:45:87: replace != with == in Mode::combined",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.692746604,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.811191495,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:49:20: replace != with == in require_native",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.655068163,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.717434989,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:49:5: replace require_native -> Result<(), Error> with Ok(())",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 6.24957055,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.75717781,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:55:5: replace hint_scope -> Option<CaptureScope> with None",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 6.345849377,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.955983828,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:55:5: replace hint_scope -> Option<CaptureScope> with Some(Default::default())",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 7.294558764,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.90698678,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:69:5: replace failed_since -> bool with true",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 7.359556911,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.661601271,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:69:5: replace failed_since -> bool with false",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 7.426257002,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.706126881,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:69:14: replace > with == in failed_since",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 7.132648785,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.760648828,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:69:14: replace > with < in failed_since",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.036625001,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.707719462,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:69:14: replace > with >= in failed_since",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.530699707,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.602873634,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:72:5: replace restored -> bool with true",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.483937982,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.764019041,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:72:5: replace restored -> bool with false",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.105456692,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.702943382,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:72:32: replace == with != in restored",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.888630735,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.804725484,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:81:9: replace Observations::ready -> bool with true",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.796450314,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.808536031,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:81:9: replace Observations::ready -> bool with false",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.513178503,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.70407258,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:95:9: replace <impl SourceMaintenance for Observed>::pending -> bool with true",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.841649852,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.707864486,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:95:9: replace <impl SourceMaintenance for Observed>::pending -> bool with false",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.124526616,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.612320222,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:98:9: replace <impl SourceMaintenance for Observed>::run -> Result<(), String> with Ok(())",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.354539788,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.806214451,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:154:30: replace != with == in run",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.936762043,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 6.928334045,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:119:5: replace run -> Result<Value, Error> with Ok(Default::default())",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 6.851647744,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 6.853478394,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:64:5: replace submit with ()",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 8.746221448,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.047361826,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:163:33: replace == with != in run",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.835335091,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 9.137586122,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:163:29: replace % with / in run",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.407390101,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 9.311808166,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:163:29: replace % with + in run",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.523021192,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 10.710243914,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:193:16: delete ! in run",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.91510579,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 8.428805195,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:296:44: replace && with || in run",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.08792084,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 9.264751155999999,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:185:17: delete ! in run",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.738081994,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.036299917,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:205:21: replace || with && in run",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.760544013,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.013073354,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:222:58: replace == with != in run",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.51132569,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.044391838,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:311:54: replace == with != in run",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.056754365,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 7.9284578759999995,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:345:28: replace != with == in run",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.968856776,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 5.617730267,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:296:47: delete ! in run",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.109539978,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.032351059,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/idle_probe.rs:355:33: replace == with != in run",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.9674231660000001,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.012901445,
+              "status": "Timeout"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "shared_timing",
+      "version": "27.1.0",
+      "baseline": "Success",
+      "summary": {
+        "total_mutants": 5,
+        "caught": 5,
+        "missed": 0,
+        "timeout": 0,
+        "unviable": 0
+      },
+      "outcomes": [
+        {
+          "name": "crates/vizzi/src/foreground_maintenance.rs:130:5: replace millis -> f64 with 0.0",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 12.633913877,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.935250582,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/foreground_maintenance.rs:130:5: replace millis -> f64 with -1.0",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 6.938929827,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.760897629,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/foreground_maintenance.rs:130:47: replace * with + in millis",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 6.289546097,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.863527281,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/foreground_maintenance.rs:130:47: replace * with / in millis",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 6.309032016,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.808309064,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/foreground_maintenance.rs:130:5: replace millis -> f64 with 1.0",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 47.159925129,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.813732913,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "investigation": "Exploratory survivors prompted tests of delegated maintenance hints, alternating condition order, restoration barriers, new versus existing failures, cleanup entry/completion states, and submillisecond timing. No new exclusions.",
+  "limitations": [
+    "Six final timeouts stall hint submission, readiness or watcher-release progress; they are separate from assertion catches.",
+    "Production scheduler/storage code is unchanged and uses the preceding idle-maintenance mutation evidence.",
+    "Python drivers, OS/dependencies and browser internals are outside this mutation scope."
+  ]
+}

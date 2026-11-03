@@ -1,0 +1,542 @@
+{
+  "schema": 1,
+  "recorded_after_measurement_utc": "2026-11-03T20:45:18.672189+00:00",
+  "machine": {
+    "platform": "Linux-6.8.0-147-lowlatency-x86_64-with-glibc2.39",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13700H",
+    "logical_cpus": 20,
+    "mem_total_kib": 65508048,
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)"
+  },
+  "profiles": [
+    {
+      "profile": "linux",
+      "files": 66066,
+      "sampled_peak_rss_gib": 2.8349685668945312,
+      "wall_s": 75.83387637115084,
+      "shutdown_ms": 0.7964279999999999,
+      "released_ms": 7.10895,
+      "maintenance": {
+        "attempts": 9,
+        "completed": 9,
+        "error": null,
+        "failed": 0,
+        "running": false
+      },
+      "final_spool": {
+        "allocated_bytes": 0,
+        "capacity_bytes": 8589934592,
+        "cleaning_bytes": 0,
+        "cleaning_files": 0,
+        "extent_bytes": 0,
+        "file_bytes": 0,
+        "free_bytes": 0,
+        "max_read_request": 65536,
+        "peak_extent_bytes": 5790692464,
+        "peak_staging_bytes": 4294967296,
+        "pending_retirements": 0,
+        "read_bytes": 1497148240,
+        "reads": 78008,
+        "staging_bytes": 0,
+        "stores": 66090,
+        "written_bytes": 27265906544
+      },
+      "binary_sha256": "5910dd05c45b4f0b99f762f7c7394b5f635dde3821b8475c6bfb32e0de87e484"
+    },
+    {
+      "profile": "pytorch",
+      "files": 10578,
+      "sampled_peak_rss_gib": 0.5073165893554688,
+      "wall_s": 14.333060181932524,
+      "shutdown_ms": 0.21629700000000002,
+      "released_ms": 6.674511,
+      "maintenance": {
+        "attempts": 8,
+        "completed": 8,
+        "error": null,
+        "failed": 0,
+        "running": false
+      },
+      "final_spool": {
+        "allocated_bytes": 0,
+        "capacity_bytes": 1073741824,
+        "cleaning_bytes": 0,
+        "cleaning_files": 0,
+        "extent_bytes": 0,
+        "file_bytes": 0,
+        "free_bytes": 0,
+        "max_read_request": 65536,
+        "peak_extent_bytes": 991431049,
+        "peak_staging_bytes": 805306368,
+        "pending_retirements": 0,
+        "read_bytes": 182302391,
+        "reads": 11245,
+        "staging_bytes": 0,
+        "stores": 10602,
+        "written_bytes": 5018026577
+      },
+      "binary_sha256": "5910dd05c45b4f0b99f762f7c7394b5f635dde3821b8475c6bfb32e0de87e484"
+    }
+  ],
+  "conditions": [
+    {
+      "profile": "linux",
+      "condition": "after_cleanup",
+      "samples": 3,
+      "publication_ms": {
+        "min": 50.348213,
+        "median": 54.108881999999994,
+        "max": 55.966694999999994
+      },
+      "write_overlap_count": 0,
+      "published_during_cleanup": 0,
+      "cleanup_ms": {
+        "min": 334.283173,
+        "median": 451.41430199999996,
+        "max": 452.16261299999996
+      },
+      "admission_ms": {
+        "min": 2624.1956760000003,
+        "median": 2661.6057829999995,
+        "max": 2695.733158
+      }
+    },
+    {
+      "profile": "linux",
+      "condition": "during_cleanup",
+      "samples": 3,
+      "publication_ms": {
+        "min": 53.817093,
+        "median": 55.963709,
+        "max": 58.121191
+      },
+      "write_overlap_count": 3,
+      "published_during_cleanup": 3,
+      "cleanup_ms": {
+        "min": 363.972931,
+        "median": 406.336517,
+        "max": 432.061847
+      },
+      "admission_ms": {
+        "min": 2486.424206,
+        "median": 2559.4118209999997,
+        "max": 2608.195217
+      }
+    },
+    {
+      "profile": "linux",
+      "condition": "recovery_observed",
+      "samples": 3,
+      "publication_ms": {
+        "min": 53.806779,
+        "median": 57.563864,
+        "max": 58.206925
+      },
+      "recovery_counter_pairs_before": [
+        [
+          7,
+          0
+        ],
+        [
+          7,
+          0
+        ],
+        [
+          7,
+          0
+        ]
+      ],
+      "interpretation": "Three writes within the same observed recovery cycle, not independent recovery cycles."
+    },
+    {
+      "profile": "pytorch",
+      "condition": "after_cleanup",
+      "samples": 3,
+      "publication_ms": {
+        "min": 31.043133,
+        "median": 31.071145,
+        "max": 31.195143
+      },
+      "write_overlap_count": 0,
+      "published_during_cleanup": 0,
+      "cleanup_ms": {
+        "min": 86.425932,
+        "median": 94.701487,
+        "max": 97.325631
+      },
+      "admission_ms": {
+        "min": 68.38776,
+        "median": 74.78594500000001,
+        "max": 621.01426
+      }
+    },
+    {
+      "profile": "pytorch",
+      "condition": "during_cleanup",
+      "samples": 3,
+      "publication_ms": {
+        "min": 31.112530999999997,
+        "median": 31.157262000000003,
+        "max": 31.203024
+      },
+      "write_overlap_count": 3,
+      "published_during_cleanup": 3,
+      "cleanup_ms": {
+        "min": 86.016131,
+        "median": 86.161208,
+        "max": 91.297066
+      },
+      "admission_ms": {
+        "min": 82.920252,
+        "median": 592.277302,
+        "max": 612.928358
+      }
+    },
+    {
+      "profile": "pytorch",
+      "condition": "recovery_observed",
+      "samples": 3,
+      "publication_ms": {
+        "min": 30.950907,
+        "median": 30.967542,
+        "max": 31.074161999999998
+      },
+      "recovery_counter_pairs_before": [
+        [
+          4,
+          0
+        ],
+        [
+          4,
+          0
+        ],
+        [
+          4,
+          0
+        ]
+      ],
+      "interpretation": "Three writes within the same observed recovery cycle, not independent recovery cycles."
+    }
+  ],
+  "samples": [
+    {
+      "profile": "linux",
+      "sample": 0,
+      "condition": "after_cleanup",
+      "publication_ms": 55.966694999999994,
+      "write_overlaps_cleanup": false,
+      "published_during_cleanup": false,
+      "cleanup_ms": 334.283173,
+      "admission_ms": 2624.1956760000003,
+      "recovery_running_before": false,
+      "recovery_running_after": false,
+      "recovery_completed_before": 2,
+      "recovery_completed_after": 2,
+      "recovery_discarded_before": 0,
+      "recovery_discarded_after": 0,
+      "latest_operation_read_files": 1
+    },
+    {
+      "profile": "linux",
+      "sample": 1,
+      "condition": "during_cleanup",
+      "publication_ms": 58.121191,
+      "write_overlaps_cleanup": true,
+      "published_during_cleanup": true,
+      "cleanup_ms": 406.336517,
+      "admission_ms": 2486.424206,
+      "recovery_running_before": false,
+      "recovery_running_after": false,
+      "recovery_completed_before": 3,
+      "recovery_completed_after": 3,
+      "recovery_discarded_before": 0,
+      "recovery_discarded_after": 0,
+      "latest_operation_read_files": 1
+    },
+    {
+      "profile": "linux",
+      "sample": 2,
+      "condition": "during_cleanup",
+      "publication_ms": 53.817093,
+      "write_overlaps_cleanup": true,
+      "published_during_cleanup": true,
+      "cleanup_ms": 363.972931,
+      "admission_ms": 2559.4118209999997,
+      "recovery_running_before": false,
+      "recovery_running_after": false,
+      "recovery_completed_before": 4,
+      "recovery_completed_after": 4,
+      "recovery_discarded_before": 0,
+      "recovery_discarded_after": 0,
+      "latest_operation_read_files": 1
+    },
+    {
+      "profile": "linux",
+      "sample": 3,
+      "condition": "after_cleanup",
+      "publication_ms": 54.108881999999994,
+      "write_overlaps_cleanup": false,
+      "published_during_cleanup": false,
+      "cleanup_ms": 452.16261299999996,
+      "admission_ms": 2661.6057829999995,
+      "recovery_running_before": false,
+      "recovery_running_after": false,
+      "recovery_completed_before": 5,
+      "recovery_completed_after": 5,
+      "recovery_discarded_before": 0,
+      "recovery_discarded_after": 0,
+      "latest_operation_read_files": 1
+    },
+    {
+      "profile": "linux",
+      "sample": 4,
+      "condition": "after_cleanup",
+      "publication_ms": 50.348213,
+      "write_overlaps_cleanup": false,
+      "published_during_cleanup": false,
+      "cleanup_ms": 451.41430199999996,
+      "admission_ms": 2695.733158,
+      "recovery_running_before": false,
+      "recovery_running_after": false,
+      "recovery_completed_before": 6,
+      "recovery_completed_after": 6,
+      "recovery_discarded_before": 0,
+      "recovery_discarded_after": 0,
+      "latest_operation_read_files": 1
+    },
+    {
+      "profile": "linux",
+      "sample": 5,
+      "condition": "during_cleanup",
+      "publication_ms": 55.963709,
+      "write_overlaps_cleanup": true,
+      "published_during_cleanup": true,
+      "cleanup_ms": 432.061847,
+      "admission_ms": 2608.195217,
+      "recovery_running_before": false,
+      "recovery_running_after": false,
+      "recovery_completed_before": 7,
+      "recovery_completed_after": 7,
+      "recovery_discarded_before": 0,
+      "recovery_discarded_after": 0,
+      "latest_operation_read_files": 1
+    },
+    {
+      "profile": "linux",
+      "sample": 6,
+      "condition": "recovery_observed",
+      "publication_ms": 53.806779,
+      "write_overlaps_cleanup": null,
+      "published_during_cleanup": null,
+      "cleanup_ms": null,
+      "admission_ms": null,
+      "recovery_running_before": true,
+      "recovery_running_after": true,
+      "recovery_completed_before": 7,
+      "recovery_completed_after": 7,
+      "recovery_discarded_before": 0,
+      "recovery_discarded_after": 0,
+      "latest_operation_read_files": 1
+    },
+    {
+      "profile": "linux",
+      "sample": 7,
+      "condition": "recovery_observed",
+      "publication_ms": 57.563864,
+      "write_overlaps_cleanup": null,
+      "published_during_cleanup": null,
+      "cleanup_ms": null,
+      "admission_ms": null,
+      "recovery_running_before": true,
+      "recovery_running_after": true,
+      "recovery_completed_before": 7,
+      "recovery_completed_after": 7,
+      "recovery_discarded_before": 0,
+      "recovery_discarded_after": 0,
+      "latest_operation_read_files": 1
+    },
+    {
+      "profile": "linux",
+      "sample": 8,
+      "condition": "recovery_observed",
+      "publication_ms": 58.206925,
+      "write_overlaps_cleanup": null,
+      "published_during_cleanup": null,
+      "cleanup_ms": null,
+      "admission_ms": null,
+      "recovery_running_before": true,
+      "recovery_running_after": true,
+      "recovery_completed_before": 7,
+      "recovery_completed_after": 7,
+      "recovery_discarded_before": 0,
+      "recovery_discarded_after": 0,
+      "latest_operation_read_files": 1
+    },
+    {
+      "profile": "pytorch",
+      "sample": 0,
+      "condition": "after_cleanup",
+      "publication_ms": 31.195143,
+      "write_overlaps_cleanup": false,
+      "published_during_cleanup": false,
+      "cleanup_ms": 94.701487,
+      "admission_ms": 68.38776,
+      "recovery_running_before": false,
+      "recovery_running_after": false,
+      "recovery_completed_before": 1,
+      "recovery_completed_after": 1,
+      "recovery_discarded_before": 0,
+      "recovery_discarded_after": 0,
+      "latest_operation_read_files": 1
+    },
+    {
+      "profile": "pytorch",
+      "sample": 1,
+      "condition": "during_cleanup",
+      "publication_ms": 31.203024,
+      "write_overlaps_cleanup": true,
+      "published_during_cleanup": true,
+      "cleanup_ms": 86.016131,
+      "admission_ms": 592.277302,
+      "recovery_running_before": false,
+      "recovery_running_after": false,
+      "recovery_completed_before": 2,
+      "recovery_completed_after": 2,
+      "recovery_discarded_before": 0,
+      "recovery_discarded_after": 0,
+      "latest_operation_read_files": 1
+    },
+    {
+      "profile": "pytorch",
+      "sample": 2,
+      "condition": "during_cleanup",
+      "publication_ms": 31.157262000000003,
+      "write_overlaps_cleanup": true,
+      "published_during_cleanup": true,
+      "cleanup_ms": 86.161208,
+      "admission_ms": 82.920252,
+      "recovery_running_before": false,
+      "recovery_running_after": false,
+      "recovery_completed_before": 2,
+      "recovery_completed_after": 2,
+      "recovery_discarded_before": 0,
+      "recovery_discarded_after": 0,
+      "latest_operation_read_files": 1
+    },
+    {
+      "profile": "pytorch",
+      "sample": 3,
+      "condition": "after_cleanup",
+      "publication_ms": 31.043133,
+      "write_overlaps_cleanup": false,
+      "published_during_cleanup": false,
+      "cleanup_ms": 86.425932,
+      "admission_ms": 621.01426,
+      "recovery_running_before": false,
+      "recovery_running_after": false,
+      "recovery_completed_before": 3,
+      "recovery_completed_after": 3,
+      "recovery_discarded_before": 0,
+      "recovery_discarded_after": 0,
+      "latest_operation_read_files": 1
+    },
+    {
+      "profile": "pytorch",
+      "sample": 4,
+      "condition": "after_cleanup",
+      "publication_ms": 31.071145,
+      "write_overlaps_cleanup": false,
+      "published_during_cleanup": false,
+      "cleanup_ms": 97.325631,
+      "admission_ms": 74.78594500000001,
+      "recovery_running_before": false,
+      "recovery_running_after": false,
+      "recovery_completed_before": 3,
+      "recovery_completed_after": 3,
+      "recovery_discarded_before": 0,
+      "recovery_discarded_after": 0,
+      "latest_operation_read_files": 1
+    },
+    {
+      "profile": "pytorch",
+      "sample": 5,
+      "condition": "during_cleanup",
+      "publication_ms": 31.112530999999997,
+      "write_overlaps_cleanup": true,
+      "published_during_cleanup": true,
+      "cleanup_ms": 91.297066,
+      "admission_ms": 612.928358,
+      "recovery_running_before": false,
+      "recovery_running_after": false,
+      "recovery_completed_before": 4,
+      "recovery_completed_after": 4,
+      "recovery_discarded_before": 0,
+      "recovery_discarded_after": 0,
+      "latest_operation_read_files": 1
+    },
+    {
+      "profile": "pytorch",
+      "sample": 6,
+      "condition": "recovery_observed",
+      "publication_ms": 31.074161999999998,
+      "write_overlaps_cleanup": null,
+      "published_during_cleanup": null,
+      "cleanup_ms": null,
+      "admission_ms": null,
+      "recovery_running_before": true,
+      "recovery_running_after": true,
+      "recovery_completed_before": 4,
+      "recovery_completed_after": 4,
+      "recovery_discarded_before": 0,
+      "recovery_discarded_after": 0,
+      "latest_operation_read_files": 1
+    },
+    {
+      "profile": "pytorch",
+      "sample": 7,
+      "condition": "recovery_observed",
+      "publication_ms": 30.967542,
+      "write_overlaps_cleanup": null,
+      "published_during_cleanup": null,
+      "cleanup_ms": null,
+      "admission_ms": null,
+      "recovery_running_before": true,
+      "recovery_running_after": true,
+      "recovery_completed_before": 4,
+      "recovery_completed_after": 4,
+      "recovery_discarded_before": 0,
+      "recovery_discarded_after": 0,
+      "latest_operation_read_files": 1
+    },
+    {
+      "profile": "pytorch",
+      "sample": 8,
+      "condition": "recovery_observed",
+      "publication_ms": 30.950907,
+      "write_overlaps_cleanup": null,
+      "published_during_cleanup": null,
+      "cleanup_ms": null,
+      "admission_ms": null,
+      "recovery_running_before": true,
+      "recovery_running_after": true,
+      "recovery_completed_before": 4,
+      "recovery_completed_after": 4,
+      "recovery_discarded_before": 0,
+      "recovery_discarded_after": 0,
+      "latest_operation_read_files": 1
+    }
+  ],
+  "limits": [
+    "Watch/recovery options recorded in configuration; exact notification attribution and recovery overlap are not isolated.",
+    "Generated streamed tail is controlled allocation pressure outside project source; it is not representative repository code.",
+    "Three samples per condition/profile; finite observations, not browser latency tails or randomised speedups.",
+    "Unlabelled capture tracing disabled; latest operation measurements may describe recovery rather than the foreground edit.",
+    "Compatible cache preparation, pressure setup and independent verification are outside write-to-publication timing, but affect process peaks.",
+    "Child 12 GiB virtual-address-space limit is not RSS/physical-RAM enforcement or baseline-laptop qualification.",
+    "Actual idle scheduler admits cleanup and waits for recovery before admission; no three-way overlap is forced.",
+    "Only generated-tail cuts at least as large as the fixture signal cleanup entry; no artificial truncate delay.",
+    "Recovery-observed cases record running status before writing, not an instrumented capture or parse interval.",
+    "Native watcher callback release may outlast coordinator join; qualification waits for release before final storage checks.",
+    "Quiet time can elapse during pressure setup; unblocked shutdown observations do not establish a deadline."
+  ]
+}
