@@ -68,30 +68,53 @@ All successful replies remain bound to the requested snapshot/file/version.
 
 ## Private session spool
 
-`SourceSpool::new(directory, capacity)` creates a private anonymous file. `persist` appends
-resident captured bytes under a mutex and moves metadata onto a read-only descriptor.
+`SourceSpool::new(directory, capacity)` creates private anonymous committed and staging
+files. `persist` appends resident captured bytes and moves metadata onto a read-only descriptor.
 The descriptor exposes no project filename or writable file handle. Concurrent readers
 use serialized seek/read operations, so file-cursor sharing cannot mix captured ranges.
-Already-backed sources and verified unchanged captures keep their original backing.
+Already-backed sources passed to `persist` keep their original backing.
+
+`capture` reads actual project input through EOF in requests of at most 64 KiB. It builds
+identity, encoding, line/CRLF and integrity metadata from private staged bytes with bounded
+scratch, preserving the existing identity algorithm. UTF-8 validation carries at most
+three incomplete bytes between chunks. A matching previous capture keeps its original
+source and backing, even at full committed quota. Changed captures append staged bytes
+in bounded chunks before returning an immutable descriptor. A separate writer gate
+serialises staging/commit work; old sources remain readable between committed-file IO
+operations. Capture and reads use no publication lock.
 
 `Directory::with_spool` rejects a spool inside the analysed root. CLI
 `--source-spool-mib N` creates it in the required external cache directory; `0` disables
 it and is the default. Capacity conversion is checked. This capacity bounds cumulative
-session appends, including old/cancelled captures, rather than live-source bytes. Failure
-aborts capture, preserving the last published observation and dirty hints. There is no
-per-version disk reclamation or automatic compaction in this first adapter.
+committed session appends, including old/cancelled captures, rather than live-source bytes.
+The reusable staging file is separately bounded by the same capacity, so combined file
+lengths can reach twice the configured value. Unchanged verification needs staging space
+but consumes no committed quota. Failure aborts capture, preserving the last published
+observation and dirty hints. There is no
+per-version disk reclamation or automatic compaction in this adapter.
+
+Observed cancellation/read failure discards staged candidates; incomplete append tails
+are truncated without changing earlier committed ranges. Cleanup is best effort if
+truncation itself fails. Cancellation after commit may leave an unreferenced committed
+capture. Blocking IO, mutex waits and cleanup have no hard cancellation deadline.
+`SpoolStats` reports committed bytes, stores, backing reads/bytes, current and peak staging
+length and maximum input read request. These observations are separate from resident memory.
 
 Backing lifetime follows its directory/store handle and all captured descriptors. Dropping
 the engine, deleting/rewriting project files, or expiring publication history cannot
 change a retained query's bytes. The final store/descriptor release closes the anonymous
-file. This is ephemeral session storage, not crash recovery or a chosen durable engine.
+files. This is ephemeral session storage, not crash recovery or a chosen durable engine.
 
-Native capture still reads one complete file into a transient vector before hashing,
-indexing and optional spooling. Spooling removes permanent resident bodies from snapshots;
-it does not bound that transient read, index/integrity metadata, parser scratch/facts,
-syntax retention, response allocations, allocator retention or whole-process RSS.
+Default resident capture reads one complete file into a transient vector before hashing
+and indexing. Opt-in spooled capture bounds transient input, metadata scanning and append
+byte buffers independently of file size. A metadata scan uses a 64 KiB buffer and, only
+across incomplete UTF-8 boundaries, a join of at most 64 KiB plus three bytes. Staging and
+append buffers are released between those phases. This does not bound index/integrity
+metadata, parser scratch/facts, syntax retention, response allocations, allocator retention
+or whole-process RSS.
 `SourceStorage` adds CRLF terminator and integrity-digest capacities to its accounting.
 
-See [validation and measurements](../../experiments/source-reads/RESULTS.md) and the
-[delivery plan](../plans/bounded-source-reads.md). Streaming capture, reclamation and a
-calibrated resident/process envelope remain subsequent work.
+See [reader validation](../../experiments/source-reads/RESULTS.md),
+[streaming capture measurements](../../experiments/stream-capture/RESULTS.md), and the
+[capture design](../plans/streaming-source-capture.md). Reclamation and a calibrated
+resident/process envelope remain subsequent work.

@@ -1,5 +1,5 @@
-#![cfg(feature = "qualification")]
 //! The owned-copy probe must measure actual parsing and preserve its source inputs.
+#![cfg(feature = "qualification")]
 
 #[test]
 fn repeated_edit_probe_checks_fresh_equivalence_and_rejects_unowned_roots() {

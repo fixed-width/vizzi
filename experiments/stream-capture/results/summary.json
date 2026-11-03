@@ -1,0 +1,134 @@
+{
+  "schema": 1,
+  "recorded_after_measurement_utc": "2026-11-03T06:09:55.234945+00:00",
+  "machine": {
+    "platform": "Linux-6.8.0-147-lowlatency-x86_64-with-glibc2.39",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13700H",
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)"
+  },
+  "fixture": [
+    {
+      "mode": "whole",
+      "bytes": 536870912,
+      "sampled_peak_rss_mib": 514.99609375,
+      "first_capture_ms": 1033.440431,
+      "unchanged_capture_ms": 399.365966,
+      "spool": {
+        "capacity_bytes": 536870912,
+        "max_read_request": 0,
+        "peak_staging_bytes": 0,
+        "read_bytes": 1073741824,
+        "reads": 16384,
+        "staging_bytes": 0,
+        "stores": 1,
+        "written_bytes": 536870912
+      }
+    },
+    {
+      "mode": "stream",
+      "bytes": 536870912,
+      "sampled_peak_rss_mib": 3.25,
+      "first_capture_ms": 1107.9114539999998,
+      "unchanged_capture_ms": 794.655271,
+      "spool": {
+        "capacity_bytes": 536870912,
+        "max_read_request": 65536,
+        "peak_staging_bytes": 536870912,
+        "read_bytes": 1073741824,
+        "reads": 16384,
+        "staging_bytes": 0,
+        "stores": 1,
+        "written_bytes": 536870912
+      }
+    }
+  ],
+  "corpus": [
+    {
+      "profile": "linux",
+      "files": 66066,
+      "source_bytes": 1495484792,
+      "baseline_ms": 4447.039906999999,
+      "unchanged_ms": 4009.663993,
+      "edit4_ms": 8503.953599,
+      "baseline_buffers_gib": 0.420308381319046,
+      "publication_edit4_gib": 1.6881514489650726,
+      "external_union_edit4_gib": 2.1084598302841187,
+      "sampled_peak_rss_gib": 2.2626724243164062,
+      "spool": {
+        "capacity_bytes": 17179869184,
+        "max_read_request": 65536,
+        "peak_staging_bytes": 24009446,
+        "read_bytes": 27080455824,
+        "reads": 1404189,
+        "staging_bytes": 0,
+        "stores": 396396,
+        "written_bytes": 9017833632
+      },
+      "historical_whole_vector_backed": {
+        "profile": "linux",
+        "spool_mib": 16384,
+        "baseline_ms": 3905.468039,
+        "unchanged_ms": 1462.870394,
+        "edit4_ms": 7611.155442,
+        "baseline_buffers_gib": 0.4144365191459656,
+        "publication_edit4_gib": 1.6646534204483032,
+        "external_union_edit4_gib": 2.079089939594269,
+        "sampled_peak_rss_gib": 2.3387489318847656,
+        "spool": {
+          "capacity_bytes": 17179869184,
+          "read_bytes": 27080455824,
+          "reads": 1404189,
+          "stores": 396396,
+          "written_bytes": 9017833632
+        }
+      }
+    },
+    {
+      "profile": "pytorch",
+      "files": 10578,
+      "source_bytes": 186092681,
+      "baseline_ms": 665.195662,
+      "unchanged_ms": 611.108432,
+      "edit4_ms": 1104.874223,
+      "baseline_buffers_gib": 0.05388662964105606,
+      "publication_edit4_gib": 0.21665003895759583,
+      "external_union_edit4_gib": 0.2705366685986519,
+      "sampled_peak_rss_gib": 0.3074188232421875,
+      "spool": {
+        "capacity_bytes": 17179869184,
+        "max_read_request": 65536,
+        "peak_staging_bytes": 8416901,
+        "read_bytes": 3375563202,
+        "reads": 212015,
+        "staging_bytes": 0,
+        "stores": 63468,
+        "written_bytes": 1123749126
+      },
+      "historical_whole_vector_backed": {
+        "profile": "pytorch",
+        "spool_mib": 16384,
+        "baseline_ms": 534.689065,
+        "unchanged_ms": 217.01103,
+        "edit4_ms": 973.797239,
+        "baseline_buffers_gib": 0.05296913534402847,
+        "publication_edit4_gib": 0.2129228413105011,
+        "external_union_edit4_gib": 0.26589197665452957,
+        "sampled_peak_rss_gib": 0.3178825378417969,
+        "spool": {
+          "capacity_bytes": 17179869184,
+          "read_bytes": 3375563202,
+          "reads": 212015,
+          "stores": 63468,
+          "written_bytes": 1123749126
+        }
+      }
+    }
+  ],
+  "limits": [
+    "Generated fixture compares current-code whole-vector capture plus persist with streamed staging capture in separate sequential children. Verification is bounded; no parser/cache/UI work.",
+    "Corpus source-only storage history omits facts/parsers and is comparable to the preceding backed-source workload, not randomized paired speedups.",
+    "Child RLIMIT_AS constrains virtual address space, not RSS or physical RAM; no baseline-laptop qualification.",
+    "Staging is separately bounded by configured committed capacity; combined temporary/committed file lengths can reach twice that value.",
+    "Metadata, allocator retention and process RSS are distinct from bounded transient capture bytes. Corpus validation and probe orchestration contribute to peaks and elapsed phases."
+  ]
+}

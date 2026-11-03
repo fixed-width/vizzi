@@ -99,38 +99,48 @@ impl CapturedSource {
         if let Some(previous) = previous.filter(|old| old.content == content) {
             return previous.clone();
         }
-        let encoding = if std::str::from_utf8(&bytes).is_ok() {
-            SourceEncoding::Utf8
-        } else {
-            SourceEncoding::Unsupported
-        };
-        let mut line_starts = vec![0];
-        let mut crlf = Vec::new();
-        if encoding == SourceEncoding::Utf8 {
-            for (index, byte) in bytes.iter().enumerate() {
-                if *byte == b'\n' {
-                    if index > 0 && bytes[index - 1] == b'\r' {
-                        let line = line_starts.len() - 1;
-                        crlf.resize((line / 8 + 1).max(crlf.len()), 0);
-                        crlf[line / 8] |= 1 << (line % 8);
-                    }
-                    line_starts.push(index + 1);
-                }
-            }
+        let mut metadata = Metadata::new();
+        for chunk in bytes.chunks(SOURCE_CHUNK) {
+            metadata.push(chunk);
         }
-        let chunks = bytes
-            .chunks(SOURCE_CHUNK)
-            .map(|chunk| *blake3::hash(chunk).as_bytes())
-            .collect();
-        Arc::new(Self {
-            content,
-            len: bytes.len(),
-            encoding,
-            data: Data::Resident(bytes),
-            line_starts,
-            crlf,
-            chunks,
-        })
+        Arc::new(metadata.finish(content, Data::Resident(bytes)))
+    }
+    /// Captures metadata/identity from an immutable known-length backing with bounded scratch.
+    /// Cancellation discards the candidate; no source is returned until all bytes are verified.
+    pub fn capture_reader(
+        len: usize,
+        reader: Arc<dyn SourceReader>,
+        cancelled: &dyn Fn() -> bool,
+    ) -> Result<Option<Arc<Self>>, SourceReadError> {
+        if cancelled() {
+            return Ok(None);
+        }
+        let mut hash = blake3::Hasher::new();
+        hash.update(b"ContentId");
+        hash.update(&(len as u64).to_le_bytes());
+        let mut metadata = Metadata::new();
+        let mut buffer = vec![0u8; len.min(SOURCE_CHUNK)];
+        let mut at = 0;
+        while at < len {
+            if cancelled() {
+                return Ok(None);
+            }
+            let count = (len - at).min(SOURCE_CHUNK);
+            reader.read_at(at, &mut buffer[..count])?;
+            if cancelled() {
+                return Ok(None);
+            }
+            hash.update(&buffer[..count]);
+            metadata.push(&buffer[..count]);
+            at += count;
+        }
+        if cancelled() {
+            return Ok(None);
+        }
+        Ok(Some(Arc::new(metadata.finish(
+            ContentId::from_digest(hash.finalize()),
+            Data::Backed(reader),
+        ))))
     }
     /// Replaces resident bytes with a backing bound to this captured metadata.
     /// Reads verify captured integrity blocks; callers must keep backing immutable.
@@ -260,6 +270,97 @@ impl CapturedSource {
                 .partition_point(|offset| *offset <= span.end.saturating_sub(1))
     }
 }
+// Metadata construction is shared by owned capture and immutable streamed backing.
+struct Metadata {
+    len: usize,
+    line_starts: Vec<usize>,
+    crlf: Vec<u8>,
+    chunks: Vec<[u8; 32]>,
+    utf8_tail: Vec<u8>,
+    valid: bool,
+    previous: Option<u8>,
+}
+impl Metadata {
+    fn new() -> Self {
+        Self {
+            len: 0,
+            line_starts: vec![0],
+            crlf: Vec::new(),
+            chunks: Vec::new(),
+            utf8_tail: Vec::new(),
+            valid: true,
+            previous: None,
+        }
+    }
+    fn invalidate(&mut self) {
+        self.valid = false;
+        self.utf8_tail = Vec::new();
+        self.line_starts = vec![0];
+        self.crlf = Vec::new();
+    }
+    fn push(&mut self, bytes: &[u8]) {
+        self.chunks.push(*blake3::hash(bytes).as_bytes());
+        if self.valid {
+            let mut joined = Vec::new();
+            if !self.utf8_tail.is_empty() {
+                joined.extend_from_slice(&self.utf8_tail);
+                joined.extend_from_slice(bytes);
+            }
+            let checked = if joined.is_empty() {
+                bytes
+            } else {
+                joined.as_slice()
+            };
+            match std::str::from_utf8(checked) {
+                Ok(_) => self.utf8_tail.clear(),
+                Err(error) if error.error_len().is_none() => {
+                    let tail = checked[error.valid_up_to()..].to_vec();
+                    self.utf8_tail = tail;
+                }
+                Err(_) => self.invalidate(),
+            }
+        }
+        if self.valid {
+            for (index, byte) in bytes.iter().enumerate() {
+                if *byte == b'\n' {
+                    let previous = if index == 0 {
+                        self.previous
+                    } else {
+                        Some(bytes[index - 1])
+                    };
+                    if previous == Some(b'\r') {
+                        let line = self.line_starts.len() - 1;
+                        let slot = line / 8;
+                        self.crlf.resize((slot + 1).max(self.crlf.len()), 0);
+                        self.crlf[slot] |= 1 << (line % 8);
+                    }
+                    self.line_starts.push(self.len + index + 1);
+                }
+            }
+        }
+        self.len += bytes.len();
+        self.previous = bytes.last().copied();
+    }
+    fn finish(mut self, content: ContentId, data: Data) -> CapturedSource {
+        if !self.utf8_tail.is_empty() {
+            self.invalidate();
+        }
+        CapturedSource {
+            content,
+            len: self.len,
+            encoding: if self.valid {
+                SourceEncoding::Utf8
+            } else {
+                SourceEncoding::Unsupported
+            },
+            data,
+            line_starts: self.line_starts,
+            crlf: self.crlf,
+            chunks: self.chunks,
+        }
+    }
+}
+
 /// Bounded reads with a two-block cache; integrity is checked before exposing backing bytes.
 pub struct SourceSession<'a> {
     source: &'a CapturedSource,
@@ -342,5 +443,20 @@ impl<'a> SourceSession<'a> {
             offset -= 1;
         }
         Ok(offset)
+    }
+}
+
+#[cfg(test)]
+mod metadata_tests {
+    use super::{Metadata, SOURCE_CHUNK};
+
+    #[test]
+    fn invalid_utf8_does_not_accumulate_validation_scratch() {
+        let mut metadata = Metadata::new();
+        let invalid = vec![255; SOURCE_CHUNK];
+        for _ in 0..4 {
+            metadata.push(&invalid);
+            assert!(metadata.utf8_tail.capacity() <= 3);
+        }
     }
 }

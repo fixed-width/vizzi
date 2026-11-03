@@ -15,6 +15,8 @@ resident/process-memory cap or a change to default capture.
 The [reference](../../docs/prototype/SOURCE_READS.md) defines guards, integrity blocks,
 bulk/window limits, HTTP errors and spool lifetime. The
 [delivery plan](../../docs/plans/bounded-source-reads.md) records the architecture.
+The subsequent [streaming-capture report](../stream-capture/RESULTS.md) replaces the
+whole-file temporary vector in opt-in capture; measurements below describe this earlier stage.
 
 ## Reader and native integration
 

@@ -1,0 +1,28 @@
+{
+  "base_commit": "1e3fd469fdc27bf014a0f90e9bcd359bcd171399",
+  "note": "Measured working tree before commit; production code frozen before release measurements. No dependency changes.",
+  "sha256": {
+    "Cargo.toml": "b48edcbfd70277e9d0a58f7680b6ed414bc70108b279fdfba98dcd9a07092636",
+    "Cargo.lock": "032ea2295563c2354c3d92c54cf4be9943ad62eb1ed116d6267b7c2c0ee1456d",
+    "crates/vizzi/Cargo.toml": "a06c14a80f913ff2cfd4164263c8b6ee45235b4585111d9495adcc4bb35b50a8",
+    "crates/vizzi/src/lib.rs": "6892511ab2ed522c597dfaa3ef786dfbe234bbaa28302d5b04abdc8f4ce35a66",
+    "crates/vizzi/src/source.rs": "09970b251d1526440a4aafa9f91cc1c0d807a9b17c895da4d5005ec321f543f8",
+    "crates/vizzi/src/source_spool.rs": "203b9f2f5d84e0d687ad6716d9aee0a39f07b769698e4ebaffb5cce12bf4cced",
+    "crates/vizzi/src/stream_probe.rs": "a796dac4cfcc461cea925d708d6bf472cb30c1d0d383067d1262654de19e8d97",
+    "crates/vizzi/src/source_storage_probe.rs": "34785b403f3e0a07d67988080ea416346c672f5082592a88bf3b4cb875e6fbc5",
+    "crates/vizzi-core/src/captured_source.rs": "a54a908b445e0a420f7ce88aff509689b823352a5554b7e5932dacc49e00e4e5",
+    "crates/vizzi-core/src/model.rs": "5aa0bdaf63823ca474b7128e9cfabbad4ae18a87d0cb21cbf99b26c04b729066",
+    "crates/vizzi-core/src/projection.rs": "f5395fe12279f9f172c073da7645f9d472a31a9d160f6cd22eb8e752dfe5c17f",
+    "crates/vizzi-core/src/query.rs": "3c2901659f7cf517ad065bd530d1e27218a2801526874a9531fba9f5b28e0165",
+    "crates/vizzi-core/tests/stream_metadata.rs": "13a66f58bb8e1cf0b6315c3aa9918d42bf69e89b6d2fc18daeb533da21034743",
+    "crates/vizzi-core/tests/source_reads.rs": "9e68bb4473ea9c7b055f8262a4e79017ea7f0a6a9782ad48070aea1503faa96e",
+    "crates/vizzi/tests/stream_capture.rs": "146075ed2f7a8e45d25060a04fb040a0274af9d27867939b7d7bb5d727f20281",
+    "crates/vizzi/tests/stream_probe.rs": "c9b65e3d77dad2617b75244484f0c8cf5d9e550bd4ef4c52f9211bd42f75ffa7",
+    "crates/vizzi/tests/source_spool.rs": "031eba1c240c2435127bc74c4175550a8b3c21bb815f218b771f0a1214adf7bd",
+    "crates/vizzi/examples/stream_capture.rs": "2aa5aad72d5d2e1d6a719b101e475bd54eaaa2f50290855aae660db6a70fd37e",
+    "experiments/stream-capture/measure.py": "f133c3ac3a3d039a2124ce03a2c2274d551f0e8ac0b79458f71aeb2d805adb05",
+    "experiments/qualification/native.py": "e637e001eff0f81059c10e02f5381c00ef44e45efbd79348f94b792203ef924a",
+    "experiments/qualification/profiles.json": "fe3443645d36e1749ab6f360cecc52c667269e0504326155ed89e1baf98af260",
+    "experiments/admission/limit.py": "fdabefbcaa734cb366b6bcc87306a480bccac672bf5d41dd5592982eb8c08785"
+  }
+}

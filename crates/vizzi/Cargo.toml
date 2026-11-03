@@ -46,3 +46,7 @@ required-features = ["qualification"]
 [[example]]
 name = "source_storage"
 required-features = ["qualification"]
+
+[[example]]
+name = "stream_capture"
+required-features = ["qualification"]

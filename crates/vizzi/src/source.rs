@@ -292,22 +292,23 @@ impl Directory {
         if cancelled() {
             return Ok(None);
         }
+        let old = previous
+            .and_then(|snapshot| snapshot.file_by_path(key))
+            .map(|file| file.captured());
+        if let Some(spool) = &self.spool {
+            let mut file = std::fs::File::open(path)?;
+            return spool
+                .capture(&mut file, old, cancelled)
+                .map_err(io::Error::other);
+        }
         let bytes = std::fs::read(path)?;
         if cancelled() {
             return Ok(None);
         }
-        let old = previous
-            .and_then(|snapshot| snapshot.file_by_path(key))
-            .map(|file| file.captured());
         let source = CapturedSource::capture(bytes, old);
         if cancelled() {
             return Ok(None);
         }
-        let source = if let Some(spool) = &self.spool {
-            spool.persist(source).map_err(io::Error::other)?
-        } else {
-            source
-        };
         Ok((!cancelled()).then_some(source))
     }
 

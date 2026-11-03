@@ -109,8 +109,17 @@ The [reader/backing follow-up](../../experiments/source-reads/RESULTS.md) implem
 fallible verified loads/windows and an opt-in anonymous session spool. Current-code
 whole-source history peaks change from 9.156 to 2.339 GiB Linux and 1.163 to 0.318 GiB
 PyTorch, with higher capture/validation IO cost. Source pins and admitted workflows pass.
-Default capture is still resident; transient whole-file capture, indexes, parser heap,
-response memory and cumulative disk reclamation remain separately unresolved.
+Those observations predate streaming; default capture remains resident.
+
+The [streaming-capture follow-up](../../experiments/stream-capture/RESULTS.md) bounds
+transient input/scan/copy byte buffers for opt-in spooling. A 512 MiB generated file
+peaks at 515.0 MiB RSS with whole-vector capture versus 3.25 MiB streamed. Source-only
+Linux/PyTorch history peaks are 2.263 / 0.307 GiB, with preserved old pins and restored
+bytes. Unchanged capture regresses to 4,010 / 611 ms versus historical backed observations
+of 1,463 / 217 ms; investigate avoiding unnecessary candidate metadata construction while
+still verifying actual contents. Committed and staging files each have the configured
+allowance, so combined lengths may reach twice it. Resident indexes, parser heap,
+response memory, cumulative disk reclamation and baseline hardware remain unresolved.
 
 Do not replace semantic correctness checks with these performance targets. Language
 assignments, partial grammar coverage, source-only cases, cancellation, cache validity,

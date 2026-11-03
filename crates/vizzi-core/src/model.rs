@@ -74,6 +74,12 @@ pub struct Context {
     pub id: ContextId,
 }
 
+impl ContentId {
+    pub(crate) fn from_digest(digest: blake3::Hash) -> Self {
+        Self(digest.to_hex().to_string())
+    }
+}
+
 /// Coverage of syntax extraction, without a semantic-resolution claim.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
