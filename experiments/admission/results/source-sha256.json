@@ -1,0 +1,33 @@
+{
+  "base_commit": "28973e3a4586d43a6a19f049dcc0a12a7149d335",
+  "note": "Working tree before commit; Core model coverage additions conservatively change analyser context fingerprints; prepared caches are separate.",
+  "sha256": {
+    "Cargo.lock": "032ea2295563c2354c3d92c54cf4be9943ad62eb1ed116d6267b7c2c0ee1456d",
+    "Cargo.toml": "b48edcbfd70277e9d0a58f7680b6ed414bc70108b279fdfba98dcd9a07092636",
+    "crates/vizzi-core/src/model.rs": "c0fa1dd09bedbc4014057b81b6e6365dbb2bfeb9057b404d7382b07dabc83a4a",
+    "crates/vizzi-core/src/query.rs": "245886c5555a122720e9003861e4a9188e888afe7d032db2e7886e4d1cfd3c99",
+    "crates/vizzi/Cargo.toml": "37d3d886995af583223bb8c5e62d35cb5cefc379eb55bdc9f2b87f04464f4c19",
+    "crates/vizzi/examples/admit.rs": "3240ebe281b17608bf73198300387788466acb1062d5b59cc0a26f8d342b75e6",
+    "crates/vizzi/src/admission.rs": "529149815297ca277debd94899a71ca6b40133a949e16299c27c4729740124eb",
+    "crates/vizzi/src/admission_probe.rs": "25f4bae6fea52def109d63ce36976b2cbdaef20e1017be191f78e2ab8ba44e56",
+    "crates/vizzi/src/cache.rs": "be4991b783bebd7f7eba79d16569cfd353fd56ea85b4137d2387093bf7931852",
+    "crates/vizzi/src/engine.rs": "1eb20cb2087e7e15be2919e640e9913026dff7ca22b739acbd031f71a04fefe6",
+    "crates/vizzi/src/host.rs": "e79dbb1176d3002fbc9d95e3380bb21bc794c984c8b2e5938094a3aaab3c0a1e",
+    "crates/vizzi/src/lib.rs": "59e352c822023bf61205ea1d7dab3f120985cb0dfad89dce16b0d5425a9b8ea9",
+    "crates/vizzi/src/main.rs": "529bb6f73b89cd907ac093fb952d6c97895e65d0afb7445a467cb2381893a9c9",
+    "crates/vizzi/src/source.rs": "8792b47605463a7c8cdda47dfc9284ea95ccb2372b25f37f0918a64786450555",
+    "crates/vizzi/tests/admission.rs": "89f86e1daf35d18ea4deb0c4ba7593b3f4f10fca501950da9374ef16cfad3c77",
+    "crates/vizzi/tests/admission_probe.rs": "cfc6d97b1e34b85ce406079e6fcb883d3d17fa6c867be538d925ace039f5c860",
+    "crates/vizzi/tests/cli.rs": "c6827b8380877447203bde9925d707591fbb7f4bc022aec419c803a059914113",
+    "crates/vizzi/tests/recovery.rs": "520a4b44689016670ca2c52d8fec90d00b760a73f0fddc004ecd298ac479d748",
+    "crates/vizzi/web/app.js": "dac30ee78396b9c53f6d29d6995f500337c95519ddedf108728ace8871e34d0a",
+    "crates/vizzi/web/source-description.js": "dbd5258464e4cb15c572a240c19f90b35be840c9858ad6407d6d3b8e8bfafc78",
+    "crates/vizzi/web/source-description.test.js": "1495517f56f389ec69c731d0438328e0a20205fba836cf611282fe9bffa85c4d",
+    "experiments/admission/limit.py": "fdabefbcaa734cb366b6bcc87306a480bccac672bf5d41dd5592982eb8c08785",
+    "experiments/admission/measure.py": "047049688f16edc0a40574b2d1bc31e987101fa2dad0c57b08d197df189000d1",
+    "experiments/browser/browser.test.mjs": "f22212a6a187c746bec59a756e47ddfb6820931baef8ede51357e2a976db6c15",
+    "experiments/browser/run.mjs": "19b9d1996f8d5918f5a0ad04a8497a096e6b7dfcbe9ad4d5abc8921132a4cd3e",
+    "experiments/qualification/native.py": "e637e001eff0f81059c10e02f5381c00ef44e45efbd79348f94b792203ef924a",
+    "experiments/qualification/profiles.json": "fe3443645d36e1749ab6f360cecc52c667269e0504326155ed89e1baf98af260"
+  }
+}

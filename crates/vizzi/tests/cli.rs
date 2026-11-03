@@ -295,3 +295,51 @@ fn newly_discovered_directories_keep_their_file_watches() {
     assert_eq!(status["measurements"]["reconciled"], false);
     assert_eq!(status["measurements"]["read_files"], 1);
 }
+
+#[test]
+fn admission_option_preserves_source_and_rejects_invalid_budgets() {
+    let root = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    std::fs::write(
+        root.path().join("a.rs"),
+        " ".repeat(3 * 1024 * 1024 / 4 + 1),
+    )
+    .unwrap();
+    std::fs::write(root.path().join("b.rs"), " ".repeat(3 * 1024 * 1024 / 4)).unwrap();
+    let output = std::process::Command::new(env!("CARGO_BIN_EXE_vizzi"))
+        .args([
+            "--root",
+            root.path().to_str().unwrap(),
+            "--cache",
+            cache.path().to_str().unwrap(),
+            "--once",
+            "--analysis-input-mib",
+            "1",
+        ])
+        .output()
+        .unwrap();
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let status: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(status["measurements"]["deferred"], 1);
+    assert_eq!(status["measurements"]["files"], 2);
+    assert_eq!(status["measurements"]["parsed"], 1);
+    for value in ["invalid", "18446744073709551615"] {
+        let output = std::process::Command::new(env!("CARGO_BIN_EXE_vizzi"))
+            .args([
+                "--root",
+                root.path().to_str().unwrap(),
+                "--cache",
+                cache.path().to_str().unwrap(),
+                "--once",
+                "--analysis-input-mib",
+                value,
+            ])
+            .output()
+            .unwrap();
+        assert!(!output.status.success());
+    }
+}

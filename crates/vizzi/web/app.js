@@ -27,7 +27,7 @@ const controller = createController({
   onView: next => {
     const first = !view;
     view = next;
-    element("counts").textContent = `${next.files.length} shown / ${next.matching} matching / ${next.total} source files · ${next.analyzed} with analysis / ${next.source_only} source only`;
+    element("counts").textContent = `${next.files.length} shown / ${next.matching} matching / ${next.total} source files · ${next.analyzed - (next.deferred ?? 0)} with analysis / ${next.deferred ?? 0} deferred / ${next.source_only} source only`;
     element("empty").hidden = next.files.length > 0;
     element("file-title").textContent = next.source?.path ?? "Choose a file";
     element("snapshot").textContent = next.snapshot.slice(0, 8);
@@ -89,7 +89,7 @@ function draw(timestamp) {
       if (x + w < 0 || y + h < 0 || x > width || y > height) continue;
       visibleFiles++;
       const selected = file.id === view.selection.file;
-      context.fillStyle = selected ? "#265dc5" : file.coverage === "partial" ? "#f3deb2" : file.coverage === "unavailable" ? "#d5dce4" : "#d0deed";
+      context.fillStyle = selected ? "#265dc5" : file.coverage === "partial" ? "#f3deb2" : ["unavailable", "deferred"].includes(file.coverage) ? "#d5dce4" : "#d0deed";
       context.fillRect(x, y, w, h);
       if (w > 80 && h > 20) {
         labels++;
@@ -117,7 +117,7 @@ canvas.addEventListener("pointermove", event => {
   const p = point(event);
   if (drag) { camera.x += p.x - drag.x; camera.y += p.y - drag.y; drag.moved ||= Math.hypot(p.x - drag.startX, p.y - drag.startY) > 4; drag.x = p.x; drag.y = p.y; invalidate(); return; }
   const file = hit(p.x, p.y), tooltip = element("tooltip"); tooltip.hidden = !file;
-  if (file) { tooltip.textContent = `${file.path}\n${file.bytes.toLocaleString()} bytes · ${file.classification.kind === "source_only" ? "source only" : `${file.coverage} syntax`}`; tooltip.style.left = `${Math.min(p.x + 12, canvas.clientWidth * .45)}px`; tooltip.style.top = `${Math.max(0, Math.min(p.y + 12, canvas.clientHeight - 65))}px`; }
+  if (file) { tooltip.textContent = `${file.path}\n${file.bytes.toLocaleString()} bytes · ${file.classification.kind === "source_only" ? "source only" : file.coverage === "deferred" ? "analysis deferred" : `${file.coverage} syntax`}`; tooltip.style.left = `${Math.min(p.x + 12, canvas.clientWidth * .45)}px`; tooltip.style.top = `${Math.max(0, Math.min(p.y + 12, canvas.clientHeight - 65))}px`; }
 });
 canvas.addEventListener("pointerup", event => { if (drag && !drag.moved) { const p = point(event), file = hit(p.x, p.y); if (file) controller.load({ file: file.id, entity: null }); } drag = null; previousFrame = null; });
 canvas.addEventListener("pointercancel", () => { drag = null; previousFrame = null; });

@@ -293,3 +293,29 @@ test("source text stays text, and syntax/encoding limits are visible", async () 
     assert.deepEqual(session.errors, []);
   } finally { await session.close(); }
 });
+
+test("deferred files stay readable and resume outlines after an admitted edit", async () => {
+  const large = "// deferred source stays readable\nfn original() {}\n" + " ".repeat(800000);
+  const fixture = await workspace({files:{"a.rs":large},sourceArguments:["--analysis-input-mib","1"]});
+  let live,session;
+  try {
+    live=await startHost(fixture);session=await openWorkspace(chromium,live);const {page}=session;
+    await page.waitForFunction(()=>document.getElementById("coverage").textContent.includes("analysis deferred"));
+    assert.ok((await page.locator("#source").textContent()).includes("deferred source stays readable"));
+    assert.ok((await page.locator("#diagnostics").textContent()).includes("per-file"));
+    assert.ok((await page.locator("#counts").textContent()).includes("1 deferred"));
+    assert.equal(await page.locator("#outline button").count(),0);
+    const old=await (await fetch(`${live.url}/api/view`)).json();
+    assert.equal(old.deferred,1);assert.equal(old.source.classification.kind,"assigned");
+    assert.equal(old.source.outlines[0].coverage,"deferred");
+    await writeFile(join(fixture.root,"a.rs"),"fn resumed() {}\n");
+    await page.waitForFunction(()=>document.getElementById("coverage").textContent.includes("syntax parsed"));
+    assert.ok((await page.locator("#outline").textContent()).includes("resumed"));
+    assert.ok((await page.locator("#counts").textContent()).includes("0 deferred"));
+    const pin=await (await fetch(`${live.url}/api/source?snapshot=${old.snapshot}&file=${old.selection.file}`)).json();
+    assert.equal(pin.text,large);
+    const oldView=await (await fetch(`${live.url}/api/view?snapshot=${old.snapshot}&file=${old.selection.file}`)).json();
+    assert.equal(oldView.source.outlines[0].coverage,"deferred");
+    assert.deepEqual(session.errors,[]);
+  } finally {await session?.close();await live?.close();await fixture.close();}
+});

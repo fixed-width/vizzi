@@ -15,7 +15,7 @@ export function describeSource(source) {
     };
     diagnostics.push(explanations[classification.reason]);
   } else {
-    coverage = `Read-only · ${outlines.map(outline => `${outline.context.language}: ${outline.coverage === "syntax" ? "syntax parsed" : outline.coverage === "partial" ? "partial syntax" : "analysis unavailable"}`).join(" · ")} · raw syntax · configuration unknown · ${evidence}`;
+    coverage = `Read-only · ${outlines.map(outline => `${outline.context.language}: ${outline.coverage === "syntax" ? "syntax parsed" : outline.coverage === "partial" ? "partial syntax" : outline.coverage === "deferred" ? "analysis deferred" : "analysis unavailable"}`).join(" · ")} · raw syntax · configuration unknown · ${evidence}`;
   }
   if (encoding === "unsupported" && !diagnostics.some(text => text.includes("UTF-8"))) diagnostics.push("Source is not UTF-8; text preview is unavailable");
   return { coverage, diagnostics };

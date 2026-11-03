@@ -1,6 +1,7 @@
 //! Background refresh coordination and native directory observation.
 
 use crate::{
+    admission::Priority,
     application::Application,
     engine::{Engine, EngineError, Refresh},
     invalidation::{PendingRefresh, RecoveryToken, classify},
@@ -155,6 +156,7 @@ impl Host {
                                             .cancelled(background_stop.load(Ordering::Acquire))
                                     },
                                     1,
+                                    Priority::Recovery,
                                 )
                             });
                             recovery = Some(RecoveryTask {
@@ -209,6 +211,7 @@ impl Host {
                         &plan.scope,
                         &cancelled,
                         workers,
+                        Priority::Foreground,
                     ) {
                         Ok(Some(refresh)) => {
                             let directories = refresh.directories.clone();
@@ -244,6 +247,7 @@ impl Host {
                                         || work.token.cancelled(false)
                                 },
                                 engine.workers(),
+                                Priority::Foreground,
                             )
                         } else {
                             Ok(Some(candidate.clone()))

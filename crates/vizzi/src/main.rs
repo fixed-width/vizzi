@@ -5,6 +5,7 @@ use std::{
     path::PathBuf,
     sync::Arc,
 };
+use vizzi::admission::Admission;
 use vizzi::syntax_cache::SyntaxCache;
 use vizzi::{cache::Cache, engine::Engine, host::Host, source::Directory};
 use vizzi_core::{
@@ -21,6 +22,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut stdio = false;
     let mut once = false;
     let mut syntax_cache_mib = 0usize;
+    let mut analysis_input_mib = 0usize;
     let mut policy = PolicyConfig::default();
     let mut arguments = std::env::args().skip(1);
     while let Some(argument) = arguments.next() {
@@ -49,6 +51,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     .next()
                     .ok_or("--syntax-cache-mib needs a weight budget")?
                     .parse()?
+            }
+            "--analysis-input-mib" => {
+                analysis_input_mib = arguments
+                    .next()
+                    .ok_or("--analysis-input-mib needs an input-byte budget")?
+                    .parse()?;
             }
             "--c-family-root" => policy.c_family_roots.push(
                 arguments
@@ -79,7 +87,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             "--help" | "-h" => {
                 println!(
-                    "vizzi --root DIR --cache DIR [--workers 1..32] [--port 7474] [--stdio | --once]\n  [--syntax-cache-mib N] (0 disables, default 0; weighted retention, not a heap cap)\n  [--c-family-root SCOPE] [--exclude-source SCOPE] [--syntax-language SCOPE=c|cpp] (repeatable)"
+                    "vizzi --root DIR --cache DIR [--workers 1..32] [--port 7474] [--stdio | --once]\n  [--syntax-cache-mib N] (0 disables, default 0; weighted retention, not a heap cap)\n  [--analysis-input-mib N] (0 disables; active input volume, not a heap cap)\n  [--c-family-root SCOPE] [--exclude-source SCOPE] [--syntax-language SCOPE=c|cpp] (repeatable)"
                 );
                 return Ok(());
             }
@@ -98,6 +106,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         cache.ok_or("--cache is required; choose a directory outside the analyzed workspace")?;
     let cache = vizzi::cache::external_path(&cache, directory.root())?;
     let mut engine = Engine::new(directory, Cache::new(cache), workers)?;
+    if analysis_input_mib != 0 {
+        let bytes = analysis_input_mib
+            .checked_mul(1024 * 1024)
+            .ok_or("analysis input budget overflow")?;
+        engine = engine.with_admission(Arc::new(Admission::for_budget(bytes)?));
+    }
     if syntax_cache_mib != 0 {
         let budget = syntax_cache_mib
             .checked_mul(1024 * 1024)

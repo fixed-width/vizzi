@@ -21,6 +21,7 @@ validating coordination; it does not qualify large-codebase GPU performance.
 - [Language adapters and shared worker budget](docs/prototype/LANGUAGES.md)
 - [Cooperative analysis cancellation](docs/prototype/ANALYSIS_CANCELLATION.md)
 - [Bounded syntax retention](docs/prototype/SYNTAX_RETENTION.md)
+- [Analysis input admission and deferred coverage](docs/prototype/ADMISSION.md)
 - [Source selection and policy identity](docs/prototype/SOURCE_POLICY.md)
 - [Verified capture plans](docs/prototype/CAPTURE_PLAN.md) and [bounded outlines](docs/prototype/OUTLINE.md)
 - [Raw C/C++ extraction](docs/prototype/C_FAMILY_SYNTAX.md)
@@ -40,6 +41,7 @@ validating coordination; it does not qualify large-codebase GPU performance.
 - [Foreground edits during periodic recovery](experiments/recovery/RESULTS.md)
 - [Retained syntax across mixed working sets](experiments/working-set/RESULTS.md)
 - [Replacement-allowance validation and measurements](experiments/allowances/RESULTS.md)
+- [Source availability under input admission](experiments/admission/RESULTS.md)
 - [Earlier performance experiments](experiments/performance/README.md)
 - [Contributor guidance](AGENTS.md)
 

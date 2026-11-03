@@ -90,6 +90,12 @@ impose a hard deadline on all analysis/capture operations. Parsing never holds t
 between workers through exclusive, weight/count-bounded native leases. Published
 documents remain immutable and carry no mutable syntax state.
 
+[Opt-in analysis admission](ADMISSION.md) additionally shares active input capacity
+across foreground/recovery attempts. Refused jobs retain verified source with explicit
+deferred coverage and no stale facts. Deferred records are retried rather than persisted
+or reused as complete analysis. Input capacity does not bound captured source or parser
+heap; it complements worker and syntax-retention limits.
+
 ## Host interface
 
 - `GET /api/status` returns generation, snapshot identity, pending state, and last

@@ -1,0 +1,17 @@
+profile,input_budget_mib,kind,write_to_published_source_ms,observed_deferred_files,settled_deferred_files
+linux,0,structural,70.685921,0,0
+linux,0,large_paste,938.4500409999999,0,0
+linux,0,unseen,757.53713,0,0
+linux,0,batch,1035.2740629999998,0,0
+linux,32,structural,76.922921,0,0
+linux,32,large_paste,121.94991800000001,1,1
+linux,32,unseen,790.7378080000001,0,0
+linux,32,batch,866.926018,2,0
+pytorch,0,structural,42.175121000000004,0,0
+pytorch,0,large_paste,1979.3268959999998,0,0
+pytorch,0,unseen,1455.944957,0,0
+pytorch,0,batch,1871.574253,0,0
+pytorch,12,structural,39.297892000000004,0,0
+pytorch,12,large_paste,54.629443,1,1
+pytorch,12,unseen,1541.3608199999999,0,0
+pytorch,12,batch,1683.120275,1,0

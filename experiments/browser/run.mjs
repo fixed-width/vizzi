@@ -12,6 +12,9 @@ if (process.argv.includes("--install-browser")) {
     const info = await cdp.send("SystemInfo.getInfo");
     console.log(JSON.stringify({ browser: instance.version(), deviceNodes: await readdir("/dev/dri").catch(() => []), display: process.env.DISPLAY ?? null, wayland: process.env.WAYLAND_DISPLAY ?? null, devices: info.gpu.devices, features: info.gpu.featureStatus }, null, 2));
   } finally { await instance.close(); }
+} else if (process.argv.includes("--admission-mutations")) {
+  const result = spawnSync(process.execPath, ["node_modules/@stryker-mutator/core/bin/stryker.js", "run", "experiments/browser/admission-stryker.config.json"], { stdio: "inherit" });
+  process.exit(result.status ?? 1);
 } else if (process.argv.includes("--window-mutations")) {
   const result = spawnSync(process.execPath, ["node_modules/@stryker-mutator/core/bin/stryker.js", "run", "experiments/browser/window-stryker.config.json"], { stdio: "inherit" });
   process.exit(result.status ?? 1);

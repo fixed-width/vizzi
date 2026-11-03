@@ -131,6 +131,8 @@ pub struct Selection {
 /// A coherent response suitable for both linked views.
 #[derive(Debug, Serialize)]
 pub struct View {
+    /// Files with at least one deferred analysis, independently of the overview bound.
+    pub deferred: usize,
     /// Version of the linked-view response schema.
     pub schema: u32,
     /// Source and fact observation used throughout this response.
@@ -263,7 +265,13 @@ impl Snapshot {
             });
             y += 30.0;
             for (i, file) in documents.iter().enumerate() {
-                let coverage = if file.analyses().is_empty()
+                let coverage = if file
+                    .analyses()
+                    .iter()
+                    .any(|analysis| analysis.coverage == Coverage::Deferred)
+                {
+                    Coverage::Deferred
+                } else if file.analyses().is_empty()
                     || file
                         .analyses()
                         .iter()
@@ -296,6 +304,7 @@ impl Snapshot {
             y += documents.len().div_ceil(8) as f64 * 56.0 + 18.0;
         }
         View {
+            deferred: self.deferred_files(),
             schema: if query.projection.is_some() { 3 } else { 2 },
             snapshot: self.id().clone(),
             policy: self.policy().clone(),

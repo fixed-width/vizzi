@@ -82,6 +82,8 @@ pub enum Coverage {
     Partial,
     /// Analysis could not run on this input.
     Unavailable,
+    /// Analysis was postponed by resource admission; no facts were produced.
+    Deferred,
 }
 
 /// Captured text availability, independent of analyzer assignment.
@@ -186,6 +188,9 @@ impl Document {
                 return Err(ModelError("analysis content or context mismatch".into()));
             }
             let mut keys = BTreeSet::new();
+            if analysis.coverage == Coverage::Deferred && !analysis.facts.is_empty() {
+                return Err(ModelError("deferred analysis cannot contain facts".into()));
+            }
             for fact in &analysis.facts {
                 if !keys.insert(&fact.key)
                     || fact.span.start >= fact.span.end
@@ -196,7 +201,12 @@ impl Document {
                     ));
                 }
             }
-            if text.is_none() && analysis.coverage != Coverage::Unavailable {
+            if text.is_none()
+                && !matches!(
+                    analysis.coverage,
+                    Coverage::Unavailable | Coverage::Deferred
+                )
+            {
                 return Err(ModelError(
                     "non-UTF-8 source requires unavailable analysis".into(),
                 ));
@@ -290,6 +300,7 @@ pub struct Snapshot {
     policy: CapturePolicyId,
     capture_plan: Option<CapturePlanId>,
     analyzed: usize,
+    deferred: usize,
 }
 
 impl Snapshot {
@@ -336,11 +347,18 @@ impl Snapshot {
             }
         }
         let mut analyzed = 0;
+        let mut deferred = 0;
         for document in &documents {
             if document.workspace != workspace {
                 return Err(ModelError("mismatched captured workspace".into()));
             }
             analyzed += usize::from(!document.analyses().is_empty());
+            deferred += usize::from(
+                document
+                    .analyses()
+                    .iter()
+                    .any(|analysis| analysis.coverage == Coverage::Deferred),
+            );
             hash.update(document.version.as_str().as_bytes());
         }
         Ok(Self {
@@ -350,6 +368,7 @@ impl Snapshot {
             policy,
             capture_plan,
             analyzed,
+            deferred,
         })
     }
     /// Returns this observation's identity.
@@ -371,6 +390,10 @@ impl Snapshot {
     /// Counts captured files with analysis records, including unavailable analysis.
     pub fn analyzed_files(&self) -> usize {
         self.analyzed
+    }
+    /// Counts files with at least one deferred analysis record.
+    pub fn deferred_files(&self) -> usize {
+        self.deferred
     }
     /// Finds a captured path without scanning all documents.
     pub fn file_by_path(&self, path: &str) -> Option<&Arc<Document>> {
@@ -700,5 +723,27 @@ mod tests {
         let foreign =
             Arc::new(crate::model::fixture_document(other, "a.rs".into(), b"", vec![]).unwrap());
         assert!(crate::model::fixture_snapshot(workspace(), vec![foreign]).is_err());
+    }
+    #[test]
+    fn deferred_analysis_has_no_facts_and_can_describe_undecodable_captured_bytes() {
+        let mut deferred = analysis(b"fn f() {}");
+        deferred.coverage = Coverage::Deferred;
+        assert!(
+            crate::model::fixture_document(
+                workspace(),
+                "a.rs".into(),
+                b"fn f() {}",
+                vec![deferred.clone()]
+            )
+            .is_err()
+        );
+        deferred.facts.clear();
+        let source = b"\xff";
+        deferred.content = ContentId::derive(&[source]);
+        let document =
+            crate::model::fixture_document(workspace(), "a.rs".into(), source, vec![deferred])
+                .unwrap();
+        assert_eq!(document.encoding(), SourceEncoding::Unsupported);
+        assert_eq!(document.analyses()[0].coverage, Coverage::Deferred);
     }
 }

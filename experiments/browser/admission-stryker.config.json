@@ -1,0 +1,44 @@
+{
+  "$schema": "../../node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "mutate": [
+    "crates/vizzi/web/source-description.js"
+  ],
+  "testRunner": "command",
+  "commandRunner": {
+    "command": "node crates/vizzi/web/source-description.test.js"
+  },
+  "coverageAnalysis": "off",
+  "concurrency": 4,
+  "timeoutMS": 5000,
+  "reporters": [
+    "clear-text",
+    "json"
+  ],
+  "clearTextReporter": {
+    "reportMutants": false,
+    "logTests": false
+  },
+  "jsonReporter": {
+    "fileName": "experiments/browser/results/local/admission-js-mutation.json"
+  },
+  "ignorePatterns": [
+    "target",
+    "docs",
+    "crates/vizzi-core",
+    "crates/vizzi-perf",
+    "crates/vizzi/src",
+    "crates/vizzi/tests",
+    "experiments/qualification",
+    "experiments/shared-source",
+    "experiments/retention",
+    "experiments/performance",
+    "experiments/browser/results",
+    "experiments/allowances",
+    "experiments/recovery",
+    "experiments/working-set",
+    "experiments/admission"
+  ],
+  "thresholds": {
+    "break": 100
+  }
+}

@@ -1,6 +1,7 @@
 //! Bounded parallel analysis with immutable reuse and disposable persistence.
 
 use crate::{
+    admission::{Admission, Priority, Refusal},
     cache::Cache,
     source::{CaptureScope, Directory, MAX_PATH_HINTS},
     syntax_cache::{SyntaxCache, SyntaxKey},
@@ -17,7 +18,7 @@ use std::{
 };
 use vizzi_core::{
     analysis::{AnalysisResult, Analyzer},
-    model::{Document, ModelError, Snapshot},
+    model::{Analysis, Coverage, Document, ModelError, Snapshot},
 };
 
 /// Native source/analysis failure; the host retains its previous snapshot.
@@ -39,6 +40,8 @@ pub enum EngineError {
 /// Measurements of an entire capture and analysis attempt.
 #[derive(Clone, Debug, Default, PartialEq, Serialize)]
 pub struct Measurements {
+    /// Indexed files whose analysis is deferred by resource admission.
+    pub deferred: usize,
     /// Total indexed source files in the candidate snapshot.
     pub files: usize,
     /// Captured files containing analysis records, including unavailable analysis.
@@ -86,6 +89,7 @@ pub struct Engine {
     cache: Cache,
     workers: usize,
     syntax_cache: Option<Arc<SyntaxCache>>,
+    admission: Option<Arc<Admission>>,
 }
 impl Engine {
     /// Configures 1–32 workers shared across languages, with worker-local parsers.
@@ -100,11 +104,17 @@ impl Engine {
             cache,
             workers,
             syntax_cache: None,
+            admission: None,
         })
     }
     /// Enables explicitly shared, bounded retained syntax independently of persistence.
     pub fn with_syntax_cache(mut self, cache: Arc<SyntaxCache>) -> Self {
         self.syntax_cache = Some(cache);
+        self
+    }
+    /// Shares an opt-in active-input admission budget across attempts and languages.
+    pub fn with_admission(mut self, admission: Arc<Admission>) -> Self {
+        self.admission = Some(admission);
         self
     }
     /// Returns the source adapter used by the watcher.
@@ -131,7 +141,13 @@ impl Engine {
         scope: &CaptureScope,
         cancelled: &(dyn Fn() -> bool + Sync),
     ) -> Result<Option<Refresh>, EngineError> {
-        self.refresh_budget(previous, scope, cancelled, self.workers)
+        self.refresh_budget(
+            previous,
+            scope,
+            cancelled,
+            self.workers,
+            Priority::Foreground,
+        )
     }
     pub(crate) fn refresh_budget(
         &self,
@@ -139,6 +155,7 @@ impl Engine {
         scope: &CaptureScope,
         cancelled: &(dyn Fn() -> bool + Sync),
         workers: usize,
+        priority: Priority,
     ) -> Result<Option<Refresh>, EngineError> {
         let workers = workers.clamp(1, self.workers);
         if cancelled() {
@@ -210,6 +227,7 @@ impl Engine {
                     && match language {
                         Some(language) => {
                             old.analyses().len() == 1
+                                && old.analyses()[0].coverage != Coverage::Deferred
                                 && old.analyses()[0].context == *language.context()
                         }
                         None => old.analyses().is_empty(),
@@ -248,6 +266,22 @@ impl Engine {
                             };
                             let context = language.context();
                             let content = file.source.content();
+                            let _permit = match self.admission.as_ref().map(|budget| budget.acquire(file.source.bytes().len(), priority)) {
+                                Some(Ok(permit)) => Some(permit),
+                                Some(Err(reason)) => {
+                                    let diagnostic = match reason {
+                                        Refusal::Busy => "Analysis deferred: active input capacity is occupied or reserved for foreground work; source remains available".into(),
+                                        Refusal::FileLimit => format!("Analysis deferred: {} input bytes exceed the per-file admission limit; source remains available", file.source.bytes().len()),
+                                    };
+                                    batch.push(Arc::new(Document::capture_source(
+                                        self.directory.workspace().clone(), file.path.clone(), file.source.clone(),
+                                        vec![Analysis { content: content.clone(), context: context.clone(), coverage: Coverage::Deferred, facts: vec![], diagnostics: vec![diagnostic] }],
+                                        file.classification.clone(),
+                                    )?));
+                                    continue;
+                                }
+                                None => None,
+                            };
                             let cached = self
                                 .cache
                                 .load(&context.id, content)
@@ -371,6 +405,7 @@ impl Engine {
             cache.reconcile(&snapshot);
         }
         measurements.files = snapshot.documents().len();
+        measurements.deferred = snapshot.deferred_files();
         measurements.analyzed = snapshot.analyzed_files();
         measurements.source_only = measurements.files - measurements.analyzed;
         measurements.total_ms = milliseconds(started.elapsed());

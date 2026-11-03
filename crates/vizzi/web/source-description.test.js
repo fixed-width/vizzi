@@ -40,3 +40,12 @@ test("raw analysis reports recovery and unknown configuration without inventing 
   ] };
   assert.ok(describeSource(combined).coverage.includes("rust: syntax parsed · python: partial syntax"));
 });
+test("deferred analysis preserves language assignment and its resource explanation", () => {
+  const input = { encoding:"utf8", classification:{kind:"assigned",language:"cpp",provenance:{kind:"explicit_scope",scope:"."}},
+    outlines:[{context:{language:"cpp"},coverage:"deferred",diagnostics:["Analysis deferred: active input capacity is occupied; source remains available"]}] };
+  const description = describeSource(input);
+  assert.ok(description.coverage.includes("analysis deferred"));
+  assert.ok(description.coverage.includes("assigned for ."));
+  assert.deepEqual(description.diagnostics, input.outlines[0].diagnostics);
+  assert.ok(!description.coverage.includes("Source only"));
+});

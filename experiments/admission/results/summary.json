@@ -1,0 +1,347 @@
+{
+  "schema": 1,
+  "recorded_after_measurement_utc": "2026-11-03T01:10:35.041056+00:00",
+  "address_space_limit_mib": 8192,
+  "machine": {
+    "platform": "Linux-6.8.0-147-lowlatency-x86_64-with-glibc2.39",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13700H",
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)"
+  },
+  "rows": [
+    {
+      "profile": "linux",
+      "input_budget_mib": 0,
+      "kind": "structural",
+      "write_to_published_source_ms": 70.685921,
+      "observed_coverage": {
+        "kernel/locking/mutex.c": "partial"
+      },
+      "settled_coverage": {
+        "kernel/locking/mutex.c": "partial"
+      },
+      "snapshot_deferred_at_publication": 0,
+      "all_admissible_completed": true,
+      "source_scope_matches": true,
+      "completed_facts_match": true
+    },
+    {
+      "profile": "linux",
+      "input_budget_mib": 0,
+      "kind": "large_paste",
+      "write_to_published_source_ms": 938.4500409999999,
+      "observed_coverage": {
+        "kernel/locking/mutex.c": "partial"
+      },
+      "settled_coverage": {
+        "kernel/locking/mutex.c": "partial"
+      },
+      "snapshot_deferred_at_publication": 0,
+      "all_admissible_completed": true,
+      "source_scope_matches": true,
+      "completed_facts_match": true
+    },
+    {
+      "profile": "linux",
+      "input_budget_mib": 0,
+      "kind": "unseen",
+      "write_to_published_source_ms": 757.53713,
+      "observed_coverage": {
+        "vizzi_admission_probe.c": "syntax"
+      },
+      "settled_coverage": {
+        "vizzi_admission_probe.c": "syntax"
+      },
+      "snapshot_deferred_at_publication": 0,
+      "all_admissible_completed": true,
+      "source_scope_matches": true,
+      "completed_facts_match": true
+    },
+    {
+      "profile": "linux",
+      "input_budget_mib": 0,
+      "kind": "batch",
+      "write_to_published_source_ms": 1035.2740629999998,
+      "observed_coverage": {
+        "drivers/gpu/drm/amd/include/asic_reg/dcn/dcn_3_2_0_sh_mask.h": "syntax",
+        "drivers/gpu/drm/amd/include/asic_reg/nbio/nbio_7_2_0_sh_mask.h": "syntax",
+        "drivers/gpu/drm/amd/include/asic_reg/nbio/nbio_7_7_0_sh_mask.h": "syntax"
+      },
+      "settled_coverage": {
+        "drivers/gpu/drm/amd/include/asic_reg/dcn/dcn_3_2_0_sh_mask.h": "syntax",
+        "drivers/gpu/drm/amd/include/asic_reg/nbio/nbio_7_2_0_sh_mask.h": "syntax",
+        "drivers/gpu/drm/amd/include/asic_reg/nbio/nbio_7_7_0_sh_mask.h": "syntax"
+      },
+      "snapshot_deferred_at_publication": 0,
+      "all_admissible_completed": true,
+      "source_scope_matches": true,
+      "completed_facts_match": true
+    },
+    {
+      "profile": "linux",
+      "input_budget_mib": 32,
+      "kind": "structural",
+      "write_to_published_source_ms": 76.922921,
+      "observed_coverage": {
+        "kernel/locking/mutex.c": "partial"
+      },
+      "settled_coverage": {
+        "kernel/locking/mutex.c": "partial"
+      },
+      "snapshot_deferred_at_publication": 0,
+      "all_admissible_completed": true,
+      "source_scope_matches": true,
+      "completed_facts_match": true
+    },
+    {
+      "profile": "linux",
+      "input_budget_mib": 32,
+      "kind": "large_paste",
+      "write_to_published_source_ms": 121.94991800000001,
+      "observed_coverage": {
+        "kernel/locking/mutex.c": "deferred"
+      },
+      "settled_coverage": {
+        "kernel/locking/mutex.c": "deferred"
+      },
+      "snapshot_deferred_at_publication": 1,
+      "all_admissible_completed": true,
+      "source_scope_matches": true,
+      "completed_facts_match": true
+    },
+    {
+      "profile": "linux",
+      "input_budget_mib": 32,
+      "kind": "unseen",
+      "write_to_published_source_ms": 790.7378080000001,
+      "observed_coverage": {
+        "vizzi_admission_probe.c": "syntax"
+      },
+      "settled_coverage": {
+        "vizzi_admission_probe.c": "syntax"
+      },
+      "snapshot_deferred_at_publication": 1,
+      "all_admissible_completed": true,
+      "source_scope_matches": true,
+      "completed_facts_match": true
+    },
+    {
+      "profile": "linux",
+      "input_budget_mib": 32,
+      "kind": "batch",
+      "write_to_published_source_ms": 866.926018,
+      "observed_coverage": {
+        "drivers/gpu/drm/amd/include/asic_reg/dcn/dcn_3_2_0_sh_mask.h": "syntax",
+        "drivers/gpu/drm/amd/include/asic_reg/nbio/nbio_7_2_0_sh_mask.h": "deferred",
+        "drivers/gpu/drm/amd/include/asic_reg/nbio/nbio_7_7_0_sh_mask.h": "deferred"
+      },
+      "settled_coverage": {
+        "drivers/gpu/drm/amd/include/asic_reg/dcn/dcn_3_2_0_sh_mask.h": "syntax",
+        "drivers/gpu/drm/amd/include/asic_reg/nbio/nbio_7_2_0_sh_mask.h": "syntax",
+        "drivers/gpu/drm/amd/include/asic_reg/nbio/nbio_7_7_0_sh_mask.h": "syntax"
+      },
+      "snapshot_deferred_at_publication": 3,
+      "all_admissible_completed": true,
+      "source_scope_matches": true,
+      "completed_facts_match": true
+    },
+    {
+      "profile": "pytorch",
+      "input_budget_mib": 0,
+      "kind": "structural",
+      "write_to_published_source_ms": 42.175121000000004,
+      "observed_coverage": {
+        "c10/core/Device.cpp": "syntax"
+      },
+      "settled_coverage": {
+        "c10/core/Device.cpp": "syntax"
+      },
+      "snapshot_deferred_at_publication": 0,
+      "all_admissible_completed": true,
+      "source_scope_matches": true,
+      "completed_facts_match": true
+    },
+    {
+      "profile": "pytorch",
+      "input_budget_mib": 0,
+      "kind": "large_paste",
+      "write_to_published_source_ms": 1979.3268959999998,
+      "observed_coverage": {
+        "c10/core/Device.cpp": "partial"
+      },
+      "settled_coverage": {
+        "c10/core/Device.cpp": "partial"
+      },
+      "snapshot_deferred_at_publication": 0,
+      "all_admissible_completed": true,
+      "source_scope_matches": true,
+      "completed_facts_match": true
+    },
+    {
+      "profile": "pytorch",
+      "input_budget_mib": 0,
+      "kind": "unseen",
+      "write_to_published_source_ms": 1455.944957,
+      "observed_coverage": {
+        "vizzi_admission_probe.cpp": "partial"
+      },
+      "settled_coverage": {
+        "vizzi_admission_probe.cpp": "partial"
+      },
+      "snapshot_deferred_at_publication": 0,
+      "all_admissible_completed": true,
+      "source_scope_matches": true,
+      "completed_facts_match": true
+    },
+    {
+      "profile": "pytorch",
+      "input_budget_mib": 0,
+      "kind": "batch",
+      "write_to_published_source_ms": 1871.574253,
+      "observed_coverage": {
+        "aten/src/ATen/native/SobolEngineOpsUtils.cpp": "syntax",
+        "third_party/perfetto/sdk/perfetto.cc": "partial",
+        "third_party/perfetto/sdk/perfetto.h": "partial"
+      },
+      "settled_coverage": {
+        "aten/src/ATen/native/SobolEngineOpsUtils.cpp": "syntax",
+        "third_party/perfetto/sdk/perfetto.cc": "partial",
+        "third_party/perfetto/sdk/perfetto.h": "partial"
+      },
+      "snapshot_deferred_at_publication": 0,
+      "all_admissible_completed": true,
+      "source_scope_matches": true,
+      "completed_facts_match": true
+    },
+    {
+      "profile": "pytorch",
+      "input_budget_mib": 12,
+      "kind": "structural",
+      "write_to_published_source_ms": 39.297892000000004,
+      "observed_coverage": {
+        "c10/core/Device.cpp": "syntax"
+      },
+      "settled_coverage": {
+        "c10/core/Device.cpp": "syntax"
+      },
+      "snapshot_deferred_at_publication": 0,
+      "all_admissible_completed": true,
+      "source_scope_matches": true,
+      "completed_facts_match": true
+    },
+    {
+      "profile": "pytorch",
+      "input_budget_mib": 12,
+      "kind": "large_paste",
+      "write_to_published_source_ms": 54.629443,
+      "observed_coverage": {
+        "c10/core/Device.cpp": "deferred"
+      },
+      "settled_coverage": {
+        "c10/core/Device.cpp": "deferred"
+      },
+      "snapshot_deferred_at_publication": 1,
+      "all_admissible_completed": true,
+      "source_scope_matches": true,
+      "completed_facts_match": true
+    },
+    {
+      "profile": "pytorch",
+      "input_budget_mib": 12,
+      "kind": "unseen",
+      "write_to_published_source_ms": 1541.3608199999999,
+      "observed_coverage": {
+        "vizzi_admission_probe.cpp": "partial"
+      },
+      "settled_coverage": {
+        "vizzi_admission_probe.cpp": "partial"
+      },
+      "snapshot_deferred_at_publication": 1,
+      "all_admissible_completed": true,
+      "source_scope_matches": true,
+      "completed_facts_match": true
+    },
+    {
+      "profile": "pytorch",
+      "input_budget_mib": 12,
+      "kind": "batch",
+      "write_to_published_source_ms": 1683.120275,
+      "observed_coverage": {
+        "aten/src/ATen/native/SobolEngineOpsUtils.cpp": "deferred",
+        "third_party/perfetto/sdk/perfetto.cc": "partial",
+        "third_party/perfetto/sdk/perfetto.h": "partial"
+      },
+      "settled_coverage": {
+        "aten/src/ATen/native/SobolEngineOpsUtils.cpp": "syntax",
+        "third_party/perfetto/sdk/perfetto.cc": "partial",
+        "third_party/perfetto/sdk/perfetto.h": "partial"
+      },
+      "snapshot_deferred_at_publication": 2,
+      "all_admissible_completed": true,
+      "source_scope_matches": true,
+      "completed_facts_match": true
+    }
+  ],
+  "resources": [
+    {
+      "profile": "linux",
+      "input_budget_mib": 0,
+      "sampled_peak_rss_gib": 4.776435852050781,
+      "lifetime_high_water_gib": 4.797393798828125,
+      "sampled_peak_virtual_gib": 5.086238861083984,
+      "admission_final": null
+    },
+    {
+      "profile": "linux",
+      "input_budget_mib": 32,
+      "sampled_peak_rss_gib": 4.7197723388671875,
+      "lifetime_high_water_gib": 4.7197723388671875,
+      "sampled_peak_virtual_gib": 4.938625335693359,
+      "admission_final": {
+        "active_bytes": 0,
+        "active_jobs": 0,
+        "busy": 6,
+        "capacity_bytes": 33554432,
+        "file_limit_bytes": 25165824,
+        "foreground_reserve_bytes": 8388608,
+        "oversized": 5,
+        "peak_bytes": 33144580,
+        "recovery_bytes": 0
+      }
+    },
+    {
+      "profile": "pytorch",
+      "input_budget_mib": 0,
+      "sampled_peak_rss_gib": 1.6672134399414062,
+      "lifetime_high_water_gib": 1.6672134399414062,
+      "sampled_peak_virtual_gib": 1.8302268981933594,
+      "admission_final": null
+    },
+    {
+      "profile": "pytorch",
+      "input_budget_mib": 12,
+      "sampled_peak_rss_gib": 1.336456298828125,
+      "lifetime_high_water_gib": 1.336456298828125,
+      "sampled_peak_virtual_gib": 1.4604263305664062,
+      "admission_final": {
+        "active_bytes": 0,
+        "active_jobs": 0,
+        "busy": 478,
+        "capacity_bytes": 12582912,
+        "file_limit_bytes": 9437184,
+        "foreground_reserve_bytes": 3145728,
+        "oversized": 7,
+        "peak_bytes": 12568184,
+        "recovery_bytes": 0
+      }
+    }
+  ],
+  "limits": [
+    "Address-space limit applies to each probe child via RLIMIT_AS; it is not an RSS/physical-RAM limit or 16 GB laptop qualification.",
+    "Analysis admission bounds actual captured input volume, not parser scratch/facts or in-memory captured source.",
+    "Separate processes and unique UUIDs; native watcher disabled, periodic recovery remains active; Node/browser timing absent.",
+    "A recovery status sample immediately precedes writes; this observes activity rather than proving every IO/parse overlap.",
+    "Each step verifies independent source discovery and completed changed-file facts. Restored final snapshots match complete capture.",
+    "RSS/phase peaks include probe input construction, source verification and independent fresh parses; verification is excluded from publication latency.",
+    "Single runs do not establish latency tails or randomized paired speedups."
+  ]
+}

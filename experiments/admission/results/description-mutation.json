@@ -1,0 +1,18 @@
+{
+  "tool": "Stryker 10.1.1",
+  "scope": [
+    "crates/vizzi/web/source-description.js"
+  ],
+  "baseline": "passed",
+  "tested": 59,
+  "counts": {
+    "Killed": 59
+  },
+  "command": "npm test -- --admission-mutations",
+  "source_sha256": "dbd5258464e4cb15c572a240c19f90b35be840c9858ad6407d6d3b8e8bfafc78",
+  "exclusions": [],
+  "non_caught": [],
+  "limits": [
+    "Actual browser integration checks cover source/outline recovery and immutable pins separately. App canvas painting, count/tooltip rendering, CSS and native code are outside this JS mutation scope."
+  ]
+}

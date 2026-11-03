@@ -88,6 +88,14 @@ At 512 MiB, bypasses fall from two to one but Perfetto's final edit remains cold
 whole-process limits and baseline hardware remain unresolved. Retention stays disabled
 by default and its quota/maxima are unchanged.
 
+[Input admission](../prototype/ADMISSION.md) now bounds opted-in active analysis input
+across foreground/recovery work and reports deferred analysis without hiding source.
+The [workflow report](../../experiments/admission/RESULTS.md) covers structural edits,
+a paste, an unseen file and a batch under an 8 GiB child virtual address-space limit.
+Eligible deferrals recover without another edit. This input-volume bound and OS address
+limit do not enforce parser heap, capture/snapshot storage, physical RAM or a 16 GB
+laptop envelope. Keep input admission disabled by default pending broader calibration.
+
 Do not replace semantic correctness checks with these performance targets. Language
 assignments, partial grammar coverage, source-only cases, cancellation, cache validity,
 and immutable publication must remain explicit and independently tested.

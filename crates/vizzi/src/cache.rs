@@ -5,7 +5,7 @@ use std::{
     io::Write,
     path::{Path, PathBuf},
 };
-use vizzi_core::model::{Analysis, ContentId, ContextId};
+use vizzi_core::model::{Analysis, ContentId, ContextId, Coverage};
 
 /// Resolves existing symlinks and rejects caches inside the read-only source root.
 pub fn external_path(path: &Path, root: &Path) -> std::io::Result<PathBuf> {
@@ -62,6 +62,7 @@ impl Cache {
         let record: Record = serde_json::from_slice(&bytes).ok()?;
         let payload = serde_json::to_vec(&record.payload).ok()?;
         (record.schema == 1
+            && record.payload.coverage != Coverage::Deferred
             && &record.payload.context.id == context
             && &record.payload.content == content
             && record.checksum == blake3::hash(&payload).to_hex().as_str())
@@ -72,6 +73,9 @@ impl Cache {
         &self,
         analysis: &Analysis,
     ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        if analysis.coverage == Coverage::Deferred {
+            return Err("deferred analysis is not persistent fact data".into());
+        }
         std::fs::create_dir_all(&self.directory)?;
         let payload = serde_json::to_vec(analysis)?;
         let record = Record {
@@ -146,6 +150,35 @@ mod tests {
         std::fs::copy(&path, cache.path(&other_context, &analysis.content)).unwrap();
         assert!(cache.load(&other_context, &analysis.content).is_none());
         std::fs::write(path, b"not json").unwrap();
+        assert!(
+            cache
+                .load(&analysis.context.id, &analysis.content)
+                .is_none()
+        );
+    }
+    #[test]
+    fn deferred_observations_are_neither_stored_nor_loaded_as_facts() {
+        let temp = tempfile::tempdir().unwrap();
+        let cache = Cache::new(temp.path().into());
+        let mut analysis = RustAnalyzer::new()
+            .unwrap()
+            .analyze(b"fn example() {}")
+            .unwrap();
+        analysis.coverage = Coverage::Deferred;
+        analysis.facts.clear();
+        assert!(cache.store(&analysis).is_err());
+        assert_eq!(std::fs::read_dir(temp.path()).unwrap().count(), 0);
+        let payload = serde_json::to_vec(&analysis).unwrap();
+        let record = Record {
+            schema: 1,
+            checksum: blake3::hash(&payload).to_hex().to_string(),
+            payload: analysis.clone(),
+        };
+        std::fs::write(
+            cache.path(&analysis.context.id, &analysis.content),
+            serde_json::to_vec(&record).unwrap(),
+        )
+        .unwrap();
         assert!(
             cache
                 .load(&analysis.context.id, &analysis.content)

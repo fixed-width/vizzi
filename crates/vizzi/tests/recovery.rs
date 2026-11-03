@@ -449,3 +449,46 @@ fn foreground_discovery_registers_new_directories_before_the_next_periodic_pass(
         .source()
         == Some("fn changed_via_new_watch() {}")));
 }
+
+#[test]
+fn recovery_input_admission_preserves_foreground_headroom_and_releases_on_shutdown() {
+    use vizzi::admission::Admission;
+    let fixture = Fixture::new();
+    let budget = Arc::new(Admission::new(100, 75, 25).unwrap());
+    let host = Host::start_with_options(
+        fixture.engine(2).with_admission(budget.clone()),
+        HostOptions {
+            watch: false,
+            reconcile_interval: Duration::from_millis(20),
+        },
+    )
+    .unwrap();
+    let app = host.application();
+    let activity = &fixture.activity;
+    activity.hold.store(true, Ordering::Release);
+    let background = format!("{:<75}", "fn slow_recovered() {}");
+    std::fs::write(fixture.root.path().join("b.rs"), background).unwrap();
+    assert!(until(|| activity.started.load(Ordering::Acquire)));
+    assert_eq!(budget.stats().recovery_bytes, 75);
+    activity.foreground_hold.store(true, Ordering::Release);
+    let foreground = format!("{:<25}", "fn foreground_a() {}");
+    std::fs::write(fixture.root.path().join("a.rs"), &foreground).unwrap();
+    host.request(CaptureScope::Paths(["a.rs".into()].into()));
+    assert!(until(|| activity
+        .foreground_started
+        .load(Ordering::Acquire)));
+    assert_eq!(budget.stats().active_bytes, 100);
+    assert_eq!(budget.stats().recovery_bytes, 75);
+    activity.foreground_hold.store(false, Ordering::Release);
+    assert!(until(|| app
+        .snapshot()
+        .unwrap()
+        .file_by_path("a.rs")
+        .unwrap()
+        .source()
+        == Some(foreground.as_str())));
+    drop(host);
+    assert_eq!(budget.stats().active_bytes, 0);
+    assert_eq!(budget.stats().recovery_bytes, 0);
+    assert_eq!(budget.stats().active_jobs, 0);
+}

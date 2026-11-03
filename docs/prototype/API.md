@@ -59,7 +59,12 @@ event is current state; slow consumers may skip intermediate states. Every recon
 resynchronises from current state, including after a server restart. See the
 [notification contract](CHANGES.md) for ordering, closure, and client rules.
 
-Coverage values are `syntax` (parsed without grammar recovery), `partial` (recovery
+Coverage values also include `deferred`: analysis was postponed by input admission,
+with no facts and an explicit diagnostic. Captured source remains available.
+`View.deferred` and `Measurements.deferred` count these files over the whole snapshot.
+See [admission](ADMISSION.md) for retry, persistence and priority rules.
+
+Other coverage values are `syntax` (parsed without grammar recovery), `partial` (recovery
 occurred), and `unavailable`. None claims compiler-level resolution or complete build
 configuration coverage.
 

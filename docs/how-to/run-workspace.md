@@ -114,3 +114,10 @@ The browser fetches [pinned source/outline windows](../prototype/WINDOWS.md) aut
 Generated long lines expose text-fragment controls; outline Home/End navigate the whole
 logical list. The diagnostic `/api/view` and `/api/source` operations retain explicit
 bulk access, while `projection=summary` and `/api/window` are available to other hosts.
+
+To opt into a shared active analysis input budget, add `--analysis-input-mib 32`.
+This permits at most 32 MiB of active input, with a 24 MiB per-file/recovery limit
+and 8 MiB reserved from recovery for foreground work. It does not cap parser heap or
+captured source storage. Refused files stay readable with explicit deferred analysis;
+eligible jobs retry during recovery. `0` disables admission and is the default.
+See [the admission reference](../prototype/ADMISSION.md) for cache, retry and resource semantics.
