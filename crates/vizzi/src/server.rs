@@ -30,6 +30,7 @@ pub fn router(application: Arc<Application>) -> Router {
         .route("/", get(|| async { asset("text/html; charset=utf-8", include_str!("../web/index.html")) }))
         .route("/app.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/app.js")) }))
         .route("/controller.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/controller.js")) }))
+        .route("/navigation.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/navigation.js")) }))
         .route("/updates.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/updates.js")) }))
         .route("/source-description.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/source-description.js")) }))
         .route("/outline.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/outline.js")) }))

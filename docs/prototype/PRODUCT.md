@@ -30,6 +30,10 @@ engine and works without a project build or external account.
   position changes; ambiguous duplicate identities fall back to file selection.
   Background publication preserves the reader's scroll position in the same file.
   Explicitly selecting a declaration, including the current one, reveals its lines.
+- Session-local Back/Forward navigation revisits accepted locations using current source.
+  Matching document versions restore reading positions; changed locations show a notice
+  and reveal the current declaration or file start. Missing files keep the last coherent
+  view. The [navigation contract](NAVIGATION.md) defines the bounded trail and expiry.
 - A source edit triggers analysis and publishes a complete replacement snapshot.
   Queries continue to use the previous snapshot while work is in progress.
 - Versioned change notifications replace browser polling. Reconnection starts with

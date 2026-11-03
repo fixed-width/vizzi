@@ -4,7 +4,7 @@ Bulk views and pinned source use schema **2**. Browser summary views use schema 
 and pinned document windows use schema **1**; see [WINDOWS.md](WINDOWS.md).
 Status and notification envelopes remain
 schema **1**. These prototype contracts are independent of Git. Identities are opaque
-strings. HTTP responses disable caching. The host serves `/`, `/app.js`, `/controller.js`,
+strings. HTTP responses disable caching. The host serves `/`, `/app.js`, `/controller.js`, `/navigation.js`,
 `/updates.js`, `/source-description.js`, `/outline.js`, `/windows.js`, `/inspector.js`, and `/app.css` without external assets.
 
 | Request | Parameters | Response |

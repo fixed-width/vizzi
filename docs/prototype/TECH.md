@@ -124,6 +124,13 @@ Source lines and [declaration controls](OUTLINE.md) are virtualised; selected-so
 transport uses [pinned windows](WINDOWS.md), with summary metadata in the linked overview. Map geometry is supplied by Rust,
 with visible-item painting and hit testing in the host adapter.
 
+The browser [navigation module](NAVIGATION.md) stores at most 50 location records without
+source bodies or snapshot leases. Request intent passes through the controller's pinned
+loads/retries; a return can reject a missing-file fallback before publishing a view.
+The inspector captures/restores its viewport, and changed-context returns explicitly
+reveal current source rather than reuse old coordinates. Browser history contains only
+opaque session/visit markers. These are host navigation concerns, independent of SCM.
+
 ## Rendering and validation scope
 
 The initial browser uses DOM controls and a Canvas2D reference overview. This validates

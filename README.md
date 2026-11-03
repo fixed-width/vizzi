@@ -15,13 +15,15 @@ The [view-selection rationale](docs/explanation/task-driven-views.md) connects t
 tasks to the literature. Further performance work is conditional on a workflow blocker.
 
 The [baseline learning walkthrough](experiments/learning-workflow/RESULTS.md) records
-the task in the existing UI. It identifies lost return context; the next design step is
-bounded investigation navigation using existing source/declaration identities.
+the task and its return-context gap. [Investigation navigation](docs/prototype/NAVIGATION.md)
+now restores that context; the [updated recording](experiments/learning-workflow/NAVIGATION_RESULTS.md)
+demonstrates the same task with Back/Forward controls.
 
 - [Run the workspace](docs/how-to/run-workspace.md)
 - [Next product milestones](docs/plans/product-milestones.md)
 - [Why these coordinated views](docs/explanation/task-driven-views.md)
 - [Baseline learning walkthrough and recording](experiments/learning-workflow/RESULTS.md)
+- [Investigation navigation and updated walkthrough](experiments/learning-workflow/NAVIGATION_RESULTS.md)
 - [Architecture and scope](DESIGN.md)
 - [First-slice behaviour](docs/prototype/PRODUCT.md) and [technical contract](docs/prototype/TECH.md)
 - [Host API reference](docs/prototype/API.md)

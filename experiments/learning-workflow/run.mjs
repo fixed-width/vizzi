@@ -10,6 +10,7 @@ const options = {};
 for (let i = 2; i < process.argv.length; i++) {
   const flag = process.argv[i];
   if (flag === "--learning-walkthrough") continue;
+  if (flag === "--return-history") { options.returnHistory = true; continue; }
   assert.ok(["--source", "--revision", "--output"].includes(flag), `Unknown option ${flag}`);
   options[flag.slice(2)] = process.argv[++i];
 }
@@ -182,9 +183,22 @@ try {
   const diskFound = await seek("DiskSourceReader");
   report.diskReaderInOutline = diskFound;
   await checkpoint("disk-reader", "Inspect the default disk reader and raw-byte read implementation.");
-  await filter("src/compiler/mod.rs");
-  await chooseFile(compiler);
-  report.readAnchorAfterManualReturn = await checkpoint("manual-return", "Return through the file filter/list and inspect retained declaration/scroll context.");
+  if(options.returnHistory) {
+    for(let i=0;i<8;i++) {
+      const current=await state();
+      if(current.file===compiler && current.selectedDeclaration===read.selectedDeclaration)break;
+      const key=await page.evaluate(()=>history.state?.vizziNavigation?.key);
+      await page.getByRole("button",{name:"Back",exact:true}).click();
+      await page.waitForFunction(key=>history.state?.vizziNavigation?.key!==key && document.querySelector("#navigation").getAttribute("aria-busy")==="false",key);
+    }
+    report.readAnchorAfterHistoryReturn = await checkpoint("history-return", "Use Back to revisit the compiler read policy and preserve its exact reading position.");
+    assert.equal(report.readAnchorAfterHistoryReturn.selectedDeclaration,read.selectedDeclaration);
+    assert.equal(report.readAnchorAfterHistoryReturn.sourceTop,read.sourceTop);
+  } else {
+    await filter("src/compiler/mod.rs");
+    await chooseFile(compiler);
+    report.readAnchorAfterManualReturn = await checkpoint("manual-return", "Return through the file filter/list and inspect retained declaration/scroll context.");
+  }
   await filter("src/compiler/source.rs");
   await chooseFile("src/compiler/source.rs");
   assert.ok(await seek("CompilerSource"));
@@ -203,6 +217,7 @@ try {
   report.beforeBrowserBack = await state();
   await page.goBack();
   report.afterBrowserBack = await checkpoint("browser-back", "Deliberate capability probe: does browser Back restore the previous source location?");
+  if(options.returnHistory) assert.equal(report.afterBrowserBack.outsideWorkspace,undefined);
 
   // Independent checks follow the UI replay; they do not supply navigation targets.
   report.inputSha256 = {};

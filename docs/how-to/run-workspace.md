@@ -21,6 +21,13 @@ declaration to reveal its lines. Drag to pan, scroll to zoom, or choose **Fit ma
 Filtering limits the overview while preserving an existing selection. The expandable
 file list provides keyboard access to file selection; arrow keys pan a focused map.
 
+Use **Back** and **Forward** in the header, or browser Back/Forward, to return to an
+earlier file/declaration and its reading position. The session keeps up to 50 visits.
+Returns follow current source: changed locations show a notice and reveal the current
+declaration or file start. Missing locations keep the current view; Forward/Back can
+continue or retry. Reload starts a new trail. See [navigation](../prototype/NAVIGATION.md)
+for expiry and scope.
+
 Source is read only. Edit a file in your editor to trigger a refresh. The status shows
 analysis in progress while the previous observation remains usable. Syntax recovery
 appears beside the source. The outline describes raw syntax, without macro expansion

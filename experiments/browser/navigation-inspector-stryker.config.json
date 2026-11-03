@@ -1,0 +1,38 @@
+{
+  "$schema": "../../node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "mutate": [
+    "crates/vizzi/web/inspector.js:108:0-150:0"
+  ],
+  "testRunner": "command",
+  "commandRunner": {
+    "command": "node experiments/browser/navigation-inspector.test.mjs"
+  },
+  "coverageAnalysis": "off",
+  "concurrency": 4,
+  "timeoutMS": 15000,
+  "reporters": [
+    "clear-text",
+    "json"
+  ],
+  "clearTextReporter": {
+    "reportMutants": false,
+    "logTests": false
+  },
+  "jsonReporter": {
+    "fileName": "experiments/browser/results/local/navigation-inspector-mutation.json"
+  },
+  "ignorePatterns": [
+    "target",
+    "docs",
+    "crates/vizzi-core",
+    "crates/vizzi-perf",
+    "crates/vizzi/src",
+    "crates/vizzi/tests",
+    "experiments/browser/results",
+    "experiments/memory-envelope",
+    "experiments/learning-workflow"
+  ],
+  "thresholds": {
+    "break": 100
+  }
+}

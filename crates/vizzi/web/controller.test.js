@@ -7,6 +7,51 @@ const view = (file = "a", snapshot = "s1") => ({ schema: 2, snapshot, selection:
 const state = (snapshot = "s1", patch = {}) => ({ schema: 1, name: "test", generation: 1, snapshot, pending: false, measurements: null, error: null, observation: "native", ...patch });
 const change = (revision = "1", snapshot = "s1", patch = {}) => ({ schema: 1, stream: "host", revision, status: state(snapshot), ...patch });
 
+test("a rejected return rolls back its query and still refreshes the current view after a coalesced publication", async () => {
+  const pending=[],displayed=[],intent={kind:"return"};
+  const c=createController({transport:(uri,options)=>{const p=deferred();pending.push({...p,uri,options});return p.promise;},
+    acceptView:(v,info)=>!info.intent || v.selection.file==="missing",onView:v=>displayed.push(v)});
+  const stream=c.updates();stream.receive(change());
+  pending[0].resolve(view("a"));await flush();
+  const returning=c.load({file:"missing"},{intent,rollbackOnFailure:true});
+  stream.receive(change("2","s2"));
+  pending[1].resolve(view("fallback"));await flush();
+  assert.equal(pending[2].options.intent,intent);
+  pending[2].resolve(view("fallback","s2"));assert.equal(await returning,false);await flush();
+  assert.equal(pending.length,4);
+  assert.equal(new URL(pending[3].uri,"http://local").searchParams.get("file"),"a");
+  assert.equal(pending[3].options.intent,undefined);
+  pending[3].resolve(view("a","s2"));await flush();
+  assert.deepEqual(displayed.map(v=>[v.selection.file,v.snapshot]),[["a","s1"],["a","s2"]]);
+});
+
+test("return transport errors roll back intent while ordinary failed selections remain retryable", async () => {
+  const calls=[],errors=[];let fail=false;
+  const c=createController({transport:async(uri,options)=>{calls.push({uri,options});if(fail)throw new Error("offline");return view("a");},onError:e=>errors.push(e)});
+  await c.load({file:"a"});
+  fail=true;assert.equal(await c.load({file:"missing"},{intent:{kind:"return"},rollbackOnFailure:true}),false);
+  fail=false;await c.load();
+  assert.equal(new URL(calls.at(-1).uri,"http://local").searchParams.get("file"),"a");
+  assert.equal(calls.at(-1).options.intent,undefined);
+  assert.equal(errors.length,1);
+});
+
+test("request metadata survives implicit retry but explicit legacy selections clear it; accepted metadata uses reconciled selection",async()=>{
+  const calls=[],views=[],intent={saved:"location"};let failing=true;
+  const c=createController({transport:async(uri,options)=>{calls.push({uri,options});if(failing)throw new Error("offline");return view("actual");},onView:(v,info)=>views.push(info)});
+  await c.load({}, {intent});
+  await c.load();
+  assert.equal(calls.at(-1).options.intent,intent);
+  failing=false;await c.load();
+  assert.equal(views.at(-1).intent,intent);
+  assert.equal(views.at(-1).query.file,"actual");
+  failing=true;await c.load({}, {intent});await c.load({file:"new",filter:"src"});
+  assert.equal(calls.at(-1).options.intent,undefined);
+  assert.deepEqual(calls.at(-1).options.query,{file:"new",entity:null,filter:"src"});
+  failing=false;await c.load();
+  assert.equal(views.at(-1).query.file,"actual");assert.equal(views.at(-1).query.filter,"src");
+});
+
 test("user selections cancel superseded fetches and reject late results/errors", async () => {
   const requests = [], views = [], errors = [];
   const c = createController({ transport: (uri, options) => { const p = deferred(); requests.push({ ...p, uri, options }); return p.promise; }, onView: v => views.push(v), onError: e => errors.push(e) });

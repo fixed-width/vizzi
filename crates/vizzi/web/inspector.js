@@ -105,33 +105,47 @@ export function createInspector({ source, space, outline, transport, select, onE
   source.addEventListener("scroll",()=>{if(source.scrollTop!==sourceTop){sourceTop=source.scrollTop;schedule();}},{passive:true});outline.addEventListener("scroll",schedule,{passive:true});
   const resize=new ResizeObserver(schedule);resize.observe(source);resize.observe(outline);
   return {
+    position() {
+      return { sourceTop:source.scrollTop, sourceLeft:source.scrollLeft, outlineTop:outline.scrollTop,
+        cursorIndex:cursor, columnLine, column };
+    },
     async prepare(next,options={}) {
       if(!next.source)return {...next,inspection:null};
-      const changedFile=view?.source?.id!==next.source.id,changedSelection=changedFile || view?.selection.entity!==next.selection.entity;
+      const changedFile=view?.source?.id!==next.source.id,changedSelection=changedFile || view.selection.entity!==next.selection.entity;
+      const sameDocument=!changedFile && view.source.version===next.source.version;
       const active=next.source.summary.active;
-      const desiredSourceTop=active && changedSelection?Math.max(0,(active.start_line-4)*SOURCE_ROW):changedFile?0:source.scrollTop;
+      const restore=options.restore;
+      const reveal=Boolean(options.reveal);
+      const desiredSourceTop=restore?restore.sourceTop:active && (changedSelection || reveal)?Math.max(0,(active.start_line-4)*SOURCE_ROW):changedFile || reveal?0:source.scrollTop;
       const sourceTop=Math.max(0,Math.min(desiredSourceTop,next.source.summary.lines*SOURCE_ROW-source.clientHeight));
-      let outlineTop=changedFile?0:outline.scrollTop;
-      if(changedSelection && active)outlineTop=Math.max(0,active.index*OUTLINE_ROW-outline.clientHeight/2);
+      let outlineTop=restore?restore.outlineTop:changedFile || reveal?0:outline.scrollTop;
+      if(!restore && (changedSelection || reveal) && active)outlineTop=Math.max(0,active.index*OUTLINE_ROW-outline.clientHeight/2);
       outlineTop=Math.max(0,Math.min(outlineTop,next.source.summary.declarations*OUTLINE_ROW-outline.clientHeight));
       const query=ranges(sourceTop,outlineTop);query.cursor_index=changedFile?(active?.index ?? 0):changedSelection && active?active.index:cursor;
-      if(view?.source?.version!==next.source.version){delete query.column_line;query.column=0;}
-      if(!changedFile && view?.source?.version!==next.source.version) {
+      if(reveal)query.cursor_index=active?.index ?? 0;
+      if(restore) {
+        query.cursor_index=restore.cursorIndex;
+        query.column_line=restore.columnLine;query.column=restore.column;
+      }
+      if(!restore && (!sameDocument || reveal)){delete query.column_line;query.column=0;}
+      if(!restore && !reveal && !changedFile && view.source.version!==next.source.version) {
         const top=Math.floor(outline.scrollTop/OUTLINE_ROW),anchor=entries.get(top),focus=focused() ?? entries.get(cursor)?.id;
         query.previous_snapshot=view.snapshot;query.cursor=focus;if(anchor){query.anchor=anchor.id;query.anchor_offset=top-query.outline_start;}
       }
       const window=await reader.prepare(next,query,options);
       outlineTop+=(window.outline_start-query.outline_start)*OUTLINE_ROW;
-      return {...next,inspection:window,inspectionPosition:{sourceTop,outlineTop}};
+      return {...next,inspection:window,inspectionPosition:{sourceTop,outlineTop,
+        sourceLeft:restore?restore.sourceLeft:sameDocument && !reveal?source.scrollLeft:0,
+        columnLine:restore?restore.columnLine:sameDocument && !reveal?columnLine:undefined,
+        column:restore?restore.column:sameDocument && !reveal?column:0}};
     },
     apply(next) {
-      const hadFocus=outline.contains(document.activeElement),oldFocus=focused(),sourceChanged=view?.source?.version!==next.source?.version || view?.source?.id!==next.source?.id;
+      const hadFocus=outline.contains(document.activeElement);
       view=next;queuedActivation=false;reader.activate(view);
-      if(sourceChanged){columnLine=undefined;column=0;}
       if(!sourceNodes.size)space.replaceChildren();if(!outlineNodes.size)outlineSpace.replaceChildren();sizes();
-      if(next.inspection){source.scrollTop=next.inspectionPosition.sourceTop;outline.scrollTop=next.inspectionPosition.outlineTop;accept(next.inspection,{},{});}
-      else {data=null;sourceRows.clear();entries.clear();cursor=0;renderSource();renderOutline();}
-      if(hadFocus && oldFocus!==focused()) {if(view.source?.summary.declarations)focusCursor();else outline.focus({preventScroll:true});}
+      if(next.inspection){source.scrollTop=next.inspectionPosition.sourceTop;outline.scrollTop=next.inspectionPosition.outlineTop;accept(next.inspection,{},{});columnLine=next.inspectionPosition.columnLine;column=next.inspectionPosition.column;source.scrollLeft=next.inspectionPosition.sourceLeft;}
+      else {data=null;sourceRows=new Map();entries=new Map();cursor=0;columnLine=undefined;column=0;renderSource();renderOutline();}
+      if(hadFocus && !view.source?.summary.declarations)outline.focus({preventScroll:true});
     },
     async revealActive() {
       const active=view?.source?.summary.active;if(!active)return;

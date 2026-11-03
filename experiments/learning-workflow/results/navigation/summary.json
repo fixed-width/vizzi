@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "completed": true,
+  "source_commit": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+  "operator": "guided_reference_aware_automation",
+  "before_return": {
+    "file": "src/compiler/mod.rs",
+    "declaration": "function read_file \u00b7 line 151",
+    "source_top": 3234
+  },
+  "after_return": {
+    "file": "src/compiler/mod.rs",
+    "declaration": "function read_file \u00b7 line 151",
+    "source_top": 3234
+  },
+  "browser_back_stays_in_workspace": true,
+  "snapshot_consistent": true,
+  "visible_rows_checked": 408,
+  "trace_sha256": "a7f516aede2cbfc02c20e1ddd11efb6cb37db546e12d081cb11cc4c5a6e23650",
+  "response_audit_unavailable_bodies": 1
+}

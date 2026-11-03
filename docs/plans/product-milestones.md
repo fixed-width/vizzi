@@ -1,7 +1,8 @@
 # Product milestones: understand a subsystem, then review a change
 
-Status: baseline learning walkthrough delivered; milestone 1 navigation acceptance and
-milestone 2 remain open. This follows the product-alignment checkpoint at commit 4e75d04.
+Status: the baseline and navigation slice are delivered, with a passing guided learning
+workflow. Independent-operator/usability acceptance remains open; milestone 2 is planned.
+This follows the product-alignment checkpoint at commit 4e75d04.
 
 The goal is coordinated views for learning unfamiliar code and reviewing changes, as
 defined in [DESIGN.md](../../DESIGN.md). The [research rationale](../explanation/task-driven-views.md)
@@ -51,8 +52,9 @@ this plan is not that browser walkthrough.
 
 The [baseline replay](../../experiments/learning-workflow/RESULTS.md) answers the question
 using existing views, but returning to an earlier file loses its declaration/reading
-position. The next candidate is a bounded session-local navigation trail using existing
-identities. Workspace declaration lookup is secondary; the originally proposed focused
+position. The [navigation slice](../../experiments/learning-workflow/NAVIGATION_RESULTS.md)
+now restores reading context using bounded session metadata and existing identities.
+Workspace declaration lookup is secondary; the originally proposed focused
 Rust module/import view remains deferred until a task requires it. Preserve keyboard
 access and explicit bounds. Existing CLI launch is sufficient for this milestone.
 
@@ -77,7 +79,8 @@ separate from agent/maintainer replay.
 
 The recorded baseline is guided, reference-aware automation. Its successful source
 explanation is functional evidence, not independent-operator acceptance or a comprehension
-study. Milestone 1 remains open because return navigation does not preserve context.
+study. The return-context criterion now has regression coverage and a repeated guided
+demonstration; independent-operator acceptance is not inferred from that recording.
 
 ## Milestone 2: a contextual local-change review
 
@@ -145,9 +148,9 @@ engine, a Git library or a complete graph API.
 | Step | Reviewable output |
 | --- | --- |
 | 1. Baseline learning walkthrough — delivered | [Guided replay](../../experiments/learning-workflow/RESULTS.md), source evidence, recording and observed gaps using current views. |
-| 2. Choose the smallest useful extension — next | Specify bounded investigation navigation to address the observed return-context gap; keep a graph deferred. |
-| 3. Demonstrate milestone 1 | One complete learning workflow, with any required implementation and meaningful TDD/mutation evidence. |
-| 4. Freeze the review fixture/contracts | Good/bad patches, change semantics and source-provider/pinning boundaries. |
+| 2. Choose the smallest useful extension — delivered | [Navigation contract](../prototype/NAVIGATION.md) and implementation address the observed return-context gap; a graph stays deferred. |
+| 3. Demonstrate milestone 1 — guided workflow delivered | [Repeated learning task](../../experiments/learning-workflow/NAVIGATION_RESULTS.md) with TDD/mutation evidence. Independent-operator validation remains open. |
+| 4. Freeze the review fixture/contracts — next | Good/bad patches, change semantics and source-provider/pinning boundaries. |
 | 5. Build and demonstrate milestone 2 | One complete Git-based review workflow plus provider-independent correctness tests. |
 
 Work in small vertical slices. Tests should cover public behaviour, stale/expired anchors,

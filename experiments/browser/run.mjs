@@ -1,7 +1,19 @@
 import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 
-if (process.argv.includes("--learning-walkthrough")) {
+if (process.argv.includes("--navigation")) {
+  const result = spawnSync(process.execPath, ["experiments/browser/navigation.test.mjs"], { stdio: "inherit" });
+  process.exit(result.status ?? 1);
+} else if (process.argv.includes("--navigation-inspector")) {
+  const result = spawnSync(process.execPath, ["experiments/browser/navigation-inspector.test.mjs"], { stdio: "inherit" });
+  process.exit(result.status ?? 1);
+} else if (process.argv.includes("--navigation-inspector-mutations")) {
+  const result = spawnSync(process.execPath, ["node_modules/@stryker-mutator/core/bin/stryker.js", "run", "experiments/browser/navigation-inspector-stryker.config.json"], { stdio: "inherit" });
+  process.exit(result.status ?? 1);
+} else if (process.argv.includes("--navigation-mutations")) {
+  const result = spawnSync(process.execPath, ["node_modules/@stryker-mutator/core/bin/stryker.js", "run", "experiments/browser/navigation-stryker.config.json"], { stdio: "inherit" });
+  process.exit(result.status ?? 1);
+} else if (process.argv.includes("--learning-walkthrough")) {
   await import("../learning-workflow/run.mjs");
 } else if (process.argv.includes("--envelope-matrix")) {
   const args = process.argv.slice(2).filter(value => value !== "--envelope-matrix");
@@ -46,7 +58,7 @@ if (process.argv.includes("--learning-walkthrough")) {
 } else if (process.argv.includes("--measure")) {
   await import("./measure.mjs");
 } else {
-  for (const file of ["crates/vizzi/web/controller.test.js", "crates/vizzi/web/updates.test.js", "crates/vizzi/web/source-description.test.js", "experiments/browser/statistics.test.mjs", "crates/vizzi/web/windows.test.js", "experiments/browser/outline.test.mjs", "experiments/browser/inspection.test.mjs", "experiments/browser/browser.test.mjs"]) {
+  for (const file of ["crates/vizzi/web/controller.test.js", "crates/vizzi/web/navigation.test.js", "crates/vizzi/web/updates.test.js", "crates/vizzi/web/source-description.test.js", "experiments/browser/statistics.test.mjs", "crates/vizzi/web/windows.test.js", "experiments/browser/outline.test.mjs", "experiments/browser/inspection.test.mjs", "experiments/browser/navigation-inspector.test.mjs", "experiments/browser/browser.test.mjs", "experiments/browser/navigation.test.mjs"]) {
     const result = spawnSync(process.execPath, [file], { stdio: "inherit" });
     if (result.status !== 0) process.exit(result.status ?? 1);
   }

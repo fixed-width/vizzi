@@ -20,6 +20,10 @@ temporary directory, builds Vizzi's release host and starts it with a fresh anal
 cache. It does not change the original checkout, execute lpc-rs, enable C-family capture
 or analyse LPC. Default Rust/Python capture remains in effect.
 
+Add `--return-history` with another output directory to exercise the delivered
+navigation feature. See the [updated recording](NAVIGATION_RESULTS.md). Original baseline
+artifacts describe commit b866b1f; check out that commit to reproduce its lack of history.
+
 Playwright navigates the real UI using the file filter, accessible file list,
 declaration outline and source scrolling. It records screenshots, video, raw UI states
 and a full Playwright trace. Response metadata audits snapshot binding and filter

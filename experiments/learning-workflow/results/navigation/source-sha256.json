@@ -1,0 +1,42 @@
+{
+  "base_commit": "b866b1f0601ab0fdaa7188859da23286c0e693d2",
+  "note": "Final navigation feature working tree; task source is the same pinned archive as the baseline.",
+  "binary_sha256": "3bd54833d5a77fa7b38c74d1230a32882d1363f5e356ba2d8ec1d3058de540d0",
+  "sha256": {
+    "Cargo.lock": "032ea2295563c2354c3d92c54cf4be9943ad62eb1ed116d6267b7c2c0ee1456d",
+    "crates/vizzi/src/server.rs": "3cbb19a98c788e2672326417dc09dab9840d1a1250133c8098ef42523b8e1773",
+    "crates/vizzi/web/navigation.js": "9fa4b664267b0ae847cde8b04f69899ef1ae79cd1f8c1ba10b2b99d95d7dda5f",
+    "crates/vizzi/web/navigation.test.js": "7234c33fd2505227457b0a4154255834ccf353a521e7362ed64afb6acb4f2916",
+    "crates/vizzi/web/controller.js": "c60e46ce32e1ec6c77ef0e034bf21068a6d5dd74f579b3d70d2564b9edbd451f",
+    "crates/vizzi/web/controller.test.js": "8a12aaa04af0e85d10654e7298d6a6d9ca17c51ef7cc5434442d71feccf3562f",
+    "crates/vizzi/web/inspector.js": "25fec03e05943620dc5fafe1d9a709fb97e84db838861671d77b9b97dc94530c",
+    "crates/vizzi/web/app.js": "ddfab53d396a6e76daa3aeb96d46bd404f0152bb47392f82d29ece6221a39362",
+    "crates/vizzi/web/index.html": "a6c5ba56ad72e090627954c0a5fdaea81b5935cacb6c8ddab2aca02e70315cb8",
+    "crates/vizzi/web/app.css": "1ab6b4c2d47a6acaa191db49691837f46590d8c17ce5cbc064298600824997aa",
+    "experiments/browser/navigation.test.mjs": "cf9d071a723b8c099cb2de5702a7d6a7e1332eab1a7d9d933dac89e4e0aec39d",
+    "experiments/browser/navigation-inspector.test.mjs": "f58dacafea21bb09b8ed81c741d6bf688c9dac64af3e6b23769121b2e8da3b3f",
+    "experiments/browser/navigation-stryker.config.json": "7023502d43166b624072bf3de267e3de66838926688aa142af5ad5b313fe42ed",
+    "experiments/browser/navigation-inspector-stryker.config.json": "1d766d197ed33890da98e8d1b464be9ec0c3e04ada49dd8e860d6d3e5c2ad8ff",
+    "experiments/browser/run.mjs": "b06808788945ecbe3420fd7ce759a41a45ebaa04022495dcbf9b4f82e11dbd44",
+    "experiments/learning-workflow/run.mjs": "ebafe0cd1a5611bdbca2f46c705b1f81ffc880de710d7a63c2b6de57fd1959b0"
+  },
+  "artifact_sha256": {
+    "03-compile-entry.png": "8d5877f97939434eb9a61594cb5f30f632cba4e96a6bae945cfc085eb794904d",
+    "00-initial.png": "9aaec789bd6d935cd14de7dfd3505d1407f08ad73b41cb73856563358bb22904",
+    "10-regression-test.png": "dbf5fa51d2c117152ecaa84fd664acd307ce3e0a15eed7fcf692efc0ca5763f3",
+    "mutation.json": "03092f0e5925f73fc77ad3355994996d815110e2baee96908ccf1e44e731b763",
+    "12-browser-back.png": "4f8eb06ed0a93ff5a2a6f43bd827469823f1c4fc4871f9932ce48bac96cb1fe6",
+    "04-read-policy.png": "b48e3e191ff044520cb96aa2cc8132c11a5a8c6780f192e92b20ca05ab38add3",
+    "07-history-return.png": "380f82d23e75fa03b2ae4486bac8a98bb1c3cd29a23857627ba2154007c8ed55",
+    "01-symbol-in-path-filter.png": "bf9df6805f96458c74668cea9eaaa454aef2601a04de392941950f029c795c39",
+    "walkthrough.webm": "11433089cde62c5e5e7f6df3898a7924d538f2e488a4746d01de3418406bc082",
+    "11-read-error-cases.png": "9311fe6e43ecd696ef4a5ca0640b4977ca7417814bfdcd4222ea6c1c499248d7",
+    "08-source-identity.png": "e5418e001caac865725c2c62cd19db23042a0232518f8c3cf03cb2190af38d41",
+    "06-disk-reader.png": "3af7b4205ade74cb8fbc65691b2c4bce0c9773ab4ff5e368c911bcdd46e5988e",
+    "02-compiler-module.png": "0888fa75596bbae7245df68d3fea8c9ae4c68efb345bd8c7d31c2b34ca3d7011",
+    "09-diagnostic-name.png": "3818db17ecb21899658e8a0223b5b9a24bf246e3b8a60fadb05847e4d4e6ea8c",
+    "summary.json": "9449a786e7d13b2e002f457a7ddc1abc359985cf86c44b891f10a85c45b2cd55",
+    "observations.json": "5484878f71b6cb9937def97612834b465846effb2e74bcd1f307e73fe7f17b11",
+    "05-reader-contract.png": "1133ef56637b49161e4ec5fbde8f927e0176070c7d883a93644968fcdf310800"
+  }
+}
