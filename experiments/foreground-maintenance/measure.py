@@ -19,13 +19,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--cache', type=pathlib.Path, required=True)
     parser.add_argument('--output', type=pathlib.Path, required=True)
+    parser.add_argument('--binary', type=pathlib.Path, default=pathlib.Path('target/release/examples/foreground_maintenance'))
     parser.add_argument('--prepare-only', action='store_true')
     args = parser.parse_args()
     if args.output.exists():
         parser.error('output must be new')
     args.output.parent.mkdir(parents=True, exist_ok=True)
     host = pathlib.Path('target/release/vizzi').resolve()
-    binary = pathlib.Path('target/release/examples/foreground_maintenance').resolve()
+    binary = args.binary.resolve()
     profiles = json.loads(pathlib.Path('experiments/qualification/profiles.json').read_text())
     if args.prepare_only:
         prepared = []
@@ -70,7 +71,6 @@ def main():
                 assert case['measurements']['read_files'] == 1 and len(case['capture_marks']) == 1
                 mark = case['capture_marks'][0]
                 assert case['write_start_ms'] <= case['hint_ms'] <= mark['entered_ms'] <= mark['ready_ms'] <= case['published_ms']
-                assert mark['ready_ms'] >= case['cleanup_end_ms']
                 assert case['write_overlaps_cleanup'] == (case['cleanup_start_ms'] <= case['write_start_ms'] < case['cleanup_end_ms'])
                 assert case['capture_overlaps_cleanup'] == (case['cleanup_start_ms'] <= mark['entered_ms'] < case['cleanup_end_ms'])
                 if case['condition'] == 'after_cleanup':

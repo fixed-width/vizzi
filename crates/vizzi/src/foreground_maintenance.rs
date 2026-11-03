@@ -78,7 +78,6 @@ fn settled(pending: bool, matches: impl FnOnce() -> bool) -> bool {
 fn capture_mark(
     marks: &[(Instant, Instant)],
     read_files: usize,
-    cleanup_finished: Instant,
 ) -> Result<(Instant, Instant), Error> {
     let [mark] = marks else {
         return Err("foreground edit was not a one-file capture".into());
@@ -88,9 +87,6 @@ fn capture_mark(
     }
     if mark.1 < mark.0 {
         return Err("capture readiness precedes entry".into());
-    }
-    if mark.1 < cleanup_finished {
-        return Err("capture passed the unfinished cut".into());
     }
     Ok(*mark)
 }
@@ -295,7 +291,6 @@ pub fn run(configuration: &[u8], emit: &mut impl FnMut(Value)) -> Result<Value, 
                         .as_ref()
                         .ok_or("foreground measurements missing")?
                         .read_files,
-                    cleanup.finished,
                 )?;
                 let source = visible
                     .file_by_path(&config.target)
@@ -401,13 +396,12 @@ mod tests {
     fn protocol_checks_reject_missing_marks_bad_order_and_incorrect_tail() {
         let now = Instant::now();
         let later = now + Duration::from_millis(1);
-        assert_eq!(capture_mark(&[(now, now)], 1, now).unwrap(), (now, now));
-        assert!(capture_mark(&[], 1, now).is_err());
-        assert!(capture_mark(&[(now, later), (now, later)], 1, now).is_err());
-        assert!(capture_mark(&[(now, later)], 0, now).is_err());
-        assert!(capture_mark(&[(now, later)], 2, now).is_err());
-        assert!(capture_mark(&[(later, now)], 1, now).is_err());
-        assert!(capture_mark(&[(now, now)], 1, later).is_err());
+        assert_eq!(capture_mark(&[(now, now)], 1).unwrap(), (now, now));
+        assert!(capture_mark(&[], 1).is_err());
+        assert!(capture_mark(&[(now, later), (now, later)], 1).is_err());
+        assert!(capture_mark(&[(now, later)], 0).is_err());
+        assert!(capture_mark(&[(now, later)], 2).is_err());
+        assert!(capture_mark(&[(later, now)], 1).is_err());
         let tail = CapturedSource::capture(b"z".to_vec(), None);
         validate_tail(&tail, 1).unwrap();
         assert!(validate_tail(&tail, 2).is_err());

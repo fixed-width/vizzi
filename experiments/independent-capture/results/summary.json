@@ -1,0 +1,548 @@
+{
+  "schema": 1,
+  "recorded_after_measurement_utc": "2026-11-03T19:16:53.030501+00:00",
+  "machine": {
+    "platform": "Linux-6.8.0-147-lowlatency-x86_64-with-glibc2.39",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13700H",
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)"
+  },
+  "conditions": [
+    {
+      "implementation": "before",
+      "profile": "linux",
+      "condition": "after_cleanup",
+      "samples": 3,
+      "published_during_cleanup": 0,
+      "publication_ms": {
+        "min": 57.87756,
+        "median": 58.40549,
+        "max": 72.286899
+      },
+      "gate_ms": {
+        "min": 0.000403,
+        "median": 0.000557,
+        "max": 0.001214
+      },
+      "cleanup_ms": {
+        "min": 434.886007,
+        "median": 461.606376,
+        "max": 476.31012499999997
+      },
+      "analysis_merge_ms": {
+        "min": 31.022288,
+        "median": 31.898315,
+        "max": 45.803638
+      }
+    },
+    {
+      "implementation": "before",
+      "profile": "linux",
+      "condition": "during_cleanup",
+      "samples": 3,
+      "published_during_cleanup": 0,
+      "publication_ms": {
+        "min": 394.07329699999997,
+        "median": 418.61066600000004,
+        "max": 502.914842
+      },
+      "gate_ms": {
+        "min": 300.001377,
+        "median": 357.230271,
+        "max": 414.583694
+      },
+      "cleanup_ms": {
+        "min": 359.290356,
+        "median": 382.71421,
+        "max": 467.286898
+      },
+      "analysis_merge_ms": {
+        "min": 33.43630400000001,
+        "median": 34.62110499999994,
+        "max": 34.86428599999999
+      }
+    },
+    {
+      "implementation": "before",
+      "profile": "pytorch",
+      "condition": "after_cleanup",
+      "samples": 3,
+      "published_during_cleanup": 0,
+      "publication_ms": {
+        "min": 31.292896,
+        "median": 31.349425,
+        "max": 31.666528999999997
+      },
+      "gate_ms": {
+        "min": 0.000437,
+        "median": 0.000734,
+        "max": 0.000807
+      },
+      "cleanup_ms": {
+        "min": 93.365655,
+        "median": 97.12237999999999,
+        "max": 102.056812
+      },
+      "analysis_merge_ms": {
+        "min": 5.136989,
+        "median": 5.150384,
+        "max": 5.351879
+      }
+    },
+    {
+      "implementation": "before",
+      "profile": "pytorch",
+      "condition": "during_cleanup",
+      "samples": 3,
+      "published_during_cleanup": 0,
+      "publication_ms": {
+        "min": 90.767178,
+        "median": 101.520338,
+        "max": 103.697157
+      },
+      "gate_ms": {
+        "min": 58.616678,
+        "median": 69.728683,
+        "max": 72.63353599999999
+      },
+      "cleanup_ms": {
+        "min": 83.98961100000001,
+        "median": 94.95841300000001,
+        "max": 98.023271
+      },
+      "analysis_merge_ms": {
+        "min": 3.6091659999999877,
+        "median": 4.936004999999994,
+        "max": 5.834558000000001
+      }
+    },
+    {
+      "implementation": "after",
+      "profile": "linux",
+      "condition": "after_cleanup",
+      "samples": 3,
+      "published_during_cleanup": 0,
+      "publication_ms": {
+        "min": 60.161644,
+        "median": 60.188719,
+        "max": 64.54067400000001
+      },
+      "gate_ms": {
+        "min": 0.0006360000000000001,
+        "median": 0.000886,
+        "max": 0.0013880000000000001
+      },
+      "cleanup_ms": {
+        "min": 418.450339,
+        "median": 481.453615,
+        "max": 482.576122
+      },
+      "analysis_merge_ms": {
+        "min": 33.33308,
+        "median": 33.933081,
+        "max": 37.308851
+      }
+    },
+    {
+      "implementation": "after",
+      "profile": "linux",
+      "condition": "during_cleanup",
+      "samples": 3,
+      "published_during_cleanup": 3,
+      "publication_ms": {
+        "min": 60.022133,
+        "median": 62.385222,
+        "max": 70.960999
+      },
+      "gate_ms": {
+        "min": 0.00027,
+        "median": 0.000531,
+        "max": 0.000803
+      },
+      "cleanup_ms": {
+        "min": 355.031197,
+        "median": 359.18130399999995,
+        "max": 443.50784799999997
+      },
+      "analysis_merge_ms": {
+        "min": 32.823052,
+        "median": 34.997808,
+        "max": 44.387186
+      }
+    },
+    {
+      "implementation": "after",
+      "profile": "pytorch",
+      "condition": "after_cleanup",
+      "samples": 3,
+      "published_during_cleanup": 0,
+      "publication_ms": {
+        "min": 33.087431,
+        "median": 33.117458,
+        "max": 33.14025
+      },
+      "gate_ms": {
+        "min": 0.00035,
+        "median": 0.0005239999999999999,
+        "max": 0.001137
+      },
+      "cleanup_ms": {
+        "min": 80.362093,
+        "median": 86.189634,
+        "max": 92.95658900000001
+      },
+      "analysis_merge_ms": {
+        "min": 6.165412,
+        "median": 6.6246599999999995,
+        "max": 7.700879999999999
+      }
+    },
+    {
+      "implementation": "after",
+      "profile": "pytorch",
+      "condition": "during_cleanup",
+      "samples": 3,
+      "published_during_cleanup": 3,
+      "publication_ms": {
+        "min": 31.084597,
+        "median": 33.292120000000004,
+        "max": 33.317015
+      },
+      "gate_ms": {
+        "min": 0.00036199999999999996,
+        "median": 0.000432,
+        "max": 0.000829
+      },
+      "cleanup_ms": {
+        "min": 76.770646,
+        "median": 90.320642,
+        "max": 92.282698
+      },
+      "analysis_merge_ms": {
+        "min": 4.374086,
+        "median": 6.593000000000001,
+        "max": 7.530226000000001
+      }
+    }
+  ],
+  "samples": [
+    {
+      "implementation": "before",
+      "profile": "linux",
+      "sample": 0,
+      "condition": "after_cleanup",
+      "publication_ms": 57.87756,
+      "gate_ms": 0.000557,
+      "cleanup_ms": 434.886007,
+      "capture_ms": 0.24543399999999999,
+      "analysis_merge_ms": 31.022288,
+      "published_during_cleanup": false,
+      "capture_overlaps_cleanup": false
+    },
+    {
+      "implementation": "before",
+      "profile": "linux",
+      "sample": 1,
+      "condition": "during_cleanup",
+      "publication_ms": 394.07329699999997,
+      "gate_ms": 300.001377,
+      "cleanup_ms": 359.290356,
+      "capture_ms": 300.23822900000005,
+      "analysis_merge_ms": 34.62110499999994,
+      "published_during_cleanup": false,
+      "capture_overlaps_cleanup": true
+    },
+    {
+      "implementation": "before",
+      "profile": "linux",
+      "sample": 2,
+      "condition": "during_cleanup",
+      "publication_ms": 418.61066600000004,
+      "gate_ms": 357.230271,
+      "cleanup_ms": 382.71421,
+      "capture_ms": 357.499843,
+      "analysis_merge_ms": 34.86428599999999,
+      "published_during_cleanup": false,
+      "capture_overlaps_cleanup": true
+    },
+    {
+      "implementation": "before",
+      "profile": "linux",
+      "sample": 3,
+      "condition": "after_cleanup",
+      "publication_ms": 72.286899,
+      "gate_ms": 0.000403,
+      "cleanup_ms": 461.606376,
+      "capture_ms": 0.22348600000000002,
+      "analysis_merge_ms": 45.803638,
+      "published_during_cleanup": false,
+      "capture_overlaps_cleanup": false
+    },
+    {
+      "implementation": "before",
+      "profile": "linux",
+      "sample": 4,
+      "condition": "after_cleanup",
+      "publication_ms": 58.40549,
+      "gate_ms": 0.001214,
+      "cleanup_ms": 476.31012499999997,
+      "capture_ms": 0.273408,
+      "analysis_merge_ms": 31.898315,
+      "published_during_cleanup": false,
+      "capture_overlaps_cleanup": false
+    },
+    {
+      "implementation": "before",
+      "profile": "linux",
+      "sample": 5,
+      "condition": "during_cleanup",
+      "publication_ms": 502.914842,
+      "gate_ms": 414.583694,
+      "cleanup_ms": 467.286898,
+      "capture_ms": 414.851788,
+      "analysis_merge_ms": 33.43630400000001,
+      "published_during_cleanup": false,
+      "capture_overlaps_cleanup": true
+    },
+    {
+      "implementation": "before",
+      "profile": "pytorch",
+      "sample": 0,
+      "condition": "after_cleanup",
+      "publication_ms": 31.666528999999997,
+      "gate_ms": 0.000807,
+      "cleanup_ms": 93.365655,
+      "capture_ms": 0.157949,
+      "analysis_merge_ms": 5.150384,
+      "published_during_cleanup": false,
+      "capture_overlaps_cleanup": false
+    },
+    {
+      "implementation": "before",
+      "profile": "pytorch",
+      "sample": 1,
+      "condition": "during_cleanup",
+      "publication_ms": 90.767178,
+      "gate_ms": 58.616678,
+      "cleanup_ms": 83.98961100000001,
+      "capture_ms": 58.748964,
+      "analysis_merge_ms": 4.936004999999994,
+      "published_during_cleanup": false,
+      "capture_overlaps_cleanup": true
+    },
+    {
+      "implementation": "before",
+      "profile": "pytorch",
+      "sample": 2,
+      "condition": "during_cleanup",
+      "publication_ms": 101.520338,
+      "gate_ms": 69.728683,
+      "cleanup_ms": 94.95841300000001,
+      "capture_ms": 69.894972,
+      "analysis_merge_ms": 5.834558000000001,
+      "published_during_cleanup": false,
+      "capture_overlaps_cleanup": true
+    },
+    {
+      "implementation": "before",
+      "profile": "pytorch",
+      "sample": 3,
+      "condition": "after_cleanup",
+      "publication_ms": 31.292896,
+      "gate_ms": 0.000734,
+      "cleanup_ms": 97.12237999999999,
+      "capture_ms": 0.142371,
+      "analysis_merge_ms": 5.351879,
+      "published_during_cleanup": false,
+      "capture_overlaps_cleanup": false
+    },
+    {
+      "implementation": "before",
+      "profile": "pytorch",
+      "sample": 4,
+      "condition": "after_cleanup",
+      "publication_ms": 31.349425,
+      "gate_ms": 0.000437,
+      "cleanup_ms": 102.056812,
+      "capture_ms": 0.10807399999999999,
+      "analysis_merge_ms": 5.136989,
+      "published_during_cleanup": false,
+      "capture_overlaps_cleanup": false
+    },
+    {
+      "implementation": "before",
+      "profile": "pytorch",
+      "sample": 5,
+      "condition": "during_cleanup",
+      "publication_ms": 103.697157,
+      "gate_ms": 72.63353599999999,
+      "cleanup_ms": 98.023271,
+      "capture_ms": 72.835126,
+      "analysis_merge_ms": 3.6091659999999877,
+      "published_during_cleanup": false,
+      "capture_overlaps_cleanup": true
+    },
+    {
+      "implementation": "after",
+      "profile": "linux",
+      "sample": 0,
+      "condition": "after_cleanup",
+      "publication_ms": 60.161644,
+      "gate_ms": 0.0013880000000000001,
+      "cleanup_ms": 418.450339,
+      "capture_ms": 0.240511,
+      "analysis_merge_ms": 33.933081,
+      "published_during_cleanup": false,
+      "capture_overlaps_cleanup": false
+    },
+    {
+      "implementation": "after",
+      "profile": "linux",
+      "sample": 1,
+      "condition": "during_cleanup",
+      "publication_ms": 62.385222,
+      "gate_ms": 0.00027,
+      "cleanup_ms": 355.031197,
+      "capture_ms": 0.183978,
+      "analysis_merge_ms": 34.997808,
+      "published_during_cleanup": true,
+      "capture_overlaps_cleanup": true
+    },
+    {
+      "implementation": "after",
+      "profile": "linux",
+      "sample": 2,
+      "condition": "during_cleanup",
+      "publication_ms": 60.022133,
+      "gate_ms": 0.000803,
+      "cleanup_ms": 359.18130399999995,
+      "capture_ms": 0.281319,
+      "analysis_merge_ms": 32.823052,
+      "published_during_cleanup": true,
+      "capture_overlaps_cleanup": true
+    },
+    {
+      "implementation": "after",
+      "profile": "linux",
+      "sample": 3,
+      "condition": "after_cleanup",
+      "publication_ms": 64.54067400000001,
+      "gate_ms": 0.000886,
+      "cleanup_ms": 482.576122,
+      "capture_ms": 0.266789,
+      "analysis_merge_ms": 37.308851,
+      "published_during_cleanup": false,
+      "capture_overlaps_cleanup": false
+    },
+    {
+      "implementation": "after",
+      "profile": "linux",
+      "sample": 4,
+      "condition": "after_cleanup",
+      "publication_ms": 60.188719,
+      "gate_ms": 0.0006360000000000001,
+      "cleanup_ms": 481.453615,
+      "capture_ms": 0.177352,
+      "analysis_merge_ms": 33.33308,
+      "published_during_cleanup": false,
+      "capture_overlaps_cleanup": false
+    },
+    {
+      "implementation": "after",
+      "profile": "linux",
+      "sample": 5,
+      "condition": "during_cleanup",
+      "publication_ms": 70.960999,
+      "gate_ms": 0.000531,
+      "cleanup_ms": 443.50784799999997,
+      "capture_ms": 0.218973,
+      "analysis_merge_ms": 44.387186,
+      "published_during_cleanup": true,
+      "capture_overlaps_cleanup": true
+    },
+    {
+      "implementation": "after",
+      "profile": "pytorch",
+      "sample": 0,
+      "condition": "after_cleanup",
+      "publication_ms": 33.117458,
+      "gate_ms": 0.001137,
+      "cleanup_ms": 92.95658900000001,
+      "capture_ms": 0.197588,
+      "analysis_merge_ms": 6.165412,
+      "published_during_cleanup": false,
+      "capture_overlaps_cleanup": false
+    },
+    {
+      "implementation": "after",
+      "profile": "pytorch",
+      "sample": 1,
+      "condition": "during_cleanup",
+      "publication_ms": 33.292120000000004,
+      "gate_ms": 0.000432,
+      "cleanup_ms": 90.320642,
+      "capture_ms": 0.108839,
+      "analysis_merge_ms": 6.593000000000001,
+      "published_during_cleanup": true,
+      "capture_overlaps_cleanup": true
+    },
+    {
+      "implementation": "after",
+      "profile": "pytorch",
+      "sample": 2,
+      "condition": "during_cleanup",
+      "publication_ms": 31.084597,
+      "gate_ms": 0.000829,
+      "cleanup_ms": 92.282698,
+      "capture_ms": 0.18344999999999997,
+      "analysis_merge_ms": 4.374086,
+      "published_during_cleanup": true,
+      "capture_overlaps_cleanup": true
+    },
+    {
+      "implementation": "after",
+      "profile": "pytorch",
+      "sample": 3,
+      "condition": "after_cleanup",
+      "publication_ms": 33.14025,
+      "gate_ms": 0.00035,
+      "cleanup_ms": 80.362093,
+      "capture_ms": 0.122258,
+      "analysis_merge_ms": 6.6246599999999995,
+      "published_during_cleanup": false,
+      "capture_overlaps_cleanup": false
+    },
+    {
+      "implementation": "after",
+      "profile": "pytorch",
+      "sample": 4,
+      "condition": "after_cleanup",
+      "publication_ms": 33.087431,
+      "gate_ms": 0.0005239999999999999,
+      "cleanup_ms": 86.189634,
+      "capture_ms": 0.10390700000000001,
+      "analysis_merge_ms": 7.700879999999999,
+      "published_during_cleanup": false,
+      "capture_overlaps_cleanup": false
+    },
+    {
+      "implementation": "after",
+      "profile": "pytorch",
+      "sample": 5,
+      "condition": "during_cleanup",
+      "publication_ms": 33.317015,
+      "gate_ms": 0.00036199999999999996,
+      "cleanup_ms": 76.770646,
+      "capture_ms": 0.108668,
+      "analysis_merge_ms": 7.530226000000001,
+      "published_during_cleanup": true,
+      "capture_overlaps_cleanup": true
+    }
+  ],
+  "limits": [
+    "Identical updated foreground harness on preceding/current backends, separate build outputs and verified binary hashes.",
+    "Old first, new second; three alternating condition pairs per repository/implementation, finite warm native observations.",
+    "Controlled generated tails and explicit hints isolate cleanup; source/fact/pin/restoration checks remain mandatory.",
+    "Aggregate backing quotas include cleaning space until IO succeeds; independent staging bound is additional.",
+    "No browser/watcher/recovery-contention or baseline-laptop latency qualification; child AS limit is not physical RAM."
+  ]
+}

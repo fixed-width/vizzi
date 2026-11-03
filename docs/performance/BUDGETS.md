@@ -154,6 +154,15 @@ Design foreground capture independently of in-flight truncation while preserving
 pin and aggregate capacity safety. These three-sample conditions are not browser tails
 or a representative distribution of retired tails.
 
+The [independent capture implementation](../../experiments/independent-capture/RESULTS.md)
+routes allocations away from a cleaning file while retaining its full aggregate charge
+until IO succeeds. In the identical-harness comparison, median during-cleanup publication
+changes from 418.6 / 101.5 ms to 62.4 / 33.3 ms, and all six new-backend edits publish
+before truncation ends. History still completes within 8 / 1 GiB shared backing allowances
+and returns both files to zero. Progress requires headroom/contiguous fit; capture performs
+only logical retirement, with physical cleanup explicit. These finite warm native samples
+do not qualify full-capacity pressure, browser tails, cold storage or baseline hardware.
+
 Do not replace semantic correctness checks with these performance targets. Language
 assignments, partial grammar coverage, source-only cases, cancellation, cache validity,
 and immutable publication must remain explicit and independently tested.

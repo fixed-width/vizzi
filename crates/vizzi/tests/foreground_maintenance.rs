@@ -50,7 +50,6 @@ fn foreground_edits_during_cleanup_keep_facts_pins_and_restoration_correct() {
         assert!(
             number("hint_ms") <= entered && entered <= ready && ready <= number("published_ms")
         );
-        assert!(ready >= number("cleanup_end_ms"));
         assert!(
             (number("published_ms") - number("write_start_ms") - number("write_to_published_ms"))
                 .abs()

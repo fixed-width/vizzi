@@ -114,6 +114,8 @@ design should compare bounded active storage separate from cleaning files with e
 foreground capture admission, preserving immutable pins and aggregate disk/memory bounds.
 Physical cleanup remains non-preemptible; moving it to another thread alone does not
 remove the allocation dependency. No scheduling/storage fix is claimed in this report.
+The subsequent [independent capture stage](../independent-capture/RESULTS.md) implements
+two fixed backing files with aggregate charging and compares both backends.
 
 [Raw observations](results/observations.json), [summary](results/summary.json),
 [sample CSV](results/samples.csv), [cache preparation](results/preparation.json),

@@ -1,7 +1,8 @@
 //! Private captured-source backing with owned extents and deferred retirement.
 
 mod extents;
-use extents::{Extent, Extents};
+mod pool;
+use pool::{Allocation, Cut, Pool};
 
 use serde::Serialize;
 #[cfg(feature = "qualification")]
@@ -25,10 +26,7 @@ pub(crate) struct ReclaimSpan {
 const CAPTURE_CHUNK: usize = 64 * 1024;
 #[derive(Debug)]
 struct State {
-    // Shared-cursor maintenance handle: metadata/set_len only; never seek through it.
-    file: File,
-    extents: Extents,
-    cleanup_pending: bool,
+    pool: Pool,
     written: usize,
     stores: usize,
     staging_bytes: usize,
@@ -42,13 +40,55 @@ struct Backing {
     read_bytes: usize,
 }
 #[derive(Debug)]
+struct Files {
+    // Both handles share a cursor; this one is metadata/set_len only.
+    maintenance: Mutex<File>,
+    backing: Mutex<Backing>,
+}
+impl Files {
+    fn new(directory: &Path) -> Result<Self, SourceReadError> {
+        let file =
+            tempfile::tempfile_in(directory).map_err(|e| SourceReadError::Io(e.to_string()))?;
+        let cursor = file
+            .try_clone()
+            .map_err(|e| SourceReadError::Io(e.to_string()))?;
+        Ok(Self {
+            maintenance: Mutex::new(file),
+            backing: Mutex::new(Backing {
+                file: cursor,
+                reads: 0,
+                read_bytes: 0,
+            }),
+        })
+    }
+}
+struct Cleaning<'a> {
+    inner: &'a Inner,
+    cut: Option<Cut>,
+}
+impl Cleaning<'_> {
+    fn finish(mut self, success: bool) {
+        if let Some(cut) = self.cut.take() {
+            self.inner.lock().pool.finish_clean(cut, success);
+        }
+    }
+}
+impl Drop for Cleaning<'_> {
+    fn drop(&mut self) {
+        if let Some(cut) = self.cut.take() {
+            self.inner.lock().pool.finish_clean(cut, false);
+        }
+    }
+}
+#[derive(Debug)]
 struct Inner {
     state: Mutex<State>,
-    backing: Mutex<Backing>,
+    files: [Files; 2],
+    maintenance: Mutex<()>,
     capacity: usize,
     writer: Mutex<()>,
     stage: Arc<Mutex<File>>,
-    retired: Mutex<Vec<Extent>>,
+    retired: Mutex<Vec<Allocation>>,
     #[cfg(feature = "qualification")]
     trace: Mutex<Option<Arc<CaptureTrace>>>,
 }
@@ -58,8 +98,9 @@ impl Inner {
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner)
     }
-    fn backing(&self) -> MutexGuard<'_, Backing> {
-        self.backing
+    fn backing(&self, bank: usize) -> MutexGuard<'_, Backing> {
+        self.files[bank]
+            .backing
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner)
     }
@@ -68,13 +109,13 @@ impl Inner {
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner)
     }
-    fn retired(&self) -> MutexGuard<'_, Vec<Extent>> {
+    fn retired(&self) -> MutexGuard<'_, Vec<Allocation>> {
         self.retired
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner)
     }
 }
-/// Private committed backing and reusable staging; project paths are never backing.
+/// Two private committed files and reusable staging; project paths are never backing.
 #[derive(Debug)]
 pub struct SourceSpool {
     directory: PathBuf,
@@ -83,22 +124,26 @@ pub struct SourceSpool {
 /// Backing allocation and cumulative IO observations, separate from resident memory.
 #[derive(Clone, Debug, Serialize)]
 pub struct SpoolStats {
-    /// Maximum reserved backing address span; staging has a separate equal bound.
+    /// Maximum aggregate charged span of both files; staging has a separate equal bound.
     pub capacity_bytes: usize,
     /// Cumulative committed bytes; may exceed capacity as ranges are reused.
     pub written_bytes: usize,
     /// Charged bytes, including unfinished writes and queued retirements.
     pub allocated_bytes: usize,
-    /// Current reserved address span, including reusable gaps.
+    /// Aggregate charged spans, including gaps and tails awaiting physical cleanup.
     pub extent_bytes: usize,
-    /// Free bytes in reusable gaps inside that span.
+    /// Charged but unallocated bytes; cleaning-file space is temporarily unavailable.
     pub free_bytes: usize,
     /// Largest reserved address span observed.
     pub peak_extent_bytes: usize,
-    /// Actual backing length, absent if metadata IO fails.
+    /// Total actual length of both files, absent if metadata IO fails.
     pub file_bytes: Option<u64>,
     /// Descriptor retirements awaiting maintenance.
     pub pending_retirements: usize,
+    /// Backing files currently unavailable for allocation during physical cleanup.
+    pub cleaning_files: usize,
+    /// Full charges retained by those cleaning files until IO succeeds.
+    pub cleaning_bytes: usize,
     /// Captures committed to backing.
     pub stores: usize,
     /// Backing range calls.
@@ -123,31 +168,22 @@ impl SourceSpool {
         let directory = directory
             .canonicalize()
             .map_err(|error| SourceReadError::Io(error.to_string()))?;
-        let file = tempfile::tempfile_in(&directory)
-            .map_err(|error| SourceReadError::Io(error.to_string()))?;
-        let cursor = file
-            .try_clone()
-            .map_err(|error| SourceReadError::Io(error.to_string()))?;
+        let files = [Files::new(&directory)?, Files::new(&directory)?];
         let stage = tempfile::tempfile_in(&directory)
             .map_err(|error| SourceReadError::Io(error.to_string()))?;
         Ok(Self {
             directory,
             inner: Arc::new(Inner {
                 state: Mutex::new(State {
-                    file,
-                    extents: Extents::default(),
-                    cleanup_pending: false,
+                    pool: Pool::default(),
                     written: 0,
                     stores: 0,
                     staging_bytes: 0,
                     peak_staging_bytes: 0,
                     max_read_request: 0,
                 }),
-                backing: Mutex::new(Backing {
-                    file: cursor,
-                    reads: 0,
-                    read_bytes: 0,
-                }),
+                files,
+                maintenance: Mutex::new(()),
                 capacity,
                 writer: Mutex::new(()),
                 stage: Arc::new(Mutex::new(stage)),
@@ -162,7 +198,7 @@ impl SourceSpool {
         &self.directory
     }
     /// Persists a resident capture and moves its metadata onto private immutable backing.
-    /// Already-backed captures are unchanged; retired ranges are reclaimed before allocation.
+    /// Retirements update allocation indexes without performing physical cleanup.
     pub fn persist(
         &self,
         source: Arc<CapturedSource>,
@@ -203,7 +239,7 @@ impl SourceSpool {
             .clone();
         let _writer = self.inner.writer();
         let _reset = StageReset { inner: &self.inner };
-        self.reclaim()?;
+        self.drain_retired();
         #[cfg(feature = "qualification")]
         if let Some(trace) = trace {
             let ready = Instant::now();
@@ -294,19 +330,20 @@ impl SourceSpool {
         read: impl FnMut(usize, &mut [u8]) -> Result<(), SourceReadError>,
         cancelled: &dyn Fn() -> bool,
     ) -> Result<Option<Arc<Blob>>, SourceReadError> {
-        self.reclaim()?;
+        self.drain_retired();
         let extent = self
             .inner
             .lock()
-            .extents
+            .pool
             .reserve(len, self.inner.capacity)
             .ok_or(SourceReadError::Capacity)?;
-        let start = extent.start;
+        let start = extent.extent.start;
+        let bank = extent.bank;
         let backing = Arc::new(Blob {
             inner: self.inner.clone(),
             extent: Some(extent),
         });
-        match self.write_range(start, len, read, cancelled) {
+        match self.write_range(bank, start, len, read, cancelled) {
             Ok(true) => {
                 let mut state = self.inner.lock();
                 state.written = state.written.saturating_add(len);
@@ -315,15 +352,15 @@ impl SourceSpool {
             }
             result => {
                 drop(backing);
-                let cleanup = self.reclaim();
+                self.drain_retired();
                 result?;
-                cleanup?;
                 Ok(None)
             }
         }
     }
     fn write_range(
         &self,
+        bank: usize,
         start: usize,
         len: usize,
         mut read: impl FnMut(usize, &mut [u8]) -> Result<(), SourceReadError>,
@@ -341,7 +378,7 @@ impl SourceSpool {
                 return Ok(false);
             }
             {
-                let mut backing = self.inner.backing();
+                let mut backing = self.inner.backing(bank);
                 backing
                     .file
                     .seek(SeekFrom::Start((start + at) as u64))
@@ -358,8 +395,8 @@ impl SourceSpool {
         }
         Ok(true)
     }
-    /// Reclaims queued descriptor retirements and truncates a free tail outside publication locks.
-    /// Failed physical truncation is reported and retried by the next maintenance call.
+    /// Cleans at most both files once, without holding allocation state during physical IO.
+    /// Failure retains the old disk charge for retry; captures can use the other file.
     pub fn reclaim(&self) -> Result<(), SourceReadError> {
         self.reclaim_with(File::set_len)
     }
@@ -369,9 +406,15 @@ impl SourceSpool {
         on_cut: impl FnOnce(u64),
     ) -> Result<Option<ReclaimSpan>, SourceReadError> {
         let mut span = None;
+        let mut on_cut = Some(on_cut);
         self.reclaim_with(|file, end| {
+            if span.is_some() {
+                return file.set_len(end);
+            }
             let started = Instant::now();
-            on_cut(end);
+            if let Some(on_cut) = on_cut.take() {
+                on_cut(end);
+            }
             let result = file.set_len(end);
             span = Some(ReclaimSpan {
                 started,
@@ -390,53 +433,92 @@ impl SourceSpool {
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner) = trace;
     }
-    fn reclaim_with(
-        &self,
-        truncate: impl FnOnce(&File, u64) -> std::io::Result<()>,
-    ) -> Result<(), SourceReadError> {
+    fn drain_retired(&self) {
         let retired = std::mem::take(&mut *self.inner.retired());
         let mut state = self.inner.lock();
-        for extent in retired {
-            if state.extents.release(extent) {
-                state.cleanup_pending = true;
-            }
+        for allocation in retired {
+            state.pool.retire(allocation);
         }
-        if state.cleanup_pending {
-            let end = state.extents.end as u64;
-            if state
-                .file
-                .metadata()
-                .map_err(|e| SourceReadError::Io(e.to_string()))?
-                .len()
-                > end
-            {
-                truncate(&state.file, end).map_err(|e| SourceReadError::Io(e.to_string()))?;
-            }
-            state.cleanup_pending = false;
+    }
+    fn reclaim_with(
+        &self,
+        mut truncate: impl FnMut(&File, u64) -> std::io::Result<()>,
+    ) -> Result<(), SourceReadError> {
+        let _maintenance = self
+            .inner
+            .maintenance
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        self.drain_retired();
+        let active = self.inner.lock().pool.active;
+        for bank in [active, 1 - active] {
+            let Some(cut) = self.inner.lock().pool.begin_clean(bank) else {
+                continue;
+            };
+            let end = cut.end as u64;
+            let cleaning = Cleaning {
+                inner: &self.inner,
+                cut: Some(cut),
+            };
+            let result = (|| {
+                let file = self.inner.files[bank]
+                    .maintenance
+                    .lock()
+                    .unwrap_or_else(std::sync::PoisonError::into_inner);
+                if file.metadata()?.len() > end {
+                    truncate(&file, end)?;
+                }
+                Ok::<(), std::io::Error>(())
+            })();
+            cleaning.finish(result.is_ok());
+            result.map_err(|error| SourceReadError::Io(error.to_string()))?;
         }
         Ok(())
     }
-    /// Reads session accounting without loading captured source.
+    /// Observes aggregate charges and IO; concurrent values are diagnostic snapshots.
     pub fn stats(&self) -> SpoolStats {
         let pending_retirements = self.inner.retired().len();
         let state = self.inner.lock();
-        let backing = self.inner.backing();
-        SpoolStats {
+        let charged = state.pool.charged();
+        let allocated = state.pool.allocated();
+        let mut stats = SpoolStats {
             capacity_bytes: self.inner.capacity,
             written_bytes: state.written,
-            allocated_bytes: state.extents.allocated,
-            extent_bytes: state.extents.end,
-            free_bytes: state.extents.end - state.extents.allocated,
-            peak_extent_bytes: state.extents.peak,
-            file_bytes: state.file.metadata().ok().map(|meta| meta.len()),
+            allocated_bytes: allocated,
+            extent_bytes: charged,
+            free_bytes: charged - allocated,
+            peak_extent_bytes: state.pool.peak,
+            file_bytes: None,
             pending_retirements,
             stores: state.stores,
-            reads: backing.reads,
-            read_bytes: backing.read_bytes,
+            reads: 0,
+            read_bytes: 0,
             staging_bytes: state.staging_bytes,
             peak_staging_bytes: state.peak_staging_bytes,
             max_read_request: state.max_read_request,
+            cleaning_files: state.pool.banks.iter().filter(|b| b.cleaning).count(),
+            cleaning_bytes: state
+                .pool
+                .banks
+                .iter()
+                .filter(|b| b.cleaning)
+                .map(|b| b.charged)
+                .sum(),
+        };
+        drop(state);
+        stats.file_bytes = self.inner.files.iter().try_fold(0u64, |total, files| {
+            let file = files
+                .maintenance
+                .lock()
+                .unwrap_or_else(std::sync::PoisonError::into_inner);
+            total.checked_add(file.metadata().ok()?.len())
+        });
+        for bank in 0..2 {
+            let backing = self.inner.backing(bank);
+            stats.reads = stats.reads.saturating_add(backing.reads);
+            stats.read_bytes = stats.read_bytes.saturating_add(backing.read_bytes);
         }
+        stats
     }
 }
 struct StageReset<'a> {
@@ -489,12 +571,12 @@ impl SourceReader for Staged {
 #[derive(Debug)]
 struct Blob {
     inner: Arc<Inner>,
-    extent: Option<Extent>,
+    extent: Option<Allocation>,
 }
 impl Drop for Blob {
     fn drop(&mut self) {
         if let Some(extent) = self.extent.take()
-            && extent.len != 0
+            && extent.extent.len != 0
         {
             self.inner.retired().push(extent);
         }
@@ -503,6 +585,8 @@ impl Drop for Blob {
 impl SourceReader for Blob {
     fn read_at(&self, offset: usize, target: &mut [u8]) -> Result<(), SourceReadError> {
         let extent = self.extent.as_ref().ok_or(SourceReadError::Integrity)?;
+        let bank = extent.bank;
+        let extent = &extent.extent;
         let end = offset
             .checked_add(target.len())
             .ok_or(SourceReadError::InvalidRange)?;
@@ -513,7 +597,7 @@ impl SourceReader for Blob {
             .start
             .checked_add(offset)
             .ok_or(SourceReadError::InvalidRange)?;
-        let mut backing = self.inner.backing();
+        let mut backing = self.inner.backing(bank);
         backing
             .file
             .seek(SeekFrom::Start(at as u64))
@@ -534,6 +618,51 @@ impl SourceReader for Blob {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn capture_finishes_before_a_different_backing_tail_is_unpaused() {
+        use std::{sync::mpsc, time::Duration};
+        let root = tempfile::tempdir().unwrap();
+        let spool = Arc::new(SourceSpool::new(root.path(), 24).unwrap());
+        let original = spool
+            .persist(CapturedSource::capture(b"original".to_vec(), None))
+            .unwrap();
+        let tail = spool
+            .persist(CapturedSource::capture(b"old tail".to_vec(), None))
+            .unwrap();
+        drop(tail);
+        let (cut, at_cut) = mpsc::channel();
+        let (release, resume) = mpsc::channel();
+        let cleaning = spool.clone();
+        let worker = std::thread::spawn(move || {
+            cleaning.reclaim_with(|file, end| {
+                cut.send(end).unwrap();
+                resume.recv_timeout(Duration::from_secs(5)).unwrap();
+                file.set_len(end)
+            })
+        });
+        assert_eq!(at_cut.recv_timeout(Duration::from_secs(2)).unwrap(), 8);
+        let capture = spool.clone();
+        let (done, completed) = mpsc::channel();
+        let writer = std::thread::spawn(move || {
+            let result = capture.capture(&mut std::io::Cursor::new(b"new tail"), None, &|| false);
+            done.send(()).unwrap();
+            result
+        });
+        let progressed = completed.recv_timeout(Duration::from_secs(2));
+        release.send(()).unwrap();
+        worker.join().unwrap().unwrap();
+        let next = writer.join().unwrap().unwrap().unwrap();
+        assert!(progressed.is_ok());
+        assert_eq!(original.read_text(8).unwrap().as_deref(), Some("original"));
+        assert_eq!(next.read_text(8).unwrap().as_deref(), Some("new tail"));
+        assert_eq!(spool.stats().file_bytes, Some(16));
+        assert_eq!(spool.stats().extent_bytes, 16);
+        drop(original);
+        drop(next);
+        spool.reclaim().unwrap();
+        assert_eq!(spool.stats().extent_bytes, 0);
+        assert_eq!(spool.stats().file_bytes, Some(0));
+    }
     #[cfg(feature = "qualification")]
     #[test]
     fn capture_trace_is_bounded_and_can_be_disabled() {
@@ -556,10 +685,10 @@ mod tests {
     }
     #[cfg(feature = "qualification")]
     #[test]
-    fn capture_trace_spans_the_gate_during_a_paused_real_cut() {
+    fn capture_trace_finishes_while_another_file_has_a_paused_cut() {
         use std::{sync::mpsc, time::Duration};
         let root = tempfile::tempdir().unwrap();
-        let spool = Arc::new(SourceSpool::new(root.path(), 16).unwrap());
+        let spool = Arc::new(SourceSpool::new(root.path(), 24).unwrap());
         let old = spool
             .persist(CapturedSource::capture(b"original".to_vec(), None))
             .unwrap();
@@ -580,20 +709,21 @@ mod tests {
         let trace = Arc::new(CaptureTrace::default());
         spool.trace_capture(Some(trace.clone()));
         let capturing = spool.clone();
+        let (done, completed) = mpsc::channel();
         let writer = std::thread::spawn(move || {
-            capturing.capture(&mut std::io::Cursor::new(b"new tail"), None, &|| false)
+            let result = capturing.capture(&mut std::io::Cursor::new(b"new tail"), None, &|| false);
+            done.send(()).unwrap();
+            result
         });
-        let waiting = Instant::now();
-        while spool.inner.writer.try_lock().is_ok() && waiting.elapsed() < Duration::from_secs(2) {
-            std::thread::sleep(Duration::from_millis(1));
-        }
+        let progressed = completed.recv_timeout(Duration::from_secs(2));
         let released = Instant::now();
         release.send(()).unwrap();
         maintenance.join().unwrap().unwrap();
         let next = writer.join().unwrap().unwrap().unwrap();
+        assert!(progressed.is_ok());
         let marks = trace.lock().unwrap();
         assert_eq!(marks.len(), 1);
-        assert!(marks[0].0 < released && marks[0].1 >= released);
+        assert!(marks[0].0 < released && marks[0].1 < released);
         assert_eq!(old.read_text(8).unwrap().as_deref(), Some("original"));
         assert_eq!(next.read_text(8).unwrap().as_deref(), Some("new tail"));
         drop(marks);
@@ -619,11 +749,11 @@ mod tests {
         assert_eq!(read.unwrap(), "original");
     }
     #[test]
-    fn pinned_reads_finish_during_paused_truncation_and_new_allocations_wait() {
+    fn reads_and_captures_progress_during_successful_or_failed_cleanup() {
         use std::{sync::mpsc, time::Duration};
         for fail in [false, true] {
             let root = tempfile::tempdir().unwrap();
-            let spool = Arc::new(SourceSpool::new(root.path(), 16).unwrap());
+            let spool = Arc::new(SourceSpool::new(root.path(), 24).unwrap());
             let source = spool
                 .persist(CapturedSource::capture(b"original".to_vec(), None))
                 .unwrap();
@@ -668,16 +798,18 @@ mod tests {
                 result
             });
             attempting.recv_timeout(Duration::from_secs(2)).unwrap();
-            let premature = finished.recv_timeout(Duration::from_millis(50));
+            let premature = finished.recv_timeout(Duration::from_secs(2));
             release.send(()).unwrap();
             let maintained = maintenance.join().unwrap();
             reader.join().unwrap();
             let next = writer.join().unwrap().unwrap();
             assert_eq!(read.unwrap().unwrap(), "original");
-            assert!(premature.is_err());
+            assert!(premature.is_ok());
             assert_eq!(maintained.is_err(), fail);
             assert_eq!(source.read_text(8).unwrap().as_deref(), Some("original"));
             assert_eq!(next.read_text(8).unwrap().as_deref(), Some("new tail"));
+            assert_eq!(spool.stats().file_bytes, Some(if fail { 24 } else { 16 }));
+            spool.reclaim().unwrap();
             assert_eq!(spool.stats().file_bytes, Some(16));
         }
     }
@@ -689,7 +821,7 @@ mod tests {
             .persist(CapturedSource::capture(b"correct bytes".to_vec(), None))
             .unwrap();
         {
-            let mut backing = spool.inner.backing();
+            let mut backing = spool.inner.backing(0);
             backing.file.seek(SeekFrom::Start(1)).unwrap();
             backing.file.write_all(b"X").unwrap();
         }
@@ -697,14 +829,19 @@ mod tests {
             source.reader().read(0..1, 1).unwrap_err(),
             SourceReadError::Integrity
         );
-        spool.inner.lock().file.set_len(0).unwrap();
+        spool.inner.files[0]
+            .maintenance
+            .lock()
+            .unwrap()
+            .set_len(0)
+            .unwrap();
         assert_eq!(
             source.read_all(100).unwrap_err(),
             SourceReadError::ShortRead
         );
     }
     #[test]
-    fn cancelled_or_failed_append_rolls_back_only_the_uncommitted_tail() {
+    fn cancelled_or_failed_copy_returns_logical_space_before_physical_cleanup() {
         let root = tempfile::tempdir().unwrap();
         let spool = SourceSpool::new(root.path(), 200000).unwrap();
         let old = spool
@@ -712,8 +849,14 @@ mod tests {
             .unwrap()
             .unwrap();
         let cancelled = || {
-            let state = spool.inner.lock();
-            state.file.metadata().unwrap().len() > state.written as u64
+            spool.inner.files[0]
+                .maintenance
+                .lock()
+                .unwrap()
+                .metadata()
+                .unwrap()
+                .len()
+                > 8
         };
         assert!(
             spool
@@ -725,32 +868,35 @@ mod tests {
                 .unwrap()
                 .is_none()
         );
-        assert_eq!(spool.inner.lock().file.metadata().unwrap().len(), 8);
+        assert_eq!(spool.stats().allocated_bytes, 8);
+        assert!(spool.stats().extent_bytes > 8);
         assert_eq!(spool.stats().written_bytes, 8);
-        assert_eq!(spool.stats().staging_bytes, 0);
-        {
-            let _writer = spool.inner.writer();
-            let mut calls = 0;
-            assert!(
-                spool
-                    .append(
-                        100000,
-                        |_, target| {
-                            calls += 1;
-                            if calls == 2 {
-                                return Err(SourceReadError::Io("fixture".into()));
-                            }
-                            target.fill(b'x');
-                            Ok(())
-                        },
-                        &|| false
-                    )
-                    .is_err()
-            );
-        }
-        assert_eq!(spool.inner.lock().file.metadata().unwrap().len(), 8);
+        spool.reclaim().unwrap();
+        assert_eq!(spool.stats().file_bytes, Some(8));
+        let mut calls = 0;
+        assert!(
+            spool
+                .append(
+                    100000,
+                    |_, target| {
+                        calls += 1;
+                        if calls == 2 {
+                            return Err(SourceReadError::Io("fixture".into()));
+                        }
+                        target.fill(b'x');
+                        Ok(())
+                    },
+                    &|| false
+                )
+                .is_err()
+        );
+        assert_eq!(spool.stats().allocated_bytes, 8);
+        assert!(spool.stats().extent_bytes > 8);
+        spool.reclaim().unwrap();
+        assert_eq!(spool.stats().file_bytes, Some(8));
         assert_eq!(old.read_text(8).unwrap().as_deref(), Some("original"));
     }
+
     #[test]
     fn short_staging_reads_are_reported_as_short_reads() {
         let mut file = tempfile::tempfile().unwrap();
@@ -776,7 +922,7 @@ mod tests {
         let source = spool
             .persist(CapturedSource::capture(b"original".to_vec(), None))
             .unwrap();
-        let guard = spool.inner.backing();
+        let guard = spool.inner.backing(0);
         let (sent, received) = mpsc::channel();
         let worker = std::thread::spawn(move || {
             drop(source);
@@ -889,14 +1035,14 @@ mod tests {
         let mut readonly = tempfile::NamedTempFile::new_in(root.path()).unwrap();
         readonly.write_all(b"original").unwrap();
         let original = std::mem::replace(
-            &mut spool.inner.lock().file,
+            &mut *spool.inner.files[0].maintenance.lock().unwrap(),
             File::open(readonly.path()).unwrap(),
         );
         assert!(matches!(spool.reclaim(), Err(SourceReadError::Io(_))));
         assert_eq!(spool.stats().allocated_bytes, 0);
-        assert_eq!(spool.stats().extent_bytes, 0);
+        assert_eq!(spool.stats().extent_bytes, 8);
         assert_eq!(spool.stats().file_bytes, Some(8));
-        spool.inner.lock().file = original;
+        *spool.inner.files[0].maintenance.lock().unwrap() = original;
         spool.reclaim().unwrap();
         assert_eq!(spool.stats().file_bytes, Some(0));
     }
@@ -910,11 +1056,11 @@ mod tests {
         let mut readonly = tempfile::NamedTempFile::new_in(root.path()).unwrap();
         readonly.write_all(b"original").unwrap();
         let maintenance_file = std::mem::replace(
-            &mut spool.inner.lock().file,
+            &mut *spool.inner.files[0].maintenance.lock().unwrap(),
             File::open(readonly.path()).unwrap(),
         );
         let original = std::mem::replace(
-            &mut spool.inner.backing().file,
+            &mut spool.inner.backing(0).file,
             File::open(readonly.path()).unwrap(),
         );
         assert!(matches!(
@@ -924,7 +1070,78 @@ mod tests {
         spool.reclaim().unwrap();
         assert_eq!(spool.stats().allocated_bytes, 8);
         assert_eq!(source.read_text(8).unwrap().as_deref(), Some("original"));
-        spool.inner.backing().file = original;
-        spool.inner.lock().file = maintenance_file;
+        spool.inner.backing(0).file = original;
+        *spool.inner.files[0].maintenance.lock().unwrap() = maintenance_file;
+    }
+    #[test]
+    fn cleaning_space_is_not_credited_before_io_completes() {
+        use std::{sync::mpsc, time::Duration};
+        let root = tempfile::tempdir().unwrap();
+        let spool = Arc::new(SourceSpool::new(root.path(), 16).unwrap());
+        let pin = spool
+            .persist(CapturedSource::capture(b"original".to_vec(), None))
+            .unwrap();
+        let tail = spool
+            .persist(CapturedSource::capture(b"old tail".to_vec(), None))
+            .unwrap();
+        drop(tail);
+        let (cut, at_cut) = mpsc::channel();
+        let (release, resume) = mpsc::channel();
+        let maintenance = spool.clone();
+        let cleaner = std::thread::spawn(move || {
+            maintenance.reclaim_with(|file, end| {
+                cut.send(()).unwrap();
+                resume.recv_timeout(Duration::from_secs(5)).unwrap();
+                file.set_len(end)
+            })
+        });
+        at_cut.recv_timeout(Duration::from_secs(2)).unwrap();
+        let capture = spool.clone();
+        let (done, complete) = mpsc::channel();
+        let writer = std::thread::spawn(move || {
+            let result = capture.persist(CapturedSource::capture(b"new tail".to_vec(), None));
+            done.send(()).unwrap();
+            result
+        });
+        let prompt = complete.recv_timeout(Duration::from_secs(2));
+        assert_eq!(spool.inner.lock().pool.charged(), 16);
+        release.send(()).unwrap();
+        cleaner.join().unwrap().unwrap();
+        let result = writer.join().unwrap();
+        assert!(prompt.is_ok());
+        assert!(matches!(result, Err(SourceReadError::Capacity)));
+        let next = spool
+            .persist(CapturedSource::capture(b"new tail".to_vec(), None))
+            .unwrap();
+        assert_eq!(next.read_text(8).unwrap().as_deref(), Some("new tail"));
+        assert_eq!(pin.read_text(8).unwrap().as_deref(), Some("original"));
+        assert_eq!(spool.stats().extent_bytes, 16);
+    }
+    #[test]
+    fn cleanup_unwind_restores_availability_and_keeps_charge_for_retry() {
+        let root = tempfile::tempdir().unwrap();
+        let spool = SourceSpool::new(root.path(), 24).unwrap();
+        let pin = spool
+            .persist(CapturedSource::capture(b"original".to_vec(), None))
+            .unwrap();
+        let tail = spool
+            .persist(CapturedSource::capture(b"old tail".to_vec(), None))
+            .unwrap();
+        drop(tail);
+        assert!(
+            std::panic::catch_unwind(std::panic::AssertUnwindSafe(
+                || spool.reclaim_with(|_, _| panic!("cleanup fixture"))
+            ))
+            .is_err()
+        );
+        assert_eq!(spool.stats().cleaning_files, 0);
+        assert_eq!(spool.stats().extent_bytes, 16);
+        let next = spool
+            .persist(CapturedSource::capture(b"new tail".to_vec(), None))
+            .unwrap();
+        spool.reclaim().unwrap();
+        assert_eq!(pin.read_text(8).unwrap().as_deref(), Some("original"));
+        assert_eq!(next.read_text(8).unwrap().as_deref(), Some("new tail"));
+        assert_eq!(spool.stats().file_bytes, Some(16));
     }
 }

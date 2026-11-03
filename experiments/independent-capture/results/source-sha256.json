@@ -1,0 +1,23 @@
+{
+  "base_commit": "93d56329253e2e9c3518269ac0e83baba9d844ce",
+  "note": "Measured working tree before commit. Before backend is the preceding commit with the identical updated foreground harness and isolated target; current build uses two files. Release binaries frozen before timing; no dependencies changed.",
+  "before_spool_sha256": "c38acec8b449ea0f2759fa8fb1a7a42a9f7c637754fc1cc9f73439d15205d550",
+  "sha256": {
+    "Cargo.toml": "b48edcbfd70277e9d0a58f7680b6ed414bc70108b279fdfba98dcd9a07092636",
+    "Cargo.lock": "032ea2295563c2354c3d92c54cf4be9943ad62eb1ed116d6267b7c2c0ee1456d",
+    "crates/vizzi/src/source_spool.rs": "e95aaacb509c70c9235867be3110eeea874a83c6f0ac4c2cc29af918fbd2d501",
+    "crates/vizzi/src/source_spool/pool.rs": "ed3928e903593724531e9ec7515784b34d9c65bd3174d3ff5584c0f754506d8c",
+    "crates/vizzi/src/source_spool/extents.rs": "68654c6afb42bd46dc22d0203db170c473b1ac8c5b79a177e4d43a28f0bee66f",
+    "crates/vizzi/src/foreground_maintenance.rs": "a5e78a8cd2b5cf872ab8fb11a75d953d99de65a6cedc91a96d7859161df529db",
+    "crates/vizzi/tests/foreground_maintenance.rs": "2d0596aca62af16c0243e0a158e51670423ab71c627cc46d7dd4d377e1813600",
+    "crates/vizzi/src/host.rs": "522193d1f18a0dc304d409d12a991eae35f70575672d58fb732f552894792004",
+    "crates/vizzi/src/engine.rs": "47336db32583f0a7facc74fc08c759c302bd4a676d24206ec3b67fffe40ac425",
+    "experiments/foreground-maintenance/measure.py": "433c2270fc36992672eeb754a4d218bd6e62607da09105ab759ddcec0919c31f",
+    "experiments/independent-capture/measure.py": "efe800d4eba640cef4abd1530c25fd4ffdaa8b6c037f9e3c977d9941b7f262c9",
+    "experiments/reclamation/measure.py": "93b8db1745c40ac1e54a0d716b24f972f45555193bac63c0acbeb8c4c1df81ba",
+    "experiments/qualification/native.py": "e637e001eff0f81059c10e02f5381c00ef44e45efbd79348f94b792203ef924a",
+    "experiments/qualification/profiles.json": "fe3443645d36e1749ab6f360cecc52c667269e0504326155ed89e1baf98af260",
+    "experiments/admission/limit.py": "fdabefbcaa734cb366b6bcc87306a480bccac672bf5d41dd5592982eb8c08785",
+    "experiments/independent-capture/plot.py": "a9786eaa68a1f857bbe4e3e9894143360860d0110f2ac6207d7b80a8e7c86db0"
+  }
+}

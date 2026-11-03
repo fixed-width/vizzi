@@ -76,23 +76,27 @@ All successful replies remain bound to the requested snapshot/file/version.
 
 ## Private session spool
 
-`SourceSpool::new(directory, capacity)` creates private anonymous committed and staging
-files. `persist` stores resident captured bytes in an owned range and moves metadata onto a read-only descriptor.
+`SourceSpool::new(directory, capacity)` creates two private anonymous committed files and
+one staging file. Each committed file has cursor/maintenance handles, giving five handles
+per spool. `persist` stores resident captured bytes in an owned range and moves metadata
+onto a read-only descriptor bound to its file index.
 The descriptor exposes no project filename or writable file handle. Concurrent readers
 use serialized seek/read operations, so file-cursor sharing cannot mix captured ranges.
 Already-backed sources passed to `persist` keep their original backing.
 
-Cursor reads/writes and read counters have a separate lock from allocation/maintenance
-state. Backing reads acquire only the cursor lock. Maintenance holds allocation state
-through coalescing and truncation, freezing new reservations above the selected cut point,
-and uses a safe cloned handle only for metadata and `set_len`. Those operations do not
-move the shared cursor. It never acquires the cursor lock. Already-reserved copies remain
-inside the retained span; each seek/read/write still holds the cursor lock for its chunk.
-One additional handle is opened per spool, not per captured source. No unsafe IO is used.
+Each file's cursor reads/writes and counters have a separate lock from allocation state.
+Backing reads acquire only their file's cursor lock. Explicit maintenance serializes physical
+cleanup, marks a file unavailable under allocation state, then releases that state before
+metadata/truncation. It uses a safe cloned handle only for metadata and `set_len`, which do
+not move the shared cursor. Existing reservations remain inside the selected cut; new
+reservations use the other file. Completion restores availability and reduces charge only
+after successful cleanup. Failure/unwind restores availability while retaining charge for
+retry. Handles are fixed per spool, not per captured source. No unsafe IO is used.
 
-Pinned reads can proceed during maintenance without waiting for the Rust allocation lock.
-The OS/filesystem can still delay or serialize their IO. Captures needing state, diagnostics
-and other maintenance may wait; this is not a hard read, capture or cleanup deadline.
+Pinned reads and captures with aggregate headroom can proceed during physical cleanup.
+No headroom or contiguous fit returns capacity refusal rather than waiting on that cleanup.
+The OS/filesystem, another capture using staging, or metadata work can still delay IO;
+diagnostics and other explicit maintenance may wait. No hard deadline is established.
 
 `capture` reads actual project input through EOF in requests of at most 64 KiB and stages
 all bytes. With a previous capture, it also verifies those actual input slices using its
@@ -109,7 +113,8 @@ operations. Capture and reads use no publication lock.
 `Directory::with_spool` rejects a spool inside the analysed root. CLI
 `--source-spool-mib N` creates it in the required external cache directory; `0` disables
 it and is the default. Capacity conversion is checked. This capacity bounds the reserved
-backing address span, including active reservations and reusable interior gaps.
+aggregate charged spans of both backing files, including reservations, gaps and retired
+tails. A cleaning file keeps its full pre-cleanup charge until IO succeeds.
 The reusable staging file is separately bounded by the same capacity, so combined file
 lengths can reach twice the configured value. Unchanged verification needs staging space
 but consumes no committed quota. Failure aborts capture, preserving the last published
@@ -120,24 +125,30 @@ sufficient total free bytes. Live ranges never move; compaction is not implement
 Each backing descriptor owns its range. The final descriptor release queues retirement
 using a separate memory-only lock, without acquiring the backing IO lock or writer gate.
 Publication expiration alone does not free an externally pinned source. Capture/commit
-drain retirements before allocating. `SourceSpool::reclaim()` provides explicit maintenance
-for idle callers; it runs outside publication locks. It releases queued allocations and
-truncates a free tail once per batch. Interior holes become reusable without immediately
-reducing file length. An unfinished copy keeps its range reserved during concurrent
-maintenance. Reclamation is deferred until maintenance or final backing closure.
+drain retirements into allocation indexes before allocating, without physical cleanup.
+`SourceSpool::reclaim()` provides explicit maintenance outside publication locks. It visits
+at most both files once, cleans eligible tails and keeps allocation state free during IO.
+Interior holes and retired tails in available files can be overwritten within their existing
+charge. Captures never initiate physical truncation. File lengths can stay at a prior
+high-water mark until explicit maintenance or final backing closure; no background schedule
+is introduced. An unfinished copy retains its reservation during concurrent cleanup.
 
 Observed cancellation/read failure discards staged candidates. Failed/cancelled copies
-retire their reservations and run maintenance before returning; neighboring live ranges
-remain intact. Maintenance errors are reported and a failed physical truncation is retried.
+retire reservations into allocation indexes before returning; their physical space remains
+charged until overwritten or explicitly cleaned. Neighboring live ranges remain intact.
+Maintenance errors are reported and failed physical cleanup can be retried.
 Staging cleanup remains best effort if truncation fails. Late cancellation may retire a
 completed private capture; its space returns on subsequent maintenance. Blocking IO,
 mutex waits and cleanup have no hard cancellation deadline.
 
 `SpoolStats::written_bytes` remains cumulative committed bytes and can exceed capacity
 after reuse. `allocated_bytes` includes in-flight reservations and queued retirements;
-`extent_bytes` is their address span plus free gaps, `free_bytes` counts those gaps, and
-`peak_extent_bytes` is the largest span. `file_bytes` reports actual file length or `None`
-on metadata IO failure. `pending_retirements` counts queued descriptors. Store/read counters,
+`extent_bytes` is the aggregate charged span, `free_bytes` is charged but unallocated space,
+and `peak_extent_bytes` is the largest aggregate charge. `cleaning_files` and `cleaning_bytes`
+identify temporarily unavailable files and their retained charges. Free bytes in a cleaning
+file are not available for admission. `file_bytes` reports total actual file lengths or `None`
+on metadata IO failure. Diagnostics are observational under concurrency, not an admission
+transaction. `pending_retirements` counts queued descriptors. Store/read counters,
 staging lengths and maximum input request remain separate. File lengths are not filesystem
 block allocation, resident memory or process caps; index/retirement-queue memory also scales.
 
@@ -165,3 +176,5 @@ The [reclamation report](../../experiments/reclamation/RESULTS.md) and
 metadata admission and a calibrated resident/process envelope remain subsequent work.
 The [maintenance-read report](../../experiments/readable-maintenance/RESULTS.md) measures
 concurrent prefix reads and documents the remaining filesystem/scheduling limits.
+The [independent capture design](../plans/independent-capture.md) and
+[comparison](../../experiments/independent-capture/RESULTS.md) cover allocation during cleanup.

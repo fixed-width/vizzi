@@ -50,6 +50,7 @@ validating coordination; it does not qualify large-codebase GPU performance.
 - [Retired-source reclamation measurements](experiments/reclamation/RESULTS.md)
 - [Pinned reads during maintenance](experiments/readable-maintenance/RESULTS.md)
 - [Foreground edits during cleanup](experiments/foreground-maintenance/RESULTS.md)
+- [Independent capture during cleanup](experiments/independent-capture/RESULTS.md)
 - [Earlier performance experiments](experiments/performance/README.md)
 - [Contributor guidance](AGENTS.md)
 
