@@ -20,21 +20,21 @@ use vizzi_core::{
     model::{Analysis, CapturedSource, ContentId, Document},
     policy::PolicyConfig,
 };
-type Error = Box<dyn std::error::Error>;
+pub(crate) type Error = Box<dyn std::error::Error>;
 
 #[derive(Deserialize)]
-struct Config {
-    root: PathBuf,
-    cache: PathBuf,
-    policy: PolicyConfig,
-    target: String,
-    owner: String,
-    probe: String,
-    spool_mib: usize,
-    tail_mib: usize,
-    pairs: usize,
+pub(crate) struct Config {
+    pub(crate) root: PathBuf,
+    pub(crate) cache: PathBuf,
+    pub(crate) policy: PolicyConfig,
+    pub(crate) target: String,
+    pub(crate) owner: String,
+    pub(crate) probe: String,
+    pub(crate) spool_mib: usize,
+    pub(crate) tail_mib: usize,
+    pub(crate) pairs: usize,
 }
-fn engine(config: &Config, spool: Option<Arc<SourceSpool>>) -> Result<Engine, Error> {
+pub(crate) fn engine(config: &Config, spool: Option<Arc<SourceSpool>>) -> Result<Engine, Error> {
     let mut directory = Directory::with_policy(
         &config.root,
         config.policy.clone(),
@@ -49,7 +49,7 @@ fn engine(config: &Config, spool: Option<Arc<SourceSpool>>) -> Result<Engine, Er
         4,
     )?)
 }
-fn wait(
+pub(crate) fn wait(
     app: &Application,
     timeout: Duration,
     mut predicate: impl FnMut() -> bool,
@@ -69,13 +69,13 @@ fn wait(
         std::thread::sleep(remaining.min(Duration::from_millis(2)));
     }
 }
-fn initial_ready(status: &Status) -> bool {
+pub(crate) fn initial_ready(status: &Status) -> bool {
     !status.pending && !status.recovery.running && status.recovery.completed >= 1
 }
-fn settled(pending: bool, matches: impl FnOnce() -> bool) -> bool {
+pub(crate) fn settled(pending: bool, matches: impl FnOnce() -> bool) -> bool {
     !pending && matches()
 }
-fn capture_mark(
+pub(crate) fn capture_mark(
     marks: &[(Instant, Instant)],
     read_files: usize,
 ) -> Result<(Instant, Instant), Error> {
@@ -90,7 +90,7 @@ fn capture_mark(
     }
     Ok(*mark)
 }
-fn validate_tail(tail: &CapturedSource, bytes: usize) -> Result<(), Error> {
+pub(crate) fn validate_tail(tail: &CapturedSource, bytes: usize) -> Result<(), Error> {
     if tail.len() != bytes {
         return Err("pressure tail length differs".into());
     }
@@ -100,7 +100,7 @@ fn validate_tail(tail: &CapturedSource, bytes: usize) -> Result<(), Error> {
     }
     Ok(())
 }
-fn verify_publication(
+pub(crate) fn verify_publication(
     source: &Document,
     bytes: &[u8],
     fresh: &Analysis,
@@ -126,10 +126,15 @@ fn verify_publication(
     }
     Ok(())
 }
-fn millis(clock: Instant, event: Instant) -> f64 {
+pub(crate) fn millis(clock: Instant, event: Instant) -> f64 {
     event.duration_since(clock).as_secs_f64() * 1000.0
 }
-fn edit(language: &str, original: &[u8], probe: &str, sample: usize) -> (Vec<u8>, String) {
+pub(crate) fn edit(
+    language: &str,
+    original: &[u8],
+    probe: &str,
+    sample: usize,
+) -> (Vec<u8>, String) {
     let name = format!("maintenance_edit_{sample}");
     let (marker, definition) = match language {
         "rust" => ("//", format!("fn {name}() {{}}\n")),
@@ -143,10 +148,7 @@ fn edit(language: &str, original: &[u8], probe: &str, sample: usize) -> (Vec<u8>
     (bytes, name)
 }
 
-/// Measures explicit-hint edits after completed cleanup and during real truncation.
-/// Only a marked owned source copy is edited; the source and original observation are restored.
-pub fn run(configuration: &[u8], emit: &mut impl FnMut(Value)) -> Result<Value, Error> {
-    let config: Config = serde_json::from_slice(configuration)?;
+pub(crate) fn budgets(config: &Config) -> Result<(usize, usize), Error> {
     if config.owner.is_empty()
         || config.probe.is_empty()
         || config.pairs == 0
@@ -169,6 +171,14 @@ pub fn run(configuration: &[u8], emit: &mut impl FnMut(Value)) -> Result<Value, 
     if tail_bytes >= capacity {
         return Err("tail must leave space for the live workspace".into());
     }
+    Ok((capacity, tail_bytes))
+}
+
+/// Measures explicit-hint edits after completed cleanup and during real truncation.
+/// Only a marked owned source copy is edited; the source and original observation are restored.
+pub fn run(configuration: &[u8], emit: &mut impl FnMut(Value)) -> Result<Value, Error> {
+    let config: Config = serde_json::from_slice(configuration)?;
+    let (capacity, tail_bytes) = budgets(&config)?;
     let spool = Arc::new(SourceSpool::new(
         &config
             .root
@@ -183,6 +193,7 @@ pub fn run(configuration: &[u8], emit: &mut impl FnMut(Value)) -> Result<Value, 
         HostOptions {
             watch: false,
             reconcile_interval: Duration::from_secs(3600),
+            idle_maintenance: false,
         },
     )?;
     let app = host.application();

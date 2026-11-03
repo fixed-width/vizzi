@@ -6,6 +6,7 @@ pub mod changes;
 pub mod engine;
 pub mod host;
 mod invalidation;
+mod maintenance;
 pub mod server;
 pub mod source;
 pub mod source_spool;
@@ -27,3 +28,6 @@ pub mod stream_probe;
 
 #[cfg(feature = "qualification")]
 pub mod foreground_maintenance;
+
+#[cfg(feature = "qualification")]
+pub mod idle_probe;

@@ -405,10 +405,18 @@ impl SourceSpool {
         &self,
         on_cut: impl FnOnce(u64),
     ) -> Result<Option<ReclaimSpan>, SourceReadError> {
+        self.observe_reclaim_minimum(0, on_cut)
+    }
+    #[cfg(feature = "qualification")]
+    pub(crate) fn observe_reclaim_minimum(
+        &self,
+        minimum: u64,
+        on_cut: impl FnOnce(u64),
+    ) -> Result<Option<ReclaimSpan>, SourceReadError> {
         let mut span = None;
         let mut on_cut = Some(on_cut);
         self.reclaim_with(|file, end| {
-            if span.is_some() {
+            if span.is_some() || file.metadata()?.len().saturating_sub(end) < minimum {
                 return file.set_len(end);
             }
             let started = Instant::now();
@@ -521,6 +529,22 @@ impl SourceSpool {
         stats
     }
 }
+impl crate::maintenance::SourceMaintenance for SourceSpool {
+    fn pending(&self) -> bool {
+        if !self.inner.retired().is_empty() {
+            return true;
+        }
+        self.inner
+            .lock()
+            .pool
+            .banks
+            .iter()
+            .any(|bank| !bank.cleaning && bank.charged > bank.extents.end)
+    }
+    fn run(&self) -> Result<(), String> {
+        self.reclaim().map_err(|error| error.to_string())
+    }
+}
 struct StageReset<'a> {
     inner: &'a Inner,
 }
@@ -618,6 +642,46 @@ impl SourceReader for Blob {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn maintenance_hint_is_metadata_only_and_clears_after_cleanup() {
+        use crate::maintenance::SourceMaintenance;
+        let root = tempfile::tempdir().unwrap();
+        let spool = SourceSpool::new(root.path(), 8).unwrap();
+        assert!(!spool.pending());
+        let source = spool
+            .persist(CapturedSource::capture(b"original".to_vec(), None))
+            .unwrap();
+        assert!(!spool.pending());
+        drop(source);
+        assert!(spool.pending());
+        spool.drain_retired();
+        assert!(spool.pending());
+        spool.reclaim().unwrap();
+        assert!(!spool.pending());
+    }
+    #[cfg(feature = "qualification")]
+    #[test]
+    fn observed_cleanup_filters_small_cuts_without_skipping_physical_work() {
+        for (minimum, expected) in [(8, true), (9, false)] {
+            let root = tempfile::tempdir().unwrap();
+            let spool = SourceSpool::new(root.path(), 16).unwrap();
+            let pin = spool
+                .persist(CapturedSource::capture(b"original".to_vec(), None))
+                .unwrap();
+            let tail = spool
+                .persist(CapturedSource::capture(b"old tail".to_vec(), None))
+                .unwrap();
+            drop(tail);
+            let mut observed = false;
+            let span = spool
+                .observe_reclaim_minimum(minimum, |_| observed = true)
+                .unwrap();
+            assert_eq!(observed, expected);
+            assert_eq!(span.is_some(), expected);
+            assert_eq!(spool.stats().file_bytes, Some(8));
+            assert_eq!(pin.read_text(8).unwrap().as_deref(), Some("original"));
+        }
+    }
     #[test]
     fn capture_finishes_before_a_different_backing_tail_is_unpaused() {
         use std::{sync::mpsc, time::Duration};

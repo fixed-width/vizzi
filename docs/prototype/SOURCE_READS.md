@@ -130,8 +130,9 @@ drain retirements into allocation indexes before allocating, without physical cl
 at most both files once, cleans eligible tails and keeps allocation state free during IO.
 Interior holes and retired tails in available files can be overwritten within their existing
 charge. Captures never initiate physical truncation. File lengths can stay at a prior
-high-water mark until explicit maintenance or final backing closure; no background schedule
-is introduced. An unfinished copy retains its reservation during concurrent cleanup.
+high-water mark until explicit maintenance or final backing closure. The native host can
+schedule that explicit operation through [idle maintenance](RECOVERY.md#idle-source-maintenance);
+non-host callers manage it themselves. An unfinished copy retains its reservation during cleanup.
 
 Observed cancellation/read failure discards staged candidates. Failed/cancelled copies
 retire reservations into allocation indexes before returning; their physical space remains

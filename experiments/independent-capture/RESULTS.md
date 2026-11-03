@@ -133,6 +133,8 @@ explicit callers. Compaction, foreground headroom policy, metadata/queue memory,
 idle maintenance and full process budgets remain open. HTTP/browser presentation, native
 watcher latency, cold storage and competing recovery are not qualified here. Broader real
 interactive workflows and baseline hardware are needed before changing defaults.
+The subsequent [idle-maintenance stage](../idle-maintenance/RESULTS.md) adds bounded
+host admission and lifecycle handling for that physical cleanup.
 
 [Raw comparison](results/observations.json), [summary](results/summary.json),
 [sample CSV](results/samples.csv), [history replay](results/history.json),

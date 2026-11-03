@@ -1,0 +1,4247 @@
+{
+  "base_commit": "6e990971d0d33c44adf495721e9e5f9d8330f50c",
+  "scope": [
+    "Complete maintenance.rs, host.rs, source.rs and source_spool.rs; vizzi/vizzi-core tests for every mutant, all features, offline."
+  ],
+  "aggregation": "Broad unchanged functions plus complete final host constructor/idle-eligibility scopes and exact final Drop join rerun. Superseded constructor/Drop outcomes are replaced without duplication.",
+  "final_unique_mutants": 236,
+  "final_outcomes": {
+    "Unviable": 67,
+    "CaughtMutant": 138,
+    "Timeout": 31
+  },
+  "runs": [
+    {
+      "label": "broad",
+      "version": "27.1.0",
+      "baseline": "Success",
+      "summary": {
+        "total_mutants": 233,
+        "caught": 133,
+        "missed": 2,
+        "unviable": 67,
+        "timeout": 31
+      },
+      "outcomes": [
+        {
+          "name": "crates/vizzi/src/host.rs:70:9: replace Host::start_with_options -> Result<Self, EngineError> with Ok(Default::default())",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 23.730581447,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:66:9: replace Host::start -> Result<Self, EngineError> with Ok(Default::default())",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 24.772909603,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:60:9: replace RecoveryTask::running -> bool with true",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 10.939621989,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 14.942435364,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:78:9: replace Host::start_with_maintenance -> Result<Self, EngineError> with Ok(Default::default())",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.8674317590000005,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:60:9: replace RecoveryTask::running -> bool with false",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 29.641344884,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 6.1486247370000005,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:79:13: replace || with && in Host::start_with_maintenance",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 10.794550021,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 6.429814542,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:163:29: replace && with || in Host::start_with_maintenance",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.401568205,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:194:21: replace && with || in Host::start_with_maintenance",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.401316306,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:193:21: replace && with || in Host::start_with_maintenance",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.40123836,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:158:46: replace || with && in Host::start_with_maintenance",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 11.426284901,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 5.862382323,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:208:57: replace && with || in Host::start_with_maintenance",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.05712523,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 8.966235013,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:228:25: replace - with + in Host::start_with_maintenance",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.962125954,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 5.608940007,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:208:41: delete ! in Host::start_with_maintenance",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.966605443,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 13.328068256,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:241:33: replace && with || in Host::start_with_maintenance",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.859536422,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:131:17: replace != with == in Host::start_with_maintenance",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.20691328,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.043022379,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:255:21: replace && with || in Host::start_with_maintenance",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.059139259,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:158:41: replace == with != in Host::start_with_maintenance",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.651904502,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.049247274,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:240:40: replace != with == in Host::start_with_maintenance",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.372980901,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 13.726708553,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:294:41: replace && with || in Host::start_with_maintenance",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.351388245,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:267:41: replace || with && in Host::start_with_maintenance",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.010303332,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 13.193303308,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:290:44: replace != with == in Host::start_with_maintenance",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.858917266,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 6.2686628110000004,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:317:21: delete ! in Host::start_with_maintenance",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.522467137,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 3.108800014,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:357:9: replace Host::application -> Arc<Application> with Arc::new(Default::default())",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.401322601,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:317:50: replace && with || in Host::start_with_maintenance",
+          "outcome": "MissedMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.959039589,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 10.054395579,
+              "status": "Success"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:367:5: replace join_recovery -> Result<Option<Refresh>, EngineError> with Ok(None)",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.058662845,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.501708851,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:367:5: replace join_recovery -> Result<Option<Refresh>, EngineError> with Ok(Some(Default::default()))",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.351331682,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:374:5: replace pending -> MutexGuard<'_, PendingRefresh> with MutexGuard::new()",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.351598658,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:374:5: replace pending -> MutexGuard<'_, PendingRefresh> with MutexGuard::from_iter([Default::default()])",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.401445851,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:374:5: replace pending -> MutexGuard<'_, PendingRefresh> with MutexGuard::new(Default::default())",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.401518157,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:374:5: replace pending -> MutexGuard<'_, PendingRefresh> with MutexGuard::from(Default::default())",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.401532453,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:228:25: replace - with / in Host::start_with_maintenance",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.210260031,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.036005992,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:390:9: replace Reconciliation::due -> bool with true",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.909203873,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 3.117280834,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:390:9: replace Reconciliation::due -> bool with false",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.172477498,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.401694971,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:390:16: replace < with > in Reconciliation::due",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.117382485,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.401616634,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:390:16: replace < with == in Reconciliation::due",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.510847815,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 3.213639351,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:390:16: replace < with <= in Reconciliation::due",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.8130169600000001,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.551950425,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:397:9: replace Reconciliation::wait -> Duration with Default::default()",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.360807217,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.553476634,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:408:9: replace Reconciliation::completed with ()",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.017669047,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.551774848,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:417:5: replace observe -> bool with false",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.275566125,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.552119146,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:417:5: replace observe -> bool with true",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.519946651,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 3.115299492,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:433:19: replace |= with &= in observe",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.263781547,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.655956202,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:352:9: replace Host::request with ()",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.209149824,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.016227503,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:435:22: replace += with -= in observe",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.790833748,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.705740907,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:435:22: replace += with *= in observe",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.66726325,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.860027774,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:361:9: replace Host::maintenance_status -> MaintenanceStatus with Default::default()",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.007700289,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.039084478,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:459:5: replace one_shot -> Result<Arc<Application>, EngineError> with Ok(Arc::new(Default::default()))",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.207514161,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/maintenance.rs:55:9: replace Idle::status -> MutexGuard<'_, MaintenanceStatus> with MutexGuard::new()",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.161822681,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:439:33: replace == with != in observe",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.4261330660000002,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.785684799,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/maintenance.rs:55:9: replace Idle::status -> MutexGuard<'_, MaintenanceStatus> with MutexGuard::from_iter([Default::default()])",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.009141702,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/maintenance.rs:55:9: replace Idle::status -> MutexGuard<'_, MaintenanceStatus> with MutexGuard::new(Default::default())",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.911043842,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/maintenance.rs:55:9: replace Idle::status -> MutexGuard<'_, MaintenanceStatus> with MutexGuard::from(Default::default())",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.805236988,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:448:9: replace <impl Drop for Host>::drop with ()",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.027707179,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.553583281,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/maintenance.rs:63:9: replace Idle::poll_wait -> Option<Duration> with Some(Default::default())",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 6.664407362,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.451741224,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/maintenance.rs:63:9: replace Idle::poll_wait -> Option<Duration> with None",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.831147497,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 3.243975692,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/maintenance.rs:81:41: replace + with * in Idle::complete",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.806085117,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/maintenance.rs:81:41: replace + with - in Idle::complete",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.511334502,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.552545941,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/maintenance.rs:90:13: replace && with || in Idle::poll",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.762178917,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/maintenance.rs:86:9: replace Idle::poll with ()",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.224963975,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 3.262120816,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/maintenance.rs:94:12: delete ! in Idle::poll",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.46848981,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 3.107540774,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/maintenance.rs:60:9: replace Idle::busy with ()",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.572084376,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.017658229,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/maintenance.rs:70:9: replace Idle::complete with ()",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 6.269341966,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.033818655,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/maintenance.rs:101:13: replace || with && in Idle::poll",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.867797855,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.013203838,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/maintenance.rs:100:13: replace || with && in Idle::poll",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.7719808500000003,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.005173932,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/maintenance.rs:100:53: replace < with <= in Idle::poll",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.764198791,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 2.312711959,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/maintenance.rs:101:20: replace < with == in Idle::poll",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.519898042,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.603027211,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/maintenance.rs:101:20: replace < with <= in Idle::poll",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.33648634,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.552007206,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/maintenance.rs:101:20: replace < with > in Idle::poll",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.534605639,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 3.272279348,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/maintenance.rs:131:9: replace Idle::shutdown with ()",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.710857097,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.552177707,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/maintenance.rs:108:12: delete ! in Idle::poll",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.3752009,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 3.112133599,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/maintenance.rs:100:53: replace < with == in Idle::poll",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.217347743,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.058983847,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:31:9: replace CaptureScope::merge with ()",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 6.57079823,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.606213169,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:71:9: replace Directory::maintenance -> Option<Arc<dyn crate::maintenance::SourceMaintenance>> with Some(Arc::new(Default::default()))",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.116171797,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/maintenance.rs:100:53: replace < with > in Idle::poll",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.208984547,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.045604209,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:84:9: replace Directory::with_spool -> io::Result<Self> with Ok(Default::default())",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.856590162,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:77:9: replace Directory::open -> io::Result<Self> with Ok(Default::default())",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.958398797,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:94:9: replace Directory::with_languages -> io::Result<Self> with Ok(Default::default())",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.602461164,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:102:9: replace Directory::with_policy -> io::Result<Self> with Ok(Default::default())",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.602266601,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:118:9: replace Directory::root -> &Path with Box::leak(Box::new(Default::default()))",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.602224075,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:122:9: replace Directory::workspace -> &WorkspaceId with Box::leak(Box::new(Default::default()))",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.956411655,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:104:12: delete ! in Directory::with_policy",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.474328913,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.201399775,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:126:9: replace Directory::relevant -> bool with true",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.5773384999999998,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.80683972,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:126:9: replace Directory::relevant -> bool with false",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.733321186,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.703882079,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/maintenance.rs:139:9: replace <impl Drop for Idle>::drop with ()",
+          "outcome": "MissedMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.665109819,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 16.208038614,
+              "status": "Success"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:128:17: replace && with || in Directory::relevant",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.669588663,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.855531824,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:71:9: replace Directory::maintenance -> Option<Arc<dyn crate::maintenance::SourceMaintenance>> with None",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.404685163,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 10.86410227,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:133:9: replace Directory::capture -> io::Result<Capture> with Ok(Default::default())",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.160591711,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:144:9: replace Directory::capture_reusing -> io::Result<Option<Capture>> with Ok(Some(Default::default()))",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.804945746,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:128:48: replace || with && in Directory::relevant",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.535694668,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.704398518,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:154:9: replace Directory::capture_full -> io::Result<Option<Capture>> with Ok(Some(Default::default()))",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.808795706,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:176:35: replace && with || in Directory::capture_full",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 12.691067539,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.96259308,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:176:20: delete ! in Directory::capture_full",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 12.622776369,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.907210836,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:176:38: delete ! in Directory::capture_full",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 7.456284891,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 1.371896926,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:210:9: replace Directory::capture_paths -> io::Result<Capture> with Ok(Default::default())",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.660032407,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:144:9: replace Directory::capture_reusing -> io::Result<Option<Capture>> with Ok(None)",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.123085864,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.046614308,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:219:9: replace Directory::capture_hints -> io::Result<Option<Capture>> with Ok(Some(Default::default()))",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.802599971,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:245:38: replace == with != in Directory::capture_hints",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.5334651,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.653507084,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:154:9: replace Directory::capture_full -> io::Result<Option<Capture>> with Ok(None)",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 8.434524009,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.052949123,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:245:34: replace + with * in Directory::capture_hints",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 7.99641871,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.706098771,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:248:35: replace match guard error.kind() == io::ErrorKind::NotFound && leaf with true in Directory::capture_hints",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.940691486,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.808164038,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:205:13: delete ! in Directory::capture_full",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 9.561851149,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.015640651,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:248:35: replace match guard error.kind() == io::ErrorKind::NotFound && leaf with false in Directory::capture_hints",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.690399068,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.556829929,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:248:75: replace && with || in Directory::capture_hints",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.06783968,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.859131942,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:248:48: replace == with != in Directory::capture_hints",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.82866443,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.713132064,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:219:9: replace Directory::capture_hints -> io::Result<Option<Capture>> with Ok(None)",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 7.9988989870000005,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.051908381,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:256:20: delete ! in Directory::capture_hints",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.6505772050000003,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.834001772,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:257:24: delete ! in Directory::capture_hints",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.70050189,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.70892748,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:297:9: replace Directory::read_source -> io::Result<Option<Arc<CapturedSource>>> with Ok(Some(Arc::new(Default::default())))",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.525492555,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:245:34: replace + with - in Directory::capture_hints",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.662079735,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.048598402,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:321:9: replace Directory::check_root -> io::Result<()> with Ok(())",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 8.540370717,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.602012449,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:321:12: delete ! in Directory::check_root",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.340080446,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.451832025,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:328:9: replace Directory::policy -> &SourcePolicy with Box::leak(Box::new(Default::default()))",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.551912528,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:332:9: replace Directory::plan -> &CapturePlan with Box::leak(Box::new(Default::default()))",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.651957619,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:335:9: replace Directory::source_path -> bool with true",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.582182471,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.552068454,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:297:9: replace Directory::read_source -> io::Result<Option<Arc<CapturedSource>>> with Ok(None)",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 8.888312591,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.042459108,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:317:13: delete ! in Directory::read_source",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 8.791356287,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.025272541,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:288:13: delete ! in Directory::capture_hints",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 15.351334883,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.006633142,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:338:9: replace Directory::classification -> io::Result<Option<Classification>> with Ok(Some(Default::default()))",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.60312866,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:349:9: replace Directory::language -> Option<&Language> with Some(Box::leak(Box::new(Default::default())))",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.401536414,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:349:9: replace Directory::language -> Option<&Language> with None",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.323555828,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.454319012,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:352:9: replace Directory::relative_key -> io::Result<Option<String>> with Ok(Some(String::new()))",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.123497067,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.151312997,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:335:9: replace Directory::source_path -> bool with false",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.260582687,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.051452543,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:376:9: replace Directory::event_path -> Option<PathBuf> with None",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.622076646,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.551885166,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:376:9: replace Directory::event_path -> Option<PathBuf> with Some(Default::default())",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.011026802,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.602083154,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:338:9: replace Directory::classification -> io::Result<Option<Classification>> with Ok(None)",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.652727766,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.067808886,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:352:9: replace Directory::relative_key -> io::Result<Option<String>> with Ok(None)",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.97798944,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.010371884,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:26:33: replace * with +",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.315116133,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 12.424161712,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source.rs:352:9: replace Directory::relative_key -> io::Result<Option<String>> with Ok(Some(\"xyzzy\".into()))",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.260487941,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.047444957,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:97:9: replace Inner::lock -> MutexGuard<'_, State> with MutexGuard::new()",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.688495079,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:71:9: replace Cleaning<'_>::finish with ()",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 7.952597297,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 1.261309069,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:97:9: replace Inner::lock -> MutexGuard<'_, State> with MutexGuard::from_iter([Default::default()])",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.173443485,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:97:9: replace Inner::lock -> MutexGuard<'_, State> with MutexGuard::new(Default::default())",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.024259888,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:78:9: replace <impl Drop for Cleaning<'_>>::drop with ()",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 7.907903585,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.756829522,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:97:9: replace Inner::lock -> MutexGuard<'_, State> with MutexGuard::from(Default::default())",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.279576426,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:102:9: replace Inner::backing -> MutexGuard<'_, Backing> with MutexGuard::new()",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.209481431,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:102:9: replace Inner::backing -> MutexGuard<'_, Backing> with MutexGuard::new(Default::default())",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.054738075,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:102:9: replace Inner::backing -> MutexGuard<'_, Backing> with MutexGuard::from(Default::default())",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.963610175,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:102:9: replace Inner::backing -> MutexGuard<'_, Backing> with MutexGuard::from_iter([Default::default()])",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.367761416,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:108:9: replace Inner::writer -> MutexGuard<'_, ()> with MutexGuard::new()",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.006573769,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:108:9: replace Inner::writer -> MutexGuard<'_, ()> with MutexGuard::from_iter([()])",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.061562246,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:108:9: replace Inner::writer -> MutexGuard<'_, ()> with MutexGuard::new(())",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.314030776,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:108:9: replace Inner::writer -> MutexGuard<'_, ()> with MutexGuard::from(())",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.406910677,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:113:9: replace Inner::retired -> MutexGuard<'_, Vec<Allocation>> with MutexGuard::from_iter([vec![]])",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.011119246,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:113:9: replace Inner::retired -> MutexGuard<'_, Vec<Allocation>> with MutexGuard::new()",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.460298814,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:113:9: replace Inner::retired -> MutexGuard<'_, Vec<Allocation>> with MutexGuard::from(vec![])",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.861336212,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:113:9: replace Inner::retired -> MutexGuard<'_, Vec<Allocation>> with MutexGuard::from_iter([vec![Default::default()]])",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.861284484,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:113:9: replace Inner::retired -> MutexGuard<'_, Vec<Allocation>> with MutexGuard::new(vec![])",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.365762224,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:113:9: replace Inner::retired -> MutexGuard<'_, Vec<Allocation>> with MutexGuard::new(vec![Default::default()])",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.855668049,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:113:9: replace Inner::retired -> MutexGuard<'_, Vec<Allocation>> with MutexGuard::from(vec![Default::default()])",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.921654224,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:198:9: replace SourceSpool::directory -> &Path with Box::leak(Box::new(Default::default()))",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.058331854,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:206:9: replace SourceSpool::persist -> Result<Arc<CapturedSource>, SourceReadError> with Ok(Arc::new(Default::default()))",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.111911842,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:215:66: replace + with - in SourceSpool::persist",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 6.890262403,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 1.01583682,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:231:9: replace SourceSpool::capture -> Result<Option<Arc<CapturedSource>>, SourceReadError> with Ok(Some(Arc::new(Default::default())))",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.837948439,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:215:66: replace + with * in SourceSpool::persist",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 10.2490891,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.905110845,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:26:33: replace * with /",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.647617495,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.038295399,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:231:9: replace SourceSpool::capture -> Result<Option<Arc<CapturedSource>>, SourceReadError> with Ok(None)",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 16.153799155,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.911127419,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:249:28: replace < with == in SourceSpool::capture",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 7.729567524,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.910664523,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:249:28: replace < with > in SourceSpool::capture",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 7.988099386,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.762550078,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:249:28: replace < with <= in SourceSpool::capture",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.799383776,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.904185896,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:270:35: replace match guard error.kind() == std::io::ErrorKind::Interrupted with false in SourceSpool::capture",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.4900807799999995,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 13.36123319,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:279:26: replace > with == in SourceSpool::capture",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.721305332,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 3.658052547,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:279:26: replace > with < in SourceSpool::capture",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.015449125,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.60253176,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:279:26: replace > with >= in SourceSpool::capture",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.721033725,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 3.106078821,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:270:35: replace match guard error.kind() == std::io::ErrorKind::Interrupted with true in SourceSpool::capture",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 8.414467971,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.035193566,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:270:48: replace == with != in SourceSpool::capture",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 8.006640163,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.005893101,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:276:26: replace == with != in SourceSpool::capture",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 6.29169059,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.007566046,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:279:48: replace - with + in SourceSpool::capture",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.622327449,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 8.678748694,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:279:48: replace - with / in SourceSpool::capture",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.312330812,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.605518419,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:306:13: replace && with || in SourceSpool::capture",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.762057683,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:298:21: replace += with -= in SourceSpool::capture",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.769962307,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.808763845,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:298:21: replace += with *= in SourceSpool::capture",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.524136107,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.712374297,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:333:9: replace SourceSpool::append -> Result<Option<Arc<Blob>>, SourceReadError> with Ok(Some(Arc::new(Default::default())))",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.372554167,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:333:9: replace SourceSpool::append -> Result<Option<Arc<Blob>>, SourceReadError> with Ok(None)",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 7.318894208,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.907531322,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:350:30: replace += with -= in SourceSpool::append",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.376354265,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.702613181,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:369:9: replace SourceSpool::write_range -> Result<bool, SourceReadError> with Ok(true)",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.486041605,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.762047388,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:369:9: replace SourceSpool::write_range -> Result<bool, SourceReadError> with Ok(false)",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.949982696,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.653284431,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:371:18: replace < with > in SourceSpool::write_range",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.18723037,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.552146313,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:350:30: replace += with *= in SourceSpool::append",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.031683441,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 11.492970435,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:375:30: replace - with + in SourceSpool::write_range",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.295777276,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.75436833,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:375:30: replace - with / in SourceSpool::write_range",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.860673683,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.763441217,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:384:50: replace + with - in SourceSpool::write_range",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.4969732239999995,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.655497175,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:308:24: delete ! in SourceSpool::capture",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.853082751,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.033421904,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:384:50: replace + with * in SourceSpool::write_range",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.117224327,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.65763866,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:391:16: replace += with -= in SourceSpool::write_range",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.156583293,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 1.021049071,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:371:18: replace < with == in SourceSpool::write_range",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.920227635,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.049996629,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:401:9: replace SourceSpool::reclaim -> Result<(), SourceReadError> with Ok(())",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 7.209002656,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.95545476,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:408:9: replace SourceSpool::observe_reclaim -> Result<Option<ReclaimSpan>, SourceReadError> with Ok(Some(Default::default()))",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.712450766,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:371:18: replace < with <= in SourceSpool::write_range",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.466060241,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.034724919,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:416:9: replace SourceSpool::observe_reclaim_minimum -> Result<Option<ReclaimSpan>, SourceReadError> with Ok(Some(Default::default()))",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.629564915,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:408:9: replace SourceSpool::observe_reclaim -> Result<Option<ReclaimSpan>, SourceReadError> with Ok(None)",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 6.605747446,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.652424534,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:416:9: replace SourceSpool::observe_reclaim_minimum -> Result<Option<ReclaimSpan>, SourceReadError> with Ok(None)",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 9.553892565,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.964175733,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:419:31: replace || with && in SourceSpool::observe_reclaim_minimum",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 8.761165301,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 1.226828091,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:419:77: replace < with == in SourceSpool::observe_reclaim_minimum",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 9.715905734,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.704349048,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:419:77: replace < with > in SourceSpool::observe_reclaim_minimum",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 10.355639122,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.861841825,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:419:77: replace < with <= in SourceSpool::observe_reclaim_minimum",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 8.594693968,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.967169119,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:438:9: replace SourceSpool::trace_capture with ()",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 9.858753922,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.915537929,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:391:16: replace += with *= in SourceSpool::write_range",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.133354722,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.050982634,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:445:9: replace SourceSpool::drain_retired with ()",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 7.046424794,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.757303236,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:462:32: replace - with / in SourceSpool::reclaim_with",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.653553991,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.81383079,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:462:32: replace - with + in SourceSpool::reclaim_with",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 8.403203281,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.862504901,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:455:9: replace SourceSpool::reclaim_with -> Result<(), SourceReadError> with Ok(())",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 11.063129555,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.811643782,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:488:9: replace SourceSpool::stats -> SpoolStats with Default::default()",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.209651762,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:476:43: replace > with < in SourceSpool::reclaim_with",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.229667455,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.860926193,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:476:43: replace > with == in SourceSpool::reclaim_with",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 8.658910032,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.911573323,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:476:43: replace > with >= in SourceSpool::reclaim_with",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.448217034,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.704752212,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:497:33: replace - with / in SourceSpool::stats",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.359268715,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.854852846,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:497:33: replace - with + in SourceSpool::stats",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 7.9022403709999995,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.708136316,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:534:9: replace <impl crate::maintenance::SourceMaintenance for SourceSpool>::pending -> bool with true",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 7.722272068,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.826065071,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:534:9: replace <impl crate::maintenance::SourceMaintenance for SourceSpool>::pending -> bool with false",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 7.593954133,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.714357621,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:534:12: delete ! in <impl crate::maintenance::SourceMaintenance for SourceSpool>::pending",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.721830107,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.811207747,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:542:40: replace && with || in <impl crate::maintenance::SourceMaintenance for SourceSpool>::pending",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.13127825,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.761787983,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:542:25: delete ! in <impl crate::maintenance::SourceMaintenance for SourceSpool>::pending",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.223027478,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.719126261,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:542:56: replace > with == in <impl crate::maintenance::SourceMaintenance for SourceSpool>::pending",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 7.131466558,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.713307267,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:542:56: replace > with < in <impl crate::maintenance::SourceMaintenance for SourceSpool>::pending",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.858972741,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.764414976,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:542:56: replace > with >= in <impl crate::maintenance::SourceMaintenance for SourceSpool>::pending",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.831200236,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.812409278,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:576:35: replace > with == in <impl SourceReader for Staged>::read_at",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.701213677,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.602641175,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:574:9: replace <impl SourceReader for Staged>::read_at -> Result<(), SourceReadError> with Ok(())",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 7.383696977,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.551817781,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:545:9: replace <impl crate::maintenance::SourceMaintenance for SourceSpool>::run -> Result<(), String> with Ok(())",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.344092592,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 8.158644433,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:576:35: replace > with < in <impl SourceReader for Staged>::read_at",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.020105947,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.810721501,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:576:35: replace > with >= in <impl SourceReader for Staged>::read_at",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.341886935,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.604966877,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:603:13: replace && with || in <impl Drop for Blob>::drop",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.165659527,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:587:29: replace == with != in <impl SourceReader for Staged>::read_at",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.288126503,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.761598588,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:602:9: replace <impl Drop for Blob>::drop with ()",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.150043435,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.859348901,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:553:9: replace <impl Drop for StageReset<'_>>::drop with ()",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.418766128,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 14.070686572,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:603:34: replace != with == in <impl Drop for Blob>::drop",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.556406805,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.917683595,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:611:9: replace <impl SourceReader for Blob>::read_at -> Result<(), SourceReadError> with Ok(())",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.5228303180000005,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.829002672,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:617:16: replace > with == in <impl SourceReader for Blob>::read_at",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 6.390168699,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.871911708,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:617:16: replace > with >= in <impl SourceReader for Blob>::read_at",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 7.869590979,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.756416732,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:617:16: replace > with < in <impl SourceReader for Blob>::read_at",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 9.115464209,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.858898468,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:630:29: replace == with != in <impl SourceReader for Blob>::read_at",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 9.339706001,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.912149086,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:636:23: replace += with -= in <impl SourceReader for Blob>::read_at",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 6.548103794,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.759483628,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:637:28: replace += with -= in <impl SourceReader for Blob>::read_at",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.794438212,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.858719424,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:636:23: replace += with *= in <impl SourceReader for Blob>::read_at",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.823419296,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 8.729479568,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/source_spool.rs:637:28: replace += with *= in <impl SourceReader for Blob>::read_at",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.805830956,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 7.563728933,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "idle_admission",
+      "version": "27.1.0",
+      "baseline": "Success",
+      "summary": {
+        "total_mutants": 23,
+        "caught": 13,
+        "missed": 0,
+        "unviable": 7,
+        "timeout": 3
+      },
+      "outcomes": [
+        {
+          "name": "crates/vizzi/src/host.rs:78:9: replace Host::start_with_maintenance -> Result<Self, EngineError> with Ok(Default::default())",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 10.512797942,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:79:13: replace || with && in Host::start_with_maintenance",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 52.646143106,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 7.003283696,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:158:46: replace || with && in Host::start_with_maintenance",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 53.840256136,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 6.473986764,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:163:29: replace && with || in Host::start_with_maintenance",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.064338296,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:194:21: replace && with || in Host::start_with_maintenance",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.661889796,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:193:21: replace && with || in Host::start_with_maintenance",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.709745944,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:158:41: replace == with != in Host::start_with_maintenance",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 21.294209832,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.024178765,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:208:57: replace && with || in Host::start_with_maintenance",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 5.032221763,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 10.017177666,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:228:25: replace - with + in Host::start_with_maintenance",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 6.014991897,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 8.495570432,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:241:33: replace && with || in Host::start_with_maintenance",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.651692238,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:208:41: delete ! in Host::start_with_maintenance",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 6.625464974,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 17.393481409,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:255:21: replace && with || in Host::start_with_maintenance",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 1.409906506,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:131:17: replace != with == in Host::start_with_maintenance",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 54.752816676,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.034279037,
+              "status": "Timeout"
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:290:44: replace != with == in Host::start_with_maintenance",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.334693122,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 6.884266475,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:294:41: replace && with || in Host::start_with_maintenance",
+          "outcome": "Unviable",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 0.705481784,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:240:40: replace != with == in Host::start_with_maintenance",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 7.737457708,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 16.178513758,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/maintenance.rs:41:9: replace Idle::eligible -> bool with true",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 2.360678548,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.601906443,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:267:41: replace || with && in Host::start_with_maintenance",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.125545828,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 15.955247031,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/maintenance.rs:41:18: replace && with || in Idle::eligible",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.622648599,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.855938917,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/maintenance.rs:41:9: replace Idle::eligible -> bool with false",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.008097445,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 3.415808554,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/maintenance.rs:41:9: delete ! in Idle::eligible",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.408628715,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 3.164285642,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/maintenance.rs:41:21: delete ! in Idle::eligible",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 4.328685025,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 3.267309932,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        },
+        {
+          "name": "crates/vizzi/src/host.rs:228:25: replace - with / in Host::start_with_maintenance",
+          "outcome": "Timeout",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 7.345212062,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 35.022004425,
+              "status": "Timeout"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "drop_join",
+      "version": "27.1.0",
+      "baseline": "Success",
+      "summary": {
+        "total_mutants": 1,
+        "caught": 1,
+        "missed": 0,
+        "unviable": 0,
+        "timeout": 0
+      },
+      "outcomes": [
+        {
+          "name": "crates/vizzi/src/maintenance.rs:142:9: replace <impl Drop for Idle>::drop with ()",
+          "outcome": "CaughtMutant",
+          "phases": [
+            {
+              "phase": "Build",
+              "seconds": 3.519049169,
+              "status": "Success"
+            },
+            {
+              "phase": "Test",
+              "seconds": 0.551589603,
+              "status": {
+                "Failure": 101
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "Timeouts break bootstrap/capture/coordinator or worker progress and are separate from assertion catches. Unviable substitutions fail compilation/build.",
+    "No new exclusions; existing unrelated engine directory-prefix configuration unchanged.",
+    "Optional measurement code/Python, allocator/portable source/dependencies and OS/browser internals are unchanged or outside these scopes.",
+    "Thread creation error branch is handled but not forced by resource exhaustion in tests. Passing baselines and zero survivors are evidence, not proof."
+  ]
+}

@@ -1,0 +1,309 @@
+{
+  "schema": 1,
+  "recorded_after_measurement_utc": "2026-11-03T19:59:33.505216+00:00",
+  "machine": {
+    "platform": "Linux-6.8.0-147-lowlatency-x86_64-with-glibc2.39",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13700H",
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)"
+  },
+  "conditions": [
+    {
+      "profile": "linux",
+      "condition": "after_cleanup",
+      "samples": 3,
+      "overlap_count": 0,
+      "published_during_cleanup": 0,
+      "publication_ms": {
+        "min": 64.504823,
+        "median": 82.68449,
+        "max": 102.325387
+      },
+      "admission_ms": {
+        "min": 13.314202,
+        "median": 55.175495,
+        "max": 97.17234099999999
+      },
+      "cleanup_ms": {
+        "min": 449.757392,
+        "median": 505.200702,
+        "max": 517.6769730000001
+      },
+      "gate_ms": {
+        "min": 0.0004969999999999999,
+        "median": 0.000685,
+        "max": 0.000791
+      },
+      "analysis_merge_ms": {
+        "min": 37.048752,
+        "median": 56.347485,
+        "max": 74.95020699999999
+      }
+    },
+    {
+      "profile": "linux",
+      "condition": "during_cleanup",
+      "samples": 3,
+      "overlap_count": 3,
+      "published_during_cleanup": 3,
+      "publication_ms": {
+        "min": 67.386984,
+        "median": 67.532789,
+        "max": 76.88934499999999
+      },
+      "admission_ms": {
+        "min": 21.885837000000002,
+        "median": 39.186569999999996,
+        "max": 88.14813000000001
+      },
+      "cleanup_ms": {
+        "min": 503.853923,
+        "median": 519.690461,
+        "max": 537.868472
+      },
+      "gate_ms": {
+        "min": 0.000368,
+        "median": 0.00041,
+        "max": 0.000547
+      },
+      "analysis_merge_ms": {
+        "min": 40.32479,
+        "median": 40.735638,
+        "max": 50.21098
+      }
+    },
+    {
+      "profile": "pytorch",
+      "condition": "after_cleanup",
+      "samples": 3,
+      "overlap_count": 0,
+      "published_during_cleanup": 0,
+      "publication_ms": {
+        "min": 33.233729,
+        "median": 45.411108,
+        "max": 47.603511000000005
+      },
+      "admission_ms": {
+        "min": 6.0241929999999995,
+        "median": 27.548133,
+        "max": 92.152664
+      },
+      "cleanup_ms": {
+        "min": 107.39135700000001,
+        "median": 110.754268,
+        "max": 126.158091
+      },
+      "gate_ms": {
+        "min": 0.000456,
+        "median": 0.0010979999999999998,
+        "max": 0.001396
+      },
+      "analysis_merge_ms": {
+        "min": 6.108274,
+        "median": 19.854979000000004,
+        "max": 21.432688000000002
+      }
+    },
+    {
+      "profile": "pytorch",
+      "condition": "during_cleanup",
+      "samples": 3,
+      "overlap_count": 3,
+      "published_during_cleanup": 3,
+      "publication_ms": {
+        "min": 33.525536,
+        "median": 33.579471999999996,
+        "max": 47.175549
+      },
+      "admission_ms": {
+        "min": 0.6472990000000001,
+        "median": 11.548077000000001,
+        "max": 80.990294
+      },
+      "cleanup_ms": {
+        "min": 93.377083,
+        "median": 104.222786,
+        "max": 111.251605
+      },
+      "gate_ms": {
+        "min": 0.00042899999999999997,
+        "median": 0.0008150000000000001,
+        "max": 0.001564
+      },
+      "analysis_merge_ms": {
+        "min": 7.385918,
+        "median": 7.967459999999999,
+        "max": 20.139561999999998
+      }
+    }
+  ],
+  "samples": [
+    {
+      "profile": "linux",
+      "sample": 0,
+      "condition": "after_cleanup",
+      "publication_ms": 82.68449,
+      "admission_ms": 97.17234099999999,
+      "cleanup_ms": 505.200702,
+      "gate_ms": 0.000685,
+      "hint_to_entry_ms": 25.302401999999915,
+      "analysis_merge_ms": 56.347485,
+      "capture_overlaps_cleanup": false,
+      "published_during_cleanup": false
+    },
+    {
+      "profile": "linux",
+      "sample": 1,
+      "condition": "during_cleanup",
+      "publication_ms": 76.88934499999999,
+      "admission_ms": 39.186569999999996,
+      "cleanup_ms": 519.690461,
+      "gate_ms": 0.00041,
+      "hint_to_entry_ms": 25.150259999999996,
+      "analysis_merge_ms": 50.21098,
+      "capture_overlaps_cleanup": true,
+      "published_during_cleanup": true
+    },
+    {
+      "profile": "linux",
+      "sample": 2,
+      "condition": "during_cleanup",
+      "publication_ms": 67.532789,
+      "admission_ms": 21.885837000000002,
+      "cleanup_ms": 537.868472,
+      "gate_ms": 0.000547,
+      "hint_to_entry_ms": 25.134742999999997,
+      "analysis_merge_ms": 40.735638,
+      "capture_overlaps_cleanup": true,
+      "published_during_cleanup": true
+    },
+    {
+      "profile": "linux",
+      "sample": 3,
+      "condition": "after_cleanup",
+      "publication_ms": 102.325387,
+      "admission_ms": 55.175495,
+      "cleanup_ms": 517.6769730000001,
+      "gate_ms": 0.0004969999999999999,
+      "hint_to_entry_ms": 25.137499999999932,
+      "analysis_merge_ms": 74.95020699999999,
+      "capture_overlaps_cleanup": false,
+      "published_during_cleanup": false
+    },
+    {
+      "profile": "linux",
+      "sample": 4,
+      "condition": "after_cleanup",
+      "publication_ms": 64.504823,
+      "admission_ms": 13.314202,
+      "cleanup_ms": 449.757392,
+      "gate_ms": 0.000791,
+      "hint_to_entry_ms": 25.144762999999955,
+      "analysis_merge_ms": 37.048752,
+      "capture_overlaps_cleanup": false,
+      "published_during_cleanup": false
+    },
+    {
+      "profile": "linux",
+      "sample": 5,
+      "condition": "during_cleanup",
+      "publication_ms": 67.386984,
+      "admission_ms": 88.14813000000001,
+      "cleanup_ms": 503.853923,
+      "gate_ms": 0.000368,
+      "hint_to_entry_ms": 25.164112000000003,
+      "analysis_merge_ms": 40.32479,
+      "capture_overlaps_cleanup": true,
+      "published_during_cleanup": true
+    },
+    {
+      "profile": "pytorch",
+      "sample": 0,
+      "condition": "after_cleanup",
+      "publication_ms": 47.603511000000005,
+      "admission_ms": 27.548133,
+      "cleanup_ms": 107.39135700000001,
+      "gate_ms": 0.001396,
+      "hint_to_entry_ms": 25.23915199999999,
+      "analysis_merge_ms": 21.432688000000002,
+      "capture_overlaps_cleanup": false,
+      "published_during_cleanup": false
+    },
+    {
+      "profile": "pytorch",
+      "sample": 1,
+      "condition": "during_cleanup",
+      "publication_ms": 33.579471999999996,
+      "admission_ms": 80.990294,
+      "cleanup_ms": 104.222786,
+      "gate_ms": 0.0008150000000000001,
+      "hint_to_entry_ms": 25.114611999999994,
+      "analysis_merge_ms": 7.385918,
+      "capture_overlaps_cleanup": true,
+      "published_during_cleanup": true
+    },
+    {
+      "profile": "pytorch",
+      "sample": 2,
+      "condition": "during_cleanup",
+      "publication_ms": 47.175549,
+      "admission_ms": 11.548077000000001,
+      "cleanup_ms": 93.377083,
+      "gate_ms": 0.001564,
+      "hint_to_entry_ms": 25.299072000000002,
+      "analysis_merge_ms": 20.139561999999998,
+      "capture_overlaps_cleanup": true,
+      "published_during_cleanup": true
+    },
+    {
+      "profile": "pytorch",
+      "sample": 3,
+      "condition": "after_cleanup",
+      "publication_ms": 33.233729,
+      "admission_ms": 6.0241929999999995,
+      "cleanup_ms": 110.754268,
+      "gate_ms": 0.000456,
+      "hint_to_entry_ms": 25.20671200000001,
+      "analysis_merge_ms": 6.108274,
+      "capture_overlaps_cleanup": false,
+      "published_during_cleanup": false
+    },
+    {
+      "profile": "pytorch",
+      "sample": 4,
+      "condition": "after_cleanup",
+      "publication_ms": 45.411108,
+      "admission_ms": 92.152664,
+      "cleanup_ms": 126.158091,
+      "gate_ms": 0.0010979999999999998,
+      "hint_to_entry_ms": 25.194169000000016,
+      "analysis_merge_ms": 19.854979000000004,
+      "capture_overlaps_cleanup": false,
+      "published_during_cleanup": false
+    },
+    {
+      "profile": "pytorch",
+      "sample": 5,
+      "condition": "during_cleanup",
+      "publication_ms": 33.525536,
+      "admission_ms": 0.6472990000000001,
+      "cleanup_ms": 111.251605,
+      "gate_ms": 0.00042899999999999997,
+      "hint_to_entry_ms": 25.223429999999997,
+      "analysis_merge_ms": 7.967459999999999,
+      "capture_overlaps_cleanup": true,
+      "published_during_cleanup": true
+    }
+  ],
+  "limits": [
+    "Explicit host path hints, watcher disabled; initial recovery completes before an hour-long recovery interval isolates cleanup.",
+    "Generated streamed tail is controlled allocation pressure outside project source; it is not representative repository code.",
+    "Three samples per condition/profile; finite observations, not browser latency tails or randomised speedups.",
+    "Writer plus initial maintenance gate is traced; engine capture/total durations and observed publication include distinct work.",
+    "Compatible cache preparation, pressure setup and independent verification are outside write-to-publication timing, but affect process peaks.",
+    "Child 12 GiB virtual-address-space limit is not RSS/physical-RAM enforcement or baseline-laptop qualification.",
+    "Actual host idle scheduler admits all cleanup; an observed provider delegates the same metadata hint and physical operation.",
+    "Only generated-tail cuts at least as large as the fixture signal overlap; unrelated small maintenance is not mistaken for the target cut.",
+    "Quiet interval may already have elapsed during pressure setup; retirement-to-entry includes up to the host poll cadence.",
+    "Shutdown observations with no blocked syscall do not establish a hard shutdown deadline."
+  ]
+}

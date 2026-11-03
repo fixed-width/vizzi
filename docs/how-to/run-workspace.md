@@ -131,3 +131,9 @@ until reused, while free tails shrink. Fragmentation can still cause capacity re
 Capacity failure keeps the previous published observation. `0` preserves resident
 capture and is the default. See [source reads](../prototype/SOURCE_READS.md) for lifetime,
 range/bulk limits, maintenance, errors and the remaining resident-capture/parser/index limits.
+
+With spooling enabled, a live host schedules pending cleanup after a 250 ms quiet interval.
+At most one cleanup worker runs, independently of foreground publication. Native embedders
+can disable it with `HostOptions::idle_maintenance` and inspect `Host::maintenance_status()`;
+cleanup errors are separate from foreground errors. Shutdown joins running cleanup and may
+wait for filesystem IO. See [idle maintenance](../prototype/RECOVERY.md#idle-source-maintenance).

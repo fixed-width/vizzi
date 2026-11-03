@@ -67,6 +67,11 @@ pub struct Directory {
     spool: Option<Arc<crate::source_spool::SourceSpool>>,
 }
 impl Directory {
+    pub(crate) fn maintenance(&self) -> Option<Arc<dyn crate::maintenance::SourceMaintenance>> {
+        self.spool
+            .as_ref()
+            .map(|spool| spool.clone() as Arc<dyn crate::maintenance::SourceMaintenance>)
+    }
     /// Opens a directory; never executes project build scripts.
     pub fn open(root: &Path) -> io::Result<Self> {
         Self::with_languages(

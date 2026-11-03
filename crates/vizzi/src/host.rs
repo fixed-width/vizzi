@@ -1,10 +1,12 @@
 //! Background refresh coordination and native directory observation.
 
+pub use crate::maintenance::MaintenanceStatus;
 use crate::{
     admission::Priority,
     application::Application,
     engine::{Engine, EngineError, Refresh},
     invalidation::{PendingRefresh, RecoveryToken, classify},
+    maintenance::{Idle, SourceMaintenance},
     source::CaptureScope,
 };
 use notify::{RecursiveMode, Watcher};
@@ -27,6 +29,7 @@ pub struct Host {
     signal: SyncSender<()>,
     task: Option<JoinHandle<()>>,
     queue: Arc<Mutex<PendingRefresh>>,
+    maintenance: Arc<Mutex<MaintenanceStatus>>,
 }
 /// Native observation and periodic verification settings.
 #[derive(Clone, Debug)]
@@ -35,12 +38,15 @@ pub struct HostOptions {
     pub watch: bool,
     /// Delay between accepted verification and the next periodic request.
     pub reconcile_interval: Duration,
+    /// Admit source cleanup after a quiet interval; false leaves cleanup caller-managed.
+    pub idle_maintenance: bool,
 }
 impl Default for HostOptions {
     fn default() -> Self {
         Self {
             watch: true,
             reconcile_interval: Duration::from_secs(2),
+            idle_maintenance: true,
         }
     }
 }
@@ -61,6 +67,14 @@ impl Host {
     }
     /// Starts a host with explicit observation policy; analyzed projects are never run.
     pub fn start_with_options(engine: Engine, options: HostOptions) -> Result<Self, EngineError> {
+        let source = engine.directory().maintenance();
+        Self::start_with_maintenance(engine, options, source)
+    }
+    pub(crate) fn start_with_maintenance(
+        engine: Engine,
+        options: HostOptions,
+        source: Option<Arc<dyn SourceMaintenance>>,
+    ) -> Result<Self, EngineError> {
         if options.reconcile_interval.is_zero()
             || Instant::now()
                 .checked_add(options.reconcile_interval)
@@ -126,16 +140,21 @@ impl Host {
         let worker_stop = stop.clone();
         let worker_app = application.clone();
         let worker_queue = queue.clone();
+        let maintenance = Arc::new(Mutex::new(MaintenanceStatus::default()));
+        let maintenance_status = maintenance.clone();
+        let source = options.idle_maintenance.then_some(source).flatten();
         let task = std::thread::spawn(move || {
             let queue = worker_queue;
             let mut schedule = Reconciliation::new(Instant::now());
             schedule.interval = options.reconcile_interval;
             let mut recovery: Option<RecoveryTask> = None;
+            let mut maintenance = Idle::new(source, maintenance_status, Instant::now());
             loop {
                 if worker_stop.load(Ordering::Acquire) {
                     break;
                 }
                 if schedule.due(Instant::now()) {
+                    maintenance.busy();
                     if engine.workers() == 1 || worker_app.status().error.is_some() {
                         pending(&queue).invalidate(&worker_app, CaptureScope::Reconcile);
                     } else if recovery.is_none() {
@@ -192,6 +211,7 @@ impl Host {
                     recovery = None;
                 }
                 if worker_app.status().pending {
+                    maintenance.busy();
                     while receive.try_recv().is_ok() {}
                     std::thread::sleep(Duration::from_millis(25));
                     if worker_stop.load(Ordering::Acquire) {
@@ -292,11 +312,18 @@ impl Host {
                         }
                     }
                 }
-                let wait = schedule.wait(
+                maintenance.poll(
+                    Instant::now(),
+                    Idle::eligible(worker_app.status().pending, recovery.is_some()),
+                );
+                let mut wait = schedule.wait(
                     Instant::now(),
                     worker_app.status().pending,
                     recovery.is_some(),
                 );
+                if let Some(poll) = maintenance.poll_wait() {
+                    wait = wait.min(poll);
+                }
                 match receive.recv_timeout(wait) {
                     Ok(()) | Err(mpsc::RecvTimeoutError::Timeout) => {}
                     Err(mpsc::RecvTimeoutError::Disconnected) => break,
@@ -309,6 +336,7 @@ impl Host {
                 }
                 worker_app.recovery_discarded(None);
             }
+            maintenance.shutdown();
         });
         Ok(Self {
             application,
@@ -316,6 +344,7 @@ impl Host {
             signal,
             task: Some(task),
             queue,
+            maintenance,
         })
     }
     /// Supplies source hints or requests discovery through the same invalidation path.
@@ -326,6 +355,10 @@ impl Host {
     /// Returns the same application used by browser and diagnostic hosts.
     pub fn application(&self) -> Arc<Application> {
         self.application.clone()
+    }
+    /// Reads native maintenance progress without waiting for backing IO or publication.
+    pub fn maintenance_status(&self) -> MaintenanceStatus {
+        Idle::status(&self.maintenance).clone()
     }
 }
 fn join_recovery(
@@ -440,6 +473,85 @@ mod tests {
     use super::*;
     use crate::{cache::Cache, source::Directory};
     use futures_util::FutureExt;
+    #[test]
+    fn publication_continues_during_maintenance_and_errors_stay_separate() {
+        use std::sync::mpsc;
+        struct Paused {
+            entered: mpsc::Sender<()>,
+            resume: Mutex<mpsc::Receiver<()>>,
+        }
+        impl SourceMaintenance for Paused {
+            fn pending(&self) -> bool {
+                true
+            }
+            fn run(&self) -> Result<(), String> {
+                self.entered.send(()).unwrap();
+                self.resume.lock().unwrap().recv().unwrap();
+                Err("maintenance IO fixture".into())
+            }
+        }
+        let root = tempfile::tempdir().unwrap();
+        let cache = tempfile::tempdir().unwrap();
+        std::fs::write(root.path().join("a.rs"), "fn original() {}\n").unwrap();
+        let engine = Engine::new(
+            Directory::open(root.path()).unwrap(),
+            Cache::new(cache.path().into()),
+            4,
+        )
+        .unwrap();
+        let (entered, started) = mpsc::channel();
+        let (release, resume) = mpsc::channel();
+        let work = Arc::new(Paused {
+            entered,
+            resume: Mutex::new(resume),
+        });
+        let host = Host::start_with_maintenance(
+            engine,
+            HostOptions {
+                watch: false,
+                reconcile_interval: Duration::from_secs(3600),
+                idle_maintenance: true,
+            },
+            Some(work),
+        )
+        .unwrap();
+        let app = host.application();
+        let old = app.snapshot().unwrap();
+        started.recv_timeout(Duration::from_secs(3)).unwrap();
+        std::fs::write(root.path().join("a.rs"), "fn changed() {}\n").unwrap();
+        host.request(CaptureScope::Paths(
+            [PathBuf::from("a.rs")].into_iter().collect(),
+        ));
+        let deadline = Instant::now() + Duration::from_secs(2);
+        while app.snapshot().unwrap().id() == old.id() && Instant::now() < deadline {
+            std::thread::sleep(Duration::from_millis(2));
+        }
+        assert_ne!(app.snapshot().unwrap().id(), old.id());
+        assert!(host.maintenance_status().running);
+        assert_eq!(host.maintenance_status().attempts, 1);
+        assert!(app.status().error.is_none());
+        release.send(()).unwrap();
+        let deadline = Instant::now() + Duration::from_secs(2);
+        while host.maintenance_status().failed == 0 && Instant::now() < deadline {
+            std::thread::sleep(Duration::from_millis(2));
+        }
+        assert_eq!(host.maintenance_status().failed, 1);
+        assert!(
+            host.maintenance_status()
+                .error
+                .as_ref()
+                .unwrap()
+                .contains("fixture")
+        );
+        assert!(app.status().error.is_none());
+        let current = app.snapshot().unwrap().id().clone();
+        drop(host);
+        assert_eq!(app.snapshot().unwrap().id(), &current);
+        assert_eq!(
+            old.documents()[0].resident_source(),
+            Some("fn original() {}\n")
+        );
+    }
     #[derive(Default)]
     struct TestWatcher {
         active: BTreeSet<PathBuf>,

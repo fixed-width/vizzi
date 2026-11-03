@@ -117,6 +117,7 @@ fn run_probe(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Erro
         HostOptions {
             watch: false,
             reconcile_interval: Duration::from_millis(config.recovery_ms),
+            idle_maintenance: false,
         },
     )?;
     let app = host.application();

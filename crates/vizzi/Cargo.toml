@@ -54,3 +54,7 @@ required-features = ["qualification"]
 [[example]]
 name = "foreground_maintenance"
 required-features = ["qualification"]
+
+[[example]]
+name = "idle_maintenance"
+required-features = ["qualification"]

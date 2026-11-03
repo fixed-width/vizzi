@@ -135,6 +135,7 @@ impl Fixture {
             HostOptions {
                 watch: false,
                 reconcile_interval: Duration::from_millis(20),
+                idle_maintenance: true,
             },
         )
         .unwrap()
@@ -280,7 +281,8 @@ fn single_worker_recovers_silent_changes_serially_and_rejects_invalid_intervals(
                 fixture.engine(1),
                 HostOptions {
                     watch: false,
-                    reconcile_interval: interval
+                    reconcile_interval: interval,
+                    idle_maintenance: true,
                 }
             )
             .is_err()
@@ -422,6 +424,7 @@ fn foreground_discovery_registers_new_directories_before_the_next_periodic_pass(
         HostOptions {
             watch: true,
             reconcile_interval: Duration::from_secs(60),
+            idle_maintenance: true,
         },
     )
     .unwrap();
@@ -460,6 +463,7 @@ fn recovery_input_admission_preserves_foreground_headroom_and_releases_on_shutdo
         HostOptions {
             watch: false,
             reconcile_interval: Duration::from_millis(20),
+            idle_maintenance: true,
         },
     )
     .unwrap();

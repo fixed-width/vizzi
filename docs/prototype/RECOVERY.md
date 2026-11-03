@@ -68,7 +68,7 @@ private recovery counters.
 ## Native integration
 
 `Host::start` uses native observation and a two-second reconciliation interval.
-`Host::start_with_options` accepts `HostOptions { watch, reconcile_interval }` for native
+`Host::start_with_options` accepts `HostOptions { watch, reconcile_interval, idle_maintenance }` for native
 embedders and controlled probes. Disabling watches deliberately selects polling. The
 interval must be positive and representable; it runs from accepted full verification
 to the next periodic request. Blocking filesystem operations can extend that delay.
@@ -83,3 +83,35 @@ cancellation and capture checks preserve existing limits: blocking I/O, cleanup,
 snapshot construction, and arbitrary adapter code have no hard interruption deadline.
 Additional concurrent input/parser buffers are outside the opt-in syntax retention quota;
 there is no new whole-process memory limit.
+
+## Idle source maintenance
+
+When source spooling supplies maintenance work, the host admits one cleanup worker after
+250 ms without foreground/recovery activity. Foreground/recovery work resets the quiet
+interval. An in-memory provider hint reports queued retirements or charged tails; the
+coordinator never polls source statistics or filesystem metadata. A 100 ms wake ceiling
+notices external pin release even without another hint. Hosts without a provider retain
+the existing wait schedule and spawn no cleanup worker.
+
+The coordinator joins only finished workers. Already-running filesystem cleanup is not
+cancelled by a new edit; the two-file spool permits capture elsewhere when aggregate
+headroom exists. Cleanup runs outside publication/coordinator locks. Failures and panics
+retry after at least one second, subject to the quiet rule. Success clears the last error.
+Shutdown stops admission and joins the outstanding task; blocking IO has no hard deadline.
+
+`HostOptions::idle_maintenance` defaults true. Set it false for caller-managed cleanup or
+controlled probes. One-shot/non-host callers retain explicit `SourceSpool::reclaim`.
+The native `Host::maintenance_status()` getter returns metadata without backing IO:
+
+| Field | Meaning |
+| --- | --- |
+| `attempts` | Admitted attempts, including failed thread creation |
+| `running` | A worker remains outstanding until coordinator collection |
+| `completed` | Successful operations, including metadata-only retirement batches |
+| `failed` | IO, worker panic or thread creation failures |
+| `error` | Last failure, retained until successful cleanup |
+
+This status is separate from `Application::Status` and does not publish a new snapshot,
+overwrite foreground errors or alter recovery counters. Browser/HTTP schemas are unchanged.
+Native embedders can expose these diagnostics through their own integration. See the
+[design](../plans/idle-maintenance.md) and [qualification](../../experiments/idle-maintenance/RESULTS.md).

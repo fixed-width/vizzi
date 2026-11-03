@@ -163,6 +163,15 @@ and returns both files to zero. Progress requires headroom/contiguous fit; captu
 only logical retirement, with physical cleanup explicit. These finite warm native samples
 do not qualify full-capacity pressure, browser tails, cold storage or baseline hardware.
 
+The [idle-maintenance implementation](../../experiments/idle-maintenance/RESULTS.md) admits
+one cleanup worker after a 250 ms quiet interval, using metadata hints and a 100 ms wake
+ceiling. Each observed host completes eight operations without failure; all six requested
+overlap edits publish during real truncation. During-cleanup medians are 67.5 / 33.6 ms
+with gates below 0.01 ms. Retry backoff and joined shutdown are tested; the 1–97 ms
+retirement-to-entry observations follow already-idle pressure setup and do not calibrate
+the quiet timeout. Generated tails, warm native samples and nonblocked shutdown do not
+qualify browser/recovery/cold-storage tails, physical RAM or baseline defaults.
+
 Do not replace semantic correctness checks with these performance targets. Language
 assignments, partial grammar coverage, source-only cases, cancellation, cache validity,
 and immutable publication must remain explicit and independently tested.

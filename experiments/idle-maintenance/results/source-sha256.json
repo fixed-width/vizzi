@@ -1,0 +1,23 @@
+{
+  "base_commit": "6e990971d0d33c44adf495721e9e5f9d8330f50c",
+  "note": "Measured final working tree before commit; release probe frozen before timing. Host scheduling enabled through a provider with only qualification observation; no dependency/unsafe-code changes.",
+  "sha256": {
+    "Cargo.toml": "b48edcbfd70277e9d0a58f7680b6ed414bc70108b279fdfba98dcd9a07092636",
+    "Cargo.lock": "032ea2295563c2354c3d92c54cf4be9943ad62eb1ed116d6267b7c2c0ee1456d",
+    "crates/vizzi/Cargo.toml": "84ffe4de6633d996c98d085060ab7afd8661c8d6031792fde465afd6e5fdc16a",
+    "crates/vizzi/src/lib.rs": "9df7c2ec70ac4b4bc27ff85f32d76d516ccd46cb13e942f1286f7e7ffaef0fbb",
+    "crates/vizzi/src/maintenance.rs": "6d33d1813bc29cd3d15ad2ffe530a927af691d8052bb3617bc3d6e22e1062c08",
+    "crates/vizzi/src/host.rs": "7da9d6155a139c47ed3164a561b2fbb44d30c963a6772f2c9588f46abc37ef39",
+    "crates/vizzi/src/source.rs": "73728a9fb35b95bdaa851da9268d95e0b2b9cc1af8c2dd86bc71049b226da255",
+    "crates/vizzi/src/source_spool.rs": "2999453b49e4adb6d6aa90c66509d118475a411873d1b3a2c46c760a1698457e",
+    "crates/vizzi/src/idle_probe.rs": "ef2d95e142e73de180124c839fb899c90f73d28c497e66402f29cc854d26c1c5",
+    "crates/vizzi/src/foreground_maintenance.rs": "2f2e88d7c7ff44e2ec6e054dc4e4fa88cbd2ecc435ee3e40e549cef38e3a342d",
+    "crates/vizzi/tests/idle_maintenance.rs": "8ccef9941d1b688f955e0575de55b2e3c5408014a05ee4c2fa34d958a0053125",
+    "crates/vizzi/examples/idle_maintenance.rs": "603a756558f7314bb47733957df26e65c79938c1f183cf424a6e8e4f6c3fc90c",
+    "experiments/idle-maintenance/measure.py": "1187fcdb331d8ed0e05dd1a2e22d326a3b4dfdc390ef55800ecb7a3e6a6c666e",
+    "experiments/foreground-maintenance/measure.py": "433c2270fc36992672eeb754a4d218bd6e62607da09105ab759ddcec0919c31f",
+    "experiments/qualification/native.py": "e637e001eff0f81059c10e02f5381c00ef44e45efbd79348f94b792203ef924a",
+    "experiments/qualification/profiles.json": "fe3443645d36e1749ab6f360cecc52c667269e0504326155ed89e1baf98af260",
+    "experiments/admission/limit.py": "fdabefbcaa734cb366b6bcc87306a480bccac672bf5d41dd5592982eb8c08785"
+  }
+}
