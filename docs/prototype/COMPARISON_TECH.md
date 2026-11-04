@@ -3,8 +3,9 @@
 Status: portable inventory comparison, side-specific source binding and bounded textual
 hunks are implemented, with source-only native acquisition and bounded review ownership.
 Admitted analysis now shares the live engine, with a native review application and
-[comparison HTTP/stdio transport](COMPARISON_API.md). Linked browser review views remain
-planned. This reference supports the
+[comparison HTTP/stdio transport](COMPARISON_API.md). The initial
+[browser review implementation](REVIEW_INTERFACE.md) is available; Chromium acceptance
+remains open. This reference supports the
 [behaviour contract](COMPARISON_PRODUCT.md). Exact wire fields can be refined with
 implementation while preserving these invariants.
 

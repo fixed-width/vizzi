@@ -118,4 +118,5 @@ Responses use the existing diagnostic envelope. Both live/review streaming event
 paths return **400** through finite diagnostics. Native tests consume the independent
 subscription interface; browser clients will use SSE. The
 [transport validation report](../../experiments/review-workflow/TRANSPORT_RESULTS.md)
-records tested behaviour and the frozen-fixture replay. Linked review UI is next.
+records tested behaviour and the frozen-fixture replay. The initial
+[review interface](REVIEW_INTERFACE.md) is implemented; browser acceptance remains open.

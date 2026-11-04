@@ -29,7 +29,9 @@ implemented, along with [bounded textual hunks](docs/prototype/TEXT_DIFF.md).
 same model, now with [bounded review ownership](docs/prototype/REVIEW_OWNERSHIP.md).
 Review analysis now [shares the existing engine](docs/prototype/REVIEW_ANALYSIS.md).
 [Comparison transport](docs/prototype/COMPARISON_API.md) now exposes bounded queries and
-separate review status. The linked review interface and guided task remain next.
+separate review status. An initial [review interface](docs/how-to/review-local-changes.md)
+is implemented; its [browser acceptance](experiments/review-workflow/INTERFACE_RESULTS.md)
+and rendered walkthrough remain open.
 
 - [Run the workspace](docs/how-to/run-workspace.md)
 - [Next product milestones](docs/plans/product-milestones.md)

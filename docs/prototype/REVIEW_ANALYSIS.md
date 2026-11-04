@@ -85,4 +85,5 @@ The [validation report](../../experiments/review-workflow/ANALYSIS_RESULTS.md) r
 mixed-language/context/cache checks, admission/failure tests, concurrency evidence and
 the frozen review variants. Compilation-backed semantics and relationships remain
 later work. The [comparison API](COMPARISON_API.md) now exposes native queries;
-linked review UI remains next.
+the initial [review UI](REVIEW_INTERFACE.md) has controller/native validation and
+pending browser acceptance.

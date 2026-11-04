@@ -112,7 +112,8 @@ capture and query lifetime, including the shared source-byte allowance. Admissio
 checks are recorded in the [ownership report](OWNERSHIP_RESULTS.md). The
 [analysis bridge](../../docs/prototype/REVIEW_ANALYSIS.md) now uses the shared engine.
 The [comparison API](../../docs/prototype/COMPARISON_API.md) exposes host operations;
-linked browser review remains next.
+the initial [review interface](INTERFACE_RESULTS.md) is implemented with browser
+acceptance still open.
 
 ## Run an evaluation after review support exists
 

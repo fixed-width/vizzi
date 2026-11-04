@@ -1,0 +1,554 @@
+{
+  "schema": 1,
+  "source_sha256": {
+    "crates/vizzi/src/server.rs": "a679d55adb54be647bd8c5e3b63ef829bbc597c2b620d76ca49cc0555bbbb1b6",
+    "crates/vizzi/web/index.html": "e5c9dc97029850e872891d8939e686f7cd0c978f4b2c2dda2ceb94fc088ad9a4",
+    "crates/vizzi/web/inspector.js": "89aad9fb75a46835e377a40cf9444ed63fb413d86a5439f4195c91f494e60abc",
+    "crates/vizzi/web/review-app.js": "bdc42b1becd3b932ed4ac7fc3c570d23a618c54e030c6dd7cbc79f54474a2443",
+    "crates/vizzi/web/review-controller.js": "79e87cbf950ee6dc57023c2150e462d3f748667436681ebfa052249ee417ea8f",
+    "crates/vizzi/web/review-controller.test.js": "2984bd06e203cb1942f4a779db4d983deb392be7dccc61ae225c305767d90ea8",
+    "crates/vizzi/web/review-windows.js": "7c1730aeabdd076f4cce970266492b36a52057babb937d6db5eeb8a166110a56",
+    "crates/vizzi/web/review-windows.test.js": "86093e69dcfd75d1f58c3fa69ea40eced535eb421a1277c9a504508475132e3e",
+    "crates/vizzi/web/review.css": "c68aa60a52b65e4f5246a7969eb6ea504575e0444937acf1916488e8a26c32d6",
+    "crates/vizzi/web/review.html": "e8e16dc2333c00fc043467a220bad2347e8d531de9017efffd2b18955835d29e",
+    "crates/vizzi/web/updates.js": "9893fc4e490f7a6fa0239548f89076e4c5b7f72479526e8bf729b7a54ff33ee6",
+    "crates/vizzi/web/updates.test.js": "91e3f459494502eff230a3450262826de3b5dcb882f32cb29dde8b29cf6539cb",
+    "crates/vizzi/web/windows.js": "4da1aaab22fe5e32a3ad879e8b2962abb4aa8ccc4abb1b40dbf16905dd17688d",
+    "experiments/browser/offline-mutations.mjs": "ab8827476da3cd103021babd3a2bcef84621ff7365c637fc28994233704e9051",
+    "experiments/browser/review.test.mjs": "092228f72b66a1723221604948cf4c2e125f1c2c87f9d7076b45a4c1a526e5a4",
+    "experiments/browser/run.mjs": "9d1dcb8dfc9d624e7a877cdf02cad0b4e328b86a7e444c8415c716a7afd2b0b3",
+    "experiments/review-workflow/verify_interface.mjs": "6665a46e86476d9a4eba1cb7f4b913ede573a06b6ad9f7f5e6b94abc790b5b67",
+    "Cargo.lock": "39a4317d3c52be9199837d27320749e93c2591f3c021a8afac28b1a79a23e8d6",
+    "package-lock.json": "e7ff76f17d7408c0b6dfd075c564ba31fec03cc838be612a008cf5bd343e291f",
+    "experiments/browser/review-stryker.config.json": "39cd7ab511b47fcc685d0b68ed3d8a59456cc822767f2b7f6fe4df8a8c7bf04e"
+  },
+  "commands": [
+    "CARGO_BUILD_JOBS=1 nice -n 10 cargo build --release --offline -p vizzi",
+    "CARGO_BUILD_JOBS=1 nice -n 10 node_modules/node/bin/node experiments/review-workflow/verify_interface.mjs /tmp/vizzi-text-hunks-a-20261103 /tmp/vizzi-review-ui-revalidated-a-20261103",
+    "CARGO_BUILD_JOBS=1 nice -n 10 node_modules/node/bin/node experiments/review-workflow/verify_interface.mjs /tmp/vizzi-text-hunks-b-20261103 /tmp/vizzi-review-ui-revalidated-b-20261103"
+  ],
+  "variants": [
+    {
+      "variant": "variant-a",
+      "verified": true,
+      "fixture_reverified": true,
+      "raw_report_sha256": "9fd81aeef903f75dbc1c195c6ee4f506864b6dbb55aacc6a67a751a8b89a5873",
+      "baseline": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+      "binary_sha256": "15d9294be35cccdf8845bdbc78ed0315a763dc7bbedc45532562a9a1757ae8af",
+      "regression_detected": true,
+      "verified_source_rows": 1044,
+      "hunk_headers": [
+        "@@ -117,7 +117,7 @@",
+        "@@ -156,8 +156,10 @@",
+        "@@ -166,7 +168,7 @@"
+      ],
+      "assets": [
+        {
+          "uri": "/review",
+          "sha256": "e8e16dc2333c00fc043467a220bad2347e8d531de9017efffd2b18955835d29e"
+        },
+        {
+          "uri": "/review-app.js",
+          "sha256": "bdc42b1becd3b932ed4ac7fc3c570d23a618c54e030c6dd7cbc79f54474a2443"
+        },
+        {
+          "uri": "/review-controller.js",
+          "sha256": "79e87cbf950ee6dc57023c2150e462d3f748667436681ebfa052249ee417ea8f"
+        },
+        {
+          "uri": "/review-windows.js",
+          "sha256": "7c1730aeabdd076f4cce970266492b36a52057babb937d6db5eeb8a166110a56"
+        },
+        {
+          "uri": "/review.css",
+          "sha256": "c68aa60a52b65e4f5246a7969eb6ea504575e0444937acf1916488e8a26c32d6"
+        },
+        {
+          "uri": "/windows.js",
+          "sha256": "4da1aaab22fe5e32a3ad879e8b2962abb4aa8ccc4abb1b40dbf16905dd17688d"
+        },
+        {
+          "uri": "/inspector.js",
+          "sha256": "89aad9fb75a46835e377a40cf9444ed63fb413d86a5439f4195c91f494e60abc"
+        }
+      ],
+      "steps": [
+        {
+          "step": "changed-compiler",
+          "path": "src/compiler/mod.rs",
+          "selection": {
+            "side": "working",
+            "entity": null,
+            "hunk": "8e33638836326fd9b68ab24cf1fec45426e4d6d75394f6a32505663a54110b6d"
+          },
+          "token": "e5114430d3ea969fc316895c25d2394a5fdc53ef16ba42786de289885a93da3c:1",
+          "source_evidence": [
+            {
+              "side": "base",
+              "line": 159,
+              "text": "                    if error.kind() == ErrorKind::NotFound"
+            },
+            {
+              "side": "base",
+              "line": 163,
+              "text": "                        identity.input().with_extension(\"c\"),"
+            },
+            {
+              "side": "working",
+              "line": 161,
+              "text": "                        ErrorKind::NotFound | ErrorKind::PermissionDenied"
+            },
+            {
+              "side": "working",
+              "line": 165,
+              "text": "                        identity.input().with_extension(\"c\"),"
+            }
+          ]
+        },
+        {
+          "step": "read-policy",
+          "path": "src/compiler/mod.rs",
+          "selection": {
+            "side": "working",
+            "entity": "ed71f6144f6a2488da024a206d41c22f24d111b505118bc09faaeef37deae133",
+            "hunk": null
+          },
+          "token": "e5114430d3ea969fc316895c25d2394a5fdc53ef16ba42786de289885a93da3c:1",
+          "source_evidence": [
+            {
+              "side": "base",
+              "line": 159,
+              "text": "                    if error.kind() == ErrorKind::NotFound"
+            },
+            {
+              "side": "base",
+              "line": 163,
+              "text": "                        identity.input().with_extension(\"c\"),"
+            },
+            {
+              "side": "working",
+              "line": 161,
+              "text": "                        ErrorKind::NotFound | ErrorKind::PermissionDenied"
+            },
+            {
+              "side": "working",
+              "line": 165,
+              "text": "                        identity.input().with_extension(\"c\"),"
+            }
+          ]
+        },
+        {
+          "step": "reader-contract",
+          "path": "src/compiler/source_reader.rs",
+          "selection": {
+            "side": "working",
+            "entity": null,
+            "hunk": null
+          },
+          "token": "e5114430d3ea969fc316895c25d2394a5fdc53ef16ba42786de289885a93da3c:1",
+          "source_evidence": [
+            {
+              "side": "base",
+              "line": 17,
+              "text": "pub trait SourceReader: Debug + Send + Sync {"
+            },
+            {
+              "side": "base",
+              "line": 19,
+              "text": "    async fn read(&self, path: &Path) -> io::Result<Vec<u8>>;"
+            },
+            {
+              "side": "base",
+              "line": 31,
+              "text": "    async fn read(&self, path: &Path) -> io::Result<Vec<u8>> {"
+            },
+            {
+              "side": "working",
+              "line": 17,
+              "text": "pub trait SourceReader: Debug + Send + Sync {"
+            },
+            {
+              "side": "working",
+              "line": 19,
+              "text": "    async fn read(&self, path: &Path) -> io::Result<Vec<u8>>;"
+            },
+            {
+              "side": "working",
+              "line": 31,
+              "text": "    async fn read(&self, path: &Path) -> io::Result<Vec<u8>> {"
+            }
+          ]
+        },
+        {
+          "step": "exact-review-return",
+          "path": "src/compiler/mod.rs",
+          "selection": {
+            "side": "working",
+            "entity": "ed71f6144f6a2488da024a206d41c22f24d111b505118bc09faaeef37deae133",
+            "hunk": null
+          },
+          "token": "e5114430d3ea969fc316895c25d2394a5fdc53ef16ba42786de289885a93da3c:1",
+          "source_evidence": [
+            {
+              "side": "base",
+              "line": 159,
+              "text": "                    if error.kind() == ErrorKind::NotFound"
+            },
+            {
+              "side": "base",
+              "line": 163,
+              "text": "                        identity.input().with_extension(\"c\"),"
+            },
+            {
+              "side": "working",
+              "line": 161,
+              "text": "                        ErrorKind::NotFound | ErrorKind::PermissionDenied"
+            },
+            {
+              "side": "working",
+              "line": 165,
+              "text": "                        identity.input().with_extension(\"c\"),"
+            }
+          ]
+        },
+        {
+          "step": "source-identity",
+          "path": "src/compiler/source.rs",
+          "selection": {
+            "side": "working",
+            "entity": null,
+            "hunk": null
+          },
+          "token": "e5114430d3ea969fc316895c25d2394a5fdc53ef16ba42786de289885a93da3c:1",
+          "source_evidence": [
+            {
+              "side": "base",
+              "line": 12,
+              "text": "pub struct CompilerSource {"
+            },
+            {
+              "side": "base",
+              "line": 47,
+              "text": "    pub fn name(&self) -> &SourceName {"
+            },
+            {
+              "side": "working",
+              "line": 12,
+              "text": "pub struct CompilerSource {"
+            },
+            {
+              "side": "working",
+              "line": 47,
+              "text": "    pub fn name(&self) -> &SourceName {"
+            }
+          ]
+        },
+        {
+          "step": "regression-test",
+          "path": "src/compiler/mod.rs",
+          "selection": {
+            "side": "working",
+            "entity": "eb0a001ad0f8f76c3b548feb3a15832716761420c295317daf69e64839e9d13e",
+            "hunk": null
+          },
+          "token": "e5114430d3ea969fc316895c25d2394a5fdc53ef16ba42786de289885a93da3c:1",
+          "source_evidence": [
+            {
+              "side": "base",
+              "line": 159,
+              "text": "                    if error.kind() == ErrorKind::NotFound"
+            },
+            {
+              "side": "base",
+              "line": 163,
+              "text": "                        identity.input().with_extension(\"c\"),"
+            },
+            {
+              "side": "working",
+              "line": 2031,
+              "text": "            async fn read(&self, path: &Path) -> io::Result<Vec<u8>> {"
+            },
+            {
+              "side": "working",
+              "line": 2049,
+              "text": "                ErrorKind::NotFound,"
+            },
+            {
+              "side": "working",
+              "line": 2054,
+              "text": "                ErrorKind::NotFound,"
+            },
+            {
+              "side": "working",
+              "line": 2059,
+              "text": "                ErrorKind::PermissionDenied,"
+            }
+          ]
+        }
+      ],
+      "requests": 69
+    },
+    {
+      "variant": "variant-b",
+      "verified": true,
+      "fixture_reverified": true,
+      "raw_report_sha256": "eb3aa091384e402fa005f2f527cb1427df971797de3285fbd6e75cab457e5285",
+      "baseline": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+      "binary_sha256": "15d9294be35cccdf8845bdbc78ed0315a763dc7bbedc45532562a9a1757ae8af",
+      "regression_detected": false,
+      "verified_source_rows": 1044,
+      "hunk_headers": [
+        "@@ -117,7 +117,7 @@",
+        "@@ -166,7 +166,7 @@"
+      ],
+      "assets": [
+        {
+          "uri": "/review",
+          "sha256": "e8e16dc2333c00fc043467a220bad2347e8d531de9017efffd2b18955835d29e"
+        },
+        {
+          "uri": "/review-app.js",
+          "sha256": "bdc42b1becd3b932ed4ac7fc3c570d23a618c54e030c6dd7cbc79f54474a2443"
+        },
+        {
+          "uri": "/review-controller.js",
+          "sha256": "79e87cbf950ee6dc57023c2150e462d3f748667436681ebfa052249ee417ea8f"
+        },
+        {
+          "uri": "/review-windows.js",
+          "sha256": "7c1730aeabdd076f4cce970266492b36a52057babb937d6db5eeb8a166110a56"
+        },
+        {
+          "uri": "/review.css",
+          "sha256": "c68aa60a52b65e4f5246a7969eb6ea504575e0444937acf1916488e8a26c32d6"
+        },
+        {
+          "uri": "/windows.js",
+          "sha256": "4da1aaab22fe5e32a3ad879e8b2962abb4aa8ccc4abb1b40dbf16905dd17688d"
+        },
+        {
+          "uri": "/inspector.js",
+          "sha256": "89aad9fb75a46835e377a40cf9444ed63fb413d86a5439f4195c91f494e60abc"
+        }
+      ],
+      "steps": [
+        {
+          "step": "changed-compiler",
+          "path": "src/compiler/mod.rs",
+          "selection": {
+            "side": "working",
+            "entity": null,
+            "hunk": "05d1e66a27c8c85506c95304a3460c4cac79591f4a6cf5bed4ea2c556c8b366e"
+          },
+          "token": "2bb756713bf1fa287e92fdf544673d84983fa30c90a312f8378275e2e88101ae:1",
+          "source_evidence": [
+            {
+              "side": "base",
+              "line": 159,
+              "text": "                    if error.kind() == ErrorKind::NotFound"
+            },
+            {
+              "side": "base",
+              "line": 163,
+              "text": "                        identity.input().with_extension(\"c\"),"
+            },
+            {
+              "side": "working",
+              "line": 159,
+              "text": "                    if error.kind() == ErrorKind::NotFound"
+            },
+            {
+              "side": "working",
+              "line": 163,
+              "text": "                        identity.input().with_extension(\"c\"),"
+            }
+          ]
+        },
+        {
+          "step": "read-policy",
+          "path": "src/compiler/mod.rs",
+          "selection": {
+            "side": "working",
+            "entity": "bebcf55acd4cda57b40db88fd9e40b479a161e48b5fc8fa7bee1642f0255b883",
+            "hunk": null
+          },
+          "token": "2bb756713bf1fa287e92fdf544673d84983fa30c90a312f8378275e2e88101ae:1",
+          "source_evidence": [
+            {
+              "side": "base",
+              "line": 159,
+              "text": "                    if error.kind() == ErrorKind::NotFound"
+            },
+            {
+              "side": "base",
+              "line": 163,
+              "text": "                        identity.input().with_extension(\"c\"),"
+            },
+            {
+              "side": "working",
+              "line": 159,
+              "text": "                    if error.kind() == ErrorKind::NotFound"
+            },
+            {
+              "side": "working",
+              "line": 163,
+              "text": "                        identity.input().with_extension(\"c\"),"
+            }
+          ]
+        },
+        {
+          "step": "reader-contract",
+          "path": "src/compiler/source_reader.rs",
+          "selection": {
+            "side": "working",
+            "entity": null,
+            "hunk": null
+          },
+          "token": "2bb756713bf1fa287e92fdf544673d84983fa30c90a312f8378275e2e88101ae:1",
+          "source_evidence": [
+            {
+              "side": "base",
+              "line": 17,
+              "text": "pub trait SourceReader: Debug + Send + Sync {"
+            },
+            {
+              "side": "base",
+              "line": 19,
+              "text": "    async fn read(&self, path: &Path) -> io::Result<Vec<u8>>;"
+            },
+            {
+              "side": "base",
+              "line": 31,
+              "text": "    async fn read(&self, path: &Path) -> io::Result<Vec<u8>> {"
+            },
+            {
+              "side": "working",
+              "line": 17,
+              "text": "pub trait SourceReader: Debug + Send + Sync {"
+            },
+            {
+              "side": "working",
+              "line": 19,
+              "text": "    async fn read(&self, path: &Path) -> io::Result<Vec<u8>>;"
+            },
+            {
+              "side": "working",
+              "line": 31,
+              "text": "    async fn read(&self, path: &Path) -> io::Result<Vec<u8>> {"
+            }
+          ]
+        },
+        {
+          "step": "exact-review-return",
+          "path": "src/compiler/mod.rs",
+          "selection": {
+            "side": "working",
+            "entity": "bebcf55acd4cda57b40db88fd9e40b479a161e48b5fc8fa7bee1642f0255b883",
+            "hunk": null
+          },
+          "token": "2bb756713bf1fa287e92fdf544673d84983fa30c90a312f8378275e2e88101ae:1",
+          "source_evidence": [
+            {
+              "side": "base",
+              "line": 159,
+              "text": "                    if error.kind() == ErrorKind::NotFound"
+            },
+            {
+              "side": "base",
+              "line": 163,
+              "text": "                        identity.input().with_extension(\"c\"),"
+            },
+            {
+              "side": "working",
+              "line": 159,
+              "text": "                    if error.kind() == ErrorKind::NotFound"
+            },
+            {
+              "side": "working",
+              "line": 163,
+              "text": "                        identity.input().with_extension(\"c\"),"
+            }
+          ]
+        },
+        {
+          "step": "source-identity",
+          "path": "src/compiler/source.rs",
+          "selection": {
+            "side": "working",
+            "entity": null,
+            "hunk": null
+          },
+          "token": "2bb756713bf1fa287e92fdf544673d84983fa30c90a312f8378275e2e88101ae:1",
+          "source_evidence": [
+            {
+              "side": "base",
+              "line": 12,
+              "text": "pub struct CompilerSource {"
+            },
+            {
+              "side": "base",
+              "line": 47,
+              "text": "    pub fn name(&self) -> &SourceName {"
+            },
+            {
+              "side": "working",
+              "line": 12,
+              "text": "pub struct CompilerSource {"
+            },
+            {
+              "side": "working",
+              "line": 47,
+              "text": "    pub fn name(&self) -> &SourceName {"
+            }
+          ]
+        },
+        {
+          "step": "regression-test",
+          "path": "src/compiler/mod.rs",
+          "selection": {
+            "side": "working",
+            "entity": "6590fb83201864a533385e107db028f9cdd1199dddda13b0e980ad5ed9210a6a",
+            "hunk": null
+          },
+          "token": "2bb756713bf1fa287e92fdf544673d84983fa30c90a312f8378275e2e88101ae:1",
+          "source_evidence": [
+            {
+              "side": "base",
+              "line": 159,
+              "text": "                    if error.kind() == ErrorKind::NotFound"
+            },
+            {
+              "side": "base",
+              "line": 163,
+              "text": "                        identity.input().with_extension(\"c\"),"
+            },
+            {
+              "side": "working",
+              "line": 2029,
+              "text": "            async fn read(&self, path: &Path) -> io::Result<Vec<u8>> {"
+            },
+            {
+              "side": "working",
+              "line": 2047,
+              "text": "                ErrorKind::NotFound,"
+            },
+            {
+              "side": "working",
+              "line": 2052,
+              "text": "                ErrorKind::NotFound,"
+            },
+            {
+              "side": "working",
+              "line": 2057,
+              "text": "                ErrorKind::PermissionDenied,"
+            }
+          ]
+        }
+      ],
+      "requests": 72
+    }
+  ],
+  "operator": "Reference-aware agent: expected paths, declaration names and seeded defect were known beforehand.",
+  "scope": "Normal release executable plus browser controller through finite stdio HTTP handlers. Status probes drive notification state; no DOM, SSE wire/browser history, layout, keyboard or usability validation.",
+  "browser_validation": "Blocked: host loopback listener and Chromium startup return EPERM. Sandbox escalation was rejected by environment policy."
+}

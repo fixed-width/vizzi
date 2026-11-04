@@ -2,9 +2,9 @@ const integer = value => Number.isSafeInteger(value) && value >= 0;
 const opaque = value => typeof value === "string" && value.length > 0 && value.length <= 256;
 const bytes = value => typeof value === "string" ? new TextEncoder().encode(value).length : Infinity;
 
-function validate(view, window) {
-  const source = view.source, meta = source.summary;
-  if (window?.schema !== 1 || window.snapshot !== view.snapshot || window.file !== source.id || window.version !== source.version || window.line_total !== meta.lines || window.outline_total !== meta.declarations) throw new Error("Mismatched captured window");
+export function validateDocumentWindow(source, window) {
+  const meta = source.summary;
+  if (window?.schema !== 1 || window.file !== source.id || window.version !== source.version || window.line_total !== meta.lines || window.outline_total !== meta.declarations) throw new Error("Mismatched captured window");
   if (!integer(window.line_start) || window.line_start < 1 || window.line_start > Math.max(1, meta.lines) || !integer(window.outline_start) || window.outline_start > Math.max(0, meta.declarations - 1) || !Array.isArray(window.lines) || window.lines.length > 96 || !Array.isArray(window.outline) || window.outline.length > 200) throw new Error("Invalid window bounds");
   let size = 0;
   for (const [index, line] of window.lines.entries()) {
@@ -31,7 +31,9 @@ export function createWindowReader({ transport, onWindow = () => {}, onError = (
     if (!opaque(id) || !opaque(version) || !summary) throw new Error("Invalid captured document summary");
     if (!integer(summary.lines) || !integer(summary.declarations)) throw new Error("Invalid captured document summary");
     const params = new URLSearchParams(Object.entries({ ...query, snapshot:view.snapshot, file:source.id, version:source.version }).filter(([,value]) => value != null));
-    return validate(view, await transport(`/api/window?${params}`,options));
+    const window=await transport(`/api/window?${params}`,options);
+    if(window?.snapshot!==view.snapshot)throw new Error("Mismatched captured window");
+    return validateDocumentWindow(source, window);
   }
   return {
     prepare,

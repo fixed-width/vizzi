@@ -1,6 +1,8 @@
 # Contextual local-change review: behaviour contract
 
-Status: specified for implementation; the review interface is not delivered yet.
+Status: the initial browser implementation is available at `/review`. Controller/native
+validation is recorded; Chromium acceptance and the rendered review walkthrough remain
+open in the [validation record](../../experiments/review-workflow/INTERFACE_RESULTS.md).
 This reference defines milestone 2 in the [product plan](../plans/product-milestones.md).
 The [technical contract](COMPARISON_TECH.md) defines identities, ownership and limits.
 

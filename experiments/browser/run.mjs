@@ -1,7 +1,10 @@
 import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 
-if (process.argv.includes("--navigation")) {
+if (process.argv.includes("--review")) {
+  const result = spawnSync(process.execPath, ["experiments/browser/review.test.mjs",...process.argv.slice(2).filter(arg=>arg!=="--review")], { stdio: "inherit" });
+  process.exit(result.status ?? 1);
+} else if (process.argv.includes("--navigation")) {
   const result = spawnSync(process.execPath, ["experiments/browser/navigation.test.mjs"], { stdio: "inherit" });
   process.exit(result.status ?? 1);
 } else if (process.argv.includes("--navigation-inspector")) {
@@ -58,7 +61,7 @@ if (process.argv.includes("--navigation")) {
 } else if (process.argv.includes("--measure")) {
   await import("./measure.mjs");
 } else {
-  for (const file of ["crates/vizzi/web/controller.test.js", "crates/vizzi/web/navigation.test.js", "crates/vizzi/web/updates.test.js", "crates/vizzi/web/source-description.test.js", "experiments/browser/statistics.test.mjs", "crates/vizzi/web/windows.test.js", "experiments/browser/outline.test.mjs", "experiments/browser/inspection.test.mjs", "experiments/browser/navigation-inspector.test.mjs", "experiments/browser/browser.test.mjs", "experiments/browser/navigation.test.mjs"]) {
+  for (const file of ["crates/vizzi/web/controller.test.js", "crates/vizzi/web/navigation.test.js", "crates/vizzi/web/updates.test.js", "crates/vizzi/web/source-description.test.js", "crates/vizzi/web/review-controller.test.js", "crates/vizzi/web/review-windows.test.js", "experiments/browser/statistics.test.mjs", "crates/vizzi/web/windows.test.js", "experiments/browser/outline.test.mjs", "experiments/browser/inspection.test.mjs", "experiments/browser/navigation-inspector.test.mjs", "experiments/browser/browser.test.mjs", "experiments/browser/navigation.test.mjs", "experiments/browser/review.test.mjs"]) {
     const result = spawnSync(process.execPath, [file], { stdio: "inherit" });
     if (result.status !== 0) process.exit(result.status ?? 1);
   }

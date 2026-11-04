@@ -2,6 +2,12 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { followChanges } from "./updates.js";
 
+test("review uses an independent endpoint and event without consuming live workspace events",()=>{
+  const handlers=new Map(),received=[];let address;
+  const adapter=followChanges({url:"/api/comparisons/events",eventName:"comparison",session:()=>({receive:value=>{received.push(value);return true;},close(){}}),createSource:url=>{address=url;return {addEventListener:(name,handler)=>handlers.set(name,handler),close(){}};}});
+  assert.equal(address,"/api/comparisons/events");assert.ok(!handlers.has("workspace"));handlers.get("comparison")({data:'{"schema":1}'});assert.deepEqual(received,[{schema:1}]);adapter.stop();
+});
+
 function fixture() {
   const sources = [], sessions = [], timers = [];
   const adapter = followChanges({

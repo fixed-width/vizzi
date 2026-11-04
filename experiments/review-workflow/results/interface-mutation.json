@@ -1,0 +1,505 @@
+{
+  "schema": 1,
+  "source_sha256": {
+    "crates/vizzi/src/server.rs": "a679d55adb54be647bd8c5e3b63ef829bbc597c2b620d76ca49cc0555bbbb1b6",
+    "crates/vizzi/web/index.html": "e5c9dc97029850e872891d8939e686f7cd0c978f4b2c2dda2ceb94fc088ad9a4",
+    "crates/vizzi/web/inspector.js": "89aad9fb75a46835e377a40cf9444ed63fb413d86a5439f4195c91f494e60abc",
+    "crates/vizzi/web/review-app.js": "bdc42b1becd3b932ed4ac7fc3c570d23a618c54e030c6dd7cbc79f54474a2443",
+    "crates/vizzi/web/review-controller.js": "79e87cbf950ee6dc57023c2150e462d3f748667436681ebfa052249ee417ea8f",
+    "crates/vizzi/web/review-controller.test.js": "2984bd06e203cb1942f4a779db4d983deb392be7dccc61ae225c305767d90ea8",
+    "crates/vizzi/web/review-windows.js": "7c1730aeabdd076f4cce970266492b36a52057babb937d6db5eeb8a166110a56",
+    "crates/vizzi/web/review-windows.test.js": "86093e69dcfd75d1f58c3fa69ea40eced535eb421a1277c9a504508475132e3e",
+    "crates/vizzi/web/review.css": "c68aa60a52b65e4f5246a7969eb6ea504575e0444937acf1916488e8a26c32d6",
+    "crates/vizzi/web/review.html": "e8e16dc2333c00fc043467a220bad2347e8d531de9017efffd2b18955835d29e",
+    "crates/vizzi/web/updates.js": "9893fc4e490f7a6fa0239548f89076e4c5b7f72479526e8bf729b7a54ff33ee6",
+    "crates/vizzi/web/updates.test.js": "91e3f459494502eff230a3450262826de3b5dcb882f32cb29dde8b29cf6539cb",
+    "crates/vizzi/web/windows.js": "4da1aaab22fe5e32a3ad879e8b2962abb4aa8ccc4abb1b40dbf16905dd17688d",
+    "experiments/browser/offline-mutations.mjs": "ab8827476da3cd103021babd3a2bcef84621ff7365c637fc28994233704e9051",
+    "experiments/browser/review.test.mjs": "092228f72b66a1723221604948cf4c2e125f1c2c87f9d7076b45a4c1a526e5a4",
+    "experiments/browser/run.mjs": "9d1dcb8dfc9d624e7a877cdf02cad0b4e328b86a7e444c8415c716a7afd2b0b3",
+    "experiments/review-workflow/verify_interface.mjs": "6665a46e86476d9a4eba1cb7f4b913ede573a06b6ad9f7f5e6b94abc790b5b67",
+    "Cargo.lock": "39a4317d3c52be9199837d27320749e93c2591f3c021a8afac28b1a79a23e8d6",
+    "package-lock.json": "e7ff76f17d7408c0b6dfd075c564ba31fec03cc838be612a008cf5bd343e291f",
+    "experiments/browser/review-stryker.config.json": "39cd7ab511b47fcc685d0b68ed3d8a59456cc822767f2b7f6fe4df8a8c7bf04e"
+  },
+  "base_commit": "728bb53943925215703e9fdeae1f56aa2f160a9e",
+  "resource_policy": {
+    "processes": 1,
+    "serial_tests": true,
+    "nice": 10
+  },
+  "runner": "Installed Stryker 10.1.1 instrumenter with serial regular-file subprocess logs; regular Stryker CLI was blocked by its logging socket.",
+  "cohorts": [
+    {
+      "name": "initial-offline-mutation",
+      "generated": 761,
+      "tested": 761,
+      "raw_counts": {
+        "Killed": 426,
+        "Survived": 335
+      },
+      "started": "2026-11-04T06:32:04.373Z",
+      "finished": "2026-11-04T06:33:42.880Z",
+      "raw_report_sha256": "b74b1f1d133787e21d4505a00c4c563225269d47fda713e4bab3a73c1f39b42a",
+      "source_test_sha256": {
+        "crates/vizzi/web/review-controller.js": "384a418dc247d08beed84657fafe7b0a48480675d887240d4b2b8a5a88c6c2e4",
+        "crates/vizzi/web/review-windows.js": "7c1730aeabdd076f4cce970266492b36a52057babb937d6db5eeb8a166110a56",
+        "crates/vizzi/web/review-controller.test.js": "caa1fe9b1f2cbeb7affa5a0bd6c6640de7fe4c68ea446d6c4cf7624fd144b0b2",
+        "crates/vizzi/web/review-windows.test.js": "df4eb07fd9d030a91160841e555df8e98bad5933712f3b3849e02e699424d14c",
+        "crates/vizzi/web/windows.test.js": "442c6df4dba3d9f47fb0370ec49add9501d38b08d463d507f8bbecb4b111bc79",
+        "crates/vizzi/web/updates.test.js": "91e3f459494502eff230a3450262826de3b5dcb882f32cb29dde8b29cf6539cb"
+      },
+      "baselines": "unmodified and instrumented passed; activation control passed"
+    },
+    {
+      "name": "second-offline-mutation",
+      "generated": 715,
+      "tested": 715,
+      "raw_counts": {
+        "Killed": 553,
+        "Survived": 161,
+        "Unviable": 1
+      },
+      "started": "2026-11-04T06:37:30.504Z",
+      "finished": "2026-11-04T06:38:55.067Z",
+      "raw_report_sha256": "5abdf607cff009db16ac5ddd83d03b2e891de021246eb502bad57c4819236e3f",
+      "source_test_sha256": {
+        "crates/vizzi/web/review-controller.js": "62d7d9d9ebebd1216ddb21db4ea6121286b458914f0f261035570c189ef152d3",
+        "crates/vizzi/web/review-windows.js": "7c1730aeabdd076f4cce970266492b36a52057babb937d6db5eeb8a166110a56",
+        "crates/vizzi/web/review-controller.test.js": "da16c1c57a984feaa685776ba0a20314256d52370df4f8d385bcaa406a5faed4",
+        "crates/vizzi/web/review-windows.test.js": "df4eb07fd9d030a91160841e555df8e98bad5933712f3b3849e02e699424d14c",
+        "crates/vizzi/web/windows.test.js": "442c6df4dba3d9f47fb0370ec49add9501d38b08d463d507f8bbecb4b111bc79",
+        "crates/vizzi/web/updates.test.js": "91e3f459494502eff230a3450262826de3b5dcb882f32cb29dde8b29cf6539cb"
+      },
+      "baselines": "unmodified and instrumented passed; activation control passed"
+    },
+    {
+      "name": "final-offline-mutation",
+      "generated": 718,
+      "tested": 718,
+      "raw_counts": {
+        "Killed": 621,
+        "Survived": 96,
+        "Unviable": 1
+      },
+      "started": "2026-11-04T06:41:39.853Z",
+      "finished": "2026-11-04T06:42:54.610Z",
+      "raw_report_sha256": "7f2cb171b17933a52f3c6140c3509fb5fe72ff0073d68752b30e0316b67b742e",
+      "source_test_sha256": {
+        "crates/vizzi/web/review-controller.js": "6910264fa9e3f63096ccfff9ac029a77f50aecb6d9aebb4f91eb39a93e7ca090",
+        "crates/vizzi/web/review-windows.js": "7c1730aeabdd076f4cce970266492b36a52057babb937d6db5eeb8a166110a56",
+        "crates/vizzi/web/review-controller.test.js": "f519321530717859c334633c6523bbbc10b8d5711f06e086fd3266465af19ab4",
+        "crates/vizzi/web/review-windows.test.js": "7912d75d8059943c7f47e20361b6a5a35209e45d81438873307f456e4e7c6b9e",
+        "crates/vizzi/web/windows.test.js": "442c6df4dba3d9f47fb0370ec49add9501d38b08d463d507f8bbecb4b111bc79",
+        "crates/vizzi/web/updates.test.js": "91e3f459494502eff230a3450262826de3b5dcb882f32cb29dde8b29cf6539cb"
+      },
+      "baselines": "unmodified and instrumented passed; activation control passed"
+    },
+    {
+      "name": "follow-up-offline-mutation",
+      "generated": 718,
+      "tested": 96,
+      "raw_counts": {
+        "Killed": 28,
+        "Survived": 68
+      },
+      "started": "2026-11-04T06:45:40.645Z",
+      "finished": "2026-11-04T06:45:58.999Z",
+      "raw_report_sha256": "b99314651714de20bf9316c26e3c9726d3dea117f79ad3c095b100c28b8d64f1",
+      "source_test_sha256": {
+        "crates/vizzi/web/review-controller.js": "6910264fa9e3f63096ccfff9ac029a77f50aecb6d9aebb4f91eb39a93e7ca090",
+        "crates/vizzi/web/review-windows.js": "7c1730aeabdd076f4cce970266492b36a52057babb937d6db5eeb8a166110a56",
+        "crates/vizzi/web/review-controller.test.js": "a9a5382e78fbfea3fc6b314381ba1d3dca871779b032c5ff523fc780bcd7cd8b",
+        "crates/vizzi/web/review-windows.test.js": "7912d75d8059943c7f47e20361b6a5a35209e45d81438873307f456e4e7c6b9e",
+        "crates/vizzi/web/windows.test.js": "442c6df4dba3d9f47fb0370ec49add9501d38b08d463d507f8bbecb4b111bc79",
+        "crates/vizzi/web/updates.test.js": "91e3f459494502eff230a3450262826de3b5dcb882f32cb29dde8b29cf6539cb"
+      },
+      "baselines": "unmodified and instrumented passed; activation control passed"
+    },
+    {
+      "name": "closure-offline-mutation",
+      "generated": 718,
+      "tested": 68,
+      "raw_counts": {
+        "Survived": 48,
+        "Killed": 20
+      },
+      "started": "2026-11-04T06:48:46.348Z",
+      "finished": "2026-11-04T06:48:59.136Z",
+      "raw_report_sha256": "054ad6b7d2822c90fe7c7b71e9b451e0955d778e9745aefd78078ceab61a192e",
+      "source_test_sha256": {
+        "crates/vizzi/web/review-controller.js": "6910264fa9e3f63096ccfff9ac029a77f50aecb6d9aebb4f91eb39a93e7ca090",
+        "crates/vizzi/web/review-windows.js": "7c1730aeabdd076f4cce970266492b36a52057babb937d6db5eeb8a166110a56",
+        "crates/vizzi/web/review-controller.test.js": "b4f076e6a546b6f24bbde010acd0b739d8a8ba7f2526fd2f7322c9208819bdbe",
+        "crates/vizzi/web/review-windows.test.js": "7912d75d8059943c7f47e20361b6a5a35209e45d81438873307f456e4e7c6b9e",
+        "crates/vizzi/web/windows.test.js": "442c6df4dba3d9f47fb0370ec49add9501d38b08d463d507f8bbecb4b111bc79",
+        "crates/vizzi/web/updates.test.js": "91e3f459494502eff230a3450262826de3b5dcb882f32cb29dde8b29cf6539cb"
+      },
+      "baselines": "unmodified and instrumented passed; activation control passed"
+    },
+    {
+      "name": "last-offline-mutation",
+      "generated": 718,
+      "tested": 48,
+      "raw_counts": {
+        "Survived": 36,
+        "Killed": 12
+      },
+      "started": "2026-11-04T06:52:49.068Z",
+      "finished": "2026-11-04T06:52:58.750Z",
+      "raw_report_sha256": "eadf91a7b8cd085cae4f791b65c40daca2fd2fde5477e8f29e3357498a944de7",
+      "source_test_sha256": {
+        "crates/vizzi/web/review-controller.js": "6910264fa9e3f63096ccfff9ac029a77f50aecb6d9aebb4f91eb39a93e7ca090",
+        "crates/vizzi/web/review-windows.js": "7c1730aeabdd076f4cce970266492b36a52057babb937d6db5eeb8a166110a56",
+        "crates/vizzi/web/review-controller.test.js": "cef4e0ea9fb793012de384399bb9c2efd646d9e45a52d21d2747652485664340",
+        "crates/vizzi/web/review-windows.test.js": "7912d75d8059943c7f47e20361b6a5a35209e45d81438873307f456e4e7c6b9e",
+        "crates/vizzi/web/windows.test.js": "442c6df4dba3d9f47fb0370ec49add9501d38b08d463d507f8bbecb4b111bc79",
+        "crates/vizzi/web/updates.test.js": "91e3f459494502eff230a3450262826de3b5dcb882f32cb29dde8b29cf6539cb"
+      },
+      "baselines": "unmodified and instrumented passed; activation control passed"
+    },
+    {
+      "name": "integration-offline-mutation",
+      "generated": 719,
+      "tested": 719,
+      "raw_counts": {
+        "Killed": 690,
+        "Survived": 28,
+        "Unviable": 1
+      },
+      "started": "2026-11-04T06:55:10.731Z",
+      "finished": "2026-11-04T06:56:24.496Z",
+      "raw_report_sha256": "433b17775feff3da941bc507d9af8be316662eda3b67d3ad634eda6777d46ab0",
+      "source_test_sha256": {
+        "crates/vizzi/web/review-controller.js": "79e87cbf950ee6dc57023c2150e462d3f748667436681ebfa052249ee417ea8f",
+        "crates/vizzi/web/review-windows.js": "7c1730aeabdd076f4cce970266492b36a52057babb937d6db5eeb8a166110a56",
+        "crates/vizzi/web/review-controller.test.js": "4c39dc390c110c7c633448d483a3379d1a1c82c0a1c2ef96f98b40f0d442dbe3",
+        "crates/vizzi/web/review-windows.test.js": "86093e69dcfd75d1f58c3fa69ea40eced535eb421a1277c9a504508475132e3e",
+        "crates/vizzi/web/windows.test.js": "442c6df4dba3d9f47fb0370ec49add9501d38b08d463d507f8bbecb4b111bc79",
+        "crates/vizzi/web/updates.test.js": "91e3f459494502eff230a3450262826de3b5dcb882f32cb29dde8b29cf6539cb"
+      },
+      "baselines": "unmodified and instrumented passed; activation control passed"
+    },
+    {
+      "name": "audit-offline-mutation",
+      "generated": 719,
+      "tested": 28,
+      "raw_counts": {
+        "Survived": 10,
+        "Killed": 18
+      },
+      "started": "2026-11-04T07:00:47.018Z",
+      "finished": "2026-11-04T07:00:52.095Z",
+      "raw_report_sha256": "0e5ca206706244108c816ece8622b43f2e2e19909d50121779b1cf623cee085b",
+      "source_test_sha256": {
+        "crates/vizzi/web/review-controller.js": "79e87cbf950ee6dc57023c2150e462d3f748667436681ebfa052249ee417ea8f",
+        "crates/vizzi/web/review-windows.js": "7c1730aeabdd076f4cce970266492b36a52057babb937d6db5eeb8a166110a56",
+        "crates/vizzi/web/review-controller.test.js": "2984bd06e203cb1942f4a779db4d983deb392be7dccc61ae225c305767d90ea8",
+        "crates/vizzi/web/review-windows.test.js": "86093e69dcfd75d1f58c3fa69ea40eced535eb421a1277c9a504508475132e3e",
+        "crates/vizzi/web/windows.test.js": "442c6df4dba3d9f47fb0370ec49add9501d38b08d463d507f8bbecb4b111bc79",
+        "crates/vizzi/web/updates.test.js": "91e3f459494502eff230a3450262826de3b5dcb882f32cb29dde8b29cf6539cb"
+      },
+      "baselines": "unmodified and instrumented passed; activation control passed"
+    },
+    {
+      "name": "regex-follow-up",
+      "generated": 719,
+      "tested": 1,
+      "raw_counts": {
+        "Killed": 1
+      },
+      "started": "2026-11-04T07:02:20.337Z",
+      "finished": "2026-11-04T07:02:21.153Z",
+      "raw_report_sha256": "336519a489b4b6fe6989f2443c100d369751aa8d9a96784dd2614f32d725d951",
+      "source_test_sha256": {
+        "crates/vizzi/web/review-controller.js": "79e87cbf950ee6dc57023c2150e462d3f748667436681ebfa052249ee417ea8f",
+        "crates/vizzi/web/review-windows.js": "7c1730aeabdd076f4cce970266492b36a52057babb937d6db5eeb8a166110a56",
+        "crates/vizzi/web/review-controller.test.js": "2984bd06e203cb1942f4a779db4d983deb392be7dccc61ae225c305767d90ea8",
+        "crates/vizzi/web/review-windows.test.js": "86093e69dcfd75d1f58c3fa69ea40eced535eb421a1277c9a504508475132e3e",
+        "crates/vizzi/web/windows.test.js": "442c6df4dba3d9f47fb0370ec49add9501d38b08d463d507f8bbecb4b111bc79",
+        "crates/vizzi/web/updates.test.js": "91e3f459494502eff230a3450262826de3b5dcb882f32cb29dde8b29cf6539cb"
+      },
+      "baselines": "unmodified and instrumented passed; activation control passed"
+    },
+    {
+      "name": "shared-offline-mutation",
+      "generated": 333,
+      "tested": 333,
+      "raw_counts": {
+        "Killed": 331,
+        "Survived": 1,
+        "Timeout": 1
+      },
+      "started": "2026-11-04T06:50:02.174Z",
+      "finished": "2026-11-04T06:50:57.020Z",
+      "raw_report_sha256": "07839a9a81404fdfaeb4fa327251d5283be7276926c672ed40039fb7e59f98fd",
+      "source_test_sha256": {
+        "crates/vizzi/web/windows.js": "4da1aaab22fe5e32a3ad879e8b2962abb4aa8ccc4abb1b40dbf16905dd17688d",
+        "crates/vizzi/web/updates.js": "9893fc4e490f7a6fa0239548f89076e4c5b7f72479526e8bf729b7a54ff33ee6",
+        "crates/vizzi/web/review-controller.test.js": "b4f076e6a546b6f24bbde010acd0b739d8a8ba7f2526fd2f7322c9208819bdbe",
+        "crates/vizzi/web/review-windows.test.js": "7912d75d8059943c7f47e20361b6a5a35209e45d81438873307f456e4e7c6b9e",
+        "crates/vizzi/web/windows.test.js": "442c6df4dba3d9f47fb0370ec49add9501d38b08d463d507f8bbecb4b111bc79",
+        "crates/vizzi/web/updates.test.js": "91e3f459494502eff230a3450262826de3b5dcb882f32cb29dde8b29cf6539cb"
+      },
+      "baselines": "unmodified and instrumented passed; activation control passed"
+    },
+    {
+      "name": "shared-follow-up",
+      "generated": 333,
+      "tested": 1,
+      "raw_counts": {
+        "Killed": 1
+      },
+      "started": "2026-11-04T06:57:43.775Z",
+      "finished": "2026-11-04T06:57:44.481Z",
+      "raw_report_sha256": "ffd65fee48f2f23d7ab0907db20c25713e1b5c0f4b030c54621b9ed51fff41c9",
+      "source_test_sha256": {
+        "crates/vizzi/web/windows.js": "4da1aaab22fe5e32a3ad879e8b2962abb4aa8ccc4abb1b40dbf16905dd17688d",
+        "crates/vizzi/web/updates.js": "9893fc4e490f7a6fa0239548f89076e4c5b7f72479526e8bf729b7a54ff33ee6",
+        "crates/vizzi/web/review-controller.test.js": "4c39dc390c110c7c633448d483a3379d1a1c82c0a1c2ef96f98b40f0d442dbe3",
+        "crates/vizzi/web/review-windows.test.js": "86093e69dcfd75d1f58c3fa69ea40eced535eb421a1277c9a504508475132e3e",
+        "crates/vizzi/web/windows.test.js": "442c6df4dba3d9f47fb0370ec49add9501d38b08d463d507f8bbecb4b111bc79",
+        "crates/vizzi/web/updates.test.js": "91e3f459494502eff230a3450262826de3b5dcb882f32cb29dde8b29cf6539cb"
+      },
+      "baselines": "unmodified and instrumented passed; activation control passed"
+    }
+  ],
+  "final_source_new_modules_with_targeted_follow_up": {
+    "tested": 719,
+    "outcomes": {
+      "Killed": 709,
+      "Survived": 10,
+      "Timeout": 0,
+      "RunnerError": 0,
+      "Unviable": 0
+    },
+    "exclusions_applied": 0,
+    "survivor_assessments": [
+      {
+        "id": "34",
+        "fileName": "crates/vizzi/web/review-controller.js",
+        "location": {
+          "start": {
+            "column": 106,
+            "line": 6
+          },
+          "end": {
+            "column": 112,
+            "line": 6
+          }
+        },
+        "mutatorName": "StringLiteral",
+        "replacement": "\"\"",
+        "assessment": "Equivalent internal sentinel: only declaration selects the other mode; both hunk and empty string take the hunk branch in supported consumers."
+      },
+      {
+        "id": "141",
+        "fileName": "crates/vizzi/web/review-controller.js",
+        "location": {
+          "start": {
+            "column": 159,
+            "line": 18
+          },
+          "end": {
+            "column": 175,
+            "line": 18
+          }
+        },
+        "mutatorName": "OptionalChaining",
+        "replacement": "s.error.message",
+        "assessment": "Equivalent short-circuit guard: the preceding code-field type test succeeds only for a non-null error value, before message is read."
+      },
+      {
+        "id": "211",
+        "fileName": "crates/vizzi/web/review-controller.js",
+        "location": {
+          "start": {
+            "column": 65,
+            "line": 34
+          },
+          "end": {
+            "column": 95,
+            "line": 34
+          }
+        },
+        "mutatorName": "CallExpression",
+        "replacement": ";",
+        "assessment": "Equivalent redundant refresh of a returned visit: exact-pair query/metadata are immutable; departure always saves the current viewport before another traversal."
+      },
+      {
+        "id": "247",
+        "fileName": "crates/vizzi/web/review-controller.js",
+        "location": {
+          "start": {
+            "column": 17,
+            "line": 38
+          },
+          "end": {
+            "column": 36,
+            "line": 38
+          }
+        },
+        "mutatorName": "OptionalChaining",
+        "replacement": "visits[cursor].key",
+        "assessment": "Equivalent under trail bounds: when a previous shown visit exists, cursor names an existing visit; discarded markers clear shown before this branch."
+      },
+      {
+        "id": "265",
+        "fileName": "crates/vizzi/web/review-controller.js",
+        "location": {
+          "start": {
+            "column": 4,
+            "line": 47
+          },
+          "end": {
+            "column": 19,
+            "line": 47
+          }
+        },
+        "mutatorName": "CallExpression",
+        "replacement": ";",
+        "assessment": "Equivalent final state: load finally emits the completed history state in the same synchronous turn. Intermediate observer-call count is not a contract."
+      },
+      {
+        "id": "275",
+        "fileName": "crates/vizzi/web/review-controller.js",
+        "location": {
+          "start": {
+            "column": 58,
+            "line": 53
+          },
+          "end": {
+            "column": 85,
+            "line": 53
+          }
+        },
+        "mutatorName": "StringLiteral",
+        "replacement": "\"\"",
+        "assessment": "Equivalent unobserved diagnostic: this error arises only for obsolete intent; the outer catch suppresses obsolete errors."
+      },
+      {
+        "id": "444",
+        "fileName": "crates/vizzi/web/review-controller.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 100
+          },
+          "end": {
+            "column": 14,
+            "line": 100
+          }
+        },
+        "mutatorName": "CallExpression",
+        "replacement": ";",
+        "assessment": "Equivalent duplicate synchronous check: each awaited read/error path already checks intent and there is no intervening await before this final check."
+      },
+      {
+        "id": "450",
+        "fileName": "crates/vizzi/web/review-controller.js",
+        "location": {
+          "start": {
+            "column": 27,
+            "line": 100
+          },
+          "end": {
+            "column": 47,
+            "line": 100
+          }
+        },
+        "mutatorName": "OptionalChaining",
+        "replacement": "latest.active.token",
+        "assessment": "Equivalent under cancellation ordering: active-null delivery invalidates intent first, so the preceding alive check fails before the optional access could differ."
+      },
+      {
+        "id": "568",
+        "fileName": "crates/vizzi/web/review-controller.js",
+        "location": {
+          "start": {
+            "column": 10,
+            "line": 137
+          },
+          "end": {
+            "column": 17,
+            "line": 137
+          }
+        },
+        "mutatorName": "CallExpression",
+        "replacement": ";",
+        "assessment": "Equivalent retired-visit viewport save: replaced tokens can never be restored; history rejects the old pair before its coordinates can be used."
+      },
+      {
+        "id": "673",
+        "fileName": "crates/vizzi/web/review-controller.js",
+        "location": {
+          "start": {
+            "column": 33,
+            "line": 156
+          },
+          "end": {
+            "column": 47,
+            "line": 156
+          }
+        },
+        "mutatorName": "OptionalChaining",
+        "replacement": "latest.active",
+        "assessment": "Equivalent initialisation guard: accepted visits require a prior active status, so latest exists whenever a valid session visit reaches this check."
+      }
+    ]
+  },
+  "shared_modules_with_targeted_follow_up": {
+    "tested": 333,
+    "outcomes": {
+      "Killed": 332,
+      "Survived": 0,
+      "Timeout": 1,
+      "RunnerError": 0,
+      "Unviable": 0
+    },
+    "timeout_cases": [
+      {
+        "fileName": "crates/vizzi/web/updates.js",
+        "id": "293",
+        "location": {
+          "start": {
+            "column": 56,
+            "line": 0
+          },
+          "end": {
+            "column": 83,
+            "line": 0
+          }
+        },
+        "mutatorName": "ArrowFunction",
+        "replacement": "() => undefined",
+        "status": "Timeout",
+        "test": "updates.test.js",
+        "detail": "Error: spawnSync /home/mpd/git-sources/vizzi/node_modules/node/bin/node ETIMEDOUT\u2714 review uses an independent endpoint and event without consuming live workspace events (1.547109ms)\n\u2714 live delivery creates no timer while healthy and replaces failed connections (0.484231ms)\n\u2716 the default browser factory opens the notification endpoint (4.991514ms)\n\u2714 invalid data and view resynchronisation use bounded retry, and stop cancels it (0.353431ms)\n\u2714 consumer rejection closes the stream and schedules resynchronisation (0.138623ms)\n\u2714 source-construction failures retry, and stopping a healthy source is terminal (0.18959ms)\n"
+      }
+    ]
+  },
+  "classification_correction": {
+    "id": "99",
+    "scope": "controller/reader final full cohort",
+    "original": "Unviable",
+    "corrected": "Killed",
+    "reason": "A regex mutant let a decimal revision reach BigInt, which raised a runtime SyntaxError and failed the assertion. The original runner mistook the log token SyntaxError for compilation failure. Classification was fixed and mutant 99 was replayed and killed. All switched source already parses in the instrumented baseline."
+  },
+  "test_first_regressions": [
+    "initial unimplemented controller",
+    "discarded-marker recovery",
+    "duplicate filter-only history visits",
+    "available side for selected removed source",
+    "external closure clears navigation busy state"
+  ],
+  "verification": {
+    "node_tests_passed": 88,
+    "workspace_tests_passed": 397,
+    "workspace_tests_failed": 0,
+    "format": "passed",
+    "clippy_all_targets_all_features_deny_warnings": "passed",
+    "controller_native_variants": 2,
+    "chromium": "blocked before UI validation"
+  },
+  "limitations": "Cohorts overlap and used evolving tests/source; do not sum them. Final-source rollups override only matching mutant IDs on identical production hashes with explicitly recorded follow-ups. Ten survivors were reviewed as equivalent under browser-controller invariants; they were not excluded or counted as detected. Timeout is separate even though its child log contains an assertion failure. DOM/CSS/inspector integration and the rendered walkthrough remain unverified. These results do not prove coverage or usability."
+}

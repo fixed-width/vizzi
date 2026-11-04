@@ -133,9 +133,9 @@ mutation scope. Its final results and investigated gaps are recorded in the
 For native delivery and its HTTP adapter:
 
 ```sh
-cargo mutants -p vizzi --no-config \
+CARGO_BUILD_JOBS=1 RUST_TEST_THREADS=1 nice -n 10 cargo mutants -p vizzi --no-config \
   --file 'crates/vizzi/src/{changes,application,server}.rs' \
-  --jobs 4 --timeout 15 --build-timeout 180 -- --lib
+  -j 1 --jobserver-tasks 1 --timeout 15 --build-timeout 180 -- --lib
 ```
 
 This scope covers initial delivery, coalescing, closure, stale publication, pinned views,
@@ -154,3 +154,23 @@ This uses Node behavioral tests and writes `results/local/window-mutation.json`.
 Inspector DOM painting/CSS are outside that mutation scope; native HTTP/browser
 regressions exercise navigation, pinning, fragments, and live updates. The
 [windowed report](../windows/RESULTS.md) records scopes, limits, and response-byte audits.
+
+## Check the initial review interface
+
+```sh
+CARGO_BUILD_JOBS=1 RUST_TEST_THREADS=1 nice -n 10 npm test -- --review
+```
+
+The review check exercises a disposable Git fixture through the normal native HTTP
+host and Chromium: paired source, hunk/declaration selection, unchanged context,
+history, absent/binary/literal source, refresh expiry and narrow layout. It is also
+included in the default browser suite. The
+[review validation record](../review-workflow/INTERFACE_RESULTS.md) records which
+parts have run and which remain blocked by the execution environment.
+
+The new controller/reader mutation scope is
+`experiments/browser/review-stryker.config.json`, configured with one worker. In a
+socket-restricted environment, the documented offline instrumenter fallback runs
+the same serial Node tests without Stryker's logging server. It checks both baselines
+and a known-mutant activation control; its JSON separates survivors, runner errors,
+timeouts and test failures. Parsing/instrumentation failure stops the baseline.

@@ -1,7 +1,7 @@
 import { createWindowReader } from "/windows.js";
 
 const SOURCE_ROW = 22, OUTLINE_ROW = 48;
-export function createInspector({ source, space, outline, transport, select, onError }) {
+export function createInspector({ source, space, outline, transport, select, onError, makeReader=createWindowReader, decorateLine=()=>{}, emptyText="Select a file in the repository map." }) {
   const outlineSpace = outline.ownerDocument.createElement("div"); outline.replaceChildren(outlineSpace);
   outline.setAttribute("role","list"); outline.setAttribute("aria-label","Declarations");
   outline.style.maxHeight = `${180 * OUTLINE_ROW}px`; source.style.maxHeight = `${64 * SOURCE_ROW}px`;
@@ -33,11 +33,11 @@ export function createInspector({ source, space, outline, transport, select, onE
     if(intent.end)source.scrollLeft=source.scrollWidth;
     if(queuedActivation && entries.has(cursor)) {queuedActivation=false;void select(entries.get(cursor));}
   }
-  const reader=createWindowReader({transport,onWindow:accept,onError});
+  const reader=makeReader({transport,onWindow:accept,onError});
   function focusCursor() { const row=entries.get(cursor); if(row)outlineNodes.get(row.id)?.button.focus({preventScroll:true}); }
   function renderSource() {
     if(!view?.source || !view.source.summary.lines) {
-      sourceNodes.clear();space.replaceChildren();const note=document.createElement("p");note.className="source-empty";note.textContent=view?.source?"Source encoding is unavailable in this inspector.":"Select a file in the repository map.";space.append(note);return;
+      sourceNodes.clear();space.replaceChildren();const note=document.createElement("p");note.className="source-empty";note.textContent=view?.source?"Source encoding is unavailable in this inspector.":emptyText;space.append(note);return;
     }
     const first=Math.max(1,Math.floor(source.scrollTop/SOURCE_ROW)-16+1),last=Math.min(view.source.summary.lines+1,Math.ceil((source.scrollTop+source.clientHeight)/SOURCE_ROW)+17,first+96);
     for(const [number,node] of sourceNodes)if(number<first || number>=last || !sourceRows.has(number)){node.row.remove();sourceNodes.delete(number);}
@@ -54,6 +54,7 @@ export function createInspector({ source, space, outline, transport, select, onE
       }
       node.row.style.top=`${(number-1)*SOURCE_ROW}px`;node.label.textContent=number;node.text.textContent=`${line.left?"…":""}${line.text}${line.right?"…":""}`;
       const active=view.source.summary.active;node.row.classList.toggle("active",Boolean(active && number>=active.start_line && number<=active.end_line));
+      decorateLine(node.row,number,view);
       for(const [action,button] of node.buttons)button.hidden=action==="first" || action==="previous" ? !line.left : !line.right;
     }
   }

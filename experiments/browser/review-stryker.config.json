@@ -1,0 +1,14 @@
+{
+  "$schema":"../../node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "mutate":["crates/vizzi/web/review-controller.js","crates/vizzi/web/review-windows.js"],
+  "testRunner":"command",
+  "commandRunner":{"command":"node_modules/node/bin/node crates/vizzi/web/review-controller.test.js && node_modules/node/bin/node crates/vizzi/web/review-windows.test.js"},
+  "coverageAnalysis":"off",
+  "concurrency":1,
+  "timeoutMS":1500,
+  "reporters":["clear-text","json"],
+  "clearTextReporter":{"reportMutants":false,"logTests":false},
+  "jsonReporter":{"fileName":"experiments/browser/results/local/review-mutation.json"},
+  "ignorePatterns":["target","docs","crates/vizzi-core","crates/vizzi-perf","crates/vizzi/src","crates/vizzi/tests","experiments/browser/results","experiments/memory-envelope","experiments/learning-workflow","experiments/review-workflow/results"],
+  "thresholds":{"break":100}
+}

@@ -3,7 +3,8 @@
 The local host now exposes create/refresh/close, independent review status/subscription,
 and finite token/side/version-bound file/window/diff queries. The
 [API reference](../../docs/prototype/COMPARISON_API.md) records delivered schemas and
-resource limits. Comparison controls and linked browser views remain next.
+resource limits. The initial [browser implementation](INTERFACE_RESULTS.md) now has
+controller/native evidence; its rendered walkthrough remains open.
 
 ## Behavioural evidence
 

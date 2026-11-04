@@ -1,4 +1,4 @@
-export function followChanges({ session, createSource = url => new EventSource(url), schedule = setTimeout, cancel = clearTimeout }) {
+export function followChanges({ session, createSource = url => new EventSource(url), schedule = setTimeout, cancel = clearTimeout, url="/api/events", eventName="workspace" }) {
   let current, timer, stopped = false, backoff = 100;
   function close(connection, error) {
     current = undefined;
@@ -15,8 +15,8 @@ export function followChanges({ session, createSource = url => new EventSource(u
     if (stopped) return;
     const connection = current = { consumer: session() };
     try {
-      const source = connection.source = createSource("/api/events");
-      source.addEventListener("workspace", event => {
+      const source = connection.source = createSource(url);
+      source.addEventListener(eventName, event => {
         if (current !== connection) return;
         try { if (connection.consumer.receive(JSON.parse(event.data))) backoff = 100; }
         catch (error) { retry(connection, error); }
