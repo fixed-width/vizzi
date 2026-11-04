@@ -174,3 +174,8 @@ socket-restricted environment, the documented offline instrumenter fallback runs
 the same serial Node tests without Stryker's logging server. It checks both baselines
 and a known-mutant activation control; its JSON separates survivors, runner errors,
 timeouts and test failures. Parsing/instrumentation failure stops the baseline.
+
+The [two-variant rendered review walkthrough](../review-workflow/README.md#run-the-guided-rendered-walkthrough)
+uses `npm test -- --review-walkthrough --fixture … --output …`. Its source/bounds
+audit tests run before the browser stages in the default suite. A blocked attempt
+records its failure phase and fixture checks rather than a successful walkthrough.

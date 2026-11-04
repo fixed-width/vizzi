@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "base_commit": "514293eba0e61d320c8cb4ccd8280ce3945de94b",
+  "source_sha256": {
+    "experiments/review-workflow/run.mjs": "76a47bcac3f31ac9db8c7a6ae7055cf554d7503765aceccda21596af8ce49089",
+    "experiments/review-workflow/walkthrough-audit.js": "d197527dbf202faa3b7492c7543610736266378beba10ac72f5dc202657df756",
+    "experiments/review-workflow/walkthrough-audit.test.mjs": "3503b43e5126ba6cc734ce64df4e5c3e6083baaa3c51b2d6572231226554f93e",
+    "experiments/review-workflow/walkthrough-stryker.config.json": "6c706ae983432965c17d3df9fff57bbe3f18ddbcdf9491d7d96ec6d78ac397a3",
+    "experiments/browser/run.mjs": "f1d7dbd02330ede5cff2bbebeb92c2490fb601282ce3dc199252f4bc97f9757a",
+    "experiments/browser/offline-mutations.mjs": "01f923f7e4d85c0a51c1e6f8b18336b91a6e857571dd997cc5cf3bd3409ee38d",
+    "Cargo.lock": "39a4317d3c52be9199837d27320749e93c2591f3c021a8afac28b1a79a23e8d6",
+    "package-lock.json": "e7ff76f17d7408c0b6dfd075c564ba31fec03cc838be612a008cf5bd343e291f"
+  },
+  "verification": {
+    "node_tests_passed": 100,
+    "native_workspace_tests_passed": 397,
+    "format": "passed",
+    "clippy_workspace_all_targets_all_features_deny_warnings": "passed",
+    "javascript_syntax": "passed",
+    "audit_test_first_sha256": "6e6c968d93874a9e946acb956eb8311fb7944a0b4979d4003705f0321217903f",
+    "inventory_pin_regression_red_sha256": "2e64945577ab674a80cabf6772f2d8e9fa7c33deec87d36ac995e42111e507b1"
+  },
+  "offline_runner_compatibility": {
+    "unmodified_baseline": "passed",
+    "instrumented_baseline": "passed",
+    "activation_control": "unmodified passes; known mutant fails",
+    "selected_mutants": 0,
+    "scope": "Existing browser module configuration: baseline compatibility only, no mutation-coverage claim.",
+    "report_sha256": "097ac7bae160cf8289229363e332386fa1da95a9496fe1438fc64034a2dc62ab"
+  },
+  "attempts": [
+    {
+      "variant": "variant-a",
+      "completed": false,
+      "phase": "host_start",
+      "failure": "Host exited (1): Error: Os { code: 1, kind: PermissionDenied, message: \"Operation not permitted\" }\n",
+      "fixture_before": {
+        "variant": "variant-a",
+        "verified": true,
+        "changed_paths": 2,
+        "hunks": 3,
+        "working_differs_from_index": true
+      },
+      "fixture_after": {
+        "variant": "variant-a",
+        "verified": true,
+        "changed_paths": 2,
+        "hunks": 3,
+        "working_differs_from_index": true
+      },
+      "cleanup_errors": [],
+      "browser_steps": 0,
+      "browser_responses": 0,
+      "binary_sha256": "15d9294be35cccdf8845bdbc78ed0315a763dc7bbedc45532562a9a1757ae8af",
+      "observations_sha256": "c5fb2bb5fa4f905ad2b6866237c2c0272b875e3b173be94a3a0c1f4b219da2ca",
+      "started_binary_without_build": true,
+      "commands": "CARGO_BUILD_JOBS=1 RUST_TEST_THREADS=1 nice -n 10 npm test -- --review-walkthrough --fixture /tmp/vizzi-text-hunks-a-20261103 --output /tmp/vizzi-rendered-review-pinned-a-20261104 --no-build"
+    },
+    {
+      "variant": "variant-b",
+      "completed": false,
+      "phase": "host_start",
+      "failure": "Host exited (1): Error: Os { code: 1, kind: PermissionDenied, message: \"Operation not permitted\" }\n",
+      "fixture_before": {
+        "variant": "variant-b",
+        "verified": true,
+        "changed_paths": 2,
+        "hunks": 2,
+        "working_differs_from_index": true
+      },
+      "fixture_after": {
+        "variant": "variant-b",
+        "verified": true,
+        "changed_paths": 2,
+        "hunks": 2,
+        "working_differs_from_index": true
+      },
+      "cleanup_errors": [],
+      "browser_steps": 0,
+      "browser_responses": 0,
+      "binary_sha256": "15d9294be35cccdf8845bdbc78ed0315a763dc7bbedc45532562a9a1757ae8af",
+      "observations_sha256": "1c1170b62dadbc64b14466fb9b9df79af9330628d0ec7573c0bea51b7b80f87a",
+      "started_binary_without_build": true,
+      "commands": "CARGO_BUILD_JOBS=1 RUST_TEST_THREADS=1 nice -n 10 npm test -- --review-walkthrough --fixture /tmp/vizzi-text-hunks-b-20261103 --output /tmp/vizzi-rendered-review-pinned-b-20261104 --no-build"
+    }
+  ],
+  "acceptance_status": "blocked_before_browser_execution",
+  "next_gate": "Run the normal browser integration check and both guided rendered variants in an environment permitting the loopback listener and Chromium; inspect screenshots and recordings before claiming acceptance.",
+  "limitations": "Prepared orchestration is syntax-checked and its startup/failure cleanup path was exercised. Its successful browser path has not run. No rendered source, screenshot, keyboard/layout behaviour, task completion, latency or usability success is inferred from these attempts.",
+  "listener_probe": {
+    "allowed": false,
+    "stage": "socket_create",
+    "errno": 1,
+    "message": "[Errno 1] Operation not permitted",
+    "report_sha256": "191a841f58bc033879317457673a1230208636f02a8d44a4e5cc27520a55abcb"
+  }
+}

@@ -1,0 +1,1055 @@
+{
+  "schema": 1,
+  "source_sha256": {
+    "experiments/review-workflow/run.mjs": "76a47bcac3f31ac9db8c7a6ae7055cf554d7503765aceccda21596af8ce49089",
+    "experiments/review-workflow/walkthrough-audit.js": "d197527dbf202faa3b7492c7543610736266378beba10ac72f5dc202657df756",
+    "experiments/review-workflow/walkthrough-audit.test.mjs": "3503b43e5126ba6cc734ce64df4e5c3e6083baaa3c51b2d6572231226554f93e",
+    "experiments/review-workflow/walkthrough-stryker.config.json": "6c706ae983432965c17d3df9fff57bbe3f18ddbcdf9491d7d96ec6d78ac397a3",
+    "experiments/browser/run.mjs": "f1d7dbd02330ede5cff2bbebeb92c2490fb601282ce3dc199252f4bc97f9757a",
+    "experiments/browser/offline-mutations.mjs": "01f923f7e4d85c0a51c1e6f8b18336b91a6e857571dd997cc5cf3bd3409ee38d",
+    "Cargo.lock": "39a4317d3c52be9199837d27320749e93c2591f3c021a8afac28b1a79a23e8d6",
+    "package-lock.json": "e7ff76f17d7408c0b6dfd075c564ba31fec03cc838be612a008cf5bd343e291f"
+  },
+  "scope": "Complete walkthrough-audit.js; audit tests only. Browser orchestration, product DOM/CSS, native code and actual rendering are outside this mutation scope.",
+  "resource_policy": {
+    "processes": 1,
+    "nice": 10,
+    "serial_tests": true
+  },
+  "runner": "Installed Stryker 10.1.1 instrumenter using the serial socket-free fallback with both baselines and an activation control.",
+  "cohorts": [
+    {
+      "name": "initial",
+      "generated": 272,
+      "tested": 272,
+      "counts": {
+        "Killed": 185,
+        "Survived": 87
+      },
+      "started": "2026-11-04T15:50:11.322Z",
+      "finished": "2026-11-04T15:50:22.857Z",
+      "source_test_sha256": {
+        "experiments/review-workflow/walkthrough-audit.js": "37c140f32361318f03957c682f197df4bb1fe74cfe32a9999cf008d80f72e34d",
+        "experiments/review-workflow/walkthrough-audit.test.mjs": "1218927605b96de81d633a25d8181adc60063d44b9b6bce15f0e2a2c0738b091"
+      },
+      "report_sha256": "6f2877f71acc57a83d084fa28c8684b10e2824581e952c78a953d7fb73046934",
+      "baselines": "Unmodified and instrumented passed; known-mutant activation control passed."
+    },
+    {
+      "name": "final",
+      "generated": 272,
+      "tested": 272,
+      "counts": {
+        "Killed": 220,
+        "Survived": 52
+      },
+      "started": "2026-11-04T15:59:33.825Z",
+      "finished": "2026-11-04T15:59:46.628Z",
+      "source_test_sha256": {
+        "experiments/review-workflow/walkthrough-audit.js": "37c140f32361318f03957c682f197df4bb1fe74cfe32a9999cf008d80f72e34d",
+        "experiments/review-workflow/walkthrough-audit.test.mjs": "4e253329c17265043577a3a7a27282eecaa133152bdd4abb86725b9c2f61e22e"
+      },
+      "report_sha256": "a47f85a328ff2bdc9e25ef9eb8f655fe377167e215f91da56cec4fdc6ef148f9",
+      "baselines": "Unmodified and instrumented passed; known-mutant activation control passed."
+    },
+    {
+      "name": "follow-up",
+      "generated": 272,
+      "tested": 52,
+      "counts": {
+        "Survived": 49,
+        "Killed": 3
+      },
+      "started": "2026-11-04T16:03:53.349Z",
+      "finished": "2026-11-04T16:03:56.591Z",
+      "source_test_sha256": {
+        "experiments/review-workflow/walkthrough-audit.js": "37c140f32361318f03957c682f197df4bb1fe74cfe32a9999cf008d80f72e34d",
+        "experiments/review-workflow/walkthrough-audit.test.mjs": "381c812965310e3c5b8318bc6fabef2730edc7bab5ce4b5614cdca3637ca5d2b"
+      },
+      "report_sha256": "95edbbdb53e7b51b44fa0388af10bbed942ef452588fdae229b5d6eea386c048",
+      "baselines": "Unmodified and instrumented passed; known-mutant activation control passed."
+    },
+    {
+      "name": "integration",
+      "generated": 274,
+      "tested": 274,
+      "counts": {
+        "Killed": 221,
+        "Survived": 53
+      },
+      "started": "2026-11-04T16:10:15.522Z",
+      "finished": "2026-11-04T16:10:30.064Z",
+      "source_test_sha256": {
+        "experiments/review-workflow/walkthrough-audit.js": "d197527dbf202faa3b7492c7543610736266378beba10ac72f5dc202657df756",
+        "experiments/review-workflow/walkthrough-audit.test.mjs": "3503b43e5126ba6cc734ce64df4e5c3e6083baaa3c51b2d6572231226554f93e"
+      },
+      "report_sha256": "1609861cf06ab080d44f5c1491263e706c9fbec68ac9ec3afd49e422cb7e94ae",
+      "baselines": "Unmodified and instrumented passed; known-mutant activation control passed."
+    }
+  ],
+  "final_source_outcomes": {
+    "tested": 274,
+    "detected": 221,
+    "survived": 53,
+    "timeout": 0,
+    "runner_errors": 0,
+    "exclusions_applied": 0
+  },
+  "survivor_assessments": [
+    {
+      "id": "8",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 46,
+          "line": 3
+        },
+        "end": {
+          "column": 52,
+          "line": 3
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"utf8\"",
+      "acceptance_assessment": "Empty encoding selects the same UTF-8 default in Node Buffer operations."
+    },
+    {
+      "id": "22",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 15,
+          "line": 11
+        },
+        "end": {
+          "column": 27,
+          "line": 11
+        }
+      },
+      "mutatorName": "OptionalChaining",
+      "replacement": "body.schema",
+      "source_span": "body?.schema",
+      "acceptance_assessment": "Null/missing inputs still fail schema/anchor checks or throw before acceptance; valid captured windows already have their required object. Error wording/type can differ."
+    },
+    {
+      "id": "23",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 30,
+          "line": 11
+        },
+        "end": {
+          "column": 49,
+          "line": 11
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"projection schema\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "25",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 52,
+          "line": 12
+        },
+        "end": {
+          "column": 70,
+          "line": 12
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"projection token\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "36",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 74,
+          "line": 13
+        },
+        "end": {
+          "column": 95,
+          "line": 13
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"comparison identity\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "50",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 66,
+          "line": 16
+        },
+        "end": {
+          "column": 83,
+          "line": 16
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"file page bound\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "57",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 31,
+          "line": 19
+        },
+        "end": {
+          "column": 48,
+          "line": 19
+        }
+      },
+      "mutatorName": "OptionalChaining",
+      "replacement": "body.window.file",
+      "source_span": "body.window?.file",
+      "acceptance_assessment": "Null/missing inputs still fail schema/anchor checks or throw before acceptance; valid captured windows already have their required object. Error wording/type can differ."
+    },
+    {
+      "id": "59",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 88,
+          "line": 19
+        },
+        "end": {
+          "column": 105,
+          "line": 19
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"projection file\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "68",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 105,
+          "line": 21
+        },
+        "end": {
+          "column": 119,
+          "line": 21
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"diff version\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "76",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 66,
+          "line": 22
+        },
+        "end": {
+          "column": 83,
+          "line": 22
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"hunk page bound\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "84",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 66,
+          "line": 23
+        },
+        "end": {
+          "column": 83,
+          "line": 23
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"edit page bound\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "87",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 38,
+          "line": 26
+        },
+        "end": {
+          "column": 60,
+          "line": 26
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"explicit window side\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "90",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 54,
+          "line": 27
+        },
+        "end": {
+          "column": 71,
+          "line": 27
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"window side pin\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "93",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 67,
+          "line": 28
+        },
+        "end": {
+          "column": 87,
+          "line": 28
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"window version pin\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "95",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 31,
+          "line": 30
+        },
+        "end": {
+          "column": 48,
+          "line": 30
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"document schema\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "103",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 67,
+          "line": 31
+        },
+        "end": {
+          "column": 85,
+          "line": 31
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"source row bound\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "111",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 72,
+          "line": 32
+        },
+        "end": {
+          "column": 92,
+          "line": 32
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"outline page bound\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "120",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 50,
+          "line": 35
+        },
+        "end": {
+          "column": 70,
+          "line": 35
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"source line number\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "129",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 75,
+          "line": 36
+        },
+        "end": {
+          "column": 101,
+          "line": 36
+        }
+      },
+      "mutatorName": "ConditionalExpression",
+      "replacement": "true",
+      "source_span": "row.column<=row.end_column",
+      "acceptance_assessment": "The independently checked nonnegative UTF-8 byte length equals end minus start, so a reversed range is already rejected."
+    },
+    {
+      "id": "135",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 136,
+          "line": 36
+        },
+        "end": {
+          "column": 163,
+          "line": 36
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"fragment byte coordinates\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "138",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 64,
+          "line": 37
+        },
+        "end": {
+          "column": 86,
+          "line": 37
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"fragment UTF-8 bytes\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "144",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 39,
+          "line": 38
+        },
+        "end": {
+          "column": 62,
+          "line": 38
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"earlier-fragment flag\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "150",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 117,
+          "line": 38
+        },
+        "end": {
+          "column": 138,
+          "line": 38
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"later-fragment flag\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "157",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 25,
+          "line": 41
+        },
+        "end": {
+          "column": 44,
+          "line": 41
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"source byte bound\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "161",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 12,
+          "line": 46
+        },
+        "end": {
+          "column": 43,
+          "line": 46
+        }
+      },
+      "mutatorName": "ConditionalExpression",
+      "replacement": "true",
+      "source_span": "state.token && state.comparison",
+      "acceptance_assessment": "Inventory pin equality independently requires the displayed token and comparison to equal nonempty pins from the audited file response."
+    },
+    {
+      "id": "163",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 12,
+          "line": 46
+        },
+        "end": {
+          "column": 43,
+          "line": 46
+        }
+      },
+      "mutatorName": "LogicalOperator",
+      "replacement": "state.token || state.comparison",
+      "source_span": "state.token && state.comparison",
+      "acceptance_assessment": "Inventory pin equality independently requires the displayed token and comparison to equal nonempty pins from the audited file response."
+    },
+    {
+      "id": "164",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 44,
+          "line": 46
+        },
+        "end": {
+          "column": 71,
+          "line": 46
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"displayed comparison pins\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "166",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 38,
+          "line": 47
+        },
+        "end": {
+          "column": 55,
+          "line": 47
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"inventory token\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "168",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 48,
+          "line": 48
+        },
+        "end": {
+          "column": 70,
+          "line": 48
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"inventory comparison\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "170",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 36,
+          "line": 49
+        },
+        "end": {
+          "column": 59,
+          "line": 49
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"displayed source path\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "172",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 39,
+          "line": 50
+        },
+        "end": {
+          "column": 54,
+          "line": 50
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"selected side\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "175",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 52,
+          "line": 51
+        },
+        "end": {
+          "column": 71,
+          "line": 51
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"one selected side\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "183",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 65,
+          "line": 52
+        },
+        "end": {
+          "column": 81,
+          "line": 52
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"file DOM bound\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "191",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 65,
+          "line": 53
+        },
+        "end": {
+          "column": 81,
+          "line": 53
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"hunk DOM bound\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "200",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 44,
+          "line": 58
+        },
+        "end": {
+          "column": 68,
+          "line": 58
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"displayed side version\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "208",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 66,
+          "line": 59
+        },
+        "end": {
+          "column": 84,
+          "line": 59
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"source DOM bound\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "216",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 71,
+          "line": 60
+        },
+        "end": {
+          "column": 90,
+          "line": 60
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"outline DOM bound\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "222",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 50,
+          "line": 61
+        },
+        "end": {
+          "column": 81,
+          "line": 61
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"visible/rendered source count\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "230",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 51,
+          "line": 63
+        },
+        "end": {
+          "column": 78,
+          "line": 63
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"absent side has no source\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "250",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 126,
+          "line": 64
+        },
+        "end": {
+          "column": 143,
+          "line": 64
+        }
+      },
+      "mutatorName": "OptionalChaining",
+      "replacement": "body.window.file",
+      "source_span": "body.window?.file",
+      "acceptance_assessment": "Null/missing inputs still fail schema/anchor checks or throw before acceptance; valid captured windows already have their required object. Error wording/type can differ."
+    },
+    {
+      "id": "258",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 32,
+          "line": 65
+        },
+        "end": {
+          "column": 57,
+          "line": 65
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"source response anchors\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "261",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 7,
+          "line": 66
+        },
+        "end": {
+          "column": 24,
+          "line": 66
+        }
+      },
+      "mutatorName": "ConditionalExpression",
+      "replacement": "false",
+      "source_span": "!pane.rows.length",
+      "acceptance_assessment": "For no visible rows the driver supplies no source buffer. Decoding that missing buffer and iterating zero rows changes no acceptance result."
+    },
+    {
+      "id": "265",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 16,
+          "line": 69
+        },
+        "end": {
+          "column": 91,
+          "line": 69
+        }
+      },
+      "mutatorName": "ConditionalExpression",
+      "replacement": "true",
+      "source_span": "integer(visible.number) && visible.number>0 && visible.number<=lines.length",
+      "acceptance_assessment": "Invalid physical-line indices still fail source-line lookup or strict matching-fragment lookup before acceptance; the earlier diagnostic can differ."
+    },
+    {
+      "id": "267",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 16,
+          "line": 69
+        },
+        "end": {
+          "column": 91,
+          "line": 69
+        }
+      },
+      "mutatorName": "LogicalOperator",
+      "replacement": "integer(visible.number) && visible.number > 0 || visible.number <= lines.length",
+      "source_span": "integer(visible.number) && visible.number>0 && visible.number<=lines.length",
+      "acceptance_assessment": "Invalid physical-line indices still fail source-line lookup or strict matching-fragment lookup before acceptance; the earlier diagnostic can differ."
+    },
+    {
+      "id": "268",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 16,
+          "line": 69
+        },
+        "end": {
+          "column": 59,
+          "line": 69
+        }
+      },
+      "mutatorName": "ConditionalExpression",
+      "replacement": "true",
+      "source_span": "integer(visible.number) && visible.number>0",
+      "acceptance_assessment": "Invalid physical-line indices still fail source-line lookup or strict matching-fragment lookup before acceptance; the earlier diagnostic can differ."
+    },
+    {
+      "id": "269",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 16,
+          "line": 69
+        },
+        "end": {
+          "column": 59,
+          "line": 69
+        }
+      },
+      "mutatorName": "LogicalOperator",
+      "replacement": "integer(visible.number) || visible.number > 0",
+      "source_span": "integer(visible.number) && visible.number>0",
+      "acceptance_assessment": "Invalid physical-line indices still fail source-line lookup or strict matching-fragment lookup before acceptance; the earlier diagnostic can differ."
+    },
+    {
+      "id": "270",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 43,
+          "line": 69
+        },
+        "end": {
+          "column": 59,
+          "line": 69
+        }
+      },
+      "mutatorName": "ConditionalExpression",
+      "replacement": "true",
+      "source_span": "visible.number>0",
+      "acceptance_assessment": "Invalid physical-line indices still fail source-line lookup or strict matching-fragment lookup before acceptance; the earlier diagnostic can differ."
+    },
+    {
+      "id": "271",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 43,
+          "line": 69
+        },
+        "end": {
+          "column": 59,
+          "line": 69
+        }
+      },
+      "mutatorName": "EqualityOperator",
+      "replacement": "visible.number >= 0",
+      "source_span": "visible.number>0",
+      "acceptance_assessment": "Invalid physical-line indices still fail source-line lookup or strict matching-fragment lookup before acceptance; the earlier diagnostic can differ."
+    },
+    {
+      "id": "273",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 63,
+          "line": 69
+        },
+        "end": {
+          "column": 91,
+          "line": 69
+        }
+      },
+      "mutatorName": "ConditionalExpression",
+      "replacement": "true",
+      "source_span": "visible.number<=lines.length",
+      "acceptance_assessment": "Invalid physical-line indices still fail source-line lookup or strict matching-fragment lookup before acceptance; the earlier diagnostic can differ."
+    },
+    {
+      "id": "276",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 92,
+          "line": 69
+        },
+        "end": {
+          "column": 113,
+          "line": 69
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"visible source line\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    },
+    {
+      "id": "280",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 70,
+          "line": 70
+        },
+        "end": {
+          "column": 76,
+          "line": 70
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"utf8\"",
+      "acceptance_assessment": "Empty encoding selects the same UTF-8 default in Node Buffer operations."
+    },
+    {
+      "id": "295",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 42,
+          "line": 73
+        },
+        "end": {
+          "column": 67,
+          "line": 73
+        }
+      },
+      "mutatorName": "ConditionalExpression",
+      "replacement": "false",
+      "source_span": "row.end_column>raw.length",
+      "acceptance_assessment": "Audited responses already require end <= line_bytes, and this path also checks line_bytes equals independently read raw length."
+    },
+    {
+      "id": "307",
+      "fileName": "experiments/review-workflow/walkthrough-audit.js",
+      "location": {
+        "start": {
+          "column": 9,
+          "line": 76
+        },
+        "end": {
+          "column": 81,
+          "line": 76
+        }
+      },
+      "mutatorName": "StringLiteral",
+      "replacement": "\"\"",
+      "source_span": "\"visible source differs from captured bytes or has no matching fragment\"",
+      "acceptance_assessment": "Only assertion diagnostic wording changes; validation still rejects exactly the same observations. Diagnostic text is not claimed equivalent."
+    }
+  ],
+  "limitations": "Development cohorts overlap and must not be summed. Remaining mutants are reviewed for acceptance/rejection in the documented pipeline: response audit precedes checkpoint audit, inventory pins come from that response, source buffers are read only for visible rows, and any thrown error prevents completion. Diagnostic wording/type is outside this equivalence claim. Survivors are not counted as detected. Tests and mutation analysis do not establish a successful rendered walkthrough."
+}

@@ -2,7 +2,8 @@
 
 Use this how-to to materialise the frozen local-change review fixtures for
 [milestone 2](../../docs/plans/product-milestones.md). Git and Python 3.12+ are required.
-The review interface itself is not implemented yet; this prepares its acceptance input.
+The initial review interface is implemented; browser acceptance is still open. This
+guide prepares its frozen input and the rendered walkthrough.
 The [portable inventory validation](INVENTORY_RESULTS.md) records the first implemented
 comparison-model slice, independently of this Git fixture preparation.
 The [textual-diff validation](TEXT_DIFF_RESULTS.md) checks bounded hunks on the same inputs.
@@ -115,7 +116,34 @@ The [comparison API](../../docs/prototype/COMPARISON_API.md) exposes host operat
 the initial [review interface](INTERFACE_RESULTS.md) is implemented with browser
 acceptance still open.
 
-## Run an evaluation after review support exists
+## Run the guided rendered walkthrough
+
+In an environment that permits a local listener and Chromium, run each prepared
+variant separately with a fresh output directory whose parent already exists:
+
+```sh
+CARGO_BUILD_JOBS=1 RUST_TEST_THREADS=1 nice -n 10 npm test -- \
+  --review-walkthrough --fixture /tmp/vizzi-review-a --output /tmp/vizzi-rendered-a
+CARGO_BUILD_JOBS=1 RUST_TEST_THREADS=1 nice -n 10 npm test -- \
+  --review-walkthrough --fixture /tmp/vizzi-review-b --output /tmp/vizzi-rendered-b
+```
+
+The runner builds Vizzi, uses one native worker and launches the normal HTTP host.
+It navigates rendered file/hunk/declaration controls, unchanged reader/path contracts,
+the regression test, the added document, history and refresh/expiry recovery. Response
+data audits source identity and bounds; it does not choose navigation targets.
+
+Each output records `observations.json` and fixture verification before/after. If the
+browser starts, it also retains screenshots, `walkthrough.webm` and `trace.zip`.
+Source rows are checked against independently read pinned/working bytes. An unsuccessful
+attempt records its failure phase with `completed:false`; those files are not acceptance
+evidence. Use `--no-build` only to deliberately reuse the recorded release binary.
+
+Inspect the screenshots and recording after a successful run. The scripted judgement
+is reference-aware and does not replace an independent reviewer. Current preparation,
+audit tests and blocked attempts are in the [walkthrough record](WALKTHROUGH_RESULTS.md).
+
+## Run an independent evaluation
 
 The [transport replay](TRANSPORT_RESULTS.md) now checks these fixtures through normal
 HTTP/stdio handlers. It remains separate from the upcoming linked-browser walkthrough.

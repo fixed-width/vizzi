@@ -185,7 +185,8 @@ one aggregate worker budget, preserving admitted source owners and the baseline 
 Bounded, token/side/version-bound [application queries and transport](../prototype/COMPARISON_API.md)
 now expose this model. The initial [linked review interface](../prototype/REVIEW_INTERFACE.md)
 has [controller/native evidence](../../experiments/review-workflow/INTERFACE_RESULTS.md);
-Chromium acceptance and the rendered walkthrough remain next.
+The [rendered walkthrough driver and audits](../../experiments/review-workflow/WALKTHROUGH_RESULTS.md)
+are prepared; actual Chromium acceptance and the rendered walkthrough remain next.
 
 Work in small vertical slices. Tests should cover public behaviour, stale/expired anchors,
 source identity, language-capability gaps and comparison correctness; use mutation testing

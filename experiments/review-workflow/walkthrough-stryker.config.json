@@ -1,0 +1,5 @@
+{
+  "mutate":["experiments/review-workflow/walkthrough-audit.js"],
+  "offlineTestFiles":["experiments/review-workflow/walkthrough-audit.test.mjs"],
+  "timeoutMS":1500
+}

@@ -90,6 +90,10 @@ CARGO_BUILD_JOBS=1 RUST_TEST_THREADS=1 nice -n 10 \
 
 ## Browser acceptance still open
 
+The [rendered walkthrough driver](run.mjs) and independent source/bounds audits are now
+prepared. The [walkthrough record](WALKTHROUGH_RESULTS.md) documents its tests and both
+blocked launch attempts; it does not replace the missing browser acceptance.
+
 The real Chromium integration test is checked in at
 [review.test.mjs](../browser/review.test.mjs). Both the host's loopback listener and
 Chromium startup failed with `Operation not permitted` in this sandbox. The environment

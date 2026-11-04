@@ -10,8 +10,11 @@ import {openSync,closeSync,readFileSync} from "node:fs";
 
 const config=JSON.parse(await readFile(process.argv[2],"utf8")),output=resolve(process.argv[3]);
 const files=config.mutate;
-assert.ok(files.every(name=>name.startsWith("crates/vizzi/web/") && name.endsWith(".js") && !name.includes(":")));
-const tests=["review-controller.test.js","review-windows.test.js","windows.test.js","updates.test.js"];
+const localScript=name=>/^(crates\/vizzi\/web|experiments\/review-workflow)\/[^/]+\.(js|mjs)$/.test(name);
+assert.ok(files.every(localScript));
+const testFiles=config.offlineTestFiles ?? ["review-controller.test.js","review-windows.test.js","windows.test.js","updates.test.js"].map(name=>`crates/vizzi/web/${name}`);
+assert.ok(testFiles.length>0 && testFiles.every(localScript));
+const tests=testFiles.map(name=>basename(name));
 const temporary=await mkdtemp(join(tmpdir(),"vizzi-offline-mutations-"));
 const sha=value=>createHash("sha256").update(value).digest("hex");
 const logger={debug(){},info(){},warn(){},trace(){},error(){},isDebugEnabled:()=>false};
@@ -32,7 +35,9 @@ function execute(mutant) {
 async function save() {report.counts=Object.fromEntries([...new Set(report.outcomes.map(o=>o.status))].map(status=>[status,report.outcomes.filter(o=>o.status===status).length]));await writeFile(output,JSON.stringify(report,null,2)+"\n");}
 try {
   for(const name of await readdir("crates/vizzi/web"))if(name.endsWith(".js") || name==="package.json")await writeFile(join(temporary,name),await readFile(join("crates/vizzi/web",name)));
-  for(const name of [...files,...tests.map(test=>`crates/vizzi/web/${test}`)])report.sourceSha256[name]=sha(await readFile(name));
+  const extras=[...new Set([...files,...testFiles].filter(name=>!name.startsWith("crates/vizzi/web/")))];
+  for(const name of extras)await writeFile(join(temporary,basename(name)),await readFile(name));
+  for(const name of [...files,...testFiles])report.sourceSha256[name]=sha(await readFile(name));
   const baseline=execute();assert.equal(baseline.status,"Survived",`unmodified baseline failed: ${JSON.stringify(baseline)}`);report.unmodifiedBaseline="passed";
   const control=await instrumenter.instrument([{name:"control.js",mutate:true,content:"export const matches = a => a === 1;"}],options);
   await writeFile(join(temporary,"control.js"),control.files[0].content);
