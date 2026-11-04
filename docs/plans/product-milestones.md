@@ -4,7 +4,8 @@ Status: the baseline and navigation slice are delivered, with a passing guided l
 workflow. Independent-operator/usability acceptance remains open. The review fixture and
 comparison contracts are frozen, and portable inventories/hunks are implemented.
 Native acquisition, bounded ownership and shared-engine analysis are delivered.
-Milestone 2 still needs comparison queries/transport and the linked review workflow.
+Comparison queries/transport are delivered. Milestone 2 still needs the linked review
+interface and its complete walkthrough.
 This follows the product-alignment checkpoint at commit 4e75d04.
 
 The goal is coordinated views for learning unfamiliar code and reviewing changes, as
@@ -180,8 +181,8 @@ now supply those bytes directly. [Pair/source admission](../prototype/REVIEW_OWN
 now protects the active pair, private capture and held retired queries. The
 [analysis bridge](../prototype/REVIEW_ANALYSIS.md) now applies the shared engine under
 one aggregate worker budget, preserving admitted source owners and the baseline plan.
-Next are bounded, token/side/version-bound application queries and transport, followed
-by linked review views and the full walkthrough.
+Bounded, token/side/version-bound [application queries and transport](../prototype/COMPARISON_API.md)
+now expose this model. Next are linked review views and the full walkthrough.
 
 Work in small vertical slices. Tests should cover public behaviour, stale/expired anchors,
 source identity, language-capability gaps and comparison correctness; use mutation testing

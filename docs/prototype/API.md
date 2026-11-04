@@ -1,5 +1,9 @@
 # Local host API reference
 
+The [comparison API](COMPARISON_API.md) adds separate lifecycle/status/SSE and bounded
+token/side/version-bound review queries. The live workspace routes below retain their
+existing schemas and behaviour.
+
 Bulk views and pinned source use schema **2**. Browser summary views use schema **3**,
 and pinned document windows use schema **1**; see [WINDOWS.md](WINDOWS.md).
 Status and notification envelopes remain

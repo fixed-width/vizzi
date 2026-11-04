@@ -10,6 +10,7 @@ pub mod host;
 mod invalidation;
 mod maintenance;
 pub mod review;
+pub mod review_application;
 pub mod review_source;
 pub mod server;
 pub mod source;

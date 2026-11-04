@@ -2,8 +2,9 @@
 
 Status: portable inventory comparison, side-specific source binding and bounded textual
 hunks are implemented, with source-only native acquisition and bounded review ownership.
-Admitted analysis now shares the live engine; host/browser comparison operations remain planned. There
-is no comparison transport yet. This reference supports the
+Admitted analysis now shares the live engine, with a native review application and
+[comparison HTTP/stdio transport](COMPARISON_API.md). Linked browser review views remain
+planned. This reference supports the
 [behaviour contract](COMPARISON_PRODUCT.md). Exact wire fields can be refined with
 implementation while preserving these invariants.
 
@@ -189,7 +190,7 @@ supersedes an earlier candidate. Accept a complete new pair atomically, then ret
 the old owner. New requests for a retired token return conflict; already acquired
 queries may finish but cannot replace the browser's newer state.
 
-The planned local transport operations are:
+The local transport operations are:
 
 | Operation | Contract |
 | --- | --- |
@@ -200,10 +201,11 @@ The planned local transport operations are:
 | Source/context/hunks | Token + side + version/range validation; bounded source windows and paged hunk/declaration metadata. |
 | Close | Retire active ownership; old query tokens fail explicitly. |
 
-HTTP and future editor/stdio adapters use these application operations. The HTTP
-mapping can use `/api/comparisons` plus token-scoped subresources; these routes do not
-exist yet and the current [API reference](API.md) remains authoritative for delivered
-routes. Change notifications require a versioned comparison status schema, not reuse
+HTTP and finite stdio use these application operations, with the same seam available
+to future editor adapters. The HTTP
+mapping uses `/api/comparisons` plus token-scoped subresources; the
+[comparison API reference](COMPARISON_API.md) defines the delivered routes. Change
+notifications use a versioned comparison status schema, not reuse
 of a live `status.snapshot` as if it named a pair. Invalid input, stale token, unavailable
 source, capture failure and capacity refusal remain distinct in every adapter.
 

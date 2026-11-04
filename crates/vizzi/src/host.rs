@@ -62,6 +62,10 @@ impl RecoveryTask {
     }
 }
 impl Host {
+    /// Returns the configured canonical workspace root; transports cannot select another root.
+    pub fn root(&self) -> &std::path::Path {
+        self.engine.directory().root()
+    }
     /// Analyses a private admitted review through this host's exact engine and budget.
     /// Callers run this blocking operation outside publication/transport locks.
     pub fn analyze_review(

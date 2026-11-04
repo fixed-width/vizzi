@@ -52,6 +52,12 @@ pub enum ReviewError {
 pub struct CaptureTicket {
     token: String,
 }
+impl CaptureTicket {
+    /// Opaque request identity, scoped to one store lifetime.
+    pub fn as_str(&self) -> &str {
+        &self.token
+    }
+}
 
 /// Metadata counters; byte counts exclude facts, source indexes and allocator overhead.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -137,7 +143,23 @@ impl ReviewStore {
     }
     /// Creates newer intent, cooperatively invalidating any older capture ticket.
     pub fn request(&self) -> Result<CaptureTicket, ReviewError> {
+        self.request_with(None, |_| {})
+    }
+    // Observers update application metadata only; they must not re-enter this store.
+    pub(crate) fn request_with(
+        &self,
+        expected: Option<&str>,
+        observe: impl FnOnce(&CaptureTicket),
+    ) -> Result<CaptureTicket, ReviewError> {
         let mut state = lock(&self.state);
+        if expected.is_some_and(|token| {
+            !state
+                .current
+                .as_ref()
+                .is_some_and(|pair| pair.token == token)
+        }) {
+            return Err(ReviewError::Stale);
+        }
         state.sequence = state
             .sequence
             .checked_add(1)
@@ -146,7 +168,24 @@ impl ReviewStore {
             token: format!("{}:{}", self.nonce, state.sequence),
         };
         state.desired = Some(ticket.clone());
+        observe(&ticket);
         Ok(ticket)
+    }
+    pub(crate) fn is_current(&self, ticket: &CaptureTicket) -> bool {
+        lock(&self.state).desired.as_ref() == Some(ticket)
+    }
+    pub(crate) fn cancel_with(&self, observe: impl FnOnce()) {
+        let mut state = lock(&self.state);
+        state.desired = None;
+        observe();
+    }
+    pub(crate) fn update_if_current(&self, ticket: &CaptureTicket, observe: impl FnOnce()) -> bool {
+        let state = lock(&self.state);
+        if state.desired.as_ref() != Some(ticket) {
+            return false;
+        }
+        observe();
+        true
     }
     /// Admits one candidate; a refresh requires the current token and reuses its base.
     pub fn begin(
@@ -208,16 +247,30 @@ impl ReviewStore {
     }
     /// Pins exactly the active token; new requests cannot acquire a retired pair.
     pub fn query(&self, token: &str) -> Result<ReviewLease, ReviewError> {
+        self.query_with(token, || ()).map(|(lease, ())| lease)
+    }
+    pub(crate) fn query_with<T>(
+        &self,
+        token: &str,
+        observe: impl FnOnce() -> T,
+    ) -> Result<(ReviewLease, T), ReviewError> {
         let state = lock(&self.state);
         let pair = state
             .current
             .as_ref()
             .filter(|pair| pair.token == token)
             .ok_or(ReviewError::Stale)?;
-        Ok(ReviewLease { pair: pair.clone() })
+        Ok((ReviewLease { pair: pair.clone() }, observe()))
     }
     /// Retires current ownership and invalidates outstanding capture intent.
     pub fn close(&self, token: &str) -> Result<(), ReviewError> {
+        self.close_with(token, || {})
+    }
+    pub(crate) fn close_with(
+        &self,
+        token: &str,
+        observe: impl FnOnce(),
+    ) -> Result<(), ReviewError> {
         let old = {
             let mut state = lock(&self.state);
             if !state
@@ -228,6 +281,7 @@ impl ReviewStore {
                 return Err(ReviewError::Stale);
             }
             state.desired = None;
+            observe();
             state.current.take()
         };
         drop(old);
@@ -324,6 +378,7 @@ struct InputOwner {
 struct Pair {
     token: String,
     comparison: Comparison,
+    files: std::collections::BTreeMap<String, ReviewPath>,
     analysis_plan: Option<CapturePlanId>,
     base: Arc<InputOwner>,
     working: Arc<InputOwner>,
@@ -428,7 +483,13 @@ impl ReviewCandidate {
         Ok(())
     }
     /// Validates and atomically replaces the pair only for the latest live request.
-    pub fn publish(mut self) -> Result<String, ReviewError> {
+    pub fn publish(self) -> Result<String, ReviewError> {
+        self.publish_with(|_| {})
+    }
+    pub(crate) fn publish_with(
+        mut self,
+        observe: impl FnOnce(&ReviewLease),
+    ) -> Result<String, ReviewError> {
         self.check()?;
         if self.analysis_required && self.working_view.is_none() {
             return Err(ReviewError::Stage);
@@ -444,9 +505,23 @@ impl ReviewCandidate {
                 .unwrap_or_else(|| working.capture.observation.clone()),
         )?;
         let token = self.ticket.token.clone();
+        let mut files = std::collections::BTreeMap::new();
+        for entry in comparison.entries() {
+            let file = entry
+                .path
+                .file_id(comparison.observation(Side::Base).snapshot().workspace())
+                .as_str()
+                .to_owned();
+            if files.insert(file, entry.path.clone()).is_some() {
+                return Err(ReviewError::Model(ModelError(
+                    "duplicate review file identity".into(),
+                )));
+            }
+        }
         let pair = Arc::new(Pair {
             token: token.clone(),
             comparison,
+            files,
             analysis_plan: self.analysis_plan.take(),
             base,
             working,
@@ -459,7 +534,10 @@ impl ReviewCandidate {
                 return Err(ReviewError::Stale);
             }
             state.building = None;
-            state.current.replace(pair)
+            let lease = ReviewLease { pair: pair.clone() };
+            let old = state.current.replace(pair);
+            observe(&lease);
+            old
         };
         drop(old);
         Ok(token)
@@ -532,6 +610,31 @@ pub struct ReviewLease {
 }
 
 impl ReviewLease {
+    /// Resolves an opaque workspace file identity through this pair's fixed inventory.
+    pub fn path(&self, file: &str) -> Option<&ReviewPath> {
+        self.pair.files.get(file)
+    }
+    /// Returns the ordinary workspace file identity for a captured path.
+    pub fn file_id(&self, path: &ReviewPath) -> vizzi_core::model::FileId {
+        path.file_id(
+            self.pair
+                .comparison
+                .observation(Side::Base)
+                .snapshot()
+                .workspace(),
+        )
+    }
+    /// Borrows a held document version without exposing its source owner.
+    pub fn document_version(
+        &self,
+        side: Side,
+        path: &ReviewPath,
+    ) -> Option<&vizzi_core::model::DocumentVersion> {
+        self.pair
+            .comparison
+            .document(side, path)
+            .map(|doc| doc.version())
+    }
     /// Frozen analyser-registration/configuration identity, absent for source-only pairs.
     pub fn analysis_plan(&self) -> Option<&CapturePlanId> {
         self.pair.analysis_plan.as_ref()
@@ -601,6 +704,14 @@ impl ReviewLease {
             Side::Base => &self.pair.base.capture.notices,
             Side::Working => &self.pair.working.capture.notices,
         }
+    }
+    /// Borrows a captured literal target/reference value without following it.
+    pub fn literal(&self, side: Side, path: &ReviewPath) -> Option<&[u8]> {
+        let owner = match side {
+            Side::Base => &self.pair.base,
+            Side::Working => &self.pair.working,
+        };
+        owner.capture.values.get(path).map(Vec::as_slice)
     }
 }
 
@@ -812,5 +923,22 @@ mod tests {
             view.snapshot().documents()[0].captured(),
             document.captured()
         ));
+    }
+    #[test]
+    fn application_intent_checks_and_cancellation_share_one_authoritative_ticket() {
+        let store = ReviewStore::open(0).unwrap();
+        let first = store.request().unwrap();
+        assert!(store.is_current(&first));
+        let latest = store.request().unwrap();
+        assert!(!store.is_current(&first));
+        assert!(store.is_current(&latest));
+        let observed = std::cell::Cell::new(false);
+        assert!(!store.update_if_current(&first, || observed.set(true)));
+        assert!(!observed.get());
+        assert!(store.update_if_current(&latest, || observed.set(true)));
+        assert!(observed.get());
+        store.cancel_with(|| observed.set(false));
+        assert!(!store.is_current(&latest));
+        assert!(!observed.get());
     }
 }

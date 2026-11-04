@@ -140,9 +140,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         );
         return Ok(());
     }
-    let host = Host::start(engine)?;
+    let host = Arc::new(Host::start(engine)?);
     let application = host.application();
-    let router = vizzi::server::router(application.clone());
+    let reviews = Arc::new(vizzi::review_application::ReviewApplication::start(
+        host.clone(),
+        vizzi::review_source::CaptureLimits::default(),
+    )?);
+    let router = vizzi::server::router_with_reviews(application.clone(), reviews.clone());
     if stdio {
         let stdin = std::io::stdin();
         let mut stdout = std::io::stdout().lock();
@@ -152,10 +156,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             struct Request {
                 id: serde_json::Value,
                 uri: String,
+                method: Option<String>,
+                body: Option<serde_json::Value>,
             }
             let response = match serde_json::from_str::<Request>(&line) {
                 Ok(request) => {
-                    match vizzi::server::diagnostic(router.clone(), request.id, &request.uri).await
+                    match vizzi::server::diagnostic_request(
+                        router.clone(),
+                        request.id,
+                        request.method.as_deref().unwrap_or("GET"),
+                        &request.uri,
+                        request.body,
+                    )
+                    .await
                     {
                         Ok(response) => response,
                         Err(error) => vizzi::server::DiagnosticResponse {
@@ -183,6 +196,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .with_graceful_shutdown(async move {
                 let _ = tokio::signal::ctrl_c().await;
                 application.close_updates();
+                reviews.shutdown();
             })
             .await?;
     }

@@ -1,0 +1,768 @@
+{
+  "schema": 1,
+  "source_sha256": {
+    "crates/vizzi-core/src/text_diff.rs": "4a4b12e56056dfd568f759c856553833f6fd946a58feeff70f50e737393bfd48",
+    "crates/vizzi/src/host.rs": "dfbc9fd26c694e93b5144c891bafe2ae6c0d2cf6b32601aacacf771b42784962",
+    "crates/vizzi/src/lib.rs": "16c41367cc6d6dfb82ce86a3242f7c2645c07c6dcc52bde9623532d093b4c42c",
+    "crates/vizzi/src/main.rs": "0da1399f98f41f9b55cd487606cd7bfef233e82f3e4ccaf1e1a4480f57252255",
+    "crates/vizzi/src/review.rs": "033307a15e51a5bbceaa4f7b0e226edf073de428cfd5172e14c2ee5cf5baf92a",
+    "crates/vizzi/src/review_application.rs": "a8a94304d4c10a9c156e5a229982fd15f65b14b0f1fb939eafeef203b45ed8c5",
+    "crates/vizzi/src/review_application/projection.rs": "2322dd475e35d463615bd3d303c8cb51d79a4c8965aba8542bc296f5be945f80",
+    "crates/vizzi/src/review_source/git.rs": "050eef48aa3353258c4f2361e587e6a17dd2844c1966488358ff4bd23aa8e602",
+    "crates/vizzi/src/server.rs": "a7a40152053a08169356619bdbba9f33402f084488e9af06e9d609c204c2415f",
+    "crates/vizzi/src/server/review.rs": "37aaed734f1af482deefc8ac93d1a9acc13635ceab4c0cfc90dacf6234e7b93a",
+    "crates/vizzi/tests/review_application.rs": "c68e0c94f24ca9d5809538514d42287d43d56bb7779a29a89eb0ae7172702005",
+    "Cargo.lock": "39a4317d3c52be9199837d27320749e93c2591f3c021a8afac28b1a79a23e8d6",
+    "experiments/review-workflow/verify_transport.py": "209863d5f12d304937ce160da91eb6797f62b0f924ca0acd7dd105637fa32e1a"
+  },
+  "binary_sha256": "b109c59a3beeb9716ba9365a436035f4c6760f4b9818fb30a47f69cbb553b181",
+  "commands": [
+    "CARGO_BUILD_JOBS=1 nice -n 10 cargo build -p vizzi --offline",
+    "python3 experiments/review-workflow/verify_transport.py --fixture /tmp/vizzi-text-hunks-a-20261103 --output /tmp/vizzi-review-api-final-a-20261103",
+    "python3 experiments/review-workflow/verify_transport.py --fixture /tmp/vizzi-text-hunks-b-20261103 --output /tmp/vizzi-review-api-final-b-20261103"
+  ],
+  "variants": [
+    {
+      "artifact_sha256": "67b9685d08be6640a50738cb9968f186193acd8087277c3971373016f3958ae6",
+      "replay": {
+        "schema": 1,
+        "variant": "variant-a",
+        "base_revision": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+        "verified": true,
+        "metadata": {
+          "token": "b4ab5592ef1d21b6826ec7e0373cbbc03446e9690cbe8e118c5132c1037bf08b:1",
+          "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+          "provider": "git",
+          "revision": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+          "resolved": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+          "scope": ".",
+          "working_started_ms": 1793771084033,
+          "working_finished_ms": 1793771084229
+        },
+        "refreshed": {
+          "token": "b4ab5592ef1d21b6826ec7e0373cbbc03446e9690cbe8e118c5132c1037bf08b:2",
+          "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+          "provider": "git",
+          "revision": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+          "resolved": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+          "scope": ".",
+          "working_started_ms": 1793771084931,
+          "working_finished_ms": 1793771085121
+        },
+        "totals": {
+          "paths": 1033,
+          "added": 1,
+          "removed": 0,
+          "modified": 1,
+          "unchanged": 1031,
+          "unassessed": 0,
+          "unavailable": 0
+        },
+        "hunk_headers": [
+          "@@ -117,7 +117,7 @@",
+          "@@ -156,8 +156,10 @@",
+          "@@ -166,7 +168,7 @@"
+        ],
+        "windows": [
+          {
+            "side": "base",
+            "version": "31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6",
+            "line_rows": 48,
+            "outline_total": 131,
+            "contexts": [
+              {
+                "context": "5d4f170e75d6bee595fe9613376ef5bc227050fe454f10b031cb2b79fe9f2803",
+                "language": "rust",
+                "description": "Tree-sitter Rust; raw syntax, no macro expansion",
+                "coverage": "syntax",
+                "declarations": 131,
+                "diagnostics": [],
+                "hidden_diagnostics": 0,
+                "truncated": false
+              }
+            ]
+          },
+          {
+            "side": "working",
+            "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+            "line_rows": 48,
+            "outline_total": 131,
+            "contexts": [
+              {
+                "context": "5d4f170e75d6bee595fe9613376ef5bc227050fe454f10b031cb2b79fe9f2803",
+                "language": "rust",
+                "description": "Tree-sitter Rust; raw syntax, no macro expansion",
+                "coverage": "syntax",
+                "declarations": 131,
+                "diagnostics": [],
+                "hidden_diagnostics": 0,
+                "truncated": false
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "method": "POST",
+            "uri": "/api/comparisons",
+            "status": 202,
+            "body_bytes": 90
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 495
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/b4ab5592ef1d21b6826ec7e0373cbbc03446e9690cbe8e118c5132c1037bf08b:1/files",
+            "status": 200,
+            "body_bytes": 1775
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/b4ab5592ef1d21b6826ec7e0373cbbc03446e9690cbe8e118c5132c1037bf08b:1/diff?file=b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983&base_version=31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6&working_version=db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+            "status": 200,
+            "body_bytes": 1972
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/b4ab5592ef1d21b6826ec7e0373cbbc03446e9690cbe8e118c5132c1037bf08b:1/window?file=b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983&side=base&version=31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6&line_start=140&line_count=48",
+            "status": 200,
+            "body_bytes": 38670
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/b4ab5592ef1d21b6826ec7e0373cbbc03446e9690cbe8e118c5132c1037bf08b:1/window?file=b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983&side=working&version=db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df&line_start=140&line_count=48",
+            "status": 200,
+            "body_bytes": 38726
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/b4ab5592ef1d21b6826ec7e0373cbbc03446e9690cbe8e118c5132c1037bf08b:1/diff?file=9001f4e18f72f981e25a612d75e9ecf4d6db23e3e00d01394460c2576f37bbca&working_version=d8fe76da71b6d2e8e93bb088072c524c891d87f45f1ec1e6f71135a7ac2c2537",
+            "status": 200,
+            "body_bytes": 1054
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/b4ab5592ef1d21b6826ec7e0373cbbc03446e9690cbe8e118c5132c1037bf08b:1/window?file=b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983&side=working&version=wrong",
+            "status": 409,
+            "body_bytes": 85
+          },
+          {
+            "method": "POST",
+            "uri": "/api/comparisons/b4ab5592ef1d21b6826ec7e0373cbbc03446e9690cbe8e118c5132c1037bf08b:1/refresh",
+            "status": 202,
+            "body_bytes": 90
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 494
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 494
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 494
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 494
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 494
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 494
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 494
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 494
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 494
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 494
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 495
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/b4ab5592ef1d21b6826ec7e0373cbbc03446e9690cbe8e118c5132c1037bf08b:1/files",
+            "status": 409,
+            "body_bytes": 71
+          },
+          {
+            "method": "DELETE",
+            "uri": "/api/comparisons/b4ab5592ef1d21b6826ec7e0373cbbc03446e9690cbe8e118c5132c1037bf08b:2",
+            "status": 204,
+            "body_bytes": 0
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/b4ab5592ef1d21b6826ec7e0373cbbc03446e9690cbe8e118c5132c1037bf08b:2/files",
+            "status": 409,
+            "body_bytes": 71
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/events",
+            "status": 400,
+            "body_bytes": 88
+          }
+        ],
+        "fixture_reverified": true,
+        "oracle_sha256": "facc2338c8d445d25574a59bfc44543bd1d8834b33f00eecec3d7c4834ecabd0",
+        "scope": "Finite diagnostic requests execute the same HTTP handlers; no browser/UI or human study."
+      }
+    },
+    {
+      "artifact_sha256": "e0332eac923f559b41d3567681350a8fa40616bfbd6fa2ff313e63d14940f744",
+      "replay": {
+        "schema": 1,
+        "variant": "variant-b",
+        "base_revision": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+        "verified": true,
+        "metadata": {
+          "token": "0fe2741ade1ad8879380e22265beb1b8a1bd7a39ae5dfa5a3a594889a0337cf5:1",
+          "comparison": "9d698bc7d7a5d2f96a5de03f8d298e375c5a0d51b1db90ae9e436c046996a73b",
+          "provider": "git",
+          "revision": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+          "resolved": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+          "scope": ".",
+          "working_started_ms": 1793771101051,
+          "working_finished_ms": 1793771101268
+        },
+        "refreshed": {
+          "token": "0fe2741ade1ad8879380e22265beb1b8a1bd7a39ae5dfa5a3a594889a0337cf5:2",
+          "comparison": "9d698bc7d7a5d2f96a5de03f8d298e375c5a0d51b1db90ae9e436c046996a73b",
+          "provider": "git",
+          "revision": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+          "resolved": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+          "scope": ".",
+          "working_started_ms": 1793771101947,
+          "working_finished_ms": 1793771102158
+        },
+        "totals": {
+          "paths": 1033,
+          "added": 1,
+          "removed": 0,
+          "modified": 1,
+          "unchanged": 1031,
+          "unassessed": 0,
+          "unavailable": 0
+        },
+        "hunk_headers": [
+          "@@ -117,7 +117,7 @@",
+          "@@ -166,7 +166,7 @@"
+        ],
+        "windows": [
+          {
+            "side": "base",
+            "version": "4c38596441d6e51e9df3572ff2991691d4e5086ad02cf6ec9e02fae488faa251",
+            "line_rows": 48,
+            "outline_total": 131,
+            "contexts": [
+              {
+                "context": "5d4f170e75d6bee595fe9613376ef5bc227050fe454f10b031cb2b79fe9f2803",
+                "language": "rust",
+                "description": "Tree-sitter Rust; raw syntax, no macro expansion",
+                "coverage": "syntax",
+                "declarations": 131,
+                "diagnostics": [],
+                "hidden_diagnostics": 0,
+                "truncated": false
+              }
+            ]
+          },
+          {
+            "side": "working",
+            "version": "a25ce22cfc54bff6ea7089a19c6300b7ae2e8e3585415c4ed65665e570984a5b",
+            "line_rows": 48,
+            "outline_total": 131,
+            "contexts": [
+              {
+                "context": "5d4f170e75d6bee595fe9613376ef5bc227050fe454f10b031cb2b79fe9f2803",
+                "language": "rust",
+                "description": "Tree-sitter Rust; raw syntax, no macro expansion",
+                "coverage": "syntax",
+                "declarations": 131,
+                "diagnostics": [],
+                "hidden_diagnostics": 0,
+                "truncated": false
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "method": "POST",
+            "uri": "/api/comparisons",
+            "status": 202,
+            "body_bytes": 90
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 132
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 495
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/0fe2741ade1ad8879380e22265beb1b8a1bd7a39ae5dfa5a3a594889a0337cf5:1/files",
+            "status": 200,
+            "body_bytes": 1775
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/0fe2741ade1ad8879380e22265beb1b8a1bd7a39ae5dfa5a3a594889a0337cf5:1/diff?file=e7405a10c0d20123eca35ca3f742c4fe72b801daefe3e15e4060b18a7b62d395&base_version=4c38596441d6e51e9df3572ff2991691d4e5086ad02cf6ec9e02fae488faa251&working_version=a25ce22cfc54bff6ea7089a19c6300b7ae2e8e3585415c4ed65665e570984a5b",
+            "status": 200,
+            "body_bytes": 1562
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/0fe2741ade1ad8879380e22265beb1b8a1bd7a39ae5dfa5a3a594889a0337cf5:1/window?file=e7405a10c0d20123eca35ca3f742c4fe72b801daefe3e15e4060b18a7b62d395&side=base&version=4c38596441d6e51e9df3572ff2991691d4e5086ad02cf6ec9e02fae488faa251&line_start=140&line_count=48",
+            "status": 200,
+            "body_bytes": 38670
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/0fe2741ade1ad8879380e22265beb1b8a1bd7a39ae5dfa5a3a594889a0337cf5:1/window?file=e7405a10c0d20123eca35ca3f742c4fe72b801daefe3e15e4060b18a7b62d395&side=working&version=a25ce22cfc54bff6ea7089a19c6300b7ae2e8e3585415c4ed65665e570984a5b&line_start=140&line_count=48",
+            "status": 200,
+            "body_bytes": 38697
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/0fe2741ade1ad8879380e22265beb1b8a1bd7a39ae5dfa5a3a594889a0337cf5:1/diff?file=9f659f2f99ceb41110b860570da13de197af65df2a82ef36b067c784e80a81c3&working_version=ba37f1e06eeff71ae45b88b8282387bf289e9cd1eb695b86cfc618aeed7cf69c",
+            "status": 200,
+            "body_bytes": 1054
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/0fe2741ade1ad8879380e22265beb1b8a1bd7a39ae5dfa5a3a594889a0337cf5:1/window?file=e7405a10c0d20123eca35ca3f742c4fe72b801daefe3e15e4060b18a7b62d395&side=working&version=wrong",
+            "status": 409,
+            "body_bytes": 85
+          },
+          {
+            "method": "POST",
+            "uri": "/api/comparisons/0fe2741ade1ad8879380e22265beb1b8a1bd7a39ae5dfa5a3a594889a0337cf5:1/refresh",
+            "status": 202,
+            "body_bytes": 90
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 494
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 494
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 494
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 494
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 494
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 494
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 494
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 494
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 494
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 494
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/status",
+            "status": 200,
+            "body_bytes": 495
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/0fe2741ade1ad8879380e22265beb1b8a1bd7a39ae5dfa5a3a594889a0337cf5:1/files",
+            "status": 409,
+            "body_bytes": 71
+          },
+          {
+            "method": "DELETE",
+            "uri": "/api/comparisons/0fe2741ade1ad8879380e22265beb1b8a1bd7a39ae5dfa5a3a594889a0337cf5:2",
+            "status": 204,
+            "body_bytes": 0
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/0fe2741ade1ad8879380e22265beb1b8a1bd7a39ae5dfa5a3a594889a0337cf5:2/files",
+            "status": 409,
+            "body_bytes": 71
+          },
+          {
+            "method": "GET",
+            "uri": "/api/comparisons/events",
+            "status": 400,
+            "body_bytes": 88
+          }
+        ],
+        "fixture_reverified": true,
+        "oracle_sha256": "facc2338c8d445d25574a59bfc44543bd1d8834b33f00eecec3d7c4834ecabd0",
+        "scope": "Finite diagnostic requests execute the same HTTP handlers; no browser/UI or human study."
+      }
+    }
+  ],
+  "scope": "Normal executable, finite HTTP/stdio handlers, frozen input verification before/after; no browser, human review study or performance qualification."
+}

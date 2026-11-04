@@ -172,6 +172,15 @@ impl GitRepository {
 }
 
 impl GitRevision {
+    /// Clones immutable baseline metadata without keeping or duplicating a blob-reader child.
+    pub fn fork(&self) -> Self {
+        Self {
+            repository: self.repository.clone(),
+            resolved: self.resolved.clone(),
+            entries: self.entries.clone(),
+            batch: None,
+        }
+    }
     /// Returns the resolved native object identity, for baseline provenance only.
     pub fn resolved(&self) -> &str {
         &self.resolved

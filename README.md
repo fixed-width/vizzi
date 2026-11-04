@@ -28,7 +28,8 @@ implemented, along with [bounded textual hunks](docs/prototype/TEXT_DIFF.md).
 [Source-only Git acquisition](docs/prototype/REVIEW_ACQUISITION.md) now exercises the
 same model, now with [bounded review ownership](docs/prototype/REVIEW_OWNERSHIP.md).
 Review analysis now [shares the existing engine](docs/prototype/REVIEW_ANALYSIS.md).
-Comparison transport and the guided review interface remain next.
+[Comparison transport](docs/prototype/COMPARISON_API.md) now exposes bounded queries and
+separate review status. The linked review interface and guided task remain next.
 
 - [Run the workspace](docs/how-to/run-workspace.md)
 - [Next product milestones](docs/plans/product-milestones.md)

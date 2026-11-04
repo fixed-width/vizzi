@@ -83,5 +83,6 @@ response and reject obsolete UI responses; borrowed native metadata is not a wir
 
 The [validation report](../../experiments/review-workflow/ANALYSIS_RESULTS.md) records
 mixed-language/context/cache checks, admission/failure tests, concurrency evidence and
-the frozen review variants. Compilation-backed semantics, relationships, comparison
-routes and linked review UI remain later work.
+the frozen review variants. Compilation-backed semantics and relationships remain
+later work. The [comparison API](COMPARISON_API.md) now exposes native queries;
+linked review UI remains next.

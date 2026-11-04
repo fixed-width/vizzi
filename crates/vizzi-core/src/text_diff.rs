@@ -91,7 +91,7 @@ pub enum DiffError {
 }
 
 /// Corresponding zero-based, exclusive line and UTF-8 byte ranges on one side.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
 pub struct DiffRange {
     /// Physical-line coordinates; empty ranges are insertion/deletion anchors.
     pub lines: Range<usize>,
@@ -100,7 +100,7 @@ pub struct DiffRange {
 }
 
 /// One contiguous changed run, without context or copied source text.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
 pub struct TextEdit {
     /// Removed/replaced base bytes and lines.
     pub base: DiffRange,
@@ -109,7 +109,7 @@ pub struct TextEdit {
 }
 
 /// A group of edits with up to three unchanged context lines on each side.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
 pub struct TextHunk {
     /// Comparison/path/policy-bound identity.
     pub id: HunkId,

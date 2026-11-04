@@ -110,10 +110,14 @@ future linked-UI walkthrough and performance qualification.
 It uses [bounded review ownership](../../docs/prototype/REVIEW_OWNERSHIP.md) for both
 capture and query lifetime, including the shared source-byte allowance. Admission
 checks are recorded in the [ownership report](OWNERSHIP_RESULTS.md). The
-[analysis bridge](../../docs/prototype/REVIEW_ANALYSIS.md) now uses the shared engine;
-host/browser comparison operations remain separate work.
+[analysis bridge](../../docs/prototype/REVIEW_ANALYSIS.md) now uses the shared engine.
+The [comparison API](../../docs/prototype/COMPARISON_API.md) exposes host operations;
+linked browser review remains next.
 
 ## Run an evaluation after review support exists
+
+The [transport replay](TRANSPORT_RESULTS.md) now checks these fixtures through normal
+HTTP/stdio handlers. It remains separate from the upcoming linked-browser walkthrough.
 
 Give the operator only [the neutral task brief](fixtures/task.md) and one disposable
 workspace. Select baseline `1a4f5b65dd2a269298748df2dfd68092a169a8d9` and repository-root

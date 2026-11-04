@@ -21,6 +21,15 @@ use vizzi_core::{
 };
 
 type ApiError = (StatusCode, String);
+mod review;
+
+/// Adds comparison operations to the live workspace router without sharing status schemas.
+pub fn router_with_reviews(
+    application: Arc<Application>,
+    reviews: Arc<crate::review_application::ReviewApplication>,
+) -> Router {
+    router(application).merge(review::router(reviews))
+}
 
 /// Builds the local browser host, also usable through in-process requests.
 pub fn router(application: Arc<Application>) -> Router {
@@ -207,11 +216,31 @@ pub async fn diagnostic(
     id: serde_json::Value,
     uri: &str,
 ) -> Result<DiagnosticResponse, Box<dyn std::error::Error>> {
+    diagnostic_request(router, id, "GET", uri, None).await
+}
+
+/// Dispatches a finite diagnostic mutation/read through the same local HTTP handlers.
+pub async fn diagnostic_request(
+    router: Router,
+    id: serde_json::Value,
+    method: &str,
+    uri: &str,
+    body: Option<serde_json::Value>,
+) -> Result<DiagnosticResponse, Box<dyn std::error::Error>> {
     use tower::ServiceExt;
+    let body = body
+        .map(|body| serde_json::to_vec(&body))
+        .transpose()?
+        .unwrap_or_default();
     let request = axum::http::Request::builder()
+        .method(method)
         .uri(uri)
-        .body(Body::empty())?;
-    if request.uri().path() == "/api/events" {
+        .header(header::CONTENT_TYPE, "application/json")
+        .body(Body::from(body))?;
+    if matches!(
+        request.uri().path(),
+        "/api/events" | "/api/comparisons/events"
+    ) {
         return Ok(DiagnosticResponse { id, status: 400, content_type: "text/plain".into(), body: "Event streaming requires HTTP or a native subscription; diagnostics return finite bodies".into() });
     }
     let response = router.oneshot(request).await?;

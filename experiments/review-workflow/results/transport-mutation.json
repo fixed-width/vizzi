@@ -1,0 +1,366 @@
+{
+  "schema": 1,
+  "base_commit": "ec22e8923ded98b530b5ad25d52703331297ca9a",
+  "source_sha256": {
+    "crates/vizzi-core/src/text_diff.rs": "4a4b12e56056dfd568f759c856553833f6fd946a58feeff70f50e737393bfd48",
+    "crates/vizzi/src/host.rs": "dfbc9fd26c694e93b5144c891bafe2ae6c0d2cf6b32601aacacf771b42784962",
+    "crates/vizzi/src/lib.rs": "16c41367cc6d6dfb82ce86a3242f7c2645c07c6dcc52bde9623532d093b4c42c",
+    "crates/vizzi/src/main.rs": "0da1399f98f41f9b55cd487606cd7bfef233e82f3e4ccaf1e1a4480f57252255",
+    "crates/vizzi/src/review.rs": "033307a15e51a5bbceaa4f7b0e226edf073de428cfd5172e14c2ee5cf5baf92a",
+    "crates/vizzi/src/review_application.rs": "a8a94304d4c10a9c156e5a229982fd15f65b14b0f1fb939eafeef203b45ed8c5",
+    "crates/vizzi/src/review_application/projection.rs": "2322dd475e35d463615bd3d303c8cb51d79a4c8965aba8542bc296f5be945f80",
+    "crates/vizzi/src/review_source/git.rs": "050eef48aa3353258c4f2361e587e6a17dd2844c1966488358ff4bd23aa8e602",
+    "crates/vizzi/src/server.rs": "a7a40152053a08169356619bdbba9f33402f084488e9af06e9d609c204c2415f",
+    "crates/vizzi/src/server/review.rs": "37aaed734f1af482deefc8ac93d1a9acc13635ceab4c0cfc90dacf6234e7b93a",
+    "crates/vizzi/tests/review_application.rs": "c68e0c94f24ca9d5809538514d42287d43d56bb7779a29a89eb0ae7172702005",
+    "Cargo.lock": "39a4317d3c52be9199837d27320749e93c2591f3c021a8afac28b1a79a23e8d6",
+    "experiments/review-workflow/verify_transport.py": "209863d5f12d304937ce160da91eb6797f62b0f924ca0acd7dd105637fa32e1a",
+    "crates/vizzi/tests/cli.rs": "cd2a1bd493c01b92e6cca6eec8fd2771b98d841e9a7576c7a2fb053772c384f6",
+    "crates/vizzi/tests/review.rs": "44883a812f90ce32157ecf7a7277913efa3887e60150b6e03251bdee93a54b9c"
+  },
+  "resource_policy": {
+    "mutant_jobs": 1,
+    "compiler_jobs": 1,
+    "jobserver_tasks": 1,
+    "test_threads": 1,
+    "nice": 10
+  },
+  "test_first": {
+    "test": "create_refresh_and_queries_keep_the_frozen_baseline_and_source_anchors",
+    "failure": "not yet implemented",
+    "log_sha256": "310c1f542cf06c9c949abe959772eaac1d22597a663e21758e19ab5ad7a86e69"
+  },
+  "runs": [
+    {
+      "total_mutants": 171,
+      "caught": 71,
+      "missed": 46,
+      "timeout": 4,
+      "unviable": 50,
+      "start_time": "2026-11-04T05:14:08.355518447Z",
+      "end_time": "2026-11-04T05:30:54.977497401Z",
+      "cargo_mutants_version": "27.1.0",
+      "name": "mutation",
+      "baseline": "passed",
+      "raw_outcomes_sha256": "84cc47d8079bda6873d140409ba5b63f32adb1c8e7e59265c4d1b21c2989623e",
+      "missed_mutations": [
+        "crates/vizzi/src/review_application.rs:339:9: replace <impl Drop for ReviewApplication>::drop with ()",
+        "crates/vizzi/src/review_application.rs:433:60: replace || with && in run_job",
+        "crates/vizzi/src/review_application.rs:484:9: replace || with && in validate",
+        "crates/vizzi/src/review_application.rs:483:35: replace > with == in validate",
+        "crates/vizzi/src/review_application.rs:483:35: replace > with >= in validate",
+        "crates/vizzi/src/review_application.rs:498:24: replace match guard value.len() <= 4096 with true in scope",
+        "crates/vizzi/src/review_application.rs:498:24: replace match guard value.len() <= 4096 with false in scope",
+        "crates/vizzi/src/review_application.rs:498:36: replace <= with > in scope",
+        "crates/vizzi/src/review_application.rs:509:5: replace now_ms -> u64 with 0",
+        "crates/vizzi/src/review_application.rs:509:5: replace now_ms -> u64 with 1",
+        "crates/vizzi/src/review_application.rs:518:13: replace -= with += in clip",
+        "crates/vizzi/src/review_application.rs:518:13: replace -= with /= in clip",
+        "crates/vizzi/src/review_application.rs:520:30: replace < with <= in clip",
+        "crates/vizzi/src/review_application.rs:526:9: replace ReviewApiError::code -> &'static str with \"\"",
+        "crates/vizzi/src/review_application.rs:526:9: replace ReviewApiError::code -> &'static str with \"xyzzy\"",
+        "crates/vizzi/src/review_application/projection.rs:205:25: replace > with >= in ComparisonQuery::files",
+        "crates/vizzi/src/review_application/projection.rs:218:55: replace += with -= in ComparisonQuery::files",
+        "crates/vizzi/src/review_application/projection.rs:218:55: replace += with *= in ComparisonQuery::files",
+        "crates/vizzi/src/review_application/projection.rs:221:61: replace += with -= in ComparisonQuery::files",
+        "crates/vizzi/src/review_application/projection.rs:221:61: replace += with *= in ComparisonQuery::files",
+        "crates/vizzi/src/review_application/projection.rs:223:32: replace += with -= in ComparisonQuery::files",
+        "crates/vizzi/src/review_application/projection.rs:223:32: replace += with *= in ComparisonQuery::files",
+        "crates/vizzi/src/review_application/projection.rs:290:35: replace || with && in ComparisonQuery::window",
+        "crates/vizzi/src/review_application/projection.rs:297:31: replace |= with &= in ComparisonQuery::window",
+        "crates/vizzi/src/review_application/projection.rs:362:34: replace < with == in ComparisonQuery::diff",
+        "crates/vizzi/src/review_application/projection.rs:362:34: replace < with > in ComparisonQuery::diff",
+        "crates/vizzi/src/review_application/projection.rs:362:34: replace < with <= in ComparisonQuery::diff",
+        "crates/vizzi/src/review_application/projection.rs:363:49: replace - with / in ComparisonQuery::diff",
+        "crates/vizzi/src/review_application/projection.rs:364:49: replace - with + in ComparisonQuery::diff",
+        "crates/vizzi/src/review_application/projection.rs:364:49: replace - with / in ComparisonQuery::diff",
+        "crates/vizzi/src/review_application/projection.rs:394:5: replace reason -> &'static str with \"\"",
+        "crates/vizzi/src/review_application/projection.rs:394:5: replace reason -> &'static str with \"xyzzy\"",
+        "crates/vizzi/src/review_application/projection.rs:404:5: replace unavailable -> bool with true",
+        "crates/vizzi/src/review_application/projection.rs:404:5: replace unavailable -> bool with false",
+        "crates/vizzi/src/review_application/projection.rs:455:23: replace |= with &= in classification",
+        "crates/vizzi/src/review_application/projection.rs:466:27: replace |= with &= in classification",
+        "crates/vizzi/src/review_application/projection.rs:477:15: replace |= with &= in classification",
+        "crates/vizzi/src/server/review.rs:200:13: delete match arm ReviewApiError::Invalid(_) in <impl IntoResponse for HttpError>::into_response",
+        "crates/vizzi/src/server/review.rs:201:13: delete match arm ReviewApiError::NotFound | ReviewApiError::Review(ReviewError::SourceUnavailable) in <impl IntoResponse for HttpError>::into_response",
+        "crates/vizzi/src/server/review.rs:208:13: delete match arm ReviewApiError::QueryCapacity | ReviewApiError::Review(ReviewError::Busy | ReviewError::PairCapacity) in <impl IntoResponse for HttpError>::into_response",
+        "crates/vizzi/src/server/review.rs:212:13: delete match arm ReviewApiError::Diff(DiffError::Limit(_)) | ReviewApiError::Review(ReviewError::Source(SourceReadError::Capacity)) in <impl IntoResponse for HttpError>::into_response",
+        "crates/vizzi/src/server/review.rs:216:13: delete match arm ReviewApiError::Diff(DiffError::Read{..}) in <impl IntoResponse for HttpError>::into_response",
+        "crates/vizzi/src/server/review.rs:217:13: delete match arm ReviewApiError::Diff(DiffError::Cancelled) in <impl IntoResponse for HttpError>::into_response",
+        "crates/vizzi/src/server/review.rs:218:13: delete match arm ReviewApiError::Diff(_) in <impl IntoResponse for HttpError>::into_response",
+        "crates/vizzi/src/server/review.rs:224:17: replace -= with += in <impl IntoResponse for HttpError>::into_response",
+        "crates/vizzi/src/server/review.rs:224:17: replace -= with /= in <impl IntoResponse for HttpError>::into_response"
+      ],
+      "timeouts": [
+        "crates/vizzi/src/review_application.rs:296:9: replace ReviewApplication::shutdown with ()",
+        "crates/vizzi/src/review_application.rs:377:5: replace worker_loop with ()",
+        "crates/vizzi/src/review_application.rs:380:42: replace && with || in worker_loop",
+        "crates/vizzi/src/review_application.rs:380:45: delete ! in worker_loop"
+      ],
+      "unviable_by_file": {
+        "crates/vizzi/src/review_application.rs": 17,
+        "crates/vizzi/src/review_application/projection.rs": 7,
+        "crates/vizzi/src/server/review.rs": 26
+      }
+    },
+    {
+      "total_mutants": 202,
+      "caught": 135,
+      "missed": 1,
+      "timeout": 6,
+      "unviable": 60,
+      "start_time": "2026-11-04T05:37:29.874210584Z",
+      "end_time": "2026-11-04T05:57:46.01725754Z",
+      "cargo_mutants_version": "27.1.0",
+      "name": "integration-mutation",
+      "baseline": "passed",
+      "raw_outcomes_sha256": "cb8e40eaa450110cd09e1f2ee49e4c1132dfbf9c260035bd3e0fc66e3f526c03",
+      "missed_mutations": [
+        "crates/vizzi/src/main.rs:18:5: replace main -> Result<(), Box<dyn std::error::Error>> with Ok(())"
+      ],
+      "timeouts": [
+        "crates/vizzi/src/review_application.rs:249:9: replace ReviewApplication::close -> Result<(), ReviewApiError> with Ok(())",
+        "crates/vizzi/src/review_application.rs:296:9: replace ReviewApplication::shutdown with ()",
+        "crates/vizzi/src/review_application.rs:377:5: replace worker_loop with ()",
+        "crates/vizzi/src/review_application.rs:380:42: replace && with || in worker_loop",
+        "crates/vizzi/src/review_application.rs:380:45: delete ! in worker_loop",
+        "crates/vizzi/src/review_application.rs:518:13: replace -= with /= in clip"
+      ],
+      "unviable_by_file": {
+        "crates/vizzi/src/host.rs": 1,
+        "crates/vizzi/src/review.rs": 7,
+        "crates/vizzi/src/review_application.rs": 17,
+        "crates/vizzi/src/server.rs": 2,
+        "crates/vizzi/src/review_application/projection.rs": 7,
+        "crates/vizzi/src/server/review.rs": 26
+      }
+    },
+    {
+      "total_mutants": 1,
+      "caught": 1,
+      "missed": 0,
+      "timeout": 0,
+      "unviable": 0,
+      "start_time": "2026-11-04T05:58:10.191998021Z",
+      "end_time": "2026-11-04T05:58:51.2999017Z",
+      "cargo_mutants_version": "27.1.0",
+      "name": "cli-mutation",
+      "baseline": "passed",
+      "raw_outcomes_sha256": "a0e857d4c1b9b05c40fe3a11c6dc04e6bd264b172b504c9f6b583bcd5519182b",
+      "missed_mutations": [],
+      "timeouts": [],
+      "unviable_by_file": {}
+    }
+  ],
+  "scopes": {
+    "mutation": "Full new application, projection and HTTP modules on an earlier development snapshot; --lib --test review --test review_application.",
+    "integration-mutation": "Full new application/projection/HTTP modules plus changed store, host, router and main integration, selected by the recorded patch; --lib --test review --test review_application. Source hashes above match this final production code.",
+    "cli-mutation": "Only main -> Ok(()) with --test cli, covering the executable omitted from the integration test selection."
+  },
+  "integration_diff_sha256": "dd83e3c6bce0eb7e729958c5c9acbcc2a2631c217ddbfcb2dc31bce84b4889ea",
+  "commands": [
+    "CARGO_BUILD_JOBS=1 RUST_TEST_THREADS=1 nice -n 10 cargo mutants --no-config -p vizzi -f crates/vizzi/src/review_application.rs -f crates/vizzi/src/review_application/projection.rs -f crates/vizzi/src/server/review.rs --test-package vizzi -j 1 --jobserver-tasks 1 --timeout 20 --build-timeout 180 -C --offline -o /tmp/vizzi-review-api-mutation-20261103 -- --lib --test review --test review_application",
+    "CARGO_BUILD_JOBS=1 RUST_TEST_THREADS=1 nice -n 10 cargo mutants --no-config -p vizzi -f crates/vizzi/src/review_application.rs -f crates/vizzi/src/review_application/projection.rs -f crates/vizzi/src/server/review.rs -f crates/vizzi/src/review.rs -f crates/vizzi/src/server.rs -f crates/vizzi/src/main.rs -f crates/vizzi/src/host.rs --in-diff /tmp/vizzi-review-api-integration.diff --test-package vizzi -j 1 --jobserver-tasks 1 --timeout 20 --build-timeout 180 -C --offline -o /tmp/vizzi-review-api-integration-mutation-20261103 -- --lib --test review --test review_application",
+    "CARGO_BUILD_JOBS=1 RUST_TEST_THREADS=1 nice -n 10 cargo mutants --no-config -p vizzi -f crates/vizzi/src/main.rs -F \"replace main .* with Ok\\(\\(\\)\\)\" --test-package vizzi -j 1 --jobserver-tasks 1 --timeout 30 --build-timeout 180 -C --offline -o /tmp/vizzi-review-api-cli-mutation-20261103 -- --test cli"
+  ],
+  "failed_baseline": {
+    "mutants_tested": 0,
+    "cause": "An error-mapping table caught DiffError::Read mapped to 422 after its explicit 503 arm was removed. Restored the arm before the successful integration run.",
+    "log_sha256": "949a9aea2fb37a758bf61b8c4beaead00b4af6ff7f170e54ef6b73ada170e53d"
+  },
+  "initial_survivor_follow_up": [
+    {
+      "name": "crates/vizzi/src/review_application.rs:339:9: replace <impl Drop for ReviewApplication>::drop with ()",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application.rs:433:60: replace || with && in run_job",
+      "follow_up": "Removed: cancellation now uses only the authoritative desired ticket; shutdown invalidates it."
+    },
+    {
+      "name": "crates/vizzi/src/review_application.rs:484:9: replace || with && in validate",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application.rs:483:35: replace > with == in validate",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application.rs:483:35: replace > with >= in validate",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application.rs:498:24: replace match guard value.len() <= 4096 with true in scope",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application.rs:498:24: replace match guard value.len() <= 4096 with false in scope",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application.rs:498:36: replace <= with > in scope",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application.rs:509:5: replace now_ms -> u64 with 0",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application.rs:509:5: replace now_ms -> u64 with 1",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application.rs:518:13: replace -= with += in clip",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application.rs:518:13: replace -= with /= in clip",
+      "follow_up": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/review_application.rs:520:30: replace < with <= in clip",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application.rs:526:9: replace ReviewApiError::code -> &'static str with \"\"",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application.rs:526:9: replace ReviewApiError::code -> &'static str with \"xyzzy\"",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application/projection.rs:205:25: replace > with >= in ComparisonQuery::files",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application/projection.rs:218:55: replace += with -= in ComparisonQuery::files",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application/projection.rs:218:55: replace += with *= in ComparisonQuery::files",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application/projection.rs:221:61: replace += with -= in ComparisonQuery::files",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application/projection.rs:221:61: replace += with *= in ComparisonQuery::files",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application/projection.rs:223:32: replace += with -= in ComparisonQuery::files",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application/projection.rs:223:32: replace += with *= in ComparisonQuery::files",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application/projection.rs:290:35: replace || with && in ComparisonQuery::window",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application/projection.rs:297:31: replace |= with &= in ComparisonQuery::window",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application/projection.rs:362:34: replace < with == in ComparisonQuery::diff",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application/projection.rs:362:34: replace < with > in ComparisonQuery::diff",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application/projection.rs:362:34: replace < with <= in ComparisonQuery::diff",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application/projection.rs:363:49: replace - with / in ComparisonQuery::diff",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application/projection.rs:364:49: replace - with + in ComparisonQuery::diff",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application/projection.rs:364:49: replace - with / in ComparisonQuery::diff",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application/projection.rs:394:5: replace reason -> &'static str with \"\"",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application/projection.rs:394:5: replace reason -> &'static str with \"xyzzy\"",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application/projection.rs:404:5: replace unavailable -> bool with true",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application/projection.rs:404:5: replace unavailable -> bool with false",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application/projection.rs:455:23: replace |= with &= in classification",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application/projection.rs:466:27: replace |= with &= in classification",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_application/projection.rs:477:15: replace |= with &= in classification",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/server/review.rs:200:13: delete match arm ReviewApiError::Invalid(_) in <impl IntoResponse for HttpError>::into_response",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/server/review.rs:201:13: delete match arm ReviewApiError::NotFound | ReviewApiError::Review(ReviewError::SourceUnavailable) in <impl IntoResponse for HttpError>::into_response",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/server/review.rs:208:13: delete match arm ReviewApiError::QueryCapacity | ReviewApiError::Review(ReviewError::Busy | ReviewError::PairCapacity) in <impl IntoResponse for HttpError>::into_response",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/server/review.rs:212:13: delete match arm ReviewApiError::Diff(DiffError::Limit(_)) | ReviewApiError::Review(ReviewError::Source(SourceReadError::Capacity)) in <impl IntoResponse for HttpError>::into_response",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/server/review.rs:216:13: delete match arm ReviewApiError::Diff(DiffError::Read{..}) in <impl IntoResponse for HttpError>::into_response",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/server/review.rs:217:13: delete match arm ReviewApiError::Diff(DiffError::Cancelled) in <impl IntoResponse for HttpError>::into_response",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/server/review.rs:218:13: delete match arm ReviewApiError::Diff(_) in <impl IntoResponse for HttpError>::into_response",
+      "follow_up": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/server/review.rs:224:17: replace -= with += in <impl IntoResponse for HttpError>::into_response",
+      "follow_up": "Removed: duplicate clipping loop delegates to the separately mutated shared UTF-8 clip helper."
+    },
+    {
+      "name": "crates/vizzi/src/server/review.rs:224:17: replace -= with /= in <impl IntoResponse for HttpError>::into_response",
+      "follow_up": "Removed: duplicate clipping loop delegates to the separately mutated shared UTF-8 clip helper."
+    }
+  ],
+  "integration_survivor_follow_up": "The sole survivor, main -> Ok(()), is caught by the CLI follow-up; no exclusions.",
+  "verification": {
+    "workspace_tests_passed": 397,
+    "workspace_tests_failed": 0,
+    "format": "passed",
+    "clippy_all_targets_all_features_deny_warnings": "passed",
+    "frozen_transport_variants": 2
+  },
+  "limitations": "Overlapping runs are not summed. Timeouts are deadline outcomes, not assertion catches; unviable mutations failed compilation and provide no test evidence. The initial cohort predates final source/test refinements. No coverage percentage, browser usability or performance qualification is inferred."
+}
