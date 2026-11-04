@@ -1,0 +1,5466 @@
+{
+  "schema": 1,
+  "completed": true,
+  "phase": "complete",
+  "variant": "variant-a",
+  "operator": "Reference-aware guided automation; paths, declaration names and expected behaviour are known. No unfamiliar-operator or comprehension claim.",
+  "options": {
+    "fixture": "/tmp/vizzi-text-hunks-a-20261103",
+    "output": "/tmp/vizzi-refresh-review-a-fixed-20261104",
+    "noBuild": true
+  },
+  "steps": [
+    {
+      "name": "initial",
+      "intent": "Open the review page without capturing an implicit baseline.",
+      "state": {
+        "path": "Choose a baseline",
+        "side": "working",
+        "selectedSides": [
+          "working"
+        ],
+        "panes": {
+          "base": {
+            "sourceTop": 0,
+            "sourceLeft": 0,
+            "outlineTop": 0,
+            "declaration": null,
+            "renderedRows": 0,
+            "outlineButtons": 0,
+            "rows": []
+          },
+          "working": {
+            "sourceTop": 0,
+            "sourceLeft": 0,
+            "outlineTop": 0,
+            "declaration": null,
+            "renderedRows": 0,
+            "outlineButtons": 0,
+            "rows": []
+          }
+        },
+        "labels": "The working side includes staged, unstaged and non-ignored untracked source as observed on disk.",
+        "counts": "No comparison captured",
+        "filter": "",
+        "notice": null,
+        "fileButtons": 0,
+        "hunkButtons": 0,
+        "hunks": []
+      },
+      "screenshot": "00-initial.png"
+    },
+    {
+      "name": "comparison",
+      "intent": "Observe the frozen baseline, root scope and two changed paths.",
+      "state": {
+        "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+        "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+        "path": "doc/compiler-source-reading.md",
+        "side": "working",
+        "selectedSides": [
+          "working"
+        ],
+        "panes": {
+          "base": {
+            "version": "",
+            "sourceTop": 0,
+            "sourceLeft": 0,
+            "outlineTop": 0,
+            "declaration": null,
+            "renderedRows": 0,
+            "outlineButtons": 0,
+            "rows": []
+          },
+          "working": {
+            "version": "d8fe76da71b6d2e8e93bb088072c524c891d87f45f1ec1e6f71135a7ac2c2537",
+            "sourceTop": 0,
+            "sourceLeft": 0,
+            "outlineTop": 0,
+            "declaration": null,
+            "renderedRows": 6,
+            "outlineButtons": 0,
+            "rows": [
+              {
+                "number": 1,
+                "text": "# Source-read diagnostics"
+              },
+              {
+                "number": 2,
+                "text": ""
+              },
+              {
+                "number": 3,
+                "text": "A failed source read now says that source lookup stopped. The diagnostic keeps the"
+              },
+              {
+                "number": 4,
+                "text": "requested source name and the underlying I/O error. Source-lookup rules should stay"
+              },
+              {
+                "number": 5,
+                "text": "the same; this is a wording improvement."
+              },
+              {
+                "number": 6,
+                "text": ""
+              }
+            ]
+          }
+        },
+        "labels": "Base 1a4f5b65dd2a269298748df2dfd68092a169a8d9 → 1a4f5b65dd2a269298748df2dfd68092a169a8d9 · subtree . · working observed 2026-11-04T21:21:35.204Z to 2026-11-04T21:21:35.243Z",
+        "counts": "1033 paths · 1 added · 0 removed · 1 modified · 1031 unchanged · 0 unassessed · 0 unavailable",
+        "filter": "",
+        "notice": null,
+        "fileButtons": 2,
+        "hunkButtons": 1,
+        "hunks": [
+          {
+            "id": "443f08b0f412848afbbef8f01f8d685a184ea46b2c103bcbe381d83b92c3755a",
+            "label": "1: @@ -0,0 +1,5 @@",
+            "selected": true
+          }
+        ],
+        "history": "a90f7e5b-11fb-4257-b012-d73dc37ff64d",
+        "audit": {
+          "verifiedRows": 6,
+          "maxRenderedRows": 6,
+          "maxOutlineButtons": 0
+        }
+      },
+      "screenshot": "01-comparison.png"
+    },
+    {
+      "name": "compiler-changes",
+      "intent": "Select the changed Rust source and inspect its textual hunks.",
+      "state": {
+        "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+        "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+        "path": "src/compiler/mod.rs",
+        "side": "working",
+        "selectedSides": [
+          "working"
+        ],
+        "panes": {
+          "base": {
+            "version": "31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6",
+            "sourceTop": 2552,
+            "sourceLeft": 0,
+            "outlineTop": 0,
+            "declaration": null,
+            "renderedRows": 56,
+            "outlineButtons": 18,
+            "rows": [
+              {
+                "number": 117,
+                "text": "        }"
+              },
+              {
+                "number": 118,
+                "text": "    }"
+              },
+              {
+                "number": 119,
+                "text": ""
+              },
+              {
+                "number": 120,
+                "text": "    /// Fully compile a file into a Program struct"
+              },
+              {
+                "number": 121,
+                "text": "    ///"
+              },
+              {
+                "number": 122,
+                "text": "    /// # Arguments"
+              },
+              {
+                "number": 123,
+                "text": "    /// `path` - The path of the file to compile. Also used for error messaging."
+              },
+              {
+                "number": 124,
+                "text": "    ///  If the file in question ends in `.c`, the extension can be left off, per LPC convention."
+              },
+              {
+                "number": 125,
+                "text": "    ///"
+              },
+              {
+                "number": 126,
+                "text": "    /// # Examples"
+              },
+              {
+                "number": 127,
+                "text": "    /// ```"
+              },
+              {
+                "number": 128,
+                "text": "    /// # #[tokio::main(flavor = \"current_thread\")]"
+              },
+              {
+                "number": 129,
+                "text": "    /// # async fn main() {"
+              },
+              {
+                "number": 130,
+                "text": "    /// use lpc_rs::compiler::Compiler;"
+              },
+              {
+                "number": 131,
+                "text": "    /// use lpc_rs_core::lpc_path::LpcPath;"
+              },
+              {
+                "number": 132,
+                "text": "    ///"
+              },
+              {
+                "number": 133,
+                "text": "    /// let compiled = Compiler::default()"
+              },
+              {
+                "number": 134,
+                "text": "    ///     .compile_file(LpcPath::new_server(\"tests/fixtures/code/example.c\"))"
+              },
+              {
+                "number": 135,
+                "text": "    ///     .await"
+              },
+              {
+                "number": 136,
+                "text": "    ///     .expect(\"Unable to compile.\");"
+              },
+              {
+                "number": 137,
+                "text": "    /// # }"
+              },
+              {
+                "number": 138,
+                "text": "    /// ```"
+              },
+              {
+                "number": 139,
+                "text": "    #[instrument(skip(self))]"
+              },
+              {
+                "number": 140,
+                "text": "    pub async fn compile_file<T>(&self, path: T) -> Result<Compiled>"
+              }
+            ]
+          },
+          "working": {
+            "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+            "sourceTop": 2552,
+            "sourceLeft": 0,
+            "outlineTop": 0,
+            "declaration": null,
+            "renderedRows": 56,
+            "outlineButtons": 18,
+            "rows": [
+              {
+                "number": 117,
+                "text": "        }"
+              },
+              {
+                "number": 118,
+                "text": "    }"
+              },
+              {
+                "number": 119,
+                "text": ""
+              },
+              {
+                "number": 120,
+                "text": "    /// Read a source file and compile it into a Program struct"
+              },
+              {
+                "number": 121,
+                "text": "    ///"
+              },
+              {
+                "number": 122,
+                "text": "    /// # Arguments"
+              },
+              {
+                "number": 123,
+                "text": "    /// `path` - The path of the file to compile. Also used for error messaging."
+              },
+              {
+                "number": 124,
+                "text": "    ///  If the file in question ends in `.c`, the extension can be left off, per LPC convention."
+              },
+              {
+                "number": 125,
+                "text": "    ///"
+              },
+              {
+                "number": 126,
+                "text": "    /// # Examples"
+              },
+              {
+                "number": 127,
+                "text": "    /// ```"
+              },
+              {
+                "number": 128,
+                "text": "    /// # #[tokio::main(flavor = \"current_thread\")]"
+              },
+              {
+                "number": 129,
+                "text": "    /// # async fn main() {"
+              },
+              {
+                "number": 130,
+                "text": "    /// use lpc_rs::compiler::Compiler;"
+              },
+              {
+                "number": 131,
+                "text": "    /// use lpc_rs_core::lpc_path::LpcPath;"
+              },
+              {
+                "number": 132,
+                "text": "    ///"
+              },
+              {
+                "number": 133,
+                "text": "    /// let compiled = Compiler::default()"
+              },
+              {
+                "number": 134,
+                "text": "    ///     .compile_file(LpcPath::new_server(\"tests/fixtures/code/example.c\"))"
+              },
+              {
+                "number": 135,
+                "text": "    ///     .await"
+              },
+              {
+                "number": 136,
+                "text": "    ///     .expect(\"Unable to compile.\");"
+              },
+              {
+                "number": 137,
+                "text": "    /// # }"
+              },
+              {
+                "number": 138,
+                "text": "    /// ```"
+              },
+              {
+                "number": 139,
+                "text": "    #[instrument(skip(self))]"
+              },
+              {
+                "number": 140,
+                "text": "    pub async fn compile_file<T>(&self, path: T) -> Result<Compiled>"
+              }
+            ]
+          }
+        },
+        "labels": "Base 1a4f5b65dd2a269298748df2dfd68092a169a8d9 → 1a4f5b65dd2a269298748df2dfd68092a169a8d9 · subtree . · working observed 2026-11-04T21:21:35.204Z to 2026-11-04T21:21:35.243Z",
+        "counts": "1033 paths · 1 added · 0 removed · 1 modified · 1031 unchanged · 0 unassessed · 0 unavailable",
+        "filter": "",
+        "notice": null,
+        "fileButtons": 2,
+        "hunkButtons": 3,
+        "hunks": [
+          {
+            "id": "8e33638836326fd9b68ab24cf1fec45426e4d6d75394f6a32505663a54110b6d",
+            "label": "1: @@ -117,7 +117,7 @@",
+            "selected": true
+          },
+          {
+            "id": "ea710daf40cc4e80d776db258fc85a6d68348855b8b6f81a8c0006861b74e087",
+            "label": "2: @@ -156,8 +156,10 @@",
+            "selected": false
+          },
+          {
+            "id": "7127b23b703362fc2d126df05edd925097655a9382d7e87d0e22bfc8c26656a8",
+            "label": "3: @@ -166,7 +168,7 @@",
+            "selected": false
+          }
+        ],
+        "history": "5252fe70-ef4b-4aad-91e0-08c6a199fe87",
+        "audit": {
+          "verifiedRows": 48,
+          "maxRenderedRows": 56,
+          "maxOutlineButtons": 18
+        }
+      },
+      "screenshot": "02-compiler-changes.png"
+    },
+    {
+      "name": "hunk-1",
+      "intent": "Reveal the corresponding base and working ranges through the hunk control.",
+      "state": {
+        "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+        "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+        "path": "src/compiler/mod.rs",
+        "side": "working",
+        "selectedSides": [
+          "working"
+        ],
+        "panes": {
+          "base": {
+            "version": "31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6",
+            "sourceTop": 2552,
+            "sourceLeft": 0,
+            "outlineTop": 0,
+            "declaration": null,
+            "renderedRows": 56,
+            "outlineButtons": 18,
+            "rows": [
+              {
+                "number": 117,
+                "text": "        }"
+              },
+              {
+                "number": 118,
+                "text": "    }"
+              },
+              {
+                "number": 119,
+                "text": ""
+              },
+              {
+                "number": 120,
+                "text": "    /// Fully compile a file into a Program struct"
+              },
+              {
+                "number": 121,
+                "text": "    ///"
+              },
+              {
+                "number": 122,
+                "text": "    /// # Arguments"
+              },
+              {
+                "number": 123,
+                "text": "    /// `path` - The path of the file to compile. Also used for error messaging."
+              },
+              {
+                "number": 124,
+                "text": "    ///  If the file in question ends in `.c`, the extension can be left off, per LPC convention."
+              },
+              {
+                "number": 125,
+                "text": "    ///"
+              },
+              {
+                "number": 126,
+                "text": "    /// # Examples"
+              },
+              {
+                "number": 127,
+                "text": "    /// ```"
+              },
+              {
+                "number": 128,
+                "text": "    /// # #[tokio::main(flavor = \"current_thread\")]"
+              },
+              {
+                "number": 129,
+                "text": "    /// # async fn main() {"
+              },
+              {
+                "number": 130,
+                "text": "    /// use lpc_rs::compiler::Compiler;"
+              },
+              {
+                "number": 131,
+                "text": "    /// use lpc_rs_core::lpc_path::LpcPath;"
+              },
+              {
+                "number": 132,
+                "text": "    ///"
+              },
+              {
+                "number": 133,
+                "text": "    /// let compiled = Compiler::default()"
+              },
+              {
+                "number": 134,
+                "text": "    ///     .compile_file(LpcPath::new_server(\"tests/fixtures/code/example.c\"))"
+              },
+              {
+                "number": 135,
+                "text": "    ///     .await"
+              },
+              {
+                "number": 136,
+                "text": "    ///     .expect(\"Unable to compile.\");"
+              },
+              {
+                "number": 137,
+                "text": "    /// # }"
+              },
+              {
+                "number": 138,
+                "text": "    /// ```"
+              },
+              {
+                "number": 139,
+                "text": "    #[instrument(skip(self))]"
+              },
+              {
+                "number": 140,
+                "text": "    pub async fn compile_file<T>(&self, path: T) -> Result<Compiled>"
+              }
+            ]
+          },
+          "working": {
+            "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+            "sourceTop": 2552,
+            "sourceLeft": 0,
+            "outlineTop": 0,
+            "declaration": null,
+            "renderedRows": 56,
+            "outlineButtons": 18,
+            "rows": [
+              {
+                "number": 117,
+                "text": "        }"
+              },
+              {
+                "number": 118,
+                "text": "    }"
+              },
+              {
+                "number": 119,
+                "text": ""
+              },
+              {
+                "number": 120,
+                "text": "    /// Read a source file and compile it into a Program struct"
+              },
+              {
+                "number": 121,
+                "text": "    ///"
+              },
+              {
+                "number": 122,
+                "text": "    /// # Arguments"
+              },
+              {
+                "number": 123,
+                "text": "    /// `path` - The path of the file to compile. Also used for error messaging."
+              },
+              {
+                "number": 124,
+                "text": "    ///  If the file in question ends in `.c`, the extension can be left off, per LPC convention."
+              },
+              {
+                "number": 125,
+                "text": "    ///"
+              },
+              {
+                "number": 126,
+                "text": "    /// # Examples"
+              },
+              {
+                "number": 127,
+                "text": "    /// ```"
+              },
+              {
+                "number": 128,
+                "text": "    /// # #[tokio::main(flavor = \"current_thread\")]"
+              },
+              {
+                "number": 129,
+                "text": "    /// # async fn main() {"
+              },
+              {
+                "number": 130,
+                "text": "    /// use lpc_rs::compiler::Compiler;"
+              },
+              {
+                "number": 131,
+                "text": "    /// use lpc_rs_core::lpc_path::LpcPath;"
+              },
+              {
+                "number": 132,
+                "text": "    ///"
+              },
+              {
+                "number": 133,
+                "text": "    /// let compiled = Compiler::default()"
+              },
+              {
+                "number": 134,
+                "text": "    ///     .compile_file(LpcPath::new_server(\"tests/fixtures/code/example.c\"))"
+              },
+              {
+                "number": 135,
+                "text": "    ///     .await"
+              },
+              {
+                "number": 136,
+                "text": "    ///     .expect(\"Unable to compile.\");"
+              },
+              {
+                "number": 137,
+                "text": "    /// # }"
+              },
+              {
+                "number": 138,
+                "text": "    /// ```"
+              },
+              {
+                "number": 139,
+                "text": "    #[instrument(skip(self))]"
+              },
+              {
+                "number": 140,
+                "text": "    pub async fn compile_file<T>(&self, path: T) -> Result<Compiled>"
+              }
+            ]
+          }
+        },
+        "labels": "Base 1a4f5b65dd2a269298748df2dfd68092a169a8d9 → 1a4f5b65dd2a269298748df2dfd68092a169a8d9 · subtree . · working observed 2026-11-04T21:21:35.204Z to 2026-11-04T21:21:35.243Z",
+        "counts": "1033 paths · 1 added · 0 removed · 1 modified · 1031 unchanged · 0 unassessed · 0 unavailable",
+        "filter": "",
+        "notice": null,
+        "fileButtons": 2,
+        "hunkButtons": 3,
+        "hunks": [
+          {
+            "id": "8e33638836326fd9b68ab24cf1fec45426e4d6d75394f6a32505663a54110b6d",
+            "label": "1: @@ -117,7 +117,7 @@",
+            "selected": true
+          },
+          {
+            "id": "ea710daf40cc4e80d776db258fc85a6d68348855b8b6f81a8c0006861b74e087",
+            "label": "2: @@ -156,8 +156,10 @@",
+            "selected": false
+          },
+          {
+            "id": "7127b23b703362fc2d126df05edd925097655a9382d7e87d0e22bfc8c26656a8",
+            "label": "3: @@ -166,7 +168,7 @@",
+            "selected": false
+          }
+        ],
+        "history": "5252fe70-ef4b-4aad-91e0-08c6a199fe87",
+        "audit": {
+          "verifiedRows": 48,
+          "maxRenderedRows": 56,
+          "maxOutlineButtons": 18
+        }
+      },
+      "screenshot": "03-hunk-1.png"
+    },
+    {
+      "name": "hunk-2",
+      "intent": "Reveal the corresponding base and working ranges through the hunk control.",
+      "state": {
+        "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+        "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+        "path": "src/compiler/mod.rs",
+        "side": "working",
+        "selectedSides": [
+          "working"
+        ],
+        "panes": {
+          "base": {
+            "version": "31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6",
+            "sourceTop": 3410,
+            "sourceLeft": 0,
+            "outlineTop": 0,
+            "declaration": null,
+            "renderedRows": 56,
+            "outlineButtons": 18,
+            "rows": [
+              {
+                "number": 156,
+                "text": "            match reader.read(absolute).await.map(LpcSource::from_bytes) {"
+              },
+              {
+                "number": 157,
+                "text": "                Ok(source) => return Ok((identity, source)),"
+              },
+              {
+                "number": 158,
+                "text": "                Err(error)"
+              },
+              {
+                "number": 159,
+                "text": "                    if error.kind() == ErrorKind::NotFound"
+              },
+              {
+                "number": 160,
+                "text": "                        && absolute.extension().and_then(OsStr::to_str) != Some(\"c\") =>"
+              },
+              {
+                "number": 161,
+                "text": "                {"
+              },
+              {
+                "number": 162,
+                "text": "                    identity = Arc::new(CompilerSource::new("
+              },
+              {
+                "number": 163,
+                "text": "                        identity.input().with_extension(\"c\"),"
+              },
+              {
+                "number": 164,
+                "text": "                        &self.config,"
+              },
+              {
+                "number": 165,
+                "text": "                    ));"
+              },
+              {
+                "number": 166,
+                "text": "                }"
+              },
+              {
+                "number": 167,
+                "text": "                Err(error) => {"
+              },
+              {
+                "number": 168,
+                "text": "                    return Err(lpc_error!("
+              },
+              {
+                "number": 169,
+                "text": "                        \"Cannot read file `{}`: {}\","
+              },
+              {
+                "number": 170,
+                "text": "                        identity.name(),"
+              },
+              {
+                "number": 171,
+                "text": "                        error"
+              },
+              {
+                "number": 172,
+                "text": "                    ));"
+              },
+              {
+                "number": 173,
+                "text": "                }"
+              },
+              {
+                "number": 174,
+                "text": "            }"
+              },
+              {
+                "number": 175,
+                "text": "        }"
+              },
+              {
+                "number": 176,
+                "text": "    }"
+              },
+              {
+                "number": 177,
+                "text": ""
+              },
+              {
+                "number": 178,
+                "text": "    /// Compile the object an in-game path names: its `.c` source"
+              },
+              {
+                "number": 179,
+                "text": "    /// ([`LpcPath::source_file`]), confined to the lib first."
+              }
+            ]
+          },
+          "working": {
+            "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+            "sourceTop": 3410,
+            "sourceLeft": 0,
+            "outlineTop": 0,
+            "declaration": null,
+            "renderedRows": 56,
+            "outlineButtons": 18,
+            "rows": [
+              {
+                "number": 156,
+                "text": "            match reader.read(absolute).await.map(LpcSource::from_bytes) {"
+              },
+              {
+                "number": 157,
+                "text": "                Ok(source) => return Ok((identity, source)),"
+              },
+              {
+                "number": 158,
+                "text": "                Err(error)"
+              },
+              {
+                "number": 159,
+                "text": "                    if matches!("
+              },
+              {
+                "number": 160,
+                "text": "                        error.kind(),"
+              },
+              {
+                "number": 161,
+                "text": "                        ErrorKind::NotFound | ErrorKind::PermissionDenied"
+              },
+              {
+                "number": 162,
+                "text": "                    ) && absolute.extension().and_then(OsStr::to_str) != Some(\"c\") =>"
+              },
+              {
+                "number": 163,
+                "text": "                {"
+              },
+              {
+                "number": 164,
+                "text": "                    identity = Arc::new(CompilerSource::new("
+              },
+              {
+                "number": 165,
+                "text": "                        identity.input().with_extension(\"c\"),"
+              },
+              {
+                "number": 166,
+                "text": "                        &self.config,"
+              },
+              {
+                "number": 167,
+                "text": "                    ));"
+              },
+              {
+                "number": 168,
+                "text": "                }"
+              },
+              {
+                "number": 169,
+                "text": "                Err(error) => {"
+              },
+              {
+                "number": 170,
+                "text": "                    return Err(lpc_error!("
+              },
+              {
+                "number": 171,
+                "text": "                        \"Cannot read file `{}`: {} (source lookup stopped)\","
+              },
+              {
+                "number": 172,
+                "text": "                        identity.name(),"
+              },
+              {
+                "number": 173,
+                "text": "                        error"
+              },
+              {
+                "number": 174,
+                "text": "                    ));"
+              },
+              {
+                "number": 175,
+                "text": "                }"
+              },
+              {
+                "number": 176,
+                "text": "            }"
+              },
+              {
+                "number": 177,
+                "text": "        }"
+              },
+              {
+                "number": 178,
+                "text": "    }"
+              },
+              {
+                "number": 179,
+                "text": ""
+              }
+            ]
+          }
+        },
+        "labels": "Base 1a4f5b65dd2a269298748df2dfd68092a169a8d9 → 1a4f5b65dd2a269298748df2dfd68092a169a8d9 · subtree . · working observed 2026-11-04T21:21:35.204Z to 2026-11-04T21:21:35.243Z",
+        "counts": "1033 paths · 1 added · 0 removed · 1 modified · 1031 unchanged · 0 unassessed · 0 unavailable",
+        "filter": "",
+        "notice": null,
+        "fileButtons": 2,
+        "hunkButtons": 3,
+        "hunks": [
+          {
+            "id": "8e33638836326fd9b68ab24cf1fec45426e4d6d75394f6a32505663a54110b6d",
+            "label": "1: @@ -117,7 +117,7 @@",
+            "selected": false
+          },
+          {
+            "id": "ea710daf40cc4e80d776db258fc85a6d68348855b8b6f81a8c0006861b74e087",
+            "label": "2: @@ -156,8 +156,10 @@",
+            "selected": true
+          },
+          {
+            "id": "7127b23b703362fc2d126df05edd925097655a9382d7e87d0e22bfc8c26656a8",
+            "label": "3: @@ -166,7 +168,7 @@",
+            "selected": false
+          }
+        ],
+        "history": "53912160-7ceb-4551-b1e6-0153a9b9a9dc",
+        "audit": {
+          "verifiedRows": 48,
+          "maxRenderedRows": 56,
+          "maxOutlineButtons": 18
+        }
+      },
+      "screenshot": "04-hunk-2.png"
+    },
+    {
+      "name": "hunk-3",
+      "intent": "Reveal the corresponding base and working ranges through the hunk control.",
+      "state": {
+        "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+        "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+        "path": "src/compiler/mod.rs",
+        "side": "working",
+        "selectedSides": [
+          "working"
+        ],
+        "panes": {
+          "base": {
+            "version": "31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6",
+            "sourceTop": 3630,
+            "sourceLeft": 0,
+            "outlineTop": 0,
+            "declaration": null,
+            "renderedRows": 56,
+            "outlineButtons": 18,
+            "rows": [
+              {
+                "number": 166,
+                "text": "                }"
+              },
+              {
+                "number": 167,
+                "text": "                Err(error) => {"
+              },
+              {
+                "number": 168,
+                "text": "                    return Err(lpc_error!("
+              },
+              {
+                "number": 169,
+                "text": "                        \"Cannot read file `{}`: {}\","
+              },
+              {
+                "number": 170,
+                "text": "                        identity.name(),"
+              },
+              {
+                "number": 171,
+                "text": "                        error"
+              },
+              {
+                "number": 172,
+                "text": "                    ));"
+              },
+              {
+                "number": 173,
+                "text": "                }"
+              },
+              {
+                "number": 174,
+                "text": "            }"
+              },
+              {
+                "number": 175,
+                "text": "        }"
+              },
+              {
+                "number": 176,
+                "text": "    }"
+              },
+              {
+                "number": 177,
+                "text": ""
+              },
+              {
+                "number": 178,
+                "text": "    /// Compile the object an in-game path names: its `.c` source"
+              },
+              {
+                "number": 179,
+                "text": "    /// ([`LpcPath::source_file`]), confined to the lib first."
+              },
+              {
+                "number": 180,
+                "text": "    #[instrument(skip(self))]"
+              },
+              {
+                "number": 181,
+                "text": "    pub async fn compile_in_game_file("
+              },
+              {
+                "number": 182,
+                "text": "        &self,"
+              },
+              {
+                "number": 183,
+                "text": "        path: &LpcPath,"
+              },
+              {
+                "number": 184,
+                "text": "        span: Option<Span>,"
+              },
+              {
+                "number": 185,
+                "text": "    ) -> Result<Compiled> {"
+              },
+              {
+                "number": 186,
+                "text": "        self.config.validate_in_game_path(path, span)?;"
+              },
+              {
+                "number": 187,
+                "text": ""
+              },
+              {
+                "number": 188,
+                "text": "        self.compile_file(path.source_file()).await"
+              },
+              {
+                "number": 189,
+                "text": "    }"
+              }
+            ]
+          },
+          "working": {
+            "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+            "sourceTop": 3674,
+            "sourceLeft": 0,
+            "outlineTop": 0,
+            "declaration": null,
+            "renderedRows": 56,
+            "outlineButtons": 18,
+            "rows": [
+              {
+                "number": 168,
+                "text": "                }"
+              },
+              {
+                "number": 169,
+                "text": "                Err(error) => {"
+              },
+              {
+                "number": 170,
+                "text": "                    return Err(lpc_error!("
+              },
+              {
+                "number": 171,
+                "text": "                        \"Cannot read file `{}`: {} (source lookup stopped)\","
+              },
+              {
+                "number": 172,
+                "text": "                        identity.name(),"
+              },
+              {
+                "number": 173,
+                "text": "                        error"
+              },
+              {
+                "number": 174,
+                "text": "                    ));"
+              },
+              {
+                "number": 175,
+                "text": "                }"
+              },
+              {
+                "number": 176,
+                "text": "            }"
+              },
+              {
+                "number": 177,
+                "text": "        }"
+              },
+              {
+                "number": 178,
+                "text": "    }"
+              },
+              {
+                "number": 179,
+                "text": ""
+              },
+              {
+                "number": 180,
+                "text": "    /// Compile the object an in-game path names: its `.c` source"
+              },
+              {
+                "number": 181,
+                "text": "    /// ([`LpcPath::source_file`]), confined to the lib first."
+              },
+              {
+                "number": 182,
+                "text": "    #[instrument(skip(self))]"
+              },
+              {
+                "number": 183,
+                "text": "    pub async fn compile_in_game_file("
+              },
+              {
+                "number": 184,
+                "text": "        &self,"
+              },
+              {
+                "number": 185,
+                "text": "        path: &LpcPath,"
+              },
+              {
+                "number": 186,
+                "text": "        span: Option<Span>,"
+              },
+              {
+                "number": 187,
+                "text": "    ) -> Result<Compiled> {"
+              },
+              {
+                "number": 188,
+                "text": "        self.config.validate_in_game_path(path, span)?;"
+              },
+              {
+                "number": 189,
+                "text": ""
+              },
+              {
+                "number": 190,
+                "text": "        self.compile_file(path.source_file()).await"
+              },
+              {
+                "number": 191,
+                "text": "    }"
+              }
+            ]
+          }
+        },
+        "labels": "Base 1a4f5b65dd2a269298748df2dfd68092a169a8d9 → 1a4f5b65dd2a269298748df2dfd68092a169a8d9 · subtree . · working observed 2026-11-04T21:21:35.204Z to 2026-11-04T21:21:35.243Z",
+        "counts": "1033 paths · 1 added · 0 removed · 1 modified · 1031 unchanged · 0 unassessed · 0 unavailable",
+        "filter": "",
+        "notice": null,
+        "fileButtons": 2,
+        "hunkButtons": 3,
+        "hunks": [
+          {
+            "id": "8e33638836326fd9b68ab24cf1fec45426e4d6d75394f6a32505663a54110b6d",
+            "label": "1: @@ -117,7 +117,7 @@",
+            "selected": false
+          },
+          {
+            "id": "ea710daf40cc4e80d776db258fc85a6d68348855b8b6f81a8c0006861b74e087",
+            "label": "2: @@ -156,8 +156,10 @@",
+            "selected": false
+          },
+          {
+            "id": "7127b23b703362fc2d126df05edd925097655a9382d7e87d0e22bfc8c26656a8",
+            "label": "3: @@ -166,7 +168,7 @@",
+            "selected": true
+          }
+        ],
+        "history": "40787e23-2898-4202-bd83-aa00c383e5c9",
+        "audit": {
+          "verifiedRows": 48,
+          "maxRenderedRows": 56,
+          "maxOutlineButtons": 18
+        }
+      },
+      "screenshot": "05-hunk-3.png"
+    },
+    {
+      "name": "read-policy",
+      "intent": "Inspect both source-read policies without inferring semantic equivalence.",
+      "state": {
+        "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+        "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+        "path": "src/compiler/mod.rs",
+        "side": "base",
+        "selectedSides": [
+          "base"
+        ],
+        "panes": {
+          "base": {
+            "version": "31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6",
+            "sourceTop": 3234,
+            "sourceLeft": 0,
+            "outlineTop": 912,
+            "declaration": "ed71f6144f6a2488da024a206d41c22f24d111b505118bc09faaeef37deae133",
+            "renderedRows": 56,
+            "outlineButtons": 26,
+            "rows": [
+              {
+                "number": 150,
+                "text": ""
+              },
+              {
+                "number": 151,
+                "text": "    async fn read_file(&self, path: LpcPath) -> Result<(Arc<CompilerSource>, LpcSource)> {"
+              },
+              {
+                "number": 152,
+                "text": "        let mut identity = Arc::new(CompilerSource::new(path, &self.config));"
+              },
+              {
+                "number": 153,
+                "text": "        loop {"
+              },
+              {
+                "number": 154,
+                "text": "            let absolute = identity.resolved().server();"
+              },
+              {
+                "number": 155,
+                "text": "            let reader = self.source_reader.as_deref().unwrap_or(&DiskSourceReader);"
+              },
+              {
+                "number": 156,
+                "text": "            match reader.read(absolute).await.map(LpcSource::from_bytes) {"
+              },
+              {
+                "number": 157,
+                "text": "                Ok(source) => return Ok((identity, source)),"
+              },
+              {
+                "number": 158,
+                "text": "                Err(error)"
+              },
+              {
+                "number": 159,
+                "text": "                    if error.kind() == ErrorKind::NotFound"
+              },
+              {
+                "number": 160,
+                "text": "                        && absolute.extension().and_then(OsStr::to_str) != Some(\"c\") =>"
+              },
+              {
+                "number": 161,
+                "text": "                {"
+              },
+              {
+                "number": 162,
+                "text": "                    identity = Arc::new(CompilerSource::new("
+              },
+              {
+                "number": 163,
+                "text": "                        identity.input().with_extension(\"c\"),"
+              },
+              {
+                "number": 164,
+                "text": "                        &self.config,"
+              },
+              {
+                "number": 165,
+                "text": "                    ));"
+              },
+              {
+                "number": 166,
+                "text": "                }"
+              },
+              {
+                "number": 167,
+                "text": "                Err(error) => {"
+              },
+              {
+                "number": 168,
+                "text": "                    return Err(lpc_error!("
+              },
+              {
+                "number": 169,
+                "text": "                        \"Cannot read file `{}`: {}\","
+              },
+              {
+                "number": 170,
+                "text": "                        identity.name(),"
+              },
+              {
+                "number": 171,
+                "text": "                        error"
+              },
+              {
+                "number": 148,
+                "text": "        self.compile_source(identity, &source.text, warning).await"
+              },
+              {
+                "number": 149,
+                "text": "    }"
+              }
+            ]
+          },
+          "working": {
+            "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+            "sourceTop": 3234,
+            "sourceLeft": 0,
+            "outlineTop": 912,
+            "declaration": null,
+            "renderedRows": 56,
+            "outlineButtons": 26,
+            "rows": [
+              {
+                "number": 152,
+                "text": "        let mut identity = Arc::new(CompilerSource::new(path, &self.config));"
+              },
+              {
+                "number": 153,
+                "text": "        loop {"
+              },
+              {
+                "number": 154,
+                "text": "            let absolute = identity.resolved().server();"
+              },
+              {
+                "number": 155,
+                "text": "            let reader = self.source_reader.as_deref().unwrap_or(&DiskSourceReader);"
+              },
+              {
+                "number": 156,
+                "text": "            match reader.read(absolute).await.map(LpcSource::from_bytes) {"
+              },
+              {
+                "number": 157,
+                "text": "                Ok(source) => return Ok((identity, source)),"
+              },
+              {
+                "number": 158,
+                "text": "                Err(error)"
+              },
+              {
+                "number": 159,
+                "text": "                    if matches!("
+              },
+              {
+                "number": 160,
+                "text": "                        error.kind(),"
+              },
+              {
+                "number": 161,
+                "text": "                        ErrorKind::NotFound | ErrorKind::PermissionDenied"
+              },
+              {
+                "number": 162,
+                "text": "                    ) && absolute.extension().and_then(OsStr::to_str) != Some(\"c\") =>"
+              },
+              {
+                "number": 163,
+                "text": "                {"
+              },
+              {
+                "number": 164,
+                "text": "                    identity = Arc::new(CompilerSource::new("
+              },
+              {
+                "number": 165,
+                "text": "                        identity.input().with_extension(\"c\"),"
+              },
+              {
+                "number": 166,
+                "text": "                        &self.config,"
+              },
+              {
+                "number": 167,
+                "text": "                    ));"
+              },
+              {
+                "number": 168,
+                "text": "                }"
+              },
+              {
+                "number": 169,
+                "text": "                Err(error) => {"
+              },
+              {
+                "number": 170,
+                "text": "                    return Err(lpc_error!("
+              },
+              {
+                "number": 171,
+                "text": "                        \"Cannot read file `{}`: {} (source lookup stopped)\","
+              },
+              {
+                "number": 148,
+                "text": "        self.compile_source(identity, &source.text, warning).await"
+              },
+              {
+                "number": 149,
+                "text": "    }"
+              },
+              {
+                "number": 150,
+                "text": ""
+              },
+              {
+                "number": 151,
+                "text": "    async fn read_file(&self, path: LpcPath) -> Result<(Arc<CompilerSource>, LpcSource)> {"
+              }
+            ]
+          }
+        },
+        "labels": "Base 1a4f5b65dd2a269298748df2dfd68092a169a8d9 → 1a4f5b65dd2a269298748df2dfd68092a169a8d9 · subtree . · working observed 2026-11-04T21:21:35.204Z to 2026-11-04T21:21:35.243Z",
+        "counts": "1033 paths · 1 added · 0 removed · 1 modified · 1031 unchanged · 0 unassessed · 0 unavailable",
+        "filter": "",
+        "notice": null,
+        "fileButtons": 2,
+        "hunkButtons": 3,
+        "hunks": [
+          {
+            "id": "8e33638836326fd9b68ab24cf1fec45426e4d6d75394f6a32505663a54110b6d",
+            "label": "1: @@ -117,7 +117,7 @@",
+            "selected": false
+          },
+          {
+            "id": "ea710daf40cc4e80d776db258fc85a6d68348855b8b6f81a8c0006861b74e087",
+            "label": "2: @@ -156,8 +156,10 @@",
+            "selected": false
+          },
+          {
+            "id": "7127b23b703362fc2d126df05edd925097655a9382d7e87d0e22bfc8c26656a8",
+            "label": "3: @@ -166,7 +168,7 @@",
+            "selected": false
+          }
+        ],
+        "history": "ac49ea0c-a377-4376-b15d-fee801e9a145",
+        "audit": {
+          "verifiedRows": 48,
+          "maxRenderedRows": 56,
+          "maxOutlineButtons": 26
+        }
+      },
+      "screenshot": "06-read-policy.png"
+    },
+    {
+      "name": "read-policy-horizontal",
+      "intent": "Pan the two source panes horizontally to expose the clipped condition; retain independent reading positions.",
+      "state": {
+        "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+        "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+        "path": "src/compiler/mod.rs",
+        "side": "base",
+        "selectedSides": [
+          "base"
+        ],
+        "panes": {
+          "base": {
+            "version": "31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6",
+            "sourceTop": 3234,
+            "sourceLeft": 208,
+            "outlineTop": 912,
+            "declaration": "ed71f6144f6a2488da024a206d41c22f24d111b505118bc09faaeef37deae133",
+            "renderedRows": 56,
+            "outlineButtons": 26,
+            "rows": [
+              {
+                "number": 150,
+                "text": ""
+              },
+              {
+                "number": 151,
+                "text": "    async fn read_file(&self, path: LpcPath) -> Result<(Arc<CompilerSource>, LpcSource)> {"
+              },
+              {
+                "number": 152,
+                "text": "        let mut identity = Arc::new(CompilerSource::new(path, &self.config));"
+              },
+              {
+                "number": 153,
+                "text": "        loop {"
+              },
+              {
+                "number": 154,
+                "text": "            let absolute = identity.resolved().server();"
+              },
+              {
+                "number": 155,
+                "text": "            let reader = self.source_reader.as_deref().unwrap_or(&DiskSourceReader);"
+              },
+              {
+                "number": 156,
+                "text": "            match reader.read(absolute).await.map(LpcSource::from_bytes) {"
+              },
+              {
+                "number": 157,
+                "text": "                Ok(source) => return Ok((identity, source)),"
+              },
+              {
+                "number": 158,
+                "text": "                Err(error)"
+              },
+              {
+                "number": 159,
+                "text": "                    if error.kind() == ErrorKind::NotFound"
+              },
+              {
+                "number": 160,
+                "text": "                        && absolute.extension().and_then(OsStr::to_str) != Some(\"c\") =>"
+              },
+              {
+                "number": 161,
+                "text": "                {"
+              },
+              {
+                "number": 162,
+                "text": "                    identity = Arc::new(CompilerSource::new("
+              },
+              {
+                "number": 163,
+                "text": "                        identity.input().with_extension(\"c\"),"
+              },
+              {
+                "number": 164,
+                "text": "                        &self.config,"
+              },
+              {
+                "number": 165,
+                "text": "                    ));"
+              },
+              {
+                "number": 166,
+                "text": "                }"
+              },
+              {
+                "number": 167,
+                "text": "                Err(error) => {"
+              },
+              {
+                "number": 168,
+                "text": "                    return Err(lpc_error!("
+              },
+              {
+                "number": 169,
+                "text": "                        \"Cannot read file `{}`: {}\","
+              },
+              {
+                "number": 170,
+                "text": "                        identity.name(),"
+              },
+              {
+                "number": 171,
+                "text": "                        error"
+              },
+              {
+                "number": 148,
+                "text": "        self.compile_source(identity, &source.text, warning).await"
+              },
+              {
+                "number": 149,
+                "text": "    }"
+              }
+            ]
+          },
+          "working": {
+            "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+            "sourceTop": 3234,
+            "sourceLeft": 209,
+            "outlineTop": 912,
+            "declaration": null,
+            "renderedRows": 56,
+            "outlineButtons": 26,
+            "rows": [
+              {
+                "number": 152,
+                "text": "        let mut identity = Arc::new(CompilerSource::new(path, &self.config));"
+              },
+              {
+                "number": 153,
+                "text": "        loop {"
+              },
+              {
+                "number": 154,
+                "text": "            let absolute = identity.resolved().server();"
+              },
+              {
+                "number": 155,
+                "text": "            let reader = self.source_reader.as_deref().unwrap_or(&DiskSourceReader);"
+              },
+              {
+                "number": 156,
+                "text": "            match reader.read(absolute).await.map(LpcSource::from_bytes) {"
+              },
+              {
+                "number": 157,
+                "text": "                Ok(source) => return Ok((identity, source)),"
+              },
+              {
+                "number": 158,
+                "text": "                Err(error)"
+              },
+              {
+                "number": 159,
+                "text": "                    if matches!("
+              },
+              {
+                "number": 160,
+                "text": "                        error.kind(),"
+              },
+              {
+                "number": 161,
+                "text": "                        ErrorKind::NotFound | ErrorKind::PermissionDenied"
+              },
+              {
+                "number": 162,
+                "text": "                    ) && absolute.extension().and_then(OsStr::to_str) != Some(\"c\") =>"
+              },
+              {
+                "number": 163,
+                "text": "                {"
+              },
+              {
+                "number": 164,
+                "text": "                    identity = Arc::new(CompilerSource::new("
+              },
+              {
+                "number": 165,
+                "text": "                        identity.input().with_extension(\"c\"),"
+              },
+              {
+                "number": 166,
+                "text": "                        &self.config,"
+              },
+              {
+                "number": 167,
+                "text": "                    ));"
+              },
+              {
+                "number": 168,
+                "text": "                }"
+              },
+              {
+                "number": 169,
+                "text": "                Err(error) => {"
+              },
+              {
+                "number": 170,
+                "text": "                    return Err(lpc_error!("
+              },
+              {
+                "number": 171,
+                "text": "                        \"Cannot read file `{}`: {} (source lookup stopped)\","
+              },
+              {
+                "number": 148,
+                "text": "        self.compile_source(identity, &source.text, warning).await"
+              },
+              {
+                "number": 149,
+                "text": "    }"
+              },
+              {
+                "number": 150,
+                "text": ""
+              },
+              {
+                "number": 151,
+                "text": "    async fn read_file(&self, path: LpcPath) -> Result<(Arc<CompilerSource>, LpcSource)> {"
+              }
+            ]
+          }
+        },
+        "labels": "Base 1a4f5b65dd2a269298748df2dfd68092a169a8d9 → 1a4f5b65dd2a269298748df2dfd68092a169a8d9 · subtree . · working observed 2026-11-04T21:21:35.204Z to 2026-11-04T21:21:35.243Z",
+        "counts": "1033 paths · 1 added · 0 removed · 1 modified · 1031 unchanged · 0 unassessed · 0 unavailable",
+        "filter": "",
+        "notice": null,
+        "fileButtons": 2,
+        "hunkButtons": 3,
+        "hunks": [
+          {
+            "id": "8e33638836326fd9b68ab24cf1fec45426e4d6d75394f6a32505663a54110b6d",
+            "label": "1: @@ -117,7 +117,7 @@",
+            "selected": false
+          },
+          {
+            "id": "ea710daf40cc4e80d776db258fc85a6d68348855b8b6f81a8c0006861b74e087",
+            "label": "2: @@ -156,8 +156,10 @@",
+            "selected": false
+          },
+          {
+            "id": "7127b23b703362fc2d126df05edd925097655a9382d7e87d0e22bfc8c26656a8",
+            "label": "3: @@ -166,7 +168,7 @@",
+            "selected": false
+          }
+        ],
+        "history": "ac49ea0c-a377-4376-b15d-fee801e9a145",
+        "audit": {
+          "verifiedRows": 48,
+          "maxRenderedRows": 56,
+          "maxOutlineButtons": 26
+        }
+      },
+      "screenshot": "07-read-policy-horizontal.png"
+    },
+    {
+      "name": "reader-contract",
+      "intent": "Follow unchanged source and its raw-byte reader contract on the selected side.",
+      "state": {
+        "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+        "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+        "path": "src/compiler/source_reader.rs",
+        "side": "working",
+        "selectedSides": [
+          "working"
+        ],
+        "panes": {
+          "base": {
+            "version": "2384ba977e73b7cb5309ffa170312e4b714233643601349fc9a00365e3cf6217",
+            "sourceTop": 0,
+            "sourceLeft": 0,
+            "outlineTop": 0,
+            "declaration": null,
+            "renderedRows": 41,
+            "outlineButtons": 8,
+            "rows": [
+              {
+                "number": 1,
+                "text": "//! Source reads and path probes shared by the compiler and its include walk."
+              },
+              {
+                "number": 2,
+                "text": ""
+              },
+              {
+                "number": 3,
+                "text": "use std::{fmt::Debug, io, path::Path};"
+              },
+              {
+                "number": 4,
+                "text": ""
+              },
+              {
+                "number": 5,
+                "text": "use async_trait::async_trait;"
+              },
+              {
+                "number": 6,
+                "text": ""
+              },
+              {
+                "number": 7,
+                "text": "/// The filesystem distinction needed when resolving compiler inputs."
+              },
+              {
+                "number": 8,
+                "text": "#[derive(Debug, Clone, Copy, PartialEq, Eq)]"
+              },
+              {
+                "number": 9,
+                "text": "pub enum SourceKind {"
+              },
+              {
+                "number": 10,
+                "text": "    File,"
+              },
+              {
+                "number": 11,
+                "text": "    Directory,"
+              },
+              {
+                "number": 12,
+                "text": "    Other,"
+              },
+              {
+                "number": 13,
+                "text": "}"
+              },
+              {
+                "number": 14,
+                "text": ""
+              },
+              {
+                "number": 15,
+                "text": "/// Supplies source bytes independently of compile-time authorization."
+              },
+              {
+                "number": 16,
+                "text": "#[async_trait]"
+              },
+              {
+                "number": 17,
+                "text": "pub trait SourceReader: Debug + Send + Sync {"
+              },
+              {
+                "number": 18,
+                "text": "    /// Read a file's bytes, before decoding or newline normalization."
+              },
+              {
+                "number": 19,
+                "text": "    async fn read(&self, path: &Path) -> io::Result<Vec<u8>>;"
+              },
+              {
+                "number": 20,
+                "text": ""
+              },
+              {
+                "number": 21,
+                "text": "    /// Probe a path without reading its contents; missing paths return `NotFound`."
+              },
+              {
+                "number": 22,
+                "text": "    async fn kind(&self, path: &Path) -> io::Result<SourceKind>;"
+              },
+              {
+                "number": 23,
+                "text": "}"
+              },
+              {
+                "number": 24,
+                "text": ""
+              },
+              {
+                "number": 25,
+                "text": "/// Host-facing compiles read directly from disk."
+              }
+            ]
+          },
+          "working": {
+            "version": "2384ba977e73b7cb5309ffa170312e4b714233643601349fc9a00365e3cf6217",
+            "sourceTop": 286,
+            "sourceLeft": 0,
+            "outlineTop": 0,
+            "declaration": "ca9c55c3926bf01ad31cb4335f7425cccf047e95a22c311c64cfb028b8c1d38d",
+            "renderedRows": 46,
+            "outlineButtons": 8,
+            "rows": [
+              {
+                "number": 14,
+                "text": ""
+              },
+              {
+                "number": 15,
+                "text": "/// Supplies source bytes independently of compile-time authorization."
+              },
+              {
+                "number": 16,
+                "text": "#[async_trait]"
+              },
+              {
+                "number": 17,
+                "text": "pub trait SourceReader: Debug + Send + Sync {"
+              },
+              {
+                "number": 18,
+                "text": "    /// Read a file's bytes, before decoding or newline normalization."
+              },
+              {
+                "number": 19,
+                "text": "    async fn read(&self, path: &Path) -> io::Result<Vec<u8>>;"
+              },
+              {
+                "number": 20,
+                "text": ""
+              },
+              {
+                "number": 21,
+                "text": "    /// Probe a path without reading its contents; missing paths return `NotFound`."
+              },
+              {
+                "number": 22,
+                "text": "    async fn kind(&self, path: &Path) -> io::Result<SourceKind>;"
+              },
+              {
+                "number": 23,
+                "text": "}"
+              },
+              {
+                "number": 24,
+                "text": ""
+              },
+              {
+                "number": 25,
+                "text": "/// Host-facing compiles read directly from disk."
+              },
+              {
+                "number": 26,
+                "text": "#[derive(Debug)]"
+              },
+              {
+                "number": 27,
+                "text": "pub struct DiskSourceReader;"
+              },
+              {
+                "number": 28,
+                "text": ""
+              },
+              {
+                "number": 29,
+                "text": "#[async_trait]"
+              },
+              {
+                "number": 30,
+                "text": "impl SourceReader for DiskSourceReader {"
+              },
+              {
+                "number": 31,
+                "text": "    async fn read(&self, path: &Path) -> io::Result<Vec<u8>> {"
+              },
+              {
+                "number": 32,
+                "text": "        tokio::fs::read(path).await"
+              },
+              {
+                "number": 33,
+                "text": "    }"
+              },
+              {
+                "number": 34,
+                "text": ""
+              },
+              {
+                "number": 35,
+                "text": "    async fn kind(&self, path: &Path) -> io::Result<SourceKind> {"
+              },
+              {
+                "number": 36,
+                "text": "        let metadata = tokio::fs::metadata(path).await?;"
+              },
+              {
+                "number": 37,
+                "text": "        Ok(if metadata.is_file() {"
+              },
+              {
+                "number": 38,
+                "text": "            SourceKind::File"
+              }
+            ]
+          }
+        },
+        "labels": "Base 1a4f5b65dd2a269298748df2dfd68092a169a8d9 → 1a4f5b65dd2a269298748df2dfd68092a169a8d9 · subtree . · working observed 2026-11-04T21:21:35.204Z to 2026-11-04T21:21:35.243Z",
+        "counts": "1033 paths · 1 added · 0 removed · 1 modified · 1031 unchanged · 0 unassessed · 0 unavailable",
+        "filter": "source_reader.rs",
+        "notice": null,
+        "fileButtons": 1,
+        "hunkButtons": 0,
+        "hunks": [],
+        "history": "ad9dcccb-dbdb-4a1b-9006-563f14490186",
+        "audit": {
+          "verifiedRows": 50,
+          "maxRenderedRows": 46,
+          "maxOutlineButtons": 8
+        }
+      },
+      "screenshot": "08-reader-contract.png"
+    },
+    {
+      "name": "review-return",
+      "intent": "Restore the compiler policy and both captured reading positions.",
+      "state": {
+        "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+        "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+        "path": "src/compiler/mod.rs",
+        "side": "base",
+        "selectedSides": [
+          "base"
+        ],
+        "panes": {
+          "base": {
+            "version": "31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6",
+            "sourceTop": 3234,
+            "sourceLeft": 208,
+            "outlineTop": 912,
+            "declaration": "ed71f6144f6a2488da024a206d41c22f24d111b505118bc09faaeef37deae133",
+            "renderedRows": 56,
+            "outlineButtons": 26,
+            "rows": [
+              {
+                "number": 148,
+                "text": "        self.compile_source(identity, &source.text, warning).await"
+              },
+              {
+                "number": 149,
+                "text": "    }"
+              },
+              {
+                "number": 150,
+                "text": ""
+              },
+              {
+                "number": 151,
+                "text": "    async fn read_file(&self, path: LpcPath) -> Result<(Arc<CompilerSource>, LpcSource)> {"
+              },
+              {
+                "number": 152,
+                "text": "        let mut identity = Arc::new(CompilerSource::new(path, &self.config));"
+              },
+              {
+                "number": 153,
+                "text": "        loop {"
+              },
+              {
+                "number": 154,
+                "text": "            let absolute = identity.resolved().server();"
+              },
+              {
+                "number": 155,
+                "text": "            let reader = self.source_reader.as_deref().unwrap_or(&DiskSourceReader);"
+              },
+              {
+                "number": 156,
+                "text": "            match reader.read(absolute).await.map(LpcSource::from_bytes) {"
+              },
+              {
+                "number": 157,
+                "text": "                Ok(source) => return Ok((identity, source)),"
+              },
+              {
+                "number": 158,
+                "text": "                Err(error)"
+              },
+              {
+                "number": 159,
+                "text": "                    if error.kind() == ErrorKind::NotFound"
+              },
+              {
+                "number": 160,
+                "text": "                        && absolute.extension().and_then(OsStr::to_str) != Some(\"c\") =>"
+              },
+              {
+                "number": 161,
+                "text": "                {"
+              },
+              {
+                "number": 162,
+                "text": "                    identity = Arc::new(CompilerSource::new("
+              },
+              {
+                "number": 163,
+                "text": "                        identity.input().with_extension(\"c\"),"
+              },
+              {
+                "number": 164,
+                "text": "                        &self.config,"
+              },
+              {
+                "number": 165,
+                "text": "                    ));"
+              },
+              {
+                "number": 166,
+                "text": "                }"
+              },
+              {
+                "number": 167,
+                "text": "                Err(error) => {"
+              },
+              {
+                "number": 168,
+                "text": "                    return Err(lpc_error!("
+              },
+              {
+                "number": 169,
+                "text": "                        \"Cannot read file `{}`: {}\","
+              },
+              {
+                "number": 170,
+                "text": "                        identity.name(),"
+              },
+              {
+                "number": 171,
+                "text": "                        error"
+              }
+            ]
+          },
+          "working": {
+            "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+            "sourceTop": 3234,
+            "sourceLeft": 209,
+            "outlineTop": 912,
+            "declaration": null,
+            "renderedRows": 56,
+            "outlineButtons": 26,
+            "rows": [
+              {
+                "number": 148,
+                "text": "        self.compile_source(identity, &source.text, warning).await"
+              },
+              {
+                "number": 149,
+                "text": "    }"
+              },
+              {
+                "number": 150,
+                "text": ""
+              },
+              {
+                "number": 151,
+                "text": "    async fn read_file(&self, path: LpcPath) -> Result<(Arc<CompilerSource>, LpcSource)> {"
+              },
+              {
+                "number": 152,
+                "text": "        let mut identity = Arc::new(CompilerSource::new(path, &self.config));"
+              },
+              {
+                "number": 153,
+                "text": "        loop {"
+              },
+              {
+                "number": 154,
+                "text": "            let absolute = identity.resolved().server();"
+              },
+              {
+                "number": 155,
+                "text": "            let reader = self.source_reader.as_deref().unwrap_or(&DiskSourceReader);"
+              },
+              {
+                "number": 156,
+                "text": "            match reader.read(absolute).await.map(LpcSource::from_bytes) {"
+              },
+              {
+                "number": 157,
+                "text": "                Ok(source) => return Ok((identity, source)),"
+              },
+              {
+                "number": 158,
+                "text": "                Err(error)"
+              },
+              {
+                "number": 159,
+                "text": "                    if matches!("
+              },
+              {
+                "number": 160,
+                "text": "                        error.kind(),"
+              },
+              {
+                "number": 161,
+                "text": "                        ErrorKind::NotFound | ErrorKind::PermissionDenied"
+              },
+              {
+                "number": 162,
+                "text": "                    ) && absolute.extension().and_then(OsStr::to_str) != Some(\"c\") =>"
+              },
+              {
+                "number": 163,
+                "text": "                {"
+              },
+              {
+                "number": 164,
+                "text": "                    identity = Arc::new(CompilerSource::new("
+              },
+              {
+                "number": 165,
+                "text": "                        identity.input().with_extension(\"c\"),"
+              },
+              {
+                "number": 166,
+                "text": "                        &self.config,"
+              },
+              {
+                "number": 167,
+                "text": "                    ));"
+              },
+              {
+                "number": 168,
+                "text": "                }"
+              },
+              {
+                "number": 169,
+                "text": "                Err(error) => {"
+              },
+              {
+                "number": 170,
+                "text": "                    return Err(lpc_error!("
+              },
+              {
+                "number": 171,
+                "text": "                        \"Cannot read file `{}`: {} (source lookup stopped)\","
+              }
+            ]
+          }
+        },
+        "labels": "Base 1a4f5b65dd2a269298748df2dfd68092a169a8d9 → 1a4f5b65dd2a269298748df2dfd68092a169a8d9 · subtree . · working observed 2026-11-04T21:21:35.204Z to 2026-11-04T21:21:35.243Z",
+        "counts": "1033 paths · 1 added · 0 removed · 1 modified · 1031 unchanged · 0 unassessed · 0 unavailable",
+        "filter": "source_reader.rs",
+        "notice": null,
+        "fileButtons": 1,
+        "hunkButtons": 3,
+        "hunks": [
+          {
+            "id": "8e33638836326fd9b68ab24cf1fec45426e4d6d75394f6a32505663a54110b6d",
+            "label": "1: @@ -117,7 +117,7 @@",
+            "selected": false
+          },
+          {
+            "id": "ea710daf40cc4e80d776db258fc85a6d68348855b8b6f81a8c0006861b74e087",
+            "label": "2: @@ -156,8 +156,10 @@",
+            "selected": false
+          },
+          {
+            "id": "7127b23b703362fc2d126df05edd925097655a9382d7e87d0e22bfc8c26656a8",
+            "label": "3: @@ -166,7 +168,7 @@",
+            "selected": false
+          }
+        ],
+        "history": "ac49ea0c-a377-4376-b15d-fee801e9a145",
+        "audit": {
+          "verifiedRows": 48,
+          "maxRenderedRows": 56,
+          "maxOutlineButtons": 26
+        }
+      },
+      "screenshot": "09-review-return.png"
+    },
+    {
+      "name": "source-identity",
+      "intent": "Inspect input/resolved path and diagnostic-name ownership.",
+      "state": {
+        "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+        "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+        "path": "src/compiler/source.rs",
+        "side": "working",
+        "selectedSides": [
+          "working"
+        ],
+        "panes": {
+          "base": {
+            "version": "2c63be2cba7d05cf253c32b1f69e94f8d74b6fce7439ea3766695758fc08583c",
+            "sourceTop": 0,
+            "sourceLeft": 0,
+            "outlineTop": 0,
+            "declaration": null,
+            "renderedRows": 41,
+            "outlineButtons": 13,
+            "rows": [
+              {
+                "number": 1,
+                "text": "use std::{"
+              },
+              {
+                "number": 2,
+                "text": "    fmt,"
+              },
+              {
+                "number": 3,
+                "text": "    path::{Path, PathBuf},"
+              },
+              {
+                "number": 4,
+                "text": "    sync::Arc,"
+              },
+              {
+                "number": 5,
+                "text": "};"
+              },
+              {
+                "number": 6,
+                "text": ""
+              },
+              {
+                "number": 7,
+                "text": "use lpc_rs_core::lpc_path::{LpcPath, ResolvedPath, SourceName};"
+              },
+              {
+                "number": 8,
+                "text": "use lpc_rs_utils::config::Config;"
+              },
+              {
+                "number": 9,
+                "text": ""
+              },
+              {
+                "number": 10,
+                "text": "/// One compiler input's host location, names, and relative-path bases."
+              },
+              {
+                "number": 11,
+                "text": "#[derive(Clone)]"
+              },
+              {
+                "number": 12,
+                "text": "pub struct CompilerSource {"
+              },
+              {
+                "number": 13,
+                "text": "    resolved: ResolvedPath,"
+              },
+              {
+                "number": 14,
+                "text": "    input: Arc<LpcPath>,"
+              },
+              {
+                "number": 15,
+                "text": "    program: Arc<LpcPath>,"
+              },
+              {
+                "number": 16,
+                "text": "    name: SourceName,"
+              },
+              {
+                "number": 17,
+                "text": "    include_cwd: PathBuf,"
+              },
+              {
+                "number": 18,
+                "text": "    inheritance_cwd: PathBuf,"
+              },
+              {
+                "number": 19,
+                "text": "}"
+              },
+              {
+                "number": 20,
+                "text": ""
+              },
+              {
+                "number": 21,
+                "text": "impl CompilerSource {"
+              },
+              {
+                "number": 22,
+                "text": "    /// Establish an input's identity without restricting host-facing compiler inputs."
+              },
+              {
+                "number": 23,
+                "text": "    pub fn new(path: impl Into<LpcPath>, config: &Config) -> Self {"
+              },
+              {
+                "number": 24,
+                "text": "        let input = Arc::new(path.into());"
+              },
+              {
+                "number": 25,
+                "text": "        let root = config.paths();"
+              }
+            ]
+          },
+          "working": {
+            "version": "2c63be2cba7d05cf253c32b1f69e94f8d74b6fce7439ea3766695758fc08583c",
+            "sourceTop": 176,
+            "sourceLeft": 0,
+            "outlineTop": 0,
+            "declaration": "76875d91b8d083d6b735cfc70a988b981b31700d06c789bc2e9d7e90e676f6f1",
+            "renderedRows": 49,
+            "outlineButtons": 13,
+            "rows": [
+              {
+                "number": 9,
+                "text": ""
+              },
+              {
+                "number": 10,
+                "text": "/// One compiler input's host location, names, and relative-path bases."
+              },
+              {
+                "number": 11,
+                "text": "#[derive(Clone)]"
+              },
+              {
+                "number": 12,
+                "text": "pub struct CompilerSource {"
+              },
+              {
+                "number": 13,
+                "text": "    resolved: ResolvedPath,"
+              },
+              {
+                "number": 14,
+                "text": "    input: Arc<LpcPath>,"
+              },
+              {
+                "number": 15,
+                "text": "    program: Arc<LpcPath>,"
+              },
+              {
+                "number": 16,
+                "text": "    name: SourceName,"
+              },
+              {
+                "number": 17,
+                "text": "    include_cwd: PathBuf,"
+              },
+              {
+                "number": 18,
+                "text": "    inheritance_cwd: PathBuf,"
+              },
+              {
+                "number": 19,
+                "text": "}"
+              },
+              {
+                "number": 20,
+                "text": ""
+              },
+              {
+                "number": 21,
+                "text": "impl CompilerSource {"
+              },
+              {
+                "number": 22,
+                "text": "    /// Establish an input's identity without restricting host-facing compiler inputs."
+              },
+              {
+                "number": 23,
+                "text": "    pub fn new(path: impl Into<LpcPath>, config: &Config) -> Self {"
+              },
+              {
+                "number": 24,
+                "text": "        let input = Arc::new(path.into());"
+              },
+              {
+                "number": 25,
+                "text": "        let root = config.paths();"
+              },
+              {
+                "number": 26,
+                "text": "        Self {"
+              },
+              {
+                "number": 27,
+                "text": "            resolved: root.source(&input),"
+              },
+              {
+                "number": 28,
+                "text": "            program: Arc::new(root.program_path(&input)),"
+              },
+              {
+                "number": 29,
+                "text": "            name: root.source_name(&input),"
+              },
+              {
+                "number": 30,
+                "text": "            include_cwd: root.source_cwd(&input),"
+              },
+              {
+                "number": 31,
+                "text": "            inheritance_cwd: root.inheritance_cwd(&input),"
+              },
+              {
+                "number": 32,
+                "text": "            input,"
+              },
+              {
+                "number": 33,
+                "text": "        }"
+              }
+            ]
+          }
+        },
+        "labels": "Base 1a4f5b65dd2a269298748df2dfd68092a169a8d9 → 1a4f5b65dd2a269298748df2dfd68092a169a8d9 · subtree . · working observed 2026-11-04T21:21:35.204Z to 2026-11-04T21:21:35.243Z",
+        "counts": "1033 paths · 1 added · 0 removed · 1 modified · 1031 unchanged · 0 unassessed · 0 unavailable",
+        "filter": "src/compiler/source.rs",
+        "notice": null,
+        "fileButtons": 1,
+        "hunkButtons": 0,
+        "hunks": [],
+        "history": "4c9d827e-30ab-48a4-b05d-8d13019f6011",
+        "audit": {
+          "verifiedRows": 50,
+          "maxRenderedRows": 49,
+          "maxOutlineButtons": 13
+        }
+      },
+      "screenshot": "10-source-identity.png"
+    },
+    {
+      "name": "regression-test",
+      "intent": "Locate the existing lookup contract through keyboard declaration navigation.",
+      "state": {
+        "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+        "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+        "path": "src/compiler/mod.rs",
+        "side": "working",
+        "selectedSides": [
+          "working"
+        ],
+        "panes": {
+          "base": {
+            "version": "31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6",
+            "sourceTop": 2552,
+            "sourceLeft": 0,
+            "outlineTop": 0,
+            "declaration": null,
+            "renderedRows": 56,
+            "outlineButtons": 18,
+            "rows": [
+              {
+                "number": 117,
+                "text": "        }"
+              },
+              {
+                "number": 118,
+                "text": "    }"
+              },
+              {
+                "number": 119,
+                "text": ""
+              },
+              {
+                "number": 120,
+                "text": "    /// Fully compile a file into a Program struct"
+              },
+              {
+                "number": 121,
+                "text": "    ///"
+              },
+              {
+                "number": 122,
+                "text": "    /// # Arguments"
+              },
+              {
+                "number": 123,
+                "text": "    /// `path` - The path of the file to compile. Also used for error messaging."
+              },
+              {
+                "number": 124,
+                "text": "    ///  If the file in question ends in `.c`, the extension can be left off, per LPC convention."
+              },
+              {
+                "number": 125,
+                "text": "    ///"
+              },
+              {
+                "number": 126,
+                "text": "    /// # Examples"
+              },
+              {
+                "number": 127,
+                "text": "    /// ```"
+              },
+              {
+                "number": 128,
+                "text": "    /// # #[tokio::main(flavor = \"current_thread\")]"
+              },
+              {
+                "number": 129,
+                "text": "    /// # async fn main() {"
+              },
+              {
+                "number": 130,
+                "text": "    /// use lpc_rs::compiler::Compiler;"
+              },
+              {
+                "number": 131,
+                "text": "    /// use lpc_rs_core::lpc_path::LpcPath;"
+              },
+              {
+                "number": 132,
+                "text": "    ///"
+              },
+              {
+                "number": 133,
+                "text": "    /// let compiled = Compiler::default()"
+              },
+              {
+                "number": 134,
+                "text": "    ///     .compile_file(LpcPath::new_server(\"tests/fixtures/code/example.c\"))"
+              },
+              {
+                "number": 135,
+                "text": "    ///     .await"
+              },
+              {
+                "number": 136,
+                "text": "    ///     .expect(\"Unable to compile.\");"
+              },
+              {
+                "number": 137,
+                "text": "    /// # }"
+              },
+              {
+                "number": 138,
+                "text": "    /// ```"
+              },
+              {
+                "number": 139,
+                "text": "    #[instrument(skip(self))]"
+              },
+              {
+                "number": 140,
+                "text": "    pub async fn compile_file<T>(&self, path: T) -> Result<Compiled>"
+              }
+            ]
+          },
+          "working": {
+            "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+            "sourceTop": 44220,
+            "sourceLeft": 0,
+            "outlineTop": 5845,
+            "declaration": "eb0a001ad0f8f76c3b548feb3a15832716761420c295317daf69e64839e9d13e",
+            "renderedRows": 56,
+            "outlineButtons": 18,
+            "rows": [
+              {
+                "number": 2011,
+                "text": "    }"
+              },
+              {
+                "number": 2012,
+                "text": ""
+              },
+              {
+                "number": 2013,
+                "text": "    #[tokio::test]"
+              },
+              {
+                "number": 2014,
+                "text": "    async fn file_reads_stop_after_extension_fallback_and_preserve_other_io_errors() {"
+              },
+              {
+                "number": 2015,
+                "text": "        use crate::compiler::source_reader::SourceKind;"
+              },
+              {
+                "number": 2016,
+                "text": "        use parking_lot::Mutex;"
+              },
+              {
+                "number": 2017,
+                "text": "        use std::{"
+              },
+              {
+                "number": 2018,
+                "text": "            io,"
+              },
+              {
+                "number": 2019,
+                "text": "            path::{Path, PathBuf},"
+              },
+              {
+                "number": 2020,
+                "text": "        };"
+              },
+              {
+                "number": 2021,
+                "text": ""
+              },
+              {
+                "number": 2022,
+                "text": "        #[derive(Debug)]"
+              },
+              {
+                "number": 2023,
+                "text": "        struct RecoveringReader {"
+              },
+              {
+                "number": 2024,
+                "text": "            error: ErrorKind,"
+              },
+              {
+                "number": 2025,
+                "text": "            failures: usize,"
+              },
+              {
+                "number": 2026,
+                "text": "            reads: Mutex<Vec<PathBuf>>,"
+              },
+              {
+                "number": 2027,
+                "text": "        }"
+              },
+              {
+                "number": 2028,
+                "text": ""
+              },
+              {
+                "number": 2029,
+                "text": "        #[async_trait::async_trait]"
+              },
+              {
+                "number": 2030,
+                "text": "        impl SourceReader for RecoveringReader {"
+              },
+              {
+                "number": 2031,
+                "text": "            async fn read(&self, path: &Path) -> io::Result<Vec<u8>> {"
+              },
+              {
+                "number": 2032,
+                "text": "                let mut reads = self.reads.lock();"
+              },
+              {
+                "number": 2033,
+                "text": "                reads.push(path.to_path_buf());"
+              },
+              {
+                "number": 2034,
+                "text": "                if reads.len() <= self.failures {"
+              }
+            ]
+          }
+        },
+        "labels": "Base 1a4f5b65dd2a269298748df2dfd68092a169a8d9 → 1a4f5b65dd2a269298748df2dfd68092a169a8d9 · subtree . · working observed 2026-11-04T21:21:35.204Z to 2026-11-04T21:21:35.243Z",
+        "counts": "1033 paths · 1 added · 0 removed · 1 modified · 1031 unchanged · 0 unassessed · 0 unavailable",
+        "filter": "src/compiler/mod.rs",
+        "notice": null,
+        "fileButtons": 1,
+        "hunkButtons": 3,
+        "hunks": [
+          {
+            "id": "8e33638836326fd9b68ab24cf1fec45426e4d6d75394f6a32505663a54110b6d",
+            "label": "1: @@ -117,7 +117,7 @@",
+            "selected": false
+          },
+          {
+            "id": "ea710daf40cc4e80d776db258fc85a6d68348855b8b6f81a8c0006861b74e087",
+            "label": "2: @@ -156,8 +156,10 @@",
+            "selected": false
+          },
+          {
+            "id": "7127b23b703362fc2d126df05edd925097655a9382d7e87d0e22bfc8c26656a8",
+            "label": "3: @@ -166,7 +168,7 @@",
+            "selected": false
+          }
+        ],
+        "history": "c86eb945-7cdc-4e88-bf6e-e2efbe98cb94",
+        "audit": {
+          "verifiedRows": 48,
+          "maxRenderedRows": 56,
+          "maxOutlineButtons": 18
+        }
+      },
+      "screenshot": "11-regression-test.png"
+    },
+    {
+      "name": "permission-error-case",
+      "intent": "Read the existing permission-error read-attempt expectation.",
+      "state": {
+        "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+        "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+        "path": "src/compiler/mod.rs",
+        "side": "working",
+        "selectedSides": [
+          "working"
+        ],
+        "panes": {
+          "base": {
+            "version": "31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6",
+            "sourceTop": 2552,
+            "sourceLeft": 0,
+            "outlineTop": 0,
+            "declaration": null,
+            "renderedRows": 56,
+            "outlineButtons": 18,
+            "rows": [
+              {
+                "number": 117,
+                "text": "        }"
+              },
+              {
+                "number": 118,
+                "text": "    }"
+              },
+              {
+                "number": 119,
+                "text": ""
+              },
+              {
+                "number": 120,
+                "text": "    /// Fully compile a file into a Program struct"
+              },
+              {
+                "number": 121,
+                "text": "    ///"
+              },
+              {
+                "number": 122,
+                "text": "    /// # Arguments"
+              },
+              {
+                "number": 123,
+                "text": "    /// `path` - The path of the file to compile. Also used for error messaging."
+              },
+              {
+                "number": 124,
+                "text": "    ///  If the file in question ends in `.c`, the extension can be left off, per LPC convention."
+              },
+              {
+                "number": 125,
+                "text": "    ///"
+              },
+              {
+                "number": 126,
+                "text": "    /// # Examples"
+              },
+              {
+                "number": 127,
+                "text": "    /// ```"
+              },
+              {
+                "number": 128,
+                "text": "    /// # #[tokio::main(flavor = \"current_thread\")]"
+              },
+              {
+                "number": 129,
+                "text": "    /// # async fn main() {"
+              },
+              {
+                "number": 130,
+                "text": "    /// use lpc_rs::compiler::Compiler;"
+              },
+              {
+                "number": 131,
+                "text": "    /// use lpc_rs_core::lpc_path::LpcPath;"
+              },
+              {
+                "number": 132,
+                "text": "    ///"
+              },
+              {
+                "number": 133,
+                "text": "    /// let compiled = Compiler::default()"
+              },
+              {
+                "number": 134,
+                "text": "    ///     .compile_file(LpcPath::new_server(\"tests/fixtures/code/example.c\"))"
+              },
+              {
+                "number": 135,
+                "text": "    ///     .await"
+              },
+              {
+                "number": 136,
+                "text": "    ///     .expect(\"Unable to compile.\");"
+              },
+              {
+                "number": 137,
+                "text": "    /// # }"
+              },
+              {
+                "number": 138,
+                "text": "    /// ```"
+              },
+              {
+                "number": 139,
+                "text": "    #[instrument(skip(self))]"
+              },
+              {
+                "number": 140,
+                "text": "    pub async fn compile_file<T>(&self, path: T) -> Result<Compiled>"
+              }
+            ]
+          },
+          "working": {
+            "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+            "sourceTop": 45112,
+            "sourceLeft": 0,
+            "outlineTop": 5845,
+            "declaration": "eb0a001ad0f8f76c3b548feb3a15832716761420c295317daf69e64839e9d13e",
+            "renderedRows": 48,
+            "outlineButtons": 18,
+            "rows": [
+              {
+                "number": 2051,
+                "text": "            ),"
+              },
+              {
+                "number": 2052,
+                "text": "            ("
+              },
+              {
+                "number": 2053,
+                "text": "                \"/source-read/missing.c\","
+              },
+              {
+                "number": 2054,
+                "text": "                ErrorKind::NotFound,"
+              },
+              {
+                "number": 2055,
+                "text": "                vec![\"/source-read/missing.c\"],"
+              },
+              {
+                "number": 2056,
+                "text": "            ),"
+              },
+              {
+                "number": 2057,
+                "text": "            ("
+              },
+              {
+                "number": 2058,
+                "text": "                \"/source-read/denied\","
+              },
+              {
+                "number": 2059,
+                "text": "                ErrorKind::PermissionDenied,"
+              },
+              {
+                "number": 2060,
+                "text": "                vec![\"/source-read/denied\"],"
+              },
+              {
+                "number": 2061,
+                "text": "            ),"
+              },
+              {
+                "number": 2062,
+                "text": "        ] {"
+              },
+              {
+                "number": 2063,
+                "text": "            let reader = Arc::new(RecoveringReader {"
+              },
+              {
+                "number": 2064,
+                "text": "                error,"
+              },
+              {
+                "number": 2065,
+                "text": "                failures: expected.len(),"
+              },
+              {
+                "number": 2066,
+                "text": "                reads: Mutex::new(Vec::new()),"
+              },
+              {
+                "number": 2067,
+                "text": "            });"
+              },
+              {
+                "number": 2068,
+                "text": "            let compiler = CompilerBuilder::default()"
+              },
+              {
+                "number": 2069,
+                "text": "                .config(crate::test_support::test_config())"
+              },
+              {
+                "number": 2070,
+                "text": "                .source_reader(Some(reader.clone() as Arc<dyn SourceReader>))"
+              },
+              {
+                "number": 2071,
+                "text": "                .build()"
+              },
+              {
+                "number": 2072,
+                "text": "                .unwrap();"
+              },
+              {
+                "number": 2073,
+                "text": "            let Err(error) = compiler.read_file(LpcPath::new_server(input)).await else {"
+              },
+              {
+                "number": 2074,
+                "text": "                panic!(\"a failed source read unexpectedly recovered\");"
+              }
+            ]
+          }
+        },
+        "labels": "Base 1a4f5b65dd2a269298748df2dfd68092a169a8d9 → 1a4f5b65dd2a269298748df2dfd68092a169a8d9 · subtree . · working observed 2026-11-04T21:21:35.204Z to 2026-11-04T21:21:35.243Z",
+        "counts": "1033 paths · 1 added · 0 removed · 1 modified · 1031 unchanged · 0 unassessed · 0 unavailable",
+        "filter": "src/compiler/mod.rs",
+        "notice": null,
+        "fileButtons": 1,
+        "hunkButtons": 3,
+        "hunks": [
+          {
+            "id": "8e33638836326fd9b68ab24cf1fec45426e4d6d75394f6a32505663a54110b6d",
+            "label": "1: @@ -117,7 +117,7 @@",
+            "selected": false
+          },
+          {
+            "id": "ea710daf40cc4e80d776db258fc85a6d68348855b8b6f81a8c0006861b74e087",
+            "label": "2: @@ -156,8 +156,10 @@",
+            "selected": false
+          },
+          {
+            "id": "7127b23b703362fc2d126df05edd925097655a9382d7e87d0e22bfc8c26656a8",
+            "label": "3: @@ -166,7 +168,7 @@",
+            "selected": false
+          }
+        ],
+        "history": "c86eb945-7cdc-4e88-bf6e-e2efbe98cb94",
+        "audit": {
+          "verifiedRows": 48,
+          "maxRenderedRows": 56,
+          "maxOutlineButtons": 18
+        }
+      },
+      "screenshot": "12-permission-error-case.png"
+    },
+    {
+      "name": "untracked-document",
+      "intent": "Account for the added Markdown document without requiring an analyser.",
+      "state": {
+        "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+        "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+        "path": "doc/compiler-source-reading.md",
+        "side": "working",
+        "selectedSides": [
+          "working"
+        ],
+        "panes": {
+          "base": {
+            "version": "",
+            "sourceTop": 0,
+            "sourceLeft": 0,
+            "outlineTop": 0,
+            "declaration": null,
+            "renderedRows": 0,
+            "outlineButtons": 0,
+            "rows": []
+          },
+          "working": {
+            "version": "d8fe76da71b6d2e8e93bb088072c524c891d87f45f1ec1e6f71135a7ac2c2537",
+            "sourceTop": 0,
+            "sourceLeft": 0,
+            "outlineTop": 0,
+            "declaration": null,
+            "renderedRows": 6,
+            "outlineButtons": 0,
+            "rows": [
+              {
+                "number": 1,
+                "text": "# Source-read diagnostics"
+              },
+              {
+                "number": 2,
+                "text": ""
+              },
+              {
+                "number": 3,
+                "text": "A failed source read now says that source lookup stopped. The diagnostic keeps the"
+              },
+              {
+                "number": 4,
+                "text": "requested source name and the underlying I/O error. Source-lookup rules should stay"
+              },
+              {
+                "number": 5,
+                "text": "the same; this is a wording improvement."
+              },
+              {
+                "number": 6,
+                "text": ""
+              }
+            ]
+          }
+        },
+        "labels": "Base 1a4f5b65dd2a269298748df2dfd68092a169a8d9 → 1a4f5b65dd2a269298748df2dfd68092a169a8d9 · subtree . · working observed 2026-11-04T21:21:35.204Z to 2026-11-04T21:21:35.243Z",
+        "counts": "1033 paths · 1 added · 0 removed · 1 modified · 1031 unchanged · 0 unassessed · 0 unavailable",
+        "filter": "doc/compiler-source-reading.md",
+        "notice": null,
+        "fileButtons": 1,
+        "hunkButtons": 1,
+        "hunks": [
+          {
+            "id": "443f08b0f412848afbbef8f01f8d685a184ea46b2c103bcbe381d83b92c3755a",
+            "label": "1: @@ -0,0 +1,5 @@",
+            "selected": true
+          }
+        ],
+        "history": "25906d56-662e-4459-ba91-e97671b5775f",
+        "audit": {
+          "verifiedRows": 6,
+          "maxRenderedRows": 6,
+          "maxOutlineButtons": 0
+        }
+      },
+      "screenshot": "13-untracked-document.png"
+    },
+    {
+      "name": "browser-back",
+      "intent": "Use native browser history to return to the regression-test evidence.",
+      "state": {
+        "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+        "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+        "path": "src/compiler/mod.rs",
+        "side": "working",
+        "selectedSides": [
+          "working"
+        ],
+        "panes": {
+          "base": {
+            "version": "31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6",
+            "sourceTop": 2552,
+            "sourceLeft": 0,
+            "outlineTop": 0,
+            "declaration": null,
+            "renderedRows": 56,
+            "outlineButtons": 18,
+            "rows": [
+              {
+                "number": 117,
+                "text": "        }"
+              },
+              {
+                "number": 118,
+                "text": "    }"
+              },
+              {
+                "number": 119,
+                "text": ""
+              },
+              {
+                "number": 120,
+                "text": "    /// Fully compile a file into a Program struct"
+              },
+              {
+                "number": 121,
+                "text": "    ///"
+              },
+              {
+                "number": 122,
+                "text": "    /// # Arguments"
+              },
+              {
+                "number": 123,
+                "text": "    /// `path` - The path of the file to compile. Also used for error messaging."
+              },
+              {
+                "number": 124,
+                "text": "    ///  If the file in question ends in `.c`, the extension can be left off, per LPC convention."
+              },
+              {
+                "number": 125,
+                "text": "    ///"
+              },
+              {
+                "number": 126,
+                "text": "    /// # Examples"
+              },
+              {
+                "number": 127,
+                "text": "    /// ```"
+              },
+              {
+                "number": 128,
+                "text": "    /// # #[tokio::main(flavor = \"current_thread\")]"
+              },
+              {
+                "number": 129,
+                "text": "    /// # async fn main() {"
+              },
+              {
+                "number": 130,
+                "text": "    /// use lpc_rs::compiler::Compiler;"
+              },
+              {
+                "number": 131,
+                "text": "    /// use lpc_rs_core::lpc_path::LpcPath;"
+              },
+              {
+                "number": 132,
+                "text": "    ///"
+              },
+              {
+                "number": 133,
+                "text": "    /// let compiled = Compiler::default()"
+              },
+              {
+                "number": 134,
+                "text": "    ///     .compile_file(LpcPath::new_server(\"tests/fixtures/code/example.c\"))"
+              },
+              {
+                "number": 135,
+                "text": "    ///     .await"
+              },
+              {
+                "number": 136,
+                "text": "    ///     .expect(\"Unable to compile.\");"
+              },
+              {
+                "number": 137,
+                "text": "    /// # }"
+              },
+              {
+                "number": 138,
+                "text": "    /// ```"
+              },
+              {
+                "number": 139,
+                "text": "    #[instrument(skip(self))]"
+              },
+              {
+                "number": 140,
+                "text": "    pub async fn compile_file<T>(&self, path: T) -> Result<Compiled>"
+              }
+            ]
+          },
+          "working": {
+            "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+            "sourceTop": 45112,
+            "sourceLeft": 0,
+            "outlineTop": 5845,
+            "declaration": "eb0a001ad0f8f76c3b548feb3a15832716761420c295317daf69e64839e9d13e",
+            "renderedRows": 48,
+            "outlineButtons": 18,
+            "rows": [
+              {
+                "number": 2051,
+                "text": "            ),"
+              },
+              {
+                "number": 2052,
+                "text": "            ("
+              },
+              {
+                "number": 2053,
+                "text": "                \"/source-read/missing.c\","
+              },
+              {
+                "number": 2054,
+                "text": "                ErrorKind::NotFound,"
+              },
+              {
+                "number": 2055,
+                "text": "                vec![\"/source-read/missing.c\"],"
+              },
+              {
+                "number": 2056,
+                "text": "            ),"
+              },
+              {
+                "number": 2057,
+                "text": "            ("
+              },
+              {
+                "number": 2058,
+                "text": "                \"/source-read/denied\","
+              },
+              {
+                "number": 2059,
+                "text": "                ErrorKind::PermissionDenied,"
+              },
+              {
+                "number": 2060,
+                "text": "                vec![\"/source-read/denied\"],"
+              },
+              {
+                "number": 2061,
+                "text": "            ),"
+              },
+              {
+                "number": 2062,
+                "text": "        ] {"
+              },
+              {
+                "number": 2063,
+                "text": "            let reader = Arc::new(RecoveringReader {"
+              },
+              {
+                "number": 2064,
+                "text": "                error,"
+              },
+              {
+                "number": 2065,
+                "text": "                failures: expected.len(),"
+              },
+              {
+                "number": 2066,
+                "text": "                reads: Mutex::new(Vec::new()),"
+              },
+              {
+                "number": 2067,
+                "text": "            });"
+              },
+              {
+                "number": 2068,
+                "text": "            let compiler = CompilerBuilder::default()"
+              },
+              {
+                "number": 2069,
+                "text": "                .config(crate::test_support::test_config())"
+              },
+              {
+                "number": 2070,
+                "text": "                .source_reader(Some(reader.clone() as Arc<dyn SourceReader>))"
+              },
+              {
+                "number": 2071,
+                "text": "                .build()"
+              },
+              {
+                "number": 2072,
+                "text": "                .unwrap();"
+              },
+              {
+                "number": 2073,
+                "text": "            let Err(error) = compiler.read_file(LpcPath::new_server(input)).await else {"
+              },
+              {
+                "number": 2074,
+                "text": "                panic!(\"a failed source read unexpectedly recovered\");"
+              }
+            ]
+          }
+        },
+        "labels": "Base 1a4f5b65dd2a269298748df2dfd68092a169a8d9 → 1a4f5b65dd2a269298748df2dfd68092a169a8d9 · subtree . · working observed 2026-11-04T21:21:35.204Z to 2026-11-04T21:21:35.243Z",
+        "counts": "1033 paths · 1 added · 0 removed · 1 modified · 1031 unchanged · 0 unassessed · 0 unavailable",
+        "filter": "doc/compiler-source-reading.md",
+        "notice": null,
+        "fileButtons": 1,
+        "hunkButtons": 3,
+        "hunks": [
+          {
+            "id": "8e33638836326fd9b68ab24cf1fec45426e4d6d75394f6a32505663a54110b6d",
+            "label": "1: @@ -117,7 +117,7 @@",
+            "selected": false
+          },
+          {
+            "id": "ea710daf40cc4e80d776db258fc85a6d68348855b8b6f81a8c0006861b74e087",
+            "label": "2: @@ -156,8 +156,10 @@",
+            "selected": false
+          },
+          {
+            "id": "7127b23b703362fc2d126df05edd925097655a9382d7e87d0e22bfc8c26656a8",
+            "label": "3: @@ -166,7 +168,7 @@",
+            "selected": false
+          }
+        ],
+        "history": "c86eb945-7cdc-4e88-bf6e-e2efbe98cb94",
+        "audit": {
+          "verifiedRows": 48,
+          "maxRenderedRows": 56,
+          "maxOutlineButtons": 18
+        }
+      },
+      "screenshot": "14-browser-back.png"
+    },
+    {
+      "name": "refresh",
+      "intent": "Refresh the same baseline while preserving the selected file and unchanged reading positions.",
+      "state": {
+        "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:2",
+        "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+        "path": "src/compiler/mod.rs",
+        "side": "working",
+        "selectedSides": [
+          "working"
+        ],
+        "panes": {
+          "base": {
+            "version": "31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6",
+            "sourceTop": 2552,
+            "sourceLeft": 0,
+            "outlineTop": 0,
+            "declaration": null,
+            "renderedRows": 54,
+            "outlineButtons": 17,
+            "rows": [
+              {
+                "number": 117,
+                "text": "        }"
+              },
+              {
+                "number": 118,
+                "text": "    }"
+              },
+              {
+                "number": 119,
+                "text": ""
+              },
+              {
+                "number": 120,
+                "text": "    /// Fully compile a file into a Program struct"
+              },
+              {
+                "number": 121,
+                "text": "    ///"
+              },
+              {
+                "number": 122,
+                "text": "    /// # Arguments"
+              },
+              {
+                "number": 123,
+                "text": "    /// `path` - The path of the file to compile. Also used for error messaging."
+              },
+              {
+                "number": 124,
+                "text": "    ///  If the file in question ends in `.c`, the extension can be left off, per LPC convention."
+              },
+              {
+                "number": 125,
+                "text": "    ///"
+              },
+              {
+                "number": 126,
+                "text": "    /// # Examples"
+              },
+              {
+                "number": 127,
+                "text": "    /// ```"
+              },
+              {
+                "number": 128,
+                "text": "    /// # #[tokio::main(flavor = \"current_thread\")]"
+              },
+              {
+                "number": 129,
+                "text": "    /// # async fn main() {"
+              },
+              {
+                "number": 130,
+                "text": "    /// use lpc_rs::compiler::Compiler;"
+              },
+              {
+                "number": 131,
+                "text": "    /// use lpc_rs_core::lpc_path::LpcPath;"
+              },
+              {
+                "number": 132,
+                "text": "    ///"
+              },
+              {
+                "number": 133,
+                "text": "    /// let compiled = Compiler::default()"
+              },
+              {
+                "number": 134,
+                "text": "    ///     .compile_file(LpcPath::new_server(\"tests/fixtures/code/example.c\"))"
+              },
+              {
+                "number": 135,
+                "text": "    ///     .await"
+              },
+              {
+                "number": 136,
+                "text": "    ///     .expect(\"Unable to compile.\");"
+              },
+              {
+                "number": 137,
+                "text": "    /// # }"
+              },
+              {
+                "number": 138,
+                "text": "    /// ```"
+              }
+            ]
+          },
+          "working": {
+            "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+            "sourceTop": 45112,
+            "sourceLeft": 0,
+            "outlineTop": 5845,
+            "declaration": "eb0a001ad0f8f76c3b548feb3a15832716761420c295317daf69e64839e9d13e",
+            "renderedRows": 48,
+            "outlineButtons": 18,
+            "rows": [
+              {
+                "number": 2051,
+                "text": "            ),"
+              },
+              {
+                "number": 2052,
+                "text": "            ("
+              },
+              {
+                "number": 2053,
+                "text": "                \"/source-read/missing.c\","
+              },
+              {
+                "number": 2054,
+                "text": "                ErrorKind::NotFound,"
+              },
+              {
+                "number": 2055,
+                "text": "                vec![\"/source-read/missing.c\"],"
+              },
+              {
+                "number": 2056,
+                "text": "            ),"
+              },
+              {
+                "number": 2057,
+                "text": "            ("
+              },
+              {
+                "number": 2058,
+                "text": "                \"/source-read/denied\","
+              },
+              {
+                "number": 2059,
+                "text": "                ErrorKind::PermissionDenied,"
+              },
+              {
+                "number": 2060,
+                "text": "                vec![\"/source-read/denied\"],"
+              },
+              {
+                "number": 2061,
+                "text": "            ),"
+              },
+              {
+                "number": 2062,
+                "text": "        ] {"
+              },
+              {
+                "number": 2063,
+                "text": "            let reader = Arc::new(RecoveringReader {"
+              },
+              {
+                "number": 2064,
+                "text": "                error,"
+              },
+              {
+                "number": 2065,
+                "text": "                failures: expected.len(),"
+              },
+              {
+                "number": 2066,
+                "text": "                reads: Mutex::new(Vec::new()),"
+              },
+              {
+                "number": 2067,
+                "text": "            });"
+              },
+              {
+                "number": 2068,
+                "text": "            let compiler = CompilerBuilder::default()"
+              },
+              {
+                "number": 2069,
+                "text": "                .config(crate::test_support::test_config())"
+              },
+              {
+                "number": 2070,
+                "text": "                .source_reader(Some(reader.clone() as Arc<dyn SourceReader>))"
+              },
+              {
+                "number": 2071,
+                "text": "                .build()"
+              },
+              {
+                "number": 2072,
+                "text": "                .unwrap();"
+              }
+            ]
+          }
+        },
+        "labels": "Base 1a4f5b65dd2a269298748df2dfd68092a169a8d9 → 1a4f5b65dd2a269298748df2dfd68092a169a8d9 · subtree . · working observed 2026-11-04T21:21:44.005Z to 2026-11-04T21:21:44.074Z",
+        "counts": "1033 paths · 1 added · 0 removed · 1 modified · 1031 unchanged · 0 unassessed · 0 unavailable",
+        "filter": "doc/compiler-source-reading.md",
+        "notice": "Refreshed comparison; file and reading positions kept.",
+        "fileButtons": 1,
+        "hunkButtons": 3,
+        "hunks": [
+          {
+            "id": "8e33638836326fd9b68ab24cf1fec45426e4d6d75394f6a32505663a54110b6d",
+            "label": "1: @@ -117,7 +117,7 @@",
+            "selected": false
+          },
+          {
+            "id": "ea710daf40cc4e80d776db258fc85a6d68348855b8b6f81a8c0006861b74e087",
+            "label": "2: @@ -156,8 +156,10 @@",
+            "selected": false
+          },
+          {
+            "id": "7127b23b703362fc2d126df05edd925097655a9382d7e87d0e22bfc8c26656a8",
+            "label": "3: @@ -166,7 +168,7 @@",
+            "selected": false
+          }
+        ],
+        "history": "26898f42-0a63-47da-92b2-7e1be888d2be",
+        "audit": {
+          "verifiedRows": 44,
+          "maxRenderedRows": 54,
+          "maxOutlineButtons": 18
+        }
+      },
+      "screenshot": "15-refresh.png"
+    },
+    {
+      "name": "expired-return",
+      "intent": "Keep the fresh view while explaining that the old comparison visit expired.",
+      "state": {
+        "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:2",
+        "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+        "path": "src/compiler/mod.rs",
+        "side": "working",
+        "selectedSides": [
+          "working"
+        ],
+        "panes": {
+          "base": {
+            "version": "31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6",
+            "sourceTop": 2552,
+            "sourceLeft": 0,
+            "outlineTop": 0,
+            "declaration": null,
+            "renderedRows": 54,
+            "outlineButtons": 17,
+            "rows": [
+              {
+                "number": 117,
+                "text": "        }"
+              },
+              {
+                "number": 118,
+                "text": "    }"
+              },
+              {
+                "number": 119,
+                "text": ""
+              },
+              {
+                "number": 120,
+                "text": "    /// Fully compile a file into a Program struct"
+              },
+              {
+                "number": 121,
+                "text": "    ///"
+              },
+              {
+                "number": 122,
+                "text": "    /// # Arguments"
+              },
+              {
+                "number": 123,
+                "text": "    /// `path` - The path of the file to compile. Also used for error messaging."
+              },
+              {
+                "number": 124,
+                "text": "    ///  If the file in question ends in `.c`, the extension can be left off, per LPC convention."
+              },
+              {
+                "number": 125,
+                "text": "    ///"
+              },
+              {
+                "number": 126,
+                "text": "    /// # Examples"
+              },
+              {
+                "number": 127,
+                "text": "    /// ```"
+              },
+              {
+                "number": 128,
+                "text": "    /// # #[tokio::main(flavor = \"current_thread\")]"
+              },
+              {
+                "number": 129,
+                "text": "    /// # async fn main() {"
+              },
+              {
+                "number": 130,
+                "text": "    /// use lpc_rs::compiler::Compiler;"
+              },
+              {
+                "number": 131,
+                "text": "    /// use lpc_rs_core::lpc_path::LpcPath;"
+              },
+              {
+                "number": 132,
+                "text": "    ///"
+              },
+              {
+                "number": 133,
+                "text": "    /// let compiled = Compiler::default()"
+              },
+              {
+                "number": 134,
+                "text": "    ///     .compile_file(LpcPath::new_server(\"tests/fixtures/code/example.c\"))"
+              },
+              {
+                "number": 135,
+                "text": "    ///     .await"
+              },
+              {
+                "number": 136,
+                "text": "    ///     .expect(\"Unable to compile.\");"
+              },
+              {
+                "number": 137,
+                "text": "    /// # }"
+              },
+              {
+                "number": 138,
+                "text": "    /// ```"
+              }
+            ]
+          },
+          "working": {
+            "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+            "sourceTop": 45112,
+            "sourceLeft": 0,
+            "outlineTop": 5845,
+            "declaration": "eb0a001ad0f8f76c3b548feb3a15832716761420c295317daf69e64839e9d13e",
+            "renderedRows": 48,
+            "outlineButtons": 18,
+            "rows": [
+              {
+                "number": 2051,
+                "text": "            ),"
+              },
+              {
+                "number": 2052,
+                "text": "            ("
+              },
+              {
+                "number": 2053,
+                "text": "                \"/source-read/missing.c\","
+              },
+              {
+                "number": 2054,
+                "text": "                ErrorKind::NotFound,"
+              },
+              {
+                "number": 2055,
+                "text": "                vec![\"/source-read/missing.c\"],"
+              },
+              {
+                "number": 2056,
+                "text": "            ),"
+              },
+              {
+                "number": 2057,
+                "text": "            ("
+              },
+              {
+                "number": 2058,
+                "text": "                \"/source-read/denied\","
+              },
+              {
+                "number": 2059,
+                "text": "                ErrorKind::PermissionDenied,"
+              },
+              {
+                "number": 2060,
+                "text": "                vec![\"/source-read/denied\"],"
+              },
+              {
+                "number": 2061,
+                "text": "            ),"
+              },
+              {
+                "number": 2062,
+                "text": "        ] {"
+              },
+              {
+                "number": 2063,
+                "text": "            let reader = Arc::new(RecoveringReader {"
+              },
+              {
+                "number": 2064,
+                "text": "                error,"
+              },
+              {
+                "number": 2065,
+                "text": "                failures: expected.len(),"
+              },
+              {
+                "number": 2066,
+                "text": "                reads: Mutex::new(Vec::new()),"
+              },
+              {
+                "number": 2067,
+                "text": "            });"
+              },
+              {
+                "number": 2068,
+                "text": "            let compiler = CompilerBuilder::default()"
+              },
+              {
+                "number": 2069,
+                "text": "                .config(crate::test_support::test_config())"
+              },
+              {
+                "number": 2070,
+                "text": "                .source_reader(Some(reader.clone() as Arc<dyn SourceReader>))"
+              },
+              {
+                "number": 2071,
+                "text": "                .build()"
+              },
+              {
+                "number": 2072,
+                "text": "                .unwrap();"
+              }
+            ]
+          }
+        },
+        "labels": "Base 1a4f5b65dd2a269298748df2dfd68092a169a8d9 → 1a4f5b65dd2a269298748df2dfd68092a169a8d9 · subtree . · working observed 2026-11-04T21:21:44.005Z to 2026-11-04T21:21:44.074Z",
+        "counts": "1033 paths · 1 added · 0 removed · 1 modified · 1031 unchanged · 0 unassessed · 0 unavailable",
+        "filter": "doc/compiler-source-reading.md",
+        "notice": "This saved comparison expired. The displayed capture is kept; open the current comparison.",
+        "fileButtons": 1,
+        "hunkButtons": 3,
+        "hunks": [
+          {
+            "id": "8e33638836326fd9b68ab24cf1fec45426e4d6d75394f6a32505663a54110b6d",
+            "label": "1: @@ -117,7 +117,7 @@",
+            "selected": false
+          },
+          {
+            "id": "ea710daf40cc4e80d776db258fc85a6d68348855b8b6f81a8c0006861b74e087",
+            "label": "2: @@ -156,8 +156,10 @@",
+            "selected": false
+          },
+          {
+            "id": "7127b23b703362fc2d126df05edd925097655a9382d7e87d0e22bfc8c26656a8",
+            "label": "3: @@ -166,7 +168,7 @@",
+            "selected": false
+          }
+        ],
+        "history": "c86eb945-7cdc-4e88-bf6e-e2efbe98cb94",
+        "audit": {
+          "verifiedRows": 44,
+          "maxRenderedRows": 54,
+          "maxOutlineButtons": 18
+        }
+      },
+      "screenshot": "16-expired-return.png"
+    },
+    {
+      "name": "recovery",
+      "intent": "Explicitly reopen the current comparison.",
+      "state": {
+        "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:2",
+        "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+        "path": "doc/compiler-source-reading.md",
+        "side": "working",
+        "selectedSides": [
+          "working"
+        ],
+        "panes": {
+          "base": {
+            "version": "",
+            "sourceTop": 0,
+            "sourceLeft": 0,
+            "outlineTop": 0,
+            "declaration": null,
+            "renderedRows": 0,
+            "outlineButtons": 0,
+            "rows": []
+          },
+          "working": {
+            "version": "d8fe76da71b6d2e8e93bb088072c524c891d87f45f1ec1e6f71135a7ac2c2537",
+            "sourceTop": 0,
+            "sourceLeft": 0,
+            "outlineTop": 0,
+            "declaration": null,
+            "renderedRows": 6,
+            "outlineButtons": 0,
+            "rows": [
+              {
+                "number": 1,
+                "text": "# Source-read diagnostics"
+              },
+              {
+                "number": 2,
+                "text": ""
+              },
+              {
+                "number": 3,
+                "text": "A failed source read now says that source lookup stopped. The diagnostic keeps the"
+              },
+              {
+                "number": 4,
+                "text": "requested source name and the underlying I/O error. Source-lookup rules should stay"
+              },
+              {
+                "number": 5,
+                "text": "the same; this is a wording improvement."
+              },
+              {
+                "number": 6,
+                "text": ""
+              }
+            ]
+          }
+        },
+        "labels": "Base 1a4f5b65dd2a269298748df2dfd68092a169a8d9 → 1a4f5b65dd2a269298748df2dfd68092a169a8d9 · subtree . · working observed 2026-11-04T21:21:44.005Z to 2026-11-04T21:21:44.074Z",
+        "counts": "1033 paths · 1 added · 0 removed · 1 modified · 1031 unchanged · 0 unassessed · 0 unavailable",
+        "filter": "",
+        "notice": null,
+        "fileButtons": 2,
+        "hunkButtons": 1,
+        "hunks": [
+          {
+            "id": "443f08b0f412848afbbef8f01f8d685a184ea46b2c103bcbe381d83b92c3755a",
+            "label": "1: @@ -0,0 +1,5 @@",
+            "selected": true
+          }
+        ],
+        "history": "a6d6a41f-6e21-43bc-ada5-c6479ae8f7c2",
+        "audit": {
+          "verifiedRows": 6,
+          "maxRenderedRows": 6,
+          "maxOutlineButtons": 0
+        }
+      },
+      "screenshot": "17-recovery.png"
+    },
+    {
+      "name": "closed",
+      "intent": "Retire the pair without displaying old source under an empty selection.",
+      "state": {
+        "token": "",
+        "comparison": "",
+        "path": "Choose a baseline",
+        "side": "working",
+        "selectedSides": [
+          "working"
+        ],
+        "panes": {
+          "base": {
+            "version": "",
+            "sourceTop": 0,
+            "sourceLeft": 0,
+            "outlineTop": 0,
+            "declaration": null,
+            "renderedRows": 0,
+            "outlineButtons": 0,
+            "rows": []
+          },
+          "working": {
+            "version": "",
+            "sourceTop": 0,
+            "sourceLeft": 0,
+            "outlineTop": 0,
+            "declaration": null,
+            "renderedRows": 0,
+            "outlineButtons": 0,
+            "rows": []
+          }
+        },
+        "labels": "Comparison closed. Choose a baseline to capture another review.",
+        "counts": "No comparison captured",
+        "filter": "",
+        "notice": "This comparison expired or was closed. The displayed capture is kept.",
+        "fileButtons": 0,
+        "hunkButtons": 0,
+        "hunks": [],
+        "history": "a6d6a41f-6e21-43bc-ada5-c6479ae8f7c2"
+      },
+      "screenshot": "18-closed.png"
+    }
+  ],
+  "outlineScans": [
+    {
+      "side": "working",
+      "name": "read_file",
+      "fromEnd": false,
+      "pages": [
+        [
+          {
+            "id": "1dfacf8f49b4e07cfdd0c9cb4ce59d642eae4de494534515f5682ce5fb5f3838",
+            "name": "ast",
+            "index": 0
+          },
+          {
+            "id": "53b34311622a8f311ca21e9329f125285f29aea615c6f7ae36612225a7efad6a",
+            "name": "cache",
+            "index": 1
+          },
+          {
+            "id": "0e007f33d4732f5637d37bf33cda0571b9b98fd86b920bd2754a932f4b158681",
+            "name": "callee",
+            "index": 2
+          },
+          {
+            "id": "a902c198b68c1a06b210cc8d582d11d9e1d99590f46d6c1c577f2f46751194d1",
+            "name": "codegen",
+            "index": 3
+          },
+          {
+            "id": "b06ab855bc3e5377a0d8b51e58b728b6b501c4a7d19d4875bad097c71d78d006",
+            "name": "compilation_context",
+            "index": 4
+          },
+          {
+            "id": "8b00d96fa046dfed150527ef3a31ba0eb1c88cfd40ff7c89308e33bf02025845",
+            "name": "compile_gate",
+            "index": 5
+          },
+          {
+            "id": "309fdf184b6068f2db70311dda4122b688931f0797a141706e702ee2b780e306",
+            "name": "diagnostics",
+            "index": 6
+          },
+          {
+            "id": "0fd687e002c3a903c9cce2a526400780407b346c06d29f027c9336b81a9b2da6",
+            "name": "lexer",
+            "index": 7
+          },
+          {
+            "id": "cd23cdb23d4ea960744fa40b2765036d84006e197b7bc5253021f70e1e18452f",
+            "name": "parser",
+            "index": 8
+          }
+        ],
+        [
+          {
+            "id": "53b34311622a8f311ca21e9329f125285f29aea615c6f7ae36612225a7efad6a",
+            "name": "cache",
+            "index": 1
+          },
+          {
+            "id": "0e007f33d4732f5637d37bf33cda0571b9b98fd86b920bd2754a932f4b158681",
+            "name": "callee",
+            "index": 2
+          },
+          {
+            "id": "a902c198b68c1a06b210cc8d582d11d9e1d99590f46d6c1c577f2f46751194d1",
+            "name": "codegen",
+            "index": 3
+          },
+          {
+            "id": "b06ab855bc3e5377a0d8b51e58b728b6b501c4a7d19d4875bad097c71d78d006",
+            "name": "compilation_context",
+            "index": 4
+          },
+          {
+            "id": "8b00d96fa046dfed150527ef3a31ba0eb1c88cfd40ff7c89308e33bf02025845",
+            "name": "compile_gate",
+            "index": 5
+          },
+          {
+            "id": "309fdf184b6068f2db70311dda4122b688931f0797a141706e702ee2b780e306",
+            "name": "diagnostics",
+            "index": 6
+          },
+          {
+            "id": "0fd687e002c3a903c9cce2a526400780407b346c06d29f027c9336b81a9b2da6",
+            "name": "lexer",
+            "index": 7
+          },
+          {
+            "id": "cd23cdb23d4ea960744fa40b2765036d84006e197b7bc5253021f70e1e18452f",
+            "name": "parser",
+            "index": 8
+          },
+          {
+            "id": "96fe2cd7c7156a9315236349232da79a19c6f4006567e4971b21de27004b97c0",
+            "name": "parser_cache",
+            "index": 9
+          }
+        ],
+        [
+          {
+            "id": "61a7e7cc5bb0d0a8f2f6067916359aaf25e3c6be756d6927e538f33337a1caa5",
+            "name": "prepared_program",
+            "index": 10
+          },
+          {
+            "id": "c94444d57a81081350e50fb7df479c0e6f8527dba193dee256fd02719acf6adc",
+            "name": "preprocessor",
+            "index": 11
+          },
+          {
+            "id": "c4bb06d10a033eebd8311a630186af35935dc7ef58a8c3fc6dfeb7576d7323da",
+            "name": "program_interface",
+            "index": 12
+          },
+          {
+            "id": "779d9fd5d143c3f5b4230d0b4c0b4d03a48676af2759dcff8c0b28e03293be58",
+            "name": "semantic",
+            "index": 13
+          },
+          {
+            "id": "0beb126821281046205371cd6231a7b7c426e5254135fea3cad54845375bde8d",
+            "name": "source",
+            "index": 14
+          },
+          {
+            "id": "478e6dde96da629e0b17c490c8eb9b58ba5d1b29cf384c309d411875c81f543d",
+            "name": "source_reader",
+            "index": 15
+          },
+          {
+            "id": "9987fd9d2f91ad01a79a664c722f288c12ce539ce581c2cbe61d95113e73628a",
+            "name": "Compiler",
+            "index": 16
+          },
+          {
+            "id": "8aebe065e04b498be74eaea19da426149a9141350f33c68df4ab7854f090c85c",
+            "name": "ProgramWarnings",
+            "index": 17
+          },
+          {
+            "id": "3dbf85f35b8d982faf4b84556282486dbdcaf6dfaf1c0d8bf6f60b029ae2475b",
+            "name": "Compiled",
+            "index": 18
+          }
+        ],
+        [
+          {
+            "id": "547b9bbcad9471b370dd851c1d109d00877a7464666e1d87532c9d241e907fa9",
+            "name": "Compiler",
+            "index": 19
+          },
+          {
+            "id": "594715a9e49d514ab50f00a643fd81eda58170429da57da15384c241a0554220",
+            "name": "new",
+            "index": 20
+          },
+          {
+            "id": "485de8e293a9d437ae55ea0a99c72ceade9861b6daa76db6eae01e48cce12daf",
+            "name": "compile_file",
+            "index": 21
+          },
+          {
+            "id": "ed71f6144f6a2488da024a206d41c22f24d111b505118bc09faaeef37deae133",
+            "name": "read_file",
+            "index": 22
+          },
+          {
+            "id": "6da1980b9e6298be6438f9ed17eac18a38da838432b4bc0b6c14e91e5ff68410",
+            "name": "compile_in_game_file",
+            "index": 23
+          },
+          {
+            "id": "067e0d089671f225d2e13f4389db72e6f561263b795cd3dfbb2ad819ff4f6639",
+            "name": "preprocess_string",
+            "index": 24
+          },
+          {
+            "id": "885c3006c1491b6ae47bec00a6bb6acc475d238a2f9c5c7007c6490a7c24b4bd",
+            "name": "preprocess_source",
+            "index": 25
+          },
+          {
+            "id": "222836a9cb71e868158ae3a9881d44ea82f725b94aa66fe2d2e171e957181ad0",
+            "name": "compile_string",
+            "index": 26
+          },
+          {
+            "id": "dcc532291db9e832c73631a0bf267bf842b116fcf1a454c3740e5de312507519",
+            "name": "compile_source",
+            "index": 27
+          }
+        ]
+      ]
+    },
+    {
+      "side": "base",
+      "name": "read_file",
+      "fromEnd": false,
+      "pages": [
+        [
+          {
+            "id": "1dfacf8f49b4e07cfdd0c9cb4ce59d642eae4de494534515f5682ce5fb5f3838",
+            "name": "ast",
+            "index": 0
+          },
+          {
+            "id": "53b34311622a8f311ca21e9329f125285f29aea615c6f7ae36612225a7efad6a",
+            "name": "cache",
+            "index": 1
+          },
+          {
+            "id": "0e007f33d4732f5637d37bf33cda0571b9b98fd86b920bd2754a932f4b158681",
+            "name": "callee",
+            "index": 2
+          },
+          {
+            "id": "a902c198b68c1a06b210cc8d582d11d9e1d99590f46d6c1c577f2f46751194d1",
+            "name": "codegen",
+            "index": 3
+          },
+          {
+            "id": "b06ab855bc3e5377a0d8b51e58b728b6b501c4a7d19d4875bad097c71d78d006",
+            "name": "compilation_context",
+            "index": 4
+          },
+          {
+            "id": "8b00d96fa046dfed150527ef3a31ba0eb1c88cfd40ff7c89308e33bf02025845",
+            "name": "compile_gate",
+            "index": 5
+          },
+          {
+            "id": "309fdf184b6068f2db70311dda4122b688931f0797a141706e702ee2b780e306",
+            "name": "diagnostics",
+            "index": 6
+          },
+          {
+            "id": "0fd687e002c3a903c9cce2a526400780407b346c06d29f027c9336b81a9b2da6",
+            "name": "lexer",
+            "index": 7
+          },
+          {
+            "id": "cd23cdb23d4ea960744fa40b2765036d84006e197b7bc5253021f70e1e18452f",
+            "name": "parser",
+            "index": 8
+          }
+        ],
+        [
+          {
+            "id": "53b34311622a8f311ca21e9329f125285f29aea615c6f7ae36612225a7efad6a",
+            "name": "cache",
+            "index": 1
+          },
+          {
+            "id": "0e007f33d4732f5637d37bf33cda0571b9b98fd86b920bd2754a932f4b158681",
+            "name": "callee",
+            "index": 2
+          },
+          {
+            "id": "a902c198b68c1a06b210cc8d582d11d9e1d99590f46d6c1c577f2f46751194d1",
+            "name": "codegen",
+            "index": 3
+          },
+          {
+            "id": "b06ab855bc3e5377a0d8b51e58b728b6b501c4a7d19d4875bad097c71d78d006",
+            "name": "compilation_context",
+            "index": 4
+          },
+          {
+            "id": "8b00d96fa046dfed150527ef3a31ba0eb1c88cfd40ff7c89308e33bf02025845",
+            "name": "compile_gate",
+            "index": 5
+          },
+          {
+            "id": "309fdf184b6068f2db70311dda4122b688931f0797a141706e702ee2b780e306",
+            "name": "diagnostics",
+            "index": 6
+          },
+          {
+            "id": "0fd687e002c3a903c9cce2a526400780407b346c06d29f027c9336b81a9b2da6",
+            "name": "lexer",
+            "index": 7
+          },
+          {
+            "id": "cd23cdb23d4ea960744fa40b2765036d84006e197b7bc5253021f70e1e18452f",
+            "name": "parser",
+            "index": 8
+          },
+          {
+            "id": "96fe2cd7c7156a9315236349232da79a19c6f4006567e4971b21de27004b97c0",
+            "name": "parser_cache",
+            "index": 9
+          }
+        ],
+        [
+          {
+            "id": "61a7e7cc5bb0d0a8f2f6067916359aaf25e3c6be756d6927e538f33337a1caa5",
+            "name": "prepared_program",
+            "index": 10
+          },
+          {
+            "id": "c94444d57a81081350e50fb7df479c0e6f8527dba193dee256fd02719acf6adc",
+            "name": "preprocessor",
+            "index": 11
+          },
+          {
+            "id": "c4bb06d10a033eebd8311a630186af35935dc7ef58a8c3fc6dfeb7576d7323da",
+            "name": "program_interface",
+            "index": 12
+          },
+          {
+            "id": "779d9fd5d143c3f5b4230d0b4c0b4d03a48676af2759dcff8c0b28e03293be58",
+            "name": "semantic",
+            "index": 13
+          },
+          {
+            "id": "0beb126821281046205371cd6231a7b7c426e5254135fea3cad54845375bde8d",
+            "name": "source",
+            "index": 14
+          },
+          {
+            "id": "478e6dde96da629e0b17c490c8eb9b58ba5d1b29cf384c309d411875c81f543d",
+            "name": "source_reader",
+            "index": 15
+          },
+          {
+            "id": "9987fd9d2f91ad01a79a664c722f288c12ce539ce581c2cbe61d95113e73628a",
+            "name": "Compiler",
+            "index": 16
+          },
+          {
+            "id": "8aebe065e04b498be74eaea19da426149a9141350f33c68df4ab7854f090c85c",
+            "name": "ProgramWarnings",
+            "index": 17
+          },
+          {
+            "id": "3dbf85f35b8d982faf4b84556282486dbdcaf6dfaf1c0d8bf6f60b029ae2475b",
+            "name": "Compiled",
+            "index": 18
+          }
+        ],
+        [
+          {
+            "id": "547b9bbcad9471b370dd851c1d109d00877a7464666e1d87532c9d241e907fa9",
+            "name": "Compiler",
+            "index": 19
+          },
+          {
+            "id": "594715a9e49d514ab50f00a643fd81eda58170429da57da15384c241a0554220",
+            "name": "new",
+            "index": 20
+          },
+          {
+            "id": "485de8e293a9d437ae55ea0a99c72ceade9861b6daa76db6eae01e48cce12daf",
+            "name": "compile_file",
+            "index": 21
+          },
+          {
+            "id": "ed71f6144f6a2488da024a206d41c22f24d111b505118bc09faaeef37deae133",
+            "name": "read_file",
+            "index": 22
+          },
+          {
+            "id": "6da1980b9e6298be6438f9ed17eac18a38da838432b4bc0b6c14e91e5ff68410",
+            "name": "compile_in_game_file",
+            "index": 23
+          },
+          {
+            "id": "067e0d089671f225d2e13f4389db72e6f561263b795cd3dfbb2ad819ff4f6639",
+            "name": "preprocess_string",
+            "index": 24
+          },
+          {
+            "id": "885c3006c1491b6ae47bec00a6bb6acc475d238a2f9c5c7007c6490a7c24b4bd",
+            "name": "preprocess_source",
+            "index": 25
+          },
+          {
+            "id": "222836a9cb71e868158ae3a9881d44ea82f725b94aa66fe2d2e171e957181ad0",
+            "name": "compile_string",
+            "index": 26
+          },
+          {
+            "id": "dcc532291db9e832c73631a0bf267bf842b116fcf1a454c3740e5de312507519",
+            "name": "compile_source",
+            "index": 27
+          }
+        ]
+      ]
+    },
+    {
+      "side": "working",
+      "name": "SourceReader",
+      "fromEnd": false,
+      "pages": [
+        [
+          {
+            "id": "ab40ba9ec2cf86f7f5a56e6e610331f936272ed372afece14a1cfa3c0ae53622",
+            "name": "SourceKind",
+            "index": 0
+          },
+          {
+            "id": "ca9c55c3926bf01ad31cb4335f7425cccf047e95a22c311c64cfb028b8c1d38d",
+            "name": "SourceReader",
+            "index": 1
+          },
+          {
+            "id": "96c3e985aba9508ff1dc6baf0c813ef5002843998d695f819f7bd68f124f842e",
+            "name": "read",
+            "index": 2
+          },
+          {
+            "id": "d81a2072244618062016d99631561fe1207bd632ba24446d3c881b5be24bacff",
+            "name": "kind",
+            "index": 3
+          },
+          {
+            "id": "99525c8c583f671382f23a5214dc2e30f60ea655d904836caed82aa86f559a64",
+            "name": "DiskSourceReader",
+            "index": 4
+          },
+          {
+            "id": "1fc966a05a6f164d006e26041fd2befc9536d0fe0a3e7af81423c8704215de59",
+            "name": "SourceReader for DiskSourceReader",
+            "index": 5
+          },
+          {
+            "id": "abffeeadfc50aed1238524bde11b6444f37849cfe548682d48e57d73d498c330",
+            "name": "read",
+            "index": 6
+          },
+          {
+            "id": "a70185e1d9d5c21faec0ce722c2f86ed5150481975aac4bb783fd13f58a7b2a9",
+            "name": "kind",
+            "index": 7
+          }
+        ]
+      ]
+    },
+    {
+      "side": "working",
+      "name": "CompilerSource",
+      "fromEnd": false,
+      "pages": [
+        [
+          {
+            "id": "76875d91b8d083d6b735cfc70a988b981b31700d06c789bc2e9d7e90e676f6f1",
+            "name": "CompilerSource",
+            "index": 0
+          },
+          {
+            "id": "ba0dda4332d933895e5495daf1c9b1476f43796198c272ee8727a3d58d3a9038",
+            "name": "CompilerSource",
+            "index": 1
+          },
+          {
+            "id": "39efa49438d661373f51a15051b2aafa845383c3fa1863ce2a6da17d6b6ad92a",
+            "name": "new",
+            "index": 2
+          },
+          {
+            "id": "814b207f5ddf502dd051b4f69a3aa3a61f519d9a0df2fc7109f357787454ad4c",
+            "name": "input",
+            "index": 3
+          },
+          {
+            "id": "5346ef9a89a5b69a97102ef9063d93ec1e5cf4d4437048da29e04316b4f844f0",
+            "name": "resolved",
+            "index": 4
+          },
+          {
+            "id": "b4e0cff00ea33c4efb1437dd67178f038b5f35e96fd73bde7c5be23b536f0668",
+            "name": "name",
+            "index": 5
+          },
+          {
+            "id": "046f510fe84e4b49b84a739c8b5b3530b988072b138f21fff2d1c8f31f854657",
+            "name": "program_path",
+            "index": 6
+          },
+          {
+            "id": "06a023f09f58249e86d0585a8656cf732d473329de4cbb3dbbb1d292c32607f2",
+            "name": "include_cwd",
+            "index": 7
+          },
+          {
+            "id": "fea69eb1c239c0104e18f69f9ce81db3e87e990b732c243cef9698ef795d6805",
+            "name": "inheritance_cwd",
+            "index": 8
+          }
+        ]
+      ]
+    },
+    {
+      "side": "working",
+      "name": "file_reads_stop_after_extension_fallback_and_preserve_other_io_errors",
+      "fromEnd": true,
+      "pages": [
+        [
+          {
+            "id": "f8dbbb1a1b44c9380dbadc0b4e627d73a1b6c972af7c8ba9f18333b03cbd3151",
+            "name": "a_shadowing_local_is_a_warning",
+            "index": 122
+          },
+          {
+            "id": "f3e445b5c82e811f80111232bdf45feaada079ad22c45f0bc74923295853dd8b",
+            "name": "for_loop_initializers_do_not_shadow_themselves",
+            "index": 123
+          },
+          {
+            "id": "d6b8c150f3648d884fc1b7196e20ff8412d51c71ed9dfd0a666f19d7ed8ac2f8",
+            "name": "a_global_shadowing_an_inherited_global_is_a_warning",
+            "index": 124
+          },
+          {
+            "id": "444bab98f7a83e1e5feceb9c95d8ddfe3abe77fe962f35c368d2d4d1882815ef",
+            "name": "a_name_declared_by_two_parents_is_a_warning",
+            "index": 125
+          },
+          {
+            "id": "eb0a001ad0f8f76c3b548feb3a15832716761420c295317daf69e64839e9d13e",
+            "name": "file_reads_stop_after_extension_fallback_and_preserve_other_io_errors",
+            "index": 126
+          },
+          {
+            "id": "022e413c55f070f4d67c60400c75fa0ec8e1b3c48bebde4ec9e2ccfcd87fd609",
+            "name": "RecoveringReader",
+            "index": 127
+          },
+          {
+            "id": "5526c8f1479b221ff383af771cf5278c1e1cd3684238054a0ba0baca936ca480",
+            "name": "SourceReader for RecoveringReader",
+            "index": 128
+          },
+          {
+            "id": "0584b65b864c1bd1b65bd66008caa33f891178254296d10cdafec2c1db4df7f1",
+            "name": "read",
+            "index": 129
+          },
+          {
+            "id": "ee46260211d5cf61ba624a0b1f982f984b3d943bcd6ef863b38d43c31b15561b",
+            "name": "kind",
+            "index": 130
+          }
+        ]
+      ]
+    }
+  ],
+  "responses": [
+    {
+      "kind": "files",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "rows": 2,
+      "selectedRows": 0,
+      "payloadBytes": 1869
+    },
+    {
+      "kind": "diff",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "hunks": 1,
+      "edits": 1,
+      "payloadBytes": 1132
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "9001f4e18f72f981e25a612d75e9ecf4d6db23e3e00d01394460c2576f37bbca",
+      "version": "d8fe76da71b6d2e8e93bb088072c524c891d87f45f1ec1e6f71135a7ac2c2537",
+      "side": "working",
+      "sourceBytes": 230,
+      "rows": 6,
+      "outlineRows": 0,
+      "payloadBytes": 1454
+    },
+    {
+      "kind": "files",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "rows": 2,
+      "selectedRows": 0,
+      "payloadBytes": 1869
+    },
+    {
+      "kind": "diff",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "hunks": 3,
+      "edits": 3,
+      "payloadBytes": 2050
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6",
+      "side": "base",
+      "sourceBytes": 3316,
+      "rows": 96,
+      "outlineRows": 131,
+      "payloadBytes": 44694
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+      "side": "working",
+      "sourceBytes": 3310,
+      "rows": 96,
+      "outlineRows": 131,
+      "payloadBytes": 44691
+    },
+    {
+      "kind": "files",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "rows": 2,
+      "selectedRows": 0,
+      "payloadBytes": 1869
+    },
+    {
+      "kind": "diff",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "hunks": 3,
+      "edits": 3,
+      "payloadBytes": 2050
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6",
+      "side": "base",
+      "sourceBytes": 3316,
+      "rows": 96,
+      "outlineRows": 131,
+      "payloadBytes": 44694
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+      "side": "working",
+      "sourceBytes": 3310,
+      "rows": 96,
+      "outlineRows": 131,
+      "payloadBytes": 44691
+    },
+    {
+      "kind": "files",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "rows": 2,
+      "selectedRows": 0,
+      "payloadBytes": 1869
+    },
+    {
+      "kind": "diff",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "hunks": 3,
+      "edits": 3,
+      "payloadBytes": 2050
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6",
+      "side": "base",
+      "sourceBytes": 3247,
+      "rows": 96,
+      "outlineRows": 131,
+      "payloadBytes": 44631
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+      "side": "working",
+      "sourceBytes": 3213,
+      "rows": 96,
+      "outlineRows": 131,
+      "payloadBytes": 44600
+    },
+    {
+      "kind": "files",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "rows": 2,
+      "selectedRows": 0,
+      "payloadBytes": 1869
+    },
+    {
+      "kind": "diff",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "hunks": 3,
+      "edits": 3,
+      "payloadBytes": 2050
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6",
+      "side": "base",
+      "sourceBytes": 3215,
+      "rows": 96,
+      "outlineRows": 131,
+      "payloadBytes": 44605
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+      "side": "working",
+      "sourceBytes": 3231,
+      "rows": 96,
+      "outlineRows": 131,
+      "payloadBytes": 44626
+    },
+    {
+      "kind": "files",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "rows": 2,
+      "selectedRows": 0,
+      "payloadBytes": 1869
+    },
+    {
+      "kind": "diff",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "hunks": 3,
+      "edits": 3,
+      "payloadBytes": 2050
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6",
+      "side": "base",
+      "sourceBytes": 3215,
+      "rows": 96,
+      "outlineRows": 131,
+      "payloadBytes": 44605
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+      "side": "working",
+      "sourceBytes": 3228,
+      "rows": 96,
+      "outlineRows": 112,
+      "payloadBytes": 40657
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+      "side": "working",
+      "sourceBytes": 3228,
+      "rows": 96,
+      "outlineRows": 120,
+      "payloadBytes": 42345
+    },
+    {
+      "kind": "files",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "rows": 2,
+      "selectedRows": 0,
+      "payloadBytes": 1869
+    },
+    {
+      "kind": "diff",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "hunks": 3,
+      "edits": 3,
+      "payloadBytes": 2050
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6",
+      "side": "base",
+      "sourceBytes": 3164,
+      "rows": 96,
+      "outlineRows": 112,
+      "payloadBytes": 40588
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+      "side": "working",
+      "sourceBytes": 3228,
+      "rows": 96,
+      "outlineRows": 120,
+      "payloadBytes": 42345
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6",
+      "side": "base",
+      "sourceBytes": 3164,
+      "rows": 96,
+      "outlineRows": 120,
+      "payloadBytes": 42276
+    },
+    {
+      "kind": "files",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "rows": 200,
+      "selectedRows": 0,
+      "payloadBytes": 150455
+    },
+    {
+      "kind": "diff",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "hunks": 3,
+      "edits": 3,
+      "payloadBytes": 2050
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6",
+      "side": "base",
+      "sourceBytes": 3164,
+      "rows": 96,
+      "outlineRows": 120,
+      "payloadBytes": 42276
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+      "side": "working",
+      "sourceBytes": 3228,
+      "rows": 96,
+      "outlineRows": 120,
+      "payloadBytes": 42345
+    },
+    {
+      "kind": "files",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "rows": 1,
+      "selectedRows": 0,
+      "payloadBytes": 1390
+    },
+    {
+      "kind": "diff",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "hunks": 3,
+      "edits": 3,
+      "payloadBytes": 2050
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6",
+      "side": "base",
+      "sourceBytes": 3164,
+      "rows": 96,
+      "outlineRows": 120,
+      "payloadBytes": 42276
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+      "side": "working",
+      "sourceBytes": 3228,
+      "rows": 96,
+      "outlineRows": 120,
+      "payloadBytes": 42345
+    },
+    {
+      "kind": "files",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "rows": 1,
+      "selectedRows": 0,
+      "payloadBytes": 1390
+    },
+    {
+      "kind": "diff",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "hunks": 0,
+      "edits": 0,
+      "payloadBytes": 822
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "26ee3d49e2d6b2303f8cdec6a40fc104c91d1f420fef125f0bf156af556ced0c",
+      "version": "2384ba977e73b7cb5309ffa170312e4b714233643601349fc9a00365e3cf6217",
+      "side": "base",
+      "sourceBytes": 1283,
+      "rows": 46,
+      "outlineRows": 8,
+      "payloadBytes": 8348
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "26ee3d49e2d6b2303f8cdec6a40fc104c91d1f420fef125f0bf156af556ced0c",
+      "version": "2384ba977e73b7cb5309ffa170312e4b714233643601349fc9a00365e3cf6217",
+      "side": "working",
+      "sourceBytes": 1283,
+      "rows": 46,
+      "outlineRows": 8,
+      "payloadBytes": 8351
+    },
+    {
+      "kind": "files",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "rows": 1,
+      "selectedRows": 0,
+      "payloadBytes": 1390
+    },
+    {
+      "kind": "diff",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "hunks": 0,
+      "edits": 0,
+      "payloadBytes": 822
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "26ee3d49e2d6b2303f8cdec6a40fc104c91d1f420fef125f0bf156af556ced0c",
+      "version": "2384ba977e73b7cb5309ffa170312e4b714233643601349fc9a00365e3cf6217",
+      "side": "base",
+      "sourceBytes": 1283,
+      "rows": 46,
+      "outlineRows": 8,
+      "payloadBytes": 8348
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "26ee3d49e2d6b2303f8cdec6a40fc104c91d1f420fef125f0bf156af556ced0c",
+      "version": "2384ba977e73b7cb5309ffa170312e4b714233643601349fc9a00365e3cf6217",
+      "side": "working",
+      "sourceBytes": 1283,
+      "rows": 46,
+      "outlineRows": 8,
+      "payloadBytes": 8355
+    },
+    {
+      "kind": "files",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "rows": 1,
+      "selectedRows": 0,
+      "payloadBytes": 1390
+    },
+    {
+      "kind": "diff",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "hunks": 0,
+      "edits": 0,
+      "payloadBytes": 822
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "26ee3d49e2d6b2303f8cdec6a40fc104c91d1f420fef125f0bf156af556ced0c",
+      "version": "2384ba977e73b7cb5309ffa170312e4b714233643601349fc9a00365e3cf6217",
+      "side": "base",
+      "sourceBytes": 1283,
+      "rows": 46,
+      "outlineRows": 8,
+      "payloadBytes": 8348
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "26ee3d49e2d6b2303f8cdec6a40fc104c91d1f420fef125f0bf156af556ced0c",
+      "version": "2384ba977e73b7cb5309ffa170312e4b714233643601349fc9a00365e3cf6217",
+      "side": "working",
+      "sourceBytes": 1283,
+      "rows": 46,
+      "outlineRows": 8,
+      "payloadBytes": 8355
+    },
+    {
+      "kind": "files",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "rows": 1,
+      "selectedRows": 0,
+      "payloadBytes": 1390
+    },
+    {
+      "kind": "diff",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "hunks": 3,
+      "edits": 3,
+      "payloadBytes": 2050
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6",
+      "side": "base",
+      "sourceBytes": 3164,
+      "rows": 96,
+      "outlineRows": 120,
+      "payloadBytes": 42276
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+      "side": "working",
+      "sourceBytes": 3228,
+      "rows": 96,
+      "outlineRows": 120,
+      "payloadBytes": 42345
+    },
+    {
+      "kind": "files",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "rows": 1,
+      "selectedRows": 0,
+      "payloadBytes": 1383
+    },
+    {
+      "kind": "diff",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "hunks": 3,
+      "edits": 3,
+      "payloadBytes": 2050
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6",
+      "side": "base",
+      "sourceBytes": 3164,
+      "rows": 96,
+      "outlineRows": 120,
+      "payloadBytes": 42276
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+      "side": "working",
+      "sourceBytes": 3228,
+      "rows": 96,
+      "outlineRows": 120,
+      "payloadBytes": 42345
+    },
+    {
+      "kind": "files",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "rows": 1,
+      "selectedRows": 0,
+      "payloadBytes": 1383
+    },
+    {
+      "kind": "diff",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "hunks": 0,
+      "edits": 0,
+      "payloadBytes": 822
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "ee70a215157e38352e1dc86e8abdddab2c4da4ed527f0c186d009efc8fda13f3",
+      "version": "2c63be2cba7d05cf253c32b1f69e94f8d74b6fce7439ea3766695758fc08583c",
+      "side": "base",
+      "sourceBytes": 2863,
+      "rows": 96,
+      "outlineRows": 13,
+      "payloadBytes": 15752
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "ee70a215157e38352e1dc86e8abdddab2c4da4ed527f0c186d009efc8fda13f3",
+      "version": "2c63be2cba7d05cf253c32b1f69e94f8d74b6fce7439ea3766695758fc08583c",
+      "side": "working",
+      "sourceBytes": 2863,
+      "rows": 96,
+      "outlineRows": 13,
+      "payloadBytes": 15755
+    },
+    {
+      "kind": "files",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "rows": 1,
+      "selectedRows": 0,
+      "payloadBytes": 1383
+    },
+    {
+      "kind": "diff",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "hunks": 0,
+      "edits": 0,
+      "payloadBytes": 822
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "ee70a215157e38352e1dc86e8abdddab2c4da4ed527f0c186d009efc8fda13f3",
+      "version": "2c63be2cba7d05cf253c32b1f69e94f8d74b6fce7439ea3766695758fc08583c",
+      "side": "base",
+      "sourceBytes": 2863,
+      "rows": 96,
+      "outlineRows": 13,
+      "payloadBytes": 15752
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "ee70a215157e38352e1dc86e8abdddab2c4da4ed527f0c186d009efc8fda13f3",
+      "version": "2c63be2cba7d05cf253c32b1f69e94f8d74b6fce7439ea3766695758fc08583c",
+      "side": "working",
+      "sourceBytes": 2863,
+      "rows": 96,
+      "outlineRows": 13,
+      "payloadBytes": 15755
+    },
+    {
+      "kind": "files",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "rows": 1,
+      "selectedRows": 0,
+      "payloadBytes": 1381
+    },
+    {
+      "kind": "diff",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "hunks": 0,
+      "edits": 0,
+      "payloadBytes": 822
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "ee70a215157e38352e1dc86e8abdddab2c4da4ed527f0c186d009efc8fda13f3",
+      "version": "2c63be2cba7d05cf253c32b1f69e94f8d74b6fce7439ea3766695758fc08583c",
+      "side": "base",
+      "sourceBytes": 2863,
+      "rows": 96,
+      "outlineRows": 13,
+      "payloadBytes": 15752
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "ee70a215157e38352e1dc86e8abdddab2c4da4ed527f0c186d009efc8fda13f3",
+      "version": "2c63be2cba7d05cf253c32b1f69e94f8d74b6fce7439ea3766695758fc08583c",
+      "side": "working",
+      "sourceBytes": 2863,
+      "rows": 96,
+      "outlineRows": 13,
+      "payloadBytes": 15755
+    },
+    {
+      "kind": "files",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "rows": 1,
+      "selectedRows": 0,
+      "payloadBytes": 1381
+    },
+    {
+      "kind": "diff",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "hunks": 3,
+      "edits": 3,
+      "payloadBytes": 2050
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6",
+      "side": "base",
+      "sourceBytes": 3316,
+      "rows": 96,
+      "outlineRows": 131,
+      "payloadBytes": 44694
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+      "side": "working",
+      "sourceBytes": 3310,
+      "rows": 96,
+      "outlineRows": 131,
+      "payloadBytes": 44691
+    },
+    {
+      "kind": "files",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "rows": 1,
+      "selectedRows": 0,
+      "payloadBytes": 1381
+    },
+    {
+      "kind": "diff",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "hunks": 3,
+      "edits": 3,
+      "payloadBytes": 2050
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6",
+      "side": "base",
+      "sourceBytes": 3316,
+      "rows": 96,
+      "outlineRows": 131,
+      "payloadBytes": 44694
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+      "side": "working",
+      "sourceBytes": 2998,
+      "rows": 88,
+      "outlineRows": 8,
+      "payloadBytes": 14555
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+      "side": "working",
+      "sourceBytes": 2998,
+      "rows": 88,
+      "outlineRows": 18,
+      "payloadBytes": 16971
+    },
+    {
+      "kind": "files",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "rows": 1,
+      "selectedRows": 0,
+      "payloadBytes": 1123
+    },
+    {
+      "kind": "diff",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "hunks": 3,
+      "edits": 3,
+      "payloadBytes": 2050
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6",
+      "side": "base",
+      "sourceBytes": 3316,
+      "rows": 96,
+      "outlineRows": 131,
+      "payloadBytes": 44694
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+      "side": "working",
+      "sourceBytes": 1650,
+      "rows": 48,
+      "outlineRows": 18,
+      "payloadBytes": 11783
+    },
+    {
+      "kind": "files",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "rows": 1,
+      "selectedRows": 0,
+      "payloadBytes": 1123
+    },
+    {
+      "kind": "diff",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "hunks": 1,
+      "edits": 1,
+      "payloadBytes": 1132
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "9001f4e18f72f981e25a612d75e9ecf4d6db23e3e00d01394460c2576f37bbca",
+      "version": "d8fe76da71b6d2e8e93bb088072c524c891d87f45f1ec1e6f71135a7ac2c2537",
+      "side": "working",
+      "sourceBytes": 230,
+      "rows": 6,
+      "outlineRows": 0,
+      "payloadBytes": 1454
+    },
+    {
+      "kind": "files",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "rows": 1,
+      "selectedRows": 0,
+      "payloadBytes": 1123
+    },
+    {
+      "kind": "diff",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "hunks": 3,
+      "edits": 3,
+      "payloadBytes": 2050
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6",
+      "side": "base",
+      "sourceBytes": 3316,
+      "rows": 96,
+      "outlineRows": 131,
+      "payloadBytes": 44694
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:1",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+      "side": "working",
+      "sourceBytes": 1650,
+      "rows": 48,
+      "outlineRows": 18,
+      "payloadBytes": 11783
+    },
+    {
+      "kind": "files",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:2",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "rows": 1,
+      "selectedRows": 1,
+      "payloadBytes": 1864
+    },
+    {
+      "kind": "diff",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:2",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "hunks": 3,
+      "edits": 3,
+      "payloadBytes": 2050
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:2",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "31e931597db937588febf0d4705765a7d5ff2c6c14d3648a93d2cd09d216f9f6",
+      "side": "base",
+      "sourceBytes": 3316,
+      "rows": 96,
+      "outlineRows": 131,
+      "payloadBytes": 44694
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:2",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "b4f4339914a74c4e5b5729bef14c6a029f07bb624ad234b8f0f654de333b3983",
+      "version": "db1d11e5f893a16b196d1b106e4082186f0352f49f6585dcdda41cdebdcd09df",
+      "side": "working",
+      "sourceBytes": 1650,
+      "rows": 48,
+      "outlineRows": 18,
+      "payloadBytes": 11783
+    },
+    {
+      "kind": "files",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:2",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "rows": 2,
+      "selectedRows": 0,
+      "payloadBytes": 1869
+    },
+    {
+      "kind": "diff",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:2",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "hunks": 1,
+      "edits": 1,
+      "payloadBytes": 1132
+    },
+    {
+      "kind": "window",
+      "token": "cc22a24db60dabaf1fb511b61611dac9839fece4d500f6fde761ccf239cb43e4:2",
+      "comparison": "43f640a7c06dd795362e8db86b0d872db82af6320f2b8b366a9d272e5470afac",
+      "file": "9001f4e18f72f981e25a612d75e9ecf4d6db23e3e00d01394460c2576f37bbca",
+      "version": "d8fe76da71b6d2e8e93bb088072c524c891d87f45f1ec1e6f71135a7ac2c2537",
+      "side": "working",
+      "sourceBytes": 230,
+      "rows": 6,
+      "outlineRows": 0,
+      "payloadBytes": 1454
+    }
+  ],
+  "responseErrors": [],
+  "pageErrors": [],
+  "cleanupErrors": [],
+  "limitations": [
+    "Navigation uses rendered controls; response data is used only to audit identity, bounds and visible source.",
+    "Timing includes scripted pacing and is task friction evidence, not human task time or a latency qualification.",
+    "No analysed-project build, hooks or scripts execute. The prepared fixture is verified before and after execution."
+  ],
+  "fixtureBefore": {
+    "variant": "variant-a",
+    "verified": true,
+    "changed_paths": 2,
+    "hunks": 3,
+    "working_differs_from_index": true
+  },
+  "sourceSha256": {
+    "experiments/review-workflow/run.mjs": "0155d3512b5369e2094188df23bb440b8a1981a4bfa2613d33207c5e2b83d1d3",
+    "experiments/review-workflow/walkthrough-audit.js": "3ac026428ca5a4bc42274be44e09f5f10f59fccd0a842c629db36f563b073bfb",
+    "crates/vizzi/web/review-app.js": "f8a39af8b1e9e73fbd45c388cdf6ee03a4d3002fd7febee84ae413b85809b4b7",
+    "crates/vizzi/web/review-controller.js": "9f88ac3ee9050224198be763ae2afe2ae582b91afd935ad1cebf0ee1191521f7",
+    "crates/vizzi/web/review-windows.js": "7c1730aeabdd076f4cce970266492b36a52057babb937d6db5eeb8a166110a56",
+    "crates/vizzi/web/inspector.js": "736c24860b04e0c47956c05cf6e0c1cdbcfeb4daf53e7a039de12e6a44a76e2f",
+    "crates/vizzi/web/review.html": "e8e16dc2333c00fc043467a220bad2347e8d531de9017efffd2b18955835d29e",
+    "crates/vizzi/web/review.css": "c68aa60a52b65e4f5246a7969eb6ea504575e0444937acf1916488e8a26c32d6"
+  },
+  "vizziRevision": "141b41c6d61e0e24afa440efd57fe42f3dcab16b",
+  "binarySha256": "3e7483eebe4a89812ec572f613b04dd3882f574b4f51cc31b91b53cda650e1a3",
+  "hostReadyMs": 5.430121999999983,
+  "browser": "156.0.8078.4",
+  "reviewStreamObserved": true,
+  "firstCaptureReadyMs": 1422.8443140000002,
+  "lookupRegressionObserved": true,
+  "fixtureAfter": {
+    "variant": "variant-a",
+    "verified": true,
+    "changed_paths": 2,
+    "hunks": 3,
+    "working_differs_from_index": true
+  },
+  "finished": "2026-11-04T21:21:46.577Z"
+}

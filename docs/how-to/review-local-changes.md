@@ -7,7 +7,7 @@ cargo run --release -p vizzi -- \
   --root /path/to/repository --cache /tmp/vizzi-review-cache --workers 1
 ```
 
-Open the printed local URL and follow **Review changes**, or append `/review`.
+Append `/review` to the printed local URL to begin without starting live exploration.
 Enter a baseline revision and a literal relative subtree (`.` for the repository
 root), then select **Compare with working tree**. Check the resolved baseline and
 working observation interval above the panes. The working capture includes staged,
@@ -34,8 +34,13 @@ path have different meanings. Unavailable textual hunks do not establish equalit
 retained text can still be inspected where available.
 
 Select **Refresh working** to observe disk changes against the pinned baseline.
-Successful refresh opens a fresh capture with fresh reading positions. Failed capture
-keeps the previous coherent view. A history visit to a replaced or closed comparison
+Refresh keeps the selected file, side, filter and unchanged-context setting. Panes
+whose source versions are unchanged keep their reading positions. A surviving selected
+declaration in changed source opens at its current location; other changed source opens
+at file start. Missing files/sides/declarations have a notice and explicit fallback.
+Hunk selection clears; select a fresh hunk to reveal its ranges. Comparing a new
+baseline resets context. Failed capture keeps the previous coherent view.
+A history visit to a replaced or closed comparison
 explains expiry; **Open current comparison** explicitly returns to the active capture.
 Use **Retry inspection** for temporary query refusal and **Reconnect** after a lost
 review stream. **Close comparison** retires the current pair.

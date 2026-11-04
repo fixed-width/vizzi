@@ -72,6 +72,8 @@ pub struct ReviewAccepted {
 pub struct ComparisonMetadata {
     /// Publication-lifetime token.
     pub token: String,
+    /// Initial baseline capture token, preserved across working-source refreshes.
+    pub origin: String,
     /// Portable comparison identity.
     pub comparison: String,
     /// Source provider.
@@ -151,6 +153,7 @@ impl ReviewSubscription {
 
 struct Spec {
     pin: GitRevision,
+    origin: String,
     revision: String,
     scope: String,
 }
@@ -398,6 +401,7 @@ fn worker_loop(shared: Arc<Shared>) {
                 let outcome = candidate.publish_with(|lease| {
                     let metadata = ComparisonMetadata {
                         token: lease.token().into(),
+                        origin: spec.origin.clone(),
                         comparison: lease.comparison_id().as_str().into(),
                         provider: "git".into(),
                         revision: spec.revision.clone(),
@@ -447,6 +451,7 @@ fn run_job(
             candidate.capture_base(&mut pin, &policy, shared.limits, &cancelled)?;
             Arc::new(Spec {
                 pin: pin.fork(),
+                origin: job.ticket.as_str().into(),
                 revision: request.revision.clone(),
                 scope: request.scope.as_deref().unwrap_or(".").into(),
             })

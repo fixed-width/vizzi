@@ -15,7 +15,14 @@ export function auditResponse(uri,body) {
   const result={kind,token:body.token,comparison:body.comparison};
   if(kind==="files") {
     assert.ok(Array.isArray(body.files) && body.files.length<=200,"file page bound");
-    return {...result,rows:body.files.length};
+    if(url.searchParams.has("file")) {
+      assert.ok(body.selected===null || body.selected?.file===url.searchParams.get("file"),"selected file identity");
+      if(body.selected) {
+        assert.ok(typeof body.selected.path==="string" && byteLength(body.selected.path)<=512,"selected path bound");
+        for(const side of sides) {const version=body.selected[`${side}_version`];assert.ok(version===null || (typeof version==="string" && version.length>0 && version.length<=256),"selected version bound");}
+      }
+    }
+    return {...result,rows:body.files.length,selectedRows:body.selected?1:0};
   }
   assert.equal(kind==="window"?body.window?.file:body.file,url.searchParams.get("file"),"projection file");
   if(kind==="diff") {

@@ -203,6 +203,13 @@ The local transport operations are:
 | Source/context/hunks | Token + side + version/range validation; bounded source windows and paged hunk/declaration metadata. |
 | Close | Retire active ownership; old query tokens fail explicitly. |
 
+[Refresh navigation](REVIEW_REFRESH.md) adds an opaque baseline-capture origin to
+native labels and one optional indexed selected-row lookup to the inventory page.
+The browser carries only bounded context metadata across a refresh, resolves current
+versions and reveals surviving exact declaration identities. Equal side versions may
+reuse viewport positions and the active expanded fragment; old tokens/hunks retain
+their existing expiry semantics. No SCM-specific navigation rule enters the core model.
+
 HTTP and finite stdio use these application operations, with the same seam available
 to future editor adapters. The HTTP
 mapping uses `/api/comparisons` plus token-scoped subresources; the

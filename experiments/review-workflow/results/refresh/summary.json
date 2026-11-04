@@ -1,0 +1,578 @@
+{
+  "schema": 1,
+  "baselineSha256": "1390b675c4c6a799cefef9746d0b84612cc7dd0eda7170250e91b36f481c71a9",
+  "cases": [
+    {
+      "name": "linux",
+      "revision": "cbbddb6b08cc9900a87cccaa9b22bbe06aa4f50a",
+      "scope": "kernel/sched",
+      "indexPaths": 97345,
+      "scopePaths": 54,
+      "binarySha256": "3e7483eebe4a89812ec572f613b04dd3882f574b4f51cc31b91b53cda650e1a3",
+      "rawReportSha256": "fa4f9b85543f3fb76fc601b3dc1570d7b09809d426b0d595d85a3b2d65cb35fc",
+      "sourceSha256": {
+        "experiments/review-workflow/measure.mjs": "16c8017e4b290f3ad2861ef66783382c6e80341c8f6b32fe04fa7756d9fb9b68",
+        "experiments/review-workflow/scale_fixture.py": "ed6f2be748f2b8abe6c5a15749695db767206645c2b0ae8935bc7e8b0f10541e",
+        "experiments/review-workflow/scale-profiles.json": "659b8dca5440cc7b1ba524a25747722f46d4ba1bbbb96053945d1bfd75149670",
+        "experiments/review-workflow/walkthrough-audit.js": "3ac026428ca5a4bc42274be44e09f5f10f59fccd0a842c629db36f563b073bfb",
+        "experiments/browser/statistics.mjs": "9446fcbd9eb13a55353478c5eb51f13027322233b29116d8627095d6fe527623",
+        "crates/vizzi/web/review-app.js": "f8a39af8b1e9e73fbd45c388cdf6ee03a4d3002fd7febee84ae413b85809b4b7",
+        "crates/vizzi/web/review-controller.js": "9f88ac3ee9050224198be763ae2afe2ae582b91afd935ad1cebf0ee1191521f7",
+        "crates/vizzi/web/inspector.js": "736c24860b04e0c47956c05cf6e0c1cdbcfeb4daf53e7a039de12e6a44a76e2f",
+        "crates/vizzi/src/host.rs": "6f217ac6dd6c3e3cb23ee8edcecb11c4fb1aa56011ce3d974b30ea2472ae946e",
+        "crates/vizzi/src/application.rs": "a2809f3a4fa2562379e214db5f02bf95192e134331fa34bbbd64eb38cd51f7f6",
+        "crates/vizzi/src/server.rs": "266afcef0836c6ed63338ec16f5991223610bf8c0b0e133a61eba42f8ad97964",
+        "crates/vizzi/src/main.rs": "21ea2da8231486be4fe59e9194aba31f5106420bc8bb2c1e4bc5c5100f1b414c",
+        "crates/vizzi/web/startup.js": "6cabefb4b291024117ee505a8c63d90013d47be909f430c6be9a9372b96c7bb4",
+        "crates/vizzi/src/review.rs": "f795483ae8b320c5f589f6e94cedbd5ad82fb98efb04683c204518babb1a3937",
+        "crates/vizzi/src/review_application.rs": "da22a5d6ed113a1205d3512af9b118b22b41d5fe29e70947dd23dd95c5ece904",
+        "crates/vizzi/src/review_application/projection.rs": "379d15efd6c93066ef470c3394b10f22d117ca6e4b9e2872507cd745a1645b79"
+      },
+      "before": {
+        "hostReady": {
+          "count": 3,
+          "p50": 4.686191000000008,
+          "p95": 5.338686000000962,
+          "p99": 5.338686000000962,
+          "max": 5.338686000000962,
+          "over33ms": 0,
+          "over50ms": 0
+        },
+        "firstComparison": {
+          "count": 3,
+          "p50": 897.4000000953674,
+          "p95": 912.7999999523163,
+          "p99": 912.7999999523163,
+          "max": 912.7999999523163,
+          "over33ms": 3,
+          "over50ms": 3
+        },
+        "spawnToFirstReview": {
+          "count": 3,
+          "p50": 1028.254455000002,
+          "p95": 1073.810911,
+          "p99": 1073.810911,
+          "max": 1073.810911,
+          "over33ms": 3,
+          "over50ms": 3
+        },
+        "selection": {
+          "file": {
+            "count": 36,
+            "p50": 66.40000009536743,
+            "p95": 67,
+            "p99": 82.90000009536743,
+            "max": 82.90000009536743,
+            "over33ms": 36,
+            "over50ms": 36
+          },
+          "hunk": {
+            "count": 36,
+            "p50": 66.29999995231628,
+            "p95": 67.90000009536743,
+            "p99": 68.20000004768372,
+            "max": 68.20000004768372,
+            "over33ms": 36,
+            "over50ms": 36
+          },
+          "declaration": {
+            "count": 36,
+            "p50": 64.60000014305115,
+            "p95": 80.70000004768372,
+            "p99": 81.90000009536743,
+            "max": 81.90000009536743,
+            "over33ms": 36,
+            "over50ms": 36
+          }
+        },
+        "refresh": {
+          "count": 15,
+          "p50": 332.2999999523163,
+          "p95": 381,
+          "p99": 381,
+          "max": 381,
+          "over33ms": 15,
+          "over50ms": 15
+        },
+        "editedSourceReady": {
+          "count": 15,
+          "p50": 398.69999980926514,
+          "p95": 514.5,
+          "p99": 514.5,
+          "max": 514.5,
+          "over33ms": 15,
+          "over50ms": 15
+        },
+        "selectionResets": 6,
+        "frames": {
+          "count": 1818,
+          "p50": 16.699999999999818,
+          "p95": 16.799999999999272,
+          "p99": 16.800000000000182,
+          "max": 16.80000000000109,
+          "over33ms": 0,
+          "over50ms": 0
+        },
+        "longTasks": [],
+        "projectionFetch": {
+          "count": 726,
+          "p50": 2.3000001907348633,
+          "p95": 3.9000000953674316,
+          "p99": 4.900000095367432,
+          "max": 8.900000095367432,
+          "over33ms": 0,
+          "over50ms": 0
+        },
+        "nativeHighWaterBytes": 87916544,
+        "rendererHeapAfterBytes": 8339580,
+        "payloadBytesMax": 57774,
+        "sourceRowsPerPaneMax": 56,
+        "outlineButtonsPerPaneMax": 18,
+        "fileButtonsMax": 55,
+        "hunkButtonsMax": 1,
+        "verifiedSourceRows": 576,
+        "allRefreshBindingsPinned": true,
+        "liveIndexStayedDormant": true,
+        "originalCheckoutUnchanged": true
+      },
+      "after": {
+        "hostReady": {
+          "count": 3,
+          "p50": 3.3269319999999425,
+          "p95": 4.634979000000385,
+          "p99": 4.634979000000385,
+          "max": 4.634979000000385,
+          "over33ms": 0,
+          "over50ms": 0
+        },
+        "firstComparison": {
+          "count": 3,
+          "p50": 747.0999999046326,
+          "p95": 764.0999999046326,
+          "p99": 764.0999999046326,
+          "max": 764.0999999046326,
+          "over33ms": 3,
+          "over50ms": 3
+        },
+        "spawnToFirstReview": {
+          "count": 3,
+          "p50": 900.4035280000007,
+          "p95": 910.5924640000001,
+          "p99": 910.5924640000001,
+          "max": 910.5924640000001,
+          "over33ms": 3,
+          "over50ms": 3
+        },
+        "refresh": {
+          "count": 15,
+          "p50": 331.90000009536743,
+          "p95": 383.2999999523163,
+          "p99": 383.2999999523163,
+          "max": 383.2999999523163,
+          "over33ms": 15,
+          "over50ms": 15
+        },
+        "editedSourceReady": {
+          "count": 15,
+          "p50": 365.60000014305115,
+          "p95": 415.59999990463257,
+          "p99": 415.59999990463257,
+          "max": 415.59999990463257,
+          "over33ms": 15,
+          "over50ms": 15
+        },
+        "selectionResets": 0,
+        "selection": {
+          "file": {
+            "count": 36,
+            "p50": 66.40000009536743,
+            "p95": 68,
+            "p99": 68.29999995231628,
+            "max": 68.29999995231628,
+            "over33ms": 36,
+            "over50ms": 36
+          },
+          "hunk": {
+            "count": 36,
+            "p50": 66.20000004768372,
+            "p95": 67.09999990463257,
+            "p99": 67.19999980926514,
+            "max": 67.19999980926514,
+            "over33ms": 36,
+            "over50ms": 36
+          },
+          "declaration": {
+            "count": 36,
+            "p50": 64.70000004768372,
+            "p95": 81.60000014305115,
+            "p99": 82,
+            "max": 82,
+            "over33ms": 36,
+            "over50ms": 36
+          }
+        },
+        "frames": {
+          "count": 1772,
+          "p50": 16.699999999999818,
+          "p95": 16.700000000000728,
+          "p99": 16.800000000000182,
+          "max": 16.80000000000109,
+          "over33ms": 0,
+          "over50ms": 0
+        },
+        "longTasks": [],
+        "longTaskObserverAvailable": true,
+        "projectionFetch": {
+          "count": 702,
+          "p50": 2.3999998569488525,
+          "p95": 4.8999998569488525,
+          "p99": 6.5,
+          "max": 7.3999998569488525,
+          "over33ms": 0,
+          "over50ms": 0
+        },
+        "payloadBytesMax": 57774,
+        "nativeHighWaterBytes": 87592960,
+        "rendererHeapAfterBytes": 11920912,
+        "sourceRowsPerPaneMax": 56,
+        "outlineButtonsPerPaneMax": 18,
+        "fileButtonsMax": 55,
+        "hunkButtonsMax": 1,
+        "verifiedSourceRows": 576,
+        "liveIndexStayedDormant": true,
+        "originalCheckoutUnchanged": true
+      },
+      "hardware": {
+        "platform": "linux",
+        "release": "6.8.0-147-lowlatency",
+        "cpu": "13th Gen Intel(R) Core(TM) i7-13700H",
+        "logicalCpus": 20,
+        "totalMemory": 67080241152,
+        "initialLoad": [
+          1.99,
+          1.64,
+          1.64
+        ]
+      },
+      "gpu": {
+        "devices": [
+          {
+            "vendorId": 65535,
+            "deviceId": 65535,
+            "vendorString": "Google Inc. (Google)",
+            "deviceString": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0)",
+            "driverVendor": "SwANGLE",
+            "driverVersion": "5.0.0"
+          }
+        ],
+        "featureStatus": {
+          "2d_canvas": "unavailable_software",
+          "direct_rendering_display_compositor": "disabled_off_ok",
+          "gpu_compositing": "disabled_software",
+          "multiple_raster_threads": "enabled_on",
+          "opengl": "disabled_off",
+          "rasterization": "disabled_software",
+          "raw_draw": "disabled_off_ok",
+          "skia_graphite": "disabled_off",
+          "trees_in_viz": "disabled_off",
+          "video_decode": "disabled_software",
+          "video_encode": "disabled_software",
+          "vulkan": "disabled_off",
+          "webgl": "unavailable_software",
+          "webgpu": "unavailable_software",
+          "webgpu_on_vk_via_gl_interop": "disabled_off",
+          "webnn": "unavailable_software"
+        }
+      }
+    },
+    {
+      "name": "pytorch",
+      "revision": "1f4d2d5e820dd870626dca4f9603e3a49879dbde",
+      "scope": "torch/_inductor/codegen",
+      "indexPaths": 22762,
+      "scopePaths": 109,
+      "binarySha256": "3e7483eebe4a89812ec572f613b04dd3882f574b4f51cc31b91b53cda650e1a3",
+      "rawReportSha256": "521965e6d4da939364b4064b9bf3d86acb99058bcd9a124123fa555aa5947dfa",
+      "sourceSha256": {
+        "experiments/review-workflow/measure.mjs": "16c8017e4b290f3ad2861ef66783382c6e80341c8f6b32fe04fa7756d9fb9b68",
+        "experiments/review-workflow/scale_fixture.py": "ed6f2be748f2b8abe6c5a15749695db767206645c2b0ae8935bc7e8b0f10541e",
+        "experiments/review-workflow/scale-profiles.json": "659b8dca5440cc7b1ba524a25747722f46d4ba1bbbb96053945d1bfd75149670",
+        "experiments/review-workflow/walkthrough-audit.js": "3ac026428ca5a4bc42274be44e09f5f10f59fccd0a842c629db36f563b073bfb",
+        "experiments/browser/statistics.mjs": "9446fcbd9eb13a55353478c5eb51f13027322233b29116d8627095d6fe527623",
+        "crates/vizzi/web/review-app.js": "f8a39af8b1e9e73fbd45c388cdf6ee03a4d3002fd7febee84ae413b85809b4b7",
+        "crates/vizzi/web/review-controller.js": "9f88ac3ee9050224198be763ae2afe2ae582b91afd935ad1cebf0ee1191521f7",
+        "crates/vizzi/web/inspector.js": "736c24860b04e0c47956c05cf6e0c1cdbcfeb4daf53e7a039de12e6a44a76e2f",
+        "crates/vizzi/src/host.rs": "6f217ac6dd6c3e3cb23ee8edcecb11c4fb1aa56011ce3d974b30ea2472ae946e",
+        "crates/vizzi/src/application.rs": "a2809f3a4fa2562379e214db5f02bf95192e134331fa34bbbd64eb38cd51f7f6",
+        "crates/vizzi/src/server.rs": "266afcef0836c6ed63338ec16f5991223610bf8c0b0e133a61eba42f8ad97964",
+        "crates/vizzi/src/main.rs": "21ea2da8231486be4fe59e9194aba31f5106420bc8bb2c1e4bc5c5100f1b414c",
+        "crates/vizzi/web/startup.js": "6cabefb4b291024117ee505a8c63d90013d47be909f430c6be9a9372b96c7bb4",
+        "crates/vizzi/src/review.rs": "f795483ae8b320c5f589f6e94cedbd5ad82fb98efb04683c204518babb1a3937",
+        "crates/vizzi/src/review_application.rs": "da22a5d6ed113a1205d3512af9b118b22b41d5fe29e70947dd23dd95c5ece904",
+        "crates/vizzi/src/review_application/projection.rs": "379d15efd6c93066ef470c3394b10f22d117ca6e4b9e2872507cd745a1645b79"
+      },
+      "before": {
+        "hostReady": {
+          "count": 3,
+          "p50": 4.0546620000000075,
+          "p95": 5.036638999998104,
+          "p99": 5.036638999998104,
+          "max": 5.036638999998104,
+          "over33ms": 0,
+          "over50ms": 0
+        },
+        "firstComparison": {
+          "count": 3,
+          "p50": 679.9000000953674,
+          "p95": 697.7999999523163,
+          "p99": 697.7999999523163,
+          "max": 697.7999999523163,
+          "over33ms": 3,
+          "over50ms": 3
+        },
+        "spawnToFirstReview": {
+          "count": 3,
+          "p50": 811.1061219999992,
+          "p95": 881.2174699999999,
+          "p99": 881.2174699999999,
+          "max": 881.2174699999999,
+          "over33ms": 3,
+          "over50ms": 3
+        },
+        "selection": {
+          "file": {
+            "count": 36,
+            "p50": 66.20000004768372,
+            "p95": 69,
+            "p99": 81.5,
+            "max": 81.5,
+            "over33ms": 36,
+            "over50ms": 36
+          },
+          "hunk": {
+            "count": 36,
+            "p50": 66.20000004768372,
+            "p95": 67.89999985694885,
+            "p99": 81.89999985694885,
+            "max": 81.89999985694885,
+            "over33ms": 36,
+            "over50ms": 36
+          },
+          "declaration": {
+            "count": 36,
+            "p50": 64.29999995231628,
+            "p95": 65.40000009536743,
+            "p99": 65.5,
+            "max": 65.5,
+            "over33ms": 36,
+            "over50ms": 36
+          }
+        },
+        "refresh": {
+          "count": 15,
+          "p50": 179.59999990463257,
+          "p95": 197.89999985694885,
+          "p99": 197.89999985694885,
+          "max": 197.89999985694885,
+          "over33ms": 15,
+          "over50ms": 15
+        },
+        "editedSourceReady": {
+          "count": 15,
+          "p50": 313,
+          "p95": 332,
+          "p99": 332,
+          "max": 332,
+          "over33ms": 15,
+          "over50ms": 15
+        },
+        "selectionResets": 9,
+        "frames": {
+          "count": 1685,
+          "p50": 16.699999999999818,
+          "p95": 16.700000000000728,
+          "p99": 16.800000000000182,
+          "max": 16.80000000000109,
+          "over33ms": 0,
+          "over50ms": 0
+        },
+        "longTasks": [],
+        "projectionFetch": {
+          "count": 738,
+          "p50": 2.0999999046325684,
+          "p95": 3.799999952316284,
+          "p99": 5.299999952316284,
+          "max": 6.099999904632568,
+          "over33ms": 0,
+          "over50ms": 0
+        },
+        "nativeHighWaterBytes": 57733120,
+        "rendererHeapAfterBytes": 7761860,
+        "payloadBytesMax": 85592,
+        "sourceRowsPerPaneMax": 56,
+        "outlineButtonsPerPaneMax": 18,
+        "fileButtonsMax": 110,
+        "hunkButtonsMax": 1,
+        "verifiedSourceRows": 576,
+        "allRefreshBindingsPinned": true,
+        "liveIndexStayedDormant": true,
+        "originalCheckoutUnchanged": true
+      },
+      "after": {
+        "hostReady": {
+          "count": 3,
+          "p50": 3.7485219999980472,
+          "p95": 4.267332000001261,
+          "p99": 4.267332000001261,
+          "max": 4.267332000001261,
+          "over33ms": 0,
+          "over50ms": 0
+        },
+        "firstComparison": {
+          "count": 3,
+          "p50": 580.9000000953674,
+          "p95": 581.5,
+          "p99": 581.5,
+          "max": 581.5,
+          "over33ms": 3,
+          "over50ms": 3
+        },
+        "spawnToFirstReview": {
+          "count": 3,
+          "p50": 680.982172,
+          "p95": 710.5329320000001,
+          "p99": 710.5329320000001,
+          "max": 710.5329320000001,
+          "over33ms": 3,
+          "over50ms": 3
+        },
+        "refresh": {
+          "count": 15,
+          "p50": 165.20000004768372,
+          "p95": 198.5,
+          "p99": 198.5,
+          "max": 198.5,
+          "over33ms": 15,
+          "over50ms": 15
+        },
+        "editedSourceReady": {
+          "count": 15,
+          "p50": 198.70000004768372,
+          "p95": 232,
+          "p99": 232,
+          "max": 232,
+          "over33ms": 15,
+          "over50ms": 15
+        },
+        "selectionResets": 0,
+        "selection": {
+          "file": {
+            "count": 36,
+            "p50": 66.30000019073486,
+            "p95": 67.10000014305115,
+            "p99": 67.5,
+            "max": 67.5,
+            "over33ms": 36,
+            "over50ms": 36
+          },
+          "hunk": {
+            "count": 36,
+            "p50": 66.09999990463257,
+            "p95": 67.10000014305115,
+            "p99": 67.5,
+            "max": 67.5,
+            "over33ms": 36,
+            "over50ms": 36
+          },
+          "declaration": {
+            "count": 36,
+            "p50": 64.60000014305115,
+            "p95": 65.29999995231628,
+            "p99": 65.29999995231628,
+            "max": 65.29999995231628,
+            "over33ms": 36,
+            "over50ms": 36
+          }
+        },
+        "frames": {
+          "count": 1623,
+          "p50": 16.699999999999818,
+          "p95": 16.700000000000728,
+          "p99": 16.800000000000182,
+          "max": 16.80000000000109,
+          "over33ms": 0,
+          "over50ms": 0
+        },
+        "longTasks": [],
+        "longTaskObserverAvailable": true,
+        "projectionFetch": {
+          "count": 702,
+          "p50": 1.8000001907348633,
+          "p95": 3.0999999046325684,
+          "p99": 3.799999952316284,
+          "max": 5.5,
+          "over33ms": 0,
+          "over50ms": 0
+        },
+        "payloadBytesMax": 86458,
+        "nativeHighWaterBytes": 56217600,
+        "rendererHeapAfterBytes": 10724664,
+        "sourceRowsPerPaneMax": 56,
+        "outlineButtonsPerPaneMax": 18,
+        "fileButtonsMax": 110,
+        "hunkButtonsMax": 1,
+        "verifiedSourceRows": 576,
+        "liveIndexStayedDormant": true,
+        "originalCheckoutUnchanged": true
+      },
+      "hardware": {
+        "platform": "linux",
+        "release": "6.8.0-147-lowlatency",
+        "cpu": "13th Gen Intel(R) Core(TM) i7-13700H",
+        "logicalCpus": 20,
+        "totalMemory": 67080241152,
+        "initialLoad": [
+          1.77,
+          1.64,
+          1.63
+        ]
+      },
+      "gpu": {
+        "devices": [
+          {
+            "vendorId": 65535,
+            "deviceId": 65535,
+            "vendorString": "Google Inc. (Google)",
+            "deviceString": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver-5.0.0)",
+            "driverVendor": "SwANGLE",
+            "driverVersion": "5.0.0"
+          }
+        ],
+        "featureStatus": {
+          "2d_canvas": "unavailable_software",
+          "direct_rendering_display_compositor": "disabled_off_ok",
+          "gpu_compositing": "disabled_software",
+          "multiple_raster_threads": "enabled_on",
+          "opengl": "disabled_off",
+          "rasterization": "disabled_software",
+          "raw_draw": "disabled_off_ok",
+          "skia_graphite": "disabled_off",
+          "trees_in_viz": "disabled_off",
+          "video_decode": "disabled_software",
+          "video_encode": "disabled_software",
+          "vulkan": "disabled_off",
+          "webgl": "unavailable_software",
+          "webgpu": "unavailable_software",
+          "webgpu_on_vk_via_gl_interop": "disabled_off",
+          "webnn": "unavailable_software"
+        }
+      }
+    }
+  ],
+  "limits": [
+    "Sequential cohorts; warm filesystem caches, fresh analysis caches, one parser worker and uncontrolled external activity.",
+    "Action timings include automation observation and rAF waits. Extra edited-source verification/paint waits remain even when no re-selection is needed.",
+    "Duration over33ms fields are arithmetic counts; frame cadence comparisons apply only to rAF intervals.",
+    "Scoped finite samples and software rendering do not qualify timing tails, whole-repository review, physical presentation, GPU rendering, a 16-GB/editor envelope or human usability."
+  ]
+}

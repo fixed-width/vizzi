@@ -2,7 +2,9 @@
 
 use super::*;
 use vizzi_core::{
-    comparison::{ChangeKind, EntryContent, EntryKind, EntryState, Side, Unavailability},
+    comparison::{
+        ChangeKind, ComparedEntry, EntryContent, EntryKind, EntryState, Side, Unavailability,
+    },
     model::Coverage,
     policy::{Classification, Provenance},
     projection::{Window, WindowQuery},
@@ -18,6 +20,8 @@ pub struct ComparisonQuery {
 /// Stable page/filter request. A projection filter never changes review capture scope.
 #[derive(Clone, Debug, Default, Deserialize)]
 pub struct ReviewPageQuery {
+    /// Optional opaque selection, resolved independently of filtering and paging.
+    pub file: Option<String>,
     /// Zero-based matched-row offset.
     pub offset: Option<usize>,
     /// Requested rows, clamped to 1..200.
@@ -38,6 +42,8 @@ pub struct ReviewFiles {
     pub comparison: ComparisonMetadata,
     /// Bounded rows.
     pub files: Vec<ReviewFile>,
+    /// Requested inventory row, including outside the page/filter; null when absent.
+    pub selected: Option<ReviewFile>,
     /// Matched rows across the entire inventory.
     pub total: usize,
     /// Next offset, absent at the end.
@@ -238,27 +244,7 @@ impl ComparisonQuery {
                 continue;
             }
             if total >= offset && files.len() < count {
-                let (path, path_truncated) = clip(&entry.path.display(), 512);
-                files.push(ReviewFile {
-                    file: self.lease.file_id(entry.path).as_str().into(),
-                    path,
-                    path_truncated,
-                    change: change(entry.change).into(),
-                    base_version: self
-                        .lease
-                        .document_version(Side::Base, entry.path)
-                        .map(|v| v.as_str().into()),
-                    working_version: self
-                        .lease
-                        .document_version(Side::Working, entry.path)
-                        .map(|v| v.as_str().into()),
-                    base: entry
-                        .base
-                        .map(|state| summary(state, self.lease.literal(Side::Base, entry.path))),
-                    working: entry
-                        .working
-                        .map(|state| summary(state, self.lease.literal(Side::Working, entry.path))),
-                });
+                files.push(self.file(entry));
             }
             total += 1;
         }
@@ -267,12 +253,40 @@ impl ComparisonQuery {
             schema: 1,
             comparison: self.metadata.clone(),
             files,
+            selected: query
+                .file
+                .as_deref()
+                .and_then(|file| self.lease.entry(file))
+                .map(|entry| self.file(entry)),
             total,
             next: (end < total).then_some(end),
             offset: offset.min(total),
             remaining: total - end,
             totals,
         })
+    }
+    fn file(&self, entry: ComparedEntry<'_>) -> ReviewFile {
+        let (path, path_truncated) = clip(&entry.path.display(), 512);
+        ReviewFile {
+            file: self.lease.file_id(entry.path).as_str().into(),
+            path,
+            path_truncated,
+            change: change(entry.change).into(),
+            base_version: self
+                .lease
+                .document_version(Side::Base, entry.path)
+                .map(|v| v.as_str().into()),
+            working_version: self
+                .lease
+                .document_version(Side::Working, entry.path)
+                .map(|v| v.as_str().into()),
+            base: entry
+                .base
+                .map(|state| summary(state, self.lease.literal(Side::Base, entry.path))),
+            working: entry
+                .working
+                .map(|state| summary(state, self.lease.literal(Side::Working, entry.path))),
+        }
     }
     /// Validates token-derived file, side and document version before source IO.
     pub fn window(

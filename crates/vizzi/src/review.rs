@@ -614,6 +614,10 @@ impl ReviewLease {
     pub fn path(&self, file: &str) -> Option<&ReviewPath> {
         self.pair.files.get(file)
     }
+    /// Looks up bounded inventory evidence by opaque identity without scanning paths.
+    pub fn entry(&self, file: &str) -> Option<ComparedEntry<'_>> {
+        self.pair.comparison.entry(self.path(file)?)
+    }
     /// Returns the ordinary workspace file identity for a captured path.
     pub fn file_id(&self, path: &ReviewPath) -> vizzi_core::model::FileId {
         path.file_id(

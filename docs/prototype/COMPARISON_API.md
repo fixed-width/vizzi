@@ -36,6 +36,12 @@ portable comparison ID, provider, requested revision, resolved object, literal s
 and working capture start/completion in Unix milliseconds. These describe an observed
 interval, not an atomic filesystem transaction or a promise that disk is unchanged.
 
+Labels also include `origin`, the initial baseline capture's opaque token. It remains
+fixed across working refreshes, including identical-content refreshes, and differs for
+each explicit new capture. It is a lifecycle label, not an old-token access grant.
+Clients can recognise refresh after reconnect/coalescing without relying on the order
+of the accepting HTTP response. See [refresh navigation](REVIEW_REFRESH.md).
+
 Events contain `schema`, fresh `stream`, decimal-string `revision` and full `status`.
 SSE id is `<stream>:<revision>`; first delivery is current state and slow subscribers
 may skip intermediate states. Reconnect resynchronises rather than replaying events.
@@ -47,7 +53,7 @@ query can finish with its original labels; the future UI must reject obsolete re
 
 | Request | Required anchors | Optional projection parameters |
 | --- | --- | --- |
-| `GET /api/comparisons/{token}/files` | Current token | `offset`, `count`, `filter`, `unchanged` |
+| `GET /api/comparisons/{token}/files` | Current token | `offset`, `count`, `filter`, `unchanged`, `file` |
 | `GET /api/comparisons/{token}/window` | `file`, `side`, `version` | Existing [window](WINDOWS.md) parameters |
 | `GET /api/comparisons/{token}/diff` | `file`; versions for each retained document side | `base_version`, `working_version`, `hunk_start/count`, `edit_start/count` |
 
@@ -58,11 +64,18 @@ retained document exists; omitting a present version is a conflict, not a reques
 use whatever happens to be current. Queries never read live workspace source as a fallback.
 
 File results contain token/comparison labels, `files`, matched `total`, actual `offset`,
-`next`, `remaining` and full-scope `totals`. Count defaults to 200 and clamps to 1–200.
+`next`, `remaining`, `selected` and full-scope `totals`. Count defaults to 200 and clamps to 1–200.
 Unchanged rows are omitted by default; `unchanged=true` exposes related unchanged
 context. Filter is a case-insensitive literal display-path substring capped at 256
 bytes. It changes the projection, not inventory scope or the full-scope counts.
 Offsets stay stable within one immutable pair.
+
+Optional `file` resolves one opaque identity to the same bounded row in `selected`,
+independently of offset/filter/unchanged settings. A missing identity returns null;
+omitting it also returns null. This adds at most one row beside the 200-row page and
+does not change matched totals. The existing inventory index supplies this lookup
+without source IO or scanning additional pages. Fresh side versions from this result
+are required before using source/diff queries on a replacement token.
 
 Each row gives `file`, escaped `path`, `path_truncated`, change kind, side versions and
 base/working evidence. Display paths cap at 512 UTF-8 bytes. Entry evidence distinguishes

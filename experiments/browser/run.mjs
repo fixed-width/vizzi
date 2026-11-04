@@ -11,6 +11,9 @@ if (process.argv.includes("--review-scale")) {
 } else if (process.argv.includes("--startup")) {
   const result = spawnSync(process.execPath, ["experiments/browser/startup.test.mjs",...process.argv.slice(2).filter(arg=>arg!=="--startup")], { stdio: "inherit" });
   process.exit(result.status ?? 1);
+} else if (process.argv.includes("--review-refresh")) {
+  const result = spawnSync(process.execPath, ["experiments/browser/review-refresh.test.mjs",...process.argv.slice(2).filter(arg=>arg!=="--review-refresh")], { stdio: "inherit" });
+  process.exit(result.status ?? 1);
 } else if (process.argv.includes("--inspection")) {
   const result = spawnSync(process.execPath, ["experiments/browser/inspection.test.mjs"], { stdio: "inherit" });
   process.exit(result.status ?? 1);
@@ -21,7 +24,10 @@ if (process.argv.includes("--review-scale")) {
   const result = spawnSync(process.execPath, ["experiments/browser/navigation-inspector.test.mjs"], { stdio: "inherit" });
   process.exit(result.status ?? 1);
 } else if (process.argv.includes("--navigation-inspector-mutations")) {
-  const result = spawnSync(process.execPath, ["node_modules/@stryker-mutator/core/bin/stryker.js", "run", "experiments/browser/navigation-inspector-stryker.config.json"], { stdio: "inherit" });
+  const at=process.argv.indexOf("--config"),config=at<0?"experiments/browser/navigation-inspector-stryker.config.json":process.argv[at+1];
+  if(!config || config.startsWith("--"))throw new Error("--config needs a Stryker configuration file");
+  const args=["node_modules/@stryker-mutator/core/bin/stryker.js", "run", config];
+  const result = spawnSync(process.platform==="win32"?process.execPath:"nice",process.platform==="win32"?args:["-n","10",process.execPath,...args], { stdio: "inherit" });
   process.exit(result.status ?? 1);
 } else if (process.argv.includes("--navigation-mutations")) {
   const result = spawnSync(process.execPath, ["node_modules/@stryker-mutator/core/bin/stryker.js", "run", "experiments/browser/navigation-stryker.config.json"], { stdio: "inherit" });
@@ -71,7 +77,7 @@ if (process.argv.includes("--review-scale")) {
 } else if (process.argv.includes("--measure")) {
   await import("./measure.mjs");
 } else {
-  for (const file of ["crates/vizzi/web/startup.test.js", "crates/vizzi/web/controller.test.js", "crates/vizzi/web/navigation.test.js", "crates/vizzi/web/updates.test.js", "crates/vizzi/web/source-description.test.js", "crates/vizzi/web/review-controller.test.js", "crates/vizzi/web/review-windows.test.js", "experiments/review-workflow/walkthrough-audit.test.mjs", "experiments/browser/statistics.test.mjs", "crates/vizzi/web/windows.test.js", "experiments/browser/outline.test.mjs", "experiments/browser/inspection.test.mjs", "experiments/browser/navigation-inspector.test.mjs", "experiments/browser/startup.test.mjs", "experiments/browser/browser.test.mjs", "experiments/browser/navigation.test.mjs", "experiments/browser/review.test.mjs"]) {
+  for (const file of ["crates/vizzi/web/startup.test.js", "crates/vizzi/web/controller.test.js", "crates/vizzi/web/navigation.test.js", "crates/vizzi/web/updates.test.js", "crates/vizzi/web/source-description.test.js", "crates/vizzi/web/review-controller.test.js", "crates/vizzi/web/review-windows.test.js", "experiments/review-workflow/walkthrough-audit.test.mjs", "experiments/browser/statistics.test.mjs", "crates/vizzi/web/windows.test.js", "experiments/browser/outline.test.mjs", "experiments/browser/inspection.test.mjs", "experiments/browser/navigation-inspector.test.mjs", "experiments/browser/startup.test.mjs", "experiments/browser/browser.test.mjs", "experiments/browser/navigation.test.mjs", "experiments/browser/review.test.mjs", "experiments/browser/review-refresh.test.mjs"]) {
     const result = spawnSync(process.execPath, [file], { stdio: "inherit" });
     if (result.status !== 0) process.exit(result.status ?? 1);
   }

@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "name": "pytorch",
+  "source": "/home/mpd/git-sources/pytorch",
+  "revision": "1f4d2d5e820dd870626dca4f9603e3a49879dbde",
+  "scope": "torch/_inductor/codegen",
+  "files": [
+    {
+      "path": "torch/_inductor/codegen/wrapper.py",
+      "baseline": "baseline/0",
+      "prefix": "#",
+      "marker": "# vizzi-review-scale pytorch-full-20261104 initial",
+      "bytes": 293511,
+      "base_sha256": "f49a4c44ec402ecf77d6388de31d491c468731058ec8495c7b19fa1dee758fd3",
+      "working_sha256": "2c0c2dee5b65c4a77fda8e3c2f06cae290c2e82589aa0a9a6633325af0a4197a"
+    },
+    {
+      "path": "torch/_inductor/codegen/aoti_runtime/interface.cpp",
+      "baseline": "baseline/1",
+      "prefix": "//",
+      "marker": "// vizzi-review-scale pytorch-full-20261104 initial",
+      "bytes": 28172,
+      "base_sha256": "67a38de978e5221a5262cd533c6f33065a07f89d62242219103e9c04b07e2593",
+      "working_sha256": "fce7afc557fb8879aab1eafea3e2be719a594b90c187ca9c4866d476484701dc"
+    }
+  ],
+  "source_arguments": [
+    "--c-family-root",
+    "torch/_inductor/codegen",
+    "--syntax-language",
+    "torch/_inductor/codegen=cpp"
+  ],
+  "workspace": "workspace",
+  "probe": "pytorch-full-20261104",
+  "note": "torch/_inductor/codegen/vizzi-review-scale-pytorch-full-20261104.md",
+  "index_paths": 22762,
+  "scope_paths": 109,
+  "expected_changes": [
+    "torch/_inductor/codegen/aoti_runtime/interface.cpp",
+    "torch/_inductor/codegen/vizzi-review-scale-pytorch-full-20261104.md",
+    "torch/_inductor/codegen/wrapper.py"
+  ],
+  "original_status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "original_status_unchanged": true
+}

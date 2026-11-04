@@ -2,20 +2,20 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createReviewController } from "./review-controller.js";
 
-const metadata = (token = "pair") => ({token, comparison:`comparison-${token}`,provider:"git",revision:"HEAD",resolved:"a".repeat(40),scope:".",working_started_ms:1,working_finished_ms:2});
+const metadata = (token = "pair") => ({token,origin:token, comparison:`comparison-${token}`,provider:"git",revision:"HEAD",resolved:"a".repeat(40),scope:".",working_started_ms:1,working_finished_ms:2});
 const row = (name="a.rs",base="v-base",working="v-working") => ({file:name,path:name,path_truncated:false,change:"modified",base_version:base,working_version:working,base:base?{state:"present",kind:"regular",bytes:12}:null,working:working?{state:"present",kind:"regular",bytes:12}:null});
 const range = (start=0,end=1) => ({lines:{start,end},bytes:{start:start*12,end:end*12}});
 const hunk = (id="h0") => ({id,base:range(),working:range(),edits:{start:0,end:1}});
 const window = (file,version) => ({schema:1,file,version,line_total:1,line_start:1,lines:[{number:1,text:"fn one() {}",column:0,end_column:11,line_bytes:11,left:false,right:false}],outline_total:0,outline_start:0,outline:[],cursor:null});
 const change = (token="pair",revision="1",patch={}) => ({schema:1,stream:"stream",revision,status:{schema:1,ticket:token,pending:false,active:token?metadata(token):null,error:null,...patch}});
 const deferred=()=>{let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b;});return{resolve,reject,promise};};
-const flush=async()=>{for(let i=0;i<20;i++)await Promise.resolve();};
+const flush=()=>new Promise(setImmediate);
 function fixture(override) {
   const views=[],notices=[],requests=[],markers=[],moves=[],statuses=[],errors=[],pushes=[],replacements=[];
   let state,positions={base:{sourceTop:44,outlineTop:0},working:{sourceTop:88,outlineTop:0}};
   const response=async uri=>{
     const url=new URL(uri,"http://local"), token=url.pathname.split("/")[3],meta=metadata(token);
-    if(url.pathname.endsWith("/files"))return {schema:1,...meta,files:[row()],total:1,offset:0,next:null,remaining:0,totals:{paths:1,added:0,removed:0,modified:1,unchanged:0,unassessed:0,unavailable:0}};
+    if(url.pathname.endsWith("/files"))return {schema:1,...meta,files:[row()],selected:url.searchParams.has("file")?row(url.searchParams.get("file")):null,total:1,offset:0,next:null,remaining:0,totals:{paths:1,added:0,removed:0,modified:1,unchanged:0,unassessed:0,unavailable:0}};
     if(url.pathname.endsWith("/diff"))return {schema:1,...meta,file:url.searchParams.get("file"),base_version:url.searchParams.get("base_version"),working_version:url.searchParams.get("working_version"),hunks:[hunk()],edits:[{base:range(),working:range()}],hunk_total:1,edit_total:1,next_hunk:null,next_edit:null,remaining_hunks:0,remaining_edits:0};
     if(url.pathname.endsWith("/window")){const side=url.searchParams.get("side");return {schema:1,token,comparison:meta.comparison,side,window:window(url.searchParams.get("file"),url.searchParams.get("version")),classification:{kind:"assigned",language:"rust",provenance:{kind:"extension",extension:"rs"}},classification_truncated:false,contexts:[],hidden_contexts:0};}
     return {schema:1,ticket:"accepted"};
@@ -304,8 +304,8 @@ test("an obsolete completion cannot clear the newer pending request's cancellati
 
 test("a known replacement blocks old-pair navigation while the fresh view is still loading",async()=>{
   const held=deferred();const f=fixture((uri,options,response)=>uri.includes("/replacement/files?")?held.promise:response(uri));const s=f.controller.updates();s.receive(change());await flush();
-  s.receive(change("replacement","2"));assert.equal(await f.controller.navigate({filter:"old"}),false);assert.match(f.errors.at(-1).message,/Comparison expired/);assert.equal(f.views.length,1);
-  held.resolve(await f.response("/api/comparisons/replacement/files?"));await flush();assert.equal(f.views.length,1);
+  s.receive(change("replacement","2"));assert.equal(await f.controller.navigate({filter:"old"}),false);assert.equal(f.errors.length,0);assert.match(f.notices.at(-1),/loading/);assert.equal(f.views.length,1);
+  held.resolve(await f.response("/api/comparisons/replacement/files?"));await flush();assert.equal(f.views.length,2);assert.equal(f.views.at(-1).metadata.token,"replacement");
 });
 
 test("hunk selection clears a lexical selection and distinct declarations append visits",async()=>{
@@ -355,5 +355,236 @@ test("late supported IO failures do not initiate more obsolete source work",asyn
     let hold=false;const held=deferred();let signal;
     const f=fixture((uri,options,response)=>{if(hold && uri.includes(`/${endpoint}?`)){hold=false;signal=options.signal;return held.promise;}return response(uri);});f.controller.updates().receive(change());await flush();hold=true;
     const old=f.controller.navigate({filter:"held"});await flush();const count=f.requests.filter(r=>r.options.signal===signal).length;await f.controller.navigate({filter:"current"});held.reject(Object.assign(new Error("old IO"),{status:503}));assert.equal(await old,false);assert.equal(f.requests.filter(r=>r.options.signal===signal).length,count);
+  }
+});
+
+test("a same-origin refresh keeps an off-page file, side, projection and unchanged pane positions",async()=>{
+  const f=fixture(async(uri,options,response)=>{
+    const b=await response(uri),p=new URL(uri,"http://local").searchParams;
+    if(b.token==="next")b.origin="pair";
+    if(uri.includes("/files?"))Object.assign(b,{total:500,offset:Number(p.get("offset")),next:400,remaining:299});
+    return b;
+  });
+  const s=f.controller.updates();s.receive(change());await flush();const old=f.markers[0];
+  await f.controller.navigate({file:row("z.rs"),side:"base"});
+  await f.controller.navigate({side:"base",filter:"narrow",unchanged:true,offset:200});
+  const positions={base:{sourceTop:2200,sourceLeft:12,outlineTop:480,cursorIndex:8,columnLine:101,column:32768},working:{sourceTop:4400,sourceLeft:24,outlineTop:960,cursorIndex:16,columnLine:201,column:65536}};
+  f.setPositions(positions);
+  s.receive(change("next","2",{active:{...metadata("next"),origin:"pair"}}));await flush();
+  const v=f.views.at(-1);assert.equal(v.metadata.token,"next");assert.equal(v.file.file,"z.rs");assert.equal(v.selection.side,"base");
+  assert.equal(v.query.filter,"narrow");assert.equal(v.query.unchanged,true);assert.equal(v.query.offset,200);assert.equal(v.selection.hunk,null);assert.equal(v.query.hunk_start,0);assert.equal(v.query.edit_start,0);
+  assert.deepEqual(v.windows.base.position,positions.base);assert.deepEqual(v.windows.working.position,positions.working);
+  const lookup=f.requests.find(r=>r.uri.startsWith("/api/comparisons/next/files?"));assert.equal(new URL(lookup.uri,"http://local").searchParams.get("file"),"z.rs");
+  const before=f.views.length;assert.equal(await f.controller.traverse(old),false);assert.equal(f.views.length,before);assert.match(f.notices.at(-1),/expired/);
+});
+
+test("changed selected declarations use current identity locations while unchanged opposite panes keep their positions",async()=>{
+  const entry=fresh=>({id:"kept",index:fresh?12:8,analysis:0,name:"one",kind:"fn",name_truncated:false,kind_truncated:false,start_line:fresh?120:90,end_line:fresh?125:95});
+  const f=fixture(async(uri,options,response)=>{
+    const b=await response(uri),fresh=b.token==="next";
+    if(fresh){b.origin="pair";if(uri.includes("/files?"))b.selected=row("a.rs","v-base","next-working");}
+    if(b.window){const e=entry(fresh),selected=new URL(uri,"http://local").searchParams.get("cursor")==="kept";Object.assign(b.window,{line_total:200,outline_total:20,outline_start:e.index,outline:[e],cursor:selected?e:{...e,id:"first",index:0,start_line:1,end_line:1}});}
+    return b;
+  });
+  const s=f.controller.updates();s.receive(change());await flush();await f.controller.navigate({entity:{id:"kept",index:8,start_line:90}});
+  const base={sourceTop:2200,sourceLeft:14,outlineTop:480,cursorIndex:8,columnLine:101,column:32768};
+  f.setPositions({base,working:{sourceTop:8800,sourceLeft:33,outlineTop:432,cursorIndex:8,columnLine:90,column:65536}});
+  s.receive(change("next","2",{active:{...metadata("next"),origin:"pair"}}));await flush();
+  const v=f.views.at(-1);assert.equal(v.metadata.token,"next");assert.equal(v.file.working_version,"next-working");assert.equal(v.selection.entity,"kept");assert.equal(v.query.entity.start_line,120);assert.equal(v.query.entity.index,12);
+  assert.deepEqual(v.windows.base.position,base);assert.equal(v.windows.working.position.sourceTop,116*22);assert.equal(v.windows.working.position.outlineTop,9*48);assert.equal(v.windows.working.position.sourceLeft,0);assert.equal(v.windows.working.position.column,0);
+  const requests=f.requests.filter(r=>r.uri.startsWith("/api/comparisons/next/window?") && new URL(r.uri,"http://local").searchParams.get("side")==="working").map(r=>new URL(r.uri,"http://local").searchParams);
+  assert.ok(requests.some(q=>q.get("line_start")==="101"));
+  for(const q of requests){assert.equal(q.get("version"),"next-working");assert.notEqual(q.get("cursor_index"),"8");assert.equal(q.has("column_line"),false);}
+  assert.match(f.notices.at(-1),/working source changed.*current declaration/);assert.doesNotMatch(f.notices.at(-1),/file start|Hunk/);
+});
+
+test("refresh page shrink is bounded and selections survive becoming unchanged or disappearing from the filter",async()=>{
+  const calls=[];
+  const f=fixture(async(uri,options,response)=>{
+    const b=await response(uri);if(b.token==="next")b.origin="pair";
+    if(uri.includes("/files?")) {
+      const p=new URL(uri,"http://local").searchParams,offset=Number(p.get("offset"));
+      if(b.token==="next") {calls.push(offset);Object.assign(b,{total:201,offset:Math.min(offset,201),files:offset<201?[row("visible.rs")]:[],selected:row("z.rs"),remaining:0,next:null});b.selected.change="unchanged";}
+      else b.total=1000;
+    }
+    return b;
+  });
+  const s=f.controller.updates();s.receive(change());await flush();await f.controller.navigate({file:row("z.rs")});await f.controller.navigate({offset:800,filter:"visible"});
+  s.receive(change("next","2",{active:{...metadata("next"),origin:"pair"}}));await flush();const v=f.views.at(-1);
+  assert.equal(v.file.file,"z.rs");assert.equal(v.file.change,"unchanged");assert.equal(v.query.unchanged,false);assert.equal(v.query.filter,"visible");assert.equal(v.query.offset,200);assert.deepEqual(calls,[800,200]);
+});
+
+test("missing files choose a fresh visible row or explicit empty projection without old anchors",async()=>{
+  for(const files of [[row("replacement.rs",null,"new-only")],[]]) {
+    const f=fixture(async(uri,options,response)=>{const b=await response(uri);if(b.token==="next"){b.origin="pair";if(uri.includes("/files?"))Object.assign(b,{selected:null,files,total:files.length});}return b;});
+    const s=f.controller.updates();s.receive(change());await flush();f.setPositions({working:{sourceTop:9000,outlineTop:480,columnLine:44,column:65536}});
+    s.receive(change("next","2",{active:{...metadata("next"),origin:"pair"}}));await flush();const v=f.views.at(-1);
+    assert.equal(v.metadata.token,"next");assert.equal(v.file?.file,files[0]?.file);assert.equal(v.selection.entity,null);assert.equal(v.selection.hunk,null);assert.equal(v.query.hunk_start,0);assert.equal(v.windows.working?.position.sourceTop,files.length?0:undefined);assert.match(f.notices.at(-1),/absent/);
+    if(!files.length)assert.match(f.notices.at(-1),/No file/);
+  }
+});
+
+test("a removed side switches explicitly while unretained source keeps its selected side and availability",async()=>{
+  for(const kind of ["absent","unavailable"]) {
+    const f=fixture(async(uri,options,response)=>{
+      const b=await response(uri);if(b.token==="next"){b.origin="pair";if(uri.includes("/files?")){b.selected=row("a.rs","v-base",null);if(kind==="unavailable")b.selected.working={state:"unobserved",unavailable:"unreadable"};}}return b;
+    });
+    const s=f.controller.updates();s.receive(change());await flush();s.receive(change("next","2",{active:{...metadata("next"),origin:"pair"}}));await flush();const v=f.views.at(-1);
+    assert.equal(v.selection.side,kind==="absent"?"base":"working");assert.equal(v.windows.working,null);assert.ok(v.windows.base);if(kind==="absent")assert.match(f.notices.at(-1),/side is absent/);
+  }
+});
+
+test("reconnects can coalesce refreshes without a local POST, but identical new captures and legacy labels reset context",async()=>{
+  for(const preserve of [true,false,"legacy"]) {
+    const f=fixture(async(uri,options,response)=>{const b=await response(uri);if(b.token==="next"){b.comparison=metadata().comparison;b.origin=preserve===true?"pair":"new-create";if(preserve==="legacy")delete b.origin;}return b;});
+    f.controller.updates().receive(change());await flush();await f.controller.navigate({file:row("chosen.rs")});await f.controller.navigate({filter:"saved",unchanged:true});
+    const meta={...metadata("next"),comparison:metadata().comparison,origin:preserve===true?"pair":"new-create"};if(preserve==="legacy")delete meta.origin;
+    const s=f.controller.updates();s.receive({...change("next","0",{active:meta}),stream:"reconnected"});await flush();const v=f.views.at(-1);
+    assert.equal(v.metadata.token,"next");assert.equal(v.file.file,preserve===true?"chosen.rs":"a.rs");assert.equal(v.query.filter,preserve===true?"saved":"");assert.equal(v.query.unchanged,preserve===true);
+  }
+});
+
+test("failed fresh declaration reads keep the coherent pair and retry resolves against the new origin",async()=>{
+  const e={id:"kept",index:0,analysis:0,name:"one",kind:"fn",name_truncated:false,kind_truncated:false,start_line:1,end_line:1};let fail=true;
+  const f=fixture(async(uri,options,response)=>{const b=await response(uri),fresh=b.token==="next";if(fresh){b.origin="pair";if(uri.includes("/files?"))b.selected=row("a.rs","v-base","fresh");if(fail && uri.includes("/window?"))throw Object.assign(new Error("backing temporarily unavailable"),{status:503});}if(b.window)Object.assign(b.window,{outline_total:1,outline:[e],cursor:e});return b;});
+  const s=f.controller.updates();s.receive(change());await flush();await f.controller.navigate({entity:{id:e.id,index:0,start_line:1}});const old=f.views.at(-1);
+  s.receive(change("next","2",{active:{...metadata("next"),origin:"pair"}}));await flush();assert.equal(f.views.at(-1),old);assert.equal(f.state().pending,false);assert.match(f.notices.at(-1),/Keeping/);
+  fail=false;assert.equal(await f.controller.navigate(),true);assert.equal(f.views.at(-1).metadata.token,"next");assert.equal(f.views.at(-1).selection.entity,e.id);assert.equal(f.views.at(-1).file.working_version,"fresh");assert.equal(f.views.at(-1).windows.working.window.version,"fresh");
+});
+
+test("old navigation and history cannot cancel a pending replacement, and late refreshes cannot overwrite a newer capture",async()=>{
+  const held=deferred();let signal;
+  const f=fixture((uri,options,response)=>{if(uri.includes("/next/files?")){signal=options.signal;return held.promise;}return response(uri);});const s=f.controller.updates();s.receive(change());await flush();const marker=f.markers[0];
+  s.receive(change("next","2",{active:{...metadata("next"),origin:"pair"}}));assert.equal(await f.controller.navigate({filter:"old"}),false);assert.equal(await f.controller.traverse(marker),false);assert.equal(signal.aborted,false);assert.equal(f.state().pending,true);
+  s.receive(change("latest","3"));await flush();assert.equal(signal.aborted,true);assert.equal(f.views.at(-1).metadata.token,"latest");const count=f.views.length;
+  const old=await f.response("/api/comparisons/next/files?file=a.rs");old.origin="pair";held.resolve(old);await flush();assert.equal(f.views.length,count);
+});
+
+test("invalid origins and inconsistent refreshed file pins never replace accepted source",async()=>{
+  const f=fixture();const s=f.controller.updates();s.receive(change());await flush();
+  for(const origin of [null,"",1,"x".repeat(257)])assert.throws(()=>s.receive(change("next","2",{active:{...metadata("next"),origin}})),/origin/);
+  for(const selected of [undefined,row("wrong.rs"),{...row(),working_version:1}]) {
+    const g=fixture(async(uri,options,response)=>{const b=await response(uri);if(b.token==="next"){b.origin="pair";if(uri.includes("/files?"))b.selected=selected;}return b;});const events=g.controller.updates();events.receive(change());await flush();const old=g.views.at(-1);
+    events.receive(change("next","2",{active:{...metadata("next"),origin:"pair"}}));await flush();assert.equal(g.views.at(-1),old);assert.ok(g.errors.length);assert.match(g.notices.at(-1),/Invalid/);
+  }
+});
+
+test("refresh notices distinguish preserved context, changed source and cleared hunk selection",async()=>{
+  for(const changed of [false,true]) {
+    const f=fixture(async(uri,options,response)=>{const b=await response(uri);if(b.token==="next"){b.origin="pair";if(changed && uri.includes("/files?"))b.selected=row("a.rs","v-base","changed");}return b;});
+    const s=f.controller.updates();s.receive(change());await flush();await f.controller.navigate({side:"base",entity:null});
+    s.receive(change("next","2",{active:{...metadata("next"),origin:"pair"}}));await flush();
+    assert.equal(f.views.at(-1).metadata.token,"next");
+    assert.equal(f.notices.at(-1),changed?"working source changed; showing file start.":"Refreshed comparison; file and reading positions kept.");
+  }
+  const f=fixture(async(uri,options,response)=>{const b=await response(uri);if(b.token==="next")b.origin="pair";return b;});const s=f.controller.updates();s.receive(change());await flush();
+  s.receive(change("next","2",{active:{...metadata("next"),origin:"pair"}}));await flush();assert.equal(f.notices.at(-1),"Hunk selection cleared for the new comparison.");
+});
+
+test("refresh of an empty comparison can select a newly added or removed file without old reading coordinates",async()=>{
+  for(const current of [row("new.rs",null,"new-version"),row("removed.rs","old-base",null),null]) {
+    const f=fixture(async(uri,options,response)=>{const b=await response(uri);if(uri.includes("/files?")){b.files=b.token==="pair" || !current?[]:[current];b.total=b.files.length;if(b.token==="next")b.selected=null;}if(b.token==="next")b.origin="pair";return b;});
+    const s=f.controller.updates();s.receive(change());await flush();assert.equal(f.views.at(-1).file,null);
+    s.receive(change("next","2",{active:{...metadata("next"),origin:"pair"}}));await flush();const v=f.views.at(-1);assert.equal(v.metadata.token,"next");assert.equal(v.file?.file,current?.file);
+    if(current){const side=current.working?"working":"base";assert.equal(v.selection.side,side);assert.equal(v.windows[side].position.sourceTop,0);}assert.equal(v.selection.entity,null);assert.equal(v.selection.hunk,null);assert.doesNotMatch(f.notices.at(-1),/Selected file is absent/);
+  }
+});
+
+test("file loss explains the chosen fallback or absence of matching rows",async()=>{
+  for(const current of [row("removed.rs","old-base",null),null]) {
+    const f=fixture(async(uri,options,response)=>{const b=await response(uri);if(b.token==="next"){b.origin="pair";if(uri.includes("/files?"))Object.assign(b,{selected:null,files:current?[current]:[],total:current?1:0});}return b;});const s=f.controller.updates();s.receive(change());await flush();
+    s.receive(change("next","2",{active:{...metadata("next"),origin:"pair"}}));await flush();assert.equal(f.views.at(-1).metadata.token,"next");
+    assert.equal(f.notices.at(-1),current?"Selected file is absent from the refreshed inventory. Showing the first available file.":"Selected file is absent from the refreshed inventory. No file matches the current view.");if(current)assert.equal(f.views.at(-1).selection.side,"base");
+  }
+});
+
+test("a selected declaration is never transferred to another side or an unavailable document",async()=>{
+  const e={id:"kept",index:0,analysis:0,name:"one",kind:"fn",name_truncated:false,kind_truncated:false,start_line:1,end_line:1};
+  for(const absent of [true,false]) {
+    const f=fixture(async(uri,options,response)=>{const b=await response(uri);if(b.token==="next"){b.origin="pair";if(uri.includes("/files?")){b.selected=row("a.rs","v-base",null);if(!absent)b.selected.working={state:"unobserved",unavailable:"unreadable"};}}if(b.window)Object.assign(b.window,{outline_total:1,outline:[e],cursor:e});return b;});
+    const s=f.controller.updates();s.receive(change());await flush();await f.controller.navigate({side:"working",entity:{id:e.id,index:0,start_line:1}});
+    s.receive(change("next","2",{active:{...metadata("next"),origin:"pair"}}));await flush();const v=f.views.at(-1);assert.equal(v.metadata.token,"next");assert.equal(v.selection.entity,null);assert.equal(v.selection.side,absent?"base":"working");
+    assert.equal(f.notices.at(-1),absent?"working side is absent; showing base. working source changed; showing file start.":"Saved declaration source is unavailable in the refreshed capture. working source changed; showing file start.");
+  }
+});
+
+test("changed base versions are handled conservatively and unchanged declaration positions need no fresh reveal",async()=>{
+  const e={id:"base-kept",index:0,analysis:0,name:"one",kind:"fn",name_truncated:false,kind_truncated:false,start_line:1,end_line:1};
+  for(const changed of [true,false]) {
+    const f=fixture(async(uri,options,response)=>{const b=await response(uri);if(b.token==="next"){b.origin="pair";if(uri.includes("/files?"))b.selected=row("a.rs",changed?"new-base":"v-base","v-working");}if(b.window)Object.assign(b.window,{outline_total:1,outline:[e],cursor:e});return b;});
+    const s=f.controller.updates();s.receive(change());await flush();await f.controller.navigate({side:"base",entity:{id:e.id,index:0,start_line:1}});const positions={base:{sourceTop:1000,outlineTop:480},working:{sourceTop:2200,outlineTop:960}};f.setPositions(positions);
+    s.receive(change("next","2",{active:{...metadata("next"),origin:"pair"}}));await flush();const v=f.views.at(-1);assert.equal(v.metadata.token,"next");assert.equal(v.selection.entity,e.id);assert.deepEqual(v.windows.working.position,positions.working);
+    assert.equal(v.windows.base.position.sourceTop,changed?0:1000);assert.equal(f.notices.at(-1),changed?"base source changed; showing the current declaration.":"Refreshed comparison; file and reading positions kept.");
+  }
+});
+
+test("an offset at the matching end moves to the last page while empty results need no second inventory query",async()=>{
+  for(const total of [200,0]) {
+    const calls=[];
+    const f=fixture(async(uri,options,response)=>{const b=await response(uri);if(b.token==="next")b.origin="pair";if(uri.includes("/files?")){const offset=Number(new URL(uri,"http://local").searchParams.get("offset"));if(b.token==="next"){calls.push(offset);Object.assign(b,{total,files:offset<total?[row()]:[],selected:row(),offset:Math.min(offset,total)});}else b.total=600;}return b;});const s=f.controller.updates();s.receive(change());await flush();await f.controller.navigate({offset:200});
+    s.receive(change("next","2",{active:{...metadata("next"),origin:"pair"}}));await flush();const v=f.views.at(-1);assert.equal(v.metadata.token,"next");assert.equal(v.query.offset,0);assert.equal(v.file.file,"a.rs");assert.deepEqual(calls,total?[200,0]:[200]);
+  }
+});
+
+test("response origins must match when known, and unknown legacy origins never imply context preservation",async()=>{
+  for(const legacy of [false,true]) {
+    const f=fixture(async(uri,options,response)=>{const b=await response(uri);if(b.origin!==undefined)b.origin="other";return b;});const meta=metadata();if(legacy)delete meta.origin;
+    f.controller.updates().receive(change("pair","1",{active:meta}));await flush();
+    if(legacy)assert.equal(f.views.length,1);else{assert.equal(f.views.length,0);assert.match(f.errors.at(-1).message,/origin/);}
+  }
+});
+
+test("navigation after external closure or replacement failure cannot query a retired pair",async()=>{
+  for(const closed of [true,false]) {
+    let fail=false;const f=fixture((uri,options,response)=>fail?Promise.reject(new Error("unavailable")):response(uri));const s=f.controller.updates();s.receive(change());await flush();fail=true;
+    s.receive(closed?change(null,"2",{ticket:null}):change("new-create","2"));await flush();const count=f.requests.length;
+    assert.equal(await f.controller.navigate(),false);assert.equal(f.requests.length,count);assert.match(f.notices.at(-1),/expired.*current comparison/);
+  }
+});
+
+test("hunk navigation fetches new edit metadata at a page boundary and avoids repeating an already loaded page",async()=>{
+  const f=fixture(async(uri,options,response)=>{
+    const b=await response(uri),p=new URL(uri,"http://local").searchParams;
+    if(uri.includes("/diff?")){const start=Number(p.get("edit_start"));b.hunks=[hunk(),{...hunk("later"),base:range(300,302),working:range(400,402),edits:{start:200,end:202}}];b.hunk_total=2;b.edit_total=202;b.edits=Array.from({length:start===200?2:200},()=>({base:range(),working:range()}));}
+    if(b.window){const start=Number(p.get("line_start"));b.window.line_total=1000;b.window.line_start=start;b.window.lines=Array.from({length:Math.min(96,1001-start)},(_,i)=>{const text=`line ${start+i}`;return{number:start+i,text,column:0,end_column:text.length,line_bytes:text.length,left:false,right:false};});}
+    return b;
+  });
+  f.controller.updates().receive(change());await flush();const diffs=()=>f.requests.filter(r=>r.uri.includes("/diff?")).length;assert.equal(diffs(),1);
+  let before=diffs();assert.equal(await f.controller.navigate({hunk:"later"}),true);assert.equal(f.views.at(-1).query.edit_start,200);assert.equal(f.views.at(-1).diff.edits.length,2);assert.equal(diffs()-before,2);
+  before=diffs();assert.equal(await f.controller.navigate({filter:"still-current"}),true);assert.equal(diffs()-before,1);assert.equal(f.views.at(-1).query.edit_start,200);
+  await f.controller.navigate({hunk:"h0"});await f.controller.navigate({edit_start:200});assert.equal(f.views.at(-1).query.edit_start,200);
+  before=diffs();await f.controller.navigate({filter:"selected-hunk"});assert.equal(f.views.at(-1).query.edit_start,0);assert.equal(diffs()-before,2);
+});
+
+test("an explicitly selected absent base falls back to working without transferring declaration state",async()=>{
+  const f=fixture(async(uri,options,response)=>{const b=await response(uri);if(uri.includes("/files?")){b.files=[row("a.rs",null,"v-working")];if(b.token==="next")b.selected=b.files[0];}if(b.token==="next")b.origin="pair";return b;});const s=f.controller.updates();s.receive(change());await flush();await f.controller.navigate({side:"base",entity:null});
+  s.receive(change("next","2",{active:{...metadata("next"),origin:"pair"}}));await flush();const v=f.views.at(-1);assert.equal(v.metadata.token,"next");assert.equal(v.selection.side,"working");assert.equal(v.selection.entity,null);assert.equal(f.notices.at(-1),"base side is absent; showing working.");
+});
+
+test("a selected declaration survives successive working refreshes rather than only the first replacement",async()=>{
+  const e={id:"kept",index:0,analysis:0,name:"one",kind:"fn",name_truncated:false,kind_truncated:false,start_line:1,end_line:1};
+  const f=fixture(async(uri,options,response)=>{const b=await response(uri);if(b.token!=="pair"){b.origin="pair";if(uri.includes("/files?"))b.selected=row("a.rs","v-base",`version-${b.token}`);}if(b.window)Object.assign(b.window,{outline_total:1,outline:[e],cursor:e});return b;});const s=f.controller.updates();s.receive(change());await flush();await f.controller.navigate({entity:{id:e.id,index:0,start_line:1}});
+  for(const [token,revision] of [["one","2"],["two","3"],["three","4"]]) {s.receive(change(token,revision,{active:{...metadata(token),origin:"pair"}}));await flush();const v=f.views.at(-1);assert.equal(v.metadata.token,token);assert.equal(v.selection.entity,e.id);assert.equal(v.windows.working.window.version,`version-${token}`);}
+});
+
+test("changed nonselected source reports its own fresh position while a selected declaration remains on its side",async()=>{
+  const e={id:"kept",index:0,analysis:0,name:"one",kind:"fn",name_truncated:false,kind_truncated:false,start_line:1,end_line:1};
+  const f=fixture(async(uri,options,response)=>{const b=await response(uri);if(b.token==="next"){b.origin="pair";if(uri.includes("/files?"))b.selected=row("a.rs","changed-base","v-working");}if(b.window)Object.assign(b.window,{outline_total:1,outline:[e],cursor:e});return b;});const s=f.controller.updates();s.receive(change());await flush();await f.controller.navigate({side:"working",entity:{id:e.id,index:0,start_line:1}});f.setPositions({base:{sourceTop:4400,outlineTop:960},working:{sourceTop:2200,outlineTop:480}});
+  s.receive(change("next","2",{active:{...metadata("next"),origin:"pair"}}));await flush();const v=f.views.at(-1);assert.equal(v.selection.entity,e.id);assert.equal(v.windows.base.position.sourceTop,0);assert.equal(v.windows.working.position.sourceTop,2200);assert.equal(f.notices.at(-1),"base source changed; showing file start.");
+});
+
+test("a return marker before initial inspection completes safely cancels the pending first view",async()=>{
+  const held=deferred();let signal;const f=fixture((uri,options)=>{signal=options.signal;return held.promise;});f.controller.updates().receive(change());
+  assert.equal(await f.controller.traverse({vizziReview:{schema:1,session:"prior-browser-session",key:"old"}}),false);assert.equal(signal.aborted,true);assert.equal(f.state().pending,false);
+  held.resolve(await f.response("/api/comparisons/pair/files?"));await flush();assert.equal(f.views.length,0);
+});
+
+test("missing or ambiguous refreshed declarations clear selection and reset only changed source",async()=>{
+  const e={id:"kept",index:0,analysis:0,name:"one",kind:"fn",name_truncated:false,kind_truncated:false,start_line:1,end_line:1};
+  for(const replacement of [null,{...e,id:"different"}]) {
+    const f=fixture(async(uri,options,response)=>{const b=await response(uri),fresh=b.token==="next";if(fresh){b.origin="pair";if(uri.includes("/files?"))b.selected=row("a.rs","v-base","changed");}if(b.window){const current=fresh?replacement:e;Object.assign(b.window,{outline_total:current?1:0,outline:current?[current]:[],cursor:current});}return b;});
+    const s=f.controller.updates();s.receive(change());await flush();await f.controller.navigate({entity:{id:"kept",index:0,start_line:1}});const base={sourceTop:44,outlineTop:0};f.setPositions({base,working:{sourceTop:8800,sourceLeft:99,outlineTop:480,columnLine:1,column:65536}});
+    s.receive(change("next","2",{active:{...metadata("next"),origin:"pair"}}));await flush();const v=f.views.at(-1);
+    assert.equal(v.metadata.token,"next");assert.equal(v.selection.entity,null);assert.equal(v.selection.hunk,null);assert.equal(v.windows.working.position.sourceTop,0);assert.equal(v.windows.working.position.sourceLeft,0);assert.deepEqual(v.windows.base.position,base);assert.match(f.notices.at(-1),/declaration.*(?:unavailable|available)/);
   }
 });

@@ -232,6 +232,19 @@ async fn inventory_pages_are_bounded_and_filters_preserve_full_scope_counts() {
     assert_eq!(second.files.len(), 6);
     assert_eq!(second.next, None);
     assert_eq!(second.remaining, 0);
+    let beyond = second
+        .files
+        .iter()
+        .find(|row| row.path == "f204.txt")
+        .unwrap();
+    let selected = query
+        .files(&ReviewPageQuery {
+            file: Some(beyond.file.clone()),
+            ..ReviewPageQuery::default()
+        })
+        .unwrap();
+    assert_eq!(selected.files.len(), 200);
+    assert_eq!(selected.selected.unwrap().path, "f204.txt");
     let only = query
         .files(&ReviewPageQuery {
             filter: Some("ADDED".into()),
@@ -434,10 +447,24 @@ async fn http_and_diagnostic_share_creation_queries_errors_and_event_boundaries(
     assert_eq!(response.status, 200);
     let files: Value = serde_json::from_str(&response.body).unwrap();
     assert_eq!(files["token"], token);
+    assert_eq!(files["origin"], token);
     assert!(files["comparison"].is_string());
     let file = files["files"][0]["file"].as_str().unwrap();
     let version = files["files"][0]["working_version"].as_str().unwrap();
     let base_version = files["files"][0]["base_version"].as_str().unwrap();
+    let selected = diagnostic(
+        router.clone(),
+        json!(21),
+        &format!("/api/comparisons/{token}/files?file={file}&filter=does-not-match"),
+    )
+    .await
+    .unwrap();
+    assert_eq!(selected.status, 200);
+    let selected: Value = serde_json::from_str(&selected.body).unwrap();
+    assert_eq!(selected["total"], 0);
+    assert_eq!(selected["files"], json!([]));
+    assert_eq!(selected["selected"]["file"], file);
+    assert_eq!(selected["selected"]["working_version"], version);
     let diff=diagnostic(router.clone(),json!(20),&format!("/api/comparisons/{token}/diff?file={file}&base_version={base_version}&working_version={version}")).await.unwrap();
     assert_eq!(diff.status, 200);
     let diff: Value = serde_json::from_str(&diff.body).unwrap();
@@ -877,6 +904,109 @@ async fn ready(app: &ReviewApplication) -> vizzi::review_application::ReviewStat
     })
     .await
     .unwrap()
+}
+
+#[tokio::test]
+async fn refresh_origin_survives_working_updates_but_new_creation_gets_a_new_origin() {
+    let repo = Repo::new();
+    repo.write("a.rs", "fn base() {}\n");
+    repo.commit();
+    let app = repo.app();
+    let create = || CreateComparison {
+        provider: "git".into(),
+        revision: "HEAD".into(),
+        scope: None,
+    };
+    app.create(create()).unwrap();
+    let initial = ready(&app).await.active.unwrap();
+    assert_eq!(initial.origin, initial.token);
+    repo.write("a.rs", "fn next() {}\n");
+    app.refresh(&initial.token).unwrap();
+    let refreshed = ready(&app).await.active.unwrap();
+    assert_eq!(refreshed.origin, initial.origin);
+    assert_ne!(refreshed.token, initial.token);
+    app.refresh(&refreshed.token).unwrap();
+    let same_contents = ready(&app).await.active.unwrap();
+    assert_eq!(same_contents.origin, initial.origin);
+    assert_eq!(same_contents.comparison, refreshed.comparison);
+    app.create(create()).unwrap();
+    let created = ready(&app).await.active.unwrap();
+    assert_eq!(created.origin, created.token);
+    assert_ne!(created.origin, initial.origin);
+    assert_eq!(created.comparison, same_contents.comparison);
+}
+
+#[tokio::test]
+async fn selected_inventory_rows_resolve_fresh_versions_outside_the_projected_page_and_filter() {
+    let repo = Repo::new();
+    for name in ["a.txt", "z.txt", "context.txt"] {
+        repo.write(name, "before\n");
+    }
+    repo.commit();
+    repo.write("a.txt", "after\n");
+    repo.write("z.txt", "selected\n");
+    let app = repo.app();
+    app.create(CreateComparison {
+        provider: "git".into(),
+        revision: "HEAD".into(),
+        scope: None,
+    })
+    .unwrap();
+    let initial = ready(&app).await.active.unwrap();
+    let selected = {
+        let query = app.query(&initial.token).unwrap();
+        let files = query.files(&ReviewPageQuery::default()).unwrap();
+        assert!(files.selected.is_none());
+        files
+            .files
+            .into_iter()
+            .find(|row| row.path == "z.txt")
+            .unwrap()
+    };
+    repo.write("z.txt", "before\n");
+    app.refresh(&initial.token).unwrap();
+    let fresh = ready(&app).await.active.unwrap();
+    let query = app.query(&fresh.token).unwrap();
+    let result = query
+        .files(&ReviewPageQuery {
+            file: Some(selected.file.clone()),
+            filter: Some("a.txt".into()),
+            count: Some(1),
+            ..ReviewPageQuery::default()
+        })
+        .unwrap();
+    assert_eq!(result.files.len(), 1);
+    assert_eq!(result.files[0].path, "a.txt");
+    assert_eq!(result.total, 1);
+    assert_eq!(result.totals.unchanged, 2);
+    let current = result.selected.unwrap();
+    assert_eq!(current.file, selected.file);
+    assert_eq!(current.path, "z.txt");
+    assert_eq!(current.change, "unchanged");
+    assert_eq!(current.base_version, selected.base_version);
+    assert_ne!(current.working_version, selected.working_version);
+    assert_eq!(
+        query
+            .window(
+                &current.file,
+                Side::Working,
+                current.working_version.as_deref().unwrap(),
+                &WindowQuery::default()
+            )
+            .unwrap()
+            .window
+            .lines[0]
+            .text,
+        "before"
+    );
+    let missing = query
+        .files(&ReviewPageQuery {
+            file: Some("absent".into()),
+            ..ReviewPageQuery::default()
+        })
+        .unwrap();
+    assert!(missing.selected.is_none());
+    assert_eq!(missing.total, 1);
 }
 
 #[tokio::test]

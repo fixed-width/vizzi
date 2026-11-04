@@ -158,6 +158,10 @@ review leaves the live index unstarted. Earlier eager measurements are preserved
 The [startup report](STARTUP_RESULTS.md) and `results/startup` retain the repeated cohort
 and its correctness/mutation evidence. Use `summarize-startup.mjs` as documented there
 to compare three-session outputs with the earlier eager cohort.
+The [context-preservation report](REFRESH_RESULTS.md) and `results/refresh` retain the
+next cohort, with explicit selected-file assertions and unchanged setup. Aggregate it
+against the startup cohort using `summarize-refresh.mjs OUTPUT.json LINUX_RESULTS
+PYTORCH_RESULTS`; output files must be new.
 
 Select the profiles into temporary files:
 

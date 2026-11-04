@@ -77,7 +77,7 @@ async function verify(page,host,path) {
 
 let chromium;
 try {
-  report.sourceSha256=Object.fromEntries(await Promise.all(["experiments/review-workflow/measure.mjs","experiments/review-workflow/scale_fixture.py","experiments/review-workflow/scale-profiles.json","experiments/review-workflow/walkthrough-audit.js","experiments/browser/statistics.mjs","crates/vizzi/web/review-app.js","crates/vizzi/web/review-controller.js","crates/vizzi/web/inspector.js","crates/vizzi/src/host.rs","crates/vizzi/src/application.rs","crates/vizzi/src/server.rs","crates/vizzi/src/main.rs","crates/vizzi/web/startup.js"].map(async name=>[name,sha(await readFile(name))])));
+  report.sourceSha256=Object.fromEntries(await Promise.all(["experiments/review-workflow/measure.mjs","experiments/review-workflow/scale_fixture.py","experiments/review-workflow/scale-profiles.json","experiments/review-workflow/walkthrough-audit.js","experiments/browser/statistics.mjs","crates/vizzi/web/review-app.js","crates/vizzi/web/review-controller.js","crates/vizzi/web/inspector.js","crates/vizzi/src/host.rs","crates/vizzi/src/application.rs","crates/vizzi/src/server.rs","crates/vizzi/src/main.rs","crates/vizzi/web/startup.js","crates/vizzi/src/review.rs","crates/vizzi/src/review_application.rs","crates/vizzi/src/review_application/projection.rs"].map(async name=>[name,sha(await readFile(name))])));
   report.originalStatusBefore=originalStatus("before");assert.equal(report.originalStatusBefore,manifest.original_status_sha256);
   if(!options.noBuild)buildHost();report.binarySha256=sha(await readFile("target/release/vizzi"));chromium=await browser({desktopBus:false});report.browser=chromium.version();
   const system=await (await chromium.newBrowserCDPSession()).send("SystemInfo.getInfo");report.gpu={devices:system.gpu.devices,featureStatus:system.gpu.featureStatus};
@@ -128,7 +128,9 @@ try {
         const scroll=(async()=>{while(scrolling && await page.locator("#review-workspace").getAttribute("data-token")===old){await page.mouse.wheel(0,44);scrollInputs++;await delay(16);}})();
         try {await page.waitForFunction(old=>document.getElementById("review-workspace").dataset.token!==old,old);await ready(page);}finally {scrolling=false;await scroll;}
         const captureCommandMs=performance.now()-started,captureMs=await inputAge(page,clickAt),selected=await page.locator("#review-file-title").textContent();
-        if(selected!==file.path)await choose(page,file.path);await markerVisible(page,file.path);await paint(page);
+        assert.equal(selected,file.path,"Working refresh keeps the edited file selected");
+        assert.equal(await page.getByLabel("Include unchanged context").isChecked(),true,"Refresh keeps context projection settings");
+        await markerVisible(page,file.path);await paint(page);
         result.refreshes.push({edit,path:file.path,captureMs,captureCommandMs,editedSourceReadyMs:await inputAge(page,clickAt),editedSourceCommandMs:performance.now()-started,selectionReset:selected!==file.path,scrollInputs,oldToken:old,newToken:await page.locator("#review-workspace").getAttribute("data-token"),oldVersion,newVersion:await page.locator("#working-pane").getAttribute("data-version"),baseVersion:await page.locator("#base-pane").getAttribute("data-version")});
       }
       result.refreshActivity=summarizeProbe(await end(page));

@@ -46,6 +46,12 @@ indexing. Also record spawn-to-first-review elapsed time, including browser setu
 navigation/form automation and DOM/paint waits; do not equate URL availability with a
 completed review. Preserve both cohorts rather than overwriting the earlier results.
 
+The refresh-navigation cohort keeps that setup and adds explicit assertions that the
+edited file and unchanged-context setting survive all five refreshes per session.
+Selection-reset counts remain in the raw report for comparison, while the driver no
+longer repairs a reset by selecting another file. Record the additional marker/paint
+observation waits separately from actual extra user actions.
+
 Source/version/content correctness is checked outside timed interaction groups.
 The page uses review SSE; it must not poll status. Passive Resource Timing provides
 fetch duration/body sizes without instrumenting the production client. Browser capture

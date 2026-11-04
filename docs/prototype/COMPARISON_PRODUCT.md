@@ -64,9 +64,11 @@ is in this milestone.
 
 During capture or a failed/refused refresh, the last coherent comparison stays visible
 with its original labels. A successful refresh replaces the pair as one accepted view;
-late responses from the previous pair cannot replace it. Selection may carry forward by
-path and an unambiguous declaration key, with a notice and a fresh reveal when source
-changed. Old line/hunk coordinates are never transferred to new bytes.
+late responses from the previous pair cannot replace it. The
+[refresh navigation contract](REVIEW_REFRESH.md) preserves file, side and projection
+settings. Unchanged side versions restore their reading positions; a surviving exact
+declaration identity reveals its current location when source changed. Missing targets
+have explicit fallbacks. Old line/hunk coordinates are never transferred to new bytes.
 
 Review history records comparison identity and side as well as the bounded reading
 metadata. Returns require that exact pair. A replaced, closed or host-expired comparison

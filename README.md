@@ -38,6 +38,9 @@ The [task-driven startup contract](docs/prototype/STARTUP_PRODUCT.md) lets revie
 open before live indexing; exploration activates the same host engine explicitly.
 The [startup measurements](experiments/review-workflow/STARTUP_RESULTS.md) record the
 first usable review around 0.8–1.0 seconds from launch in the focused reference scopes.
+Working refresh now [preserves reading context](docs/prototype/REVIEW_REFRESH.md);
+the [repeated measurements](experiments/review-workflow/REFRESH_RESULTS.md) record
+zero edited-file resets across 30 scoped refreshes.
 
 - [Run the workspace](docs/how-to/run-workspace.md)
 - [Next product milestones](docs/plans/product-milestones.md)

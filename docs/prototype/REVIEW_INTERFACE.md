@@ -25,8 +25,9 @@ files + filter | hunks and change-page controls
 
 The file projection includes unchanged context when requested. Filtering never
 changes capture scope or full inventory totals. File pages and hunk/edit metadata
-pages cap at 200. Both inspectors retain the established 96-row/32-KiB source and
-200-entry outline bounds, including fragment and keyboard navigation.
+pages cap at 200. Source-window requests retain the established 96-row/32-KiB text and
+200-entry outline bounds, including fragment and keyboard navigation. Refresh may
+reuse the active expanded fragment only for the same file/version and actual byte column.
 
 File, hunk, declaration and side selection carry token, comparison ID and exact side
 document versions. Hunk selection reveals both ranges; declaration selection reveals
@@ -49,8 +50,10 @@ Unavailable diff/source is described explicitly; absent, empty, binary, literal
 symlink/reference, executable and unobserved evidence remain distinct.
 
 Initial capture is explicit. Review SSE supplies pending/error/active state without
-polling. Failed/refused refresh keeps the old pair. A successful new capture resets
-selection and reading positions with a notice; no old hunk coordinates cross into
+polling. Failed/refused refresh keeps the old pair. Working refresh follows the
+[context-preservation contract](REVIEW_REFRESH.md): file/side/filter remain selected,
+unchanged versions retain their positions, and changed source requires a fresh reveal.
+An explicit new baseline capture resets context. No old hunk coordinates cross into
 new bytes. Close retires the pair. Disconnection preserves the displayed source and
 offers reconnection/inspection recovery rather than inventing an empty result.
 

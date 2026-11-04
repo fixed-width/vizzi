@@ -1,5 +1,9 @@
 # Review startup without a live index
 
+This report preserves the startup cohort at `141b41c`. The later
+[context-preservation follow-up](REFRESH_RESULTS.md) addresses its measured refresh
+selection gap and records a separate cohort.
+
 Focused review can now open without waiting for whole-workspace analysis. In three
 fresh-host sessions per case, HTTP URL availability falls from a median 1.84 seconds
 to 4.7 ms for Linux and from 16.50 seconds to 4.1 ms for PyTorch. The first usable

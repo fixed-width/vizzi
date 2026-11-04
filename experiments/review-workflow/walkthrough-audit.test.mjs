@@ -36,6 +36,14 @@ test("paging bounds accept the exact allowance on each projection",()=>{
   assert.equal(auditResponse("/api/comparisons/pair/window?side=base&file=file&version=base-version",body).rows,96);
 });
 
+test("an off-page selected row has its own identity and metadata bounds",()=>{
+  const uri="/api/comparisons/pair/files?file=file",page={schema:1,...metadata,files:[],selected:file};
+  assert.equal(auditResponse(uri,page).selectedRows,1);
+  assert.equal(auditResponse(uri,{...page,selected:null}).selectedRows,0);
+  for(const selected of [{...file,path:"x".repeat(512),base_version:null,working_version:"x".repeat(256)},{...file,path:"🙂".repeat(128),working_version:null}])assert.equal(auditResponse(uri,{...page,selected}).selectedRows,1);
+  for(const selected of [undefined,[],{...file,file:"wrong"},{...file,path:"x".repeat(513)},{...file,path:"🙂".repeat(129)},{...file,working_version:1},{...file,working_version:{length:3}},{...file,base_version:""},{...file,base_version:"x".repeat(257)}])assert.throws(()=>auditResponse(uri,{...page,selected}));
+});
+
 test("DOM auditing rejects wrong paths, side versions, rows, double selection and excessive elements",()=>{
   for(const patch of [{token:"wrong"},{comparison:"wrong"},{path:"wrong"},{side:"wrong"},{selectedSides:["base","working"]},{fileButtons:201},{hunkButtons:201}])assert.throws(()=>auditCheckpoint({...state(),...patch},file,[window(),window("working")],sources));
   for(const patch of [{version:"wrong"},{renderedRows:97},{outlineButtons:201},{renderedRows:0},{rows:[{number:2,text:"text"}]},{rows:[{number:1,text:"wrong"}]}]){const s=state();Object.assign(s.panes.working,patch);assert.throws(()=>auditCheckpoint(s,file,[window(),window("working")],sources));}

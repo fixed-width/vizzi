@@ -7,8 +7,9 @@ Native acquisition, bounded ownership and shared-engine analysis are delivered.
 Comparison queries/transport and linked review views are delivered. Both frozen
 variants pass the rendered guided review; the learning workflow passes again too.
 Focused Linux/PyTorch review-scale observations are recorded. Review now opens without
-starting the live index, with repeated startup measurements. Refresh selection reset
-remains observed friction; independent-operator/usability validation remains open.
+starting the live index, with repeated startup measurements. Working refresh preserves
+useful reading context, with zero file resets in the repeated scoped cohort.
+Independent-operator/usability validation remains open.
 This follows the product-alignment checkpoint at commit 4e75d04.
 
 The goal is coordinated views for learning unfamiliar code and reviewing changes, as
@@ -195,10 +196,13 @@ now record actual review interaction, explicit refresh, bounds and memory observ
 The [startup contract](../prototype/STARTUP_PRODUCT.md) now keeps live indexing dormant
 until exploration activates it. The [repeated startup cohort](../../experiments/review-workflow/STARTUP_RESULTS.md)
 shows URL availability around 4–5 ms and the first scoped review around 0.8–1.0 seconds
-from launch, while preserving the learning/review workflows. Refresh still resets the
-selected file in 6/15 Linux and 9/15 PyTorch samples. Preserving useful review location
-across explicit refresh is the remaining measured interaction gap; unfamiliar-operator
-validation remains separate.
+from launch, while preserving the learning/review workflows. The
+[refresh navigation contract](../prototype/REVIEW_REFRESH.md) and
+[repeated context cohort](../../experiments/review-workflow/REFRESH_RESULTS.md) now
+preserve file/side/filter, same-version pane positions and surviving exact declarations.
+All 30 working refreshes retain the edited file. Unfamiliar-operator validation remains
+the separate acceptance step; further views should follow demonstrated learning/review
+gaps rather than an infrastructure experiment's open questions.
 
 Work in small vertical slices. Tests should cover public behaviour, stale/expired anchors,
 source identity, language-capability gaps and comparison correctness; use mutation testing

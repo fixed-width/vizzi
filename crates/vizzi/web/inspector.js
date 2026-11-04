@@ -20,11 +20,15 @@ export function createInspector({ source, space, outline, transport, select, onE
     space.style.height=`${Math.max(1,view?.source?.summary.lines ?? 0)*SOURCE_ROW}px`;
     outlineSpace.style.height=`${Math.max(1,view?.source?.summary.declarations ?? 0)*OUTLINE_ROW}px`;
   }
-  function accept(window, query, intent = {}) {
+  function accept(window, query, intent = {}, retainedFragment) {
     const hadFocus=outline.contains(document.activeElement);
     if (intent.fragment) {
       for(const row of window.lines)sourceRows.set(row.number,row);
     } else sourceRows=new Map(window.lines.map(row=>[row.number,row]));
+    if(retainedFragment) {
+      const row=sourceRows.get(retainedFragment.number);
+      if(row && row.column===retainedFragment.column && row.end_column<retainedFragment.end_column)sourceRows.set(row.number,retainedFragment);
+    }
     data=window; entries=new Map(window.outline.map(row=>[row.index,row]));
     if(window.cursor)entries.set(window.cursor.index,window.cursor);
     cursor=window.cursor?.index ?? 0;
@@ -89,7 +93,9 @@ export function createInspector({ source, space, outline, transport, select, onE
   }
   async function fragment(number,action) {
     const row=sourceRows.get(number);if(!row)return;
-    columnLine=number;column=action==="first"?0:action==="previous"?Math.max(0,row.column-32768):action==="last"?Math.max(0,row.line_bytes-32768):row.end_column;
+    // Leave room for UTF-8 boundary rounding so the final fragment includes the end.
+    const tail=row.line_bytes>32768?row.line_bytes-32765:0;
+    columnLine=number;column=action==="first"?0:action==="previous"?Math.max(0,row.column-32768):action==="last"?tail:row.end_column;
     source.scrollLeft=0;
     return reader.request({...ranges(),line_start:number,line_count:1,column_line:number,column},{fragment:true,end:action==="last"});
   }
@@ -142,9 +148,11 @@ export function createInspector({ source, space, outline, transport, select, onE
     },
     apply(next) {
       const hadFocus=outline.contains(document.activeElement);
+      const position=next.inspectionPosition;
+      const retainedFragment=view?.source?.id===next.source?.id && view?.source?.version===next.source?.version?sourceRows.get(position?.columnLine):undefined;
       view=next;queuedActivation=false;reader.activate(view);
       if(!sourceNodes.size)space.replaceChildren();if(!outlineNodes.size)outlineSpace.replaceChildren();sizes();
-      if(next.inspection){source.scrollTop=next.inspectionPosition.sourceTop;outline.scrollTop=next.inspectionPosition.outlineTop;accept(next.inspection,{},{});columnLine=next.inspectionPosition.columnLine;column=next.inspectionPosition.column;source.scrollLeft=next.inspectionPosition.sourceLeft;}
+      if(next.inspection){source.scrollTop=next.inspectionPosition.sourceTop;outline.scrollTop=next.inspectionPosition.outlineTop;accept(next.inspection,{},{},retainedFragment);columnLine=next.inspectionPosition.columnLine;column=next.inspectionPosition.column;source.scrollLeft=next.inspectionPosition.sourceLeft;}
       else {data=null;sourceRows=new Map();entries=new Map();cursor=0;columnLine=undefined;column=0;renderSource();renderOutline();}
       if(hadFocus && !view.source?.summary.declarations)outline.focus({preventScroll:true});
     },

@@ -7,6 +7,7 @@ const element=id=>document.getElementById(id);
 const node=(tag,text)=>{const value=document.createElement(tag);value.textContent=text;return value;};
 const sides=["base","working"],inspectors={};
 let view,updates,filterTimer;
+function cancelFilter(){clearTimeout(filterTimer);filterTimer=undefined;}
 const transport=async(uri,options)=>{
   const response=await fetch(uri,options);
   if(!response.ok){let message=await response.text();try{message=JSON.parse(message).message ?? message;}catch{}throw Object.assign(new Error(message.slice(0,512)),{status:response.status});}
@@ -70,7 +71,7 @@ function render(next) {
   }
   const {metadata,query,file,diff,windows,selection}=next;
   element("comparison-labels").textContent=`Base ${metadata.revision} → ${metadata.resolved} · subtree ${metadata.scope} · working observed ${new Date(metadata.working_started_ms).toISOString()} to ${new Date(metadata.working_finished_ms).toISOString()}`;
-  element("review-filter").value=query.filter;element("include-unchanged").checked=query.unchanged;
+  if(filterTimer===undefined)element("review-filter").value=query.filter;element("include-unchanged").checked=query.unchanged;
   const totals=next.files.totals;
   element("review-counts").textContent=`${totals.paths} paths · ${totals.added} added · ${totals.removed} removed · ${totals.modified} modified · ${totals.unchanged} unchanged · ${totals.unassessed} unassessed · ${totals.unavailable} unavailable`;
   element("file-page-label").textContent=`${next.files.files.length} shown / ${next.files.total} matching · ${next.files.remaining} remaining`;
@@ -105,15 +106,15 @@ function render(next) {
   if(fileFocus)[...files.querySelectorAll("button")].find(button=>button.dataset.file===fileFocus)?.focus({preventScroll:true});
   if(hunkFocus)[...hunks.querySelectorAll("button")].find(button=>button.dataset.hunk===hunkFocus)?.focus({preventScroll:true});
 }
-element("comparison-form").addEventListener("submit",async event=>{event.preventDefault();element("compare").disabled=true;try{await controller.create({revision:element("baseline").value,scope:element("scope").value});}finally{element("compare").disabled=false;}});
+element("comparison-form").addEventListener("submit",async event=>{event.preventDefault();cancelFilter();element("compare").disabled=true;try{await controller.create({revision:element("baseline").value,scope:element("scope").value});}finally{element("compare").disabled=false;}});
 element("refresh-working").addEventListener("click",()=>controller.refresh());
-element("close-comparison").addEventListener("click",()=>controller.close());
-element("review-filter").addEventListener("input",()=>{clearTimeout(filterTimer);filterTimer=setTimeout(()=>controller.navigate({filter:element("review-filter").value,offset:0}),160);});
-element("include-unchanged").addEventListener("change",()=>{clearTimeout(filterTimer);void controller.navigate({filter:element("review-filter").value,unchanged:element("include-unchanged").checked,offset:0});});
-element("review-back").addEventListener("click",()=>{clearTimeout(filterTimer);controller.move(-1);});
-element("review-forward").addEventListener("click",()=>{clearTimeout(filterTimer);controller.move(1);});
-window.addEventListener("popstate",event=>{clearTimeout(filterTimer);void controller.traverse(event.state);});
-element("open-current").addEventListener("click",()=>controller.openCurrent());
+element("close-comparison").addEventListener("click",()=>{cancelFilter();void controller.close();});
+element("review-filter").addEventListener("input",()=>{cancelFilter();filterTimer=setTimeout(()=>{filterTimer=undefined;void controller.navigate({filter:element("review-filter").value,offset:0});},160);});
+element("include-unchanged").addEventListener("change",()=>{cancelFilter();void controller.navigate({filter:element("review-filter").value,unchanged:element("include-unchanged").checked,offset:0});});
+element("review-back").addEventListener("click",()=>{cancelFilter();controller.move(-1);});
+element("review-forward").addEventListener("click",()=>{cancelFilter();controller.move(1);});
+window.addEventListener("popstate",event=>{cancelFilter();void controller.traverse(event.state);});
+element("open-current").addEventListener("click",()=>{cancelFilter();void controller.openCurrent();});
 element("retry-review").addEventListener("click",()=>controller.navigate());
 element("reconnect-review").addEventListener("click",()=>updates.restart());
 updates=followChanges({url:"/api/comparisons/events",eventName:"comparison",session:()=>controller.updates()});

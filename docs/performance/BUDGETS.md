@@ -20,7 +20,10 @@ with one parser worker. They show bounded sampled DOM and 16.8-ms observed rAF p
 The [startup follow-up](../../experiments/review-workflow/STARTUP_RESULTS.md) now opens
 review without activating live indexing: URL availability is around 4–5 ms and first
 scoped review around 0.8–1.0 seconds from launch, including browser automation.
-Refresh selection reset remains task friction.
+The [context follow-up](../../experiments/review-workflow/REFRESH_RESULTS.md) records
+zero file resets in 30 refreshes, preserving same-version pane positions and using
+fresh locations for changed source. Median edited-source observations are 366 / 199 ms
+for the scoped Linux/PyTorch tasks; these include explicit capture and observer waits.
 Their scoped refresh timings do not qualify the live-edit/core-map targets below.
 
 | Area | Proposed target / policy | Current evidence |

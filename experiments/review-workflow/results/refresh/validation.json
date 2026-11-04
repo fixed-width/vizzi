@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "baseCommit": "141b41c6d61e0e24afa440efd57fe42f3dcab16b",
+  "sourceSha256": {
+    "crates/vizzi/src/review.rs": "f795483ae8b320c5f589f6e94cedbd5ad82fb98efb04683c204518babb1a3937",
+    "crates/vizzi/src/review_application.rs": "da22a5d6ed113a1205d3512af9b118b22b41d5fe29e70947dd23dd95c5ece904",
+    "crates/vizzi/src/review_application/projection.rs": "379d15efd6c93066ef470c3394b10f22d117ca6e4b9e2872507cd745a1645b79",
+    "crates/vizzi/tests/review_application.rs": "8868910312fa2e5f51ace89894c095899bde96ac104ec6253f84de13ec15909e",
+    "crates/vizzi/web/inspector.js": "736c24860b04e0c47956c05cf6e0c1cdbcfeb4daf53e7a039de12e6a44a76e2f",
+    "crates/vizzi/web/review-app.js": "f8a39af8b1e9e73fbd45c388cdf6ee03a4d3002fd7febee84ae413b85809b4b7",
+    "crates/vizzi/web/review-controller.js": "9f88ac3ee9050224198be763ae2afe2ae582b91afd935ad1cebf0ee1191521f7",
+    "crates/vizzi/web/review-controller.test.js": "45bb0a9924b8a907de9219743acf49ecaedea3d16125d56521ecf708ce0f902d",
+    "experiments/browser/review-refresh.test.mjs": "5cb9233132ab6d0b8c023b729699710eeaf963abc1f30d8d08607ac63cce3bbd",
+    "experiments/browser/navigation-inspector.test.mjs": "da7e604e5d247898cb061d25002f66207b8e78736a075fc139a826d32f2890c8",
+    "experiments/browser/navigation-inspector-stryker.config.json": "de4a896589dd459c55d9d54a4d8f057f6ea438b1ccec768762477da8069e734e",
+    "experiments/browser/run.mjs": "9ecd7156e6fc82fd045fc71c3eb8c9f2b441eef8b4f97a10beeda8ab62b79c0d",
+    "experiments/review-workflow/run.mjs": "0155d3512b5369e2094188df23bb440b8a1981a4bfa2613d33207c5e2b83d1d3",
+    "experiments/review-workflow/measure.mjs": "16c8017e4b290f3ad2861ef66783382c6e80341c8f6b32fe04fa7756d9fb9b68",
+    "experiments/review-workflow/summarize-refresh.mjs": "5d8d78607309e6adb764da117f7bc52d97a1e3af9567afd5dc4d5ac0b3625686",
+    "experiments/review-workflow/walkthrough-audit.js": "3ac026428ca5a4bc42274be44e09f5f10f59fccd0a842c629db36f563b073bfb",
+    "experiments/review-workflow/walkthrough-audit.test.mjs": "4efa36ddfd647fe4e61c9a5a3a12291c1da65decf35a40a4f37b07d2a392adf6",
+    "Cargo.lock": "39a4317d3c52be9199837d27320749e93c2591f3c021a8afac28b1a79a23e8d6",
+    "package-lock.json": "e7ff76f17d7408c0b6dfd075c564ba31fec03cc838be612a008cf5bd343e291f"
+  },
+  "logs": {
+    "nativeRed": {
+      "localPath": "/tmp/vizzi-refresh-native-red.log",
+      "sha256": "0afd36d2ad56608db041bbdfb284180986eec8704d8ffc7eaad1dec579df519e"
+    },
+    "nativeGreen": {
+      "localPath": "/tmp/vizzi-refresh-native-green.log",
+      "sha256": "3d887d722629d2601ebf423af58104aaa6e878d2e818c69fd0355af8862e4f28"
+    },
+    "workspaceTests": {
+      "localPath": "/tmp/vizzi-refresh-workspace-tests.log",
+      "sha256": "46b6bffd8d3d6c5d5ad439ee84b9a446207f0c2aa52ac64f60888b2dd4989cbf"
+    },
+    "clippy": {
+      "localPath": "/tmp/vizzi-refresh-clippy.log",
+      "sha256": "e493c5f99f455ce21bbbada1816ecd0aba39077e576fda9e886e8d9e35f1b51b"
+    },
+    "controllerRed": {
+      "localPath": "/tmp/vizzi-refresh-controller-red.log",
+      "sha256": "786826c8ac4d8c21e3c060e6285096ebd8485b99b6a2dde706a702c8471f6507"
+    },
+    "auditRed": {
+      "localPath": "/tmp/vizzi-refresh-audit-red.log",
+      "sha256": "0e7f9f7535a96ead4190d15962647d3b331621d4a4a12f4ba68d06ba1f2b40b1"
+    },
+    "browserSuite": {
+      "localPath": "/tmp/vizzi-refresh-full-browser.log",
+      "sha256": "0d7fbcb1b7e3b7194997978ca2dae33b77d68dc8d79366ccf3091a99ad72414f"
+    }
+  },
+  "verification": {
+    "rustWorkspaceAllFeaturesIncludingDoctests": 409,
+    "doctestExamples": 0,
+    "clippyWorkspaceAllTargetsAllFeaturesDenyWarnings": "passed",
+    "format": "passed",
+    "nodeAndChromiumCases": 177,
+    "startupScenario": "passed",
+    "reviewScenario": "passed",
+    "reviewRefreshScenario": "passed",
+    "guidedVariantA": "passed",
+    "guidedVariantB": "passed",
+    "learningWithReturnHistory": "passed"
+  },
+  "mutations": {
+    "native": "native-mutations.json",
+    "controller": "controller-mutations.json",
+    "inspector": "inspector-mutations.json",
+    "sourceAudit": "audit-mutations.json",
+    "note": "Cohorts overlap. Raw survivors and timeouts remain separate from assertion catches. Equivalent survivors have explicit invariant-based assessments; no exclusions are applied."
+  },
+  "regressions": {
+    "draftFilter": "An older render could overwrite a typed but debounced filter. Rendering preserves active drafts and explicit lifecycle/history actions cancel them.",
+    "expandedFragment": "A multi-line refresh window had a smaller per-line allowance and shrank the expanded fragment. Same-file/version cached rows are retained only for matching actual byte columns.",
+    "utf8End": "Last-fragment requests now leave room for up to three UTF-8 boundary bytes, verified with two multibyte suffix alignments.",
+    "offPageAudit": "A preserved selection outside the filtered page is audited through the bounded selected inventory row."
+  },
+  "measurementPolicy": "No tests, mutation jobs or other agent benchmarks overlap final collection. External activity remains uncontrolled. One parser worker, fresh analysis caches and warm filesystem caches.",
+  "limits": "Full native application/projection and controller/reader mutation scopes, affected inspector functions/public methods and audit module; CSS and app glue are browser-tested rather than mutated. No whole-repository review, timing-tail, GPU/physical-presentation, 16-GB/editor or independent-operator qualification.",
+  "measuredBinarySha256": "3e7483eebe4a89812ec572f613b04dd3882f574b4f51cc31b91b53cda650e1a3",
+  "measurements": {
+    "report": "summary.json",
+    "sessionsPerCase": 3,
+    "allThirtyFileSelectionsPreserved": true,
+    "allSixLiveIndexesDormant": true,
+    "originalCheckoutStatusDigestsMatched": true
+  },
+  "screenshotsInspected": [
+    "unchanged-refresh.png",
+    "moved-declaration.png"
+  ]
+}

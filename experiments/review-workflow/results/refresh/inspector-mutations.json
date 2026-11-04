@@ -1,0 +1,5492 @@
+{
+  "schema": 1,
+  "cohorts": [
+    {
+      "rawReportSha256": "a67b02cad14aad984b3ab316142bb5c99e38a6725c986e80154f7ccce5fa6552",
+      "sourceSha256": "736c24860b04e0c47956c05cf6e0c1cdbcfeb4daf53e7a039de12e6a44a76e2f",
+      "mutate": [
+        "crates/vizzi/web/inspector.js:23:0-39:0",
+        "crates/vizzi/web/inspector.js:94:0-102:0",
+        "crates/vizzi/web/inspector.js:115:0-164:0"
+      ],
+      "concurrency": 1,
+      "command": "node experiments/browser/navigation-inspector.test.mjs",
+      "counts": {
+        "Killed": 198,
+        "Timeout": 28,
+        "Survived": 13
+      },
+      "outcomes": [
+        {
+          "id": "0",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2933,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 24,
+              "line": 25
+            },
+            "start": {
+              "column": 9,
+              "line": 25
+            }
+          }
+        },
+        {
+          "id": "1",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2782,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 24,
+              "line": 25
+            },
+            "start": {
+              "column": 9,
+              "line": 25
+            }
+          }
+        },
+        {
+          "id": "2",
+          "mutatorName": "BlockStatement",
+          "replacement": "{}",
+          "status": "Timeout",
+          "duration": 19121,
+          "location": {
+            "end": {
+              "column": 6,
+              "line": 27
+            },
+            "start": {
+              "column": 26,
+              "line": 25
+            }
+          }
+        },
+        {
+          "id": "3",
+          "mutatorName": "CallExpression",
+          "replacement": ";",
+          "status": "Timeout",
+          "duration": 19109,
+          "location": {
+            "end": {
+              "column": 68,
+              "line": 26
+            },
+            "start": {
+              "column": 37,
+              "line": 26
+            }
+          }
+        },
+        {
+          "id": "4",
+          "mutatorName": "ArrowFunction",
+          "replacement": "() => undefined",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 865,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 69,
+              "line": 27
+            },
+            "start": {
+              "column": 48,
+              "line": 27
+            }
+          }
+        },
+        {
+          "id": "5",
+          "mutatorName": "ArrayDeclaration",
+          "replacement": "[]",
+          "status": "Timeout",
+          "duration": 19107,
+          "location": {
+            "end": {
+              "column": 69,
+              "line": 27
+            },
+            "start": {
+              "column": 53,
+              "line": 27
+            }
+          }
+        },
+        {
+          "id": "6",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 897,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 24,
+              "line": 28
+            },
+            "start": {
+              "column": 8,
+              "line": 28
+            }
+          }
+        },
+        {
+          "id": "7",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2553,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 24,
+              "line": 28
+            },
+            "start": {
+              "column": 8,
+              "line": 28
+            }
+          }
+        },
+        {
+          "id": "8",
+          "mutatorName": "BlockStatement",
+          "replacement": "{}",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2603,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 6,
+              "line": 31
+            },
+            "start": {
+              "column": 26,
+              "line": 28
+            }
+          }
+        },
+        {
+          "id": "9",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2587,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 99,
+              "line": 30
+            },
+            "start": {
+              "column": 10,
+              "line": 30
+            }
+          }
+        },
+        {
+          "id": "10",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2569,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 99,
+              "line": 30
+            },
+            "start": {
+              "column": 10,
+              "line": 30
+            }
+          }
+        },
+        {
+          "id": "11",
+          "mutatorName": "LogicalOperator",
+          "replacement": "row && row.column === retainedFragment.column || row.end_column < retainedFragment.end_column",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2559,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 99,
+              "line": 30
+            },
+            "start": {
+              "column": 10,
+              "line": 30
+            }
+          }
+        },
+        {
+          "id": "12",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2565,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 53,
+              "line": 30
+            },
+            "start": {
+              "column": 10,
+              "line": 30
+            }
+          }
+        },
+        {
+          "id": "13",
+          "mutatorName": "LogicalOperator",
+          "replacement": "row || row.column === retainedFragment.column",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2558,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 53,
+              "line": 30
+            },
+            "start": {
+              "column": 10,
+              "line": 30
+            }
+          }
+        },
+        {
+          "id": "14",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2619,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 53,
+              "line": 30
+            },
+            "start": {
+              "column": 17,
+              "line": 30
+            }
+          }
+        },
+        {
+          "id": "15",
+          "mutatorName": "EqualityOperator",
+          "replacement": "row.column !== retainedFragment.column",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2639,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 53,
+              "line": 30
+            },
+            "start": {
+              "column": 17,
+              "line": 30
+            }
+          }
+        },
+        {
+          "id": "16",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2475,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 99,
+              "line": 30
+            },
+            "start": {
+              "column": 57,
+              "line": 30
+            }
+          }
+        },
+        {
+          "id": "17",
+          "mutatorName": "EqualityOperator",
+          "replacement": "row.end_column <= retainedFragment.end_column",
+          "status": "Survived",
+          "testsCompleted": 1,
+          "duration": 2546,
+          "location": {
+            "end": {
+              "column": 99,
+              "line": 30
+            },
+            "start": {
+              "column": 57,
+              "line": 30
+            }
+          }
+        },
+        {
+          "id": "18",
+          "mutatorName": "EqualityOperator",
+          "replacement": "row.end_column >= retainedFragment.end_column",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2636,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 99,
+              "line": 30
+            },
+            "start": {
+              "column": 57,
+              "line": 30
+            }
+          }
+        },
+        {
+          "id": "19",
+          "mutatorName": "CallExpression",
+          "replacement": ";",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2623,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 144,
+              "line": 30
+            },
+            "start": {
+              "column": 100,
+              "line": 30
+            }
+          }
+        },
+        {
+          "id": "20",
+          "mutatorName": "ArrowFunction",
+          "replacement": "() => undefined",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 979,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 73,
+              "line": 32
+            },
+            "start": {
+              "column": 53,
+              "line": 32
+            }
+          }
+        },
+        {
+          "id": "21",
+          "mutatorName": "ArrayDeclaration",
+          "replacement": "[]",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 7660,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 73,
+              "line": 32
+            },
+            "start": {
+              "column": 58,
+              "line": 32
+            }
+          }
+        },
+        {
+          "id": "22",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 1793,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 21,
+              "line": 33
+            },
+            "start": {
+              "column": 8,
+              "line": 33
+            }
+          }
+        },
+        {
+          "id": "23",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2638,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 21,
+              "line": 33
+            },
+            "start": {
+              "column": 8,
+              "line": 33
+            }
+          }
+        },
+        {
+          "id": "24",
+          "mutatorName": "CallExpression",
+          "replacement": ";",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2566,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 69,
+              "line": 33
+            },
+            "start": {
+              "column": 22,
+              "line": 33
+            }
+          }
+        },
+        {
+          "id": "25",
+          "mutatorName": "LogicalOperator",
+          "replacement": "window.cursor?.index && 0",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 7296,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 37,
+              "line": 34
+            },
+            "start": {
+              "column": 12,
+              "line": 34
+            }
+          }
+        },
+        {
+          "id": "26",
+          "mutatorName": "OptionalChaining",
+          "replacement": "window.cursor.index",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 1778,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 32,
+              "line": 34
+            },
+            "start": {
+              "column": 12,
+              "line": 34
+            }
+          }
+        },
+        {
+          "id": "27",
+          "mutatorName": "CallExpression",
+          "replacement": ";",
+          "status": "Timeout",
+          "duration": 19110,
+          "location": {
+            "end": {
+              "column": 20,
+              "line": 35
+            },
+            "start": {
+              "column": 5,
+              "line": 35
+            }
+          }
+        },
+        {
+          "id": "28",
+          "mutatorName": "CallExpression",
+          "replacement": ";",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2519,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 36,
+              "line": 35
+            },
+            "start": {
+              "column": 20,
+              "line": 35
+            }
+          }
+        },
+        {
+          "id": "29",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2535,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 16,
+              "line": 36
+            },
+            "start": {
+              "column": 8,
+              "line": 36
+            }
+          }
+        },
+        {
+          "id": "30",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2515,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 16,
+              "line": 36
+            },
+            "start": {
+              "column": 8,
+              "line": 36
+            }
+          }
+        },
+        {
+          "id": "31",
+          "mutatorName": "CallExpression",
+          "replacement": ";",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2413,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 31,
+              "line": 36
+            },
+            "start": {
+              "column": 17,
+              "line": 36
+            }
+          }
+        },
+        {
+          "id": "32",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2594,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 18,
+              "line": 37
+            },
+            "start": {
+              "column": 8,
+              "line": 37
+            }
+          }
+        },
+        {
+          "id": "33",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2393,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 18,
+              "line": 37
+            },
+            "start": {
+              "column": 8,
+              "line": 37
+            }
+          }
+        },
+        {
+          "id": "34",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 1662,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 47,
+              "line": 38
+            },
+            "start": {
+              "column": 8,
+              "line": 38
+            }
+          }
+        },
+        {
+          "id": "35",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 7533,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 47,
+              "line": 38
+            },
+            "start": {
+              "column": 8,
+              "line": 38
+            }
+          }
+        },
+        {
+          "id": "36",
+          "mutatorName": "LogicalOperator",
+          "replacement": "queuedActivation || entries.has(cursor)",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2401,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 47,
+              "line": 38
+            },
+            "start": {
+              "column": 8,
+              "line": 38
+            }
+          }
+        },
+        {
+          "id": "37",
+          "mutatorName": "BlockStatement",
+          "replacement": "{}",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 7450,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 107,
+              "line": 38
+            },
+            "start": {
+              "column": 49,
+              "line": 38
+            }
+          }
+        },
+        {
+          "id": "38",
+          "mutatorName": "BooleanLiteral",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2535,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 72,
+              "line": 38
+            },
+            "start": {
+              "column": 67,
+              "line": 38
+            }
+          }
+        },
+        {
+          "id": "39",
+          "mutatorName": "BlockStatement",
+          "replacement": "{}",
+          "status": "Timeout",
+          "duration": 19106,
+          "location": {
+            "end": {
+              "column": 4,
+              "line": 101
+            },
+            "start": {
+              "column": 42,
+              "line": 94
+            }
+          }
+        },
+        {
+          "id": "40",
+          "mutatorName": "BooleanLiteral",
+          "replacement": "row",
+          "status": "Timeout",
+          "duration": 19120,
+          "location": {
+            "end": {
+              "column": 45,
+              "line": 95
+            },
+            "start": {
+              "column": 41,
+              "line": 95
+            }
+          }
+        },
+        {
+          "id": "41",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Timeout",
+          "duration": 19120,
+          "location": {
+            "end": {
+              "column": 45,
+              "line": 95
+            },
+            "start": {
+              "column": 41,
+              "line": 95
+            }
+          }
+        },
+        {
+          "id": "42",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Survived",
+          "testsCompleted": 1,
+          "duration": 2540,
+          "location": {
+            "end": {
+              "column": 45,
+              "line": 95
+            },
+            "start": {
+              "column": 41,
+              "line": 95
+            }
+          }
+        },
+        {
+          "id": "43",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2546,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 36,
+              "line": 97
+            },
+            "start": {
+              "column": 16,
+              "line": 97
+            }
+          }
+        },
+        {
+          "id": "44",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Timeout",
+          "duration": 19121,
+          "location": {
+            "end": {
+              "column": 36,
+              "line": 97
+            },
+            "start": {
+              "column": 16,
+              "line": 97
+            }
+          }
+        },
+        {
+          "id": "45",
+          "mutatorName": "EqualityOperator",
+          "replacement": "row.line_bytes >= 32768",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2570,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 36,
+              "line": 97
+            },
+            "start": {
+              "column": 16,
+              "line": 97
+            }
+          }
+        },
+        {
+          "id": "46",
+          "mutatorName": "EqualityOperator",
+          "replacement": "row.line_bytes <= 32768",
+          "status": "Timeout",
+          "duration": 19115,
+          "location": {
+            "end": {
+              "column": 36,
+              "line": 97
+            },
+            "start": {
+              "column": 16,
+              "line": 97
+            }
+          }
+        },
+        {
+          "id": "47",
+          "mutatorName": "ArithmeticOperator",
+          "replacement": "row.line_bytes + 32765",
+          "status": "Timeout",
+          "duration": 19120,
+          "location": {
+            "end": {
+              "column": 57,
+              "line": 97
+            },
+            "start": {
+              "column": 37,
+              "line": 97
+            }
+          }
+        },
+        {
+          "id": "48",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Timeout",
+          "duration": 19120,
+          "location": {
+            "end": {
+              "column": 46,
+              "line": 98
+            },
+            "start": {
+              "column": 30,
+              "line": 98
+            }
+          }
+        },
+        {
+          "id": "49",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Survived",
+          "testsCompleted": 1,
+          "duration": 2534,
+          "location": {
+            "end": {
+              "column": 46,
+              "line": 98
+            },
+            "start": {
+              "column": 30,
+              "line": 98
+            }
+          }
+        },
+        {
+          "id": "50",
+          "mutatorName": "EqualityOperator",
+          "replacement": "action !== \"first\"",
+          "status": "Timeout",
+          "duration": 19117,
+          "location": {
+            "end": {
+              "column": 46,
+              "line": 98
+            },
+            "start": {
+              "column": 30,
+              "line": 98
+            }
+          }
+        },
+        {
+          "id": "51",
+          "mutatorName": "StringLiteral",
+          "replacement": "\"\"",
+          "status": "Survived",
+          "testsCompleted": 1,
+          "duration": 2565,
+          "location": {
+            "end": {
+              "column": 46,
+              "line": 98
+            },
+            "start": {
+              "column": 39,
+              "line": 98
+            }
+          }
+        },
+        {
+          "id": "52",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Timeout",
+          "duration": 19117,
+          "location": {
+            "end": {
+              "column": 68,
+              "line": 98
+            },
+            "start": {
+              "column": 49,
+              "line": 98
+            }
+          }
+        },
+        {
+          "id": "53",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Survived",
+          "testsCompleted": 1,
+          "duration": 2626,
+          "location": {
+            "end": {
+              "column": 68,
+              "line": 98
+            },
+            "start": {
+              "column": 49,
+              "line": 98
+            }
+          }
+        },
+        {
+          "id": "54",
+          "mutatorName": "EqualityOperator",
+          "replacement": "action !== \"previous\"",
+          "status": "Timeout",
+          "duration": 19116,
+          "location": {
+            "end": {
+              "column": 68,
+              "line": 98
+            },
+            "start": {
+              "column": 49,
+              "line": 98
+            }
+          }
+        },
+        {
+          "id": "55",
+          "mutatorName": "StringLiteral",
+          "replacement": "\"\"",
+          "status": "Survived",
+          "testsCompleted": 1,
+          "duration": 2678,
+          "location": {
+            "end": {
+              "column": 68,
+              "line": 98
+            },
+            "start": {
+              "column": 58,
+              "line": 98
+            }
+          }
+        },
+        {
+          "id": "56",
+          "mutatorName": "MethodExpression",
+          "replacement": "Math.min(0, row.column - 32768)",
+          "status": "Survived",
+          "testsCompleted": 1,
+          "duration": 2666,
+          "location": {
+            "end": {
+              "column": 97,
+              "line": 98
+            },
+            "start": {
+              "column": 69,
+              "line": 98
+            }
+          }
+        },
+        {
+          "id": "57",
+          "mutatorName": "ArithmeticOperator",
+          "replacement": "row.column + 32768",
+          "status": "Survived",
+          "testsCompleted": 1,
+          "duration": 2650,
+          "location": {
+            "end": {
+              "column": 96,
+              "line": 98
+            },
+            "start": {
+              "column": 80,
+              "line": 98
+            }
+          }
+        },
+        {
+          "id": "58",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Survived",
+          "testsCompleted": 1,
+          "duration": 2620,
+          "location": {
+            "end": {
+              "column": 113,
+              "line": 98
+            },
+            "start": {
+              "column": 98,
+              "line": 98
+            }
+          }
+        },
+        {
+          "id": "59",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Timeout",
+          "duration": 19120,
+          "location": {
+            "end": {
+              "column": 113,
+              "line": 98
+            },
+            "start": {
+              "column": 98,
+              "line": 98
+            }
+          }
+        },
+        {
+          "id": "60",
+          "mutatorName": "EqualityOperator",
+          "replacement": "action !== \"last\"",
+          "status": "Timeout",
+          "duration": 19121,
+          "location": {
+            "end": {
+              "column": 113,
+              "line": 98
+            },
+            "start": {
+              "column": 98,
+              "line": 98
+            }
+          }
+        },
+        {
+          "id": "61",
+          "mutatorName": "StringLiteral",
+          "replacement": "\"\"",
+          "status": "Timeout",
+          "duration": 19125,
+          "location": {
+            "end": {
+              "column": 113,
+              "line": 98
+            },
+            "start": {
+              "column": 107,
+              "line": 98
+            }
+          }
+        },
+        {
+          "id": "62",
+          "mutatorName": "ObjectLiteral",
+          "replacement": "{}",
+          "status": "Timeout",
+          "duration": 19124,
+          "location": {
+            "end": {
+              "column": 97,
+              "line": 100
+            },
+            "start": {
+              "column": 27,
+              "line": 100
+            }
+          }
+        },
+        {
+          "id": "63",
+          "mutatorName": "ObjectLiteral",
+          "replacement": "{}",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2530,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 133,
+              "line": 100
+            },
+            "start": {
+              "column": 98,
+              "line": 100
+            }
+          }
+        },
+        {
+          "id": "64",
+          "mutatorName": "BooleanLiteral",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2675,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 112,
+              "line": 100
+            },
+            "start": {
+              "column": 108,
+              "line": 100
+            }
+          }
+        },
+        {
+          "id": "65",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Survived",
+          "testsCompleted": 1,
+          "duration": 2776,
+          "location": {
+            "end": {
+              "column": 132,
+              "line": 100
+            },
+            "start": {
+              "column": 117,
+              "line": 100
+            }
+          }
+        },
+        {
+          "id": "66",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2673,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 132,
+              "line": 100
+            },
+            "start": {
+              "column": 117,
+              "line": 100
+            }
+          }
+        },
+        {
+          "id": "67",
+          "mutatorName": "EqualityOperator",
+          "replacement": "action !== \"last\"",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2959,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 132,
+              "line": 100
+            },
+            "start": {
+              "column": 117,
+              "line": 100
+            }
+          }
+        },
+        {
+          "id": "68",
+          "mutatorName": "StringLiteral",
+          "replacement": "\"\"",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2648,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 132,
+              "line": 100
+            },
+            "start": {
+              "column": 126,
+              "line": 100
+            }
+          }
+        },
+        {
+          "id": "69",
+          "mutatorName": "BlockStatement",
+          "replacement": "{}",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2527,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 6,
+              "line": 118
+            },
+            "start": {
+              "column": 16,
+              "line": 115
+            }
+          }
+        },
+        {
+          "id": "70",
+          "mutatorName": "ObjectLiteral",
+          "replacement": "{}",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2629,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 49,
+              "line": 117
+            },
+            "start": {
+              "column": 14,
+              "line": 116
+            }
+          }
+        },
+        {
+          "id": "71",
+          "mutatorName": "BlockStatement",
+          "replacement": "{}",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 1123,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 6,
+              "line": 148
+            },
+            "start": {
+              "column": 36,
+              "line": 119
+            }
+          }
+        },
+        {
+          "id": "72",
+          "mutatorName": "BooleanLiteral",
+          "replacement": "next.source",
+          "status": "Timeout",
+          "duration": 19121,
+          "location": {
+            "end": {
+              "column": 22,
+              "line": 120
+            },
+            "start": {
+              "column": 10,
+              "line": 120
+            }
+          }
+        },
+        {
+          "id": "73",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Timeout",
+          "duration": 19118,
+          "location": {
+            "end": {
+              "column": 22,
+              "line": 120
+            },
+            "start": {
+              "column": 10,
+              "line": 120
+            }
+          }
+        },
+        {
+          "id": "74",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2661,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 22,
+              "line": 120
+            },
+            "start": {
+              "column": 10,
+              "line": 120
+            }
+          }
+        },
+        {
+          "id": "75",
+          "mutatorName": "ObjectLiteral",
+          "replacement": "{}",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2738,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 55,
+              "line": 120
+            },
+            "start": {
+              "column": 30,
+              "line": 120
+            }
+          }
+        },
+        {
+          "id": "76",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2676,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 58,
+              "line": 121
+            },
+            "start": {
+              "column": 25,
+              "line": 121
+            }
+          }
+        },
+        {
+          "id": "77",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 1017,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 58,
+              "line": 121
+            },
+            "start": {
+              "column": 25,
+              "line": 121
+            }
+          }
+        },
+        {
+          "id": "78",
+          "mutatorName": "EqualityOperator",
+          "replacement": "view?.source?.id === next.source.id",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 982,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 58,
+              "line": 121
+            },
+            "start": {
+              "column": 25,
+              "line": 121
+            }
+          }
+        },
+        {
+          "id": "79",
+          "mutatorName": "OptionalChaining",
+          "replacement": "view?.source.id",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2587,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 41,
+              "line": 121
+            },
+            "start": {
+              "column": 25,
+              "line": 121
+            }
+          }
+        },
+        {
+          "id": "80",
+          "mutatorName": "OptionalChaining",
+          "replacement": "view.source",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 1062,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 37,
+              "line": 121
+            },
+            "start": {
+              "column": 25,
+              "line": 121
+            }
+          }
+        },
+        {
+          "id": "81",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2863,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 136,
+              "line": 121
+            },
+            "start": {
+              "column": 76,
+              "line": 121
+            }
+          }
+        },
+        {
+          "id": "82",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2616,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 136,
+              "line": 121
+            },
+            "start": {
+              "column": 76,
+              "line": 121
+            }
+          }
+        },
+        {
+          "id": "83",
+          "mutatorName": "LogicalOperator",
+          "replacement": "changedFile && view.selection.entity !== next.selection.entity",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 1070,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 136,
+              "line": 121
+            },
+            "start": {
+              "column": 76,
+              "line": 121
+            }
+          }
+        },
+        {
+          "id": "84",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2708,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 136,
+              "line": 121
+            },
+            "start": {
+              "column": 91,
+              "line": 121
+            }
+          }
+        },
+        {
+          "id": "85",
+          "mutatorName": "EqualityOperator",
+          "replacement": "view.selection.entity === next.selection.entity",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2665,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 136,
+              "line": 121
+            },
+            "start": {
+              "column": 91,
+              "line": 121
+            }
+          }
+        },
+        {
+          "id": "86",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2720,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 83,
+              "line": 122
+            },
+            "start": {
+              "column": 26,
+              "line": 122
+            }
+          }
+        },
+        {
+          "id": "87",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2614,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 83,
+              "line": 122
+            },
+            "start": {
+              "column": 26,
+              "line": 122
+            }
+          }
+        },
+        {
+          "id": "88",
+          "mutatorName": "LogicalOperator",
+          "replacement": "!changedFile || view.source.version === next.source.version",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 1039,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 83,
+              "line": 122
+            },
+            "start": {
+              "column": 26,
+              "line": 122
+            }
+          }
+        },
+        {
+          "id": "89",
+          "mutatorName": "BooleanLiteral",
+          "replacement": "changedFile",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 984,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 38,
+              "line": 122
+            },
+            "start": {
+              "column": 26,
+              "line": 122
+            }
+          }
+        },
+        {
+          "id": "90",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2729,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 83,
+              "line": 122
+            },
+            "start": {
+              "column": 42,
+              "line": 122
+            }
+          }
+        },
+        {
+          "id": "91",
+          "mutatorName": "EqualityOperator",
+          "replacement": "view.source.version !== next.source.version",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2753,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 83,
+              "line": 122
+            },
+            "start": {
+              "column": 42,
+              "line": 122
+            }
+          }
+        },
+        {
+          "id": "92",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 1046,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 94,
+              "line": 126
+            },
+            "start": {
+              "column": 56,
+              "line": 126
+            }
+          }
+        },
+        {
+          "id": "93",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2512,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 94,
+              "line": 126
+            },
+            "start": {
+              "column": 56,
+              "line": 126
+            }
+          }
+        },
+        {
+          "id": "94",
+          "mutatorName": "LogicalOperator",
+          "replacement": "active || changedSelection || reveal",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 1022,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 94,
+              "line": 126
+            },
+            "start": {
+              "column": 56,
+              "line": 126
+            }
+          }
+        },
+        {
+          "id": "95",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2907,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 93,
+              "line": 126
+            },
+            "start": {
+              "column": 67,
+              "line": 126
+            }
+          }
+        },
+        {
+          "id": "96",
+          "mutatorName": "LogicalOperator",
+          "replacement": "changedSelection && reveal",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2637,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 93,
+              "line": 126
+            },
+            "start": {
+              "column": 67,
+              "line": 126
+            }
+          }
+        },
+        {
+          "id": "97",
+          "mutatorName": "MethodExpression",
+          "replacement": "Math.min(0, (active.start_line - 4) * SOURCE_ROW)",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2693,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 139,
+              "line": 126
+            },
+            "start": {
+              "column": 95,
+              "line": 126
+            }
+          }
+        },
+        {
+          "id": "98",
+          "mutatorName": "ArithmeticOperator",
+          "replacement": "(active.start_line - 4) / SOURCE_ROW",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2664,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 138,
+              "line": 126
+            },
+            "start": {
+              "column": 106,
+              "line": 126
+            }
+          }
+        },
+        {
+          "id": "99",
+          "mutatorName": "ArithmeticOperator",
+          "replacement": "active.start_line + 4",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2638,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 126,
+              "line": 126
+            },
+            "start": {
+              "column": 107,
+              "line": 126
+            }
+          }
+        },
+        {
+          "id": "100",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2892,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 161,
+              "line": 126
+            },
+            "start": {
+              "column": 140,
+              "line": 126
+            }
+          }
+        },
+        {
+          "id": "101",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2711,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 161,
+              "line": 126
+            },
+            "start": {
+              "column": 140,
+              "line": 126
+            }
+          }
+        },
+        {
+          "id": "102",
+          "mutatorName": "LogicalOperator",
+          "replacement": "changedFile && reveal",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3217,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 161,
+              "line": 126
+            },
+            "start": {
+              "column": 140,
+              "line": 126
+            }
+          }
+        },
+        {
+          "id": "103",
+          "mutatorName": "MethodExpression",
+          "replacement": "Math.min(0, Math.min(desiredSourceTop, next.source.summary.lines * SOURCE_ROW - source.clientHeight))",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3015,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 118,
+              "line": 127
+            },
+            "start": {
+              "column": 23,
+              "line": 127
+            }
+          }
+        },
+        {
+          "id": "104",
+          "mutatorName": "MethodExpression",
+          "replacement": "Math.max(desiredSourceTop, next.source.summary.lines * SOURCE_ROW - source.clientHeight)",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2911,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 117,
+              "line": 127
+            },
+            "start": {
+              "column": 34,
+              "line": 127
+            }
+          }
+        },
+        {
+          "id": "105",
+          "mutatorName": "ArithmeticOperator",
+          "replacement": "next.source.summary.lines * SOURCE_ROW + source.clientHeight",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3077,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 116,
+              "line": 127
+            },
+            "start": {
+              "column": 60,
+              "line": 127
+            }
+          }
+        },
+        {
+          "id": "106",
+          "mutatorName": "ArithmeticOperator",
+          "replacement": "next.source.summary.lines / SOURCE_ROW",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2970,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 96,
+              "line": 127
+            },
+            "start": {
+              "column": 60,
+              "line": 127
+            }
+          }
+        },
+        {
+          "id": "107",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3142,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 70,
+              "line": 128
+            },
+            "start": {
+              "column": 49,
+              "line": 128
+            }
+          }
+        },
+        {
+          "id": "108",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3053,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 70,
+              "line": 128
+            },
+            "start": {
+              "column": 49,
+              "line": 128
+            }
+          }
+        },
+        {
+          "id": "109",
+          "mutatorName": "LogicalOperator",
+          "replacement": "changedFile && reveal",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3179,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 70,
+              "line": 128
+            },
+            "start": {
+              "column": 49,
+              "line": 128
+            }
+          }
+        },
+        {
+          "id": "110",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 1308,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 60,
+              "line": 129
+            },
+            "start": {
+              "column": 10,
+              "line": 129
+            }
+          }
+        },
+        {
+          "id": "111",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3178,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 60,
+              "line": 129
+            },
+            "start": {
+              "column": 10,
+              "line": 129
+            }
+          }
+        },
+        {
+          "id": "112",
+          "mutatorName": "LogicalOperator",
+          "replacement": "!restore && (changedSelection || reveal) || active",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 1376,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 60,
+              "line": 129
+            },
+            "start": {
+              "column": 10,
+              "line": 129
+            }
+          }
+        },
+        {
+          "id": "113",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3220,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 50,
+              "line": 129
+            },
+            "start": {
+              "column": 10,
+              "line": 129
+            }
+          }
+        },
+        {
+          "id": "114",
+          "mutatorName": "LogicalOperator",
+          "replacement": "!restore || changedSelection || reveal",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3302,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 50,
+              "line": 129
+            },
+            "start": {
+              "column": 10,
+              "line": 129
+            }
+          }
+        },
+        {
+          "id": "115",
+          "mutatorName": "BooleanLiteral",
+          "replacement": "restore",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3195,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 18,
+              "line": 129
+            },
+            "start": {
+              "column": 10,
+              "line": 129
+            }
+          }
+        },
+        {
+          "id": "116",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3084,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 49,
+              "line": 129
+            },
+            "start": {
+              "column": 23,
+              "line": 129
+            }
+          }
+        },
+        {
+          "id": "117",
+          "mutatorName": "LogicalOperator",
+          "replacement": "changedSelection && reveal",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2977,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 49,
+              "line": 129
+            },
+            "start": {
+              "column": 23,
+              "line": 129
+            }
+          }
+        },
+        {
+          "id": "118",
+          "mutatorName": "MethodExpression",
+          "replacement": "Math.min(0, active.index * OUTLINE_ROW - outline.clientHeight / 2)",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2994,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 131,
+              "line": 129
+            },
+            "start": {
+              "column": 72,
+              "line": 129
+            }
+          }
+        },
+        {
+          "id": "119",
+          "mutatorName": "ArithmeticOperator",
+          "replacement": "active.index * OUTLINE_ROW + outline.clientHeight / 2",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2973,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 130,
+              "line": 129
+            },
+            "start": {
+              "column": 83,
+              "line": 129
+            }
+          }
+        },
+        {
+          "id": "120",
+          "mutatorName": "ArithmeticOperator",
+          "replacement": "active.index / OUTLINE_ROW",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3021,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 107,
+              "line": 129
+            },
+            "start": {
+              "column": 83,
+              "line": 129
+            }
+          }
+        },
+        {
+          "id": "121",
+          "mutatorName": "ArithmeticOperator",
+          "replacement": "outline.clientHeight * 2",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2987,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 130,
+              "line": 129
+            },
+            "start": {
+              "column": 108,
+              "line": 129
+            }
+          }
+        },
+        {
+          "id": "122",
+          "mutatorName": "MethodExpression",
+          "replacement": "Math.min(0, Math.min(outlineTop, next.source.summary.declarations * OUTLINE_ROW - outline.clientHeight))",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3008,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 116,
+              "line": 130
+            },
+            "start": {
+              "column": 18,
+              "line": 130
+            }
+          }
+        },
+        {
+          "id": "123",
+          "mutatorName": "MethodExpression",
+          "replacement": "Math.max(outlineTop, next.source.summary.declarations * OUTLINE_ROW - outline.clientHeight)",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 7855,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 115,
+              "line": 130
+            },
+            "start": {
+              "column": 29,
+              "line": 130
+            }
+          }
+        },
+        {
+          "id": "124",
+          "mutatorName": "ArithmeticOperator",
+          "replacement": "next.source.summary.declarations * OUTLINE_ROW + outline.clientHeight",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3040,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 114,
+              "line": 130
+            },
+            "start": {
+              "column": 49,
+              "line": 130
+            }
+          }
+        },
+        {
+          "id": "125",
+          "mutatorName": "ArithmeticOperator",
+          "replacement": "next.source.summary.declarations / OUTLINE_ROW",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2909,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 93,
+              "line": 130
+            },
+            "start": {
+              "column": 49,
+              "line": 130
+            }
+          }
+        },
+        {
+          "id": "126",
+          "mutatorName": "LogicalOperator",
+          "replacement": "active?.index && 0",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 4061,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 98,
+              "line": 131
+            },
+            "start": {
+              "column": 80,
+              "line": 131
+            }
+          }
+        },
+        {
+          "id": "127",
+          "mutatorName": "OptionalChaining",
+          "replacement": "active.index",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2786,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 93,
+              "line": 131
+            },
+            "start": {
+              "column": 80,
+              "line": 131
+            }
+          }
+        },
+        {
+          "id": "128",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 4921,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 126,
+              "line": 131
+            },
+            "start": {
+              "column": 100,
+              "line": 131
+            }
+          }
+        },
+        {
+          "id": "129",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 4976,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 126,
+              "line": 131
+            },
+            "start": {
+              "column": 100,
+              "line": 131
+            }
+          }
+        },
+        {
+          "id": "130",
+          "mutatorName": "LogicalOperator",
+          "replacement": "changedSelection || active",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 5073,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 126,
+              "line": 131
+            },
+            "start": {
+              "column": 100,
+              "line": 131
+            }
+          }
+        },
+        {
+          "id": "131",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 5273,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 16,
+              "line": 132
+            },
+            "start": {
+              "column": 10,
+              "line": 132
+            }
+          }
+        },
+        {
+          "id": "132",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 4931,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 16,
+              "line": 132
+            },
+            "start": {
+              "column": 10,
+              "line": 132
+            }
+          }
+        },
+        {
+          "id": "133",
+          "mutatorName": "LogicalOperator",
+          "replacement": "active?.index && 0",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 4724,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 54,
+              "line": 132
+            },
+            "start": {
+              "column": 36,
+              "line": 132
+            }
+          }
+        },
+        {
+          "id": "134",
+          "mutatorName": "OptionalChaining",
+          "replacement": "active.index",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 4866,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 49,
+              "line": 132
+            },
+            "start": {
+              "column": 36,
+              "line": 132
+            }
+          }
+        },
+        {
+          "id": "135",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 1879,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 17,
+              "line": 133
+            },
+            "start": {
+              "column": 10,
+              "line": 133
+            }
+          }
+        },
+        {
+          "id": "136",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 5320,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 17,
+              "line": 133
+            },
+            "start": {
+              "column": 10,
+              "line": 133
+            }
+          }
+        },
+        {
+          "id": "137",
+          "mutatorName": "BlockStatement",
+          "replacement": "{}",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 4507,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 8,
+              "line": 136
+            },
+            "start": {
+              "column": 19,
+              "line": 133
+            }
+          }
+        },
+        {
+          "id": "138",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 4907,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 47,
+              "line": 137
+            },
+            "start": {
+              "column": 10,
+              "line": 137
+            }
+          }
+        },
+        {
+          "id": "139",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3475,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 47,
+              "line": 137
+            },
+            "start": {
+              "column": 10,
+              "line": 137
+            }
+          }
+        },
+        {
+          "id": "140",
+          "mutatorName": "LogicalOperator",
+          "replacement": "!restore || !sameDocument || reveal",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2667,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 47,
+              "line": 137
+            },
+            "start": {
+              "column": 10,
+              "line": 137
+            }
+          }
+        },
+        {
+          "id": "141",
+          "mutatorName": "BooleanLiteral",
+          "replacement": "restore",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2689,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 18,
+              "line": 137
+            },
+            "start": {
+              "column": 10,
+              "line": 137
+            }
+          }
+        },
+        {
+          "id": "142",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2643,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 46,
+              "line": 137
+            },
+            "start": {
+              "column": 23,
+              "line": 137
+            }
+          }
+        },
+        {
+          "id": "143",
+          "mutatorName": "LogicalOperator",
+          "replacement": "!sameDocument && reveal",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2686,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 46,
+              "line": 137
+            },
+            "start": {
+              "column": 23,
+              "line": 137
+            }
+          }
+        },
+        {
+          "id": "144",
+          "mutatorName": "BooleanLiteral",
+          "replacement": "sameDocument",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2850,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 36,
+              "line": 137
+            },
+            "start": {
+              "column": 23,
+              "line": 137
+            }
+          }
+        },
+        {
+          "id": "145",
+          "mutatorName": "BlockStatement",
+          "replacement": "{}",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2928,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 90,
+              "line": 137
+            },
+            "start": {
+              "column": 48,
+              "line": 137
+            }
+          }
+        },
+        {
+          "id": "146",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 1210,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 90,
+              "line": 138
+            },
+            "start": {
+              "column": 10,
+              "line": 138
+            }
+          }
+        },
+        {
+          "id": "147",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2959,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 90,
+              "line": 138
+            },
+            "start": {
+              "column": 10,
+              "line": 138
+            }
+          }
+        },
+        {
+          "id": "148",
+          "mutatorName": "LogicalOperator",
+          "replacement": "!restore && !reveal && !changedFile || view.source.version !== next.source.version",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 1084,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 90,
+              "line": 138
+            },
+            "start": {
+              "column": 10,
+              "line": 138
+            }
+          }
+        },
+        {
+          "id": "149",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 1041,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 45,
+              "line": 138
+            },
+            "start": {
+              "column": 10,
+              "line": 138
+            }
+          }
+        },
+        {
+          "id": "150",
+          "mutatorName": "LogicalOperator",
+          "replacement": "!restore && !reveal || !changedFile",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 1077,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 45,
+              "line": 138
+            },
+            "start": {
+              "column": 10,
+              "line": 138
+            }
+          }
+        },
+        {
+          "id": "151",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2899,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 29,
+              "line": 138
+            },
+            "start": {
+              "column": 10,
+              "line": 138
+            }
+          }
+        },
+        {
+          "id": "152",
+          "mutatorName": "LogicalOperator",
+          "replacement": "!restore || !reveal",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2842,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 29,
+              "line": 138
+            },
+            "start": {
+              "column": 10,
+              "line": 138
+            }
+          }
+        },
+        {
+          "id": "153",
+          "mutatorName": "BooleanLiteral",
+          "replacement": "restore",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2962,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 18,
+              "line": 138
+            },
+            "start": {
+              "column": 10,
+              "line": 138
+            }
+          }
+        },
+        {
+          "id": "154",
+          "mutatorName": "BooleanLiteral",
+          "replacement": "reveal",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2894,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 29,
+              "line": 138
+            },
+            "start": {
+              "column": 22,
+              "line": 138
+            }
+          }
+        },
+        {
+          "id": "155",
+          "mutatorName": "BooleanLiteral",
+          "replacement": "changedFile",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 1028,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 45,
+              "line": 138
+            },
+            "start": {
+              "column": 33,
+              "line": 138
+            }
+          }
+        },
+        {
+          "id": "156",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2910,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 90,
+              "line": 138
+            },
+            "start": {
+              "column": 49,
+              "line": 138
+            }
+          }
+        },
+        {
+          "id": "157",
+          "mutatorName": "EqualityOperator",
+          "replacement": "view.source.version === next.source.version",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2851,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 90,
+              "line": 138
+            },
+            "start": {
+              "column": 49,
+              "line": 138
+            }
+          }
+        },
+        {
+          "id": "158",
+          "mutatorName": "BlockStatement",
+          "replacement": "{}",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2927,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 8,
+              "line": 141
+            },
+            "start": {
+              "column": 92,
+              "line": 138
+            }
+          }
+        },
+        {
+          "id": "159",
+          "mutatorName": "ArithmeticOperator",
+          "replacement": "outline.scrollTop * OUTLINE_ROW",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2856,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 59,
+              "line": 139
+            },
+            "start": {
+              "column": 30,
+              "line": 139
+            }
+          }
+        },
+        {
+          "id": "160",
+          "mutatorName": "LogicalOperator",
+          "replacement": "focused() && entries.get(cursor)?.id",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2854,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 127,
+              "line": 139
+            },
+            "start": {
+              "column": 91,
+              "line": 139
+            }
+          }
+        },
+        {
+          "id": "161",
+          "mutatorName": "OptionalChaining",
+          "replacement": "entries.get(cursor).id",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2800,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 127,
+              "line": 139
+            },
+            "start": {
+              "column": 104,
+              "line": 139
+            }
+          }
+        },
+        {
+          "id": "162",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2788,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 75,
+              "line": 140
+            },
+            "start": {
+              "column": 69,
+              "line": 140
+            }
+          }
+        },
+        {
+          "id": "163",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2924,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 75,
+              "line": 140
+            },
+            "start": {
+              "column": 69,
+              "line": 140
+            }
+          }
+        },
+        {
+          "id": "164",
+          "mutatorName": "BlockStatement",
+          "replacement": "{}",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2913,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 145,
+              "line": 140
+            },
+            "start": {
+              "column": 76,
+              "line": 140
+            }
+          }
+        },
+        {
+          "id": "165",
+          "mutatorName": "ArithmeticOperator",
+          "replacement": "top + query.outline_start",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2930,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 143,
+              "line": 140
+            },
+            "start": {
+              "column": 120,
+              "line": 140
+            }
+          }
+        },
+        {
+          "id": "166",
+          "mutatorName": "AssignmentOperator",
+          "replacement": "outlineTop -= (window.outline_start - query.outline_start) * OUTLINE_ROW",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2881,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 73,
+              "line": 143
+            },
+            "start": {
+              "column": 7,
+              "line": 143
+            }
+          }
+        },
+        {
+          "id": "167",
+          "mutatorName": "ArithmeticOperator",
+          "replacement": "(window.outline_start - query.outline_start) / OUTLINE_ROW",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2957,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 73,
+              "line": 143
+            },
+            "start": {
+              "column": 19,
+              "line": 143
+            }
+          }
+        },
+        {
+          "id": "168",
+          "mutatorName": "ArithmeticOperator",
+          "replacement": "window.outline_start + query.outline_start",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3566,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 60,
+              "line": 143
+            },
+            "start": {
+              "column": 20,
+              "line": 143
+            }
+          }
+        },
+        {
+          "id": "169",
+          "mutatorName": "ObjectLiteral",
+          "replacement": "{}",
+          "status": "Timeout",
+          "duration": 19122,
+          "location": {
+            "end": {
+              "column": 73,
+              "line": 147
+            },
+            "start": {
+              "column": 14,
+              "line": 144
+            }
+          }
+        },
+        {
+          "id": "170",
+          "mutatorName": "ObjectLiteral",
+          "replacement": "{}",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 9613,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 72,
+              "line": 147
+            },
+            "start": {
+              "column": 60,
+              "line": 144
+            }
+          }
+        },
+        {
+          "id": "171",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 5836,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 70,
+              "line": 145
+            },
+            "start": {
+              "column": 47,
+              "line": 145
+            }
+          }
+        },
+        {
+          "id": "172",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 5322,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 70,
+              "line": 145
+            },
+            "start": {
+              "column": 47,
+              "line": 145
+            }
+          }
+        },
+        {
+          "id": "173",
+          "mutatorName": "LogicalOperator",
+          "replacement": "sameDocument || !reveal",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 4121,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 70,
+              "line": 145
+            },
+            "start": {
+              "column": 47,
+              "line": 145
+            }
+          }
+        },
+        {
+          "id": "174",
+          "mutatorName": "BooleanLiteral",
+          "replacement": "reveal",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2640,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 70,
+              "line": 145
+            },
+            "start": {
+              "column": 63,
+              "line": 145
+            }
+          }
+        },
+        {
+          "id": "175",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2768,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 70,
+              "line": 146
+            },
+            "start": {
+              "column": 47,
+              "line": 146
+            }
+          }
+        },
+        {
+          "id": "176",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2698,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 70,
+              "line": 146
+            },
+            "start": {
+              "column": 47,
+              "line": 146
+            }
+          }
+        },
+        {
+          "id": "177",
+          "mutatorName": "LogicalOperator",
+          "replacement": "sameDocument || !reveal",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2704,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 70,
+              "line": 146
+            },
+            "start": {
+              "column": 47,
+              "line": 146
+            }
+          }
+        },
+        {
+          "id": "178",
+          "mutatorName": "BooleanLiteral",
+          "replacement": "reveal",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2579,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 70,
+              "line": 146
+            },
+            "start": {
+              "column": 63,
+              "line": 146
+            }
+          }
+        },
+        {
+          "id": "179",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2701,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 62,
+              "line": 147
+            },
+            "start": {
+              "column": 39,
+              "line": 147
+            }
+          }
+        },
+        {
+          "id": "180",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2755,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 62,
+              "line": 147
+            },
+            "start": {
+              "column": 39,
+              "line": 147
+            }
+          }
+        },
+        {
+          "id": "181",
+          "mutatorName": "LogicalOperator",
+          "replacement": "sameDocument || !reveal",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2771,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 62,
+              "line": 147
+            },
+            "start": {
+              "column": 39,
+              "line": 147
+            }
+          }
+        },
+        {
+          "id": "182",
+          "mutatorName": "BooleanLiteral",
+          "replacement": "reveal",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2623,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 62,
+              "line": 147
+            },
+            "start": {
+              "column": 55,
+              "line": 147
+            }
+          }
+        },
+        {
+          "id": "183",
+          "mutatorName": "BlockStatement",
+          "replacement": "{}",
+          "status": "Timeout",
+          "duration": 19122,
+          "location": {
+            "end": {
+              "column": 6,
+              "line": 158
+            },
+            "start": {
+              "column": 17,
+              "line": 149
+            }
+          }
+        },
+        {
+          "id": "184",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2686,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 112,
+              "line": 152
+            },
+            "start": {
+              "column": 30,
+              "line": 152
+            }
+          }
+        },
+        {
+          "id": "185",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2805,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 112,
+              "line": 152
+            },
+            "start": {
+              "column": 30,
+              "line": 152
+            }
+          }
+        },
+        {
+          "id": "186",
+          "mutatorName": "LogicalOperator",
+          "replacement": "view?.source?.id === next.source?.id || view?.source?.version === next.source?.version",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2910,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 112,
+              "line": 152
+            },
+            "start": {
+              "column": 30,
+              "line": 152
+            }
+          }
+        },
+        {
+          "id": "187",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2903,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 64,
+              "line": 152
+            },
+            "start": {
+              "column": 30,
+              "line": 152
+            }
+          }
+        },
+        {
+          "id": "188",
+          "mutatorName": "EqualityOperator",
+          "replacement": "view?.source?.id !== next.source?.id",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3117,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 64,
+              "line": 152
+            },
+            "start": {
+              "column": 30,
+              "line": 152
+            }
+          }
+        },
+        {
+          "id": "189",
+          "mutatorName": "OptionalChaining",
+          "replacement": "view?.source.id",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3047,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 46,
+              "line": 152
+            },
+            "start": {
+              "column": 30,
+              "line": 152
+            }
+          }
+        },
+        {
+          "id": "190",
+          "mutatorName": "OptionalChaining",
+          "replacement": "view.source",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 1046,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 42,
+              "line": 152
+            },
+            "start": {
+              "column": 30,
+              "line": 152
+            }
+          }
+        },
+        {
+          "id": "191",
+          "mutatorName": "OptionalChaining",
+          "replacement": "next.source.id",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2644,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 64,
+              "line": 152
+            },
+            "start": {
+              "column": 49,
+              "line": 152
+            }
+          }
+        },
+        {
+          "id": "192",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2729,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 112,
+              "line": 152
+            },
+            "start": {
+              "column": 68,
+              "line": 152
+            }
+          }
+        },
+        {
+          "id": "193",
+          "mutatorName": "EqualityOperator",
+          "replacement": "view?.source?.version !== next.source?.version",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2682,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 112,
+              "line": 152
+            },
+            "start": {
+              "column": 68,
+              "line": 152
+            }
+          }
+        },
+        {
+          "id": "194",
+          "mutatorName": "OptionalChaining",
+          "replacement": "view?.source.version",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2636,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 89,
+              "line": 152
+            },
+            "start": {
+              "column": 68,
+              "line": 152
+            }
+          }
+        },
+        {
+          "id": "195",
+          "mutatorName": "OptionalChaining",
+          "replacement": "view.source",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2751,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 80,
+              "line": 152
+            },
+            "start": {
+              "column": 68,
+              "line": 152
+            }
+          }
+        },
+        {
+          "id": "196",
+          "mutatorName": "OptionalChaining",
+          "replacement": "next.source.version",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2706,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 112,
+              "line": 152
+            },
+            "start": {
+              "column": 92,
+              "line": 152
+            }
+          }
+        },
+        {
+          "id": "197",
+          "mutatorName": "OptionalChaining",
+          "replacement": "position.columnLine",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2659,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 148,
+              "line": 152
+            },
+            "start": {
+              "column": 128,
+              "line": 152
+            }
+          }
+        },
+        {
+          "id": "198",
+          "mutatorName": "BooleanLiteral",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2701,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 39,
+              "line": 153
+            },
+            "start": {
+              "column": 34,
+              "line": 153
+            }
+          }
+        },
+        {
+          "id": "199",
+          "mutatorName": "CallExpression",
+          "replacement": ";",
+          "status": "Timeout",
+          "duration": 19117,
+          "location": {
+            "end": {
+              "column": 62,
+              "line": 153
+            },
+            "start": {
+              "column": 40,
+              "line": 153
+            }
+          }
+        },
+        {
+          "id": "200",
+          "mutatorName": "BooleanLiteral",
+          "replacement": "sourceNodes.size",
+          "status": "Timeout",
+          "duration": 19120,
+          "location": {
+            "end": {
+              "column": 27,
+              "line": 154
+            },
+            "start": {
+              "column": 10,
+              "line": 154
+            }
+          }
+        },
+        {
+          "id": "201",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Timeout",
+          "duration": 19123,
+          "location": {
+            "end": {
+              "column": 27,
+              "line": 154
+            },
+            "start": {
+              "column": 10,
+              "line": 154
+            }
+          }
+        },
+        {
+          "id": "202",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3869,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 27,
+              "line": 154
+            },
+            "start": {
+              "column": 10,
+              "line": 154
+            }
+          }
+        },
+        {
+          "id": "203",
+          "mutatorName": "CallExpression",
+          "replacement": ";",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3666,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 52,
+              "line": 154
+            },
+            "start": {
+              "column": 28,
+              "line": 154
+            }
+          }
+        },
+        {
+          "id": "204",
+          "mutatorName": "BooleanLiteral",
+          "replacement": "outlineNodes.size",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 8592,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 73,
+              "line": 154
+            },
+            "start": {
+              "column": 55,
+              "line": 154
+            }
+          }
+        },
+        {
+          "id": "205",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 7589,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 73,
+              "line": 154
+            },
+            "start": {
+              "column": 55,
+              "line": 154
+            }
+          }
+        },
+        {
+          "id": "206",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2690,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 73,
+              "line": 154
+            },
+            "start": {
+              "column": 55,
+              "line": 154
+            }
+          }
+        },
+        {
+          "id": "207",
+          "mutatorName": "CallExpression",
+          "replacement": ";",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2691,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 105,
+              "line": 154
+            },
+            "start": {
+              "column": 74,
+              "line": 154
+            }
+          }
+        },
+        {
+          "id": "208",
+          "mutatorName": "CallExpression",
+          "replacement": ";",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 17399,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 113,
+              "line": 154
+            },
+            "start": {
+              "column": 105,
+              "line": 154
+            }
+          }
+        },
+        {
+          "id": "209",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2642,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 25,
+              "line": 155
+            },
+            "start": {
+              "column": 10,
+              "line": 155
+            }
+          }
+        },
+        {
+          "id": "210",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Timeout",
+          "duration": 19117,
+          "location": {
+            "end": {
+              "column": 25,
+              "line": 155
+            },
+            "start": {
+              "column": 10,
+              "line": 155
+            }
+          }
+        },
+        {
+          "id": "211",
+          "mutatorName": "BlockStatement",
+          "replacement": "{}",
+          "status": "Timeout",
+          "duration": 19122,
+          "location": {
+            "end": {
+              "column": 316,
+              "line": 155
+            },
+            "start": {
+              "column": 26,
+              "line": 155
+            }
+          }
+        },
+        {
+          "id": "212",
+          "mutatorName": "CallExpression",
+          "replacement": ";",
+          "status": "Timeout",
+          "duration": 19124,
+          "location": {
+            "end": {
+              "column": 178,
+              "line": 155
+            },
+            "start": {
+              "column": 131,
+              "line": 155
+            }
+          }
+        },
+        {
+          "id": "213",
+          "mutatorName": "BlockStatement",
+          "replacement": "{}",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2778,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 133,
+              "line": 156
+            },
+            "start": {
+              "column": 12,
+              "line": 156
+            }
+          }
+        },
+        {
+          "id": "214",
+          "mutatorName": "CallExpression",
+          "replacement": ";",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2762,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 116,
+              "line": 156
+            },
+            "start": {
+              "column": 101,
+              "line": 156
+            }
+          }
+        },
+        {
+          "id": "215",
+          "mutatorName": "CallExpression",
+          "replacement": ";",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2794,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 132,
+              "line": 156
+            },
+            "start": {
+              "column": 116,
+              "line": 156
+            }
+          }
+        },
+        {
+          "id": "216",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2953,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 56,
+              "line": 157
+            },
+            "start": {
+              "column": 10,
+              "line": 157
+            }
+          }
+        },
+        {
+          "id": "217",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2981,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 56,
+              "line": 157
+            },
+            "start": {
+              "column": 10,
+              "line": 157
+            }
+          }
+        },
+        {
+          "id": "218",
+          "mutatorName": "LogicalOperator",
+          "replacement": "hadFocus || !view.source?.summary.declarations",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3041,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 56,
+              "line": 157
+            },
+            "start": {
+              "column": 10,
+              "line": 157
+            }
+          }
+        },
+        {
+          "id": "219",
+          "mutatorName": "BooleanLiteral",
+          "replacement": "view.source?.summary.declarations",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2876,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 56,
+              "line": 157
+            },
+            "start": {
+              "column": 22,
+              "line": 157
+            }
+          }
+        },
+        {
+          "id": "220",
+          "mutatorName": "OptionalChaining",
+          "replacement": "view.source.summary",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2648,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 43,
+              "line": 157
+            },
+            "start": {
+              "column": 23,
+              "line": 157
+            }
+          }
+        },
+        {
+          "id": "222",
+          "mutatorName": "ObjectLiteral",
+          "replacement": "{}",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2845,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 91,
+              "line": 157
+            },
+            "start": {
+              "column": 71,
+              "line": 157
+            }
+          }
+        },
+        {
+          "id": "223",
+          "mutatorName": "BooleanLiteral",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2778,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 90,
+              "line": 157
+            },
+            "start": {
+              "column": 86,
+              "line": 157
+            }
+          }
+        },
+        {
+          "id": "224",
+          "mutatorName": "BlockStatement",
+          "replacement": "{}",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2875,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 6,
+              "line": 163
+            },
+            "start": {
+              "column": 26,
+              "line": 159
+            }
+          }
+        },
+        {
+          "id": "225",
+          "mutatorName": "OptionalChaining",
+          "replacement": "view?.source.summary",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2701,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 41,
+              "line": 160
+            },
+            "start": {
+              "column": 20,
+              "line": 160
+            }
+          }
+        },
+        {
+          "id": "226",
+          "mutatorName": "OptionalChaining",
+          "replacement": "view.source",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2634,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 32,
+              "line": 160
+            },
+            "start": {
+              "column": 20,
+              "line": 160
+            }
+          }
+        },
+        {
+          "id": "227",
+          "mutatorName": "BooleanLiteral",
+          "replacement": "active",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2799,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 59,
+              "line": 160
+            },
+            "start": {
+              "column": 52,
+              "line": 160
+            }
+          }
+        },
+        {
+          "id": "228",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2794,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 59,
+              "line": 160
+            },
+            "start": {
+              "column": 52,
+              "line": 160
+            }
+          }
+        },
+        {
+          "id": "229",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2659,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 59,
+              "line": 160
+            },
+            "start": {
+              "column": 52,
+              "line": 160
+            }
+          }
+        },
+        {
+          "id": "230",
+          "mutatorName": "MethodExpression",
+          "replacement": "Math.min(0, (active.start_line - 4) * SOURCE_ROW)",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2747,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 68,
+              "line": 161
+            },
+            "start": {
+              "column": 24,
+              "line": 161
+            }
+          }
+        },
+        {
+          "id": "231",
+          "mutatorName": "ArithmeticOperator",
+          "replacement": "(active.start_line - 4) / SOURCE_ROW",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2813,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 67,
+              "line": 161
+            },
+            "start": {
+              "column": 35,
+              "line": 161
+            }
+          }
+        },
+        {
+          "id": "232",
+          "mutatorName": "ArithmeticOperator",
+          "replacement": "active.start_line + 4",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2715,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 55,
+              "line": 161
+            },
+            "start": {
+              "column": 36,
+              "line": 161
+            }
+          }
+        },
+        {
+          "id": "233",
+          "mutatorName": "CallExpression",
+          "replacement": ";",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2873,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 97,
+              "line": 161
+            },
+            "start": {
+              "column": 69,
+              "line": 161
+            }
+          }
+        },
+        {
+          "id": "234",
+          "mutatorName": "BooleanLiteral",
+          "replacement": "covered(query)",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2859,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 46,
+              "line": 162
+            },
+            "start": {
+              "column": 31,
+              "line": 162
+            }
+          }
+        },
+        {
+          "id": "235",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2833,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 46,
+              "line": 162
+            },
+            "start": {
+              "column": 31,
+              "line": 162
+            }
+          }
+        },
+        {
+          "id": "236",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 2843,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 46,
+              "line": 162
+            },
+            "start": {
+              "column": 31,
+              "line": 162
+            }
+          }
+        },
+        {
+          "id": "237",
+          "mutatorName": "BlockStatement",
+          "replacement": "{}",
+          "status": "Survived",
+          "testsCompleted": 1,
+          "duration": 2793,
+          "location": {
+            "end": {
+              "column": 116,
+              "line": 162
+            },
+            "start": {
+              "column": 83,
+              "line": 162
+            }
+          }
+        },
+        {
+          "id": "238",
+          "mutatorName": "CallExpression",
+          "replacement": ";",
+          "status": "Survived",
+          "testsCompleted": 1,
+          "duration": 2857,
+          "location": {
+            "end": {
+              "column": 99,
+              "line": 162
+            },
+            "start": {
+              "column": 84,
+              "line": 162
+            }
+          }
+        },
+        {
+          "id": "239",
+          "mutatorName": "CallExpression",
+          "replacement": ";",
+          "status": "Survived",
+          "testsCompleted": 1,
+          "duration": 2836,
+          "location": {
+            "end": {
+              "column": 115,
+              "line": 162
+            },
+            "start": {
+              "column": 99,
+              "line": 162
+            }
+          }
+        }
+      ]
+    },
+    {
+      "rawReportSha256": "a2aa52761a0a04553d00d1463958750a1142243c4ba278f5414c27fde208eb8e",
+      "sourceSha256": "736c24860b04e0c47956c05cf6e0c1cdbcfeb4daf53e7a039de12e6a44a76e2f",
+      "mutate": [
+        "crates/vizzi/web/inspector.js:98:0-101:0",
+        "crates/vizzi/web/inspector.js:162:0-163:0"
+      ],
+      "concurrency": 1,
+      "command": "node experiments/browser/navigation-inspector.test.mjs",
+      "counts": {
+        "Timeout": 8,
+        "Killed": 19
+      },
+      "outcomes": [
+        {
+          "id": "0",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Timeout",
+          "duration": 20111,
+          "location": {
+            "end": {
+              "column": 46,
+              "line": 98
+            },
+            "start": {
+              "column": 30,
+              "line": 98
+            }
+          }
+        },
+        {
+          "id": "1",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 8060,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 46,
+              "line": 98
+            },
+            "start": {
+              "column": 30,
+              "line": 98
+            }
+          }
+        },
+        {
+          "id": "2",
+          "mutatorName": "EqualityOperator",
+          "replacement": "action !== \"first\"",
+          "status": "Timeout",
+          "duration": 20110,
+          "location": {
+            "end": {
+              "column": 46,
+              "line": 98
+            },
+            "start": {
+              "column": 30,
+              "line": 98
+            }
+          }
+        },
+        {
+          "id": "3",
+          "mutatorName": "StringLiteral",
+          "replacement": "\"\"",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 8105,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 46,
+              "line": 98
+            },
+            "start": {
+              "column": 39,
+              "line": 98
+            }
+          }
+        },
+        {
+          "id": "4",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Timeout",
+          "duration": 20100,
+          "location": {
+            "end": {
+              "column": 68,
+              "line": 98
+            },
+            "start": {
+              "column": 49,
+              "line": 98
+            }
+          }
+        },
+        {
+          "id": "5",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 9219,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 68,
+              "line": 98
+            },
+            "start": {
+              "column": 49,
+              "line": 98
+            }
+          }
+        },
+        {
+          "id": "6",
+          "mutatorName": "EqualityOperator",
+          "replacement": "action !== \"previous\"",
+          "status": "Timeout",
+          "duration": 20110,
+          "location": {
+            "end": {
+              "column": 68,
+              "line": 98
+            },
+            "start": {
+              "column": 49,
+              "line": 98
+            }
+          }
+        },
+        {
+          "id": "7",
+          "mutatorName": "StringLiteral",
+          "replacement": "\"\"",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 8218,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 68,
+              "line": 98
+            },
+            "start": {
+              "column": 58,
+              "line": 98
+            }
+          }
+        },
+        {
+          "id": "8",
+          "mutatorName": "MethodExpression",
+          "replacement": "Math.min(0, row.column - 32768)",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 8314,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 97,
+              "line": 98
+            },
+            "start": {
+              "column": 69,
+              "line": 98
+            }
+          }
+        },
+        {
+          "id": "9",
+          "mutatorName": "ArithmeticOperator",
+          "replacement": "row.column + 32768",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 8367,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 96,
+              "line": 98
+            },
+            "start": {
+              "column": 80,
+              "line": 98
+            }
+          }
+        },
+        {
+          "id": "10",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 8110,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 113,
+              "line": 98
+            },
+            "start": {
+              "column": 98,
+              "line": 98
+            }
+          }
+        },
+        {
+          "id": "11",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Timeout",
+          "duration": 20104,
+          "location": {
+            "end": {
+              "column": 113,
+              "line": 98
+            },
+            "start": {
+              "column": 98,
+              "line": 98
+            }
+          }
+        },
+        {
+          "id": "12",
+          "mutatorName": "EqualityOperator",
+          "replacement": "action !== \"last\"",
+          "status": "Timeout",
+          "duration": 20095,
+          "location": {
+            "end": {
+              "column": 113,
+              "line": 98
+            },
+            "start": {
+              "column": 98,
+              "line": 98
+            }
+          }
+        },
+        {
+          "id": "13",
+          "mutatorName": "StringLiteral",
+          "replacement": "\"\"",
+          "status": "Timeout",
+          "duration": 20108,
+          "location": {
+            "end": {
+              "column": 113,
+              "line": 98
+            },
+            "start": {
+              "column": 107,
+              "line": 98
+            }
+          }
+        },
+        {
+          "id": "14",
+          "mutatorName": "ObjectLiteral",
+          "replacement": "{}",
+          "status": "Timeout",
+          "duration": 20112,
+          "location": {
+            "end": {
+              "column": 97,
+              "line": 100
+            },
+            "start": {
+              "column": 27,
+              "line": 100
+            }
+          }
+        },
+        {
+          "id": "15",
+          "mutatorName": "ObjectLiteral",
+          "replacement": "{}",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3113,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 133,
+              "line": 100
+            },
+            "start": {
+              "column": 98,
+              "line": 100
+            }
+          }
+        },
+        {
+          "id": "16",
+          "mutatorName": "BooleanLiteral",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3209,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 112,
+              "line": 100
+            },
+            "start": {
+              "column": 108,
+              "line": 100
+            }
+          }
+        },
+        {
+          "id": "17",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3310,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 132,
+              "line": 100
+            },
+            "start": {
+              "column": 117,
+              "line": 100
+            }
+          }
+        },
+        {
+          "id": "18",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3327,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 132,
+              "line": 100
+            },
+            "start": {
+              "column": 117,
+              "line": 100
+            }
+          }
+        },
+        {
+          "id": "19",
+          "mutatorName": "EqualityOperator",
+          "replacement": "action !== \"last\"",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3078,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 132,
+              "line": 100
+            },
+            "start": {
+              "column": 117,
+              "line": 100
+            }
+          }
+        },
+        {
+          "id": "20",
+          "mutatorName": "StringLiteral",
+          "replacement": "\"\"",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3258,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 132,
+              "line": 100
+            },
+            "start": {
+              "column": 126,
+              "line": 100
+            }
+          }
+        },
+        {
+          "id": "21",
+          "mutatorName": "BooleanLiteral",
+          "replacement": "covered(query)",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3131,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 46,
+              "line": 162
+            },
+            "start": {
+              "column": 31,
+              "line": 162
+            }
+          }
+        },
+        {
+          "id": "22",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "true",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3354,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 46,
+              "line": 162
+            },
+            "start": {
+              "column": 31,
+              "line": 162
+            }
+          }
+        },
+        {
+          "id": "23",
+          "mutatorName": "ConditionalExpression",
+          "replacement": "false",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 3322,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 46,
+              "line": 162
+            },
+            "start": {
+              "column": 31,
+              "line": 162
+            }
+          }
+        },
+        {
+          "id": "24",
+          "mutatorName": "BlockStatement",
+          "replacement": "{}",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 4303,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 116,
+              "line": 162
+            },
+            "start": {
+              "column": 83,
+              "line": 162
+            }
+          }
+        },
+        {
+          "id": "25",
+          "mutatorName": "CallExpression",
+          "replacement": ";",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 6294,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 99,
+              "line": 162
+            },
+            "start": {
+              "column": 84,
+              "line": 162
+            }
+          }
+        },
+        {
+          "id": "26",
+          "mutatorName": "CallExpression",
+          "replacement": ";",
+          "status": "Killed",
+          "testsCompleted": 1,
+          "duration": 5719,
+          "killedBy": [
+            "0"
+          ],
+          "location": {
+            "end": {
+              "column": 115,
+              "line": 162
+            },
+            "start": {
+              "column": 99,
+              "line": 162
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "finalRollupForIdenticalProductionSource": {
+    "counts": {
+      "Killed": 209,
+      "Timeout": 28,
+      "Survived": 2
+    },
+    "survivorAssessments": [
+      {
+        "id": "17",
+        "mutatorName": "EqualityOperator",
+        "replacement": "row.end_column <= retainedFragment.end_column",
+        "status": "Survived",
+        "testsCompleted": 1,
+        "duration": 2546,
+        "location": {
+          "end": {
+            "column": 99,
+            "line": 30
+          },
+          "start": {
+            "column": 57,
+            "line": 30
+          }
+        },
+        "assessment": "Equivalent equal-extent reuse: same file/version/actual column and equal end identify identical immutable text/flags, so reusing the old row changes no rendered bytes."
+      },
+      {
+        "id": "42",
+        "mutatorName": "ConditionalExpression",
+        "replacement": "false",
+        "status": "Survived",
+        "testsCompleted": 1,
+        "duration": 2540,
+        "location": {
+          "end": {
+            "column": 45,
+            "line": 95
+          },
+          "start": {
+            "column": 41,
+            "line": 95
+          }
+        },
+        "assessment": "Equivalent defensive missing-row guard at fragment entry: interactive fragment controls are rendered only for rows present in sourceRows, and replacing rows removes those controls synchronously. Detached programmatic clicks are outside the supported UI."
+      }
+    ]
+  },
+  "resourcePolicy": "Stock Stryker command runner, one worker, nice -n 10. No parallel mutation cohorts. Browser scripts explicitly forward the active mutant into each page.",
+  "exclusionsApplied": 0,
+  "limits": "Full affected accept/fragment functions and inspector public methods, not the entire renderer. Initial tests grew during survivor investigation; cohorts overlap. A failing-test catch on identical production source remains detected when a later longer suite times out; every raw cohort outcome is retained. Timeouts are never counted as catches. Equivalent survivors remain raw survivors."
+}

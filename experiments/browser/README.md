@@ -205,3 +205,23 @@ dormant throughout comparison capture, navigation, refresh and close. Both are i
 in `npm test`. Native controlled-parser tests cover metadata availability during held
 initial parsing, cancellation, duplicate activation, scoped review independence and
 initial failure/retry; see the [startup contract](../../docs/prototype/STARTUP_PRODUCT.md).
+
+## Check review context after refresh
+
+```sh
+CARGO_BUILD_JOBS=1 RUST_TEST_THREADS=1 nice -n 10 npm test -- --review-refresh
+```
+
+The native/Chromium scenario verifies independent pane positions, unchanged source,
+moved/missing declarations, removed sides/files, a fresh baseline reset and an expanded
+long-line fragment. Add `--output /tmp/vizzi-refresh-context` to retain observations and
+screenshots in a new directory. The default suite also runs it. Its contract is
+[review refresh](../../docs/prototype/REVIEW_REFRESH.md).
+
+`npm test -- --navigation-inspector-mutations` covers the inspector's affected
+accept/fragment functions and public methods with one lower-priority worker. The DOM
+fixtures forward the active mutant into Chromium and exercise actual UTF-8 byte ranges,
+remote keyboard focus and cached rendering. Use `--config /tmp/focused.config.json`
+for a deliberate focused follow-up; preserve the full relevant scope at integration.
+The controller/reader and source-audit scopes use the serial Node runner documented
+above. Surviving equivalent checks, timeouts and failing-test catches remain separate.
