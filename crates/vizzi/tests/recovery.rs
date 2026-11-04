@@ -27,6 +27,8 @@ struct Activity {
     overlay_started: AtomicBool,
     foreground_hold: AtomicBool,
     foreground_started: AtomicBool,
+    cancel_exit_hold: AtomicBool,
+    cancel_exit_started: AtomicBool,
     active: AtomicUsize,
     peak: AtomicUsize,
 }
@@ -74,6 +76,14 @@ impl Analyzer for Parser {
                 .foreground_started
                 .store(true, Ordering::Release);
             while self.activity.foreground_hold.load(Ordering::Acquire) && !cancelled() {
+                std::thread::sleep(Duration::from_millis(1));
+            }
+        }
+        if cancelled() && self.activity.cancel_exit_hold.load(Ordering::Acquire) {
+            self.activity
+                .cancel_exit_started
+                .store(true, Ordering::Release);
+            while self.activity.cancel_exit_hold.load(Ordering::Acquire) {
                 std::thread::sleep(Duration::from_millis(1));
             }
         }
@@ -244,6 +254,62 @@ fn hard_discovery_cancels_held_recovery_and_shutdown_joins_it() {
     drop(host);
     assert_eq!(fixture.activity.active.load(Ordering::SeqCst), 0);
     assert!(!app.status().recovery.running);
+}
+
+#[test]
+fn shutdown_joins_a_cancelled_private_parser_even_after_foreground_publication() {
+    struct ReleaseExit(Arc<Activity>);
+    impl Drop for ReleaseExit {
+        fn drop(&mut self) {
+            self.0.cancel_exit_hold.store(false, Ordering::Release);
+            self.0.hold.store(false, Ordering::Release);
+        }
+    }
+    let fixture = Fixture::new();
+    let host = fixture.host(2);
+    let _release = ReleaseExit(fixture.activity.clone());
+    let app = host.application();
+    fixture.activity.hold.store(true, Ordering::Release);
+    std::fs::write(fixture.root.path().join("b.rs"), "fn slow_recovered() {}").unwrap();
+    assert!(until(|| fixture.activity.started.load(Ordering::Acquire)));
+    fixture
+        .activity
+        .cancel_exit_hold
+        .store(true, Ordering::Release);
+    std::fs::write(fixture.root.path().join("b.rs"), "fn replacement() {}").unwrap();
+    host.request(CaptureScope::Reconcile);
+    assert!(until(|| fixture
+        .activity
+        .cancel_exit_started
+        .load(Ordering::Acquire)));
+    let published = until(|| {
+        app.snapshot()
+            .unwrap()
+            .file_by_path("b.rs")
+            .unwrap()
+            .resident_source()
+            == Some("fn replacement() {}")
+    });
+    let (done, finished) = std::sync::mpsc::channel();
+    let dropper = std::thread::spawn(move || {
+        drop(host);
+        done.send(()).unwrap();
+    });
+    let premature = finished.recv_timeout(Duration::from_millis(80));
+    fixture
+        .activity
+        .cancel_exit_hold
+        .store(false, Ordering::Release);
+    dropper.join().unwrap();
+    assert!(
+        published,
+        "foreground did not publish while private cancellation was finishing"
+    );
+    assert!(
+        premature.is_err(),
+        "shutdown detached the private parser before it finished"
+    );
+    assert_eq!(fixture.activity.active.load(Ordering::SeqCst), 0);
 }
 #[test]
 fn recovery_failure_retains_the_observation_and_retries_without_foreground_error() {

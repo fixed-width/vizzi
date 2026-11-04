@@ -6,8 +6,8 @@ vertical slice; the performance experiment crate remains independent.
 
 The [contextual-review contract](COMPARISON_TECH.md) extends this model with
 SCM-independent immutable comparisons. Portable inventory/hunk computation and
-native acquisition with bounded ownership and shared-engine analysis are delivered;
-host/browser comparison operations remain planned. Its
+native acquisition with bounded ownership and shared-engine analysis are delivered,
+along with linked host/browser comparison operations. Its
 [behaviour contract](COMPARISON_PRODUCT.md) defines that review workflow.
 
 ## Modules
@@ -109,6 +109,9 @@ Session disk quota, index metadata, transient capture and parser memory are dist
 
 ## Host interface
 
+- [Task-driven HTTP startup](STARTUP_TECH.md) prepares a dormant live host, activates
+  it on exploration entry, and permits scoped review without a live publication.
+  Eager native constructors, one-shot and stdio capture retain their existing defaults.
 - `GET /api/status` returns generation, snapshot identity, pending state, and last
   analysis/cache measurements, plus separate private recovery progress and phase measurements.
 - `GET /api/view` returns a bounded overview, reconciled selection, and selected source

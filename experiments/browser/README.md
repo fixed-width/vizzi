@@ -107,8 +107,17 @@ actual adapter request separately.
 npm test -- --mutations
 ```
 
-Stryker tests the complete request-controller and live-update adapter modules using
+Stryker tests the complete request-controller, live-update and startup modules using
 the Node behavioural tests.
+This scope uses one worker. The serial offline instrumenter fallback can run the same
+tests without opening Stryker logging sockets:
+
+```sh
+CARGO_BUILD_JOBS=1 RUST_TEST_THREADS=1 nice -n 10 node_modules/node/bin/node \
+  experiments/browser/offline-mutations.mjs experiments/browser/stryker.config.json \
+  /tmp/vizzi-controller-mutations.json
+```
+
 The unmodified baseline must pass first. Its threshold rejects surviving mutants;
 timeouts are still reported separately from assertion failures. The
 [command runner](https://stryker-mutator.io/docs/stryker-js/configuration/#commandrunner-object)
@@ -182,3 +191,17 @@ The [two-variant rendered review walkthrough](../review-workflow/README.md#run-t
 uses `npm test -- --review-walkthrough --fixture … --output …`. Its source/bounds
 audit tests run before the browser stages in the default suite. A blocked attempt
 records its failure phase and fixture checks rather than a successful walkthrough.
+
+## Check task-driven startup
+
+```sh
+CARGO_BUILD_JOBS=1 RUST_TEST_THREADS=1 nice -n 10 npm test -- --startup
+```
+
+This Chromium check opens the normal deferred HTTP host, verifies dormant metadata,
+then exercises a failed activation connection, initial source failure and explicit
+retry through rendered controls. The review check above verifies live indexing stays
+dormant throughout comparison capture, navigation, refresh and close. Both are included
+in `npm test`. Native controlled-parser tests cover metadata availability during held
+initial parsing, cancellation, duplicate activation, scoped review independence and
+initial failure/retry; see the [startup contract](../../docs/prototype/STARTUP_PRODUCT.md).

@@ -1,13 +1,41 @@
 {
   "$schema": "../../node_modules/@stryker-mutator/core/schema/stryker-schema.json",
-  "mutate": ["crates/vizzi/web/controller.js", "crates/vizzi/web/updates.js", "crates/vizzi/web/source-description.js"],
+  "mutate": [
+    "crates/vizzi/web/controller.js",
+    "crates/vizzi/web/updates.js",
+    "crates/vizzi/web/source-description.js",
+    "crates/vizzi/web/startup.js"
+  ],
   "testRunner": "command",
-  "commandRunner": { "command": "node crates/vizzi/web/controller.test.js && node crates/vizzi/web/updates.test.js && node crates/vizzi/web/source-description.test.js" },
+  "commandRunner": {
+    "command": "node crates/vizzi/web/controller.test.js && node crates/vizzi/web/updates.test.js && node crates/vizzi/web/source-description.test.js && node crates/vizzi/web/startup.test.js"
+  },
   "coverageAnalysis": "off",
-  "concurrency": 4,
+  "concurrency": 1,
   "timeoutMS": 2000,
-  "reporters": ["clear-text", "json"],
-  "jsonReporter": { "fileName": "experiments/browser/results/local/controller-mutation.json" },
-  "ignorePatterns": ["target", "experiments", "docs", "crates/vizzi-core", "crates/vizzi-perf", "crates/vizzi/src", "crates/vizzi/tests"],
-  "thresholds": { "break": 100 }
+  "reporters": [
+    "clear-text",
+    "json"
+  ],
+  "jsonReporter": {
+    "fileName": "experiments/browser/results/local/controller-mutation.json"
+  },
+  "ignorePatterns": [
+    "target",
+    "experiments",
+    "docs",
+    "crates/vizzi-core",
+    "crates/vizzi-perf",
+    "crates/vizzi/src",
+    "crates/vizzi/tests"
+  ],
+  "thresholds": {
+    "break": 100
+  },
+  "offlineTestFiles": [
+    "crates/vizzi/web/controller.test.js",
+    "crates/vizzi/web/updates.test.js",
+    "crates/vizzi/web/source-description.test.js",
+    "crates/vizzi/web/startup.test.js"
+  ]
 }

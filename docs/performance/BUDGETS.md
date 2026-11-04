@@ -16,8 +16,11 @@ The [cancellation follow-up](../../experiments/qualification/CANCELLATION_RESULT
 repeats four-worker retained reparse and measures cooperative interruption within files.
 The [focused review measurements](../../experiments/review-workflow/SCALE_RESULTS.md)
 now exercise Linux scheduler and mixed PyTorch codegen reviews in full working trees,
-with one parser worker. They show bounded sampled DOM and 16.8-ms observed rAF p99,
-while initial live-index startup and refresh selection reset remain task friction.
+with one parser worker. They show bounded sampled DOM and 16.8-ms observed rAF p99.
+The [startup follow-up](../../experiments/review-workflow/STARTUP_RESULTS.md) now opens
+review without activating live indexing: URL availability is around 4–5 ms and first
+scoped review around 0.8–1.0 seconds from launch, including browser automation.
+Refresh selection reset remains task friction.
 Their scoped refresh timings do not qualify the live-edit/core-map targets below.
 
 | Area | Proposed target / policy | Current evidence |
@@ -32,10 +35,12 @@ Their scoped refresh timings do not qualify the live-edit/core-map targets below
 | Source and outline DOM | Bound each pane by visible rows plus overscan; initial ceiling 200 rendered entries | Latest headers render 47–49 source rows and 0/21 outline controls. Browser delivery uses <=96 source rows/32 KiB text and <=200 outline entries; lazy identity indexing remains input-dependent |
 | Overview motion | Maintain rAF p99 below 33.3 ms in the software reference workload | 16.8 ms in all recorded steady/refresh runs; physical presentation unqualified |
 
-Cold indexing is a separate throughput/startup measure: about 60 s Linux and 11 s
-PyTorch at four workers. The host currently exposes its browser URL only after initial
-publication. Progress/partial exploration during cold indexing is a separate design
-decision, not something the existing loading behavior already provides.
+Cold indexing is a separate throughput measure: the earlier full profiles took about
+60 s Linux and 11 s PyTorch at four workers. The HTTP host now exposes its URL before
+live indexing and activates that work on exploration entry. Focused review leaves the
+live index dormant. Initial status/retry is visible; exploration reads a complete
+observation after indexing. These startup changes do not accelerate whole-workspace
+analysis or provide partial exploration.
 
 The native memory target leaves room for an editor, browser, OS, and filesystem cache,
 but the combined envelope has not been validated. Point-in-time renderer heap is not

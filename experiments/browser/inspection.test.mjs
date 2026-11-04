@@ -11,8 +11,21 @@ before(async()=>{
   buildHost();input=await workspace({files:{"big.rs":large,"long.rs":"// <img src=x onerror='window.injected=true'> "+"=".repeat(2_000_000)+"TAIL"}});host=await startHost(input);chromium=await browser();
 });
 after(async()=>{await chromium?.close();await host?.close();await input?.close();});
+async function observation(page,previous=null) {
+  await page.evaluate(previous=>new Promise((resolve,reject)=>{
+    const events=new EventSource("/api/events");
+    const timeout=setTimeout(()=>finish(new Error("No complete source observation received")),10000);
+    function finish(error){clearTimeout(timeout);events.close();if(error)reject(error);else resolve();}
+    events.addEventListener("workspace",event=>{
+      try {const {status}=JSON.parse(event.data);if(status.snapshot!==null && status.snapshot!==previous)finish();else if(status.error && !status.pending)finish(new Error(status.error));}catch(error){finish(error);}
+    });
+    events.onerror=()=>finish(new Error("Source notification connection failed"));
+  }),previous);
+}
 async function fixture(path="big.rs") {
   const page=await chromium.newPage();page.testErrors=[];page.on("pageerror",error=>page.testErrors.push(error.message));await page.route("**/app.js",route=>route.fulfill({body:"",contentType:"text/javascript"}));await page.goto(host.url);
+  const activation=await page.request.post(`${host.url}/api/workspace/start`,{data:{}});assert.equal(activation.status(),202);
+  await observation(page);
   await page.evaluate(async({moduleUrl,path})=>{
     const {createInspector}=await import(moduleUrl);
     window.errors=[];window.activations=[];window.requests=[];
@@ -56,7 +69,7 @@ test("background document replacement preserves focused identity",async()=>{
     const focused=await page.evaluate(()=>document.activeElement.dataset.declaration);
     const previous=await page.evaluate(()=>window.current.snapshot);
     await writeFile(join(input.root,"big.rs"),"// position shift\n"+large);
-    await page.waitForFunction(async previous=>(await (await fetch("/api/status")).json()).snapshot!==previous,previous);
+    await observation(page,previous);
     await page.evaluate(()=>window.refresh());
     assert.equal(await page.evaluate(()=>document.activeElement.dataset.declaration),focused);
     assert.ok(await page.locator("#outline button").count()<=200);assert.deepEqual(await page.evaluate(()=>window.errors),[]);assert.deepEqual(page.testErrors,[]);

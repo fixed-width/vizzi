@@ -152,6 +152,12 @@ their `source` paths if needed. The originals must contain those commits. The
 [method](SCALE_PLAN.md) defines the working-tree setup, one-worker policy and timing
 endpoints; [results](SCALE_RESULTS.md) distinguish startup, interaction and explicit
 refresh from earlier whole-repository qualification.
+The measurement driver now verifies [deferred startup](../../docs/prototype/STARTUP_PRODUCT.md):
+review leaves the live index unstarted. Earlier eager measurements are preserved in
+`results/scale`; repeat into new output directories.
+The [startup report](STARTUP_RESULTS.md) and `results/startup` retain the repeated cohort
+and its correctness/mutation evidence. Use `summarize-startup.mjs` as documented there
+to compare three-session outputs with the earlier eager cohort.
 
 Select the profiles into temporary files:
 

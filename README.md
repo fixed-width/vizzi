@@ -34,6 +34,10 @@ Review analysis now [shares the existing engine](docs/prototype/REVIEW_ANALYSIS.
 separate review status. The [review interface](docs/how-to/review-local-changes.md)
 now passes [both rendered guided variants](experiments/review-workflow/WALKTHROUGH_RESULTS.md),
 with screenshots, recordings and a repeated learning regression.
+The [task-driven startup contract](docs/prototype/STARTUP_PRODUCT.md) lets review
+open before live indexing; exploration activates the same host engine explicitly.
+The [startup measurements](experiments/review-workflow/STARTUP_RESULTS.md) record the
+first usable review around 0.8–1.0 seconds from launch in the focused reference scopes.
 
 - [Run the workspace](docs/how-to/run-workspace.md)
 - [Next product milestones](docs/plans/product-milestones.md)

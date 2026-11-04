@@ -31,6 +31,12 @@ pub struct Host {
     task: Option<JoinHandle<()>>,
     queue: Arc<Mutex<PendingRefresh>>,
     maintenance: Arc<Mutex<MaintenanceStatus>>,
+    active: Arc<AtomicBool>,
+}
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Startup {
+    Eager,
+    Deferred,
 }
 /// Native observation and periodic verification settings.
 #[derive(Clone, Debug)]
@@ -90,10 +96,27 @@ impl Host {
         let source = engine.directory().maintenance();
         Self::start_with_maintenance(engine, options, source)
     }
+    /// Prepares the shared engine without live capture or observation until activation.
+    pub fn prepare(engine: Engine) -> Result<Self, EngineError> {
+        Self::prepare_with_options(engine, HostOptions::default())
+    }
+    /// Prepares a dormant host with explicit live observation policy.
+    pub fn prepare_with_options(engine: Engine, options: HostOptions) -> Result<Self, EngineError> {
+        let source = engine.directory().maintenance();
+        Self::with_startup(engine, options, source, Startup::Deferred)
+    }
     pub(crate) fn start_with_maintenance(
         engine: Engine,
         options: HostOptions,
         source: Option<Arc<dyn SourceMaintenance>>,
+    ) -> Result<Self, EngineError> {
+        Self::with_startup(engine, options, source, Startup::Eager)
+    }
+    fn with_startup(
+        engine: Engine,
+        options: HostOptions,
+        source: Option<Arc<dyn SourceMaintenance>>,
+        startup: Startup,
     ) -> Result<Self, EngineError> {
         if options.reconcile_interval.is_zero()
             || Instant::now()
@@ -116,45 +139,37 @@ impl Host {
         )?);
         let (signal, receive) = mpsc::sync_channel(1);
         let queue = Arc::new(Mutex::new(PendingRefresh::default()));
-        let callback_app = application.clone();
-        let callback_signal = signal.clone();
-        let callback_engine = engine.clone();
-        let callback_queue = queue.clone();
-        let mut watcher = if options.watch {
-            notify::recommended_watcher(move |event: Result<notify::Event, notify::Error>| {
-                if let Some(scope) = classify(callback_engine.directory(), event) {
-                    pending(&callback_queue).invalidate(&callback_app, scope);
-                    let _ = callback_signal.try_send(());
-                }
-            })
-            .ok()
-        } else {
-            None
-        };
+        let active = Arc::new(AtomicBool::new(startup == Startup::Eager));
+        let mut watcher = None;
         let mut watched = BTreeSet::new();
-        observe(
-            &mut watcher,
-            &mut watched,
-            &[engine.directory().root().to_path_buf()],
-            &application,
-        );
-        loop {
-            pending(&queue).invalidate(&application, CaptureScope::Reconcile);
-            let plan = pending(&queue).plan(&application);
-            let Some(mut refresh) = engine
-                .refresh_scoped(None, &plan.scope, &|| plan.cancelled(&application, false))?
-            else {
-                continue;
-            };
-            let directories = refresh.directories.take();
-            if pending(&queue).publish(&application, plan.ticket, refresh)
-                != vizzi_core::publication::Outcome::Stale
-            {
-                if let Some(directories) = directories {
-                    observe(&mut watcher, &mut watched, &directories, &application);
+        if startup == Startup::Eager {
+            watcher = make_watcher(&engine, &application, &queue, &signal, options.watch);
+            observe(
+                &mut watcher,
+                &mut watched,
+                &[engine.directory().root().to_path_buf()],
+                &application,
+            );
+            loop {
+                pending(&queue).invalidate(&application, CaptureScope::Reconcile);
+                let plan = pending(&queue).plan(&application);
+                let Some(mut refresh) = engine
+                    .refresh_scoped(None, &plan.scope, &|| plan.cancelled(&application, false))?
+                else {
+                    continue;
+                };
+                let directories = refresh.directories.take();
+                if pending(&queue).publish(&application, plan.ticket, refresh)
+                    != vizzi_core::publication::Outcome::Stale
+                {
+                    if let Some(directories) = directories {
+                        observe(&mut watcher, &mut watched, &directories, &application);
+                    }
+                    break;
                 }
-                break;
             }
+        } else {
+            application.observation("live index not started".into());
         }
         let stop = Arc::new(AtomicBool::new(false));
         let worker_stop = stop.clone();
@@ -164,9 +179,28 @@ impl Host {
         let maintenance_status = maintenance.clone();
         let source = options.idle_maintenance.then_some(source).flatten();
         let worker_engine = engine.clone();
+        let worker_active = active.clone();
+        let worker_signal = signal.clone();
         let task = std::thread::spawn(move || {
             let engine = worker_engine;
             let queue = worker_queue;
+            while !worker_active.load(Ordering::Acquire) {
+                if worker_stop.load(Ordering::Acquire) || receive.recv().is_err() {
+                    return;
+                }
+            }
+            if worker_stop.load(Ordering::Acquire) {
+                return;
+            }
+            if startup == Startup::Deferred {
+                watcher = make_watcher(&engine, &worker_app, &queue, &worker_signal, options.watch);
+                observe(
+                    &mut watcher,
+                    &mut watched,
+                    &[engine.directory().root().to_path_buf()],
+                    &worker_app,
+                );
+            }
             let mut schedule = Reconciliation::new(Instant::now());
             schedule.interval = options.reconcile_interval;
             let mut recovery: Option<RecoveryTask> = None;
@@ -368,10 +402,27 @@ impl Host {
             task: Some(task),
             queue,
             maintenance,
+            active,
         })
+    }
+    /// Starts live indexing once, or retries a completed initial failure.
+    /// Duplicate calls while pending/ready do not supersede live work.
+    pub fn activate(&self) {
+        let mut queue = pending(&self.queue);
+        let first = !self.active.swap(true, Ordering::AcqRel);
+        let status = self.application.status();
+        let retry = status.snapshot.is_none() && status.error.is_some() && !status.pending;
+        if first || retry {
+            queue.invalidate(&self.application, CaptureScope::Reconcile);
+        }
+        drop(queue);
+        if first || retry {
+            let _ = self.signal.try_send(());
+        }
     }
     /// Supplies source hints or requests discovery through the same invalidation path.
     pub fn request(&self, scope: CaptureScope) {
+        self.activate();
         pending(&self.queue).invalidate(&self.application, scope);
         let _ = self.signal.try_send(());
     }
@@ -383,6 +434,28 @@ impl Host {
     pub fn maintenance_status(&self) -> MaintenanceStatus {
         Idle::status(&self.maintenance).clone()
     }
+}
+fn make_watcher(
+    engine: &Arc<Engine>,
+    application: &Arc<Application>,
+    queue: &Arc<Mutex<PendingRefresh>>,
+    signal: &SyncSender<()>,
+    enabled: bool,
+) -> Option<notify::RecommendedWatcher> {
+    if !enabled {
+        return None;
+    }
+    let engine = engine.clone();
+    let application = application.clone();
+    let queue = queue.clone();
+    let signal = signal.clone();
+    notify::recommended_watcher(move |event: Result<notify::Event, notify::Error>| {
+        if let Some(scope) = classify(engine.directory(), event) {
+            pending(&queue).invalidate(&application, scope);
+            let _ = signal.try_send(());
+        }
+    })
+    .ok()
 }
 fn join_recovery(
     task: JoinHandle<Result<Option<Refresh>, EngineError>>,

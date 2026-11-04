@@ -77,7 +77,7 @@ async function verify(page,host,path) {
 
 let chromium;
 try {
-  report.sourceSha256=Object.fromEntries(await Promise.all(["experiments/review-workflow/measure.mjs","experiments/review-workflow/scale_fixture.py","experiments/review-workflow/scale-profiles.json","experiments/review-workflow/walkthrough-audit.js","experiments/browser/statistics.mjs","crates/vizzi/web/review-app.js","crates/vizzi/web/review-controller.js","crates/vizzi/web/inspector.js"].map(async name=>[name,sha(await readFile(name))])));
+  report.sourceSha256=Object.fromEntries(await Promise.all(["experiments/review-workflow/measure.mjs","experiments/review-workflow/scale_fixture.py","experiments/review-workflow/scale-profiles.json","experiments/review-workflow/walkthrough-audit.js","experiments/browser/statistics.mjs","crates/vizzi/web/review-app.js","crates/vizzi/web/review-controller.js","crates/vizzi/web/inspector.js","crates/vizzi/src/host.rs","crates/vizzi/src/application.rs","crates/vizzi/src/server.rs","crates/vizzi/src/main.rs","crates/vizzi/web/startup.js"].map(async name=>[name,sha(await readFile(name))])));
   report.originalStatusBefore=originalStatus("before");assert.equal(report.originalStatusBefore,manifest.original_status_sha256);
   if(!options.noBuild)buildHost();report.binarySha256=sha(await readFile("target/release/vizzi"));chromium=await browser({desktopBus:false});report.browser=chromium.version();
   const system=await (await chromium.newBrowserCDPSession()).send("SystemInfo.getInfo");report.gpu={devices:system.gpu.devices,featureStatus:system.gpu.featureStatus};
@@ -86,7 +86,7 @@ try {
     const id=randomUUID();
     for(const file of manifest.files){const marker=`${file.prefix} vizzi-review-scale ${id} initial`;current.set(file.path,marker);await writeFile(join(root,file.path),Buffer.concat([Buffer.from(marker+"\n"),originals.get(file.path)]));}
     try {
-      let started=performance.now();host=await startHost({root,cache:join(output,`cache-${session}`),sourceArguments:manifest.source_arguments,startupTimeoutMs:60000},1);result.hostReadyMs=performance.now()-started;
+      const hostStarted=performance.now();let started=hostStarted;host=await startHost({root,cache:join(output,`cache-${session}`),sourceArguments:manifest.source_arguments,startupTimeoutMs:60000},1);result.hostReadyMs=performance.now()-started;
       context=await chromium.newContext({viewport:{width:1440,height:1000}});page=await context.newPage();page.setDefaultTimeout(30000);
       await page.addInitScript(()=>document.addEventListener("click",event=>{if(event.isTrusted)window.vizziReviewClickAt=performance.now();},true));
       page.on("pageerror",e=>result.errors.push(e.message));page.on("requestfailed",request=>{if(request.failure()?.errorText.includes("ERR_ABORTED"))result.abortedRequests++;else result.errors.push(request.failure()?.errorText);});
@@ -98,7 +98,9 @@ try {
       await page.route("**/*",route=>new URL(route.request().url()).origin===host.url?route.continue():route.abort());
       await page.goto(host.url+"/review");await page.bringToFront();await page.getByLabel("Baseline revision",{exact:true}).fill(manifest.revision);await page.getByLabel("Subtree",{exact:true}).fill(manifest.scope);
       result.startupStatus=await (await page.request.get(host.url+"/api/status")).json();
+      assert.equal(result.startupStatus.readiness,"not_started");assert.equal(result.startupStatus.snapshot,null);assert.equal(result.startupStatus.measurements,null);
       started=performance.now();await page.getByRole("button",{name:"Compare with working tree",exact:true}).click();await page.waitForFunction(()=>Boolean(document.getElementById("review-workspace").dataset.token) || document.getElementById("review-status").textContent.startsWith("Capture failed"));assert.ok(await page.locator("#review-workspace").getAttribute("data-token"),await page.locator("#review-status").textContent());await ready(page);result.firstComparisonCommandMs=performance.now()-started;result.firstComparisonMs=await inputAge(page);
+      result.firstReviewReadySinceSpawnMs=performance.now()-hostStarted;
       const initial=await page.evaluate(()=>({token:document.getElementById("review-workspace").dataset.token,labels:document.getElementById("comparison-labels").textContent}));assert.ok(initial.labels.includes(manifest.revision));result.afterCaptureMemory=await nativeMemory(host.pid);
       await page.getByLabel("Include unchanged context").check();await ready(page);
       for(const file of manifest.files)result.proofs.push(await verify(page,host,file.path));
@@ -132,6 +134,9 @@ try {
       result.refreshActivity=summarizeProbe(await end(page));
       for(const file of manifest.files)result.proofs.push(await verify(page,host,file.path));
       result.heapAfter=await cdp.send("Runtime.getHeapUsage");result.finalMemory=await nativeMemory(host.pid);
+      result.finalLiveStatus=await (await page.request.get(host.url+"/api/status")).json();
+      assert.equal(result.finalLiveStatus.readiness,"not_started");assert.equal(result.finalLiveStatus.snapshot,null);assert.equal(result.finalLiveStatus.measurements,null);
+      result.liveIndexStayedDormant=true;
       assert.deepEqual(result.errors,[]);for(const file of manifest.files){const proofs=result.proofs.filter(p=>p.path===file.path);assert.equal(proofs[0].baseVersion,proofs.at(-1).baseVersion);assert.notEqual(proofs[0].workingVersion,proofs.at(-1).workingVersion);}
       await page.screenshot({path:join(output,`session-${session}.png`),fullPage:true});
       result.latencySummaries=Object.fromEntries(["file","hunk","declaration"].map(kind=>[kind,summary(result.latencies.filter(s=>s.kind===kind).map(s=>s.ms))]));

@@ -6,6 +6,10 @@ first-use cost is host startup, particularly PyTorch's initial live-workspace in
 Refresh also requires another file-selection action when it resets away from the edited
 file. No product algorithm or resource policy changed for this measurement.
 
+This is the eager-startup cohort at `b116f4b`. The
+[startup follow-up](STARTUP_RESULTS.md) records the later deferred host and its separate
+measurements; the observations below are preserved as the earlier comparison.
+
 The [method](SCALE_PLAN.md), [raw reports and summary](results/scale/summary.json) preserve
 pins, hardware, policy, samples and limits. These are three sequential optimized-host
 sessions per case, one shared parser worker, fresh analysis caches and full disposable

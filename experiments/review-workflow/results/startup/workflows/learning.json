@@ -1,0 +1,4442 @@
+{
+  "schema": 1,
+  "question": "How does the compiler obtain source, decide whether to retry with the c extension, and report a read failure?",
+  "operator": "Reference-aware agent; paths, target names and expected behaviour were known before replay. This is guided functional evidence, not a newcomer usability study.",
+  "options": {
+    "source": "/home/mpd/git-sources/lpc-rs",
+    "revision": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+    "returnHistory": true,
+    "output": "/tmp/vizzi-startup-learning-20261104"
+  },
+  "steps": [
+    {
+      "name": "initial",
+      "intent": "Open the pinned Rust/Python workspace with a fresh analysis cache.",
+      "state": {
+        "url": "http://127.0.0.1:38213/",
+        "historyLength": 2,
+        "filter": "",
+        "file": "benches/bench_arithmetic.rs",
+        "observation": "Captured observation 1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+        "status": "Observation 1",
+        "observationMode": "native directory watches + periodic reconciliation",
+        "counts": "552 shown / 552 matching / 552 source files · 552 with analysis / 0 deferred / 0 source only",
+        "selectedFile": null,
+        "selectedDeclaration": null,
+        "sourceTop": 0,
+        "outlineTop": 0,
+        "sourceRows": [
+          {
+            "line": 1,
+            "text": "use std::time::{Duration, Instant};"
+          },
+          {
+            "line": 2,
+            "text": ""
+          },
+          {
+            "line": 3,
+            "text": "use criterion::{Criterion, Throughput, criterion_group, criterion_main};"
+          },
+          {
+            "line": 4,
+            "text": "use lpc_rs::interpreter::{"
+          },
+          {
+            "line": 5,
+            "text": "    lpc_ref::LpcRef,"
+          },
+          {
+            "line": 6,
+            "text": "    task::{apply_function::apply_function, task_template::TaskTemplate},"
+          },
+          {
+            "line": 7,
+            "text": "    vm::Vm,"
+          },
+          {
+            "line": 8,
+            "text": "};"
+          },
+          {
+            "line": 9,
+            "text": "use lpc_rs_utils::config::ConfigBuilder;"
+          },
+          {
+            "line": 10,
+            "text": ""
+          },
+          {
+            "line": 11,
+            "text": "#[path = \"support/profiler.rs\"]"
+          },
+          {
+            "line": 12,
+            "text": "mod profiler;"
+          },
+          {
+            "line": 13,
+            "text": ""
+          },
+          {
+            "line": 14,
+            "text": "const SOURCE: &str = r#\""
+          },
+          {
+            "line": 15,
+            "text": "int stored;"
+          },
+          {
+            "line": 16,
+            "text": "int sum(int n) {"
+          },
+          {
+            "line": 17,
+            "text": "    int sum;"
+          },
+          {
+            "line": 18,
+            "text": "    for (int i = 0; i < n; i++) sum += i;"
+          },
+          {
+            "line": 19,
+            "text": "    return sum;"
+          },
+          {
+            "line": 20,
+            "text": "}"
+          },
+          {
+            "line": 21,
+            "text": "int local_copy(int n) {"
+          },
+          {
+            "line": 22,
+            "text": "    int value;"
+          },
+          {
+            "line": 23,
+            "text": "    for (int i = 0; i < n; i++) value = i;"
+          },
+          {
+            "line": 24,
+            "text": "    return value;"
+          },
+          {
+            "line": 25,
+            "text": "}"
+          },
+          {
+            "line": 26,
+            "text": "int global_copy(int n) {"
+          },
+          {
+            "line": 27,
+            "text": "    for (int i = 0; i < n; i++) stored = i;"
+          },
+          {
+            "line": 28,
+            "text": "    return stored + 1;"
+          },
+          {
+            "line": 29,
+            "text": "}"
+          },
+          {
+            "line": 30,
+            "text": "int global_add(int n) {"
+          },
+          {
+            "line": 31,
+            "text": "    for (int i = 0; i < n; i++) stored = i + 1;"
+          },
+          {
+            "line": 32,
+            "text": "    return stored - 1;"
+          },
+          {
+            "line": 33,
+            "text": "}"
+          },
+          {
+            "line": 34,
+            "text": "int upvalue_copy(int n) {"
+          },
+          {
+            "line": 35,
+            "text": "    int value;"
+          },
+          {
+            "line": 36,
+            "text": "    function work = (: [int count] {"
+          },
+          {
+            "line": 37,
+            "text": "        for (int i = 0; i < count; i++) value = i;"
+          }
+        ],
+        "outlineButtons": 4,
+        "sourceLinks": 0,
+        "searchInputs": [
+          {
+            "id": "filter",
+            "placeholder": "Filter by path…"
+          }
+        ]
+      },
+      "screenshot": "00-initial.png"
+    },
+    {
+      "name": "symbol-in-path-filter",
+      "intent": "Deliberate capability probe: can the file filter locate a known declaration?",
+      "state": {
+        "url": "http://127.0.0.1:38213/",
+        "historyLength": 2,
+        "filter": "compile_file",
+        "file": "benches/bench_arithmetic.rs",
+        "observation": "Captured observation 1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+        "status": "Observation 1",
+        "observationMode": "native directory watches + periodic reconciliation",
+        "counts": "0 shown / 0 matching / 552 source files · 552 with analysis / 0 deferred / 0 source only",
+        "selectedFile": null,
+        "selectedDeclaration": null,
+        "sourceTop": 0,
+        "outlineTop": 0,
+        "sourceRows": [
+          {
+            "line": 1,
+            "text": "use std::time::{Duration, Instant};"
+          },
+          {
+            "line": 2,
+            "text": ""
+          },
+          {
+            "line": 3,
+            "text": "use criterion::{Criterion, Throughput, criterion_group, criterion_main};"
+          },
+          {
+            "line": 4,
+            "text": "use lpc_rs::interpreter::{"
+          },
+          {
+            "line": 5,
+            "text": "    lpc_ref::LpcRef,"
+          },
+          {
+            "line": 6,
+            "text": "    task::{apply_function::apply_function, task_template::TaskTemplate},"
+          },
+          {
+            "line": 7,
+            "text": "    vm::Vm,"
+          },
+          {
+            "line": 8,
+            "text": "};"
+          },
+          {
+            "line": 9,
+            "text": "use lpc_rs_utils::config::ConfigBuilder;"
+          },
+          {
+            "line": 10,
+            "text": ""
+          },
+          {
+            "line": 11,
+            "text": "#[path = \"support/profiler.rs\"]"
+          },
+          {
+            "line": 12,
+            "text": "mod profiler;"
+          },
+          {
+            "line": 13,
+            "text": ""
+          },
+          {
+            "line": 14,
+            "text": "const SOURCE: &str = r#\""
+          },
+          {
+            "line": 15,
+            "text": "int stored;"
+          },
+          {
+            "line": 16,
+            "text": "int sum(int n) {"
+          },
+          {
+            "line": 17,
+            "text": "    int sum;"
+          },
+          {
+            "line": 18,
+            "text": "    for (int i = 0; i < n; i++) sum += i;"
+          },
+          {
+            "line": 19,
+            "text": "    return sum;"
+          },
+          {
+            "line": 20,
+            "text": "}"
+          },
+          {
+            "line": 21,
+            "text": "int local_copy(int n) {"
+          },
+          {
+            "line": 22,
+            "text": "    int value;"
+          },
+          {
+            "line": 23,
+            "text": "    for (int i = 0; i < n; i++) value = i;"
+          },
+          {
+            "line": 24,
+            "text": "    return value;"
+          },
+          {
+            "line": 25,
+            "text": "}"
+          },
+          {
+            "line": 26,
+            "text": "int global_copy(int n) {"
+          },
+          {
+            "line": 27,
+            "text": "    for (int i = 0; i < n; i++) stored = i;"
+          },
+          {
+            "line": 28,
+            "text": "    return stored + 1;"
+          },
+          {
+            "line": 29,
+            "text": "}"
+          },
+          {
+            "line": 30,
+            "text": "int global_add(int n) {"
+          },
+          {
+            "line": 31,
+            "text": "    for (int i = 0; i < n; i++) stored = i + 1;"
+          },
+          {
+            "line": 32,
+            "text": "    return stored - 1;"
+          },
+          {
+            "line": 33,
+            "text": "}"
+          },
+          {
+            "line": 34,
+            "text": "int upvalue_copy(int n) {"
+          },
+          {
+            "line": 35,
+            "text": "    int value;"
+          },
+          {
+            "line": 36,
+            "text": "    function work = (: [int count] {"
+          },
+          {
+            "line": 37,
+            "text": "        for (int i = 0; i < count; i++) value = i;"
+          }
+        ],
+        "outlineButtons": 4,
+        "sourceLinks": 0,
+        "searchInputs": [
+          {
+            "id": "filter",
+            "placeholder": "Filter by path…"
+          }
+        ]
+      },
+      "screenshot": "01-symbol-in-path-filter.png"
+    },
+    {
+      "name": "compiler-module",
+      "intent": "Choose the compiler module through the accessible file list.",
+      "state": {
+        "url": "http://127.0.0.1:38213/",
+        "historyLength": 3,
+        "filter": "src/compiler/",
+        "file": "src/compiler/mod.rs",
+        "observation": "Captured observation 1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+        "status": "Observation 1",
+        "observationMode": "native directory watches + periodic reconciliation",
+        "counts": "94 shown / 94 matching / 552 source files · 552 with analysis / 0 deferred / 0 source only",
+        "selectedFile": "src/compiler/mod.rs",
+        "selectedDeclaration": null,
+        "sourceTop": 0,
+        "outlineTop": 0,
+        "sourceRows": [
+          {
+            "line": 1,
+            "text": "use std::{ffi::OsStr, fmt::Debug, io::ErrorKind, sync::Arc};"
+          },
+          {
+            "line": 2,
+            "text": ""
+          },
+          {
+            "line": 3,
+            "text": "use ast::program_node::ProgramNode;"
+          },
+          {
+            "line": 4,
+            "text": "use codegen::{"
+          },
+          {
+            "line": 5,
+            "text": "    codegen_walker::CodegenWalker,"
+          },
+          {
+            "line": 6,
+            "text": "    tree_walker::{Pass, apply},"
+          },
+          {
+            "line": 7,
+            "text": "};"
+          },
+          {
+            "line": 8,
+            "text": "use compilation_context::CompilationContext;"
+          },
+          {
+            "line": 9,
+            "text": "use compile_gate::CompileGate;"
+          },
+          {
+            "line": 10,
+            "text": "use derive_builder::Builder;"
+          },
+          {
+            "line": 11,
+            "text": "use educe::Educe;"
+          },
+          {
+            "line": 12,
+            "text": "use lexer::Token;"
+          },
+          {
+            "line": 13,
+            "text": "use lpc_rs_core::lpc_path::LpcPath;"
+          },
+          {
+            "line": 14,
+            "text": "use lpc_rs_errors::{self, LpcError, Result, lpc_error, source_map::DiagnosticSources, span::Span};"
+          },
+          {
+            "line": 15,
+            "text": "use lpc_rs_utils::{LpcSource, config::Config};"
+          },
+          {
+            "line": 16,
+            "text": "use preprocessor::Preprocessor;"
+          },
+          {
+            "line": 17,
+            "text": "use source::CompilerSource;"
+          },
+          {
+            "line": 18,
+            "text": "use source_reader::{DiskSourceReader, SourceReader};"
+          },
+          {
+            "line": 19,
+            "text": "use tracing::instrument;"
+          },
+          {
+            "line": 20,
+            "text": ""
+          },
+          {
+            "line": 21,
+            "text": "use crate::{"
+          },
+          {
+            "line": 22,
+            "text": "    compiler::compilation_context::CompilationContextBuilder, interpreter::program::Program,"
+          },
+          {
+            "line": 23,
+            "text": "};"
+          },
+          {
+            "line": 24,
+            "text": ""
+          },
+          {
+            "line": 25,
+            "text": "pub mod ast;"
+          },
+          {
+            "line": 26,
+            "text": "pub mod cache;"
+          },
+          {
+            "line": 27,
+            "text": "pub mod callee;"
+          },
+          {
+            "line": 28,
+            "text": "pub mod codegen;"
+          },
+          {
+            "line": 29,
+            "text": "pub mod compilation_context;"
+          },
+          {
+            "line": 30,
+            "text": "pub mod compile_gate;"
+          },
+          {
+            "line": 31,
+            "text": "pub mod diagnostics;"
+          },
+          {
+            "line": 32,
+            "text": "pub mod lexer;"
+          },
+          {
+            "line": 33,
+            "text": "pub mod parser;"
+          },
+          {
+            "line": 34,
+            "text": "pub mod parser_cache;"
+          },
+          {
+            "line": 35,
+            "text": "mod prepared_program;"
+          },
+          {
+            "line": 36,
+            "text": "pub mod preprocessor;"
+          },
+          {
+            "line": 37,
+            "text": "mod program_interface;"
+          }
+        ],
+        "outlineButtons": 24,
+        "sourceLinks": 0,
+        "searchInputs": [
+          {
+            "id": "filter",
+            "placeholder": "Filter by path…"
+          }
+        ]
+      },
+      "screenshot": "02-compiler-module.png"
+    },
+    {
+      "name": "compile-entry",
+      "intent": "Inspect the compilation entry point and its source-read call.",
+      "state": {
+        "url": "http://127.0.0.1:38213/",
+        "historyLength": 4,
+        "filter": "src/compiler/",
+        "file": "src/compiler/mod.rs",
+        "observation": "Captured observation 1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+        "status": "Observation 1",
+        "observationMode": "native directory watches + periodic reconciliation",
+        "counts": "94 shown / 94 matching / 552 source files · 552 with analysis / 0 deferred / 0 source only",
+        "selectedFile": "src/compiler/mod.rs",
+        "selectedDeclaration": "function compile_file · line 140",
+        "sourceTop": 2992,
+        "outlineTop": 632,
+        "sourceRows": [
+          {
+            "line": 137,
+            "text": "    /// # }"
+          },
+          {
+            "line": 138,
+            "text": "    /// ```"
+          },
+          {
+            "line": 139,
+            "text": "    #[instrument(skip(self))]"
+          },
+          {
+            "line": 140,
+            "text": "    pub async fn compile_file<T>(&self, path: T) -> Result<Compiled>"
+          },
+          {
+            "line": 141,
+            "text": "    where"
+          },
+          {
+            "line": 142,
+            "text": "        T: Into<LpcPath> + Debug + Send,"
+          },
+          {
+            "line": 143,
+            "text": "    {"
+          },
+          {
+            "line": 144,
+            "text": "        let (identity, source) = self.read_file(path.into()).await?;"
+          },
+          {
+            "line": 145,
+            "text": "        let warning = source"
+          },
+          {
+            "line": 146,
+            "text": "            .latin1"
+          },
+          {
+            "line": 147,
+            "text": "            .then(|| diagnostics::latin1_warning(identity.name().as_str(), None));"
+          },
+          {
+            "line": 148,
+            "text": "        self.compile_source(identity, &source.text, warning).await"
+          },
+          {
+            "line": 149,
+            "text": "    }"
+          },
+          {
+            "line": 150,
+            "text": ""
+          },
+          {
+            "line": 151,
+            "text": "    async fn read_file(&self, path: LpcPath) -> Result<(Arc<CompilerSource>, LpcSource)> {"
+          },
+          {
+            "line": 152,
+            "text": "        let mut identity = Arc::new(CompilerSource::new(path, &self.config));"
+          },
+          {
+            "line": 153,
+            "text": "        loop {"
+          },
+          {
+            "line": 154,
+            "text": "            let absolute = identity.resolved().server();"
+          },
+          {
+            "line": 155,
+            "text": "            let reader = self.source_reader.as_deref().unwrap_or(&DiskSourceReader);"
+          },
+          {
+            "line": 156,
+            "text": "            match reader.read(absolute).await.map(LpcSource::from_bytes) {"
+          },
+          {
+            "line": 157,
+            "text": "                Ok(source) => return Ok((identity, source)),"
+          },
+          {
+            "line": 158,
+            "text": "                Err(error)"
+          },
+          {
+            "line": 159,
+            "text": "                    if error.kind() == ErrorKind::NotFound"
+          },
+          {
+            "line": 160,
+            "text": "                        && absolute.extension().and_then(OsStr::to_str) != Some(\"c\") =>"
+          },
+          {
+            "line": 161,
+            "text": "                {"
+          },
+          {
+            "line": 162,
+            "text": "                    identity = Arc::new(CompilerSource::new("
+          },
+          {
+            "line": 163,
+            "text": "                        identity.input().with_extension(\"c\"),"
+          },
+          {
+            "line": 164,
+            "text": "                        &self.config,"
+          },
+          {
+            "line": 165,
+            "text": "                    ));"
+          },
+          {
+            "line": 166,
+            "text": "                }"
+          },
+          {
+            "line": 167,
+            "text": "                Err(error) => {"
+          },
+          {
+            "line": 168,
+            "text": "                    return Err(lpc_error!("
+          },
+          {
+            "line": 169,
+            "text": "                        \"Cannot read file `{}`: {}\","
+          },
+          {
+            "line": 170,
+            "text": "                        identity.name(),"
+          },
+          {
+            "line": 171,
+            "text": "                        error"
+          },
+          {
+            "line": 172,
+            "text": "                    ));"
+          },
+          {
+            "line": 173,
+            "text": "                }"
+          }
+        ],
+        "outlineButtons": 32,
+        "sourceLinks": 0,
+        "searchInputs": [
+          {
+            "id": "filter",
+            "placeholder": "Filter by path…"
+          }
+        ]
+      },
+      "screenshot": "03-compile-entry.png"
+    },
+    {
+      "name": "read-policy",
+      "intent": "Inspect reader selection, the fallback condition and error propagation.",
+      "state": {
+        "url": "http://127.0.0.1:38213/",
+        "historyLength": 5,
+        "filter": "src/compiler/",
+        "file": "src/compiler/mod.rs",
+        "observation": "Captured observation 1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+        "status": "Observation 1",
+        "observationMode": "native directory watches + periodic reconciliation",
+        "counts": "94 shown / 94 matching / 552 source files · 552 with analysis / 0 deferred / 0 source only",
+        "selectedFile": "src/compiler/mod.rs",
+        "selectedDeclaration": "function read_file · line 151",
+        "sourceTop": 3234,
+        "outlineTop": 680,
+        "sourceRows": [
+          {
+            "line": 148,
+            "text": "        self.compile_source(identity, &source.text, warning).await"
+          },
+          {
+            "line": 149,
+            "text": "    }"
+          },
+          {
+            "line": 150,
+            "text": ""
+          },
+          {
+            "line": 151,
+            "text": "    async fn read_file(&self, path: LpcPath) -> Result<(Arc<CompilerSource>, LpcSource)> {"
+          },
+          {
+            "line": 152,
+            "text": "        let mut identity = Arc::new(CompilerSource::new(path, &self.config));"
+          },
+          {
+            "line": 153,
+            "text": "        loop {"
+          },
+          {
+            "line": 154,
+            "text": "            let absolute = identity.resolved().server();"
+          },
+          {
+            "line": 155,
+            "text": "            let reader = self.source_reader.as_deref().unwrap_or(&DiskSourceReader);"
+          },
+          {
+            "line": 156,
+            "text": "            match reader.read(absolute).await.map(LpcSource::from_bytes) {"
+          },
+          {
+            "line": 157,
+            "text": "                Ok(source) => return Ok((identity, source)),"
+          },
+          {
+            "line": 158,
+            "text": "                Err(error)"
+          },
+          {
+            "line": 159,
+            "text": "                    if error.kind() == ErrorKind::NotFound"
+          },
+          {
+            "line": 160,
+            "text": "                        && absolute.extension().and_then(OsStr::to_str) != Some(\"c\") =>"
+          },
+          {
+            "line": 161,
+            "text": "                {"
+          },
+          {
+            "line": 162,
+            "text": "                    identity = Arc::new(CompilerSource::new("
+          },
+          {
+            "line": 163,
+            "text": "                        identity.input().with_extension(\"c\"),"
+          },
+          {
+            "line": 164,
+            "text": "                        &self.config,"
+          },
+          {
+            "line": 165,
+            "text": "                    ));"
+          },
+          {
+            "line": 166,
+            "text": "                }"
+          },
+          {
+            "line": 167,
+            "text": "                Err(error) => {"
+          },
+          {
+            "line": 168,
+            "text": "                    return Err(lpc_error!("
+          },
+          {
+            "line": 169,
+            "text": "                        \"Cannot read file `{}`: {}\","
+          },
+          {
+            "line": 170,
+            "text": "                        identity.name(),"
+          },
+          {
+            "line": 171,
+            "text": "                        error"
+          },
+          {
+            "line": 172,
+            "text": "                    ));"
+          },
+          {
+            "line": 173,
+            "text": "                }"
+          },
+          {
+            "line": 174,
+            "text": "            }"
+          },
+          {
+            "line": 175,
+            "text": "        }"
+          },
+          {
+            "line": 176,
+            "text": "    }"
+          },
+          {
+            "line": 177,
+            "text": ""
+          },
+          {
+            "line": 178,
+            "text": "    /// Compile the object an in-game path names: its `.c` source"
+          },
+          {
+            "line": 179,
+            "text": "    /// ([`LpcPath::source_file`]), confined to the lib first."
+          },
+          {
+            "line": 180,
+            "text": "    #[instrument(skip(self))]"
+          },
+          {
+            "line": 181,
+            "text": "    pub async fn compile_in_game_file("
+          },
+          {
+            "line": 182,
+            "text": "        &self,"
+          },
+          {
+            "line": 183,
+            "text": "        path: &LpcPath,"
+          },
+          {
+            "line": 184,
+            "text": "        span: Option<Span>,"
+          }
+        ],
+        "outlineButtons": 32,
+        "sourceLinks": 0,
+        "searchInputs": [
+          {
+            "id": "filter",
+            "placeholder": "Filter by path…"
+          }
+        ]
+      },
+      "screenshot": "04-read-policy.png"
+    },
+    {
+      "name": "reader-contract",
+      "intent": "Follow the known reader path and inspect its contract; no source identifier link is available.",
+      "state": {
+        "url": "http://127.0.0.1:38213/",
+        "historyLength": 7,
+        "filter": "source_reader",
+        "file": "src/compiler/source_reader.rs",
+        "observation": "Captured observation 1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+        "status": "Observation 1",
+        "observationMode": "native directory watches + periodic reconciliation",
+        "counts": "1 shown / 1 matching / 552 source files · 552 with analysis / 0 deferred / 0 source only",
+        "selectedFile": "src/compiler/source_reader.rs",
+        "selectedDeclaration": "trait SourceReader · line 17",
+        "sourceTop": 199,
+        "outlineTop": 0,
+        "sourceRows": [
+          {
+            "line": 10,
+            "text": "    File,"
+          },
+          {
+            "line": 11,
+            "text": "    Directory,"
+          },
+          {
+            "line": 12,
+            "text": "    Other,"
+          },
+          {
+            "line": 13,
+            "text": "}"
+          },
+          {
+            "line": 14,
+            "text": ""
+          },
+          {
+            "line": 15,
+            "text": "/// Supplies source bytes independently of compile-time authorization."
+          },
+          {
+            "line": 16,
+            "text": "#[async_trait]"
+          },
+          {
+            "line": 17,
+            "text": "pub trait SourceReader: Debug + Send + Sync {"
+          },
+          {
+            "line": 18,
+            "text": "    /// Read a file's bytes, before decoding or newline normalization."
+          },
+          {
+            "line": 19,
+            "text": "    async fn read(&self, path: &Path) -> io::Result<Vec<u8>>;"
+          },
+          {
+            "line": 20,
+            "text": ""
+          },
+          {
+            "line": 21,
+            "text": "    /// Probe a path without reading its contents; missing paths return `NotFound`."
+          },
+          {
+            "line": 22,
+            "text": "    async fn kind(&self, path: &Path) -> io::Result<SourceKind>;"
+          },
+          {
+            "line": 23,
+            "text": "}"
+          },
+          {
+            "line": 24,
+            "text": ""
+          },
+          {
+            "line": 25,
+            "text": "/// Host-facing compiles read directly from disk."
+          },
+          {
+            "line": 26,
+            "text": "#[derive(Debug)]"
+          },
+          {
+            "line": 27,
+            "text": "pub struct DiskSourceReader;"
+          },
+          {
+            "line": 28,
+            "text": ""
+          },
+          {
+            "line": 29,
+            "text": "#[async_trait]"
+          },
+          {
+            "line": 30,
+            "text": "impl SourceReader for DiskSourceReader {"
+          },
+          {
+            "line": 31,
+            "text": "    async fn read(&self, path: &Path) -> io::Result<Vec<u8>> {"
+          },
+          {
+            "line": 32,
+            "text": "        tokio::fs::read(path).await"
+          },
+          {
+            "line": 33,
+            "text": "    }"
+          },
+          {
+            "line": 34,
+            "text": ""
+          },
+          {
+            "line": 35,
+            "text": "    async fn kind(&self, path: &Path) -> io::Result<SourceKind> {"
+          },
+          {
+            "line": 36,
+            "text": "        let metadata = tokio::fs::metadata(path).await?;"
+          },
+          {
+            "line": 37,
+            "text": "        Ok(if metadata.is_file() {"
+          },
+          {
+            "line": 38,
+            "text": "            SourceKind::File"
+          },
+          {
+            "line": 39,
+            "text": "        } else if metadata.is_dir() {"
+          },
+          {
+            "line": 40,
+            "text": "            SourceKind::Directory"
+          },
+          {
+            "line": 41,
+            "text": "        } else {"
+          },
+          {
+            "line": 42,
+            "text": "            SourceKind::Other"
+          },
+          {
+            "line": 43,
+            "text": "        })"
+          },
+          {
+            "line": 44,
+            "text": "    }"
+          },
+          {
+            "line": 45,
+            "text": "}"
+          },
+          {
+            "line": 46,
+            "text": ""
+          }
+        ],
+        "outlineButtons": 8,
+        "sourceLinks": 0,
+        "searchInputs": [
+          {
+            "id": "filter",
+            "placeholder": "Filter by path…"
+          }
+        ]
+      },
+      "screenshot": "05-reader-contract.png"
+    },
+    {
+      "name": "disk-reader",
+      "intent": "Inspect the default disk reader and raw-byte read implementation.",
+      "state": {
+        "url": "http://127.0.0.1:38213/",
+        "historyLength": 8,
+        "filter": "source_reader",
+        "file": "src/compiler/source_reader.rs",
+        "observation": "Captured observation 1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+        "status": "Observation 1",
+        "observationMode": "native directory watches + periodic reconciliation",
+        "counts": "1 shown / 1 matching / 552 source files · 552 with analysis / 0 deferred / 0 source only",
+        "selectedFile": "src/compiler/source_reader.rs",
+        "selectedDeclaration": "struct DiskSourceReader · line 27",
+        "sourceTop": 199,
+        "outlineTop": 0,
+        "sourceRows": [
+          {
+            "line": 10,
+            "text": "    File,"
+          },
+          {
+            "line": 11,
+            "text": "    Directory,"
+          },
+          {
+            "line": 12,
+            "text": "    Other,"
+          },
+          {
+            "line": 13,
+            "text": "}"
+          },
+          {
+            "line": 14,
+            "text": ""
+          },
+          {
+            "line": 15,
+            "text": "/// Supplies source bytes independently of compile-time authorization."
+          },
+          {
+            "line": 16,
+            "text": "#[async_trait]"
+          },
+          {
+            "line": 17,
+            "text": "pub trait SourceReader: Debug + Send + Sync {"
+          },
+          {
+            "line": 18,
+            "text": "    /// Read a file's bytes, before decoding or newline normalization."
+          },
+          {
+            "line": 19,
+            "text": "    async fn read(&self, path: &Path) -> io::Result<Vec<u8>>;"
+          },
+          {
+            "line": 20,
+            "text": ""
+          },
+          {
+            "line": 21,
+            "text": "    /// Probe a path without reading its contents; missing paths return `NotFound`."
+          },
+          {
+            "line": 22,
+            "text": "    async fn kind(&self, path: &Path) -> io::Result<SourceKind>;"
+          },
+          {
+            "line": 23,
+            "text": "}"
+          },
+          {
+            "line": 24,
+            "text": ""
+          },
+          {
+            "line": 25,
+            "text": "/// Host-facing compiles read directly from disk."
+          },
+          {
+            "line": 26,
+            "text": "#[derive(Debug)]"
+          },
+          {
+            "line": 27,
+            "text": "pub struct DiskSourceReader;"
+          },
+          {
+            "line": 28,
+            "text": ""
+          },
+          {
+            "line": 29,
+            "text": "#[async_trait]"
+          },
+          {
+            "line": 30,
+            "text": "impl SourceReader for DiskSourceReader {"
+          },
+          {
+            "line": 31,
+            "text": "    async fn read(&self, path: &Path) -> io::Result<Vec<u8>> {"
+          },
+          {
+            "line": 32,
+            "text": "        tokio::fs::read(path).await"
+          },
+          {
+            "line": 33,
+            "text": "    }"
+          },
+          {
+            "line": 34,
+            "text": ""
+          },
+          {
+            "line": 35,
+            "text": "    async fn kind(&self, path: &Path) -> io::Result<SourceKind> {"
+          },
+          {
+            "line": 36,
+            "text": "        let metadata = tokio::fs::metadata(path).await?;"
+          },
+          {
+            "line": 37,
+            "text": "        Ok(if metadata.is_file() {"
+          },
+          {
+            "line": 38,
+            "text": "            SourceKind::File"
+          },
+          {
+            "line": 39,
+            "text": "        } else if metadata.is_dir() {"
+          },
+          {
+            "line": 40,
+            "text": "            SourceKind::Directory"
+          },
+          {
+            "line": 41,
+            "text": "        } else {"
+          },
+          {
+            "line": 42,
+            "text": "            SourceKind::Other"
+          },
+          {
+            "line": 43,
+            "text": "        })"
+          },
+          {
+            "line": 44,
+            "text": "    }"
+          },
+          {
+            "line": 45,
+            "text": "}"
+          },
+          {
+            "line": 46,
+            "text": ""
+          }
+        ],
+        "outlineButtons": 8,
+        "sourceLinks": 0,
+        "searchInputs": [
+          {
+            "id": "filter",
+            "placeholder": "Filter by path…"
+          }
+        ]
+      },
+      "screenshot": "06-disk-reader.png"
+    },
+    {
+      "name": "history-return",
+      "intent": "Use Back to revisit the compiler read policy and preserve its exact reading position.",
+      "state": {
+        "url": "http://127.0.0.1:38213/",
+        "historyLength": 8,
+        "filter": "source_reader",
+        "file": "src/compiler/mod.rs",
+        "observation": "Captured observation 1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+        "status": "Observation 1",
+        "observationMode": "native directory watches + periodic reconciliation",
+        "counts": "1 shown / 1 matching / 552 source files · 552 with analysis / 0 deferred / 0 source only",
+        "selectedFile": null,
+        "selectedDeclaration": "function read_file · line 151",
+        "sourceTop": 3234,
+        "outlineTop": 680,
+        "sourceRows": [
+          {
+            "line": 148,
+            "text": "        self.compile_source(identity, &source.text, warning).await"
+          },
+          {
+            "line": 149,
+            "text": "    }"
+          },
+          {
+            "line": 150,
+            "text": ""
+          },
+          {
+            "line": 151,
+            "text": "    async fn read_file(&self, path: LpcPath) -> Result<(Arc<CompilerSource>, LpcSource)> {"
+          },
+          {
+            "line": 152,
+            "text": "        let mut identity = Arc::new(CompilerSource::new(path, &self.config));"
+          },
+          {
+            "line": 153,
+            "text": "        loop {"
+          },
+          {
+            "line": 154,
+            "text": "            let absolute = identity.resolved().server();"
+          },
+          {
+            "line": 155,
+            "text": "            let reader = self.source_reader.as_deref().unwrap_or(&DiskSourceReader);"
+          },
+          {
+            "line": 156,
+            "text": "            match reader.read(absolute).await.map(LpcSource::from_bytes) {"
+          },
+          {
+            "line": 157,
+            "text": "                Ok(source) => return Ok((identity, source)),"
+          },
+          {
+            "line": 158,
+            "text": "                Err(error)"
+          },
+          {
+            "line": 159,
+            "text": "                    if error.kind() == ErrorKind::NotFound"
+          },
+          {
+            "line": 160,
+            "text": "                        && absolute.extension().and_then(OsStr::to_str) != Some(\"c\") =>"
+          },
+          {
+            "line": 161,
+            "text": "                {"
+          },
+          {
+            "line": 162,
+            "text": "                    identity = Arc::new(CompilerSource::new("
+          },
+          {
+            "line": 163,
+            "text": "                        identity.input().with_extension(\"c\"),"
+          },
+          {
+            "line": 164,
+            "text": "                        &self.config,"
+          },
+          {
+            "line": 165,
+            "text": "                    ));"
+          },
+          {
+            "line": 166,
+            "text": "                }"
+          },
+          {
+            "line": 167,
+            "text": "                Err(error) => {"
+          },
+          {
+            "line": 168,
+            "text": "                    return Err(lpc_error!("
+          },
+          {
+            "line": 169,
+            "text": "                        \"Cannot read file `{}`: {}\","
+          },
+          {
+            "line": 170,
+            "text": "                        identity.name(),"
+          },
+          {
+            "line": 171,
+            "text": "                        error"
+          },
+          {
+            "line": 172,
+            "text": "                    ));"
+          },
+          {
+            "line": 173,
+            "text": "                }"
+          },
+          {
+            "line": 174,
+            "text": "            }"
+          },
+          {
+            "line": 175,
+            "text": "        }"
+          },
+          {
+            "line": 176,
+            "text": "    }"
+          },
+          {
+            "line": 177,
+            "text": ""
+          },
+          {
+            "line": 178,
+            "text": "    /// Compile the object an in-game path names: its `.c` source"
+          },
+          {
+            "line": 179,
+            "text": "    /// ([`LpcPath::source_file`]), confined to the lib first."
+          },
+          {
+            "line": 180,
+            "text": "    #[instrument(skip(self))]"
+          },
+          {
+            "line": 181,
+            "text": "    pub async fn compile_in_game_file("
+          },
+          {
+            "line": 182,
+            "text": "        &self,"
+          },
+          {
+            "line": 183,
+            "text": "        path: &LpcPath,"
+          },
+          {
+            "line": 184,
+            "text": "        span: Option<Span>,"
+          }
+        ],
+        "outlineButtons": 32,
+        "sourceLinks": 0,
+        "searchInputs": [
+          {
+            "id": "filter",
+            "placeholder": "Filter by path…"
+          }
+        ]
+      },
+      "screenshot": "07-history-return.png"
+    },
+    {
+      "name": "source-identity",
+      "intent": "Inspect input, resolved path and diagnostic-name ownership.",
+      "state": {
+        "url": "http://127.0.0.1:38213/",
+        "historyLength": 7,
+        "filter": "src/compiler/source.rs",
+        "file": "src/compiler/source.rs",
+        "observation": "Captured observation 1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+        "status": "Observation 1",
+        "observationMode": "native directory watches + periodic reconciliation",
+        "counts": "1 shown / 1 matching / 552 source files · 552 with analysis / 0 deferred / 0 source only",
+        "selectedFile": "src/compiler/source.rs",
+        "selectedDeclaration": "struct CompilerSource · line 12",
+        "sourceTop": 176,
+        "outlineTop": 0,
+        "sourceRows": [
+          {
+            "line": 9,
+            "text": ""
+          },
+          {
+            "line": 10,
+            "text": "/// One compiler input's host location, names, and relative-path bases."
+          },
+          {
+            "line": 11,
+            "text": "#[derive(Clone)]"
+          },
+          {
+            "line": 12,
+            "text": "pub struct CompilerSource {"
+          },
+          {
+            "line": 13,
+            "text": "    resolved: ResolvedPath,"
+          },
+          {
+            "line": 14,
+            "text": "    input: Arc<LpcPath>,"
+          },
+          {
+            "line": 15,
+            "text": "    program: Arc<LpcPath>,"
+          },
+          {
+            "line": 16,
+            "text": "    name: SourceName,"
+          },
+          {
+            "line": 17,
+            "text": "    include_cwd: PathBuf,"
+          },
+          {
+            "line": 18,
+            "text": "    inheritance_cwd: PathBuf,"
+          },
+          {
+            "line": 19,
+            "text": "}"
+          },
+          {
+            "line": 20,
+            "text": ""
+          },
+          {
+            "line": 21,
+            "text": "impl CompilerSource {"
+          },
+          {
+            "line": 22,
+            "text": "    /// Establish an input's identity without restricting host-facing compiler inputs."
+          },
+          {
+            "line": 23,
+            "text": "    pub fn new(path: impl Into<LpcPath>, config: &Config) -> Self {"
+          },
+          {
+            "line": 24,
+            "text": "        let input = Arc::new(path.into());"
+          },
+          {
+            "line": 25,
+            "text": "        let root = config.paths();"
+          },
+          {
+            "line": 26,
+            "text": "        Self {"
+          },
+          {
+            "line": 27,
+            "text": "            resolved: root.source(&input),"
+          },
+          {
+            "line": 28,
+            "text": "            program: Arc::new(root.program_path(&input)),"
+          },
+          {
+            "line": 29,
+            "text": "            name: root.source_name(&input),"
+          },
+          {
+            "line": 30,
+            "text": "            include_cwd: root.source_cwd(&input),"
+          },
+          {
+            "line": 31,
+            "text": "            inheritance_cwd: root.inheritance_cwd(&input),"
+          },
+          {
+            "line": 32,
+            "text": "            input,"
+          },
+          {
+            "line": 33,
+            "text": "        }"
+          },
+          {
+            "line": 34,
+            "text": "    }"
+          },
+          {
+            "line": 35,
+            "text": ""
+          },
+          {
+            "line": 36,
+            "text": "    /// The original identity used by function mangling and configured-file comparisons."
+          },
+          {
+            "line": 37,
+            "text": "    pub fn input(&self) -> &Arc<LpcPath> {"
+          },
+          {
+            "line": 38,
+            "text": "        &self.input"
+          },
+          {
+            "line": 39,
+            "text": "    }"
+          },
+          {
+            "line": 40,
+            "text": ""
+          },
+          {
+            "line": 41,
+            "text": "    /// The host location and canonical diagnostic location used to register source text."
+          },
+          {
+            "line": 42,
+            "text": "    pub fn resolved(&self) -> &ResolvedPath {"
+          },
+          {
+            "line": 43,
+            "text": "        &self.resolved"
+          },
+          {
+            "line": 44,
+            "text": "    }"
+          },
+          {
+            "line": 45,
+            "text": ""
+          }
+        ],
+        "outlineButtons": 13,
+        "sourceLinks": 0,
+        "searchInputs": [
+          {
+            "id": "filter",
+            "placeholder": "Filter by path…"
+          }
+        ]
+      },
+      "screenshot": "08-source-identity.png"
+    },
+    {
+      "name": "diagnostic-name",
+      "intent": "Locate the diagnostic-name accessor through the declaration outline.",
+      "state": {
+        "url": "http://127.0.0.1:38213/",
+        "historyLength": 8,
+        "filter": "src/compiler/source.rs",
+        "file": "src/compiler/source.rs",
+        "observation": "Captured observation 1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+        "status": "Observation 1",
+        "observationMode": "native directory watches + periodic reconciliation",
+        "counts": "1 shown / 1 matching / 552 source files · 552 with analysis / 0 deferred / 0 source only",
+        "selectedFile": "src/compiler/source.rs",
+        "selectedDeclaration": "function name · line 47",
+        "sourceTop": 946,
+        "outlineTop": 0,
+        "sourceRows": [
+          {
+            "line": 44,
+            "text": "    }"
+          },
+          {
+            "line": 45,
+            "text": ""
+          },
+          {
+            "line": 46,
+            "text": "    /// The safe input spelling used in file errors and inheritance permission applies."
+          },
+          {
+            "line": 47,
+            "text": "    pub fn name(&self) -> &SourceName {"
+          },
+          {
+            "line": 48,
+            "text": "        &self.name"
+          },
+          {
+            "line": 49,
+            "text": "    }"
+          },
+          {
+            "line": 50,
+            "text": ""
+          },
+          {
+            "line": 51,
+            "text": "    /// The program identity, retaining distinct outside-host inputs internally."
+          },
+          {
+            "line": 52,
+            "text": "    pub fn program_path(&self) -> &Arc<LpcPath> {"
+          },
+          {
+            "line": 53,
+            "text": "        &self.program"
+          },
+          {
+            "line": 54,
+            "text": "    }"
+          },
+          {
+            "line": 55,
+            "text": ""
+          },
+          {
+            "line": 56,
+            "text": "    /// The base for relative include directives."
+          },
+          {
+            "line": 57,
+            "text": "    pub fn include_cwd(&self) -> &Path {"
+          },
+          {
+            "line": 58,
+            "text": "        &self.include_cwd"
+          },
+          {
+            "line": 59,
+            "text": "    }"
+          },
+          {
+            "line": 60,
+            "text": ""
+          },
+          {
+            "line": 61,
+            "text": "    /// The source directory used as the base for relative inherit paths."
+          },
+          {
+            "line": 62,
+            "text": "    pub fn inheritance_cwd(&self) -> &Path {"
+          },
+          {
+            "line": 63,
+            "text": "        &self.inheritance_cwd"
+          },
+          {
+            "line": 64,
+            "text": "    }"
+          },
+          {
+            "line": 65,
+            "text": "}"
+          },
+          {
+            "line": 66,
+            "text": ""
+          },
+          {
+            "line": 67,
+            "text": "impl fmt::Debug for CompilerSource {"
+          },
+          {
+            "line": 68,
+            "text": "    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {"
+          },
+          {
+            "line": 69,
+            "text": "        f.debug_struct(\"CompilerSource\")"
+          },
+          {
+            "line": 70,
+            "text": "            .field(\"name\", &self.name)"
+          },
+          {
+            "line": 71,
+            "text": "            .finish_non_exhaustive()"
+          },
+          {
+            "line": 72,
+            "text": "    }"
+          },
+          {
+            "line": 73,
+            "text": "}"
+          },
+          {
+            "line": 74,
+            "text": ""
+          },
+          {
+            "line": 75,
+            "text": "#[cfg(test)]"
+          },
+          {
+            "line": 76,
+            "text": "mod tests {"
+          },
+          {
+            "line": 77,
+            "text": "    use super::*;"
+          },
+          {
+            "line": 78,
+            "text": "    use lpc_rs_utils::config::ConfigBuilder;"
+          },
+          {
+            "line": 79,
+            "text": ""
+          },
+          {
+            "line": 80,
+            "text": "    #[test]"
+          }
+        ],
+        "outlineButtons": 13,
+        "sourceLinks": 0,
+        "searchInputs": [
+          {
+            "id": "filter",
+            "placeholder": "Filter by path…"
+          }
+        ]
+      },
+      "screenshot": "09-diagnostic-name.png"
+    },
+    {
+      "name": "regression-test",
+      "intent": "Locate the existing source-read regression test using End and outline navigation.",
+      "state": {
+        "url": "http://127.0.0.1:38213/",
+        "historyLength": 10,
+        "filter": "src/compiler/mod.rs",
+        "file": "src/compiler/mod.rs",
+        "observation": "Captured observation 1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+        "status": "Observation 1",
+        "observationMode": "native directory watches + periodic reconciliation",
+        "counts": "1 shown / 1 matching / 552 source files · 552 with analysis / 0 deferred / 0 source only",
+        "selectedFile": "src/compiler/mod.rs",
+        "selectedDeclaration": "function file_reads_stop_after_extension_fallback_and_preserve_other_io_errors · line 2012",
+        "sourceTop": 44176,
+        "outlineTop": 5535,
+        "sourceRows": [
+          {
+            "line": 2009,
+            "text": "    }"
+          },
+          {
+            "line": 2010,
+            "text": ""
+          },
+          {
+            "line": 2011,
+            "text": "    #[tokio::test]"
+          },
+          {
+            "line": 2012,
+            "text": "    async fn file_reads_stop_after_extension_fallback_and_preserve_other_io_errors() {"
+          },
+          {
+            "line": 2013,
+            "text": "        use crate::compiler::source_reader::SourceKind;"
+          },
+          {
+            "line": 2014,
+            "text": "        use parking_lot::Mutex;"
+          },
+          {
+            "line": 2015,
+            "text": "        use std::{"
+          },
+          {
+            "line": 2016,
+            "text": "            io,"
+          },
+          {
+            "line": 2017,
+            "text": "            path::{Path, PathBuf},"
+          },
+          {
+            "line": 2018,
+            "text": "        };"
+          },
+          {
+            "line": 2019,
+            "text": ""
+          },
+          {
+            "line": 2020,
+            "text": "        #[derive(Debug)]"
+          },
+          {
+            "line": 2021,
+            "text": "        struct RecoveringReader {"
+          },
+          {
+            "line": 2022,
+            "text": "            error: ErrorKind,"
+          },
+          {
+            "line": 2023,
+            "text": "            failures: usize,"
+          },
+          {
+            "line": 2024,
+            "text": "            reads: Mutex<Vec<PathBuf>>,"
+          },
+          {
+            "line": 2025,
+            "text": "        }"
+          },
+          {
+            "line": 2026,
+            "text": ""
+          },
+          {
+            "line": 2027,
+            "text": "        #[async_trait::async_trait]"
+          },
+          {
+            "line": 2028,
+            "text": "        impl SourceReader for RecoveringReader {"
+          },
+          {
+            "line": 2029,
+            "text": "            async fn read(&self, path: &Path) -> io::Result<Vec<u8>> {"
+          },
+          {
+            "line": 2030,
+            "text": "                let mut reads = self.reads.lock();"
+          },
+          {
+            "line": 2031,
+            "text": "                reads.push(path.to_path_buf());"
+          },
+          {
+            "line": 2032,
+            "text": "                if reads.len() <= self.failures {"
+          },
+          {
+            "line": 2033,
+            "text": "                    Err(io::Error::new(self.error, \"source unavailable\"))"
+          },
+          {
+            "line": 2034,
+            "text": "                } else {"
+          },
+          {
+            "line": 2035,
+            "text": "                    Ok(Vec::new())"
+          },
+          {
+            "line": 2036,
+            "text": "                }"
+          },
+          {
+            "line": 2037,
+            "text": "            }"
+          },
+          {
+            "line": 2038,
+            "text": ""
+          },
+          {
+            "line": 2039,
+            "text": "            async fn kind(&self, _: &Path) -> io::Result<SourceKind> {"
+          },
+          {
+            "line": 2040,
+            "text": "                Ok(SourceKind::File)"
+          },
+          {
+            "line": 2041,
+            "text": "            }"
+          },
+          {
+            "line": 2042,
+            "text": "        }"
+          },
+          {
+            "line": 2043,
+            "text": ""
+          },
+          {
+            "line": 2044,
+            "text": "        for (input, error, expected) in ["
+          },
+          {
+            "line": 2045,
+            "text": "            ("
+          }
+        ],
+        "outlineButtons": 24,
+        "sourceLinks": 0,
+        "searchInputs": [
+          {
+            "id": "filter",
+            "placeholder": "Filter by path…"
+          }
+        ]
+      },
+      "screenshot": "10-regression-test.png"
+    },
+    {
+      "name": "read-error-cases",
+      "intent": "Read the expected read-attempt cases, including permission errors.",
+      "state": {
+        "url": "http://127.0.0.1:38213/",
+        "historyLength": 10,
+        "filter": "src/compiler/mod.rs",
+        "file": "src/compiler/mod.rs",
+        "observation": "Captured observation 1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+        "status": "Observation 1",
+        "observationMode": "native directory watches + periodic reconciliation",
+        "counts": "1 shown / 1 matching / 552 source files · 552 with analysis / 0 deferred / 0 source only",
+        "selectedFile": "src/compiler/mod.rs",
+        "selectedDeclaration": "function file_reads_stop_after_extension_fallback_and_preserve_other_io_errors · line 2012",
+        "sourceTop": 44887,
+        "outlineTop": 5535,
+        "sourceRows": [
+          {
+            "line": 2041,
+            "text": "            }"
+          },
+          {
+            "line": 2042,
+            "text": "        }"
+          },
+          {
+            "line": 2043,
+            "text": ""
+          },
+          {
+            "line": 2044,
+            "text": "        for (input, error, expected) in ["
+          },
+          {
+            "line": 2045,
+            "text": "            ("
+          },
+          {
+            "line": 2046,
+            "text": "                \"/source-read/missing\","
+          },
+          {
+            "line": 2047,
+            "text": "                ErrorKind::NotFound,"
+          },
+          {
+            "line": 2048,
+            "text": "                vec![\"/source-read/missing\", \"/source-read/missing.c\"],"
+          },
+          {
+            "line": 2049,
+            "text": "            ),"
+          },
+          {
+            "line": 2050,
+            "text": "            ("
+          },
+          {
+            "line": 2051,
+            "text": "                \"/source-read/missing.c\","
+          },
+          {
+            "line": 2052,
+            "text": "                ErrorKind::NotFound,"
+          },
+          {
+            "line": 2053,
+            "text": "                vec![\"/source-read/missing.c\"],"
+          },
+          {
+            "line": 2054,
+            "text": "            ),"
+          },
+          {
+            "line": 2055,
+            "text": "            ("
+          },
+          {
+            "line": 2056,
+            "text": "                \"/source-read/denied\","
+          },
+          {
+            "line": 2057,
+            "text": "                ErrorKind::PermissionDenied,"
+          },
+          {
+            "line": 2058,
+            "text": "                vec![\"/source-read/denied\"],"
+          },
+          {
+            "line": 2059,
+            "text": "            ),"
+          },
+          {
+            "line": 2060,
+            "text": "        ] {"
+          },
+          {
+            "line": 2061,
+            "text": "            let reader = Arc::new(RecoveringReader {"
+          },
+          {
+            "line": 2062,
+            "text": "                error,"
+          },
+          {
+            "line": 2063,
+            "text": "                failures: expected.len(),"
+          },
+          {
+            "line": 2064,
+            "text": "                reads: Mutex::new(Vec::new()),"
+          },
+          {
+            "line": 2065,
+            "text": "            });"
+          },
+          {
+            "line": 2066,
+            "text": "            let compiler = CompilerBuilder::default()"
+          },
+          {
+            "line": 2067,
+            "text": "                .config(crate::test_support::test_config())"
+          },
+          {
+            "line": 2068,
+            "text": "                .source_reader(Some(reader.clone() as Arc<dyn SourceReader>))"
+          },
+          {
+            "line": 2069,
+            "text": "                .build()"
+          },
+          {
+            "line": 2070,
+            "text": "                .unwrap();"
+          },
+          {
+            "line": 2071,
+            "text": "            let Err(error) = compiler.read_file(LpcPath::new_server(input)).await else {"
+          },
+          {
+            "line": 2072,
+            "text": "                panic!(\"a failed source read unexpectedly recovered\");"
+          },
+          {
+            "line": 2073,
+            "text": "            };"
+          },
+          {
+            "line": 2074,
+            "text": "            assert!(error.message().contains(\"source unavailable\"), \"{error}\");"
+          },
+          {
+            "line": 2075,
+            "text": "            let expected: Vec<_> = expected.into_iter().map(PathBuf::from).collect();"
+          },
+          {
+            "line": 2076,
+            "text": "            assert_eq!(*reader.reads.lock(), expected, \"{input}\");"
+          },
+          {
+            "line": 2077,
+            "text": "        }"
+          },
+          {
+            "line": 2078,
+            "text": "    }"
+          }
+        ],
+        "outlineButtons": 24,
+        "sourceLinks": 0,
+        "searchInputs": [
+          {
+            "id": "filter",
+            "placeholder": "Filter by path…"
+          }
+        ]
+      },
+      "screenshot": "11-read-error-cases.png"
+    },
+    {
+      "name": "browser-back",
+      "intent": "Deliberate capability probe: does browser Back restore the previous source location?",
+      "state": {
+        "url": "http://127.0.0.1:38213/",
+        "historyLength": 10,
+        "filter": "src/compiler/mod.rs",
+        "file": "src/compiler/mod.rs",
+        "observation": "Captured observation 1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+        "status": "Observation 1",
+        "observationMode": "native directory watches + periodic reconciliation",
+        "counts": "1 shown / 1 matching / 552 source files · 552 with analysis / 0 deferred / 0 source only",
+        "selectedFile": "src/compiler/mod.rs",
+        "selectedDeclaration": null,
+        "sourceTop": 0,
+        "outlineTop": 5535,
+        "sourceRows": [
+          {
+            "line": 1,
+            "text": "use std::{ffi::OsStr, fmt::Debug, io::ErrorKind, sync::Arc};"
+          },
+          {
+            "line": 2,
+            "text": ""
+          },
+          {
+            "line": 3,
+            "text": "use ast::program_node::ProgramNode;"
+          },
+          {
+            "line": 4,
+            "text": "use codegen::{"
+          },
+          {
+            "line": 5,
+            "text": "    codegen_walker::CodegenWalker,"
+          },
+          {
+            "line": 6,
+            "text": "    tree_walker::{Pass, apply},"
+          },
+          {
+            "line": 7,
+            "text": "};"
+          },
+          {
+            "line": 8,
+            "text": "use compilation_context::CompilationContext;"
+          },
+          {
+            "line": 9,
+            "text": "use compile_gate::CompileGate;"
+          },
+          {
+            "line": 10,
+            "text": "use derive_builder::Builder;"
+          },
+          {
+            "line": 11,
+            "text": "use educe::Educe;"
+          },
+          {
+            "line": 12,
+            "text": "use lexer::Token;"
+          },
+          {
+            "line": 13,
+            "text": "use lpc_rs_core::lpc_path::LpcPath;"
+          },
+          {
+            "line": 14,
+            "text": "use lpc_rs_errors::{self, LpcError, Result, lpc_error, source_map::DiagnosticSources, span::Span};"
+          },
+          {
+            "line": 15,
+            "text": "use lpc_rs_utils::{LpcSource, config::Config};"
+          },
+          {
+            "line": 16,
+            "text": "use preprocessor::Preprocessor;"
+          },
+          {
+            "line": 17,
+            "text": "use source::CompilerSource;"
+          },
+          {
+            "line": 18,
+            "text": "use source_reader::{DiskSourceReader, SourceReader};"
+          },
+          {
+            "line": 19,
+            "text": "use tracing::instrument;"
+          },
+          {
+            "line": 20,
+            "text": ""
+          },
+          {
+            "line": 21,
+            "text": "use crate::{"
+          },
+          {
+            "line": 22,
+            "text": "    compiler::compilation_context::CompilationContextBuilder, interpreter::program::Program,"
+          },
+          {
+            "line": 23,
+            "text": "};"
+          },
+          {
+            "line": 24,
+            "text": ""
+          },
+          {
+            "line": 25,
+            "text": "pub mod ast;"
+          },
+          {
+            "line": 26,
+            "text": "pub mod cache;"
+          },
+          {
+            "line": 27,
+            "text": "pub mod callee;"
+          },
+          {
+            "line": 28,
+            "text": "pub mod codegen;"
+          },
+          {
+            "line": 29,
+            "text": "pub mod compilation_context;"
+          },
+          {
+            "line": 30,
+            "text": "pub mod compile_gate;"
+          },
+          {
+            "line": 31,
+            "text": "pub mod diagnostics;"
+          },
+          {
+            "line": 32,
+            "text": "pub mod lexer;"
+          },
+          {
+            "line": 33,
+            "text": "pub mod parser;"
+          },
+          {
+            "line": 34,
+            "text": "pub mod parser_cache;"
+          },
+          {
+            "line": 35,
+            "text": "mod prepared_program;"
+          },
+          {
+            "line": 36,
+            "text": "pub mod preprocessor;"
+          },
+          {
+            "line": 37,
+            "text": "mod program_interface;"
+          }
+        ],
+        "outlineButtons": 24,
+        "sourceLinks": 0,
+        "searchInputs": [
+          {
+            "id": "filter",
+            "placeholder": "Filter by path…"
+          }
+        ]
+      },
+      "screenshot": "12-browser-back.png"
+    }
+  ],
+  "outlineScans": [
+    {
+      "file": "src/compiler/mod.rs",
+      "name": "compile_file",
+      "start": "Home",
+      "pages": [
+        [
+          {
+            "id": "2a5cd15ec555fe8ffceb381253679044c3bd84479fa3d97982cdb524a74d6bc4",
+            "name": "ast",
+            "title": "module ast · line 25",
+            "position": 1
+          },
+          {
+            "id": "c31d578811c5e16360c3c2f5caeb5c13ec4d7f3c787e9e0c931742ec96dd2969",
+            "name": "cache",
+            "title": "module cache · line 26",
+            "position": 2
+          },
+          {
+            "id": "e4a909e2e450d94c034ea05aa073869b001ec39a783a7bf41c04c95d4887c672",
+            "name": "callee",
+            "title": "module callee · line 27",
+            "position": 3
+          },
+          {
+            "id": "eba39b4d24bfff7ba9e539b349de163217b6861d42ea9ead184ba59c9e840f32",
+            "name": "codegen",
+            "title": "module codegen · line 28",
+            "position": 4
+          },
+          {
+            "id": "a3def698d8c6cfd9074273fe954893fdf18a24a8a88561c0471ec73405c21ad0",
+            "name": "compilation_context",
+            "title": "module compilation_context · line 29",
+            "position": 5
+          },
+          {
+            "id": "7da9d6292d87285a0de1855e9b063273c623f104c9f8f1df97d81129daae3a2a",
+            "name": "compile_gate",
+            "title": "module compile_gate · line 30",
+            "position": 6
+          },
+          {
+            "id": "4ccdb3f3b51408ae3c19f18df2be60ac56fa3a8a59580b87f33c792e475f51ae",
+            "name": "diagnostics",
+            "title": "module diagnostics · line 31",
+            "position": 7
+          },
+          {
+            "id": "41474473cc01b05aee4e817c0c17412a36b655252239c81dc1bb7911e9e88021",
+            "name": "lexer",
+            "title": "module lexer · line 32",
+            "position": 8
+          },
+          {
+            "id": "cd71ff83ec7094edcaea30324d5fa128190303d621a4bc9d31690e1129efcbc2",
+            "name": "parser",
+            "title": "module parser · line 33",
+            "position": 9
+          },
+          {
+            "id": "31475811cbda9dae8f19b4669d38139ba4890d9dd329036c8f307fb9cb3fb09e",
+            "name": "parser_cache",
+            "title": "module parser_cache · line 34",
+            "position": 10
+          },
+          {
+            "id": "68f8a183b97555d5ca6eb20d513fcb53fa769730a8cbc293f0c7ef561da3533f",
+            "name": "prepared_program",
+            "title": "module prepared_program · line 35",
+            "position": 11
+          },
+          {
+            "id": "a0556bd958a523b72eff215ba13bdc249980960f16c88927ba4d9c56ea414521",
+            "name": "preprocessor",
+            "title": "module preprocessor · line 36",
+            "position": 12
+          },
+          {
+            "id": "29a949131b3f4625e7e0123f3045732a9acf61ff1cb9628ca04a68ff89744686",
+            "name": "program_interface",
+            "title": "module program_interface · line 37",
+            "position": 13
+          },
+          {
+            "id": "dfe66d894a617e48f991afacddb19bcd35e48464c936d28f9ad329a3b42d0ed2",
+            "name": "semantic",
+            "title": "module semantic · line 38",
+            "position": 14
+          },
+          {
+            "id": "e342f38830894f43b4eb15abe3f0ed4f2422dc907d22203b20e92765434b90a9",
+            "name": "source",
+            "title": "module source · line 39",
+            "position": 15
+          }
+        ],
+        [
+          {
+            "id": "c31d578811c5e16360c3c2f5caeb5c13ec4d7f3c787e9e0c931742ec96dd2969",
+            "name": "cache",
+            "title": "module cache · line 26",
+            "position": 2
+          },
+          {
+            "id": "e4a909e2e450d94c034ea05aa073869b001ec39a783a7bf41c04c95d4887c672",
+            "name": "callee",
+            "title": "module callee · line 27",
+            "position": 3
+          },
+          {
+            "id": "eba39b4d24bfff7ba9e539b349de163217b6861d42ea9ead184ba59c9e840f32",
+            "name": "codegen",
+            "title": "module codegen · line 28",
+            "position": 4
+          },
+          {
+            "id": "a3def698d8c6cfd9074273fe954893fdf18a24a8a88561c0471ec73405c21ad0",
+            "name": "compilation_context",
+            "title": "module compilation_context · line 29",
+            "position": 5
+          },
+          {
+            "id": "7da9d6292d87285a0de1855e9b063273c623f104c9f8f1df97d81129daae3a2a",
+            "name": "compile_gate",
+            "title": "module compile_gate · line 30",
+            "position": 6
+          },
+          {
+            "id": "4ccdb3f3b51408ae3c19f18df2be60ac56fa3a8a59580b87f33c792e475f51ae",
+            "name": "diagnostics",
+            "title": "module diagnostics · line 31",
+            "position": 7
+          },
+          {
+            "id": "41474473cc01b05aee4e817c0c17412a36b655252239c81dc1bb7911e9e88021",
+            "name": "lexer",
+            "title": "module lexer · line 32",
+            "position": 8
+          },
+          {
+            "id": "cd71ff83ec7094edcaea30324d5fa128190303d621a4bc9d31690e1129efcbc2",
+            "name": "parser",
+            "title": "module parser · line 33",
+            "position": 9
+          },
+          {
+            "id": "31475811cbda9dae8f19b4669d38139ba4890d9dd329036c8f307fb9cb3fb09e",
+            "name": "parser_cache",
+            "title": "module parser_cache · line 34",
+            "position": 10
+          },
+          {
+            "id": "68f8a183b97555d5ca6eb20d513fcb53fa769730a8cbc293f0c7ef561da3533f",
+            "name": "prepared_program",
+            "title": "module prepared_program · line 35",
+            "position": 11
+          },
+          {
+            "id": "a0556bd958a523b72eff215ba13bdc249980960f16c88927ba4d9c56ea414521",
+            "name": "preprocessor",
+            "title": "module preprocessor · line 36",
+            "position": 12
+          },
+          {
+            "id": "29a949131b3f4625e7e0123f3045732a9acf61ff1cb9628ca04a68ff89744686",
+            "name": "program_interface",
+            "title": "module program_interface · line 37",
+            "position": 13
+          },
+          {
+            "id": "dfe66d894a617e48f991afacddb19bcd35e48464c936d28f9ad329a3b42d0ed2",
+            "name": "semantic",
+            "title": "module semantic · line 38",
+            "position": 14
+          },
+          {
+            "id": "e342f38830894f43b4eb15abe3f0ed4f2422dc907d22203b20e92765434b90a9",
+            "name": "source",
+            "title": "module source · line 39",
+            "position": 15
+          },
+          {
+            "id": "623703ea99dc241f82ab10bd9cbda932f6dfb217a3745f17d207799858c3c18c",
+            "name": "source_reader",
+            "title": "module source_reader · line 40",
+            "position": 16
+          }
+        ],
+        [
+          {
+            "id": "a5b84f27fce18d5dab23b5a80285a963a5e8981d632f629f409352d8f7532223",
+            "name": "Compiler",
+            "title": "struct Compiler · line 45",
+            "position": 17
+          },
+          {
+            "id": "5f7dd07228291fa500d7675b7955b3a444074e50ab6c13bef21f541513334569",
+            "name": "ProgramWarnings",
+            "title": "struct ProgramWarnings · line 86",
+            "position": 18
+          },
+          {
+            "id": "19ea9b13ba843b8514635a72fc236bd658159ab313336557eb14da717599707f",
+            "name": "Compiled",
+            "title": "struct Compiled · line 96",
+            "position": 19
+          },
+          {
+            "id": "a8acf0c10a4954b1123a780853a6a7b087d55c95de1d70576352b5138f2f96b7",
+            "name": "Compiler",
+            "title": "implementation Compiler · line 103",
+            "position": 20
+          },
+          {
+            "id": "25f9f6cf4ae85a33f1b9e253e0310270f341e6441db142435303771952066094",
+            "name": "new",
+            "title": "function new · line 105",
+            "position": 21
+          },
+          {
+            "id": "c7dce40c0b66267e958d2e23f2cb57a4c34995ed5062d0c8c3fa86b5b2b372a6",
+            "name": "compile_file",
+            "title": "function compile_file · line 140",
+            "position": 22
+          },
+          {
+            "id": "aeb87c03a0434aecf1435e15fe40e00100aa4be19a01f507e9a94a1aec26b060",
+            "name": "read_file",
+            "title": "function read_file · line 151",
+            "position": 23
+          },
+          {
+            "id": "6596d346171f191607f961b22293949af01c1ac54c090898f84151e5bc5a9a65",
+            "name": "compile_in_game_file",
+            "title": "function compile_in_game_file · line 181",
+            "position": 24
+          },
+          {
+            "id": "61dc2a72300880779758b8d7915a7e83382edeff548868bfc560936f63b8a4ad",
+            "name": "preprocess_string",
+            "title": "function preprocess_string · line 221",
+            "position": 25
+          },
+          {
+            "id": "8728f01d6638669600a1b3a62f5ab0ea81dc0d263c4d62ad3cbcd4c3d5551ec8",
+            "name": "preprocess_source",
+            "title": "function preprocess_source · line 236",
+            "position": 26
+          },
+          {
+            "id": "927316d8ac4b576b576c95347ab8f1cef2f7b6bbff55b001637cc04aa951b372",
+            "name": "compile_string",
+            "title": "function compile_string · line 294",
+            "position": 27
+          },
+          {
+            "id": "70433a7173072ba6e31666a2783f9c243c1d084520832f7a60c1994e742bdbf4",
+            "name": "compile_source",
+            "title": "function compile_source · line 306",
+            "position": 28
+          },
+          {
+            "id": "b556dcc6e6a1adb79fcb7b3c9a901e67b96cec4c33fc4a05e9e63744f28d6271",
+            "name": "generate",
+            "title": "function generate · line 316",
+            "position": 29
+          },
+          {
+            "id": "57b19b175ad719c9d4d358de01ccaf860172aa880d3a11d0735168592c80dc99",
+            "name": "analyze_string",
+            "title": "function analyze_string · line 336",
+            "position": 30
+          },
+          {
+            "id": "592937d3ae30d49054a3cbe362befa4ea28bcad3bcf72df34dcaf9b39d6f4a07",
+            "name": "analyze_source",
+            "title": "function analyze_source · line 349",
+            "position": 31
+          }
+        ]
+      ],
+      "found": {
+        "id": "c7dce40c0b66267e958d2e23f2cb57a4c34995ed5062d0c8c3fa86b5b2b372a6",
+        "name": "compile_file",
+        "title": "function compile_file · line 140",
+        "position": 22
+      }
+    },
+    {
+      "file": "src/compiler/mod.rs",
+      "name": "read_file",
+      "start": "Home",
+      "pages": [
+        [
+          {
+            "id": "41474473cc01b05aee4e817c0c17412a36b655252239c81dc1bb7911e9e88021",
+            "name": "lexer",
+            "title": "module lexer · line 32",
+            "position": 8
+          },
+          {
+            "id": "cd71ff83ec7094edcaea30324d5fa128190303d621a4bc9d31690e1129efcbc2",
+            "name": "parser",
+            "title": "module parser · line 33",
+            "position": 9
+          },
+          {
+            "id": "31475811cbda9dae8f19b4669d38139ba4890d9dd329036c8f307fb9cb3fb09e",
+            "name": "parser_cache",
+            "title": "module parser_cache · line 34",
+            "position": 10
+          },
+          {
+            "id": "68f8a183b97555d5ca6eb20d513fcb53fa769730a8cbc293f0c7ef561da3533f",
+            "name": "prepared_program",
+            "title": "module prepared_program · line 35",
+            "position": 11
+          },
+          {
+            "id": "a0556bd958a523b72eff215ba13bdc249980960f16c88927ba4d9c56ea414521",
+            "name": "preprocessor",
+            "title": "module preprocessor · line 36",
+            "position": 12
+          },
+          {
+            "id": "29a949131b3f4625e7e0123f3045732a9acf61ff1cb9628ca04a68ff89744686",
+            "name": "program_interface",
+            "title": "module program_interface · line 37",
+            "position": 13
+          },
+          {
+            "id": "dfe66d894a617e48f991afacddb19bcd35e48464c936d28f9ad329a3b42d0ed2",
+            "name": "semantic",
+            "title": "module semantic · line 38",
+            "position": 14
+          },
+          {
+            "id": "e342f38830894f43b4eb15abe3f0ed4f2422dc907d22203b20e92765434b90a9",
+            "name": "source",
+            "title": "module source · line 39",
+            "position": 15
+          },
+          {
+            "id": "7da9d6292d87285a0de1855e9b063273c623f104c9f8f1df97d81129daae3a2a",
+            "name": "compile_gate",
+            "title": "module compile_gate · line 30",
+            "position": 6
+          },
+          {
+            "id": "4ccdb3f3b51408ae3c19f18df2be60ac56fa3a8a59580b87f33c792e475f51ae",
+            "name": "diagnostics",
+            "title": "module diagnostics · line 31",
+            "position": 7
+          },
+          {
+            "id": "2a5cd15ec555fe8ffceb381253679044c3bd84479fa3d97982cdb524a74d6bc4",
+            "name": "ast",
+            "title": "module ast · line 25",
+            "position": 1
+          },
+          {
+            "id": "c31d578811c5e16360c3c2f5caeb5c13ec4d7f3c787e9e0c931742ec96dd2969",
+            "name": "cache",
+            "title": "module cache · line 26",
+            "position": 2
+          },
+          {
+            "id": "e4a909e2e450d94c034ea05aa073869b001ec39a783a7bf41c04c95d4887c672",
+            "name": "callee",
+            "title": "module callee · line 27",
+            "position": 3
+          },
+          {
+            "id": "eba39b4d24bfff7ba9e539b349de163217b6861d42ea9ead184ba59c9e840f32",
+            "name": "codegen",
+            "title": "module codegen · line 28",
+            "position": 4
+          },
+          {
+            "id": "a3def698d8c6cfd9074273fe954893fdf18a24a8a88561c0471ec73405c21ad0",
+            "name": "compilation_context",
+            "title": "module compilation_context · line 29",
+            "position": 5
+          }
+        ],
+        [
+          {
+            "id": "41474473cc01b05aee4e817c0c17412a36b655252239c81dc1bb7911e9e88021",
+            "name": "lexer",
+            "title": "module lexer · line 32",
+            "position": 8
+          },
+          {
+            "id": "cd71ff83ec7094edcaea30324d5fa128190303d621a4bc9d31690e1129efcbc2",
+            "name": "parser",
+            "title": "module parser · line 33",
+            "position": 9
+          },
+          {
+            "id": "31475811cbda9dae8f19b4669d38139ba4890d9dd329036c8f307fb9cb3fb09e",
+            "name": "parser_cache",
+            "title": "module parser_cache · line 34",
+            "position": 10
+          },
+          {
+            "id": "68f8a183b97555d5ca6eb20d513fcb53fa769730a8cbc293f0c7ef561da3533f",
+            "name": "prepared_program",
+            "title": "module prepared_program · line 35",
+            "position": 11
+          },
+          {
+            "id": "a0556bd958a523b72eff215ba13bdc249980960f16c88927ba4d9c56ea414521",
+            "name": "preprocessor",
+            "title": "module preprocessor · line 36",
+            "position": 12
+          },
+          {
+            "id": "29a949131b3f4625e7e0123f3045732a9acf61ff1cb9628ca04a68ff89744686",
+            "name": "program_interface",
+            "title": "module program_interface · line 37",
+            "position": 13
+          },
+          {
+            "id": "dfe66d894a617e48f991afacddb19bcd35e48464c936d28f9ad329a3b42d0ed2",
+            "name": "semantic",
+            "title": "module semantic · line 38",
+            "position": 14
+          },
+          {
+            "id": "e342f38830894f43b4eb15abe3f0ed4f2422dc907d22203b20e92765434b90a9",
+            "name": "source",
+            "title": "module source · line 39",
+            "position": 15
+          },
+          {
+            "id": "623703ea99dc241f82ab10bd9cbda932f6dfb217a3745f17d207799858c3c18c",
+            "name": "source_reader",
+            "title": "module source_reader · line 40",
+            "position": 16
+          },
+          {
+            "id": "7da9d6292d87285a0de1855e9b063273c623f104c9f8f1df97d81129daae3a2a",
+            "name": "compile_gate",
+            "title": "module compile_gate · line 30",
+            "position": 6
+          },
+          {
+            "id": "4ccdb3f3b51408ae3c19f18df2be60ac56fa3a8a59580b87f33c792e475f51ae",
+            "name": "diagnostics",
+            "title": "module diagnostics · line 31",
+            "position": 7
+          },
+          {
+            "id": "c31d578811c5e16360c3c2f5caeb5c13ec4d7f3c787e9e0c931742ec96dd2969",
+            "name": "cache",
+            "title": "module cache · line 26",
+            "position": 2
+          },
+          {
+            "id": "e4a909e2e450d94c034ea05aa073869b001ec39a783a7bf41c04c95d4887c672",
+            "name": "callee",
+            "title": "module callee · line 27",
+            "position": 3
+          },
+          {
+            "id": "eba39b4d24bfff7ba9e539b349de163217b6861d42ea9ead184ba59c9e840f32",
+            "name": "codegen",
+            "title": "module codegen · line 28",
+            "position": 4
+          },
+          {
+            "id": "a3def698d8c6cfd9074273fe954893fdf18a24a8a88561c0471ec73405c21ad0",
+            "name": "compilation_context",
+            "title": "module compilation_context · line 29",
+            "position": 5
+          }
+        ],
+        [
+          {
+            "id": "a5b84f27fce18d5dab23b5a80285a963a5e8981d632f629f409352d8f7532223",
+            "name": "Compiler",
+            "title": "struct Compiler · line 45",
+            "position": 17
+          },
+          {
+            "id": "5f7dd07228291fa500d7675b7955b3a444074e50ab6c13bef21f541513334569",
+            "name": "ProgramWarnings",
+            "title": "struct ProgramWarnings · line 86",
+            "position": 18
+          },
+          {
+            "id": "19ea9b13ba843b8514635a72fc236bd658159ab313336557eb14da717599707f",
+            "name": "Compiled",
+            "title": "struct Compiled · line 96",
+            "position": 19
+          },
+          {
+            "id": "a8acf0c10a4954b1123a780853a6a7b087d55c95de1d70576352b5138f2f96b7",
+            "name": "Compiler",
+            "title": "implementation Compiler · line 103",
+            "position": 20
+          },
+          {
+            "id": "25f9f6cf4ae85a33f1b9e253e0310270f341e6441db142435303771952066094",
+            "name": "new",
+            "title": "function new · line 105",
+            "position": 21
+          },
+          {
+            "id": "c7dce40c0b66267e958d2e23f2cb57a4c34995ed5062d0c8c3fa86b5b2b372a6",
+            "name": "compile_file",
+            "title": "function compile_file · line 140",
+            "position": 22
+          },
+          {
+            "id": "aeb87c03a0434aecf1435e15fe40e00100aa4be19a01f507e9a94a1aec26b060",
+            "name": "read_file",
+            "title": "function read_file · line 151",
+            "position": 23
+          },
+          {
+            "id": "6596d346171f191607f961b22293949af01c1ac54c090898f84151e5bc5a9a65",
+            "name": "compile_in_game_file",
+            "title": "function compile_in_game_file · line 181",
+            "position": 24
+          },
+          {
+            "id": "61dc2a72300880779758b8d7915a7e83382edeff548868bfc560936f63b8a4ad",
+            "name": "preprocess_string",
+            "title": "function preprocess_string · line 221",
+            "position": 25
+          },
+          {
+            "id": "8728f01d6638669600a1b3a62f5ab0ea81dc0d263c4d62ad3cbcd4c3d5551ec8",
+            "name": "preprocess_source",
+            "title": "function preprocess_source · line 236",
+            "position": 26
+          },
+          {
+            "id": "927316d8ac4b576b576c95347ab8f1cef2f7b6bbff55b001637cc04aa951b372",
+            "name": "compile_string",
+            "title": "function compile_string · line 294",
+            "position": 27
+          },
+          {
+            "id": "70433a7173072ba6e31666a2783f9c243c1d084520832f7a60c1994e742bdbf4",
+            "name": "compile_source",
+            "title": "function compile_source · line 306",
+            "position": 28
+          },
+          {
+            "id": "b556dcc6e6a1adb79fcb7b3c9a901e67b96cec4c33fc4a05e9e63744f28d6271",
+            "name": "generate",
+            "title": "function generate · line 316",
+            "position": 29
+          },
+          {
+            "id": "57b19b175ad719c9d4d358de01ccaf860172aa880d3a11d0735168592c80dc99",
+            "name": "analyze_string",
+            "title": "function analyze_string · line 336",
+            "position": 30
+          },
+          {
+            "id": "592937d3ae30d49054a3cbe362befa4ea28bcad3bcf72df34dcaf9b39d6f4a07",
+            "name": "analyze_source",
+            "title": "function analyze_source · line 349",
+            "position": 31
+          }
+        ]
+      ],
+      "found": {
+        "id": "aeb87c03a0434aecf1435e15fe40e00100aa4be19a01f507e9a94a1aec26b060",
+        "name": "read_file",
+        "title": "function read_file · line 151",
+        "position": 23
+      }
+    },
+    {
+      "file": "src/compiler/source_reader.rs",
+      "name": "SourceReader",
+      "start": "Home",
+      "pages": [
+        [
+          {
+            "id": "1238a5263c8e6b59fe7837892ee0f85420a84c188593d176e52e7fa8105d0bbd",
+            "name": "SourceKind",
+            "title": "enum SourceKind · line 9",
+            "position": 1
+          },
+          {
+            "id": "c0d6fa2e884083a1f3ce77133afd017cce05d72cd5dc29d2cc4ea1b875d1a92a",
+            "name": "SourceReader",
+            "title": "trait SourceReader · line 17",
+            "position": 2
+          },
+          {
+            "id": "27b514fb188d5dcae4d66fc0efd7d5a35112c345f847f84f9151cf5c72be78fc",
+            "name": "read",
+            "title": "function read · line 19",
+            "position": 3
+          },
+          {
+            "id": "abea6e2e493623fdcc6348a3f86ec4c8a137f37f8d16b70c5f20684501f8888d",
+            "name": "kind",
+            "title": "function kind · line 22",
+            "position": 4
+          },
+          {
+            "id": "c881f798153db14b78aa5956dd49a3e687bdec56a970853626c041ad68d192b4",
+            "name": "DiskSourceReader",
+            "title": "struct DiskSourceReader · line 27",
+            "position": 5
+          },
+          {
+            "id": "67997c76ca384052d106067f42e046539c0e05b4137792f3596f3e70672b8664",
+            "name": "SourceReader for DiskSourceReader",
+            "title": "implementation SourceReader for DiskSourceReader · line 30",
+            "position": 6
+          },
+          {
+            "id": "2dd8073409492108dadda198e74c301762900bc885cccf3aa59892a0ce3a8e03",
+            "name": "read",
+            "title": "function read · line 31",
+            "position": 7
+          },
+          {
+            "id": "fc20a8662203b233417a464a2bdff597ce62fdc2c1a983cb8fe43eea21c41522",
+            "name": "kind",
+            "title": "function kind · line 35",
+            "position": 8
+          }
+        ]
+      ],
+      "found": {
+        "id": "c0d6fa2e884083a1f3ce77133afd017cce05d72cd5dc29d2cc4ea1b875d1a92a",
+        "name": "SourceReader",
+        "title": "trait SourceReader · line 17",
+        "position": 2
+      }
+    },
+    {
+      "file": "src/compiler/source_reader.rs",
+      "name": "DiskSourceReader",
+      "start": "Home",
+      "pages": [
+        [
+          {
+            "id": "1238a5263c8e6b59fe7837892ee0f85420a84c188593d176e52e7fa8105d0bbd",
+            "name": "SourceKind",
+            "title": "enum SourceKind · line 9",
+            "position": 1
+          },
+          {
+            "id": "c0d6fa2e884083a1f3ce77133afd017cce05d72cd5dc29d2cc4ea1b875d1a92a",
+            "name": "SourceReader",
+            "title": "trait SourceReader · line 17",
+            "position": 2
+          },
+          {
+            "id": "27b514fb188d5dcae4d66fc0efd7d5a35112c345f847f84f9151cf5c72be78fc",
+            "name": "read",
+            "title": "function read · line 19",
+            "position": 3
+          },
+          {
+            "id": "abea6e2e493623fdcc6348a3f86ec4c8a137f37f8d16b70c5f20684501f8888d",
+            "name": "kind",
+            "title": "function kind · line 22",
+            "position": 4
+          },
+          {
+            "id": "c881f798153db14b78aa5956dd49a3e687bdec56a970853626c041ad68d192b4",
+            "name": "DiskSourceReader",
+            "title": "struct DiskSourceReader · line 27",
+            "position": 5
+          },
+          {
+            "id": "67997c76ca384052d106067f42e046539c0e05b4137792f3596f3e70672b8664",
+            "name": "SourceReader for DiskSourceReader",
+            "title": "implementation SourceReader for DiskSourceReader · line 30",
+            "position": 6
+          },
+          {
+            "id": "2dd8073409492108dadda198e74c301762900bc885cccf3aa59892a0ce3a8e03",
+            "name": "read",
+            "title": "function read · line 31",
+            "position": 7
+          },
+          {
+            "id": "fc20a8662203b233417a464a2bdff597ce62fdc2c1a983cb8fe43eea21c41522",
+            "name": "kind",
+            "title": "function kind · line 35",
+            "position": 8
+          }
+        ]
+      ],
+      "found": {
+        "id": "c881f798153db14b78aa5956dd49a3e687bdec56a970853626c041ad68d192b4",
+        "name": "DiskSourceReader",
+        "title": "struct DiskSourceReader · line 27",
+        "position": 5
+      }
+    },
+    {
+      "file": "src/compiler/source.rs",
+      "name": "CompilerSource",
+      "start": "Home",
+      "pages": [
+        [
+          {
+            "id": "93ea3c2eaf61e98ec6bc2ef808ece4ee63b70f4f20a0c047b2bfe5657e4588b6",
+            "name": "CompilerSource",
+            "title": "struct CompilerSource · line 12",
+            "position": 1
+          },
+          {
+            "id": "25eccc9a72fca09b541342c718bbe01a775cb69a038448015b3eab3d004cf0fa",
+            "name": "CompilerSource",
+            "title": "implementation CompilerSource · line 21",
+            "position": 2
+          },
+          {
+            "id": "05074327701ac752a98bac4f455a277e623c2ac6649ee4b4d687c753358f276e",
+            "name": "new",
+            "title": "function new · line 23",
+            "position": 3
+          },
+          {
+            "id": "c9e0ba890ff77ea28699b48678b28e5a8810478a1172e791035b796e0c7faa84",
+            "name": "input",
+            "title": "function input · line 37",
+            "position": 4
+          },
+          {
+            "id": "c70667fddcada005392824f90be89b66d420d076f02c8ad10164fd6bc33619fd",
+            "name": "resolved",
+            "title": "function resolved · line 42",
+            "position": 5
+          },
+          {
+            "id": "f81b8a36785e5b6758cab1c8868965f54d8ed83281ce27616c3652c6a9e6162c",
+            "name": "name",
+            "title": "function name · line 47",
+            "position": 6
+          },
+          {
+            "id": "d3ce06b1dd1455656cb788e29ec1563107f3cf83502a8648d4423c15fc482526",
+            "name": "program_path",
+            "title": "function program_path · line 52",
+            "position": 7
+          },
+          {
+            "id": "05f6de61e2e0caf7a77b9434d4c28520d61a3e8d884fbc6a97d35a8a9a4dc6be",
+            "name": "include_cwd",
+            "title": "function include_cwd · line 57",
+            "position": 8
+          },
+          {
+            "id": "aa0302d5336f79cd79c70077f742231360bce192d1fb98df2625aea5a215393e",
+            "name": "inheritance_cwd",
+            "title": "function inheritance_cwd · line 62",
+            "position": 9
+          },
+          {
+            "id": "21399ab0ec63ac072b1b3b7ed9fe6cbb13c39396ad154726ff327167fb5340e8",
+            "name": "fmt::Debug for CompilerSource",
+            "title": "implementation fmt::Debug for CompilerSource · line 67",
+            "position": 10
+          },
+          {
+            "id": "af99c38787c46c44a3d408258e34c6860b24fd1c4d82d9c5b7fdcd622e0f40af",
+            "name": "fmt",
+            "title": "function fmt · line 68",
+            "position": 11
+          },
+          {
+            "id": "68cf66f6788388f8383853ef4c6c70e7a6600ce4a0b7ece7918cb9ec06374bc9",
+            "name": "tests",
+            "title": "module tests · line 76",
+            "position": 12
+          },
+          {
+            "id": "a437b1a7ec4bdfd99bf6c23d5832e783baab9789d71e1329a37b220c91a6a5ee",
+            "name": "debug_identifies_sources_without_exposing_host_paths",
+            "title": "function debug_identifies_sources_without_exposing_host_paths · line 81",
+            "position": 13
+          }
+        ]
+      ],
+      "found": {
+        "id": "93ea3c2eaf61e98ec6bc2ef808ece4ee63b70f4f20a0c047b2bfe5657e4588b6",
+        "name": "CompilerSource",
+        "title": "struct CompilerSource · line 12",
+        "position": 1
+      }
+    },
+    {
+      "file": "src/compiler/source.rs",
+      "name": "name",
+      "start": "Home",
+      "pages": [
+        [
+          {
+            "id": "93ea3c2eaf61e98ec6bc2ef808ece4ee63b70f4f20a0c047b2bfe5657e4588b6",
+            "name": "CompilerSource",
+            "title": "struct CompilerSource · line 12",
+            "position": 1
+          },
+          {
+            "id": "25eccc9a72fca09b541342c718bbe01a775cb69a038448015b3eab3d004cf0fa",
+            "name": "CompilerSource",
+            "title": "implementation CompilerSource · line 21",
+            "position": 2
+          },
+          {
+            "id": "05074327701ac752a98bac4f455a277e623c2ac6649ee4b4d687c753358f276e",
+            "name": "new",
+            "title": "function new · line 23",
+            "position": 3
+          },
+          {
+            "id": "c9e0ba890ff77ea28699b48678b28e5a8810478a1172e791035b796e0c7faa84",
+            "name": "input",
+            "title": "function input · line 37",
+            "position": 4
+          },
+          {
+            "id": "c70667fddcada005392824f90be89b66d420d076f02c8ad10164fd6bc33619fd",
+            "name": "resolved",
+            "title": "function resolved · line 42",
+            "position": 5
+          },
+          {
+            "id": "f81b8a36785e5b6758cab1c8868965f54d8ed83281ce27616c3652c6a9e6162c",
+            "name": "name",
+            "title": "function name · line 47",
+            "position": 6
+          },
+          {
+            "id": "d3ce06b1dd1455656cb788e29ec1563107f3cf83502a8648d4423c15fc482526",
+            "name": "program_path",
+            "title": "function program_path · line 52",
+            "position": 7
+          },
+          {
+            "id": "05f6de61e2e0caf7a77b9434d4c28520d61a3e8d884fbc6a97d35a8a9a4dc6be",
+            "name": "include_cwd",
+            "title": "function include_cwd · line 57",
+            "position": 8
+          },
+          {
+            "id": "aa0302d5336f79cd79c70077f742231360bce192d1fb98df2625aea5a215393e",
+            "name": "inheritance_cwd",
+            "title": "function inheritance_cwd · line 62",
+            "position": 9
+          },
+          {
+            "id": "21399ab0ec63ac072b1b3b7ed9fe6cbb13c39396ad154726ff327167fb5340e8",
+            "name": "fmt::Debug for CompilerSource",
+            "title": "implementation fmt::Debug for CompilerSource · line 67",
+            "position": 10
+          },
+          {
+            "id": "af99c38787c46c44a3d408258e34c6860b24fd1c4d82d9c5b7fdcd622e0f40af",
+            "name": "fmt",
+            "title": "function fmt · line 68",
+            "position": 11
+          },
+          {
+            "id": "68cf66f6788388f8383853ef4c6c70e7a6600ce4a0b7ece7918cb9ec06374bc9",
+            "name": "tests",
+            "title": "module tests · line 76",
+            "position": 12
+          },
+          {
+            "id": "a437b1a7ec4bdfd99bf6c23d5832e783baab9789d71e1329a37b220c91a6a5ee",
+            "name": "debug_identifies_sources_without_exposing_host_paths",
+            "title": "function debug_identifies_sources_without_exposing_host_paths · line 81",
+            "position": 13
+          }
+        ]
+      ],
+      "found": {
+        "id": "f81b8a36785e5b6758cab1c8868965f54d8ed83281ce27616c3652c6a9e6162c",
+        "name": "name",
+        "title": "function name · line 47",
+        "position": 6
+      }
+    },
+    {
+      "file": "src/compiler/mod.rs",
+      "name": "file_reads_stop_after_extension_fallback_and_preserve_other_io_errors",
+      "start": "End",
+      "pages": [
+        [
+          {
+            "id": "98028a2968f8eeb3dc8a2494db6bb8e28b722b41d70042edd374fb1a842f5ac6",
+            "name": "a_successful_compile_returns_its_warnings",
+            "title": "function a_successful_compile_returns_its_warnings · line 1877",
+            "position": 117
+          },
+          {
+            "id": "950b7c5ab69b14c69d9fe5e29f1bf4ddda008f11cf451567d5872cd70b658b27",
+            "name": "an_inherited_files_warnings_come_along",
+            "title": "function an_inherited_files_warnings_come_along · line 1897",
+            "position": 118
+          },
+          {
+            "id": "31bd5d4e13f82834a19b7b839eddafa0771de33db79f646fcb459e4a31f9b400",
+            "name": "a_program_reached_through_two_parents_warns_once",
+            "title": "function a_program_reached_through_two_parents_warns_once · line 1915",
+            "position": 119
+          },
+          {
+            "id": "d021fda9497b827852fdefd95cf092455fdec90a3ad7f724f7d8a6194abd41b4",
+            "name": "warnings_of",
+            "title": "function warnings_of · line 1937",
+            "position": 120
+          },
+          {
+            "id": "1a724f552c238eca40c583cd819fb28ea0a0f303cdf8a032292cf87cbc74f198",
+            "name": "an_unused_local_is_a_warning",
+            "title": "function an_unused_local_is_a_warning · line 1949",
+            "position": 121
+          },
+          {
+            "id": "f4898f1c97833704df4ae6899b86510f9e6bd56f0213af7273354a70b4d0d5e2",
+            "name": "an_unreachable_statement_is_a_warning",
+            "title": "function an_unreachable_statement_is_a_warning · line 1957",
+            "position": 122
+          },
+          {
+            "id": "4eab18e699487a61562ba28e51422ff3d7ad9ecf4117de205b1af09c9e9fd87f",
+            "name": "a_shadowing_local_is_a_warning",
+            "title": "function a_shadowing_local_is_a_warning · line 1965",
+            "position": 123
+          },
+          {
+            "id": "9a4c286f0f28ed571a971d312c19545751ed4e81c3c187ae1b0cc55b75b961bc",
+            "name": "for_loop_initializers_do_not_shadow_themselves",
+            "title": "function for_loop_initializers_do_not_shadow_themselves · line 1973",
+            "position": 124
+          },
+          {
+            "id": "a3cf85ac350d75e59ceaf8c63b5e1734f1bb37fd899a733e41421ddf9dde18e3",
+            "name": "a_global_shadowing_an_inherited_global_is_a_warning",
+            "title": "function a_global_shadowing_an_inherited_global_is_a_warning · line 1991",
+            "position": 125
+          },
+          {
+            "id": "7314328d9a3751525b351f030e12122334ad6430c959e3d13e19866cdfb03291",
+            "name": "a_name_declared_by_two_parents_is_a_warning",
+            "title": "function a_name_declared_by_two_parents_is_a_warning · line 2002",
+            "position": 126
+          },
+          {
+            "id": "ffb9f2cee95dc7adb42f8ec63edd50e8f823292a8034abeaffdef2dd81613e97",
+            "name": "file_reads_stop_after_extension_fallback_and_preserve_other_io_errors",
+            "title": "function file_reads_stop_after_extension_fallback_and_preserve_other_io_errors · line 2012",
+            "position": 127
+          },
+          {
+            "id": "1463a1cf982706e76289e1bcb9625962f9447f8a43b052c0045b2c885b06de57",
+            "name": "RecoveringReader",
+            "title": "struct RecoveringReader · line 2021",
+            "position": 128
+          },
+          {
+            "id": "9007652587a9b09b365d8beb447202c85423e429095d1a030fe2f48809bbd7e0",
+            "name": "SourceReader for RecoveringReader",
+            "title": "implementation SourceReader for RecoveringReader · line 2028",
+            "position": 129
+          },
+          {
+            "id": "51ae08d5c9f4cbcffe32a1d657f7e16e90a0826b529272f301c3408b54fbb12b",
+            "name": "read",
+            "title": "function read · line 2029",
+            "position": 130
+          },
+          {
+            "id": "ea28927c26fd5e00c8a324a33ff9c605f6703cfafe9eae1f0281248ebb0344c9",
+            "name": "kind",
+            "title": "function kind · line 2039",
+            "position": 131
+          }
+        ]
+      ],
+      "found": {
+        "id": "ffb9f2cee95dc7adb42f8ec63edd50e8f823292a8034abeaffdef2dd81613e97",
+        "name": "file_reads_stop_after_extension_fallback_and_preserve_other_io_errors",
+        "title": "function file_reads_stop_after_extension_fallback_and_preserve_other_io_errors · line 2012",
+        "position": 127
+      }
+    }
+  ],
+  "bindings": [
+    {
+      "endpoint": "/api/view",
+      "filter": null,
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "1151b58aa9f5660f9f6b4a3d49efad7503e07b21486a1693a87f4a512ca322d8",
+      "version": "78193c37b0a9b25d784de4691893631eea9502e810e115062b87127f4972c2c7",
+      "selection": {
+        "file": "1151b58aa9f5660f9f6b4a3d49efad7503e07b21486a1693a87f4a512ca322d8",
+        "entity": null
+      },
+      "matching": 552
+    },
+    {
+      "endpoint": "/api/window",
+      "filter": null,
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "1151b58aa9f5660f9f6b4a3d49efad7503e07b21486a1693a87f4a512ca322d8",
+      "version": "78193c37b0a9b25d784de4691893631eea9502e810e115062b87127f4972c2c7"
+    },
+    {
+      "endpoint": "/api/view",
+      "filter": "compile_file",
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "1151b58aa9f5660f9f6b4a3d49efad7503e07b21486a1693a87f4a512ca322d8",
+      "version": "78193c37b0a9b25d784de4691893631eea9502e810e115062b87127f4972c2c7",
+      "selection": {
+        "file": "1151b58aa9f5660f9f6b4a3d49efad7503e07b21486a1693a87f4a512ca322d8",
+        "entity": null
+      },
+      "matching": 0
+    },
+    {
+      "endpoint": "/api/window",
+      "filter": null,
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "1151b58aa9f5660f9f6b4a3d49efad7503e07b21486a1693a87f4a512ca322d8",
+      "version": "78193c37b0a9b25d784de4691893631eea9502e810e115062b87127f4972c2c7"
+    },
+    {
+      "endpoint": "/api/view",
+      "filter": "src/compiler/",
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "1151b58aa9f5660f9f6b4a3d49efad7503e07b21486a1693a87f4a512ca322d8",
+      "version": "78193c37b0a9b25d784de4691893631eea9502e810e115062b87127f4972c2c7",
+      "selection": {
+        "file": "1151b58aa9f5660f9f6b4a3d49efad7503e07b21486a1693a87f4a512ca322d8",
+        "entity": null
+      },
+      "matching": 94
+    },
+    {
+      "endpoint": "/api/window",
+      "filter": null,
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "1151b58aa9f5660f9f6b4a3d49efad7503e07b21486a1693a87f4a512ca322d8",
+      "version": "78193c37b0a9b25d784de4691893631eea9502e810e115062b87127f4972c2c7"
+    },
+    {
+      "endpoint": "/api/view",
+      "filter": "src/compiler/",
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "3406c70c36f67f4afad9538ee43c79c165e09f58a250582e0728206eac69394c",
+      "version": "813b2ed127c747e49fd33698e243a539d35da63eb0738f8613496391acf5e17d",
+      "selection": {
+        "file": "3406c70c36f67f4afad9538ee43c79c165e09f58a250582e0728206eac69394c",
+        "entity": null
+      },
+      "matching": 94
+    },
+    {
+      "endpoint": "/api/window",
+      "filter": null,
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "3406c70c36f67f4afad9538ee43c79c165e09f58a250582e0728206eac69394c",
+      "version": "813b2ed127c747e49fd33698e243a539d35da63eb0738f8613496391acf5e17d"
+    },
+    {
+      "endpoint": "/api/view",
+      "filter": "src/compiler/",
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "3406c70c36f67f4afad9538ee43c79c165e09f58a250582e0728206eac69394c",
+      "version": "813b2ed127c747e49fd33698e243a539d35da63eb0738f8613496391acf5e17d",
+      "selection": {
+        "file": "3406c70c36f67f4afad9538ee43c79c165e09f58a250582e0728206eac69394c",
+        "entity": "c7dce40c0b66267e958d2e23f2cb57a4c34995ed5062d0c8c3fa86b5b2b372a6"
+      },
+      "matching": 94
+    },
+    {
+      "endpoint": "/api/window",
+      "filter": null,
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "3406c70c36f67f4afad9538ee43c79c165e09f58a250582e0728206eac69394c",
+      "version": "813b2ed127c747e49fd33698e243a539d35da63eb0738f8613496391acf5e17d"
+    },
+    {
+      "endpoint": "/api/window",
+      "filter": null,
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "3406c70c36f67f4afad9538ee43c79c165e09f58a250582e0728206eac69394c",
+      "version": "813b2ed127c747e49fd33698e243a539d35da63eb0738f8613496391acf5e17d"
+    },
+    {
+      "endpoint": "/api/view",
+      "filter": "src/compiler/",
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "3406c70c36f67f4afad9538ee43c79c165e09f58a250582e0728206eac69394c",
+      "version": "813b2ed127c747e49fd33698e243a539d35da63eb0738f8613496391acf5e17d",
+      "selection": {
+        "file": "3406c70c36f67f4afad9538ee43c79c165e09f58a250582e0728206eac69394c",
+        "entity": "aeb87c03a0434aecf1435e15fe40e00100aa4be19a01f507e9a94a1aec26b060"
+      },
+      "matching": 94
+    },
+    {
+      "endpoint": "/api/window",
+      "filter": null,
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "3406c70c36f67f4afad9538ee43c79c165e09f58a250582e0728206eac69394c",
+      "version": "813b2ed127c747e49fd33698e243a539d35da63eb0738f8613496391acf5e17d"
+    },
+    {
+      "endpoint": "/api/view",
+      "filter": "source_reader",
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "3406c70c36f67f4afad9538ee43c79c165e09f58a250582e0728206eac69394c",
+      "version": "813b2ed127c747e49fd33698e243a539d35da63eb0738f8613496391acf5e17d",
+      "selection": {
+        "file": "3406c70c36f67f4afad9538ee43c79c165e09f58a250582e0728206eac69394c",
+        "entity": "aeb87c03a0434aecf1435e15fe40e00100aa4be19a01f507e9a94a1aec26b060"
+      },
+      "matching": 1
+    },
+    {
+      "endpoint": "/api/window",
+      "filter": null,
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "3406c70c36f67f4afad9538ee43c79c165e09f58a250582e0728206eac69394c",
+      "version": "813b2ed127c747e49fd33698e243a539d35da63eb0738f8613496391acf5e17d"
+    },
+    {
+      "endpoint": "/api/view",
+      "filter": "source_reader",
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "02aa0780db5421261f1f4790f19f29d2164d4257c5128fb60615d2c473b73659",
+      "version": "8a0fd7ef58e3813ae463323de545f763770d8e5446104755d5247f042eee6987",
+      "selection": {
+        "file": "02aa0780db5421261f1f4790f19f29d2164d4257c5128fb60615d2c473b73659",
+        "entity": null
+      },
+      "matching": 1
+    },
+    {
+      "endpoint": "/api/window",
+      "filter": null,
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "02aa0780db5421261f1f4790f19f29d2164d4257c5128fb60615d2c473b73659",
+      "version": "8a0fd7ef58e3813ae463323de545f763770d8e5446104755d5247f042eee6987"
+    },
+    {
+      "endpoint": "/api/view",
+      "filter": "source_reader",
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "02aa0780db5421261f1f4790f19f29d2164d4257c5128fb60615d2c473b73659",
+      "version": "8a0fd7ef58e3813ae463323de545f763770d8e5446104755d5247f042eee6987",
+      "selection": {
+        "file": "02aa0780db5421261f1f4790f19f29d2164d4257c5128fb60615d2c473b73659",
+        "entity": "c0d6fa2e884083a1f3ce77133afd017cce05d72cd5dc29d2cc4ea1b875d1a92a"
+      },
+      "matching": 1
+    },
+    {
+      "endpoint": "/api/window",
+      "filter": null,
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "02aa0780db5421261f1f4790f19f29d2164d4257c5128fb60615d2c473b73659",
+      "version": "8a0fd7ef58e3813ae463323de545f763770d8e5446104755d5247f042eee6987"
+    },
+    {
+      "endpoint": "/api/view",
+      "filter": "source_reader",
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "02aa0780db5421261f1f4790f19f29d2164d4257c5128fb60615d2c473b73659",
+      "version": "8a0fd7ef58e3813ae463323de545f763770d8e5446104755d5247f042eee6987",
+      "selection": {
+        "file": "02aa0780db5421261f1f4790f19f29d2164d4257c5128fb60615d2c473b73659",
+        "entity": "c881f798153db14b78aa5956dd49a3e687bdec56a970853626c041ad68d192b4"
+      },
+      "matching": 1
+    },
+    {
+      "endpoint": "/api/window",
+      "filter": null,
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "02aa0780db5421261f1f4790f19f29d2164d4257c5128fb60615d2c473b73659",
+      "version": "8a0fd7ef58e3813ae463323de545f763770d8e5446104755d5247f042eee6987"
+    },
+    {
+      "endpoint": "/api/view",
+      "filter": "source_reader",
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "02aa0780db5421261f1f4790f19f29d2164d4257c5128fb60615d2c473b73659",
+      "version": "8a0fd7ef58e3813ae463323de545f763770d8e5446104755d5247f042eee6987",
+      "selection": {
+        "file": "02aa0780db5421261f1f4790f19f29d2164d4257c5128fb60615d2c473b73659",
+        "entity": "c0d6fa2e884083a1f3ce77133afd017cce05d72cd5dc29d2cc4ea1b875d1a92a"
+      },
+      "matching": 1
+    },
+    {
+      "endpoint": "/api/window",
+      "filter": null,
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "02aa0780db5421261f1f4790f19f29d2164d4257c5128fb60615d2c473b73659",
+      "version": "8a0fd7ef58e3813ae463323de545f763770d8e5446104755d5247f042eee6987"
+    },
+    {
+      "endpoint": "/api/view",
+      "filter": "source_reader",
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "02aa0780db5421261f1f4790f19f29d2164d4257c5128fb60615d2c473b73659",
+      "version": "8a0fd7ef58e3813ae463323de545f763770d8e5446104755d5247f042eee6987",
+      "selection": {
+        "file": "02aa0780db5421261f1f4790f19f29d2164d4257c5128fb60615d2c473b73659",
+        "entity": null
+      },
+      "matching": 1
+    },
+    {
+      "endpoint": "/api/window",
+      "filter": null,
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "02aa0780db5421261f1f4790f19f29d2164d4257c5128fb60615d2c473b73659",
+      "version": "8a0fd7ef58e3813ae463323de545f763770d8e5446104755d5247f042eee6987"
+    },
+    {
+      "endpoint": "/api/view",
+      "filter": "source_reader",
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "3406c70c36f67f4afad9538ee43c79c165e09f58a250582e0728206eac69394c",
+      "version": "813b2ed127c747e49fd33698e243a539d35da63eb0738f8613496391acf5e17d",
+      "selection": {
+        "file": "3406c70c36f67f4afad9538ee43c79c165e09f58a250582e0728206eac69394c",
+        "entity": "aeb87c03a0434aecf1435e15fe40e00100aa4be19a01f507e9a94a1aec26b060"
+      },
+      "matching": 1
+    },
+    {
+      "endpoint": "/api/window",
+      "filter": null,
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "3406c70c36f67f4afad9538ee43c79c165e09f58a250582e0728206eac69394c",
+      "version": "813b2ed127c747e49fd33698e243a539d35da63eb0738f8613496391acf5e17d"
+    },
+    {
+      "endpoint": "/api/view",
+      "filter": "src/compiler/source.rs",
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "3406c70c36f67f4afad9538ee43c79c165e09f58a250582e0728206eac69394c",
+      "version": "813b2ed127c747e49fd33698e243a539d35da63eb0738f8613496391acf5e17d",
+      "selection": {
+        "file": "3406c70c36f67f4afad9538ee43c79c165e09f58a250582e0728206eac69394c",
+        "entity": "aeb87c03a0434aecf1435e15fe40e00100aa4be19a01f507e9a94a1aec26b060"
+      },
+      "matching": 1
+    },
+    {
+      "endpoint": "/api/window",
+      "filter": null,
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "3406c70c36f67f4afad9538ee43c79c165e09f58a250582e0728206eac69394c",
+      "version": "813b2ed127c747e49fd33698e243a539d35da63eb0738f8613496391acf5e17d"
+    },
+    {
+      "endpoint": "/api/view",
+      "filter": "src/compiler/source.rs",
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "cfd12e30f7a31f27897c8872a62836ea3f231fa5ef0acfa4d5284c756f2f6c9d",
+      "version": "8ce02882e91881882a269128ff970bd0e7923d9c4ee2c4c415c319b37d35e16c",
+      "selection": {
+        "file": "cfd12e30f7a31f27897c8872a62836ea3f231fa5ef0acfa4d5284c756f2f6c9d",
+        "entity": null
+      },
+      "matching": 1
+    },
+    {
+      "endpoint": "/api/window",
+      "filter": null,
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "cfd12e30f7a31f27897c8872a62836ea3f231fa5ef0acfa4d5284c756f2f6c9d",
+      "version": "8ce02882e91881882a269128ff970bd0e7923d9c4ee2c4c415c319b37d35e16c"
+    },
+    {
+      "endpoint": "/api/view",
+      "filter": "src/compiler/source.rs",
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "cfd12e30f7a31f27897c8872a62836ea3f231fa5ef0acfa4d5284c756f2f6c9d",
+      "version": "8ce02882e91881882a269128ff970bd0e7923d9c4ee2c4c415c319b37d35e16c",
+      "selection": {
+        "file": "cfd12e30f7a31f27897c8872a62836ea3f231fa5ef0acfa4d5284c756f2f6c9d",
+        "entity": "93ea3c2eaf61e98ec6bc2ef808ece4ee63b70f4f20a0c047b2bfe5657e4588b6"
+      },
+      "matching": 1
+    },
+    {
+      "endpoint": "/api/window",
+      "filter": null,
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "cfd12e30f7a31f27897c8872a62836ea3f231fa5ef0acfa4d5284c756f2f6c9d",
+      "version": "8ce02882e91881882a269128ff970bd0e7923d9c4ee2c4c415c319b37d35e16c"
+    },
+    {
+      "endpoint": "/api/view",
+      "filter": "src/compiler/source.rs",
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "cfd12e30f7a31f27897c8872a62836ea3f231fa5ef0acfa4d5284c756f2f6c9d",
+      "version": "8ce02882e91881882a269128ff970bd0e7923d9c4ee2c4c415c319b37d35e16c",
+      "selection": {
+        "file": "cfd12e30f7a31f27897c8872a62836ea3f231fa5ef0acfa4d5284c756f2f6c9d",
+        "entity": "f81b8a36785e5b6758cab1c8868965f54d8ed83281ce27616c3652c6a9e6162c"
+      },
+      "matching": 1
+    },
+    {
+      "endpoint": "/api/window",
+      "filter": null,
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "cfd12e30f7a31f27897c8872a62836ea3f231fa5ef0acfa4d5284c756f2f6c9d",
+      "version": "8ce02882e91881882a269128ff970bd0e7923d9c4ee2c4c415c319b37d35e16c"
+    },
+    {
+      "endpoint": "/api/view",
+      "filter": "src/compiler/mod.rs",
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "cfd12e30f7a31f27897c8872a62836ea3f231fa5ef0acfa4d5284c756f2f6c9d",
+      "version": "8ce02882e91881882a269128ff970bd0e7923d9c4ee2c4c415c319b37d35e16c",
+      "selection": {
+        "file": "cfd12e30f7a31f27897c8872a62836ea3f231fa5ef0acfa4d5284c756f2f6c9d",
+        "entity": "f81b8a36785e5b6758cab1c8868965f54d8ed83281ce27616c3652c6a9e6162c"
+      },
+      "matching": 1
+    },
+    {
+      "endpoint": "/api/window",
+      "filter": null,
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "cfd12e30f7a31f27897c8872a62836ea3f231fa5ef0acfa4d5284c756f2f6c9d",
+      "version": "8ce02882e91881882a269128ff970bd0e7923d9c4ee2c4c415c319b37d35e16c"
+    },
+    {
+      "endpoint": "/api/view",
+      "filter": "src/compiler/mod.rs",
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "3406c70c36f67f4afad9538ee43c79c165e09f58a250582e0728206eac69394c",
+      "version": "813b2ed127c747e49fd33698e243a539d35da63eb0738f8613496391acf5e17d",
+      "selection": {
+        "file": "3406c70c36f67f4afad9538ee43c79c165e09f58a250582e0728206eac69394c",
+        "entity": null
+      },
+      "matching": 1
+    },
+    {
+      "endpoint": "/api/window",
+      "filter": null,
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "3406c70c36f67f4afad9538ee43c79c165e09f58a250582e0728206eac69394c",
+      "version": "813b2ed127c747e49fd33698e243a539d35da63eb0738f8613496391acf5e17d"
+    },
+    {
+      "endpoint": "/api/view",
+      "filter": "src/compiler/mod.rs",
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "3406c70c36f67f4afad9538ee43c79c165e09f58a250582e0728206eac69394c",
+      "version": "813b2ed127c747e49fd33698e243a539d35da63eb0738f8613496391acf5e17d",
+      "selection": {
+        "file": "3406c70c36f67f4afad9538ee43c79c165e09f58a250582e0728206eac69394c",
+        "entity": "ffb9f2cee95dc7adb42f8ec63edd50e8f823292a8034abeaffdef2dd81613e97"
+      },
+      "matching": 1
+    },
+    {
+      "endpoint": "/api/window",
+      "filter": null,
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "3406c70c36f67f4afad9538ee43c79c165e09f58a250582e0728206eac69394c",
+      "version": "813b2ed127c747e49fd33698e243a539d35da63eb0738f8613496391acf5e17d"
+    },
+    {
+      "endpoint": "/api/view",
+      "filter": "src/compiler/mod.rs",
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "3406c70c36f67f4afad9538ee43c79c165e09f58a250582e0728206eac69394c",
+      "version": "813b2ed127c747e49fd33698e243a539d35da63eb0738f8613496391acf5e17d",
+      "selection": {
+        "file": "3406c70c36f67f4afad9538ee43c79c165e09f58a250582e0728206eac69394c",
+        "entity": null
+      },
+      "matching": 1
+    },
+    {
+      "endpoint": "/api/window",
+      "filter": null,
+      "snapshot": "1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+      "file": "3406c70c36f67f4afad9538ee43c79c165e09f58a250582e0728206eac69394c",
+      "version": "813b2ed127c747e49fd33698e243a539d35da63eb0738f8613496391acf5e17d"
+    }
+  ],
+  "pageErrors": [],
+  "responseErrors": [],
+  "sourceWorktreeBefore": "",
+  "limitations": [
+    "Navigation uses UI controls and rendered DOM; response metadata is used only to audit snapshot binding/readiness.",
+    "Actions are scripted and paced for recording; elapsed times are not human task-completion or performance measurements.",
+    "Deliberate search/back probes are capability checks, not spontaneous user errors.",
+    "No source is edited and no analysed project tooling is executed."
+  ],
+  "archiveSha256": "03b3b09405358aaa67457b306a86497f44e2bc3597a63ba720fd28cdaf7a56a0",
+  "binarySha256": "e0459806b13ca002e0879c929b0e28d90a938bc46194ef8b94b3fced88495c3f",
+  "vizziRevision": "b116f4bf929f2a5f61f85c4e31066470c8235778",
+  "hostReadyMs": 3.9463360000000307,
+  "browser": "156.0.8078.4",
+  "pageReadyMs": 560.494565,
+  "hostUrl": "http://127.0.0.1:38213",
+  "readAnchorBeforeLeaving": {
+    "url": "http://127.0.0.1:38213/",
+    "historyLength": 5,
+    "filter": "src/compiler/",
+    "file": "src/compiler/mod.rs",
+    "observation": "Captured observation 1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+    "status": "Observation 1",
+    "observationMode": "native directory watches + periodic reconciliation",
+    "counts": "94 shown / 94 matching / 552 source files · 552 with analysis / 0 deferred / 0 source only",
+    "selectedFile": "src/compiler/mod.rs",
+    "selectedDeclaration": "function read_file · line 151",
+    "sourceTop": 3234,
+    "outlineTop": 680,
+    "sourceRows": [
+      {
+        "line": 148,
+        "text": "        self.compile_source(identity, &source.text, warning).await"
+      },
+      {
+        "line": 149,
+        "text": "    }"
+      },
+      {
+        "line": 150,
+        "text": ""
+      },
+      {
+        "line": 151,
+        "text": "    async fn read_file(&self, path: LpcPath) -> Result<(Arc<CompilerSource>, LpcSource)> {"
+      },
+      {
+        "line": 152,
+        "text": "        let mut identity = Arc::new(CompilerSource::new(path, &self.config));"
+      },
+      {
+        "line": 153,
+        "text": "        loop {"
+      },
+      {
+        "line": 154,
+        "text": "            let absolute = identity.resolved().server();"
+      },
+      {
+        "line": 155,
+        "text": "            let reader = self.source_reader.as_deref().unwrap_or(&DiskSourceReader);"
+      },
+      {
+        "line": 156,
+        "text": "            match reader.read(absolute).await.map(LpcSource::from_bytes) {"
+      },
+      {
+        "line": 157,
+        "text": "                Ok(source) => return Ok((identity, source)),"
+      },
+      {
+        "line": 158,
+        "text": "                Err(error)"
+      },
+      {
+        "line": 159,
+        "text": "                    if error.kind() == ErrorKind::NotFound"
+      },
+      {
+        "line": 160,
+        "text": "                        && absolute.extension().and_then(OsStr::to_str) != Some(\"c\") =>"
+      },
+      {
+        "line": 161,
+        "text": "                {"
+      },
+      {
+        "line": 162,
+        "text": "                    identity = Arc::new(CompilerSource::new("
+      },
+      {
+        "line": 163,
+        "text": "                        identity.input().with_extension(\"c\"),"
+      },
+      {
+        "line": 164,
+        "text": "                        &self.config,"
+      },
+      {
+        "line": 165,
+        "text": "                    ));"
+      },
+      {
+        "line": 166,
+        "text": "                }"
+      },
+      {
+        "line": 167,
+        "text": "                Err(error) => {"
+      },
+      {
+        "line": 168,
+        "text": "                    return Err(lpc_error!("
+      },
+      {
+        "line": 169,
+        "text": "                        \"Cannot read file `{}`: {}\","
+      },
+      {
+        "line": 170,
+        "text": "                        identity.name(),"
+      },
+      {
+        "line": 171,
+        "text": "                        error"
+      },
+      {
+        "line": 172,
+        "text": "                    ));"
+      },
+      {
+        "line": 173,
+        "text": "                }"
+      },
+      {
+        "line": 174,
+        "text": "            }"
+      },
+      {
+        "line": 175,
+        "text": "        }"
+      },
+      {
+        "line": 176,
+        "text": "    }"
+      },
+      {
+        "line": 177,
+        "text": ""
+      },
+      {
+        "line": 178,
+        "text": "    /// Compile the object an in-game path names: its `.c` source"
+      },
+      {
+        "line": 179,
+        "text": "    /// ([`LpcPath::source_file`]), confined to the lib first."
+      },
+      {
+        "line": 180,
+        "text": "    #[instrument(skip(self))]"
+      },
+      {
+        "line": 181,
+        "text": "    pub async fn compile_in_game_file("
+      },
+      {
+        "line": 182,
+        "text": "        &self,"
+      },
+      {
+        "line": 183,
+        "text": "        path: &LpcPath,"
+      },
+      {
+        "line": 184,
+        "text": "        span: Option<Span>,"
+      }
+    ],
+    "outlineButtons": 32,
+    "sourceLinks": 0,
+    "searchInputs": [
+      {
+        "id": "filter",
+        "placeholder": "Filter by path…"
+      }
+    ]
+  },
+  "readerTraitInOutline": true,
+  "diskReaderInOutline": true,
+  "readAnchorAfterHistoryReturn": {
+    "url": "http://127.0.0.1:38213/",
+    "historyLength": 8,
+    "filter": "source_reader",
+    "file": "src/compiler/mod.rs",
+    "observation": "Captured observation 1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+    "status": "Observation 1",
+    "observationMode": "native directory watches + periodic reconciliation",
+    "counts": "1 shown / 1 matching / 552 source files · 552 with analysis / 0 deferred / 0 source only",
+    "selectedFile": null,
+    "selectedDeclaration": "function read_file · line 151",
+    "sourceTop": 3234,
+    "outlineTop": 680,
+    "sourceRows": [
+      {
+        "line": 148,
+        "text": "        self.compile_source(identity, &source.text, warning).await"
+      },
+      {
+        "line": 149,
+        "text": "    }"
+      },
+      {
+        "line": 150,
+        "text": ""
+      },
+      {
+        "line": 151,
+        "text": "    async fn read_file(&self, path: LpcPath) -> Result<(Arc<CompilerSource>, LpcSource)> {"
+      },
+      {
+        "line": 152,
+        "text": "        let mut identity = Arc::new(CompilerSource::new(path, &self.config));"
+      },
+      {
+        "line": 153,
+        "text": "        loop {"
+      },
+      {
+        "line": 154,
+        "text": "            let absolute = identity.resolved().server();"
+      },
+      {
+        "line": 155,
+        "text": "            let reader = self.source_reader.as_deref().unwrap_or(&DiskSourceReader);"
+      },
+      {
+        "line": 156,
+        "text": "            match reader.read(absolute).await.map(LpcSource::from_bytes) {"
+      },
+      {
+        "line": 157,
+        "text": "                Ok(source) => return Ok((identity, source)),"
+      },
+      {
+        "line": 158,
+        "text": "                Err(error)"
+      },
+      {
+        "line": 159,
+        "text": "                    if error.kind() == ErrorKind::NotFound"
+      },
+      {
+        "line": 160,
+        "text": "                        && absolute.extension().and_then(OsStr::to_str) != Some(\"c\") =>"
+      },
+      {
+        "line": 161,
+        "text": "                {"
+      },
+      {
+        "line": 162,
+        "text": "                    identity = Arc::new(CompilerSource::new("
+      },
+      {
+        "line": 163,
+        "text": "                        identity.input().with_extension(\"c\"),"
+      },
+      {
+        "line": 164,
+        "text": "                        &self.config,"
+      },
+      {
+        "line": 165,
+        "text": "                    ));"
+      },
+      {
+        "line": 166,
+        "text": "                }"
+      },
+      {
+        "line": 167,
+        "text": "                Err(error) => {"
+      },
+      {
+        "line": 168,
+        "text": "                    return Err(lpc_error!("
+      },
+      {
+        "line": 169,
+        "text": "                        \"Cannot read file `{}`: {}\","
+      },
+      {
+        "line": 170,
+        "text": "                        identity.name(),"
+      },
+      {
+        "line": 171,
+        "text": "                        error"
+      },
+      {
+        "line": 172,
+        "text": "                    ));"
+      },
+      {
+        "line": 173,
+        "text": "                }"
+      },
+      {
+        "line": 174,
+        "text": "            }"
+      },
+      {
+        "line": 175,
+        "text": "        }"
+      },
+      {
+        "line": 176,
+        "text": "    }"
+      },
+      {
+        "line": 177,
+        "text": ""
+      },
+      {
+        "line": 178,
+        "text": "    /// Compile the object an in-game path names: its `.c` source"
+      },
+      {
+        "line": 179,
+        "text": "    /// ([`LpcPath::source_file`]), confined to the lib first."
+      },
+      {
+        "line": 180,
+        "text": "    #[instrument(skip(self))]"
+      },
+      {
+        "line": 181,
+        "text": "    pub async fn compile_in_game_file("
+      },
+      {
+        "line": 182,
+        "text": "        &self,"
+      },
+      {
+        "line": 183,
+        "text": "        path: &LpcPath,"
+      },
+      {
+        "line": 184,
+        "text": "        span: Option<Span>,"
+      }
+    ],
+    "outlineButtons": 32,
+    "sourceLinks": 0,
+    "searchInputs": [
+      {
+        "id": "filter",
+        "placeholder": "Filter by path…"
+      }
+    ]
+  },
+  "beforeBrowserBack": {
+    "url": "http://127.0.0.1:38213/",
+    "historyLength": 10,
+    "filter": "src/compiler/mod.rs",
+    "file": "src/compiler/mod.rs",
+    "observation": "Captured observation 1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+    "status": "Observation 1",
+    "observationMode": "native directory watches + periodic reconciliation",
+    "counts": "1 shown / 1 matching / 552 source files · 552 with analysis / 0 deferred / 0 source only",
+    "selectedFile": "src/compiler/mod.rs",
+    "selectedDeclaration": "function file_reads_stop_after_extension_fallback_and_preserve_other_io_errors · line 2012",
+    "sourceTop": 44887,
+    "outlineTop": 5535,
+    "sourceRows": [
+      {
+        "line": 2041,
+        "text": "            }"
+      },
+      {
+        "line": 2042,
+        "text": "        }"
+      },
+      {
+        "line": 2043,
+        "text": ""
+      },
+      {
+        "line": 2044,
+        "text": "        for (input, error, expected) in ["
+      },
+      {
+        "line": 2045,
+        "text": "            ("
+      },
+      {
+        "line": 2046,
+        "text": "                \"/source-read/missing\","
+      },
+      {
+        "line": 2047,
+        "text": "                ErrorKind::NotFound,"
+      },
+      {
+        "line": 2048,
+        "text": "                vec![\"/source-read/missing\", \"/source-read/missing.c\"],"
+      },
+      {
+        "line": 2049,
+        "text": "            ),"
+      },
+      {
+        "line": 2050,
+        "text": "            ("
+      },
+      {
+        "line": 2051,
+        "text": "                \"/source-read/missing.c\","
+      },
+      {
+        "line": 2052,
+        "text": "                ErrorKind::NotFound,"
+      },
+      {
+        "line": 2053,
+        "text": "                vec![\"/source-read/missing.c\"],"
+      },
+      {
+        "line": 2054,
+        "text": "            ),"
+      },
+      {
+        "line": 2055,
+        "text": "            ("
+      },
+      {
+        "line": 2056,
+        "text": "                \"/source-read/denied\","
+      },
+      {
+        "line": 2057,
+        "text": "                ErrorKind::PermissionDenied,"
+      },
+      {
+        "line": 2058,
+        "text": "                vec![\"/source-read/denied\"],"
+      },
+      {
+        "line": 2059,
+        "text": "            ),"
+      },
+      {
+        "line": 2060,
+        "text": "        ] {"
+      },
+      {
+        "line": 2061,
+        "text": "            let reader = Arc::new(RecoveringReader {"
+      },
+      {
+        "line": 2062,
+        "text": "                error,"
+      },
+      {
+        "line": 2063,
+        "text": "                failures: expected.len(),"
+      },
+      {
+        "line": 2064,
+        "text": "                reads: Mutex::new(Vec::new()),"
+      },
+      {
+        "line": 2065,
+        "text": "            });"
+      },
+      {
+        "line": 2066,
+        "text": "            let compiler = CompilerBuilder::default()"
+      },
+      {
+        "line": 2067,
+        "text": "                .config(crate::test_support::test_config())"
+      },
+      {
+        "line": 2068,
+        "text": "                .source_reader(Some(reader.clone() as Arc<dyn SourceReader>))"
+      },
+      {
+        "line": 2069,
+        "text": "                .build()"
+      },
+      {
+        "line": 2070,
+        "text": "                .unwrap();"
+      },
+      {
+        "line": 2071,
+        "text": "            let Err(error) = compiler.read_file(LpcPath::new_server(input)).await else {"
+      },
+      {
+        "line": 2072,
+        "text": "                panic!(\"a failed source read unexpectedly recovered\");"
+      },
+      {
+        "line": 2073,
+        "text": "            };"
+      },
+      {
+        "line": 2074,
+        "text": "            assert!(error.message().contains(\"source unavailable\"), \"{error}\");"
+      },
+      {
+        "line": 2075,
+        "text": "            let expected: Vec<_> = expected.into_iter().map(PathBuf::from).collect();"
+      },
+      {
+        "line": 2076,
+        "text": "            assert_eq!(*reader.reads.lock(), expected, \"{input}\");"
+      },
+      {
+        "line": 2077,
+        "text": "        }"
+      },
+      {
+        "line": 2078,
+        "text": "    }"
+      }
+    ],
+    "outlineButtons": 24,
+    "sourceLinks": 0,
+    "searchInputs": [
+      {
+        "id": "filter",
+        "placeholder": "Filter by path…"
+      }
+    ]
+  },
+  "afterBrowserBack": {
+    "url": "http://127.0.0.1:38213/",
+    "historyLength": 10,
+    "filter": "src/compiler/mod.rs",
+    "file": "src/compiler/mod.rs",
+    "observation": "Captured observation 1e43adebf2f22ea526fd2c3e466d6829ad1eb904692c7686374150eebc784798",
+    "status": "Observation 1",
+    "observationMode": "native directory watches + periodic reconciliation",
+    "counts": "1 shown / 1 matching / 552 source files · 552 with analysis / 0 deferred / 0 source only",
+    "selectedFile": "src/compiler/mod.rs",
+    "selectedDeclaration": null,
+    "sourceTop": 0,
+    "outlineTop": 5535,
+    "sourceRows": [
+      {
+        "line": 1,
+        "text": "use std::{ffi::OsStr, fmt::Debug, io::ErrorKind, sync::Arc};"
+      },
+      {
+        "line": 2,
+        "text": ""
+      },
+      {
+        "line": 3,
+        "text": "use ast::program_node::ProgramNode;"
+      },
+      {
+        "line": 4,
+        "text": "use codegen::{"
+      },
+      {
+        "line": 5,
+        "text": "    codegen_walker::CodegenWalker,"
+      },
+      {
+        "line": 6,
+        "text": "    tree_walker::{Pass, apply},"
+      },
+      {
+        "line": 7,
+        "text": "};"
+      },
+      {
+        "line": 8,
+        "text": "use compilation_context::CompilationContext;"
+      },
+      {
+        "line": 9,
+        "text": "use compile_gate::CompileGate;"
+      },
+      {
+        "line": 10,
+        "text": "use derive_builder::Builder;"
+      },
+      {
+        "line": 11,
+        "text": "use educe::Educe;"
+      },
+      {
+        "line": 12,
+        "text": "use lexer::Token;"
+      },
+      {
+        "line": 13,
+        "text": "use lpc_rs_core::lpc_path::LpcPath;"
+      },
+      {
+        "line": 14,
+        "text": "use lpc_rs_errors::{self, LpcError, Result, lpc_error, source_map::DiagnosticSources, span::Span};"
+      },
+      {
+        "line": 15,
+        "text": "use lpc_rs_utils::{LpcSource, config::Config};"
+      },
+      {
+        "line": 16,
+        "text": "use preprocessor::Preprocessor;"
+      },
+      {
+        "line": 17,
+        "text": "use source::CompilerSource;"
+      },
+      {
+        "line": 18,
+        "text": "use source_reader::{DiskSourceReader, SourceReader};"
+      },
+      {
+        "line": 19,
+        "text": "use tracing::instrument;"
+      },
+      {
+        "line": 20,
+        "text": ""
+      },
+      {
+        "line": 21,
+        "text": "use crate::{"
+      },
+      {
+        "line": 22,
+        "text": "    compiler::compilation_context::CompilationContextBuilder, interpreter::program::Program,"
+      },
+      {
+        "line": 23,
+        "text": "};"
+      },
+      {
+        "line": 24,
+        "text": ""
+      },
+      {
+        "line": 25,
+        "text": "pub mod ast;"
+      },
+      {
+        "line": 26,
+        "text": "pub mod cache;"
+      },
+      {
+        "line": 27,
+        "text": "pub mod callee;"
+      },
+      {
+        "line": 28,
+        "text": "pub mod codegen;"
+      },
+      {
+        "line": 29,
+        "text": "pub mod compilation_context;"
+      },
+      {
+        "line": 30,
+        "text": "pub mod compile_gate;"
+      },
+      {
+        "line": 31,
+        "text": "pub mod diagnostics;"
+      },
+      {
+        "line": 32,
+        "text": "pub mod lexer;"
+      },
+      {
+        "line": 33,
+        "text": "pub mod parser;"
+      },
+      {
+        "line": 34,
+        "text": "pub mod parser_cache;"
+      },
+      {
+        "line": 35,
+        "text": "mod prepared_program;"
+      },
+      {
+        "line": 36,
+        "text": "pub mod preprocessor;"
+      },
+      {
+        "line": 37,
+        "text": "mod program_interface;"
+      }
+    ],
+    "outlineButtons": 24,
+    "sourceLinks": 0,
+    "searchInputs": [
+      {
+        "id": "filter",
+        "placeholder": "Filter by path…"
+      }
+    ]
+  },
+  "inputSha256": {
+    "src/compiler/mod.rs": "25012f2d87e4268a217fe59f35bca6a82223e60f1b2a978cdc38c27d5731ff48",
+    "src/compiler/source_reader.rs": "c36da30317c1ec9679a770b55a8bf6d813cac8767143534b144d48836c927382",
+    "src/compiler/source.rs": "7193804ee144a3167a62f1515c2cda74f43243a8dee4f4d31d1f587ac4799c85"
+  },
+  "verifiedVisibleRows": 408,
+  "snapshotConsistent": true,
+  "sourceWorktreeAfter": "",
+  "completed": true
+}

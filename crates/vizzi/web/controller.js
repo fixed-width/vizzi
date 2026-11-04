@@ -1,3 +1,5 @@
+import {readiness} from "./startup.js";
+
 function notification(change) {
   const opaque = value => typeof value === "string" && value.length > 0 && value.length <= 256;
   if (!change || change.schema !== 1) throw new Error("Unsupported notification schema");
@@ -5,6 +7,7 @@ function notification(change) {
   if (typeof change.revision !== "string" || !/^(0|[1-9]\d{0,19})$/.test(change.revision) || BigInt(change.revision) > 18446744073709551615n) throw new Error("Invalid notification revision");
   const s = change.status;
   if (!s || s.schema !== 1 || typeof s.name !== "string" || typeof s.observation !== "string" || !Number.isSafeInteger(s.generation) || s.generation < 0 || typeof s.pending !== "boolean" || !(s.snapshot === null || opaque(s.snapshot)) || !(s.error === null || typeof s.error === "string")) throw new Error("Invalid notification status");
+  readiness(s);
   if (s.measurements !== null) {
     const m = s.measurements;
     if (!m || !["files", "bytes", "parsed", "reused", "cache_hits", "cache_warnings"].every(key => Number.isSafeInteger(m[key]) && m[key] >= 0) || !["capture_ms", "total_ms"].every(key => Number.isFinite(m[key]) && m[key] >= 0)) throw new Error("Invalid notification status measurements");
@@ -71,7 +74,7 @@ export function createController({ transport, onView = () => {}, onStatus = () =
         if (stream !== undefined && stream !== change.stream) throw new Error("Notification stream changed without reconnecting");
         if (nextRevision <= revision) return false;
         stream = change.stream; revision = nextRevision;
-        latestStatus = change.status; onStatus(latestStatus);
+        latestStatus = change.status; onStatus(latestStatus,{stream:change.stream});
         if (!activeFetch && latestStatus.snapshot && (viewRequest !== completedViewRequest || latestStatus.snapshot !== displayedSnapshot)) void load();
         return true;
       },

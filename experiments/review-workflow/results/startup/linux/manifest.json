@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "name": "linux",
+  "source": "/home/mpd/git-sources/linux",
+  "revision": "cbbddb6b08cc9900a87cccaa9b22bbe06aa4f50a",
+  "scope": "kernel/sched",
+  "files": [
+    {
+      "path": "kernel/sched/core.c",
+      "baseline": "baseline/0",
+      "prefix": "//",
+      "marker": "// vizzi-review-scale linux-full-20261104 initial",
+      "bytes": 302556,
+      "base_sha256": "669b90bd534edf7cc02429bce973df27fe45bf466f2f054642f605dc475b54b5",
+      "working_sha256": "b036319cef60c8f8b2b9ffeb55f463c60013664434ba467c855b90d111169f4e"
+    },
+    {
+      "path": "kernel/sched/fair.c",
+      "baseline": "baseline/1",
+      "prefix": "//",
+      "marker": "// vizzi-review-scale linux-full-20261104 initial",
+      "bytes": 444615,
+      "base_sha256": "c4a4f5e01dac3cfcd070b6927755ddf3fffc8e4c315a90b01dcc214453cdea53",
+      "working_sha256": "97a4877a8190932a49c7b58fa90ec2bcac03ccbd58064f764884dd7615f8f51c"
+    }
+  ],
+  "source_arguments": [
+    "--c-family-root",
+    "kernel/sched",
+    "--syntax-language",
+    "kernel/sched=c"
+  ],
+  "workspace": "workspace",
+  "probe": "linux-full-20261104",
+  "note": "kernel/sched/vizzi-review-scale-linux-full-20261104.md",
+  "index_paths": 97345,
+  "scope_paths": 54,
+  "expected_changes": [
+    "kernel/sched/core.c",
+    "kernel/sched/fair.c",
+    "kernel/sched/vizzi-review-scale-linux-full-20261104.md"
+  ],
+  "original_status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "original_status_unchanged": true
+}

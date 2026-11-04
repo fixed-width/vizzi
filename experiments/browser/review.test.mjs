@@ -19,6 +19,8 @@ try {
   host=await startHost(input,1);chromium=await browser({desktopBus:false});context=await chromium.newContext({viewport:{width:1440,height:1000}});const page=await context.newPage(),errors=[],windows=[];
   page.on("pageerror",error=>errors.push(error.message));
   page.on("response",response=>{const u=new URL(response.url());if(u.pathname.endsWith("/window") && response.status()===200)windows.push(response.json());});
+  const dormant=async()=>{const response=await fetch(`${host.url}/api/status`);assert.equal(response.status,200);const status=await response.json();assert.equal(status.readiness,"not_started");assert.equal(status.snapshot,null);assert.equal(status.measurements,null);};
+  await dormant();
   await page.goto(`${host.url}/review`);
   await page.getByRole("button",{name:"Compare with working tree",exact:true}).click();
   await page.waitForFunction(()=>document.querySelector("#review-workspace").dataset.token);
@@ -52,4 +54,5 @@ try {
   await page.getByRole("button",{name:"Close comparison",exact:true}).click();await page.waitForFunction(()=>document.querySelector("#review-workspace").dataset.token==="");
   await Promise.all(windows);for(const w of await Promise.all(windows)){assert.ok(w.window.lines.length<=96);assert.ok(w.window.outline.length<=200);assert.ok(["base","working"].includes(w.side));}
   assert.deepEqual(errors,[]);console.log("review browser: linked source, context, history, unavailable content, refresh expiry and narrow layout passed");
+  await dormant();
 } finally {await context?.close();await chromium?.close();await host?.close();await input.close();}

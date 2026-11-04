@@ -47,6 +47,8 @@ pub struct Application {
 /// A small status response; polling never reads source or runs analysis.
 #[derive(Clone, Debug, PartialEq, Serialize)]
 pub struct Status {
+    /// Whether a first complete live observation is available or being prepared.
+    pub readiness: Readiness,
     /// Private periodic recovery progress and phase measurements.
     pub recovery: RecoveryStatus,
     /// Version of the host response schema.
@@ -65,6 +67,19 @@ pub struct Status {
     pub error: Option<String>,
     /// Native observation mode and any watcher limitation.
     pub observation: String,
+}
+/// Live-index readiness, independent of review status and later refresh activity.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Readiness {
+    /// No live indexing has been requested.
+    NotStarted,
+    /// The first complete capture is outstanding.
+    Initializing,
+    /// A complete observation exists, including an empty repository.
+    Ready,
+    /// The initial attempt failed without a complete observation.
+    Failed,
 }
 impl Application {
     /// Creates an empty application before initial capture.
@@ -192,6 +207,15 @@ impl Application {
 
 fn status(name: &str, inner: &Inner) -> Status {
     Status {
+        readiness: if inner.publication.current().is_some() {
+            Readiness::Ready
+        } else if inner.publication.pending() {
+            Readiness::Initializing
+        } else if inner.error.is_some() {
+            Readiness::Failed
+        } else {
+            Readiness::NotStarted
+        },
         recovery: inner.recovery.clone(),
         schema: 1,
         name: name.into(),
@@ -212,6 +236,26 @@ mod tests {
     use super::*;
     use crate::engine::Measurements;
     use vizzi_core::model::WorkspaceId;
+    #[test]
+    fn readiness_tracks_initial_attempts_and_a_completed_empty_observation() {
+        let app = Application::new("readiness".into()).unwrap();
+        assert_eq!(app.status().readiness, Readiness::NotStarted);
+        let ticket = app.request();
+        assert_eq!(app.status().readiness, Readiness::Initializing);
+        app.fail(ticket, "initial failure".into());
+        assert_eq!(app.status().readiness, Readiness::Failed);
+        assert!(app.snapshot().is_none());
+        let retry = app.request();
+        assert_eq!(app.status().readiness, Readiness::Initializing);
+        app.publish(retry, refresh(0));
+        assert_eq!(app.status().readiness, Readiness::Ready);
+        assert!(app.snapshot().unwrap().documents().is_empty());
+        let later = app.request();
+        assert_eq!(app.status().readiness, Readiness::Ready);
+        app.fail(later, "later failure".into());
+        assert_eq!(app.status().readiness, Readiness::Ready);
+        assert!(app.snapshot().is_some());
+    }
     fn refresh(parsed: usize) -> Refresh {
         Refresh {
             snapshot: Arc::new(

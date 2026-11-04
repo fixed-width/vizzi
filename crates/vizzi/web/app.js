@@ -3,6 +3,7 @@ import { followChanges } from "/updates.js";
 import { describeSource } from "/source-description.js";
 import { createInspector } from "/inspector.js";
 import { createNavigation } from "/navigation.js";
+import { createStartup } from "/startup.js";
 
 const element = id => document.getElementById(id);
 const canvas = element("map"), context = canvas.getContext("2d");
@@ -18,6 +19,11 @@ const fetchJSON = async (uri, options) => {
   try { const response = await fetch(uri, options); if (!response.ok) throw new Error(await response.text()); return await response.json(); }
   finally { sample(metrics.requestMs, performance.now() - start); }
 };
+const startup=createStartup({transport:fetchJSON,onError:showError,onState:state=>{
+  const button=element("start-index");button.hidden=!state.action;button.disabled=state.busy;button.textContent=state.action ?? "Start indexing";
+  if(state.initial){element("status").textContent=state.label;element("counts").textContent=state.label;}
+}});
+element("start-index").addEventListener("click",()=>startup.activate());
 const inspector = createInspector({source,space,outline:element("outline"),transport:fetchJSON,onError:error=>{showError(error);updates?.restart();},select:async fact=>{
   if(await navigate({entity:fact.id}))await inspector.revealActive();
 }});
@@ -61,19 +67,20 @@ const controller = createController({
     if (first || (info.intent?.returning && !sameScene)) fit(true); else invalidate();
     navigation.observe(info.intent);
   },
-  onStatus: status => {
+  onStatus: (status,info) => {
+    startup.receive(status,info.stream);
     element("workspace").textContent = status.name;
-    element("status").textContent = status.error ? "Refresh failed; showing captured source" : status.pending ? "Analyzing changes…" : `Observation ${status.generation}`;
+    if(status.snapshot!==null)element("status").textContent = status.error ? "Refresh failed; showing captured source" : status.pending ? "Analyzing changes…" : `Observation ${status.generation}`;
     element("status").title = status.observation;
     const m = status.measurements;
     if (m) element("measurements").textContent = `${m.total_ms.toFixed(1)} ms refresh · ${m.parsed} parsed · ${m.reused} reused · ${m.cache_hits} cache hits${m.cache_warnings ? ` · ${m.cache_warnings} cache write failures` : ""}`;
-    if (status.error) showError(new Error(status.error));
+    if (status.error && !(status.snapshot===null && status.pending)) showError(new Error(status.error));
     else element("error").hidden = true;
   },
   onError: showError,
   onResync: () => updates?.restart(),
 });
-function showError(error) { element("error").textContent = `${error.message || error} · Keeping the last captured view; retrying.`; element("error").hidden = false; }
+function showError(error) { element("error").textContent = `${error.message || error} · ${view?"Keeping the last captured view; retrying.":"No source observation is available. Retry indexing."}`; element("error").hidden = false; }
 
 function renderFileList() {
   const list = element("file-list"); list.replaceChildren();

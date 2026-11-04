@@ -6,9 +6,9 @@ comparison contracts are frozen, and portable inventories/hunks are implemented.
 Native acquisition, bounded ownership and shared-engine analysis are delivered.
 Comparison queries/transport and linked review views are delivered. Both frozen
 variants pass the rendered guided review; the learning workflow passes again too.
-Focused Linux/PyTorch review-scale observations are recorded. Initial host readiness
-and refresh selection reset are observed friction; independent-operator/usability
-validation remains open.
+Focused Linux/PyTorch review-scale observations are recorded. Review now opens without
+starting the live index, with repeated startup measurements. Refresh selection reset
+remains observed friction; independent-operator/usability validation remains open.
 This follows the product-alignment checkpoint at commit 4e75d04.
 
 The goal is coordinated views for learning unfamiliar code and reviewing changes, as
@@ -192,8 +192,13 @@ now passes for both frozen variants, with source/bounds audits, screenshots, rec
 and a repeated learning regression. The
 [focused Linux/PyTorch measurements](../../experiments/review-workflow/SCALE_RESULTS.md)
 now record actual review interaction, explicit refresh, bounds and memory observations.
-The next design question is opening a focused review while the live index initializes;
-unfamiliar-operator/usability validation remains separate.
+The [startup contract](../prototype/STARTUP_PRODUCT.md) now keeps live indexing dormant
+until exploration activates it. The [repeated startup cohort](../../experiments/review-workflow/STARTUP_RESULTS.md)
+shows URL availability around 4–5 ms and the first scoped review around 0.8–1.0 seconds
+from launch, while preserving the learning/review workflows. Refresh still resets the
+selected file in 6/15 Linux and 9/15 PyTorch samples. Preserving useful review location
+across explicit refresh is the remaining measured interaction gap; unfamiliar-operator
+validation remains separate.
 
 Work in small vertical slices. Tests should cover public behaviour, stale/expired anchors,
 source identity, language-capability gaps and comparison correctness; use mutation testing

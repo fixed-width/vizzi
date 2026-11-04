@@ -1,23 +1,45 @@
 # Local host API reference
 
 The [comparison API](COMPARISON_API.md) adds separate lifecycle/status/SSE and bounded
-token/side/version-bound review queries. The live workspace routes below retain their
-existing schemas and behaviour.
+token/side/version-bound review queries. [Task-driven startup](STARTUP_PRODUCT.md)
+keeps the HTTP live index dormant until exploration or explicit activation requests it.
 
 Bulk views and pinned source use schema **2**. Browser summary views use schema **3**,
 and pinned document windows use schema **1**; see [WINDOWS.md](WINDOWS.md).
 Status and notification envelopes remain
 schema **1**. These prototype contracts are independent of Git. Identities are opaque
 strings. HTTP responses disable caching. The host serves `/`, `/app.js`, `/controller.js`, `/navigation.js`,
-`/updates.js`, `/source-description.js`, `/outline.js`, `/windows.js`, `/inspector.js`, and `/app.css` without external assets.
+`/updates.js`, `/startup.js`, `/source-description.js`, `/outline.js`, `/windows.js`, `/inspector.js`, and `/app.css` without external assets.
 
 | Request | Parameters | Response |
 | --- | --- | --- |
-| `GET /api/status` | None | Workspace name, generation, snapshot, foreground pending flag, measurements, recovery metadata, refresh error, observation mode |
+| `GET /api/status` | None | Workspace name, generation, snapshot, readiness, foreground pending flag, measurements, recovery metadata, refresh error, observation mode |
+| `POST /api/workspace/start` | JSON `{}` | Activate live indexing or retry an initial failure; **202** with current status |
 | `GET /api/view` | Optional `snapshot`, `file`, `entity`, `filter`, `limit` | One snapshot's bounded overview, selection, captured source, and outlines |
 | `GET /api/window` | Required `snapshot`, `file`, `version`; optional source/outline ranges | Bounded text fragments, declaration page, and logical cursor from that exact pin |
 | `GET /api/source` | Required `snapshot`, `file` | Captured source from the requested retained observation |
 | `GET /api/events` | None; `Last-Event-ID` does not request replay | Latest-state `workspace` events over SSE, followed by changes |
+
+`readiness` is an additive status-schema-1 field, derived in this order:
+
+| Value | Condition |
+| --- | --- |
+| `ready` | A completed snapshot exists, including an empty observation. |
+| `initializing` | No snapshot exists and an initial attempt is pending. |
+| `failed` | No snapshot exists and the completed initial attempt failed. |
+| `not_started` | No snapshot, pending attempt or error exists. |
+
+Refreshes and failures retain `ready` when a previous snapshot is available. The
+pending/error fields describe those attempts independently. Before initial publication,
+snapshot and measurements are null. GETs and subscriptions never activate live indexing.
+Review has its own lifecycle and does not require a live publication.
+
+The host-aware activation endpoint requires a JSON content type, denies unknown fields
+and limits the body to 1 KiB (**415**, **422** and **413** respectively). Repeated
+activation while pending or ready does not restart work. The response disables caching
+and content sniffing; completion is reported through status/SSE. Application-only router
+constructors omit activation. Native `Host::prepare`/`activate` expose the same lifecycle;
+existing eager constructors, `--once` and `--stdio` retain initial capture on startup.
 
 `filter` is a case-insensitive path substring. `limit` defaults to 2,000 and is clamped
 to 1–2,000. `total` counts all discovered supported source files; `matching` counts matches before

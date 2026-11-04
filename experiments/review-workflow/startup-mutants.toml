@@ -1,0 +1,4 @@
+# A larger foreground demand is clamped by Engine and the shared worker allocator.
+# It can alter scheduling after recovery releases capacity, but cannot change source,
+# publication or the aggregate cap. Exact demand/throughput is not a functional contract.
+exclude_re = ['^crates/vizzi/src/host\.rs:\d+:\d+: replace - with \+ in Host::with_startup$']

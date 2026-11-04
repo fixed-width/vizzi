@@ -16,6 +16,12 @@ Open **http://127.0.0.1:7474** in a browser. All assets and source data are loca
 server binds to loopback. Choose another port with `--port 7475` if needed. Stop it with
 Ctrl-C. The cache must be outside the inspected workspace, including through symlinks.
 
+The URL becomes available before live indexing. Opening the exploration page starts
+that index and shows its progress. To begin a focused review directly, open
+**http://127.0.0.1:7474/review**; review captures only the explicitly selected scope,
+without starting the live index. Once exploration has activated indexing, live watching
+and reconciliation continue until the host stops.
+
 Select a file on the map to open its frozen source and declaration outline. Select a
 declaration to reveal its lines. Drag to pan, scroll to zoom, or choose **Fit map**.
 Filtering limits the overview while preserving an existing selection. The expandable
@@ -101,6 +107,10 @@ the finite diagnostic mode rejects it. See the [API reference](../prototype/API.
 for pinned source and view requests.
 
 ## Handle a failed refresh
+
+If the initial index fails, fix the reported source error and choose **Retry indexing**.
+Before the first successful capture, the interface shows that source is unavailable.
+If the activation request itself fails, **Start indexing** retries it.
 
 An unreadable source file leaves the previous observation available. Fix the filesystem
 error and wait for reconciliation. If native watching is unavailable, the host reports

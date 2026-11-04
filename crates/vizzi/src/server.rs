@@ -23,6 +23,36 @@ use vizzi_core::{
 type ApiError = (StatusCode, String);
 mod review;
 
+/// Serves deferred HTTP exploration and review through one native host.
+pub fn router_with_host(
+    host: Arc<crate::host::Host>,
+    reviews: Arc<crate::review_application::ReviewApplication>,
+) -> Router {
+    let activation = Router::new()
+        .route("/api/workspace/start", axum::routing::post(start_workspace))
+        .layer(axum::extract::DefaultBodyLimit::max(1024))
+        .with_state(host.clone());
+    router_with_reviews(host.application(), reviews).merge(activation)
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct StartWorkspace {}
+async fn start_workspace(
+    State(host): State<Arc<crate::host::Host>>,
+    Json(_): Json<StartWorkspace>,
+) -> impl IntoResponse {
+    host.activate();
+    (
+        StatusCode::ACCEPTED,
+        [
+            (header::CACHE_CONTROL, "no-store"),
+            (header::X_CONTENT_TYPE_OPTIONS, "nosniff"),
+        ],
+        Json(host.application().status()),
+    )
+}
+
 /// Adds comparison operations to the live workspace router without sharing status schemas.
 pub fn router_with_reviews(
     application: Arc<Application>,
@@ -43,6 +73,7 @@ pub fn router(application: Arc<Application>) -> Router {
         .route("/review-windows.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/review-windows.js")) }))
         .route("/review.css", get(|| async { asset("text/css; charset=utf-8", include_str!("../web/review.css")) }))
         .route("/app.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/app.js")) }))
+        .route("/startup.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/startup.js")) }))
         .route("/controller.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/controller.js")) }))
         .route("/navigation.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/navigation.js")) }))
         .route("/updates.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/updates.js")) }))

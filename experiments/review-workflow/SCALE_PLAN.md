@@ -1,6 +1,6 @@
 # Focused review-scale measurement method
 
-This reference defines the next measurements of the delivered review task. It is
+This reference defines measurements of the delivered review task. It is
 separate from correctness/mutation checks and from full-repository qualification.
 
 | Case | Pinned source | Review subtree | Changed code |
@@ -36,6 +36,15 @@ Record:
   until the refresh action and then verifying the new source/token and pinned base;
 - successful projection resource timings and body sizes, errors/refusals, coverage,
   host RSS/high-water RSS and point-in-time renderer heap.
+
+The [eager cohort](SCALE_RESULTS.md) waited for a live observation before emitting the
+URL. The [task-driven startup contract](../../docs/prototype/STARTUP_PRODUCT.md) changes
+the HTTP path. Its repeated cohort records null initial live measurements and explicit
+`not_started` readiness, then checks the live index remains dormant after review
+interaction/refresh. First-comparison analysis no longer benefits from preceding live
+indexing. Also record spawn-to-first-review elapsed time, including browser setup,
+navigation/form automation and DOM/paint waits; do not equate URL availability with a
+completed review. Preserve both cohorts rather than overwriting the earlier results.
 
 Source/version/content correctness is checked outside timed interaction groups.
 The page uses review SSE; it must not poll status. Passive Resource Timing provides

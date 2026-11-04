@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "baseCommit": "b116f4bf929f2a5f61f85c4e31066470c8235778",
+  "sourceSha256": {
+    "crates/vizzi/src/host.rs": "6f217ac6dd6c3e3cb23ee8edcecb11c4fb1aa56011ce3d974b30ea2472ae946e",
+    "crates/vizzi/src/application.rs": "a2809f3a4fa2562379e214db5f02bf95192e134331fa34bbbd64eb38cd51f7f6",
+    "crates/vizzi/src/changes.rs": "0f498a41f92e543d96608b69f8027321d00244b4f952f0bff1ff9fc851e8f9d7",
+    "crates/vizzi/src/server.rs": "266afcef0836c6ed63338ec16f5991223610bf8c0b0e133a61eba42f8ad97964",
+    "crates/vizzi/src/main.rs": "21ea2da8231486be4fe59e9194aba31f5106420bc8bb2c1e4bc5c5100f1b414c",
+    "crates/vizzi/tests/startup.rs": "dfd76ef135a9f8b7da4c81d50c8bc6e6e7fe3c1fda2f2d7501e9b50f0dcbb584",
+    "crates/vizzi/tests/recovery.rs": "feca3a936eff6c278c6448263bd18825fdff41867ef9fe896bc5de2721c761a7",
+    "crates/vizzi/web/app.js": "16c53524ac7c734ed7fe4a1e49e5d8bb5d00f33ea426d7c11662fffafe3db412",
+    "crates/vizzi/web/controller.js": "4a9168ba674a52467fe870bcddfdff195af21bcb37ab3c26ea8728546d0d8c55",
+    "crates/vizzi/web/controller.test.js": "54321aaba262767a253e9015fd1cba195970873bd63fc44a5e4b2c86c3f60308",
+    "crates/vizzi/web/index.html": "33477482e3dfafe9a0901ed343c97e10900503162515dc50ee6030103d06c24b",
+    "crates/vizzi/web/startup.js": "6cabefb4b291024117ee505a8c63d90013d47be909f430c6be9a9372b96c7bb4",
+    "crates/vizzi/web/startup.test.js": "71d137f5302850b08dc3589fe720381a7bdc9040f8e8f30c6ac3c23b0910b1f4",
+    "experiments/browser/run.mjs": "cadf2b7a6f4d135a1cc4d31eb73e11167980d769137c3b6ebfca05b76cf038e3",
+    "experiments/browser/inspection.test.mjs": "1b622b479f0ba777104ef6a3ec4ca9cd72300e4b84b858c6ff2b6bcdf1c170c4",
+    "experiments/browser/review.test.mjs": "ef274a6ba22627c7795eeba8e6882ea56cf91f009ef327d2957a5d6a9b4167ca",
+    "experiments/browser/startup.test.mjs": "e9b9bc10c75709caa239e8fe0155345dd0886312ceee209ecee5be9f99eb73e1",
+    "experiments/browser/stryker.config.json": "48dfbab50928e669630b9f0e325f3ff6edc1ebd8bcaff60ef62a4b63c86afab1",
+    "experiments/review-workflow/measure.mjs": "16ca629b29986ba76ec6223eca267d6125811b113e615fbd6f099938c4104502",
+    "experiments/review-workflow/summarize-startup.mjs": "25cdfa95afc6f54dcef2de18cf0a7db93d7bed4b00085afe99e8b6a53ec375bb",
+    "experiments/review-workflow/startup-mutants.toml": "34cee6d64b1c60905ec56333358e2684920d5a158c099c475e5fa8aad97c47a7",
+    "Cargo.lock": "39a4317d3c52be9199837d27320749e93c2591f3c021a8afac28b1a79a23e8d6",
+    "package-lock.json": "e7ff76f17d7408c0b6dfd075c564ba31fec03cc838be612a008cf5bd343e291f"
+  },
+  "logs": {
+    "nativeExpectedFailure": {
+      "sha256": "f30f39ee056d99eb1b6c9ee9043ba0a44152aeb3eab0d04fe8c4d8cb5c037e2c",
+      "localLog": "/tmp/vizzi-startup-red.log"
+    },
+    "browserExpectedFailure": {
+      "sha256": "02eadf651ff450fd3307130e3e1f07e0fd104436396414d312dd2af69bac3923",
+      "localLog": "/tmp/vizzi-startup-js-red.log"
+    },
+    "workspaceTests": {
+      "sha256": "d2e13685d9a82e837a94cad727dea8409a32d66c734b66b6cdaba95656182c31",
+      "localLog": "/tmp/vizzi-startup-workspace-tests.log"
+    },
+    "clippy": {
+      "sha256": "da0756cb4af35695ed2cc4d0bc9781d279b5810c34da782c20f46dd2ab6d0523",
+      "localLog": "/tmp/vizzi-startup-clippy.log"
+    },
+    "browserSuite": {
+      "sha256": "ac31c5e3e0c4e25b58536007981d8c6f395ac87ad2bfe32455451d7a8350471d",
+      "localLog": "/tmp/vizzi-startup-full-browser.log"
+    },
+    "initialBrowserFixtureFailure": {
+      "sha256": "94e7a06538c305b4ca7ea650ec3e2b2d6485b223e36f3ea06dd78d562cf415a1",
+      "localLog": "/tmp/vizzi-startup-full-browser-initial-failure.log"
+    },
+    "asyncWaitFailure": {
+      "sha256": "02b5633c26d3fc2a7ce1252fb19bb246693d7caf3a01a1308fbd721a609acd88",
+      "localLog": "/tmp/vizzi-startup-full-browser-async-wait-failure.log"
+    }
+  },
+  "verification": {
+    "nativeWorkspaceAllFeaturesIncludingDoctests": {
+      "passed": 407,
+      "doctestExamples": 0
+    },
+    "finalNativeFollowupBaseline": "passed with updated startup, recovery, review-analysis, source-spool, projection, idle-maintenance and library tests",
+    "clippyWorkspaceAllTargetsAllFeaturesDenyWarnings": "passed",
+    "format": "passed",
+    "browserSuite": {
+      "nodeAndChromiumCases": 144,
+      "startupScenario": "passed",
+      "reviewScenario": "passed"
+    },
+    "javascriptSyntax": "passed",
+    "tdd": "Native deferred-constructor test first failed with missing prepare_with_options. Three startup-controller cases first failed against an unimplemented stub.",
+    "mutations": "native-mutations.json and browser-mutations.json preserve separate baselines, catches, timeouts, build failures, investigated survivors/exclusion and overlapping cohorts"
+  },
+  "harnessCorrection": "Inspector-only tests stub app.js, so they now activate explicitly. Both initial and edited-source waits consume SSE publication; the installed Playwright poller treated a Promise from an async predicate as truthy before its boolean result resolved. No async waitForFunction predicates remain in experiments/web tests.",
+  "workflowReplays": {
+    "variant-a": "workflows/variant-a.json",
+    "variant-b": "workflows/variant-b.json",
+    "learningWithReturnHistory": "workflows/learning.json"
+  },
+  "visualArtifacts": "Raw workflow JSON is retained here. Fresh screenshots/video/trace remain in the local output paths recorded in those reports; prior visual evidence remains in results/browser.",
+  "measurementPolicy": "Final measurements begin after all tests/mutation runs finish; no agent tests, mutations or other benchmarks overlap the final cohort. External activity is uncontrolled.",
+  "limitations": "No GPU/physical-presentation, 16-GB/editor-envelope, whole-repository review or unfamiliar-user qualification. Exact allocation-hint scheduling is excluded from functional mutation interpretation; no performance-equivalence claim. Mutations do not cover CSS, app orchestration or benchmark harnesses.",
+  "measuredBinarySha256": "e0459806b13ca002e0879c929b0e28d90a938bc46194ef8b94b3fced88495c3f",
+  "finalMeasurements": {
+    "report": "summary.json",
+    "sessionsPerCase": 3,
+    "allSixReviewSessionsLiveIndexDormant": true,
+    "originalCheckoutStatusMatched": true,
+    "screenshotsInspected": [
+      "linux/session-2.png",
+      "pytorch/session-2.png"
+    ]
+  }
+}

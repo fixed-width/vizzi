@@ -7,6 +7,20 @@ const view = (file = "a", snapshot = "s1") => ({ schema: 2, snapshot, selection:
 const state = (snapshot = "s1", patch = {}) => ({ schema: 1, name: "test", generation: 1, snapshot, pending: false, measurements: null, error: null, observation: "native", ...patch });
 const change = (revision = "1", snapshot = "s1", patch = {}) => ({ schema: 1, stream: "host", revision, status: state(snapshot), ...patch });
 
+test("startup statuses preserve stream identity and reject inconsistent readiness before notifying",()=>{
+  const statuses=[],calls=[];
+  const c=createController({transport:uri=>{calls.push(uri);return Promise.resolve(view());},onStatus:(status,info)=>statuses.push({status,info})});
+  const stream=c.updates();
+  for(const [revision,patch] of [["1",{readiness:"not_started"}],["2",{pending:true,readiness:"initializing"}],["3",{error:"failed",readiness:"failed"}]]) {
+    const status=state(null,patch);assert.equal(stream.receive(change(revision,null,{status})),true);
+    assert.deepEqual(statuses.at(-1),{status,info:{stream:"host"}});
+  }
+  assert.deepEqual(calls,[]);
+  assert.throws(()=>stream.receive(change("4",null,{status:state(null,{readiness:"ready"})})),/readiness/);
+  assert.equal(statuses.length,3);
+  assert.equal(stream.receive(change("4",null,{status:state(null)})),true,"legacy status remains accepted");
+});
+
 test("a rejected return rolls back its query and still refreshes the current view after a coalesced publication", async () => {
   const pending=[],displayed=[],intent={kind:"return"};
   const c=createController({transport:(uri,options)=>{const p=deferred();pending.push({...p,uri,options});return p.promise;},

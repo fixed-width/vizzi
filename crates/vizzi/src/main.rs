@@ -140,13 +140,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         );
         return Ok(());
     }
-    let host = Arc::new(Host::start(engine)?);
+    let host = Arc::new(if stdio {
+        Host::start(engine)?
+    } else {
+        Host::prepare(engine)?
+    });
     let application = host.application();
     let reviews = Arc::new(vizzi::review_application::ReviewApplication::start(
         host.clone(),
         vizzi::review_source::CaptureLimits::default(),
     )?);
-    let router = vizzi::server::router_with_reviews(application.clone(), reviews.clone());
+    let router = vizzi::server::router_with_host(host.clone(), reviews.clone());
     if stdio {
         let stdin = std::io::stdin();
         let mut stdout = std::io::stdout().lock();
