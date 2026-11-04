@@ -5,8 +5,9 @@ The current prototype links a source file map, captured source, and a lexical de
 outline. A native Rust engine supplies immutable observations to a local browser host.
 Rust/Python are selected by default; explicit scopes enable raw C/C++ analysis.
 
-The production renderer, compiler-backed language integrations, review workflow, and
-storage engine remain open decisions. The Canvas2D overview is a reference view for
+The production renderer, compiler-backed language integrations and storage engine
+remain open decisions. The review workflow is specified and under development.
+The Canvas2D overview is a reference view for
 validating coordination; it does not qualify large-codebase GPU performance.
 
 Next delivery follows the [product milestones](docs/plans/product-milestones.md):
@@ -23,7 +24,8 @@ The [review fixture](experiments/review-workflow/README.md) and
 [comparison contracts](docs/prototype/COMPARISON_PRODUCT.md) now fix the next workflow:
 compare a pinned Git baseline with observed working files, including unstaged edits
 and untracked text. Portable inventory comparison and side-specific source binding are
-implemented; textual hunks, Git acquisition and the guided review interface remain next.
+implemented, along with [bounded textual hunks](docs/prototype/TEXT_DIFF.md).
+Git acquisition, admission and the guided review interface remain next.
 
 - [Run the workspace](docs/how-to/run-workspace.md)
 - [Next product milestones](docs/plans/product-milestones.md)

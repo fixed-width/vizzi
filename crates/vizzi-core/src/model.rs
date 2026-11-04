@@ -68,6 +68,10 @@ identity!(
     "An identity of an ordered immutable observation pair and comparison policy."
 );
 identity!(
+    HunkId,
+    "An identity of a textual hunk bound to a comparison, path and diff policy."
+);
+identity!(
     EntityId,
     "An identity of a declaration in a file and analysis context."
 );

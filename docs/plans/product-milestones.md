@@ -2,7 +2,8 @@
 
 Status: the baseline and navigation slice are delivered, with a passing guided learning
 workflow. Independent-operator/usability acceptance remains open. The review fixture and
-comparison contracts are frozen; milestone 2 implementation is next.
+comparison contracts are frozen, and portable inventories/hunks are implemented.
+Milestone 2 still needs native acquisition, admission and the linked review workflow.
 This follows the product-alignment checkpoint at commit 4e75d04.
 
 The goal is coordinated views for learning unfamiliar code and reviewing changes, as
@@ -152,7 +153,7 @@ engine, a Git library or a complete graph API.
 | 2. Choose the smallest useful extension — delivered | [Navigation contract](../prototype/NAVIGATION.md) and implementation address the observed return-context gap; a graph stays deferred. |
 | 3. Demonstrate milestone 1 — guided workflow delivered | [Repeated learning task](../../experiments/learning-workflow/NAVIGATION_RESULTS.md) with TDD/mutation evidence. Independent-operator validation remains open. |
 | 4. Freeze the review fixture/contracts — delivered | [Verified good/bad fixture](../../experiments/review-workflow/RESULTS.md), [behaviour](../prototype/COMPARISON_PRODUCT.md) and [technical contract](../prototype/COMPARISON_TECH.md) specify change semantics, source providers and pair ownership. |
-| 5. Build and demonstrate milestone 2 — next | One complete Git-based review workflow plus provider-independent correctness tests. |
+| 5. Build and demonstrate milestone 2 — in progress | One complete Git-based review workflow plus provider-independent correctness tests. |
 
 The implementation order for step 5 is:
 
@@ -171,8 +172,10 @@ layers first. Fixture validation is preparation evidence, not completed review a
 Step 5 has begun: [portable inventory comparison](../prototype/COMPARISON_TECH.md#delivered-portable-inventory-interface)
 now classifies supplied observations and binds source to an explicit side, with non-Git
 behavioural tests and [validation evidence](../../experiments/review-workflow/INVENTORY_RESULTS.md).
-Next is bounded raw-text hunk computation on those same captured
-documents. Native acquisition, pair admission and the linked review interface follow.
+The [bounded textual diff](../prototype/TEXT_DIFF.md) now computes raw-line hunks on
+those same captured documents, checked against the frozen variants. Next is the minimal
+native source seam and Git acquisition, with pair/source admission before host exposure.
+The linked review interface and its full walkthrough follow.
 
 Work in small vertical slices. Tests should cover public behaviour, stale/expired anchors,
 source identity, language-capability gaps and comparison correctness; use mutation testing

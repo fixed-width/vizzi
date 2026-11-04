@@ -1,7 +1,7 @@
 # Contextual local-change review: technical contract
 
-Status: portable inventory comparison and side-specific source binding are implemented.
-Textual hunks, acquisition, admission and host/browser operations remain planned; there
+Status: portable inventory comparison, side-specific source binding and bounded textual
+hunks are implemented. Acquisition, admission and host/browser operations remain planned; there
 is no comparison transport yet. This reference supports the
 [behaviour contract](COMPARISON_PRODUCT.md). Exact wire fields can be refined with
 implementation while preserving these invariants.
@@ -39,6 +39,9 @@ bodies or copying a complete encoded inventory buffer. It sorts once; comparison
 iteration merges both sorted inventories without a second full change list. Retained
 source shares existing immutable owners. Source-body admission and bounded host views
 remain necessary before exposing review capture to users.
+
+The delivered [textual diff reference](TEXT_DIFF.md) defines exact line/byte ranges,
+context grouping, hunk identities, cancellation and charged resource limits.
 
 ## Source observations and the acquisition seam
 

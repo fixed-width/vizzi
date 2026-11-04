@@ -4,9 +4,10 @@ The implementation separates an immutable Rust model from native source access,
 persistence, scheduling, and host transports. These interfaces are for the first
 vertical slice; the performance experiment crate remains independent.
 
-The planned [contextual-review contract](COMPARISON_TECH.md) extends this model with
-SCM-independent immutable comparisons. Its [behaviour contract](COMPARISON_PRODUCT.md)
-defines the next workflow; these comparison operations are not delivered yet.
+The [contextual-review contract](COMPARISON_TECH.md) extends this model with
+SCM-independent immutable comparisons. Portable inventory/hunk computation is delivered;
+native acquisition and host/browser comparison operations remain planned. Its
+[behaviour contract](COMPARISON_PRODUCT.md) defines that review workflow.
 
 ## Modules
 

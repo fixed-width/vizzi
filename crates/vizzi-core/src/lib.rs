@@ -14,3 +14,4 @@ pub mod query;
 pub mod rust;
 mod syntax;
 mod syntax_state;
+pub mod text_diff;

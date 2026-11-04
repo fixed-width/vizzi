@@ -1,0 +1,620 @@
+{
+  "total_mutants": 138,
+  "caught": 129,
+  "missed": 0,
+  "timeout": 0,
+  "unviable": 9,
+  "start_time": "2026-11-04T00:45:33.138049787Z",
+  "end_time": "2026-11-04T00:47:12.250270564Z",
+  "cargo_mutants_version": "27.1.0",
+  "schema": 1,
+  "command": "cargo mutants --no-config -p vizzi-core -f crates/vizzi-core/src/text_diff.rs --test-package vizzi-core -j 4 --timeout 20 --build-timeout 180 -C --offline -o /tmp/vizzi-text-diff-final-mutation-20261103 -- --test text_diff",
+  "source_sha256": {
+    "crates/vizzi-core/src/text_diff.rs": "c30c840c26bda1b4830df0d8b95de0e7c7a77a26003146df2c8772e9d2a60678",
+    "crates/vizzi-core/tests/text_diff.rs": "cdf572b69a27fb54b8a16a7efdf9916887a4c0a260e6a94ac45b53de280ef5f7",
+    "crates/vizzi-core/src/model.rs": "d3b5c6164d76639aeff1c096bb123802abc396e4f1aa6408523505c1cab285ce",
+    "crates/vizzi-core/src/lib.rs": "e89c831fb55ce7eb19a42310c240c5c451be1aa5bba8e569d0b73b8166b0e6ea"
+  },
+  "baseline": {
+    "scenario": "Baseline",
+    "summary": "Success",
+    "log_path": "log/baseline.log",
+    "diff_path": null,
+    "phase_results": [
+      {
+        "phase": "Build",
+        "duration": 10.958511737,
+        "process_status": "Success",
+        "argv": [
+          "/home/mpd/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo",
+          "test",
+          "--no-run",
+          "--verbose",
+          "--package=vizzi-core@0.1.0",
+          "--offline"
+        ]
+      },
+      {
+        "phase": "Test",
+        "duration": 0.201621167,
+        "process_status": "Success",
+        "argv": [
+          "/home/mpd/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo",
+          "test",
+          "--verbose",
+          "--package=vizzi-core@0.1.0",
+          "--offline",
+          "--test",
+          "text_diff"
+        ]
+      }
+    ]
+  },
+  "outcomes": [
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:168:9: replace Comparison::text_diff -> Result<TextDiff, DiffError> with Ok(Default::default())",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:180:18: replace > with == in Comparison::text_diff",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:227:35: replace - with / in Comparison::text_diff",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:238:5: replace load -> Result<SourceInput<'a>, DiffError> with Ok(Default::default())",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:250:5: replace document -> Result<Option<&'a Document>, DiffError> with Ok(None)",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:250:5: replace document -> Result<Option<&'a Document>, DiffError> with Ok(Some(Box::leak(Box::new(Default::default()))))",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:257:16: delete ! in document",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:180:18: replace > with < in Comparison::text_diff",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:180:18: replace > with >= in Comparison::text_diff",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:269:31: replace != with == in document",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:227:35: replace - with + in Comparison::text_diff",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:284:9: replace Budget<'_>::check -> Result<(), DiffError> with Ok(())",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:291:9: replace Budget<'_>::spend -> Result<(), DiffError> with Ok(())",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:299:9: replace Budget<'_>::equal -> Result<bool, DiffError> with Ok(true)",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:299:9: replace Budget<'_>::equal -> Result<bool, DiffError> with Ok(false)",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:300:20: replace != with == in Budget<'_>::equal",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:315:9: replace Lines<'a>::index -> Result<Self, DiffError> with Ok(Default::default())",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:304:14: replace == with != in Budget<'_>::equal",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:322:16: replace += with -= in Lines<'a>::index",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:322:16: replace += with *= in Lines<'a>::index",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:328:9: replace Lines<'a>::len -> usize with 0",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:328:9: replace Lines<'a>::len -> usize with 1",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:328:28: replace - with + in Lines<'a>::len",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:328:28: replace - with / in Lines<'a>::len",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:331:9: replace Lines<'a>::line -> &str with \"\"",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:331:9: replace Lines<'a>::line -> &str with \"xyzzy\"",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:334:9: replace Lines<'a>::range -> DiffRange with Default::default()",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:331:54: replace + with - in Lines<'a>::line",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:340:9: replace Lines<'a>::metadata -> DiffSide with Default::default()",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:331:54: replace + with * in Lines<'a>::line",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:354:5: replace edits -> Result<Vec<TextEdit>, DiffError> with Ok(vec![Default::default()])",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:354:5: replace edits -> Result<Vec<TextEdit>, DiffError> with Ok(vec![])",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:354:24: replace || with && in edits",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:354:41: replace == with != in edits",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:354:19: replace == with != in edits",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:355:23: replace == with != in edits",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:374:5: replace search -> Result<Vec<Vec<usize>>, DiffError> with Ok(vec![])",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:374:5: replace search -> Result<Vec<Vec<usize>>, DiffError> with Ok(vec![vec![0]])",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:374:5: replace search -> Result<Vec<Vec<usize>>, DiffError> with Ok(vec![vec![]])",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:374:5: replace search -> Result<Vec<Vec<usize>>, DiffError> with Ok(vec![vec![1]])",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:375:33: replace + with - in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:375:33: replace + with * in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:376:28: replace + with - in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:379:34: replace == with != in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:376:28: replace + with * in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:382:45: replace - with + in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:382:45: replace - with / in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:383:31: replace || with && in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:383:26: replace == with != in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:383:50: replace && with || in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:383:41: replace != with == in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:383:73: replace < with == in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:383:73: replace < with > in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:383:73: replace < with <= in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:383:68: replace - with + in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:383:68: replace - with / in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:386:41: replace + with - in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:386:41: replace + with * in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:386:36: replace - with + in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:386:36: replace - with / in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:389:35: replace - with + in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:389:35: replace - with / in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:389:27: replace + with - in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:389:27: replace + with * in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:389:39: replace * with + in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:389:39: replace * with / in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:392:17: replace && with || in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:391:17: replace && with || in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:390:21: replace < with == in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:390:21: replace < with > in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:390:21: replace < with <= in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:391:22: replace < with == in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:391:22: replace < with > in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:391:22: replace < with <= in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:394:19: replace += with -= in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:394:19: replace += with *= in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:395:19: replace += with -= in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:395:19: replace += with *= in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:398:32: replace && with || in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:398:18: replace >= with < in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:398:37: replace >= with < in search",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:414:5: replace backtrack -> Result<Vec<TextEdit>, DiffError> with Ok(vec![Default::default()])",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:414:5: replace backtrack -> Result<Vec<TextEdit>, DiffError> with Ok(vec![])",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:418:37: replace / with % in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:418:37: replace / with * in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:418:32: replace - with + in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:418:32: replace - with / in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:418:24: replace + with - in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:418:24: replace + with * in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:419:37: replace - with + in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:419:37: replace - with / in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:421:27: replace || with && in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:421:22: replace == with != in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:421:46: replace && with || in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:421:37: replace != with == in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:421:69: replace < with == in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:421:69: replace < with > in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:421:69: replace < with <= in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:421:64: replace - with + in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:421:64: replace - with / in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:424:23: replace - with + in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:424:23: replace - with / in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:427:45: replace - with + in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:427:45: replace - with / in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:427:41: replace - with + in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:427:41: replace - with / in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:427:33: replace + with - in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:427:33: replace + with * in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:427:49: replace * with + in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:427:49: replace * with / in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:428:28: replace && with || in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:428:17: replace > with == in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:428:17: replace > with < in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:428:17: replace > with >= in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:428:33: replace > with == in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:428:33: replace > with < in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:428:33: replace > with >= in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:430:15: replace -= with += in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:430:15: replace -= with /= in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:431:15: replace -= with += in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:431:15: replace -= with /= in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:461:5: replace hunks -> Result<Vec<TextHunk>, DiffError> with Ok(vec![Default::default()])",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:438:82: replace == with != in backtrack",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:461:5: replace hunks -> Result<Vec<TextHunk>, DiffError> with Ok(vec![])",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:472:17: replace < with == in hunks",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:472:17: replace < with > in hunks",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:472:17: replace < with <= in hunks",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:474:24: replace >= with < in hunks",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:491:29: replace + with - in hunks",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:491:29: replace + with * in hunks",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:492:19: replace < with == in hunks",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:492:19: replace < with > in hunks",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:492:19: replace < with <= in hunks",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:494:62: replace > with == in hunks",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:494:62: replace > with < in hunks",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:494:62: replace > with >= in hunks",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:504:17: replace += with -= in hunks",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi-core/src/text_diff.rs:504:17: replace += with *= in hunks",
+      "summary": "CaughtMutant"
+    }
+  ],
+  "raw_outcomes_sha256": "204f2b8fe2d6dabc07c32893398087ce046ffbd309fa9366129e11dc6d5fc871",
+  "workspace_tests": {
+    "command": "cargo test --workspace --all-features --offline",
+    "passed": 331,
+    "failed": 0,
+    "ignored": 0,
+    "test_executables_and_doc_suites": 52
+  },
+  "limitations": [
+    "Generated mutation patterns in the text_diff module only; no configured exclusions.",
+    "Shared captured-source, inventory and identity implementations, the diagnostic example, Git acquisition, admission and UI are outside this mutation scope.",
+    "Earlier test gaps were addressed and equivalent predicates removed before the final run."
+  ]
+}

@@ -5,6 +5,7 @@ Use this how-to to materialise the frozen local-change review fixtures for
 The review interface itself is not implemented yet; this prepares its acceptance input.
 The [portable inventory validation](INVENTORY_RESULTS.md) records the first implemented
 comparison-model slice, independently of this Git fixture preparation.
+The [textual-diff validation](TEXT_DIFF_RESULTS.md) checks bounded hunks on the same inputs.
 
 From the workspace root, using a local lpc-rs repository containing the pinned commit:
 
@@ -28,6 +29,37 @@ Successful verification reports two changed paths, working bytes different from 
 index, and the expected hunk count. It checks baseline/index/working byte hashes,
 stage status, complete changed-path inventory and frozen hunk coordinates. The
 [preparation report](RESULTS.md) records the initial checks and their limits.
+
+## Check the portable hunks
+
+After preparing both fixtures, build the source-only diagnostic example and run:
+
+```sh
+cargo build -p vizzi-core --example text_diff --offline
+python3 experiments/review-workflow/verify_hunks.py \
+  --fixture /tmp/vizzi-review-a --output /tmp/vizzi-review-hunks-a
+python3 experiments/review-workflow/verify_hunks.py \
+  --fixture /tmp/vizzi-review-b --output /tmp/vizzi-review-hunks-b
+```
+
+Choose new output directories. The checker verifies preparation, reads raw pinned/index
+objects with Git, and supplies before/after bytes to the example. It checks the Rust
+working and staged hunk coordinates against frozen expectations, plus the added
+Markdown hunk and absent base. Each output retains `base.rs`, `index.rs` and `hunks.json`.
+No analysed-project script or build runs. This exercises the portable model without
+implementing native Git acquisition or a review interface.
+
+For another already chosen pair of files, the diagnostic accepts a logical path and
+two input filenames; `-` means a verified absent side:
+
+```sh
+cargo run -p vizzi-core --example text_diff --offline -- \
+  src/example.rs /tmp/before.rs /tmp/after.rs
+```
+
+It prints metadata and unified-style hunk coordinates, using default diff limits and
+no language analysis. Its input capture is a diagnostic helper, separate from future
+native source admission and workspace discovery.
 
 ## Run an evaluation after review support exists
 

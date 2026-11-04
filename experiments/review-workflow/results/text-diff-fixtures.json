@@ -1,0 +1,232 @@
+{
+  "schema": 1,
+  "scope": "Portable model supplied pinned/index/working bytes; no native acquisition or UI.",
+  "variants": [
+    {
+      "schema": 1,
+      "variant": "variant-a",
+      "base_revision": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+      "oracle_sha256": "facc2338c8d445d25574a59bfc44543bd1d8834b33f00eecec3d7c4834ecabd0",
+      "verified": true,
+      "working": {
+        "base_present": true,
+        "comparison": "1ba7a70aa2386c49168889c98eda959207ffb70c5ebbd2fd3e19cb6cb1cd95fb",
+        "edit_count": 3,
+        "hunks": [
+          {
+            "base_bytes": {
+              "end": 3925,
+              "start": 3748
+            },
+            "edits": {
+              "end": 1,
+              "start": 0
+            },
+            "header": "@@ -117,7 +117,7 @@",
+            "id": "99cf4d56807e7930410fa8e731e8686769cbf63cd302be46c63c310d3cbdc94a",
+            "working_bytes": {
+              "end": 3938,
+              "start": 3748
+            }
+          },
+          {
+            "base_bytes": {
+              "end": 5651,
+              "start": 5200
+            },
+            "edits": {
+              "end": 2,
+              "start": 1
+            },
+            "header": "@@ -156,8 +156,10 @@",
+            "id": "542edf58ea9694a32d1b5f7cf5e2bab69fc258d7aa663f0e58a3ebeee5c322d3",
+            "working_bytes": {
+              "end": 5748,
+              "start": 5213
+            }
+          },
+          {
+            "base_bytes": {
+              "end": 5954,
+              "start": 5713
+            },
+            "edits": {
+              "end": 3,
+              "start": 2
+            },
+            "header": "@@ -166,7 +168,7 @@",
+            "id": "726a100b574f138ab9ceacb9252634040f80e44f05c8ba1ba7e335d12d36c3a4",
+            "working_bytes": {
+              "end": 6075,
+              "start": 5810
+            }
+          }
+        ],
+        "path": "src/compiler/mod.rs",
+        "work": 81819,
+        "working_present": true
+      },
+      "staged": {
+        "base_present": true,
+        "comparison": "5b7aef0aeb8eaf4f209b1321ccf550f951f6e5ef12f6c9e0cded68984e927318",
+        "edit_count": 1,
+        "hunks": [
+          {
+            "base_bytes": {
+              "end": 5954,
+              "start": 5713
+            },
+            "edits": {
+              "end": 1,
+              "start": 0
+            },
+            "header": "@@ -166,7 +166,7 @@",
+            "id": "09560f3411114aba5d41111b5c71d36974a94e7f9b36b0b83e1f30e2ee008049",
+            "working_bytes": {
+              "end": 5978,
+              "start": 5713
+            }
+          }
+        ],
+        "path": "src/compiler/mod.rs",
+        "work": 81809,
+        "working_present": true
+      },
+      "added_document": {
+        "base_present": false,
+        "comparison": "ef8b2b91aab6af3cc1e74b2a9ca080e26f35ea65bd2bf3d0f917123482fe669a",
+        "edit_count": 1,
+        "hunks": [
+          {
+            "base_bytes": {
+              "end": 0,
+              "start": 0
+            },
+            "edits": {
+              "end": 1,
+              "start": 0
+            },
+            "header": "@@ -0,0 +1,5 @@",
+            "id": "72315bbd0c693b4e3c25c5b53a382fd9bc6e05b7f171f35bdd91ec9243ed9c00",
+            "working_bytes": {
+              "end": 235,
+              "start": 0
+            }
+          }
+        ],
+        "path": "doc/compiler-source-reading.md",
+        "work": 2,
+        "working_present": true
+      },
+      "scope": "Supplied immutable bytes; no native Git acquisition or review UI exercised."
+    },
+    {
+      "schema": 1,
+      "variant": "variant-b",
+      "base_revision": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+      "oracle_sha256": "facc2338c8d445d25574a59bfc44543bd1d8834b33f00eecec3d7c4834ecabd0",
+      "verified": true,
+      "working": {
+        "base_present": true,
+        "comparison": "7454c202ee1d9e353f6da33c54bbe37f77c8fdbeb33d65be61f5ad53d14f2ab8",
+        "edit_count": 2,
+        "hunks": [
+          {
+            "base_bytes": {
+              "end": 3925,
+              "start": 3748
+            },
+            "edits": {
+              "end": 1,
+              "start": 0
+            },
+            "header": "@@ -117,7 +117,7 @@",
+            "id": "a82b9038c3bbaee0f53f45d11296bf8b089c630245aa2ef0786321f4a9a15371",
+            "working_bytes": {
+              "end": 3938,
+              "start": 3748
+            }
+          },
+          {
+            "base_bytes": {
+              "end": 5954,
+              "start": 5713
+            },
+            "edits": {
+              "end": 2,
+              "start": 1
+            },
+            "header": "@@ -166,7 +166,7 @@",
+            "id": "762b80a6f500e7b838e1dd64124488c876e0a864d9b00c313539b6d093cc887e",
+            "working_bytes": {
+              "end": 5991,
+              "start": 5726
+            }
+          }
+        ],
+        "path": "src/compiler/mod.rs",
+        "work": 81826,
+        "working_present": true
+      },
+      "staged": {
+        "base_present": true,
+        "comparison": "5b7aef0aeb8eaf4f209b1321ccf550f951f6e5ef12f6c9e0cded68984e927318",
+        "edit_count": 1,
+        "hunks": [
+          {
+            "base_bytes": {
+              "end": 5954,
+              "start": 5713
+            },
+            "edits": {
+              "end": 1,
+              "start": 0
+            },
+            "header": "@@ -166,7 +166,7 @@",
+            "id": "09560f3411114aba5d41111b5c71d36974a94e7f9b36b0b83e1f30e2ee008049",
+            "working_bytes": {
+              "end": 5978,
+              "start": 5713
+            }
+          }
+        ],
+        "path": "src/compiler/mod.rs",
+        "work": 81809,
+        "working_present": true
+      },
+      "added_document": {
+        "base_present": false,
+        "comparison": "ef8b2b91aab6af3cc1e74b2a9ca080e26f35ea65bd2bf3d0f917123482fe669a",
+        "edit_count": 1,
+        "hunks": [
+          {
+            "base_bytes": {
+              "end": 0,
+              "start": 0
+            },
+            "edits": {
+              "end": 1,
+              "start": 0
+            },
+            "header": "@@ -0,0 +1,5 @@",
+            "id": "72315bbd0c693b4e3c25c5b53a382fd9bc6e05b7f171f35bdd91ec9243ed9c00",
+            "working_bytes": {
+              "end": 235,
+              "start": 0
+            }
+          }
+        ],
+        "path": "doc/compiler-source-reading.md",
+        "work": 2,
+        "working_present": true
+      },
+      "scope": "Supplied immutable bytes; no native Git acquisition or review UI exercised."
+    }
+  ],
+  "output_inside_fixture_workspace_refused": true,
+  "source_sha256": {
+    "crates/vizzi-core/src/text_diff.rs": "c30c840c26bda1b4830df0d8b95de0e7c7a77a26003146df2c8772e9d2a60678",
+    "crates/vizzi-core/examples/text_diff.rs": "c9875121460a130fbc1904a35ea35211f27629f71ff4d724bf1119d41f9c84d8",
+    "experiments/review-workflow/verify_hunks.py": "6fdc154ccc9f18bbb9103826003406ace60db761d305cb19b3a614bd2173785f"
+  }
+}
