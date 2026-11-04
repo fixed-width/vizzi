@@ -4,9 +4,10 @@ Status: the baseline and navigation slice are delivered, with a passing guided l
 workflow. Independent-operator/usability acceptance remains open. The review fixture and
 comparison contracts are frozen, and portable inventories/hunks are implemented.
 Native acquisition, bounded ownership and shared-engine analysis are delivered.
-Comparison queries/transport are delivered. An initial linked review interface is
-implemented, with controller/native validation. Milestone 2 still needs Chromium
-acceptance and its complete rendered walkthrough.
+Comparison queries/transport and linked review views are delivered. Both frozen
+variants pass the rendered guided review; the learning workflow passes again too.
+Focused Linux/PyTorch review-scale observations and independent-operator/usability
+validation remain open.
 This follows the product-alignment checkpoint at commit 4e75d04.
 
 The goal is coordinated views for learning unfamiliar code and reviewing changes, as
@@ -156,7 +157,7 @@ engine, a Git library or a complete graph API.
 | 2. Choose the smallest useful extension — delivered | [Navigation contract](../prototype/NAVIGATION.md) and implementation address the observed return-context gap; a graph stays deferred. |
 | 3. Demonstrate milestone 1 — guided workflow delivered | [Repeated learning task](../../experiments/learning-workflow/NAVIGATION_RESULTS.md) with TDD/mutation evidence. Independent-operator validation remains open. |
 | 4. Freeze the review fixture/contracts — delivered | [Verified good/bad fixture](../../experiments/review-workflow/RESULTS.md), [behaviour](../prototype/COMPARISON_PRODUCT.md) and [technical contract](../prototype/COMPARISON_TECH.md) specify change semantics, source providers and pair ownership. |
-| 5. Build and demonstrate milestone 2 — in progress | One complete Git-based review workflow plus provider-independent correctness tests. |
+| 5. Build and demonstrate milestone 2 — guided workflow delivered; scale observations open | Both frozen variants pass the rendered review, with provider-independent correctness tests. |
 
 The implementation order for step 5 is:
 
@@ -185,8 +186,10 @@ one aggregate worker budget, preserving admitted source owners and the baseline 
 Bounded, token/side/version-bound [application queries and transport](../prototype/COMPARISON_API.md)
 now expose this model. The initial [linked review interface](../prototype/REVIEW_INTERFACE.md)
 has [controller/native evidence](../../experiments/review-workflow/INTERFACE_RESULTS.md);
-The [rendered walkthrough driver and audits](../../experiments/review-workflow/WALKTHROUGH_RESULTS.md)
-are prepared; actual Chromium acceptance and the rendered walkthrough remain next.
+The [rendered review walkthrough](../../experiments/review-workflow/WALKTHROUGH_RESULTS.md)
+now passes for both frozen variants, with source/bounds audits, screenshots, recordings
+and a repeated learning regression. Next are focused Linux/PyTorch observations of
+the actual review views; unfamiliar-operator/usability validation remains separate.
 
 Work in small vertical slices. Tests should cover public behaviour, stale/expired anchors,
 source identity, language-capability gaps and comparison correctness; use mutation testing

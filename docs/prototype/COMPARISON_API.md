@@ -119,4 +119,5 @@ paths return **400** through finite diagnostics. Native tests consume the indepe
 subscription interface; browser clients will use SSE. The
 [transport validation report](../../experiments/review-workflow/TRANSPORT_RESULTS.md)
 records tested behaviour and the frozen-fixture replay. The initial
-[review interface](REVIEW_INTERFACE.md) is implemented; browser acceptance remains open.
+[review interface](REVIEW_INTERFACE.md) passes the
+[guided browser tasks](../../experiments/review-workflow/WALKTHROUGH_RESULTS.md).

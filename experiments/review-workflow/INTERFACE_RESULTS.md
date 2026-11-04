@@ -1,5 +1,9 @@
 # Initial browser review implementation: validation record
 
+The subsequent [rendered review and learning regression](WALKTHROUGH_RESULTS.md)
+now pass. The implementation-stage evidence below is retained; its earlier blocked
+browser status is superseded by the recordings and screenshots in that report.
+
 The implementation at `/review` coordinates changed/unchanged file pages, hunk and
 change-range pages, two captured-source inspectors and lexical declarations. It
 exposes explicit baseline/scope, capture labels, refresh/close, independent review
@@ -23,7 +27,7 @@ document-window validator. Existing live window/controller/navigation tests rema
 part of the Node regression suite. Native workspace tests, formatting and Clippy
 are checked separately.
 
-Final checks pass **88 Node tests** and **397 native workspace tests**, including
+At this implementation checkpoint, **88 Node tests** and **397 native workspace tests** pass, including
 doctests, plus formatting and workspace Clippy with all targets/features and denied
 warnings. These counts exclude the blocked Chromium tests.
 
@@ -88,27 +92,29 @@ CARGO_BUILD_JOBS=1 RUST_TEST_THREADS=1 nice -n 10 \
   experiments/browser/review-stryker.config.json /tmp/vizzi-review-mutation.json
 ```
 
-## Browser acceptance still open
+## Initial browser attempts (superseded)
 
-The [rendered walkthrough driver](run.mjs) and independent source/bounds audits are now
-prepared. The [walkthrough record](WALKTHROUGH_RESULTS.md) documents its tests and both
-blocked launch attempts; it does not replace the missing browser acceptance.
+The [rendered walkthrough driver](run.mjs) and independent source/bounds audits were
+prepared while browser execution was unavailable. The
+[walkthrough record](WALKTHROUGH_RESULTS.md) now documents successful execution after
+approval-enabled commands could run outside the sandbox.
 
 The real Chromium integration test is checked in at
 [review.test.mjs](../browser/review.test.mjs). Both the host's loopback listener and
-Chromium startup failed with `Operation not permitted` in this sandbox. The environment
-also rejected escalation because sandbox approvals are disabled. No browser success,
-screenshot, keyboard/layout check or rendered good/bad walkthrough is claimed.
+Chromium startup initially failed with `Operation not permitted` in the sandbox. The
+environment also rejected escalation while sandbox approvals were disabled. Those
+initial attempts provided no browser, screenshot, keyboard/layout or rendered-task
+acceptance. The subsequent successful runs are separate evidence.
 
-Run the pending browser checks in an environment permitting a local test listener
+Repeat the browser checks in an environment permitting a local test listener
 and Chromium:
 
 ```sh
 CARGO_BUILD_JOBS=1 RUST_TEST_THREADS=1 nice -n 10 npm test -- --review
 ```
 
-Next, repeat the two-variant task through rendered controls, inspect the resulting
-screenshots, and retain the learning walkthrough as a regression. Measure the actual
-new views' payload/DOM bounds and interaction only after those browser checks pass.
+Both variants have now been repeated through rendered controls, screenshots inspected
+and the learning task retained as a passing regression. Focused Linux/PyTorch checks
+of the actual review views' payload/DOM bounds and interaction remain next.
 Controller replay is guided/reference-aware evidence, not independent-operator
 acceptance, human comprehension improvement or large-repository latency evidence.

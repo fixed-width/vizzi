@@ -1,12 +1,13 @@
 # Vizzi
 
-Coordinated views for exploring source code and, eventually, reviewing changes.
+Coordinated views for exploring source code and reviewing changes.
 The current prototype links a source file map, captured source, and a lexical declaration
 outline. A native Rust engine supplies immutable observations to a local browser host.
 Rust/Python are selected by default; explicit scopes enable raw C/C++ analysis.
 
 The production renderer, compiler-backed language integrations and storage engine
-remain open decisions. The review workflow is specified and under development.
+remain open decisions. Both guided learning and local-change review tasks now pass
+on the frozen reference repository; independent usability and review-scale checks remain.
 The Canvas2D overview is a reference view for
 validating coordination; it does not qualify large-codebase GPU performance.
 
@@ -29,9 +30,9 @@ implemented, along with [bounded textual hunks](docs/prototype/TEXT_DIFF.md).
 same model, now with [bounded review ownership](docs/prototype/REVIEW_OWNERSHIP.md).
 Review analysis now [shares the existing engine](docs/prototype/REVIEW_ANALYSIS.md).
 [Comparison transport](docs/prototype/COMPARISON_API.md) now exposes bounded queries and
-separate review status. An initial [review interface](docs/how-to/review-local-changes.md)
-is implemented; its [browser acceptance](experiments/review-workflow/INTERFACE_RESULTS.md)
-and rendered walkthrough remain open.
+separate review status. The [review interface](docs/how-to/review-local-changes.md)
+now passes [both rendered guided variants](experiments/review-workflow/WALKTHROUGH_RESULTS.md),
+with screenshots, recordings and a repeated learning regression.
 
 - [Run the workspace](docs/how-to/run-workspace.md)
 - [Next product milestones](docs/plans/product-milestones.md)

@@ -40,7 +40,7 @@ explains expiry; **Open current comparison** explicitly returns to the active ca
 Use **Retry inspection** for temporary query refusal and **Reconnect** after a lost
 review stream. **Close comparison** retires the current pair.
 
-The initial browser implementation is available; its Chromium validation and full
-rendered review walkthrough are still pending. The
-[validation record](../../experiments/review-workflow/INTERFACE_RESULTS.md) distinguishes
-verified controller/native behaviour from that remaining browser acceptance.
+At paired desktop widths, pan each source pane horizontally when a long condition is
+clipped; Back/Forward retains those independent reading positions. The
+[validation record](../../experiments/review-workflow/WALKTHROUGH_RESULTS.md) includes
+both guided review variants, recordings and remaining scale/usability limits.

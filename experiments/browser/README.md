@@ -166,7 +166,10 @@ host and Chromium: paired source, hunk/declaration selection, unchanged context,
 history, absent/binary/literal source, refresh expiry and narrow layout. It is also
 included in the default browser suite. The
 [review validation record](../review-workflow/INTERFACE_RESULTS.md) records which
-parts have run and which remain blocked by the execution environment.
+parts have run. The [rendered task report](../review-workflow/WALKTHROUGH_RESULTS.md)
+retains successful runs after approval-enabled execution became available. Add
+`--screenshots /tmp/vizzi-review-screenshots` to `--review` to retain desktop/narrow
+images in a fresh directory; the narrow check also rejects horizontal page overflow.
 
 The new controller/reader mutation scope is
 `experiments/browser/review-stryker.config.json`, configured with one worker. In a

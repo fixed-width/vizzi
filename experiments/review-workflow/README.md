@@ -2,8 +2,9 @@
 
 Use this how-to to materialise the frozen local-change review fixtures for
 [milestone 2](../../docs/plans/product-milestones.md). Git and Python 3.12+ are required.
-The initial review interface is implemented; browser acceptance is still open. This
-guide prepares its frozen input and the rendered walkthrough.
+The review interface now passes both guided rendered variants. This guide prepares
+its frozen input and repeats the walkthrough; the [report](WALKTHROUGH_RESULTS.md)
+records the evidence and its limits.
 The [portable inventory validation](INVENTORY_RESULTS.md) records the first implemented
 comparison-model slice, independently of this Git fixture preparation.
 The [textual-diff validation](TEXT_DIFF_RESULTS.md) checks bounded hunks on the same inputs.
@@ -140,8 +141,9 @@ attempt records its failure phase with `completed:false`; those files are not ac
 evidence. Use `--no-build` only to deliberately reuse the recorded release binary.
 
 Inspect the screenshots and recording after a successful run. The scripted judgement
-is reference-aware and does not replace an independent reviewer. Current preparation,
-audit tests and blocked attempts are in the [walkthrough record](WALKTHROUGH_RESULTS.md).
+is reference-aware and does not replace an independent reviewer. Current results,
+recordings, audit tests and earlier blocked attempts are in the
+[walkthrough record](WALKTHROUGH_RESULTS.md).
 
 ## Run an independent evaluation
 

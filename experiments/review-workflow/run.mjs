@@ -97,6 +97,12 @@ async function choose(path) {
   const button=page.locator("#review-file-list button").filter({hasText:path});assert.equal(await button.count(),1,"Unambiguous rendered file choice");
   await button.click();await page.waitForFunction(path=>document.querySelector("#review-file-title").textContent===path,path);await ready();
 }
+async function panSource(side) {
+  const pane=page.locator(`#${side}-source`),before=await pane.evaluate(node=>node.scrollLeft);
+  await pane.hover();await page.mouse.wheel(240,0);
+  await page.waitForFunction(({side,before})=>document.getElementById(`${side}-source`).scrollLeft>before,{side,before});
+  await paint(page);
+}
 async function backTo(key) {
   for(let i=0;i<12;i++) {
     const previous=await state();if(previous.history===key)return;
@@ -154,9 +160,11 @@ try {
   await seek("working","read_file");await seek("base","read_file");const policy=await checkpoint("read-policy","Inspect both source-read policies without inferring semantic equivalence.");
   assert.ok(policy.panes.base.rows.some(row=>row.text.includes("ErrorKind::NotFound")));assert.ok(policy.panes.working.rows.some(row=>row.text.includes("ErrorKind::NotFound")));
   report.lookupRegressionObserved=policy.panes.working.rows.some(row=>row.text.includes("ErrorKind::PermissionDenied"));assert.equal(report.lookupRegressionObserved,oracle.variants[manifest.variant].verdict==="lookup_regression");
+  await panSource("base");await panSource("working");const reading=await checkpoint("read-policy-horizontal","Pan the two source panes horizontally to expose the clipped condition; retain independent reading positions.");
   await page.getByLabel("Include unchanged context").check();await ready();await filter("source_reader.rs");await choose("src/compiler/source_reader.rs");await seek("working","SourceReader");await checkpoint("reader-contract","Follow unchanged source and its raw-byte reader contract on the selected side.");
   await backTo(policy.history);const returned=await checkpoint("review-return","Restore the compiler policy and both captured reading positions.");
   assert.equal(returned.panes.base.declaration,policy.panes.base.declaration);assert.equal(returned.panes.base.sourceTop,policy.panes.base.sourceTop);assert.equal(returned.panes.working.sourceTop,policy.panes.working.sourceTop);
+  assert.equal(returned.panes.base.sourceLeft,reading.panes.base.sourceLeft);assert.equal(returned.panes.working.sourceLeft,reading.panes.working.sourceLeft);
   await filter("src/compiler/source.rs");await choose("src/compiler/source.rs");await seek("working","CompilerSource");await checkpoint("source-identity","Inspect input/resolved path and diagnostic-name ownership.");
   await filter(oracle.source_path);await choose(oracle.source_path);await seek("working","file_reads_stop_after_extension_fallback_and_preserve_other_io_errors",true);await checkpoint("regression-test","Locate the existing lookup contract through keyboard declaration navigation.");
   for(let i=0;i<6;i++) {const current=await state();if(current.panes.working.rows.some(row=>row.text.includes("PermissionDenied")))break;await page.locator("#working-source").focus();await page.keyboard.press("PageDown");await page.waitForTimeout(120);}

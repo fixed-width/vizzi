@@ -1,10 +1,13 @@
 import assert from "node:assert/strict";
 import {spawnSync} from "node:child_process";
-import {writeFile,rm} from "node:fs/promises";
+import {writeFile,rm,mkdir} from "node:fs/promises";
 import {join} from "node:path";
 import {buildHost,browser,startHost,workspace,paint} from "./support.mjs";
 
 if(!process.argv.includes("--no-build"))buildHost();
+const screenshots=process.argv.includes("--screenshots")?process.argv[process.argv.indexOf("--screenshots")+1]:null;
+if(process.argv.includes("--screenshots"))assert.ok(screenshots && !screenshots.startsWith("--"),"--screenshots needs a fresh directory");
+if(screenshots)await mkdir(screenshots);
 const input=await workspace({files:{"a.rs":"fn before() {}\nfn context() {}\n","reader.rs":"pub trait Reader { fn read(&self); }\n","removed.txt":"before\n"}});
 const git=(...args)=>{const r=spawnSync("git",["-C",input.root,"-c","core.hooksPath=/dev/null","-c","user.name=Fixture","-c","user.email=fixture@example.invalid",...args],{encoding:"utf8",env:{...process.env,GIT_CONFIG_GLOBAL:"/dev/null",GIT_CONFIG_NOSYSTEM:"1"}});assert.equal(r.status,0,r.stderr);return r.stdout.trim();};
 let chromium,host,context;
@@ -24,6 +27,7 @@ try {
   await choose("a.rs");
   assert.match(await page.locator("#base-source").textContent(),/before/);assert.match(await page.locator("#working-source").textContent(),/after/);
   assert.equal(await page.locator("#base-source .review-removed").count(),1);assert.equal(await page.locator("#working-source .review-added").count(),1);
+  if(screenshots)await page.screenshot({path:join(screenshots,"desktop.png"),fullPage:true});
   await page.locator("#working-outline button").filter({hasText:"after"}).click();
   await page.waitForFunction(()=>document.querySelector('#working-outline [aria-current="true"]'));
   assert.equal(await page.locator("#select-working").getAttribute("aria-pressed"),"true");
@@ -43,6 +47,8 @@ try {
   await page.getByRole("button",{name:"Back",exact:true}).click();await page.waitForFunction(()=>document.querySelector("#review-notice").textContent.includes("expired"));assert.equal(await page.locator("#review-workspace").getAttribute("data-token"),replacement);
   await page.getByRole("button",{name:"Open current comparison",exact:true}).click();await page.waitForFunction(()=>document.querySelector("#review-notice").hidden);
   await page.setViewportSize({width:600,height:900});await paint(page);assert.ok(await page.locator("#select-base").isVisible());
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,"narrow layout stays within the viewport");
+  if(screenshots)await page.screenshot({path:join(screenshots,"narrow.png"),fullPage:true});
   await page.getByRole("button",{name:"Close comparison",exact:true}).click();await page.waitForFunction(()=>document.querySelector("#review-workspace").dataset.token==="");
   await Promise.all(windows);for(const w of await Promise.all(windows)){assert.ok(w.window.lines.length<=96);assert.ok(w.window.outline.length<=200);assert.ok(["base","working"].includes(w.side));}
   assert.deepEqual(errors,[]);console.log("review browser: linked source, context, history, unavailable content, refresh expiry and narrow layout passed");
