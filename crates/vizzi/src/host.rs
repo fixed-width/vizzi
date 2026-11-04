@@ -24,6 +24,7 @@ use std::{
 
 /// Owns a live workspace and stops its coordinator when dropped.
 pub struct Host {
+    engine: Arc<Engine>,
     application: Arc<Application>,
     stop: Arc<AtomicBool>,
     signal: SyncSender<()>,
@@ -61,6 +62,21 @@ impl RecoveryTask {
     }
 }
 impl Host {
+    /// Analyses a private admitted review through this host's exact engine and budget.
+    /// Callers run this blocking operation outside publication/transport locks.
+    pub fn analyze_review(
+        &self,
+        candidate: &mut crate::review::ReviewCandidate,
+        cancelled: &(dyn Fn() -> bool + Sync),
+    ) -> Result<crate::review::ReviewAnalysis, crate::review::ReviewError> {
+        candidate.analyze(&self.engine, &|| {
+            cancelled() || self.stop.load(Ordering::Acquire)
+        })
+    }
+    /// Observes the same worker allocation used by foreground, recovery and review.
+    pub fn analysis_workers(&self) -> crate::engine::WorkerStats {
+        self.engine.analysis_workers()
+    }
     /// Captures the initial observation, then watches with periodic reconciliation.
     pub fn start(engine: Engine) -> Result<Self, EngineError> {
         Self::start_with_options(engine, HostOptions::default())
@@ -143,7 +159,9 @@ impl Host {
         let maintenance = Arc::new(Mutex::new(MaintenanceStatus::default()));
         let maintenance_status = maintenance.clone();
         let source = options.idle_maintenance.then_some(source).flatten();
+        let worker_engine = engine.clone();
         let task = std::thread::spawn(move || {
+            let engine = worker_engine;
             let queue = worker_queue;
             let mut schedule = Reconciliation::new(Instant::now());
             schedule.interval = options.reconcile_interval;
@@ -339,6 +357,7 @@ impl Host {
             maintenance.shutdown();
         });
         Ok(Self {
+            engine,
             application,
             stop,
             signal,

@@ -89,10 +89,29 @@ cargo run -p vizzi --example review_capture --offline -- \
   1a4f5b65dd2a269298748df2dfd68092a169a8d9 src/compiler/mod.rs
 ```
 
+Add `--analyze` to the diagnostic invocation to apply the engine's default raw
+Rust/Python policy through the shared executor. It uses one worker and a disposable
+external analysis cache, retains other text as source-only, and prints selected
+declaration/context metadata. It never runs lpc-rs or enables C-family analysis by suffix.
+To check the frozen variants with analysis:
+
+```sh
+python3 experiments/review-workflow/verify_native.py \
+  --fixture /tmp/vizzi-review-a --output /tmp/vizzi-analyzed-a.json \
+  --require-admission --require-analysis
+python3 experiments/review-workflow/verify_native.py \
+  --fixture /tmp/vizzi-review-b --output /tmp/vizzi-analyzed-b.json \
+  --require-admission --require-analysis
+```
+
+The [analysis report](ANALYSIS_RESULTS.md) separates syntax/ownership checks from the
+future linked-UI walkthrough and performance qualification.
+
 It uses [bounded review ownership](../../docs/prototype/REVIEW_OWNERSHIP.md) for both
 capture and query lifetime, including the shared source-byte allowance. Admission
-checks are recorded in the [ownership report](OWNERSHIP_RESULTS.md). Integration with
-the analysis scheduler and host/browser operations remain separate work.
+checks are recorded in the [ownership report](OWNERSHIP_RESULTS.md). The
+[analysis bridge](../../docs/prototype/REVIEW_ANALYSIS.md) now uses the shared engine;
+host/browser comparison operations remain separate work.
 
 ## Run an evaluation after review support exists
 

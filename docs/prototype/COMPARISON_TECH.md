@@ -2,7 +2,7 @@
 
 Status: portable inventory comparison, side-specific source binding and bounded textual
 hunks are implemented, with source-only native acquisition and bounded review ownership.
-Analysis integration and host/browser operations remain planned; there
+Admitted analysis now shares the live engine; host/browser comparison operations remain planned. There
 is no comparison transport yet. This reference supports the
 [behaviour contract](COMPARISON_PRODUCT.md). Exact wire fields can be refined with
 implementation while preserving these invariants.
@@ -47,6 +47,8 @@ The [native acquisition reference](REVIEW_ACQUISITION.md) defines the delivered 
 seam, pinned Git objects, observed working bytes, limits and platform/support gaps.
 The [ownership reference](REVIEW_OWNERSHIP.md) defines admitted capture, lifetime tokens,
 retired query leases and shared source charging.
+The [analysis integration reference](REVIEW_ANALYSIS.md) defines frozen-plan rebinding,
+shared parser/cache execution and aggregate foreground/background worker allocation.
 
 ## Source observations and the acquisition seam
 

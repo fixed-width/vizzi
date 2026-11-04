@@ -1,25 +1,19 @@
 //! Bounded parallel analysis with immutable reuse and disposable persistence.
 
 use crate::{
-    admission::{Admission, Priority, Refusal},
+    admission::{Admission, Priority},
     cache::Cache,
     source::{CaptureScope, Directory, MAX_PATH_HINTS},
-    syntax_cache::{SyntaxCache, SyntaxKey},
+    syntax_cache::SyntaxCache,
 };
 use serde::Serialize;
 use std::{
-    collections::{BTreeMap, BTreeSet},
+    collections::BTreeSet,
     path::PathBuf,
-    sync::{
-        Arc,
-        atomic::{AtomicUsize, Ordering},
-    },
+    sync::Arc,
     time::{Duration, Instant},
 };
-use vizzi_core::{
-    analysis::{AnalysisResult, Analyzer},
-    model::{Analysis, Coverage, Document, ModelError, Snapshot, SourceReadError},
-};
+use vizzi_core::model::{Coverage, Document, ModelError, Snapshot, SourceReadError};
 
 /// Native source/analysis failure; the host retains its previous snapshot.
 #[derive(Debug, thiserror::Error)]
@@ -93,7 +87,11 @@ pub struct Engine {
     workers: usize,
     syntax_cache: Option<Arc<SyntaxCache>>,
     admission: Option<Arc<Admission>>,
+    analysis_workers: Arc<crate::analysis_workers::Workers>,
 }
+mod review;
+pub use crate::analysis_workers::WorkerStats;
+
 impl Engine {
     /// Configures 1–32 workers shared across languages, with worker-local parsers.
     pub fn new(directory: Directory, cache: Cache, workers: usize) -> Result<Self, EngineError> {
@@ -108,6 +106,7 @@ impl Engine {
             workers,
             syntax_cache: None,
             admission: None,
+            analysis_workers: Arc::new(crate::analysis_workers::Workers::with_capacity(workers)),
         })
     }
     /// Enables explicitly shared, bounded retained syntax independently of persistence.
@@ -247,149 +246,29 @@ impl Engine {
             }
         }
         jobs.sort_by_key(|job| std::cmp::Reverse(job.0.source.len()));
-        let next = AtomicUsize::new(0);
-        let batches = std::thread::scope(|scope| {
-            let handles: Vec<_> = (0..workers.min(jobs.len()))
-                .map(|_| {
-                    scope.spawn(|| -> Result<_, EngineError> {
-                        let mut parsers = BTreeMap::<_, Box<dyn Analyzer>>::new();
-                        let mut batch = Vec::new();
-                        let mut counters = (0, 0, 0, 0);
-                        loop {
-                            if cancelled() {
-                                break;
-                            }
-                            let index = next.fetch_add(1, Ordering::Relaxed);
-                            let Some((file, language)) = jobs.get(index) else {
-                                break;
-                            };
-                            let context = language.context();
-                            let content = file.source.content();
-                            let _permit = match self.admission.as_ref().map(|budget| budget.acquire(file.source.len(), priority)) {
-                                Some(Ok(permit)) => Some(permit),
-                                Some(Err(reason)) => {
-                                    let diagnostic = match reason {
-                                        Refusal::Busy => "Analysis deferred: active input capacity is occupied or reserved for foreground work; source remains available".into(),
-                                        Refusal::FileLimit => format!("Analysis deferred: {} input bytes exceed the per-file admission limit; source remains available", file.source.len()),
-                                    };
-                                    batch.push(Arc::new(Document::capture_source(
-                                        self.directory.workspace().clone(), file.path.clone(), file.source.clone(),
-                                        vec![Analysis { content: content.clone(), context: context.clone(), coverage: Coverage::Deferred, facts: vec![], diagnostics: vec![diagnostic] }],
-                                        file.classification.clone(),
-                                    )?));
-                                    continue;
-                                }
-                                None => None,
-                            };
-                            let input=file.source.read_all(file.source.len())?;
-                            let cached = self
-                                .cache
-                                .load(&context.id, content)
-                                .filter(|analysis| analysis.context == *context)
-                                .and_then(|analysis| {
-                                    Document::capture_loaded(
-                                        self.directory.workspace().clone(),
-                                        file.path.clone(),
-                                        file.source.clone(),
-                                        &input,
-                                        vec![analysis],
-                                        file.classification.clone(),
-                                    )
-                                    .ok()
-                                });
-                            let document = if let Some(document) = cached {
-                                counters.1 += 1;
-                                document
-                            } else {
-                                let parser = match parsers.entry(context.id.clone()) {
-                                    std::collections::btree_map::Entry::Occupied(entry) => {
-                                        entry.into_mut()
-                                    }
-                                    std::collections::btree_map::Entry::Vacant(entry) => {
-                                        entry.insert(language.create()?)
-                                    }
-                                };
-                                let mut lease = self.syntax_cache.as_ref().and_then(|cache| {
-                                    cache.lease(
-                                        SyntaxKey::new(
-                                            self.directory.workspace(),
-                                            &file.path,
-                                            context,
-                                        ),
-                                        !measurements.reconciled,
-                                    )
-                                });
-                                let result = if let Some(lease) = &mut lease {
-                                    parser.analyze_with_state(
-                                        input.bytes(),
-                                        lease.take_previous(),
-                                        lease.allowance(),
-                                        cancelled,
-                                    )?
-                                } else {
-                                    parser
-                                        .analyze_cancellable(input.bytes(), cancelled)?
-                                        .map(|analysis| AnalysisResult {
-                                            analysis,
-                                            state: None,
-                                            tree_reused: false,
-                                        })
-                                };
-                                let Some(result) = result else {
-                                    return Ok(None);
-                                };
-                                let analysis = result.analysis;
-                                if analysis.context != *context {
-                                    return Err(EngineError::Configuration(
-                                        "analyzer returned an unregistered context".into(),
-                                    ));
-                                }
-                                let document = Document::capture_loaded(
-                                    self.directory.workspace().clone(),
-                                    file.path.clone(),
-                                    file.source.clone(),
-                                    &input,
-                                    vec![analysis],
-                                    file.classification.clone(),
-                                )?;
-                                if let Some(lease) = lease {
-                                    lease.finish(result.state, content);
-                                }
-                                counters.0 += 1;
-                                counters.3 += usize::from(result.tree_reused);
-                                if self.cache.store(&document.analyses()[0]).is_err() {
-                                    counters.2 += 1;
-                                }
-                                document
-                            };
-                            batch.push(Arc::new(document));
-                        }
-                        Ok(Some((batch, counters)))
-                    })
-                })
-                .collect();
-            handles
-                .into_iter()
-                .map(|handle| {
-                    handle.join().map_err(|_| {
-                        EngineError::Configuration("analysis worker panicked".into())
-                    })?
-                })
-                .collect::<Result<Vec<_>, EngineError>>()
-        })?;
-        if cancelled() {
+        let Some(allocation) =
+            self.analysis_workers
+                .acquire(workers.min(jobs.len()), priority, cancelled)
+        else {
             return Ok(None);
+        };
+        let Some(result) = crate::analysis_jobs::Jobs {
+            workspace: self.directory.workspace(),
+            cache: &self.cache,
+            syntax_cache: self.syntax_cache.as_ref(),
+            admission: self.admission.as_ref(),
+            incremental: !measurements.reconciled,
         }
-        for batch in batches {
-            let Some((batch, (parsed, hits, warnings, tree_reuses))) = batch else {
-                return Ok(None);
-            };
-            documents.extend(batch);
-            measurements.parsed += parsed;
-            measurements.cache_hits += hits;
-            measurements.cache_warnings += warnings;
-            measurements.tree_reuses += tree_reuses;
-        }
+        .run(&jobs, allocation.workers, priority, cancelled)?
+        else {
+            return Ok(None);
+        };
+        documents.extend(result.documents);
+        measurements.parsed += result.measurements.parsed;
+        measurements.cache_hits += result.measurements.cache_hits;
+        measurements.cache_warnings += result.measurements.cache_warnings;
+        measurements.tree_reuses += result.measurements.tree_reuses;
+        drop(allocation);
         let snapshot = Arc::new(if measurements.reconciled {
             self.directory
                 .plan()

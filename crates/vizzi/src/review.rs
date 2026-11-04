@@ -4,7 +4,7 @@ use crate::review_source::{Acquired, CaptureError, CaptureLimits, CapturePolicy,
 use std::sync::{Arc, Mutex, MutexGuard, Weak};
 use vizzi_core::{
     comparison::{ComparedEntry, Comparison, ReviewPath, Side},
-    model::{ComparisonId, ModelError, SourceReadError},
+    model::{CapturePlanId, ComparisonId, ModelError, Snapshot, SourceReadError},
     projection::{Window, WindowQuery},
     text_diff::{DiffError, DiffLimits, TextDiff},
 };
@@ -33,6 +33,12 @@ pub enum ReviewError {
     /// Captured sides cannot form one coherent comparison.
     #[error(transparent)]
     Model(#[from] ModelError),
+    /// Analysis failed without replacing the active pair.
+    #[error(transparent)]
+    Analysis(#[from] crate::engine::EngineError),
+    /// A refresh cannot change the baseline's frozen analysis plan.
+    #[error("review analysis policy differs from the pinned baseline")]
+    AnalysisPolicy,
     /// No captured source document is available on the selected side.
     #[error("review source is absent or not retained")]
     SourceUnavailable,
@@ -167,12 +173,27 @@ impl ReviewStore {
             ),
             None => None,
         };
+        let (base_view, analysis_plan) = match refresh {
+            Some(_) => {
+                let pair = state.current.as_ref().ok_or(ReviewError::Stale)?;
+                (
+                    Some(pair.comparison.observation(Side::Base).clone()),
+                    pair.analysis_plan.clone(),
+                )
+            }
+            None => (None, None),
+        };
+        let analysis_required = analysis_plan.is_some();
         let slot = Slot::acquire(self.accounting.slots.clone())?;
         state.building = Some(ticket.clone());
         Ok(ReviewCandidate {
             state: Arc::downgrade(&self.state),
             ticket: ticket.clone(),
             accounting: self.accounting.clone(),
+            base_view,
+            working_view: None,
+            analysis_plan,
+            analysis_required,
             base,
             working: None,
             slot: Some(slot),
@@ -303,6 +324,7 @@ struct InputOwner {
 struct Pair {
     token: String,
     comparison: Comparison,
+    analysis_plan: Option<CapturePlanId>,
     base: Arc<InputOwner>,
     working: Arc<InputOwner>,
     _slot: Slot,
@@ -313,12 +335,70 @@ pub struct ReviewCandidate {
     state: Weak<Mutex<State>>,
     ticket: CaptureTicket,
     accounting: ReviewAccounting,
+    base_view: Option<Arc<vizzi_core::comparison::Observation>>,
+    working_view: Option<Arc<vizzi_core::comparison::Observation>>,
+    analysis_plan: Option<CapturePlanId>,
+    analysis_required: bool,
     base: Option<Arc<InputOwner>>,
     working: Option<Arc<InputOwner>>,
     slot: Option<Slot>,
 }
 
 impl ReviewCandidate {
+    /// Analyses admitted bytes with the workspace engine's shared executor and plan.
+    /// A failed or cancelled attempt cannot be published as source-only implicitly.
+    pub fn analyze(
+        &mut self,
+        engine: &crate::engine::Engine,
+        cancelled: &(dyn Fn() -> bool + Sync),
+    ) -> Result<ReviewAnalysis, ReviewError> {
+        self.check()?;
+        if self.working_view.is_some() {
+            return Err(ReviewError::Stage);
+        }
+        let base = self.base.as_ref().ok_or(ReviewError::Stage)?;
+        let working = self.working.as_ref().ok_or(ReviewError::Stage)?;
+        self.analysis_required = true;
+        let plan = engine.review_plan();
+        if self.analysis_plan.as_ref().is_some_and(|held| held != plan)
+            || (self.base_view.is_some() && self.analysis_plan.is_none())
+        {
+            return Err(ReviewError::AnalysisPolicy);
+        }
+        self.analysis_plan = Some(plan.clone());
+        let result = (|| {
+            let cancelled = || cancelled() || self.check().is_err();
+            let (base_view, measured_base) = match &self.base_view {
+                Some(view) => (view.clone(), None),
+                None => {
+                    let result = engine
+                        .analyze_review(base.capture.observation.snapshot(), &cancelled)?
+                        .ok_or(CaptureError::Cancelled)?;
+                    (
+                        analyzed_view(base, result.snapshot)?,
+                        Some(result.measurements),
+                    )
+                }
+            };
+            let result = engine
+                .analyze_review(working.capture.observation.snapshot(), &cancelled)?
+                .ok_or(CaptureError::Cancelled)?;
+            let working_view = analyzed_view(working, result.snapshot)?;
+            Ok::<_, ReviewError>((
+                base_view,
+                working_view,
+                ReviewAnalysis {
+                    base: measured_base,
+                    working: result.measurements,
+                },
+            ))
+        })();
+        self.check()?;
+        let (base_view, working_view, measurements) = result?;
+        self.base_view = Some(base_view);
+        self.working_view = Some(working_view);
+        Ok(measurements)
+    }
     /// Captures a new baseline; refresh candidates already own their exact held base.
     pub fn capture_base(
         &mut self,
@@ -350,16 +430,24 @@ impl ReviewCandidate {
     /// Validates and atomically replaces the pair only for the latest live request.
     pub fn publish(mut self) -> Result<String, ReviewError> {
         self.check()?;
+        if self.analysis_required && self.working_view.is_none() {
+            return Err(ReviewError::Stage);
+        }
         let base = self.base.take().ok_or(ReviewError::Stage)?;
         let working = self.working.take().ok_or(ReviewError::Stage)?;
         let comparison = Comparison::between(
-            base.capture.observation.clone(),
-            working.capture.observation.clone(),
+            self.base_view
+                .take()
+                .unwrap_or_else(|| base.capture.observation.clone()),
+            self.working_view
+                .take()
+                .unwrap_or_else(|| working.capture.observation.clone()),
         )?;
         let token = self.ticket.token.clone();
         let pair = Arc::new(Pair {
             token: token.clone(),
             comparison,
+            analysis_plan: self.analysis_plan.take(),
             base,
             working,
             _slot: self.slot.take().ok_or(ReviewError::Stage)?,
@@ -417,6 +505,15 @@ impl ReviewCandidate {
     }
 }
 
+/// Work performed by one pair analysis; refresh reuses the exact analysed baseline.
+#[derive(Clone, Debug, serde::Serialize)]
+pub struct ReviewAnalysis {
+    /// Baseline measurements, absent when its analysed observation was reused.
+    pub base: Option<crate::engine::Measurements>,
+    /// Working-side measurements.
+    pub working: crate::engine::Measurements,
+}
+
 impl Drop for ReviewCandidate {
     fn drop(&mut self) {
         if let Some(state) = self.state.upgrade() {
@@ -435,6 +532,34 @@ pub struct ReviewLease {
 }
 
 impl ReviewLease {
+    /// Frozen analyser-registration/configuration identity, absent for source-only pairs.
+    pub fn analysis_plan(&self) -> Option<&CapturePlanId> {
+        self.pair.analysis_plan.as_ref()
+    }
+    /// Borrows frozen classification metadata, without transferring source ownership.
+    pub fn classification(
+        &self,
+        side: Side,
+        path: &ReviewPath,
+    ) -> Result<&vizzi_core::policy::Classification, ReviewError> {
+        self.pair
+            .comparison
+            .document(side, path)
+            .map(|doc| doc.classification())
+            .ok_or(ReviewError::SourceUnavailable)
+    }
+    /// Borrows analysis records for native projections; host adapters must bound output.
+    pub fn analyses(
+        &self,
+        side: Side,
+        path: &ReviewPath,
+    ) -> Result<&[vizzi_core::model::Analysis], ReviewError> {
+        self.pair
+            .comparison
+            .document(side, path)
+            .map(|doc| doc.analyses())
+            .ok_or(ReviewError::SourceUnavailable)
+    }
     /// Publication token; identical-content refreshes still have distinct tokens.
     pub fn token(&self) -> &str {
         &self.pair.token
@@ -477,6 +602,31 @@ impl ReviewLease {
             Side::Working => &self.pair.working.capture.notices,
         }
     }
+}
+
+fn analyzed_view(
+    owner: &InputOwner,
+    snapshot: Arc<Snapshot>,
+) -> Result<Arc<vizzi_core::comparison::Observation>, ReviewError> {
+    let original = owner.capture.observation.snapshot();
+    if snapshot.documents().len() != original.documents().len()
+        || snapshot.documents().iter().any(|document| {
+            !original
+                .file_by_path(document.path())
+                .is_some_and(|old| Arc::ptr_eq(old.captured(), document.captured()))
+        })
+    {
+        return Err(ReviewError::Model(ModelError(
+            "review analysis changed admitted source ownership".into(),
+        )));
+    }
+    Ok(Arc::new(
+        vizzi_core::comparison::Observation::from_inventory(
+            snapshot,
+            owner.capture.observation.policy().clone(),
+            owner.capture.observation.inventory().to_vec(),
+        )?,
+    ))
 }
 
 fn retained_bytes(capture: &Acquired) -> Result<usize, ReviewError> {
@@ -611,5 +761,56 @@ mod tests {
         drop(pending);
         assert_eq!(accounting.stats().pair_slots, 0);
         drop(held_metadata);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn analysis_rebinding_rejects_missing_or_reallocated_admitted_source() {
+        let root = tempfile::tempdir().unwrap();
+        std::fs::write(root.path().join("a.rs"), b"abc").unwrap();
+        let mut input = crate::review_source::DirectoryInput::open(root.path()).unwrap();
+        let store = ReviewStore::open(3).unwrap();
+        let ticket = store.request().unwrap();
+        let mut candidate = store.begin(&ticket, None).unwrap();
+        candidate
+            .capture_base(
+                &mut input,
+                &CapturePolicy::scope(None, vec![]),
+                CaptureLimits::default(),
+                &|| false,
+            )
+            .unwrap();
+        let owner = candidate.base.as_ref().unwrap();
+        let original = owner.capture.observation.snapshot();
+        let document = original.documents()[0].clone();
+        let snapshot = |documents| {
+            Arc::new(
+                Snapshot::new(
+                    original.workspace().clone(),
+                    documents,
+                    original.policy().clone(),
+                )
+                .unwrap(),
+            )
+        };
+        assert!(analyzed_view(owner, snapshot(vec![])).is_err());
+        let reallocated = Arc::new(
+            Document::capture_source(
+                original.workspace().clone(),
+                document.path().into(),
+                CapturedSource::capture(b"abc".to_vec(), None),
+                vec![],
+                document.classification().clone(),
+            )
+            .unwrap(),
+        );
+        assert!(
+            matches!(analyzed_view(owner,snapshot(vec![reallocated])),Err(ReviewError::Model(ModelError(message))) if message=="review analysis changed admitted source ownership")
+        );
+        let view = analyzed_view(owner, snapshot(vec![document.clone()])).unwrap();
+        assert!(Arc::ptr_eq(
+            view.snapshot().documents()[0].captured(),
+            document.captured()
+        ));
     }
 }

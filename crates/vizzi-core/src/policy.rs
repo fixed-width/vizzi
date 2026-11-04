@@ -58,6 +58,8 @@ pub enum Provenance {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum SourceOnlyReason {
+    /// Review source is retained outside the engine's selected analysis scope.
+    OutsideAnalysisScope,
     /// This source capture deliberately runs no language analysis.
     AnalysisNotRequested,
     /// An ambiguous header has no language assignment.

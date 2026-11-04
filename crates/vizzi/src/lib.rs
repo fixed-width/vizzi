@@ -1,5 +1,7 @@
 //! Native adapters for the local codebase workspace.
 pub mod admission;
+mod analysis_jobs;
+mod analysis_workers;
 pub mod application;
 pub mod cache;
 pub mod changes;

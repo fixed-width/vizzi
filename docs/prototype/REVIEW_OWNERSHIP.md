@@ -73,9 +73,9 @@ Fresh captures with equal hashes still occupy distinct storage and are charged s
 Refresh shares the admitted baseline input owner across both pairs; that owner is
 charged once until all references disappear. Current acquisition creates fresh source
 storage per read. There is no interface for adopting arbitrary external snapshots or
-deduplicating separate captures by hash. Future analysis rebinding must preserve the
-charged input owner while replacing facts, rather than creating an untracked source
-owner or dropping the original guard.
+deduplicating separate captures by hash. The [analysis bridge](REVIEW_ANALYSIS.md)
+preserves the charged input owner while rebinding facts; it validates original source
+owner identity rather than creating an untracked source owner or dropping the guard.
 
 Accounting reports `capacity_bytes`, `charged_bytes` (retained plus outstanding
 reservations), `retained_bytes` and `pair_slots`. Input/pair destruction frees source
@@ -85,5 +85,5 @@ parser/diff heap and the live workspace remain outside this logical source allow
 it is not a process-memory cap.
 
 The [validation report](../../experiments/review-workflow/OWNERSHIP_RESULTS.md) records
-tests, mutation scope and the frozen fixtures through this admitted path. Integration
-with the existing analysis scheduler and host/browser operations remains next.
+tests, mutation scope and the frozen fixtures through this admitted path. Shared-engine
+analysis is now delivered; host/browser comparison operations remain next.

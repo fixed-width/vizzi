@@ -6,7 +6,7 @@ vertical slice; the performance experiment crate remains independent.
 
 The [contextual-review contract](COMPARISON_TECH.md) extends this model with
 SCM-independent immutable comparisons. Portable inventory/hunk computation and
-source-only native acquisition with bounded ownership are delivered; analysis integration and
+native acquisition with bounded ownership and shared-engine analysis are delivered;
 host/browser comparison operations remain planned. Its
 [behaviour contract](COMPARISON_PRODUCT.md) defines that review workflow.
 
