@@ -61,11 +61,10 @@ can differ at the same source revision.
 
 ## Use the question with an unfamiliar developer
 
-Give the operator only this task:
-
-> How does the compiler obtain source, decide whether to retry a path with the c
-> extension, and report a read failure? Explain the behaviour and cite the source
-> and tests that support your answer.
+Give the operator the [neutral learning brief](../usability/participant/learning.md),
+with the common controls and notes. The [trial procedure](../usability/README.md)
+prepares disposable workspaces; its [protocol](../usability/PROTOCOL.md) separates
+maintainer trials from unfamiliar primary attempts.
 
 Provide a pinned workspace through the [normal launch procedure](../../docs/how-to/run-workspace.md).
 Keep the oracle, scripted route and results hidden until the session ends. Record

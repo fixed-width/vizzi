@@ -41,6 +41,8 @@ first usable review around 0.8–1.0 seconds from launch in the focused referenc
 Working refresh now [preserves reading context](docs/prototype/REVIEW_REFRESH.md);
 the [repeated measurements](experiments/review-workflow/REFRESH_RESULTS.md) record
 zero edited-file resets across 30 scoped refreshes.
+The [human-trial kit](experiments/usability/README.md) prepares maintainer feedback and
+later unfamiliar-user evaluation with neutral tasks and separate scoring material.
 
 - [Run the workspace](docs/how-to/run-workspace.md)
 - [Next product milestones](docs/plans/product-milestones.md)

@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "study_status": "prepared-awaiting-operator-observations",
+  "session_role": "maintainer",
+  "independent_acceptance": "open",
+  "human_observations": null,
+  "assessment": null,
+  "viewer_commit": "66ebde86c13daf2471ec9b707ea824c18ca80b31",
+  "viewer_binary_sha256": "3e7483eebe4a89812ec572f613b04dd3882f574b4f51cc31b91b53cda650e1a3",
+  "baseline": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+  "learning_archive_sha256": "03b3b09405358aaa67457b306a86497f44e2bc3597a63ba720fd28cdaf7a56a0",
+  "original_checkout_status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "original_checkout_status_matched_during_preparation": true,
+  "review_frozen_fixture_verified": true,
+  "private_case_assignment": "retained outside participant material; not disclosed here",
+  "fixture_check_sha256": "189b92d4c8657cb12533c4e0e0c8b2f3a92aa11be3cfffb4129a28a8f56c4f08",
+  "neutral_packet_check": "Passed: participant Markdown has no variant labels, expected verdict or target-declaration/file hints. The frozen review task is reused.",
+  "health_checks": "Both local listeners answered passive status, and served learning/review assets matched the recorded source. No task was navigated or comparison created by the checks.",
+  "reference_source_sha256": {
+    "src/compiler/mod.rs": "25012f2d87e4268a217fe59f35bca6a82223e60f1b2a978cdc38c27d5731ff48",
+    "src/compiler/source_reader.rs": "c36da30317c1ec9679a770b55a8bf6d813cac8767143534b144d48836c927382",
+    "src/compiler/source.rs": "7193804ee144a3167a62f1515c2cda74f43243a8dee4f4d31d1f587ac4799c85"
+  },
+  "documentation_sha256": {
+    "experiments/usability/PREPARATION.md": "cd1e0bb31cbdf42be0bc748328bfd2999de12424fdcbeb8b032e4953ac3cbf40",
+    "experiments/usability/README.md": "c3bc5d1619e27cdfe8075a591ea438a54a68354f25901f63baf16e424df80bbb",
+    "experiments/usability/PROTOCOL.md": "906bc10f09dec3c7038b26fd31c1d3dd4432f16a4e0c55f2231cbd147a647ca5",
+    "experiments/usability/facilitator/scoring.md": "707cdb628a0363a1112b7213d5b2fa2eb0378e8807203a34479983c125a8bf46",
+    "experiments/usability/participant/notes.md": "ed9016c492847a5fe3162b961c7efb9ac390520611fd8684ae31f51a01d07fa4",
+    "experiments/usability/participant/controls.md": "32ee91981d6abb78b510147b4916ae37594fd629018d19ae1e534d339441e675",
+    "experiments/usability/participant/learning.md": "2d6f613c20b6b579a2d994a8373d714a7fc269886972602b857416cf30052f11"
+  },
+  "checks": {
+    "rust_workspace_all_features_with_doctest_checks": 409,
+    "doctest_examples": 0,
+    "clippy_all_targets_all_features_deny_warnings": "passed",
+    "format": "passed",
+    "local_documentation_links": "passed",
+    "logs": {
+      "workspace_tests": {
+        "local_log": "/tmp/vizzi-usability-workspace-tests.log",
+        "sha256": "4bdc6777da557bef43c1d67e4e6b10eeee85798ccba47dbc5ebbd63d2cdd5641"
+      },
+      "clippy": {
+        "local_log": "/tmp/vizzi-usability-clippy.log",
+        "sha256": "a41051563a4cb5fc1b1bcdd9aa0ba28ca80f7736d629d90cc138218756e8e3a9"
+      }
+    }
+  },
+  "implementation_changes": false,
+  "mutation_checks": "No runtime/test harness implementation changed. Existing viewer evidence remains in experiments/review-workflow/results/refresh.",
+  "local_session_root": "/tmp/vizzi-maintainer-20261104",
+  "limits": "This is materialisation, neutral-packet and viewer-health evidence. No participant success, comprehension gain, independent acceptance, browser/hardware portability or usability result is claimed."
+}

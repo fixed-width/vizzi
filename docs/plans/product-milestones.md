@@ -12,6 +12,11 @@ useful reading context, with zero file resets in the repeated scoped cohort.
 Independent-operator/usability validation remains open.
 This follows the product-alignment checkpoint at commit 4e75d04.
 
+The [human-trial kit](../../experiments/usability/README.md) now supplies neutral
+tasks, participant notes, a facilitator protocol and a separate rubric. A maintainer
+trial is prepared and awaiting operator observations; preparation and guided replays
+do not close unfamiliar-user acceptance.
+
 The goal is coordinated views for learning unfamiliar code and reviewing changes, as
 defined in [DESIGN.md](../../DESIGN.md). The [research rationale](../explanation/task-driven-views.md)
 explains the candidate perspectives. This plan governs the next delivery order; the

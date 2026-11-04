@@ -1,5 +1,10 @@
 # Prepare the contextual-review task
 
+For a human trial, use the [neutral frozen brief](fixtures/task.md) with the
+[trial procedure](../usability/README.md). Keep the oracle, case assignment and guided
+route with the facilitator. Maintainer trials and unfamiliar primary attempts have
+separate evidence categories in the [protocol](../usability/PROTOCOL.md).
+
 Use this how-to to materialise the frozen local-change review fixtures for
 [milestone 2](../../docs/plans/product-milestones.md). Git and Python 3.12+ are required.
 The review interface now passes both guided rendered variants. This guide prepares
