@@ -1,7 +1,8 @@
 # Product milestones: understand a subsystem, then review a change
 
 Status: the baseline and navigation slice are delivered, with a passing guided learning
-workflow. Independent-operator/usability acceptance remains open; milestone 2 is planned.
+workflow. Independent-operator/usability acceptance remains open. The review fixture and
+comparison contracts are frozen; milestone 2 implementation is next.
 This follows the product-alignment checkpoint at commit 4e75d04.
 
 The goal is coordinated views for learning unfamiliar code and reviewing changes, as
@@ -150,8 +151,22 @@ engine, a Git library or a complete graph API.
 | 1. Baseline learning walkthrough — delivered | [Guided replay](../../experiments/learning-workflow/RESULTS.md), source evidence, recording and observed gaps using current views. |
 | 2. Choose the smallest useful extension — delivered | [Navigation contract](../prototype/NAVIGATION.md) and implementation address the observed return-context gap; a graph stays deferred. |
 | 3. Demonstrate milestone 1 — guided workflow delivered | [Repeated learning task](../../experiments/learning-workflow/NAVIGATION_RESULTS.md) with TDD/mutation evidence. Independent-operator validation remains open. |
-| 4. Freeze the review fixture/contracts — next | Good/bad patches, change semantics and source-provider/pinning boundaries. |
-| 5. Build and demonstrate milestone 2 | One complete Git-based review workflow plus provider-independent correctness tests. |
+| 4. Freeze the review fixture/contracts — delivered | [Verified good/bad fixture](../../experiments/review-workflow/RESULTS.md), [behaviour](../prototype/COMPARISON_PRODUCT.md) and [technical contract](../prototype/COMPARISON_TECH.md) specify change semantics, source providers and pair ownership. |
+| 5. Build and demonstrate milestone 2 — next | One complete Git-based review workflow plus provider-independent correctness tests. |
+
+The implementation order for step 5 is:
+
+1. Portable comparison of supplied immutable observations, with an in-memory provider,
+   independently specified inventory/diff expectations, TDD and focused mutation tests.
+2. Minimal native identity/list/read seam and Git base/working acquisition, using shared
+   worker/admission budgets and bounded pair/source ownership.
+3. Token/side-bound application queries and transport, with explicit refresh, status,
+   capacity/error states and bounded source/hunk projections.
+4. Linked review views and keyboard/history behaviour, then the two-variant walkthrough
+   and focused task-scale observations. Retain the learning workflow as a regression.
+
+Each slice delivers exercised public behaviour; it does not require building the later
+layers first. Fixture validation is preparation evidence, not completed review acceptance.
 
 Work in small vertical slices. Tests should cover public behaviour, stale/expired anchors,
 source identity, language-capability gaps and comparison correctness; use mutation testing

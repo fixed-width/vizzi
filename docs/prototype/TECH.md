@@ -4,6 +4,10 @@ The implementation separates an immutable Rust model from native source access,
 persistence, scheduling, and host transports. These interfaces are for the first
 vertical slice; the performance experiment crate remains independent.
 
+The planned [contextual-review contract](COMPARISON_TECH.md) extends this model with
+SCM-independent immutable comparisons. Its [behaviour contract](COMPARISON_PRODUCT.md)
+defines the next workflow; these comparison operations are not delivered yet.
+
 ## Modules
 
 - `vizzi-core` owns typed identities, captured documents, source-backed syntax facts,

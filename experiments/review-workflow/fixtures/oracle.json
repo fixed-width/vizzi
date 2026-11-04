@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "base_revision": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+  "source_path": "src/compiler/mod.rs",
+  "untracked_path": "doc/compiler-source-reading.md",
+  "base_sha256": "25012f2d87e4268a217fe59f35bca6a82223e60f1b2a978cdc38c27d5731ff48",
+  "index_sha256": "77d27fe6bef989a24344e3842618add3414d7ce64bb23f8bb522ae7b45ed1cd4",
+  "document_sha256": "4edf32dbe15a386e8f301d7a885fe8ef6a4488202f9de51657a2e35110b6027e",
+  "changed_paths": [
+    "src/compiler/mod.rs",
+    "doc/compiler-source-reading.md"
+  ],
+  "status_porcelain": [
+    "MM src/compiler/mod.rs",
+    "?? doc/compiler-source-reading.md"
+  ],
+  "expected_lookup": [
+    {
+      "input": "/source-read/missing",
+      "error": "NotFound",
+      "reads": [
+        "/source-read/missing",
+        "/source-read/missing.c"
+      ]
+    },
+    {
+      "input": "/source-read/missing.c",
+      "error": "NotFound",
+      "reads": [
+        "/source-read/missing.c"
+      ]
+    },
+    {
+      "input": "/source-read/denied",
+      "error": "PermissionDenied",
+      "reads": [
+        "/source-read/denied"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "path": "src/compiler/mod.rs",
+      "symbol": "Compiler::compile_file"
+    },
+    {
+      "path": "src/compiler/mod.rs",
+      "symbol": "Compiler::read_file"
+    },
+    {
+      "path": "src/compiler/source_reader.rs",
+      "symbol": "SourceReader"
+    },
+    {
+      "path": "src/compiler/source.rs",
+      "symbol": "CompilerSource"
+    },
+    {
+      "path": "src/compiler/mod.rs",
+      "symbol": "file_reads_stop_after_extension_fallback_and_preserve_other_io_errors"
+    }
+  ],
+  "variants": {
+    "variant-a": {
+      "verdict": "lookup_regression",
+      "working_sha256": "6aaf1ed0b09dbbceea135ec7d1ad8601e386d8cfb3b90315ad361933d83d99a9",
+      "patch_sha256": {
+        "staged.patch": "f6423b93fbf531387e90102bb5b159f157d69e1a0f91038b57d27fd0cbdba7fe",
+        "unstaged.patch": "9993d1197747cce25479bade97ff605b50b31e7813976e3549fd8b055f0cc63b"
+      },
+      "base_to_working_hunks": [
+        "@@ -117,7 +117,7 @@",
+        "@@ -156,8 +156,10 @@",
+        "@@ -166,7 +168,7 @@"
+      ]
+    },
+    "variant-b": {
+      "verdict": "preserves_lookup",
+      "working_sha256": "e601d8d9efea6b46c08719e4aacd411aad541ed0bfe8f6cb064cae65b924872a",
+      "patch_sha256": {
+        "staged.patch": "f6423b93fbf531387e90102bb5b159f157d69e1a0f91038b57d27fd0cbdba7fe",
+        "unstaged.patch": "6ada19c9a725ac6a44c9021ba9063517a62c79e01d00d86777cbc89fbbd25527"
+      },
+      "base_to_working_hunks": [
+        "@@ -117,7 +117,7 @@",
+        "@@ -166,7 +166,7 @@"
+      ]
+    }
+  }
+}

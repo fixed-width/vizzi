@@ -4,6 +4,10 @@ The first slice lets a developer explore Rust and Python source through a reposi
 a source inspector, and a declaration outline sharing one selection. It uses the local
 engine and works without a project build or external account.
 
+The next review workflow is specified separately in the
+[contextual-review behaviour contract](COMPARISON_PRODUCT.md). Its frozen fixture and
+comparison semantics do not imply that review views are already available.
+
 ## Required behaviour
 
 - The root directory and cache directory are chosen when launching the native host.

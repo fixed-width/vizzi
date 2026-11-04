@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "date": "2026-11-03",
+  "kind": "fixture_preparation_only",
+  "git": "git version 2.43.0",
+  "base_revision": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+  "checks": {
+    "variant-a": {
+      "variant": "variant-a",
+      "verified": true,
+      "changed_paths": 2,
+      "hunks": 3,
+      "working_differs_from_index": true
+    },
+    "variant-b": {
+      "variant": "variant-b",
+      "verified": true,
+      "changed_paths": 2,
+      "hunks": 2,
+      "working_differs_from_index": true
+    },
+    "existing_output_refused": true,
+    "unexpected_working_bytes_rejected": true,
+    "index_substituted_for_working_rejected": true,
+    "omitted_untracked_document_rejected": true,
+    "original_checkout_clean_after_checks": true,
+    "output_inside_original_checkout_refused_before_write": true
+  },
+  "oracle_sha256": "facc2338c8d445d25574a59bfc44543bd1d8834b33f00eecec3d7c4834ecabd0",
+  "limitations": [
+    "No Vizzi comparison implementation or UI exercised.",
+    "No lpc-rs build, project scripts or regression tests executed.",
+    "Behavioural verdict is derived from pinned source and existing test contract.",
+    "No independent-operator/usability or scale claim."
+  ]
+}

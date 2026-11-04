@@ -1,0 +1,12 @@
+diff --git a/src/compiler/mod.rs b/src/compiler/mod.rs
+--- a/src/compiler/mod.rs
++++ b/src/compiler/mod.rs
+@@ -166,7 +166,7 @@
+                 }
+                 Err(error) => {
+                     return Err(lpc_error!(
+-                        "Cannot read file `{}`: {}",
++                        "Cannot read file `{}`: {} (source lookup stopped)",
+                         identity.name(),
+                         error
+                     ));
