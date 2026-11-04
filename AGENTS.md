@@ -48,6 +48,11 @@ Build coordinated codebase views for learning unfamiliar code and reviewing chan
   integration and performance checks. Keep the normal development feedback loop fast.
 - Use cargo-mutants to check the strength of behavioral tests. Establish a passing
   unmodified baseline before interpreting mutation results.
+- Keep mutation runs considerate of other work on the machine: use one mutant job
+  and one compiler/jobserver task (`-j 1 --jobserver-tasks 1`, `CARGO_BUILD_JOBS=1`),
+  with serial test execution (`RUST_TEST_THREADS=1`).
+  On Unix, run at lower priority with `nice -n 10`. Do not raise concurrency unless
+  the user explicitly requests it.
 - Run focused mutation testing during development and broader relevant runs at
   integration milestones. Diff-scoped runs alone do not establish full coverage.
 - Investigate surviving mutations. Add meaningful tests for behavior-changing survivors;

@@ -7,6 +7,7 @@ pub mod engine;
 pub mod host;
 mod invalidation;
 mod maintenance;
+pub mod review_source;
 pub mod server;
 pub mod source;
 pub mod source_spool;

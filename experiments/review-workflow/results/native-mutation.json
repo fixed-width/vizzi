@@ -1,0 +1,947 @@
+{
+  "total_mutants": 211,
+  "caught": 171,
+  "missed": 1,
+  "unviable": 37,
+  "timeout": 2,
+  "start_time": "2026-11-04T01:34:53.745262016Z",
+  "end_time": "2026-11-04T01:52:23.642659103Z",
+  "cargo_mutants_version": "27.1.0",
+  "schema": 1,
+  "command": "CARGO_BUILD_JOBS=1 nice -n 10 cargo mutants --config experiments/review-workflow/mutants.toml -p vizzi -f 'crates/vizzi/src/review_source*.rs' -f 'crates/vizzi/src/review_source/*.rs' --test-package vizzi -j 1 --jobserver-tasks 1 --timeout 20 --build-timeout 180 -C --offline -o /tmp/vizzi-review-source-serial-mutation-20261103 -- --lib --test review_source",
+  "baseline": {
+    "scenario": "Baseline",
+    "summary": "Success",
+    "log_path": "log/baseline.log",
+    "diff_path": null,
+    "phase_results": [
+      {
+        "phase": "Build",
+        "duration": 37.014959598,
+        "process_status": "Success",
+        "argv": [
+          "/home/mpd/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo",
+          "test",
+          "--no-run",
+          "--verbose",
+          "--package=vizzi@0.1.0",
+          "--offline"
+        ]
+      },
+      {
+        "phase": "Test",
+        "duration": 0.652225072,
+        "process_status": "Success",
+        "argv": [
+          "/home/mpd/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo",
+          "test",
+          "--verbose",
+          "--package=vizzi@0.1.0",
+          "--offline",
+          "--lib",
+          "--test",
+          "review_source"
+        ]
+      }
+    ]
+  },
+  "outcomes": [
+    {
+      "name": "crates/vizzi/src/review_source.rs:18:30: replace * with +",
+      "summary": "MissedMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:18:30: replace * with /",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:70:9: replace <impl From<rustix::io::Errno> for CaptureError>::from -> Self with Default::default()",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:145:9: replace CapturePolicy::scope -> Self with Default::default()",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:170:5: replace acquire -> Result<Acquired, CaptureError> with Ok(Default::default())",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:172:20: replace > with == in acquire",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:172:20: replace > with < in acquire",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:172:20: replace > with >= in acquire",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:176:44: replace == with != in acquire",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:185:12: delete ! in acquire",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:199:47: replace - with + in acquire",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:199:47: replace - with / in acquire",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:208:35: replace > with == in acquire",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:208:35: replace > with < in acquire",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:208:35: replace > with >= in acquire",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:211:27: replace += with -= in acquire",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:211:27: replace += with *= in acquire",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:276:5: replace within -> bool with true",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:276:5: replace within -> bool with false",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:277:9: replace || with && in within",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:276:10: replace == with != in within",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:284:5: replace check -> Result<(), CaptureError> with Ok(())",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:296:5: replace read_bytes -> Result<Vec<u8>, CaptureError> with Ok(vec![])",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:296:5: replace read_bytes -> Result<Vec<u8>, CaptureError> with Ok(vec![0])",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:296:5: replace read_bytes -> Result<Vec<u8>, CaptureError> with Ok(vec![1])",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:304:18: replace == with != in read_bytes",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:307:18: replace > with == in read_bytes",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:307:18: replace > with < in read_bytes",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:307:18: replace > with >= in read_bytes",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:307:26: replace - with + in read_bytes",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source.rs:307:26: replace - with / in read_bytes",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:28:9: replace DirectoryInput::check_root -> Result<(), CaptureError> with Ok(())",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:31:43: replace != with == in DirectoryInput::check_root",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:40:9: replace DirectoryInput::open -> Result<Self, CaptureError> with Ok(Default::default())",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:52:9: replace DirectoryInput::root -> &Path with Box::leak(Box::new(Default::default()))",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:58:9: replace <impl ReviewInput for DirectoryInput>::workspace -> &WorkspaceId with Box::leak(Box::new(Default::default()))",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:65:9: replace <impl ReviewInput for DirectoryInput>::paths -> Result<Vec<ReviewPath>, CaptureError> with Ok(vec![])",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:65:9: replace <impl ReviewInput for DirectoryInput>::paths -> Result<Vec<ReviewPath>, CaptureError> with Ok(vec![Default::default()])",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:83:9: replace <impl ReviewInput for DirectoryInput>::read -> Result<ReadEntry, CaptureError> with Ok(Default::default())",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:88:49: replace match guard error.kind() == std::io::ErrorKind::NotFound with true in <impl ReviewInput for DirectoryInput>::read",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:88:49: replace match guard error.kind() == std::io::ErrorKind::NotFound with false in <impl ReviewInput for DirectoryInput>::read",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:88:62: replace == with != in <impl ReviewInput for DirectoryInput>::read",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:104:9: replace <impl ReviewInput for DirectoryInput>::notices -> Vec<CaptureNotice> with vec![Default::default()]",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:114:9: replace DirectoryInput::parent -> Result<(std::fs::File, std::ffi::OsString), CaptureError> with Ok((Default::default(), Default::default()))",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:117:57: replace == with != in DirectoryInput::parent",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:133:9: replace DirectoryInput::discover -> Result<Vec<ReviewPath>, CaptureError> with Ok(vec![])",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:133:9: replace DirectoryInput::discover -> Result<Vec<ReviewPath>, CaptureError> with Ok(vec![Default::default()])",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:148:23: replace += with -= in DirectoryInput::discover",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:148:23: replace += with *= in DirectoryInput::discover",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:149:26: replace > with == in DirectoryInput::discover",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:149:26: replace > with < in DirectoryInput::discover",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:149:26: replace > with >= in DirectoryInput::discover",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:153:20: delete ! in DirectoryInput::discover",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:160:36: replace > with == in DirectoryInput::discover",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:160:36: replace > with < in DirectoryInput::discover",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:160:36: replace > with >= in DirectoryInput::discover",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:166:25: replace == with != in DirectoryInput::discover",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:182:9: replace DirectoryInput::read_unix -> Result<ReadEntry, CaptureError> with Ok(Default::default())",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:187:13: delete match arm FileType::Symlink in DirectoryInput::read_unix",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:197:13: delete match arm FileType::RegularFile in DirectoryInput::read_unix",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:189:32: replace > with == in DirectoryInput::read_unix",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:189:32: replace > with < in DirectoryInput::read_unix",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:189:32: replace > with >= in DirectoryInput::read_unix",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:201:20: delete ! in DirectoryInput::read_unix",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:204:33: replace > with == in DirectoryInput::read_unix",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:204:33: replace > with < in DirectoryInput::read_unix",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:204:33: replace > with >= in DirectoryInput::read_unix",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:218:20: delete ! in DirectoryInput::read_unix",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:236:5: replace regular_kind -> EntryKind with Default::default()",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:237:34: replace != with == in regular_kind",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:237:26: replace & with | in regular_kind",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:237:26: replace & with ^ in regular_kind",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:253:9: replace FileStamp::of -> Self with Default::default()",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:257:9: replace FileStamp::verifies -> bool with true",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:257:9: replace FileStamp::verifies -> bool with false",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:257:51: replace && with || in FileStamp::verifies",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:257:21: replace && with || in FileStamp::verifies",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:257:13: replace == with != in FileStamp::verifies",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:257:37: replace == with != in FileStamp::verifies",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/disk.rs:257:62: replace == with != in FileStamp::verifies",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:11:34: replace * with +",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:11:34: replace * with /",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:45:9: replace GitRepository::open -> Result<Self, CaptureError> with Ok(Default::default())",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:48:13: replace || with && in GitRepository::open",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:47:86: replace != with == in GitRepository::open",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:48:82: replace != with == in GitRepository::open",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:55:37: replace == with != in GitRepository::open",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:59:17: replace || with && in GitRepository::open",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:58:20: replace == with != in GitRepository::open",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:59:49: replace && with || in GitRepository::open",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:70:9: replace GitRepository::workspace -> &WorkspaceId with Box::leak(Box::new(Default::default()))",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:79:9: replace GitRepository::pin -> Result<GitRevision, CaptureError> with Ok(Default::default())",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:116:9: replace GitRepository::working -> Result<GitWorking, CaptureError> with Ok(Default::default())",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:116:27: replace != with == in GitRepository::working",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:131:9: replace GitRepository::command -> Command with Default::default()",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:158:9: replace GitRepository::run -> Result<Vec<u8>, CaptureError> with Ok(vec![])",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:158:9: replace GitRepository::run -> Result<Vec<u8>, CaptureError> with Ok(vec![0])",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:158:9: replace GitRepository::run -> Result<Vec<u8>, CaptureError> with Ok(vec![1])",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:166:12: delete ! in GitRepository::run",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:177:9: replace GitRevision::resolved -> &str with \"\"",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:177:9: replace GitRevision::resolved -> &str with \"xyzzy\"",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:183:9: replace <impl ReviewInput for GitRevision>::workspace -> &WorkspaceId with Box::leak(Box::new(Default::default()))",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:190:9: replace <impl ReviewInput for GitRevision>::paths -> Result<Vec<ReviewPath>, CaptureError> with Ok(vec![])",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:190:9: replace <impl ReviewInput for GitRevision>::paths -> Result<Vec<ReviewPath>, CaptureError> with Ok(vec![Default::default()])",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:191:31: replace > with == in <impl ReviewInput for GitRevision>::paths",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:191:31: replace > with < in <impl ReviewInput for GitRevision>::paths",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:191:31: replace > with >= in <impl ReviewInput for GitRevision>::paths",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:202:9: replace <impl ReviewInput for GitRevision>::read -> Result<ReadEntry, CaptureError> with Ok(Default::default())",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:206:23: replace == with != in <impl ReviewInput for GitRevision>::read",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:207:32: replace > with == in <impl ReviewInput for GitRevision>::read",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:207:32: replace > with < in <impl ReviewInput for GitRevision>::read",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:207:32: replace > with >= in <impl ReviewInput for GitRevision>::read",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:245:9: replace <impl ReviewInput for GitRevision>::notices -> Vec<CaptureNotice> with vec![]",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:245:9: replace <impl ReviewInput for GitRevision>::notices -> Vec<CaptureNotice> with vec![Default::default()]",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:247:45: replace == with != in <impl ReviewInput for GitRevision>::notices",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:258:9: replace <impl ReviewInput for GitWorking>::workspace -> &WorkspaceId with Box::leak(Box::new(Default::default()))",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:266:9: replace <impl ReviewInput for GitWorking>::paths -> Result<Vec<ReviewPath>, CaptureError> with Ok(vec![])",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:266:9: replace <impl ReviewInput for GitWorking>::paths -> Result<Vec<ReviewPath>, CaptureError> with Ok(vec![Default::default()])",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:277:19: replace != with == in <impl ReviewInput for GitWorking>::paths",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:285:28: replace > with == in <impl ReviewInput for GitWorking>::paths",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:285:28: replace > with < in <impl ReviewInput for GitWorking>::paths",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:285:28: replace > with >= in <impl ReviewInput for GitWorking>::paths",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:292:45: replace == with != in <impl ReviewInput for GitWorking>::paths",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:299:58: replace == with != in <impl ReviewInput for GitWorking>::paths",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:300:29: replace != with == in <impl ReviewInput for GitWorking>::paths",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:306:26: replace != with == in <impl ReviewInput for GitWorking>::paths",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:309:21: replace == with != in <impl ReviewInput for GitWorking>::paths",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:313:28: replace > with == in <impl ReviewInput for GitWorking>::paths",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:313:28: replace > with < in <impl ReviewInput for GitWorking>::paths",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:313:28: replace > with >= in <impl ReviewInput for GitWorking>::paths",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:337:27: replace != with == in <impl ReviewInput for GitWorking>::paths",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:341:28: replace > with == in <impl ReviewInput for GitWorking>::paths",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:341:28: replace > with < in <impl ReviewInput for GitWorking>::paths",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:341:28: replace > with >= in <impl ReviewInput for GitWorking>::paths",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:354:9: replace <impl ReviewInput for GitWorking>::read -> Result<ReadEntry, CaptureError> with Ok(Default::default())",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:355:46: replace && with || in <impl ReviewInput for GitWorking>::read",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:359:13: replace && with || in <impl ReviewInput for GitWorking>::read",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:378:21: replace && with || in <impl ReviewInput for GitWorking>::read",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:377:21: replace && with || in <impl ReviewInput for GitWorking>::read",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:376:21: replace && with || in <impl ReviewInput for GitWorking>::read",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:377:36: replace == with != in <impl ReviewInput for GitWorking>::read",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:382:36: replace > with == in <impl ReviewInput for GitWorking>::read",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:382:36: replace > with < in <impl ReviewInput for GitWorking>::read",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:382:36: replace > with >= in <impl ReviewInput for GitWorking>::read",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:397:9: replace <impl ReviewInput for GitWorking>::notices -> Vec<CaptureNotice> with vec![]",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:397:9: replace <impl ReviewInput for GitWorking>::notices -> Vec<CaptureNotice> with vec![Default::default()]",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:412:5: replace parse_tags -> Result<BTreeSet<ReviewPath>, CaptureError> with Ok(BTreeSet::new())",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:412:5: replace parse_tags -> Result<BTreeSet<ReviewPath>, CaptureError> with Ok(BTreeSet::from_iter([Default::default()]))",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:426:5: replace blob_size -> Result<usize, CaptureError> with Ok(0)",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:426:5: replace blob_size -> Result<usize, CaptureError> with Ok(1)",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:427:36: replace match guard *object == id.as_bytes() with true in blob_size",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:427:36: replace match guard *object == id.as_bytes() with false in blob_size",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:427:44: replace == with != in blob_size",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:436:5: replace records -> Result<impl Iterator<Item =&[u8]>, CaptureError> with Ok(::std::iter::empty())",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:436:5: replace records -> Result<impl Iterator<Item =&[u8]>, CaptureError> with Ok(::std::iter::once(Vec::leak(Vec::new())))",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:436:5: replace records -> Result<impl Iterator<Item =&[u8]>, CaptureError> with Ok(::std::iter::once(Vec::leak(vec![0])))",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:436:5: replace records -> Result<impl Iterator<Item =&[u8]>, CaptureError> with Ok(::std::iter::once(Vec::leak(vec![1])))",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:444:9: replace && with || in records",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:443:8: delete ! in records",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:445:33: replace == with != in records",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:451:29: replace == with != in records",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:452:26: delete ! in records",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:455:5: replace split_record -> Result<(&[u8], &[u8]), CaptureError> with Ok((Vec::leak(Vec::new()), Vec::leak(Vec::new())))",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:455:5: replace split_record -> Result<(&[u8], &[u8]), CaptureError> with Ok((Vec::leak(Vec::new()), Vec::leak(vec![0])))",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:455:5: replace split_record -> Result<(&[u8], &[u8]), CaptureError> with Ok((Vec::leak(Vec::new()), Vec::leak(vec![1])))",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:455:5: replace split_record -> Result<(&[u8], &[u8]), CaptureError> with Ok((Vec::leak(vec![0]), Vec::leak(Vec::new())))",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:455:5: replace split_record -> Result<(&[u8], &[u8]), CaptureError> with Ok((Vec::leak(vec![0]), Vec::leak(vec![0])))",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:455:5: replace split_record -> Result<(&[u8], &[u8]), CaptureError> with Ok((Vec::leak(vec![0]), Vec::leak(vec![1])))",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:455:5: replace split_record -> Result<(&[u8], &[u8]), CaptureError> with Ok((Vec::leak(vec![1]), Vec::leak(Vec::new())))",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:455:5: replace split_record -> Result<(&[u8], &[u8]), CaptureError> with Ok((Vec::leak(vec![1]), Vec::leak(vec![0])))",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:455:5: replace split_record -> Result<(&[u8], &[u8]), CaptureError> with Ok((Vec::leak(vec![1]), Vec::leak(vec![1])))",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:457:32: replace == with != in split_record",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:459:41: replace + with - in split_record",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:459:41: replace + with * in split_record",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:462:5: replace oid -> Result<String, CaptureError> with Ok(String::new())",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:462:5: replace oid -> Result<String, CaptureError> with Ok(\"xyzzy\".into())",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:463:40: replace || with && in oid",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:463:8: delete ! in oid",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:463:43: delete ! in oid",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:470:5: replace kind -> Result<EntryKind, CaptureError> with Ok(Default::default())",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:471:9: delete match arm b\"100644\" in kind",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:472:9: delete match arm b\"100755\" in kind",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:473:9: delete match arm b\"120000\" in kind",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:474:9: delete match arm b\"160000\" in kind",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:479:5: replace parse_tree -> Result<BTreeMap<ReviewPath, GitEntry>, CaptureError> with Ok(BTreeMap::new())",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:479:5: replace parse_tree -> Result<BTreeMap<ReviewPath, GitEntry>, CaptureError> with Ok(BTreeMap::from_iter([(Default::default(), Default::default())]))",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:482:54: replace == with != in parse_tree",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:483:25: replace != with == in parse_tree",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:491:13: replace != with == in parse_tree",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:491:30: replace == with != in parse_tree",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:505:26: replace > with == in parse_tree",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:505:26: replace > with < in parse_tree",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:505:26: replace > with >= in parse_tree",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:515:9: replace <impl Drop for Process>::drop with ()",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:526:9: replace Batch::spawn -> Result<Self, CaptureError> with Ok(Default::default())",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:557:9: replace Batch::read -> Result<Vec<u8>, CaptureError> with Ok(vec![])",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:557:9: replace Batch::read -> Result<Vec<u8>, CaptureError> with Ok(vec![0])",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:557:9: replace Batch::read -> Result<Vec<u8>, CaptureError> with Ok(vec![1])",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:564:12: delete ! in Batch::read",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:567:52: replace - with + in Batch::read",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:567:52: replace - with / in Batch::read",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:568:33: replace == with != in Batch::read",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:571:18: replace > with == in Batch::read",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:571:18: replace > with < in Batch::read",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:571:18: replace > with >= in Batch::read",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:576:27: replace < with == in Batch::read",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:576:27: replace < with > in Batch::read",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:576:27: replace < with <= in Batch::read",
+      "summary": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:578:47: replace - with + in Batch::read",
+      "summary": "Timeout"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:578:47: replace - with / in Batch::read",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review_source/git.rs:584:19: replace != with == in Batch::read",
+      "summary": "CaughtMutant"
+    }
+  ],
+  "tested_source_sha256": {
+    "crates/vizzi/src/review_source.rs": "bb2164112aadb38082e8f99adc8479524dd494dcee6e4386d13d097b7a7b9e99",
+    "crates/vizzi/src/review_source/disk.rs": "9d11ef0b058c4628af82bdbbf556122239843deb1328e7116541147755097b64",
+    "crates/vizzi/src/review_source/git.rs": "48643dd62250b0aeaaef526de43a461e878f7281be72967c593f1e1bc58fef76",
+    "crates/vizzi/tests/review_source.rs": "80b0738afff55c4e6a69a3bce684b38e8701b82e723566705a952619a47ac1ef",
+    "crates/vizzi-core/src/policy.rs": "375d46cec3e6605b1c95359dde15edff19e8eac6fdaef6d0d63bbef7a7b4fa3d",
+    "crates/vizzi/src/source.rs": "9bf32fc481ad100eafd7f1d9de4bd864f4996159771c17dce8aece5ad728ae65",
+    "crates/vizzi/examples/review_capture.rs": "2f4e3443dec39f284c78fc5f4c6596edc442864dfb7c365254b93dd4d5cb221b",
+    "Cargo.lock": "39a4317d3c52be9199837d27320749e93c2591f3c021a8afac28b1a79a23e8d6"
+  },
+  "final_source_sha256": {
+    "crates/vizzi/src/review_source.rs": "bb2164112aadb38082e8f99adc8479524dd494dcee6e4386d13d097b7a7b9e99",
+    "crates/vizzi/src/review_source/disk.rs": "740964949dfef10021ace3efd08666b2046235435fb9505103ce864f1a47aff4",
+    "crates/vizzi/src/review_source/git.rs": "48643dd62250b0aeaaef526de43a461e878f7281be72967c593f1e1bc58fef76",
+    "crates/vizzi/tests/review_source.rs": "80b0738afff55c4e6a69a3bce684b38e8701b82e723566705a952619a47ac1ef",
+    "crates/vizzi-core/src/policy.rs": "375d46cec3e6605b1c95359dde15edff19e8eac6fdaef6d0d63bbef7a7b4fa3d",
+    "crates/vizzi/src/source.rs": "9bf32fc481ad100eafd7f1d9de4bd864f4996159771c17dce8aece5ad728ae65",
+    "crates/vizzi/examples/review_capture.rs": "2f4e3443dec39f284c78fc5f4c6596edc442864dfb7c365254b93dd4d5cb221b",
+    "Cargo.lock": "39a4317d3c52be9199837d27320749e93c2591f3c021a8afac28b1a79a23e8d6"
+  },
+  "formatting_only_after_run": {
+    "path": "crates/vizzi/src/review_source/disk.rs",
+    "proof": "rustfmt --edition 2024 --emit stdout of tested source equals final source byte-for-byte",
+    "patch": "--- tested/disk.rs\n+++ final/disk.rs\n@@ -215,7 +215,11 @@\n                 };\n                 let after = file.metadata()?;\n                 let current = statat(&parent, &name, AtFlags::SYMLINK_NOFOLLOW)?;\n-                if !FileStamp::of(&before).verifies(&FileStamp::of(&after),(i128::from(current.st_dev),i128::from(current.st_ino)),bytes.len() as u64) {\n+                if !FileStamp::of(&before).verifies(\n+                    &FileStamp::of(&after),\n+                    (i128::from(current.st_dev), i128::from(current.st_ino)),\n+                    bytes.len() as u64,\n+                ) {\n                     return Ok(ReadEntry::Unobserved(Unavailability::Changing));\n                 }\n                 Ok(ReadEntry::Present {\n@@ -239,22 +243,28 @@\n }\n \n #[cfg(unix)]\n-#[derive(Clone,PartialEq,Eq)]\n+#[derive(Clone, PartialEq, Eq)]\n struct FileStamp {\n-    identity:(i128,i128),\n-    len:u64,\n-    mode:u32,\n-    modified:(i64,i64),\n-    changed:(i64,i64),\n+    identity: (i128, i128),\n+    len: u64,\n+    mode: u32,\n+    modified: (i64, i64),\n+    changed: (i64, i64),\n }\n #[cfg(unix)]\n impl FileStamp {\n-    fn of(meta:&std::fs::Metadata)->Self {\n+    fn of(meta: &std::fs::Metadata) -> Self {\n         use std::os::unix::fs::MetadataExt;\n-        Self {identity:(i128::from(meta.dev()),i128::from(meta.ino())),len:meta.len(),mode:meta.mode(),modified:(meta.mtime(),meta.mtime_nsec()),changed:(meta.ctime(),meta.ctime_nsec())}\n-    }\n-    fn verifies(&self,after:&Self,named_entry:(i128,i128),bytes:u64)->bool {\n-        self==after && self.identity==named_entry && self.len==bytes\n+        Self {\n+            identity: (i128::from(meta.dev()), i128::from(meta.ino())),\n+            len: meta.len(),\n+            mode: meta.mode(),\n+            modified: (meta.mtime(), meta.mtime_nsec()),\n+            changed: (meta.ctime(), meta.ctime_nsec()),\n+        }\n+    }\n+    fn verifies(&self, after: &Self, named_entry: (i128, i128), bytes: u64) -> bool {\n+        self == after && self.identity == named_entry && self.len == bytes\n     }\n }\n \n@@ -282,12 +292,14 @@\n     }\n     #[test]\n     fn equal_timestamps_do_not_prove_path_identity_or_complete_read_length() {\n-        let root=tempfile::tempdir().unwrap();std::fs::write(root.path().join(\"file\"),b\"four\").unwrap();\n-        let stamp=FileStamp::of(&std::fs::metadata(root.path().join(\"file\")).unwrap());\n-        assert!(stamp.verifies(&stamp,stamp.identity,4));\n-        assert!(!stamp.verifies(&stamp,(stamp.identity.0,stamp.identity.1+1),4));\n-        assert!(!stamp.verifies(&stamp,stamp.identity,3));\n-        let mut changed=stamp.clone();changed.mode^=0o100;\n-        assert!(!stamp.verifies(&changed,stamp.identity,4));\n-    }\n-}\n+        let root = tempfile::tempdir().unwrap();\n+        std::fs::write(root.path().join(\"file\"), b\"four\").unwrap();\n+        let stamp = FileStamp::of(&std::fs::metadata(root.path().join(\"file\")).unwrap());\n+        assert!(stamp.verifies(&stamp, stamp.identity, 4));\n+        assert!(!stamp.verifies(&stamp, (stamp.identity.0, stamp.identity.1 + 1), 4));\n+        assert!(!stamp.verifies(&stamp, stamp.identity, 3));\n+        let mut changed = stamp.clone();\n+        changed.mode ^= 0o100;\n+        assert!(!stamp.verifies(&changed, stamp.identity, 4));\n+    }\n+}\n"
+  },
+  "raw_outcomes_sha256": "fe57b1c0fc6de098599d14ac9ec5ce912a5d7996e8ed6359046d4aff81c9a491",
+  "equivalent_survivors": [
+    {
+      "name": "crates/vizzi/src/review_source.rs:18:30: replace * with +",
+      "reason": "65536-byte chunks become 1088-byte chunks; both are nonzero and within the 64-KiB bound. Immutable byte output is unchanged; throughput/checkpoint frequency is not a functional guarantee."
+    }
+  ],
+  "exclusion_correction": {
+    "initial_matcher_did_not_match": true,
+    "corrected_config": "experiments/review-workflow/mutants.toml",
+    "corrected_generated_count": 210,
+    "note": "The raw 211-case run includes this equivalent survivor. The corrected exclusion was validated with --list, without relabelling raw outcomes."
+  },
+  "timeouts_investigated": [
+    "Batch::read < to <= permits a zero-length non-progress loop at the declared body length.",
+    "Batch::read subtraction to addition over-reads the framed body and waits for a subsequent protocol response."
+  ],
+  "workspace_tests": {
+    "command": "CARGO_BUILD_JOBS=1 RUST_TEST_THREADS=1 nice -n 10 cargo test --workspace --all-features --offline",
+    "passed": 351,
+    "failed": 0,
+    "ignored": 0
+  },
+  "limitations": [
+    "Timeouts and unviable cases do not count as mutations caught by assertions.",
+    "Complete new native acquisition modules only; existing directory engine, portable comparison/hash implementation, analysis, lifetime admission and host/browser operations are outside mutation scope.",
+    "Linux run only; source-only capture has no language analysis or performance qualification."
+  ]
+}

@@ -1474,6 +1474,7 @@ dependencies = [
  "getrandom",
  "http-body-util",
  "notify",
+ "rustix",
  "serde",
  "serde_json",
  "tempfile",

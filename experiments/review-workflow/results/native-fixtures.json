@@ -1,0 +1,171 @@
+{
+  "schema": 1,
+  "scope": "Native source-only Git acquisition and portable comparison/hunks; no language analysis, global owner admission or browser UI.",
+  "source_sha256": {
+    "crates/vizzi/src/review_source.rs": "bb2164112aadb38082e8f99adc8479524dd494dcee6e4386d13d097b7a7b9e99",
+    "crates/vizzi/src/review_source/disk.rs": "740964949dfef10021ace3efd08666b2046235435fb9505103ce864f1a47aff4",
+    "crates/vizzi/src/review_source/git.rs": "48643dd62250b0aeaaef526de43a461e878f7281be72967c593f1e1bc58fef76",
+    "crates/vizzi/tests/review_source.rs": "80b0738afff55c4e6a69a3bce684b38e8701b82e723566705a952619a47ac1ef",
+    "crates/vizzi-core/src/policy.rs": "375d46cec3e6605b1c95359dde15edff19e8eac6fdaef6d0d63bbef7a7b4fa3d",
+    "crates/vizzi/src/source.rs": "9bf32fc481ad100eafd7f1d9de4bd864f4996159771c17dce8aece5ad728ae65",
+    "crates/vizzi/examples/review_capture.rs": "2f4e3443dec39f284c78fc5f4c6596edc442864dfb7c365254b93dd4d5cb221b",
+    "Cargo.lock": "39a4317d3c52be9199837d27320749e93c2591f3c021a8afac28b1a79a23e8d6"
+  },
+  "variants": [
+    {
+      "schema": 1,
+      "variant": "variant-a",
+      "verified": true,
+      "oracle_sha256": "facc2338c8d445d25574a59bfc44543bd1d8834b33f00eecec3d7c4834ecabd0",
+      "source": {
+        "acquired_bytes": 22028960,
+        "analysis": "not_requested",
+        "base_paths": 1032,
+        "base_present": true,
+        "baseline": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+        "changes": [
+          {
+            "change": "Added",
+            "path": "doc/compiler-source-reading.md"
+          },
+          {
+            "change": "Modified",
+            "path": "src/compiler/mod.rs"
+          }
+        ],
+        "comparison": "f833044dd251d4096ce9031a4191b040ed2a84b4a87ed7fd86ac7b4edcd58d5d",
+        "hidden_changes": 0,
+        "hunks": [
+          {
+            "header": "@@ -117,7 +117,7 @@",
+            "id": "b2701cb24ee8a79ae436369d5c3aaa18d407c498336627f9a290347d1d85f4cd"
+          },
+          {
+            "header": "@@ -156,8 +156,10 @@",
+            "id": "fe893d69395df3bde7764b1932bb19b33170a7b2121504da1bd1b1a4c741962e"
+          },
+          {
+            "header": "@@ -166,7 +168,7 @@",
+            "id": "acc213ec1884a2677a0dffea41a0293a4e72794c92af7f96ada52fd901998e37"
+          }
+        ],
+        "notices": [],
+        "schema": 1,
+        "selected_path": "src/compiler/mod.rs",
+        "working_paths": 1033,
+        "working_present": true,
+        "workspace": "cc6764a61488821d403e2b470cc93b3d69f1da67381cf963bb54b2c2600e2f90"
+      },
+      "document": {
+        "acquired_bytes": 22028960,
+        "analysis": "not_requested",
+        "base_paths": 1032,
+        "base_present": false,
+        "baseline": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+        "changes": [
+          {
+            "change": "Added",
+            "path": "doc/compiler-source-reading.md"
+          },
+          {
+            "change": "Modified",
+            "path": "src/compiler/mod.rs"
+          }
+        ],
+        "comparison": "f833044dd251d4096ce9031a4191b040ed2a84b4a87ed7fd86ac7b4edcd58d5d",
+        "hidden_changes": 0,
+        "hunks": [
+          {
+            "header": "@@ -0,0 +1,5 @@",
+            "id": "4d562f82a3f565f58ecd10ab504210e51a2b267259ee9e0bf0a357da1220dd25"
+          }
+        ],
+        "notices": [],
+        "schema": 1,
+        "selected_path": "doc/compiler-source-reading.md",
+        "working_paths": 1033,
+        "working_present": true,
+        "workspace": "cc6764a61488821d403e2b470cc93b3d69f1da67381cf963bb54b2c2600e2f90"
+      },
+      "fixture_reverified_after_capture": true,
+      "scope": "Native source-only capture and portable hunks; no host admission, analysis or UI."
+    },
+    {
+      "schema": 1,
+      "variant": "variant-b",
+      "verified": true,
+      "oracle_sha256": "facc2338c8d445d25574a59bfc44543bd1d8834b33f00eecec3d7c4834ecabd0",
+      "source": {
+        "acquired_bytes": 22028876,
+        "analysis": "not_requested",
+        "base_paths": 1032,
+        "base_present": true,
+        "baseline": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+        "changes": [
+          {
+            "change": "Added",
+            "path": "doc/compiler-source-reading.md"
+          },
+          {
+            "change": "Modified",
+            "path": "src/compiler/mod.rs"
+          }
+        ],
+        "comparison": "60a422ce0beca4cb958d1387d517edfa26d34bb4fc2a8ae9a69a7941ea0a08a6",
+        "hidden_changes": 0,
+        "hunks": [
+          {
+            "header": "@@ -117,7 +117,7 @@",
+            "id": "f8df20eeb49f79ed08fdb379820b623d0b690bb08380ed8e2c89cb0a886ced71"
+          },
+          {
+            "header": "@@ -166,7 +166,7 @@",
+            "id": "00bdc049d07299d0e97b7e7072092d1637e6a2608aba1a9098fc7ff126bf4a0e"
+          }
+        ],
+        "notices": [],
+        "schema": 1,
+        "selected_path": "src/compiler/mod.rs",
+        "working_paths": 1033,
+        "working_present": true,
+        "workspace": "e2d5afc6e9254021c1a3064e660a9516c7433b7509d682db2f8191b82d04b3e6"
+      },
+      "document": {
+        "acquired_bytes": 22028876,
+        "analysis": "not_requested",
+        "base_paths": 1032,
+        "base_present": false,
+        "baseline": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+        "changes": [
+          {
+            "change": "Added",
+            "path": "doc/compiler-source-reading.md"
+          },
+          {
+            "change": "Modified",
+            "path": "src/compiler/mod.rs"
+          }
+        ],
+        "comparison": "60a422ce0beca4cb958d1387d517edfa26d34bb4fc2a8ae9a69a7941ea0a08a6",
+        "hidden_changes": 0,
+        "hunks": [
+          {
+            "header": "@@ -0,0 +1,5 @@",
+            "id": "22ace6b573617534e039fb7d385b6186e59cee0458af10cac6a9fc38b05d66cc"
+          }
+        ],
+        "notices": [],
+        "schema": 1,
+        "selected_path": "doc/compiler-source-reading.md",
+        "working_paths": 1033,
+        "working_present": true,
+        "workspace": "e2d5afc6e9254021c1a3064e660a9516c7433b7509d682db2f8191b82d04b3e6"
+      },
+      "fixture_reverified_after_capture": true,
+      "scope": "Native source-only capture and portable hunks; no host admission, analysis or UI."
+    }
+  ],
+  "formatting_only_after_capture": [
+    "crates/vizzi/src/review_source/disk.rs"
+  ]
+}

@@ -61,6 +61,38 @@ It prints metadata and unified-style hunk coordinates, using default diff limits
 no language analysis. Its input capture is a diagnostic helper, separate from future
 native source admission and workspace discovery.
 
+## Check native Git capture
+
+On Linux, after preparing both fixtures, build the source-only native diagnostic:
+
+```sh
+CARGO_BUILD_JOBS=1 cargo build -p vizzi --example review_capture --offline
+python3 experiments/review-workflow/verify_native.py \
+  --fixture /tmp/vizzi-review-a --output /tmp/vizzi-native-a.json
+python3 experiments/review-workflow/verify_native.py \
+  --fixture /tmp/vizzi-review-b --output /tmp/vizzi-native-b.json
+```
+
+Choose new output files outside the fixture workspaces. This checker uses the native
+Git object/working adapters directly, then portable inventory comparison and hunks.
+It checks changed paths/statuses, the selected Rust and added-document hunks, pinned
+baseline and repeatable pair identity, and verifies fixture status/bytes afterwards.
+Each report records the complete path counts and source-only coverage. No analyser,
+analysed-project build, fetch, host publication or browser UI runs. See the
+[native validation report](NATIVE_RESULTS.md) and [acquisition reference](../../docs/prototype/REVIEW_ACQUISITION.md).
+
+For a chosen workspace/revision/file, the diagnostic invocation is:
+
+```sh
+cargo run -p vizzi --example review_capture --offline -- \
+  /tmp/vizzi-review-a/workspace \
+  1a4f5b65dd2a269298748df2dfd68092a169a8d9 src/compiler/mod.rs
+```
+
+It admits the two captures within a combined diagnostic byte allowance. Global
+pair/source lifetime admission and integration with the analysis scheduler remain
+separate work before host exposure.
+
 ## Run an evaluation after review support exists
 
 Give the operator only [the neutral task brief](fixtures/task.md) and one disposable

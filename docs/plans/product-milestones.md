@@ -3,7 +3,8 @@
 Status: the baseline and navigation slice are delivered, with a passing guided learning
 workflow. Independent-operator/usability acceptance remains open. The review fixture and
 comparison contracts are frozen, and portable inventories/hunks are implemented.
-Milestone 2 still needs native acquisition, admission and the linked review workflow.
+Source-only native acquisition is delivered. Milestone 2 still needs analysis integration,
+admission and the linked review workflow.
 This follows the product-alignment checkpoint at commit 4e75d04.
 
 The goal is coordinated views for learning unfamiliar code and reviewing changes, as
@@ -173,9 +174,11 @@ Step 5 has begun: [portable inventory comparison](../prototype/COMPARISON_TECH.m
 now classifies supplied observations and binds source to an explicit side, with non-Git
 behavioural tests and [validation evidence](../../experiments/review-workflow/INVENTORY_RESULTS.md).
 The [bounded textual diff](../prototype/TEXT_DIFF.md) now computes raw-line hunks on
-those same captured documents, checked against the frozen variants. Next is the minimal
-native source seam and Git acquisition, with pair/source admission before host exposure.
-The linked review interface and its full walkthrough follow.
+those same captured documents, checked against the frozen variants. The
+[native source seam and source-only Git acquisition](../prototype/REVIEW_ACQUISITION.md)
+now supply those bytes directly. Next is pair/source admission and an analysis bridge
+through the existing scheduler before host exposure. The linked review interface and
+its full walkthrough follow.
 
 Work in small vertical slices. Tests should cover public behaviour, stale/expired anchors,
 source identity, language-capability gaps and comparison correctness; use mutation testing

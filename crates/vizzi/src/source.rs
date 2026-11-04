@@ -13,6 +13,15 @@ use vizzi_core::{
     policy::{Classification, PolicyConfig, SourcePolicy},
 };
 
+pub(crate) fn workspace_root(root: &Path) -> io::Result<(PathBuf, WorkspaceId)> {
+    let root = root.canonicalize()?;
+    if !root.is_dir() {
+        return Err(io::Error::other("workspace root is not a directory"));
+    }
+    let workspace = WorkspaceId::derive(&[root.as_os_str().as_encoded_bytes()]);
+    Ok((root, workspace))
+}
+
 /// Input verification scope; paths are hints relative to the canonical workspace.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub enum CaptureScope {
@@ -100,11 +109,7 @@ impl Directory {
         languages: Arc<Languages>,
     ) -> io::Result<Self> {
         let plan = CapturePlan::new(config, &languages).map_err(io::Error::other)?;
-        let root = root.canonicalize()?;
-        if !root.is_dir() {
-            return Err(io::Error::other("workspace root is not a directory"));
-        }
-        let workspace = WorkspaceId::derive(&[root.as_os_str().as_encoded_bytes()]);
+        let (root, workspace) = workspace_root(root)?;
         Ok(Self {
             root,
             workspace,

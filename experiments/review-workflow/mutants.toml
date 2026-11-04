@@ -1,0 +1,3 @@
+# Smaller nonzero IO chunks preserve the <=64 KiB scratch allowance and byte results;
+# they affect throughput/checkpoint frequency, which is not a functional guarantee.
+exclude_re = ['^crates/vizzi/src/review_source\.rs:\d+:\d+: replace \* with \+$']

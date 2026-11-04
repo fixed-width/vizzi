@@ -5,8 +5,9 @@ persistence, scheduling, and host transports. These interfaces are for the first
 vertical slice; the performance experiment crate remains independent.
 
 The [contextual-review contract](COMPARISON_TECH.md) extends this model with
-SCM-independent immutable comparisons. Portable inventory/hunk computation is delivered;
-native acquisition and host/browser comparison operations remain planned. Its
+SCM-independent immutable comparisons. Portable inventory/hunk computation and
+source-only native acquisition are delivered; analysis integration, admission and
+host/browser comparison operations remain planned. Its
 [behaviour contract](COMPARISON_PRODUCT.md) defines that review workflow.
 
 ## Modules
