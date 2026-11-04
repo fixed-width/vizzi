@@ -6,8 +6,9 @@ comparison contracts are frozen, and portable inventories/hunks are implemented.
 Native acquisition, bounded ownership and shared-engine analysis are delivered.
 Comparison queries/transport and linked review views are delivered. Both frozen
 variants pass the rendered guided review; the learning workflow passes again too.
-Focused Linux/PyTorch review-scale observations and independent-operator/usability
-validation remain open.
+Focused Linux/PyTorch review-scale observations are recorded. Initial host readiness
+and refresh selection reset are observed friction; independent-operator/usability
+validation remains open.
 This follows the product-alignment checkpoint at commit 4e75d04.
 
 The goal is coordinated views for learning unfamiliar code and reviewing changes, as
@@ -157,7 +158,7 @@ engine, a Git library or a complete graph API.
 | 2. Choose the smallest useful extension — delivered | [Navigation contract](../prototype/NAVIGATION.md) and implementation address the observed return-context gap; a graph stays deferred. |
 | 3. Demonstrate milestone 1 — guided workflow delivered | [Repeated learning task](../../experiments/learning-workflow/NAVIGATION_RESULTS.md) with TDD/mutation evidence. Independent-operator validation remains open. |
 | 4. Freeze the review fixture/contracts — delivered | [Verified good/bad fixture](../../experiments/review-workflow/RESULTS.md), [behaviour](../prototype/COMPARISON_PRODUCT.md) and [technical contract](../prototype/COMPARISON_TECH.md) specify change semantics, source providers and pair ownership. |
-| 5. Build and demonstrate milestone 2 — guided workflow delivered; scale observations open | Both frozen variants pass the rendered review, with provider-independent correctness tests. |
+| 5. Build and demonstrate milestone 2 — guided workflow and focused scale observations delivered | Both frozen variants pass the rendered review, with provider-independent correctness tests and bounded Linux/PyTorch measurements. |
 
 The implementation order for step 5 is:
 
@@ -185,11 +186,14 @@ now protects the active pair, private capture and held retired queries. The
 one aggregate worker budget, preserving admitted source owners and the baseline plan.
 Bounded, token/side/version-bound [application queries and transport](../prototype/COMPARISON_API.md)
 now expose this model. The initial [linked review interface](../prototype/REVIEW_INTERFACE.md)
-has [controller/native evidence](../../experiments/review-workflow/INTERFACE_RESULTS.md);
+has [controller/native evidence](../../experiments/review-workflow/INTERFACE_RESULTS.md).
 The [rendered review walkthrough](../../experiments/review-workflow/WALKTHROUGH_RESULTS.md)
 now passes for both frozen variants, with source/bounds audits, screenshots, recordings
-and a repeated learning regression. Next are focused Linux/PyTorch observations of
-the actual review views; unfamiliar-operator/usability validation remains separate.
+and a repeated learning regression. The
+[focused Linux/PyTorch measurements](../../experiments/review-workflow/SCALE_RESULTS.md)
+now record actual review interaction, explicit refresh, bounds and memory observations.
+The next design question is opening a focused review while the live index initializes;
+unfamiliar-operator/usability validation remains separate.
 
 Work in small vertical slices. Tests should cover public behaviour, stale/expired anchors,
 source identity, language-capability gaps and comparison correctness; use mutation testing

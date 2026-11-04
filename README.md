@@ -7,7 +7,8 @@ Rust/Python are selected by default; explicit scopes enable raw C/C++ analysis.
 
 The production renderer, compiler-backed language integrations and storage engine
 remain open decisions. Both guided learning and local-change review tasks now pass
-on the frozen reference repository; independent usability and review-scale checks remain.
+on the frozen reference repository. [Focused review measurements](experiments/review-workflow/SCALE_RESULTS.md)
+are recorded; independent usability and whole-repository qualification remain open.
 The Canvas2D overview is a reference view for
 validating coordination; it does not qualify large-codebase GPU performance.
 

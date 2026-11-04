@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "base_commit": "e1e1210647067f8a265816d026783c1bdd3662a1",
+  "source_sha256": {
+    "experiments/review-workflow/measure.mjs": "101cce6eabbd1dbb9c61bf81a2a7cb876915d79bfc4c970713f3a07a49701946",
+    "experiments/review-workflow/scale_fixture.py": "ed6f2be748f2b8abe6c5a15749695db767206645c2b0ae8935bc7e8b0f10541e",
+    "experiments/review-workflow/scale_fixture_test.py": "ea81e8ad1389b35ff19d1241657e205ce964122554551b3e6c461e24bafc82e1",
+    "experiments/review-workflow/scale-profiles.json": "659b8dca5440cc7b1ba524a25747722f46d4ba1bbbb96053945d1bfd75149670",
+    "experiments/browser/run.mjs": "a35413fe614c7ab5fe4321b6e2066fdf894de3f160cb53c81ec3c5c9d46a9f4a",
+    "experiments/browser/statistics.mjs": "9446fcbd9eb13a55353478c5eb51f13027322233b29116d8627095d6fe527623",
+    "experiments/review-workflow/walkthrough-audit.js": "d197527dbf202faa3b7492c7543610736266378beba10ac72f5dc202657df756",
+    "Cargo.lock": "39a4317d3c52be9199837d27320749e93c2591f3c021a8afac28b1a79a23e8d6",
+    "package-lock.json": "e7ff76f17d7408c0b6dfd075c564ba31fec03cc838be612a008cf5bd343e291f"
+  },
+  "verification": {
+    "fixture_test": "passed: full tree/index, frozen committed bytes despite dirty source, original state, normalized scope and output refusal",
+    "fixture_test_sha256": "fb7db4f7849ff8ba9e8500299391256a5432c5873a52c83bc79adea6139056ba",
+    "initial_expected_failure_sha256": "87d28b4a7b1d13420800fef154a9549be9a1317a3481086b311f9ea5f538a012",
+    "full_tree_regression_failure_sha256": "a91821e64bba73abd5b5fc63394de43d39037a54fabb021f5d6de268461ea34e",
+    "targeted_fixture_mutations_detected": 5,
+    "full_npm_test": "passed: 137 Node/Chromium cases and review integration scenario",
+    "native_workspace_tests_passed": 397,
+    "clippy_workspace_all_targets_all_features_deny_warnings": "passed",
+    "format": "passed",
+    "javascript_syntax": "passed",
+    "existing_mutation_scope_sources_unchanged": {
+      "crates/vizzi/web/review-controller.js": true,
+      "crates/vizzi/web/review-windows.js": true,
+      "crates/vizzi/web/windows.js": true,
+      "crates/vizzi/web/updates.js": true,
+      "experiments/review-workflow/walkthrough-audit.js": true
+    }
+  },
+  "cohort_policy": "Correctness/mutation checks precede or follow final performance sessions; no agent test/mutation/other benchmark overlaps final collection. External activity is uncontrolled.",
+  "limitations": "Five fixture mutation controls are targeted, not exhaustive Python coverage. No product algorithm/native Rust source changed. Existing unchanged controller/reader/source-audit evidence is retained. Corpus timings, checkpoint bounds and memory observations do not qualify whole-repository/baseline-hardware behaviour."
+}

@@ -14,6 +14,11 @@ updates ordinary edits and outline rendering; it does not repeat retained-repars
 cancellation qualification.
 The [cancellation follow-up](../../experiments/qualification/CANCELLATION_RESULTS.md)
 repeats four-worker retained reparse and measures cooperative interruption within files.
+The [focused review measurements](../../experiments/review-workflow/SCALE_RESULTS.md)
+now exercise Linux scheduler and mixed PyTorch codegen reviews in full working trees,
+with one parser worker. They show bounded sampled DOM and 16.8-ms observed rAF p99,
+while initial live-index startup and refresh selection reset remain task friction.
+Their scoped refresh timings do not qualify the live-edit/core-map targets below.
 
 | Area | Proposed target / policy | Current evidence |
 | --- | --- | --- |

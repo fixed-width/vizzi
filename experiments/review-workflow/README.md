@@ -145,6 +145,51 @@ is reference-aware and does not replace an independent reviewer. Current results
 recordings, audit tests and earlier blocked attempts are in the
 [walkthrough record](WALKTHROUGH_RESULTS.md).
 
+## Measure focused Linux/PyTorch review views
+
+Use the supplied pinned profiles in [scale-profiles.json](scale-profiles.json); edit
+their `source` paths if needed. The originals must contain those commits. The
+[method](SCALE_PLAN.md) defines the working-tree setup, one-worker policy and timing
+endpoints; [results](SCALE_RESULTS.md) distinguish startup, interaction and explicit
+refresh from earlier whole-repository qualification.
+
+Select the profiles into temporary files:
+
+```sh
+python3 - <<'PY'
+import json
+from pathlib import Path
+for profile in json.loads(Path("experiments/review-workflow/scale-profiles.json").read_text()):
+    Path("/tmp/vizzi-scale-" + profile["name"] + ".json").write_text(json.dumps(profile))
+PY
+```
+
+Build Vizzi, then prepare and measure each case sequentially. Choose fresh output
+directories with an existing parent and enough space for the full working-tree copies.
+No project tooling runs and the original repositories are not edited:
+
+```sh
+CARGO_BUILD_JOBS=1 cargo build --release --offline -p vizzi
+for review_case in linux pytorch; do
+  python3 -B experiments/review-workflow/scale_fixture.py \
+    --profile "/tmp/vizzi-scale-$review_case.json" \
+    --output "/tmp/vizzi-scale-$review_case-fixture" --probe "$review_case"
+  CARGO_BUILD_JOBS=1 RUST_TEST_THREADS=1 nice -n 10 npm test -- \
+    --review-scale --fixture "/tmp/vizzi-scale-$review_case-fixture" \
+    --output "/tmp/vizzi-scale-$review_case-results" --sessions 3 --no-build
+done
+```
+
+Run without competing tests, mutations or benchmarks. Each report retains raw durations,
+frame intervals, successful resource timings/body sizes, source/version audits, coverage,
+RSS/heap samples, errors and source-status checks. Screenshots accompany the three
+sessions. Failed sessions retain their last UI state. Host startup and first comparison
+are separate; disk edits remain pinned until explicit refresh. These focused, finite
+observations do not qualify full-repository or baseline-laptop performance.
+
+Check fixture preparation independently with
+`python3 -B experiments/review-workflow/scale_fixture_test.py`.
+
 ## Run an independent evaluation
 
 The [transport replay](TRANSPORT_RESULTS.md) now checks these fixtures through normal

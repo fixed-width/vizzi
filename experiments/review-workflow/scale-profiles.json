@@ -1,0 +1,4 @@
+[
+  {"name":"linux","source":"/home/mpd/git-sources/linux","revision":"cbbddb6b08cc9900a87cccaa9b22bbe06aa4f50a","scope":"kernel/sched","files":["kernel/sched/core.c","kernel/sched/fair.c"],"source_arguments":["--c-family-root","kernel/sched","--syntax-language","kernel/sched=c"]},
+  {"name":"pytorch","source":"/home/mpd/git-sources/pytorch","revision":"1f4d2d5e820dd870626dca4f9603e3a49879dbde","scope":"torch/_inductor/codegen","files":["torch/_inductor/codegen/wrapper.py","torch/_inductor/codegen/aoti_runtime/interface.cpp"],"source_arguments":["--c-family-root","torch/_inductor/codegen","--syntax-language","torch/_inductor/codegen=cpp"]}
+]

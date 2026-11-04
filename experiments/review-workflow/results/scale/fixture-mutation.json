@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "scope": "Five targeted fixture-integrity mutation controls, not exhaustive Python mutation coverage.",
+  "baseline": "passed",
+  "source_sha256": "ed6f2be748f2b8abe6c5a15749695db767206645c2b0ae8935bc7e8b0f10541e",
+  "test_sha256": "ea81e8ad1389b35ff19d1241657e205ce964122554551b3e6c461e24bafc82e1",
+  "outcomes": [
+    {
+      "name": "dirty_source_instead_of_commit",
+      "detected": true,
+      "exit_code": 1,
+      "log_sha256": "ef676cac5a8849564bf30af324c74f4e56de66254fa04813ff2f9c809fbb9aa9"
+    },
+    {
+      "name": "sparse_instead_of_full_checkout",
+      "detected": true,
+      "exit_code": 1,
+      "log_sha256": "f7670e72dde44a7722f01d200ee5acbd8dcc41d06e5730143c0e42cca9a485ae"
+    },
+    {
+      "name": "omitted_comment_probe",
+      "detected": true,
+      "exit_code": 1,
+      "log_sha256": "0b62567bfe9bb40ee6f54a44206a80cadbd95076048f1768fb89a291c0cd3631"
+    },
+    {
+      "name": "outside_scope_probe",
+      "detected": true,
+      "exit_code": 1,
+      "log_sha256": "e42a8c1b19f0f2f7cf54e21686e8439f7948c6a15d49905a990854935e2fda95"
+    },
+    {
+      "name": "output_inside_original",
+      "detected": true,
+      "exit_code": 1,
+      "log_sha256": "6422719daf1cfd56754afdb119ebe6bed2edf309c2fbdfa590845fac912d4269"
+    }
+  ]
+}

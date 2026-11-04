@@ -1,7 +1,9 @@
 import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 
-if (process.argv.includes("--review-walkthrough")) {
+if (process.argv.includes("--review-scale")) {
+  await import("../review-workflow/measure.mjs");
+} else if (process.argv.includes("--review-walkthrough")) {
   await import("../review-workflow/run.mjs");
 } else if (process.argv.includes("--review")) {
   const result = spawnSync(process.execPath, ["experiments/browser/review.test.mjs",...process.argv.slice(2).filter(arg=>arg!=="--review")], { stdio: "inherit" });

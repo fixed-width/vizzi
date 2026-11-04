@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "ticket": "d89bb121412ffbdc7c2ce527be7a9e2089f9cc47985cbc09d467ae059afe7949:1",
+  "pending": false,
+  "active": null,
+  "error": {
+    "code": "capture_failed",
+    "message": "unsupported review input: sparse checkout capture"
+  }
+}
