@@ -134,6 +134,7 @@ pub trait ReviewInput {
 }
 
 /// Frozen review subtree and explicit content exclusions.
+#[derive(Clone)]
 pub struct CapturePolicy {
     scope: Option<ReviewPath>,
     exclusions: Vec<ReviewPath>,

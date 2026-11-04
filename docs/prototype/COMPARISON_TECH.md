@@ -1,8 +1,8 @@
 # Contextual local-change review: technical contract
 
 Status: portable inventory comparison, side-specific source binding and bounded textual
-hunks are implemented, with source-only native acquisition. Global admission and
-host/browser operations remain planned; there
+hunks are implemented, with source-only native acquisition and bounded review ownership.
+Analysis integration and host/browser operations remain planned; there
 is no comparison transport yet. This reference supports the
 [behaviour contract](COMPARISON_PRODUCT.md). Exact wire fields can be refined with
 implementation while preserving these invariants.
@@ -45,6 +45,8 @@ The delivered [textual diff reference](TEXT_DIFF.md) defines exact line/byte ran
 context grouping, hunk identities, cancellation and charged resource limits.
 The [native acquisition reference](REVIEW_ACQUISITION.md) defines the delivered list/read
 seam, pinned Git objects, observed working bytes, limits and platform/support gaps.
+The [ownership reference](REVIEW_OWNERSHIP.md) defines admitted capture, lifetime tokens,
+retired query leases and shared source charging.
 
 ## Source observations and the acquisition seam
 

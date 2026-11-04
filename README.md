@@ -26,7 +26,8 @@ compare a pinned Git baseline with observed working files, including unstaged ed
 and untracked text. Portable inventory comparison and side-specific source binding are
 implemented, along with [bounded textual hunks](docs/prototype/TEXT_DIFF.md).
 [Source-only Git acquisition](docs/prototype/REVIEW_ACQUISITION.md) now exercises the
-same model. Analysis integration, admission and the guided review interface remain next.
+same model, now with [bounded review ownership](docs/prototype/REVIEW_OWNERSHIP.md).
+Analysis integration and the guided review interface remain next.
 
 - [Run the workspace](docs/how-to/run-workspace.md)
 - [Next product milestones](docs/plans/product-milestones.md)

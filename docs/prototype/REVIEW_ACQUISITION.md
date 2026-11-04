@@ -3,7 +3,9 @@
 `vizzi::review_source` supplies immutable, source-only observations through a shared
 `ReviewInput` list/read interface. Directory, pinned Git revision, Git working-tree and
 in-memory inputs use the same capture function and portable comparison model.
-It does not publish comparisons, run language analysis or add host/browser routes.
+Raw acquisition does not publish comparisons, run language analysis or add host/browser routes.
+The [review ownership module](REVIEW_OWNERSHIP.md) now wraps it with admitted capture
+and private native publication, separately from host/browser transport.
 The [comparison contract](COMPARISON_TECH.md) still governs those later operations.
 
 ## Identity, scope and captured values
@@ -94,9 +96,9 @@ Unsafe code remains denied in this project; the OS calls use an existing safe wr
 | 1,000,000 candidates/entries | Git candidate count or visited raw directory entries, including directories. |
 | 128 MiB discovery bytes | One Git listing output or accumulated raw directory path names. |
 
-Limits are inclusive. Source-only diagnostics can divide the total byte allowance
-between two captures, but this is **not** the planned global owner quota or two-pair
-admission mechanism. Metadata, buffers, source indexes and allocator overhead are
+Limits are inclusive. These raw per-input limits alone do not implement global owner
+quota or pair admission; the [review ownership module](REVIEW_OWNERSHIP.md) now provides
+that admitted capture path. Metadata, buffers, source indexes and allocator overhead are
 separate. Oversized content currently refuses the candidate; streaming binary-only
 digests and backing/spool integration are not delivered here.
 

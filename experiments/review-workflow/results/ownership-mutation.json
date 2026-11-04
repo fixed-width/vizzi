@@ -1,0 +1,349 @@
+{
+  "total_mutants": 70,
+  "caught": 52,
+  "missed": 0,
+  "timeout": 0,
+  "unviable": 18,
+  "start_time": "2026-11-04T02:21:10.785597064Z",
+  "end_time": "2026-11-04T02:27:25.240336858Z",
+  "cargo_mutants_version": "27.1.0",
+  "schema": 1,
+  "command": "CARGO_BUILD_JOBS=1 RUST_TEST_THREADS=1 nice -n 10 cargo mutants --no-config -p vizzi -f crates/vizzi/src/review.rs --test-package vizzi -j 1 --jobserver-tasks 1 --timeout 20 --build-timeout 180 -C --offline -o /tmp/vizzi-review-owners-final-mutation-20261103 -- --lib --test review",
+  "source_sha256": {
+    "crates/vizzi/src/review.rs": "9b03871b4dc5f7a83c1a47aa50e4ecf648a00c7dd2c0a2c0d64a397c3d578139",
+    "crates/vizzi/tests/review.rs": "44883a812f90ce32157ecf7a7277913efa3887e60150b6e03251bdee93a54b9c",
+    "crates/vizzi/src/review_source.rs": "a8908b0118791c54afcd8df65f0424ee0f0a49c398fa815f97128e2f5bdbec97",
+    "crates/vizzi/examples/review_capture.rs": "3a081d63341abaa2175c82766dfa24d0915396a1809bb0529bba2d12e4c92d62",
+    "experiments/review-workflow/verify_native.py": "a972a6813698fc7abf76f8ed3078f736bf66b46a8ed70520691ed179991c0527"
+  },
+  "baseline": {
+    "scenario": "Baseline",
+    "summary": "Success",
+    "log_path": "log/baseline.log",
+    "diff_path": null,
+    "phase_results": [
+      {
+        "phase": "Build",
+        "duration": 41.520842545,
+        "process_status": "Success",
+        "argv": [
+          "/home/mpd/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo",
+          "test",
+          "--no-run",
+          "--verbose",
+          "--package=vizzi@0.1.0",
+          "--offline"
+        ]
+      },
+      {
+        "phase": "Test",
+        "duration": 0.902593261,
+        "process_status": "Success",
+        "argv": [
+          "/home/mpd/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo",
+          "test",
+          "--verbose",
+          "--package=vizzi@0.1.0",
+          "--offline",
+          "--lib",
+          "--test",
+          "review"
+        ]
+      }
+    ]
+  },
+  "outcomes": [
+    {
+      "name": "crates/vizzi/src/review.rs:86:9: replace ReviewAccounting::stats -> ReviewStats with Default::default()",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:113:9: replace ReviewStore::open -> Result<Self, getrandom::Error> with Ok(Default::default())",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:134:9: replace ReviewStore::request -> Result<CaptureTicket, ReviewError> with Ok(Default::default())",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:151:9: replace ReviewStore::begin -> Result<ReviewCandidate, ReviewError> with Ok(Default::default())",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:152:35: replace != with == in ReviewStore::begin",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:163:47: replace == with != in ReviewStore::begin",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:183:9: replace ReviewStore::active -> Option<String> with None",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:183:9: replace ReviewStore::active -> Option<String> with Some(String::new())",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:183:9: replace ReviewStore::active -> Option<String> with Some(\"xyzzy\".into())",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:190:9: replace ReviewStore::query -> Result<ReviewLease, ReviewError> with Ok(Default::default())",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:194:39: replace == with != in ReviewStore::query",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:200:9: replace ReviewStore::close -> Result<(), ReviewError> with Ok(())",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:202:16: delete ! in ReviewStore::close",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:205:48: replace == with != in ReviewStore::close",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:217:9: replace ReviewStore::accounting -> ReviewAccounting with Default::default()",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:223:9: replace <impl Drop for ReviewStore>::drop with ()",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:243:9: replace Slot::acquire -> Result<Self, ReviewError> with Ok(Default::default())",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:245:22: replace >= with < in Slot::acquire",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:248:19: replace += with -= in Slot::acquire",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:248:19: replace += with *= in Slot::acquire",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:255:9: replace <impl Drop for Slot>::drop with ()",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:255:32: replace -= with += in <impl Drop for Slot>::drop",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:255:32: replace -= with /= in <impl Drop for Slot>::drop",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:261:9: replace Reservation::reserve -> Self with Default::default()",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:263:55: replace - with + in Reservation::reserve",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:263:55: replace - with / in Reservation::reserve",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:264:27: replace += with -= in Reservation::reserve",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:264:27: replace += with *= in Reservation::reserve",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:274:9: replace Reservation::retain -> Result<(), ReviewError> with Ok(())",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:274:19: replace > with == in Reservation::retain",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:274:19: replace > with < in Reservation::retain",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:274:19: replace > with >= in Reservation::retain",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:280:23: replace -= with += in Reservation::retain",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:280:23: replace -= with /= in Reservation::retain",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:280:37: replace - with + in Reservation::retain",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:280:37: replace - with / in Reservation::retain",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:281:24: replace += with -= in Reservation::retain",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:281:24: replace += with *= in Reservation::retain",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:289:9: replace <impl Drop for Reservation>::drop with ()",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:290:23: replace -= with += in <impl Drop for Reservation>::drop",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:290:23: replace -= with /= in <impl Drop for Reservation>::drop",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:292:28: replace -= with += in <impl Drop for Reservation>::drop",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:292:28: replace -= with /= in <impl Drop for Reservation>::drop",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:330:9: replace ReviewCandidate::capture_base -> Result<(), ReviewError> with Ok(())",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:343:9: replace ReviewCandidate::capture_working -> Result<(), ReviewError> with Ok(())",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:352:9: replace ReviewCandidate::publish -> Result<String, ReviewError> with Ok(String::new())",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:352:9: replace ReviewCandidate::publish -> Result<String, ReviewError> with Ok(\"xyzzy\".into())",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:370:39: replace != with == in ReviewCandidate::publish",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:381:9: replace ReviewCandidate::check -> Result<(), ReviewError> with Ok(())",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:383:35: replace != with == in ReviewCandidate::check",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:397:9: replace ReviewCandidate::capture -> Result<Arc<InputOwner>, ReviewError> with Ok(Arc::new(Default::default()))",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:403:17: delete field max_bytes from struct CaptureLimits expression in ReviewCandidate::capture",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:406:29: replace || with && in ReviewCandidate::capture",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:422:9: replace <impl Drop for ReviewCandidate>::drop with ()",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:424:40: replace == with != in <impl Drop for ReviewCandidate>::drop",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:440:9: replace ReviewLease::token -> &str with \"\"",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:440:9: replace ReviewLease::token -> &str with \"xyzzy\"",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:444:9: replace ReviewLease::comparison_id -> &ComparisonId with Box::leak(Box::new(Default::default()))",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:448:9: replace ReviewLease::entries -> impl Iterator<Item = ComparedEntry<'_>> with ::std::iter::empty()",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:448:9: replace ReviewLease::entries -> impl Iterator<Item = ComparedEntry<'_>> with ::std::iter::once(Default::default())",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:457:9: replace ReviewLease::window -> Result<Window, ReviewError> with Ok(Default::default())",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:471:9: replace ReviewLease::text_diff -> Result<TextDiff, DiffError> with Ok(Default::default())",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:475:9: replace ReviewLease::notices -> &[crate::review_source::CaptureNotice] with Vec::leak(Vec::new())",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:475:9: replace ReviewLease::notices -> &[crate::review_source::CaptureNotice] with Vec::leak(vec![Default::default()])",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:483:5: replace retained_bytes -> Result<usize, ReviewError> with Ok(0)",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:483:5: replace retained_bytes -> Result<usize, ReviewError> with Ok(1)",
+      "summary": "CaughtMutant"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:501:5: replace lock -> MutexGuard<'_, T> with MutexGuard::new()",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:501:5: replace lock -> MutexGuard<'_, T> with MutexGuard::from_iter([Default::default()])",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:501:5: replace lock -> MutexGuard<'_, T> with MutexGuard::new(Default::default())",
+      "summary": "Unviable"
+    },
+    {
+      "name": "crates/vizzi/src/review.rs:501:5: replace lock -> MutexGuard<'_, T> with MutexGuard::from(Default::default())",
+      "summary": "Unviable"
+    }
+  ],
+  "raw_outcomes_sha256": "1ba2c6c66e8ae5ffacc49281bdc0b790dca33bd94e2cd487b16738f603a03917",
+  "workspace_tests": {
+    "command": "CARGO_BUILD_JOBS=1 RUST_TEST_THREADS=1 nice -n 10 cargo test --workspace --all-features --offline",
+    "passed": 367,
+    "failed": 0,
+    "ignored": 0
+  },
+  "limitations": [
+    "Complete generated mutation set in review.rs; no exclusions. Unviable cases are not caught by assertions.",
+    "Existing capture, portable hashing/comparison, scheduler, transports and UI are outside mutation scope.",
+    "Source-only resident acquisition; analysis rebinding, external snapshot adoption and general cross-capture backing reuse are not delivered."
+  ]
+}

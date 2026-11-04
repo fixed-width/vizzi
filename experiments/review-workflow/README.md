@@ -68,9 +68,9 @@ On Linux, after preparing both fixtures, build the source-only native diagnostic
 ```sh
 CARGO_BUILD_JOBS=1 cargo build -p vizzi --example review_capture --offline
 python3 experiments/review-workflow/verify_native.py \
-  --fixture /tmp/vizzi-review-a --output /tmp/vizzi-native-a.json
+  --fixture /tmp/vizzi-review-a --output /tmp/vizzi-native-a.json --require-admission
 python3 experiments/review-workflow/verify_native.py \
-  --fixture /tmp/vizzi-review-b --output /tmp/vizzi-native-b.json
+  --fixture /tmp/vizzi-review-b --output /tmp/vizzi-native-b.json --require-admission
 ```
 
 Choose new output files outside the fixture workspaces. This checker uses the native
@@ -89,9 +89,10 @@ cargo run -p vizzi --example review_capture --offline -- \
   1a4f5b65dd2a269298748df2dfd68092a169a8d9 src/compiler/mod.rs
 ```
 
-It admits the two captures within a combined diagnostic byte allowance. Global
-pair/source lifetime admission and integration with the analysis scheduler remain
-separate work before host exposure.
+It uses [bounded review ownership](../../docs/prototype/REVIEW_OWNERSHIP.md) for both
+capture and query lifetime, including the shared source-byte allowance. Admission
+checks are recorded in the [ownership report](OWNERSHIP_RESULTS.md). Integration with
+the analysis scheduler and host/browser operations remain separate work.
 
 ## Run an evaluation after review support exists
 

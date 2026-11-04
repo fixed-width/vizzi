@@ -1,9 +1,12 @@
 //! Diagnostic native source-only Git capture; no host publication or language analysis.
 
 use std::{error::Error, path::Path};
-use vizzi::review_source::{CaptureLimits, CapturePolicy, GitRepository, acquire};
+use vizzi::{
+    review::ReviewStore,
+    review_source::{CaptureLimits, CapturePolicy, GitRepository},
+};
 use vizzi_core::{
-    comparison::{ChangeKind, Comparison, ReviewPath},
+    comparison::{ChangeKind, EntryContent, EntryState, ReviewPath, Side},
     text_diff::DiffLimits,
 };
 
@@ -24,18 +27,31 @@ fn main() -> Result<(), Box<dyn Error>> {
     let limits = CaptureLimits::default();
     let policy = CapturePolicy::scope(None, vec![]);
     let mut baseline = repository.pin(revision, limits, &|| false)?;
-    let base = acquire(&mut baseline, &policy, limits, &|| false)?;
-    let working = acquire(
-        &mut repository.working(&baseline)?,
-        &policy,
-        CaptureLimits {
-            max_bytes: limits.max_bytes - base.bytes,
-            ..limits
-        },
-        &|| false,
-    )?;
-    let notices:Vec<_>=working.notices.iter().map(|notice|serde_json::json!({"path":notice.path.display(),"kind":format!("{:?}",notice.kind)})).collect();
-    let pair = Comparison::between(base.observation, working.observation)?;
+    let store = ReviewStore::open(limits.max_bytes)?;
+    let ticket = store.request()?;
+    let mut candidate = store.begin(&ticket, None)?;
+    candidate.capture_base(&mut baseline, &policy, limits, &|| false)?;
+    candidate.capture_working(&mut repository.working(&baseline)?, limits, &|| false)?;
+    let token = candidate.publish()?;
+    let pair = store.query(&token)?;
+    let notices:Vec<_>=pair.notices(Side::Working).iter().map(|notice|serde_json::json!({"path":notice.path.display(),"kind":format!("{:?}",notice.kind)})).collect();
+    let mut base_paths = 0;
+    let mut working_paths = 0;
+    let mut acquired_bytes = 0u64;
+    for entry in pair.entries() {
+        base_paths += usize::from(entry.base.is_some());
+        working_paths += usize::from(entry.working.is_some());
+        for state in [entry.base, entry.working].into_iter().flatten() {
+            if let EntryState::Present {
+                content: EntryContent::Verified { bytes, .. },
+                ..
+            } = state
+            {
+                acquired_bytes += *bytes as u64;
+            }
+        }
+    }
+    let accounting = store.accounting().stats();
     let changed = pair
         .entries()
         .filter(|entry| entry.change != ChangeKind::Unchanged)
@@ -57,10 +73,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!(
         "{}",
         serde_json::to_string_pretty(&serde_json::json!({
-            "schema":1,"baseline":baseline.resolved(),"comparison":pair.id().as_str(),"workspace":repository.workspace().as_str(),
-            "analysis":"not_requested","base_paths":pair.observation(vizzi_core::comparison::Side::Base).inventory().len(),
-            "working_paths":pair.observation(vizzi_core::comparison::Side::Working).inventory().len(),
-            "acquired_bytes":base.bytes+working.bytes,"changes":changes,"hidden_changes":changed.saturating_sub(200),
+            "schema":1,"baseline":baseline.resolved(),"comparison":pair.comparison_id().as_str(),"workspace":repository.workspace().as_str(),"token":token,
+            "analysis":"not_requested","base_paths":base_paths,"working_paths":working_paths,
+            "acquired_bytes":acquired_bytes,"retained_source_bytes":accounting.retained_bytes,"charged_source_bytes":accounting.charged_bytes,"pair_slots":accounting.pair_slots,"changes":changes,"hidden_changes":changed.saturating_sub(200),
             "notices":notices,"selected_path":path.display(),"base_present":diff.base.version.is_some(),"working_present":diff.working.version.is_some(),"hunks":hunks,
         }))?
     );
