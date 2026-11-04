@@ -60,6 +60,14 @@ identity!(
     "An identity of immutable source and analysis observations."
 );
 identity!(
+    ObservationId,
+    "An identity of a complete review inventory and its source snapshot."
+);
+identity!(
+    ComparisonId,
+    "An identity of an ordered immutable observation pair and comparison policy."
+);
+identity!(
     EntityId,
     "An identity of a declaration in a file and analysis context."
 );

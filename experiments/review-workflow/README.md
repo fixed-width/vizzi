@@ -3,6 +3,8 @@
 Use this how-to to materialise the frozen local-change review fixtures for
 [milestone 2](../../docs/plans/product-milestones.md). Git and Python 3.12+ are required.
 The review interface itself is not implemented yet; this prepares its acceptance input.
+The [portable inventory validation](INVENTORY_RESULTS.md) records the first implemented
+comparison-model slice, independently of this Git fixture preparation.
 
 From the workspace root, using a local lpc-rs repository containing the pinned commit:
 

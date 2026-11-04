@@ -22,7 +22,8 @@ demonstrates the same task with Back/Forward controls.
 The [review fixture](experiments/review-workflow/README.md) and
 [comparison contracts](docs/prototype/COMPARISON_PRODUCT.md) now fix the next workflow:
 compare a pinned Git baseline with observed working files, including unstaged edits
-and untracked text. Comparison implementation and its guided review remain next.
+and untracked text. Portable inventory comparison and side-specific source binding are
+implemented; textual hunks, Git acquisition and the guided review interface remain next.
 
 - [Run the workspace](docs/how-to/run-workspace.md)
 - [Next product milestones](docs/plans/product-milestones.md)

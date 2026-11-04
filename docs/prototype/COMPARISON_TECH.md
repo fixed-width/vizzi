@@ -1,8 +1,44 @@
 # Contextual local-change review: technical contract
 
-Status: planned interfaces and invariants, not an implemented protocol. This reference
-supports the [behaviour contract](COMPARISON_PRODUCT.md). Exact Rust types and wire field
-names can be refined with implementation while preserving these invariants.
+Status: portable inventory comparison and side-specific source binding are implemented.
+Textual hunks, acquisition, admission and host/browser operations remain planned; there
+is no comparison transport yet. This reference supports the
+[behaviour contract](COMPARISON_PRODUCT.md). Exact wire fields can be refined with
+implementation while preserving these invariants.
+
+## Delivered portable inventory interface
+
+`vizzi_core::comparison` accepts supplied immutable observations without filesystem or
+SCM access. Its public interface is exercised by the non-Git, in-memory cases in
+`crates/vizzi-core/tests/comparison.rs`.
+
+| Interface | Delivered contract |
+| --- | --- |
+| `ReviewPath::parse` | Validates lossless relative path bytes; rejects NUL, empty/dot components and absolute paths. `/` is the canonical separator. Backslash and non-UTF-8 names remain distinct inventory paths, without document aliases. |
+| `Observation::from_inventory` | Takes an `Arc<Snapshot>`, review `CapturePolicyId` and complete inventory. Sorts paths and rejects duplicates. Every retained document must match a present regular entry's content identity and length. |
+| `Comparison::between` | Requires the same logical workspace, review policy, snapshot analysis policy and capture-plan compatibility marker. Retains both observation owners. |
+| `Comparison::entries` / `entry` | Lazy sorted union or path lookup, returning before/after evidence and added/removed/modified/unchanged/unassessed status. Raw content and metadata differences are separate. |
+| `Comparison::document` | Selects retained source from the requested immutable `Side`; absence of a retained document does not establish absence of an inventory entry. |
+
+The acquisition caller must finish enumeration before constructing an observation.
+Omitted paths mean verified absence; `EntryState::Unobserved(reason)` represents unknown
+presence, including sparse materialisation. A present path can separately have
+`EntryContent::Unavailable(reason)`. Comparing two unknown values never proves equality.
+Known presence/absence proves addition/removal even when that entry's content is
+unavailable; a known mode/type change proves modification while the content dimension
+can remain unknown. Consumers retain these overlapping availability gaps in their counts.
+
+Review policy identifies the subtree, capture/exclusion rules and other acquisition
+configuration, separately from the snapshot's analysis policy. Observation identity
+hashes the analysed snapshot and sorted inventory/policy using `review-observation-v1`.
+Ordered comparison identity includes `inventory-comparison-v1`. These content identities
+are not admission/publication tokens and do not implement the lifetime rules below.
+
+The inventory constructor streams metadata into its hash, without serialising source
+bodies or copying a complete encoded inventory buffer. It sorts once; comparison
+iteration merges both sorted inventories without a second full change list. Retained
+source shares existing immutable owners. Source-body admission and bounded host views
+remain necessary before exposing review capture to users.
 
 ## Source observations and the acquisition seam
 

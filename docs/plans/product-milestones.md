@@ -168,6 +168,12 @@ The implementation order for step 5 is:
 Each slice delivers exercised public behaviour; it does not require building the later
 layers first. Fixture validation is preparation evidence, not completed review acceptance.
 
+Step 5 has begun: [portable inventory comparison](../prototype/COMPARISON_TECH.md#delivered-portable-inventory-interface)
+now classifies supplied observations and binds source to an explicit side, with non-Git
+behavioural tests and [validation evidence](../../experiments/review-workflow/INVENTORY_RESULTS.md).
+Next is bounded raw-text hunk computation on those same captured
+documents. Native acquisition, pair admission and the linked review interface follow.
+
 Work in small vertical slices. Tests should cover public behaviour, stale/expired anchors,
 source identity, language-capability gaps and comparison correctness; use mutation testing
 for the new analysis/comparison logic. Keep test assertions independent of private call
