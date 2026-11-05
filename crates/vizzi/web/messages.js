@@ -14,3 +14,8 @@ export function createMessage(root,{label='Dismiss message',content=root.querySe
     },
   };
 }
+
+// Persistent pane information has no dismissal state or close control.
+export function textRow(root) {
+ return {show(text){const value=text ?? '';if(root.textContent!==value)root.textContent=value;root.hidden=!value;}};
+}

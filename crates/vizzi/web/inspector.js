@@ -1,4 +1,3 @@
-import {createMessage} from "/messages.js";
 import {kindGroup,renderStyledText} from "/presentation.js";
 import { createWindowReader } from "/windows.js";
 
@@ -10,8 +9,8 @@ export function createInspector({ source, space, outline, transport, select, onE
   let view, data, sourceRows = new Map(), entries = new Map(), cursor = 0, scheduled = false, queuedActivation = false;
   let columnLine, column = 0;
   const sourceNodes = new Map(), outlineNodes = new Map();
-  const emptyNote=document.createElement("p");emptyNote.className="source-empty";const emptyMessage=createMessage(emptyNote,{label:"Dismiss source availability"});
-  const emptyOutline=document.createElement("p");emptyOutline.className="outline-empty";const emptyOutlineMessage=createMessage(emptyOutline,{label:"Dismiss declaration availability"});
+  const emptyNote=document.createElement("p");emptyNote.className="source-empty";
+  const emptyOutline=document.createElement("p");emptyOutline.className="outline-empty";
   const focused = () => outline.contains(document.activeElement) ? document.activeElement.closest("button[data-declaration]")?.dataset.declaration : undefined;
   function ranges(sourceTop = source.scrollTop, outlineTop = outline.scrollTop) {
     return {line_start:Math.max(1,Math.floor(sourceTop/SOURCE_ROW)-16+1),line_count:96,outline_start:Math.max(0,Math.floor(outlineTop/OUTLINE_ROW)-8),outline_count:200,cursor_index:cursor,column_line:columnLine,column};
@@ -45,7 +44,7 @@ export function createInspector({ source, space, outline, transport, select, onE
   function focusCursor() { const row=entries.get(cursor); if(row)outlineNodes.get(row.id)?.button.focus({preventScroll:true}); }
   function renderSource() {
     if(!view?.source || !view.source.summary.lines) {
-      sourceNodes.clear();space.replaceChildren(emptyNote);emptyMessage.show(view?.source?"Source encoding is unavailable in this inspector.":emptyText,view?.source?.version);return;
+      sourceNodes.clear();space.replaceChildren(emptyNote);emptyNote.textContent=view?.source?"Source encoding is unavailable in this inspector.":emptyText;return;
     }
     const first=Math.max(1,Math.floor(source.scrollTop/SOURCE_ROW)-16+1),last=Math.min(view.source.summary.lines+1,Math.ceil((source.scrollTop+source.clientHeight)/SOURCE_ROW)+17,first+96);
     for(const [number,node] of sourceNodes)if(number<first || number>=last || !sourceRows.has(number)){node.row.remove();sourceNodes.delete(number);}
@@ -68,7 +67,7 @@ export function createInspector({ source, space, outline, transport, select, onE
   }
   function renderOutline() {
     const total=view?.source?.summary.declarations ?? 0;
-    if(!total) {outlineNodes.clear();outlineSpace.replaceChildren(emptyOutline);outline.tabIndex=0;emptyOutlineMessage.show("No declarations extracted",view?.source?.version);return;}
+    if(!total) {outlineNodes.clear();outlineSpace.replaceChildren(emptyOutline);outline.tabIndex=0;emptyOutline.textContent="No declarations extracted";return;}
     outline.tabIndex=-1;
     const first=Math.max(0,Math.floor(outline.scrollTop/OUTLINE_ROW)-8),last=Math.min(total,Math.ceil((outline.scrollTop+outline.clientHeight)/OUTLINE_ROW)+8,first+199);
     const wanted=new Set();for(let i=first;i<last;i++)if(entries.has(i))wanted.add(i);if(entries.has(cursor))wanted.add(cursor);
@@ -76,9 +75,14 @@ export function createInspector({ source, space, outline, transport, select, onE
     for(const [id,node] of outlineNodes)if(!keep.has(id)){node.row.remove();outlineNodes.delete(id);}
     for(const index of wanted) {
       const fact=entries.get(index);let node=outlineNodes.get(fact.id);
-      if(!node){const row=document.createElement("div"),button=document.createElement("button"),name=document.createElement("span"),detail=document.createElement("small");row.className="outline-entry";row.setAttribute("role","listitem");button.append(name,detail);row.append(button);outlineSpace.append(row);node={row,button,name,detail};outlineNodes.set(fact.id,node);}
+      if(!node){const row=document.createElement("div"),button=document.createElement("button"),name=document.createElement("span"),detail=document.createElement("small"),scope=document.createElement("span"),depth=document.createElement("span"),parent=document.createElement("span");row.className="outline-entry";row.setAttribute("role","listitem");name.className="declaration-name";scope.className="scope-context";depth.className="scope-depth";parent.className="scope-parent";scope.append(depth,parent);button.append(name,detail,scope);row.append(button);outlineSpace.append(row);node={row,button,name,detail,scope,depth,parent};outlineNodes.set(fact.id,node);}
       node.row.style.top=`${index*OUTLINE_ROW}px`;node.row.setAttribute("aria-posinset",String(index+1));node.row.setAttribute("aria-setsize",String(total));
       node.button.dataset.declaration=fact.id;node.button.dataset.index=index;node.button.tabIndex=index===cursor?0:-1;node.button.setAttribute("aria-current",String(view.selection.entity===fact.id));node.button.title=`Reveal ${fact.kind} ${fact.name}${fact.name_truncated?"… (inspect source for full name)":""} starting at Line ${fact.start_line}`;node.button.setAttribute("aria-label",node.button.title);
+      node.scope.hidden=fact.depth===undefined;node.row.dataset.depth=String(fact.depth ?? 0);
+      node.depth.hidden=!fact.depth;node.depth.textContent=fact.depth?`Depth ${fact.depth}`:"";
+      node.parent.textContent=fact.depth?`in ${fact.scope || "unnamed scope"}`:"File outline";
+      node.scope.title=fact.depth?`Enclosed by ${fact.scope || "unnamed scope"}; declaration depth ${fact.depth}`:"No enclosing declaration in this outline";
+      node.button.setAttribute("aria-description",node.scope.hidden?"":node.scope.title);
       node.name.textContent=fact.name+(fact.name_truncated?"…":"");node.detail.replaceChildren();const badge=document.createElement("span");badge.className=`kind-badge kind-${kindGroup(fact.kind)}`;badge.textContent=fact.kind;node.detail.append(badge,document.createTextNode(` · Line ${fact.start_line}`));
     }
   }

@@ -227,6 +227,7 @@ impl SyntaxAnalyzer {
         }
         let mut cursor = tree.walk();
         let mut declarations = Vec::new();
+        let mut scope_facts = BTreeMap::<usize, usize>::new();
         let mut checkpoints = Checkpoints {
             cancelled,
             ticks: 0,
@@ -240,9 +241,13 @@ impl SyntaxAnalyzer {
             if !declarations.is_empty() {
                 let mut scope = Vec::new();
                 let mut parent = node.parent();
+                let mut parent_fact = None;
                 while let Some(ancestor) = parent {
                     if checkpoints.poll() {
                         return Ok(None);
+                    }
+                    if parent_fact.is_none() {
+                        parent_fact = scope_facts.get(&ancestor.id()).copied();
                     }
                     if let Some((kind, name)) = (self.scope)(ancestor, text) {
                         scope.push(format!("{kind}:{name}"));
@@ -250,6 +255,7 @@ impl SyntaxAnalyzer {
                     parent = ancestor.parent();
                 }
                 scope.reverse();
+                let own_scope = (self.scope)(node, text);
                 for declaration in declarations.drain(..) {
                     if checkpoints.poll() {
                         return Ok(None);
@@ -258,7 +264,13 @@ impl SyntaxAnalyzer {
                     let key = serde_json::to_string(&scope)
                         .map_err(|error| ModelError(error.to_string()))?;
                     scope.pop();
+                    if own_scope.as_ref().is_some_and(|(kind, name)| {
+                        *kind == declaration.kind && name == &declaration.name
+                    }) {
+                        scope_facts.insert(node.id(), analysis.facts.len());
+                    }
                     analysis.facts.push(Fact {
+                        parent: parent_fact,
                         key,
                         kind: declaration.kind.into(),
                         name: declaration.name,

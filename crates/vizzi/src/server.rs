@@ -86,6 +86,8 @@ pub fn router(application: Arc<Application>) -> Router {
         .route("/splitter.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/splitter.js")) }))
         .route("/map-scene.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/map-scene.js")) }))
         .route("/directory-controls.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/directory-controls.js")) }))
+        .route("/map-headings.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/map-headings.js")) }))
+        .route("/view-status.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/view-status.js")) }))
         .route("/messages.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/messages.js")) }))
         .route("/appearance.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/appearance.js")) }))
         .route("/theme-init.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/theme-init.js")) }))

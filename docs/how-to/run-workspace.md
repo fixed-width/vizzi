@@ -46,8 +46,8 @@ this workspace; the tree remains bounded when the overview reaches its 2,000-fil
 
 **Theme** defaults to **System**. Choose **Light** or **Dark** to override it; the setting
 is shared by this origin's exploration/review tabs and survives reload when storage is
-available. Close informational/error rows with their labelled × buttons. Dismissing a
-message keeps the underlying source/capture operation running; new messages can appear.
+available. Close full-width ephemeral banners outside the panes with their labelled × buttons.
+Pane information and inline status labels remain visible. Dismissing a message keeps the underlying source/capture operation running; new messages can appear.
 
 Use **Back** and **Forward** in the header, or browser Back/Forward, to return to an
 earlier file/declaration and its reading position. The session keeps up to 50 visits.
@@ -176,3 +176,9 @@ At most one cleanup worker runs, independently of foreground publication. Native
 can disable it with `HostOptions::idle_maintenance` and inspect `Host::maintenance_status()`;
 cleanup errors are separate from foreground errors. Shutdown joins running cleanup and may
 wait for filesystem IO. See [idle maintenance](../prototype/RECOVERY.md#idle-source-maintenance).
+
+Declaration names stay aligned even when source is deeply nested. A third line identifies
+the nearest enclosing declaration and its reported depth. This counts named scopes emitted
+by the analyser, not every source block. Long parent names are shortened; select the entry
+to read its full source context. During reanalysis an available view keeps its readiness
+label instead of briefly replacing it with progress text.

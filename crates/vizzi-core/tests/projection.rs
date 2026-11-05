@@ -30,6 +30,7 @@ fn document(text: &str, names: &[String]) -> Arc<Document> {
                 facts: names
                     .iter()
                     .map(|name| Fact {
+                        parent: None,
                         key: format!("key {name}"),
                         kind: "function".into(),
                         name: name.clone(),

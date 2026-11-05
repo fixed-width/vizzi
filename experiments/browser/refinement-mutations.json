@@ -1,0 +1,5 @@
+{
+  "mutate":["crates/vizzi/web/map-headings.js","crates/vizzi/web/view-status.js","crates/vizzi/web/windows.js"],
+  "offlineTestFiles":["crates/vizzi/web/map-headings.test.js","crates/vizzi/web/view-status.test.js","crates/vizzi/web/windows.test.js"],
+  "timeoutMS":2000
+}

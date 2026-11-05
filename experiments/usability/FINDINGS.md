@@ -31,3 +31,11 @@ and requested directory reorganisation/collapse, a system-default dark/light pre
 and stronger syntax colours. The trial's missing history was confirmed; see
 [the orientation response and validation](ORIENTATION_RESULTS.md). The literature
 review and project-specific hypotheses are in [the layout explanation](../../docs/explanation/repository-layouts.md).
+
+## Third maintainer corrections
+
+The maintainer limited close controls to external full-width ephemeral banners, reported
+vertically clipped map titles, requested better declaration structure without deep
+indentation, and reported distracting readiness/progress text changes. See
+[the refinement response](REFINEMENT_RESULTS.md). This supersedes the earlier broad
+dismissal interpretation.

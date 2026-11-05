@@ -33,9 +33,10 @@ separate from the task attempt.
 Directory frames show the actual hierarchy. Use the directory controls or breadcrumbs
 to focus/collapse an area. Drag rows or headers to reorder siblings; Alt+Up/Down and
 the arrow buttons also reorder them. This changes the map, not source paths. Reset map
-restores defaults. Theme offers System, Light and Dark. Informational/error rows can be
-closed with their labelled × controls.
+restores defaults. Theme offers System, Light and Dark. Only ephemeral full-width banners outside the panes can be closed with their labelled × controls.
 
 A revision trial needs history in the configured checkout. Git expressions such as
 HEAD~1 and HEAD^^ cannot reach missing shallow parents. The maintainer preparation can
 include local history; the application itself never fetches.
+
+Declaration rows show their nearest enclosing scope and depth while keeping names aligned.

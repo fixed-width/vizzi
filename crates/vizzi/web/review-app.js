@@ -1,4 +1,5 @@
-import {createMessage} from "/messages.js";
+import {reviewLabel} from "/view-status.js";
+import {createMessage,textRow} from "/messages.js";
 import {installAppearance} from "/appearance.js";
 import {pageCount} from "/presentation.js";
 import {installSplitter} from "/splitter.js";
@@ -12,7 +13,8 @@ const node=(tag,text)=>{const value=document.createElement(tag);value.textConten
 const sides=["base","working"],inspectors={};
 let view,updates,filterTimer;
 installAppearance(element("theme"));
-const messages=Object.fromEntries([["review-status","review status"],["comparison-error","comparison error"],["comparison-labels","comparison details"],["review-notice","review notice"],["file-change","file status"],["diff-note","diff note"],["base-evidence","base availability"],["working-evidence","working availability"]].map(([id,label])=>[id,createMessage(element(id),{label:`Dismiss ${label}`,...(id==="review-notice"?{content:element(id).querySelector("span")}:{})})]));
+const dismissible=new Set(["comparison-error","review-notice"]);
+const messages=Object.fromEntries([["review-status","review status"],["comparison-error","comparison error"],["comparison-labels","comparison details"],["review-notice","review notice"],["file-change","file status"],["diff-note","diff note"],["base-evidence","base availability"],["working-evidence","working availability"]].map(([id,label])=>[id,dismissible.has(id)?createMessage(element(id),{label:`Dismiss ${label}`,...(id==="review-notice"?{content:element(id).querySelector("span")}:{})}):textRow(element(id))]));
 installSplitter(element("review-workspace"),{key:"review-files",label:"Review files and source widths",initial:.21,minBefore:170,minAfter:400});
 installSplitter(document.querySelector(".review-pair"),{key:"review-pair",label:"Base and target source widths",initial:.5,minBefore:220,minAfter:220});
 for(const side of sides)installSplitter(element(`${side}-outline`).closest(".source-layout"),{key:`review-${side}-outline`,label:`${side} declarations and source widths`,initial:.3,minBefore:90,minAfter:130});
@@ -42,7 +44,8 @@ const capture=()=>Object.fromEntries(sides.map(side=>[side,inspectors[side].posi
 const controller=createReviewController({transport,capture,onView:render,onNotice:notice,onError:error=>captureError(error.message),
   onStatus:status=>{
     captureError(status.error?.message,status.ticket);
-    messages["review-status"].show(status.error?"Comparison failed":status.pending?"Capturing and analysing comparison…":status.active?"Comparison ready":"Choose a base revision to begin");
+    messages["review-status"].show(reviewLabel(status));
+    element("review-workspace").setAttribute("aria-busy",String(status.pending));
     element("refresh-working").disabled=!status.active || status.pending || Boolean(status.active.target);element("refresh-working").hidden=Boolean(status.active?.target);element("close-comparison").disabled=!status.active;
     element("open-current").disabled=!status.active;
   },

@@ -1,0 +1,7644 @@
+{
+  "schema": 1,
+  "baseline": "7de79b7",
+  "native_runs": [
+    {
+      "scope": "broad",
+      "raw_sha256": "dc0ca1e69d338fd0bc659b291411b407a514b5ac892b3384bf08639cd26dce5c",
+      "counts": {
+        "total_mutants": 68,
+        "caught": 56,
+        "missed": 8,
+        "timeout": 1,
+        "unviable": 3
+      },
+      "outcomes": [
+        {
+          "name": "unmodified baseline",
+          "outcome": "Success"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:233:9: replace Document::capture_validated -> Result<Self, ModelError> with Ok(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:235:13: replace || with && in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:234:13: replace || with && in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:240:72: replace && with || in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:240:75: delete ! in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:249:45: replace || with && in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:249:34: replace != with == in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:249:48: delete ! in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:253:44: replace || with && in Document::capture_validated",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:253:17: delete ! in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:253:68: delete ! in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:259:17: replace && with || in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:258:34: replace == with != in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:259:48: replace || with && in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:259:21: delete ! in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:272:29: replace && with || in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:271:29: replace && with || in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:270:29: replace && with || in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:269:32: replace < with == in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:269:32: replace < with > in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:269:32: replace < with <= in Document::capture_validated",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:270:45: replace <= with > in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:271:46: replace <= with > in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:272:64: replace || with && in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:272:46: replace < with == in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:272:46: replace < with > in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:272:46: replace < with <= in Document::capture_validated",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:272:81: replace < with == in Document::capture_validated",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:272:81: replace < with > in Document::capture_validated",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:272:81: replace < with <= in Document::capture_validated",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:277:61: replace + with - in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:277:61: replace + with * in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:277:51: replace + with - in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:277:51: replace + with * in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:284:21: replace || with && in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:283:21: replace || with && in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:282:20: delete ! in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:283:40: replace >= with < in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:284:24: delete ! in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:292:17: replace && with || in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:291:34: replace == with != in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:292:20: delete ! in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:141:9: replace Document::entry -> Option<Entry> with None",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:141:9: replace Document::entry -> Option<Entry> with Some(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:149:39: replace <= with > in Document::entry",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:159:53: replace > with == in Document::entry",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:159:53: replace > with < in Document::entry",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:159:53: replace > with >= in Document::entry",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:161:53: replace > with == in Document::entry",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:161:53: replace > with < in Document::entry",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:161:53: replace > with >= in Document::entry",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:166:20: replace -= with += in Document::entry",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:166:20: replace -= with /= in Document::entry",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:162:9: replace SyntaxAnalyzer::run -> Result<Option<AnalysisResult>, ModelError> with Ok(None)",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:162:9: replace SyntaxAnalyzer::run -> Result<Option<AnalysisResult>, ModelError> with Ok(Some(Default::default()))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:178:24: delete ! in SyntaxAnalyzer::run",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:193:68: replace == with != in SyntaxAnalyzer::run",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:241:16: delete ! in SyntaxAnalyzer::run",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:268:51: replace && with || in SyntaxAnalyzer::run",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:268:31: replace == with != in SyntaxAnalyzer::run",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:268:59: replace == with != in SyntaxAnalyzer::run",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:292:20: delete ! in SyntaxAnalyzer::run",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:298:70: replace += with -= in SyntaxAnalyzer::run",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:298:70: replace += with *= in SyntaxAnalyzer::run",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:305:57: replace == with != in SyntaxAnalyzer::run",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:309:34: replace += with -= in SyntaxAnalyzer::run",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:309:34: replace += with *= in SyntaxAnalyzer::run",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:317:52: replace || with && in SyntaxAnalyzer::run",
+          "outcome": "MissedMutant"
+        }
+      ]
+    },
+    {
+      "scope": "focused",
+      "raw_sha256": "25af338e109457ae41ae4af6abe50cb2e360b2b61258777cc3e372db6dcb3deb",
+      "counts": {
+        "total_mutants": 12,
+        "caught": 9,
+        "missed": 3,
+        "timeout": 0,
+        "unviable": 0
+      },
+      "outcomes": [
+        {
+          "name": "unmodified baseline",
+          "outcome": "Success"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:253:44: replace || with && in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:269:32: replace < with == in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:269:32: replace < with > in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:269:32: replace < with <= in Document::capture_validated",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:272:46: replace < with == in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:272:46: replace < with > in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:272:46: replace < with <= in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:272:81: replace < with == in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:272:81: replace < with > in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/model.rs:272:81: replace < with <= in Document::capture_validated",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:268:51: replace && with || in SyntaxAnalyzer::run",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:317:52: replace || with && in SyntaxAnalyzer::run",
+          "outcome": "MissedMutant"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Serial lower-priority mutation jobs; Rust build/jobserver/test threads all one.",
+    "No mutation exclusions. Timeouts and unviable builds are separate from mutations caught by failing tests.",
+    "Mutations and coverage are evidence, not proof; residual diagnostic/guard/performance variants remain."
+  ],
+  "native_latest": {
+    "counts": {
+      "Unviable": 3,
+      "CaughtMutant": 61,
+      "MissedMutant": 3,
+      "Timeout": 1
+    },
+    "survivors": [
+      "crates/vizzi-core/src/model.rs:269:32: replace < with <= in Document::capture_validated",
+      "crates/vizzi-core/src/syntax.rs:268:51: replace && with || in SyntaxAnalyzer::run",
+      "crates/vizzi-core/src/syntax.rs:317:52: replace || with && in SyntaxAnalyzer::run"
+    ]
+  },
+  "javascript": {
+    "raw_sha256": "9605f14b86c898bd4b482e9d84f920b5dc98991db8a805f9588930d25fda263b",
+    "counts": {
+      "Killed": 398,
+      "Survived": 36
+    },
+    "source_sha256": {
+      "crates/vizzi/web/map-headings.js": "4ff0b0c6e0e5686fa6f9be79f518c516677c447a68a49e88ad998d619dc1db21",
+      "crates/vizzi/web/view-status.js": "074731270fac63151a3791ba7e153a42d612a3734f89df56ba1bab8db63f1d81",
+      "crates/vizzi/web/windows.js": "a357966ce179d3908350bb891b53ed0a310acd8bda092314310968e606e37a83",
+      "crates/vizzi/web/map-headings.test.js": "ac598d286fdbfcee94d58c7eddb0cafa9bf4fd6786d73f44e7bcf401d12e292e",
+      "crates/vizzi/web/view-status.test.js": "f5203866ab84437315ba35d7a4aeb889544129b672be0d1ff4585627349e8e7f",
+      "crates/vizzi/web/windows.test.js": "f2653cf87cf882a3df6fc6b796ed8c90d26f1fc7e80b4b44fbed42a4e0240146"
+    },
+    "outcomes": [
+      {
+        "file": "crates/vizzi/web/map-headings.js",
+        "location": {
+          "start": {
+            "column": 46,
+            "line": 1
+          },
+          "end": {
+            "column": 1,
+            "line": 5
+          }
+        },
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/map-headings.js",
+        "location": {
+          "start": {
+            "column": 14,
+            "line": 2
+          },
+          "end": {
+            "column": 62,
+            "line": 2
+          }
+        },
+        "replacement": "Math.min(0, metrics.actualBoundingBoxAscent ?? 9)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/map-headings.js",
+        "location": {
+          "start": {
+            "column": 25,
+            "line": 2
+          },
+          "end": {
+            "column": 61,
+            "line": 2
+          }
+        },
+        "replacement": "metrics.actualBoundingBoxAscent && 9",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/map-headings.js",
+        "location": {
+          "start": {
+            "column": 71,
+            "line": 2
+          },
+          "end": {
+            "column": 120,
+            "line": 2
+          }
+        },
+        "replacement": "Math.min(0, metrics.actualBoundingBoxDescent ?? 3)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/map-headings.js",
+        "location": {
+          "start": {
+            "column": 82,
+            "line": 2
+          },
+          "end": {
+            "column": 119,
+            "line": 2
+          }
+        },
+        "replacement": "metrics.actualBoundingBoxDescent && 3",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/map-headings.js",
+        "location": {
+          "start": {
+            "column": 128,
+            "line": 2
+          },
+          "end": {
+            "column": 142,
+            "line": 2
+          }
+        },
+        "replacement": "ascent - descent",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/map-headings.js",
+        "location": {
+          "start": {
+            "column": 4,
+            "line": 3
+          },
+          "end": {
+            "column": 39,
+            "line": 3
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/map-headings.js",
+        "location": {
+          "start": {
+            "column": 4,
+            "line": 3
+          },
+          "end": {
+            "column": 39,
+            "line": 3
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/map-headings.js",
+        "location": {
+          "start": {
+            "column": 4,
+            "line": 3
+          },
+          "end": {
+            "column": 39,
+            "line": 3
+          }
+        },
+        "replacement": "box.width < 32 && box.height < height + 4",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/map-headings.js",
+        "location": {
+          "start": {
+            "column": 4,
+            "line": 3
+          },
+          "end": {
+            "column": 16,
+            "line": 3
+          }
+        },
+        "replacement": "false",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/map-headings.js",
+        "location": {
+          "start": {
+            "column": 4,
+            "line": 3
+          },
+          "end": {
+            "column": 16,
+            "line": 3
+          }
+        },
+        "replacement": "box.width <= 32",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/map-headings.js",
+        "location": {
+          "start": {
+            "column": 4,
+            "line": 3
+          },
+          "end": {
+            "column": 16,
+            "line": 3
+          }
+        },
+        "replacement": "box.width >= 32",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/map-headings.js",
+        "location": {
+          "start": {
+            "column": 20,
+            "line": 3
+          },
+          "end": {
+            "column": 39,
+            "line": 3
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/map-headings.js",
+        "location": {
+          "start": {
+            "column": 20,
+            "line": 3
+          },
+          "end": {
+            "column": 39,
+            "line": 3
+          }
+        },
+        "replacement": "box.height <= height + 4",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/map-headings.js",
+        "location": {
+          "start": {
+            "column": 20,
+            "line": 3
+          },
+          "end": {
+            "column": 39,
+            "line": 3
+          }
+        },
+        "replacement": "box.height >= height + 4",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/map-headings.js",
+        "location": {
+          "start": {
+            "column": 31,
+            "line": 3
+          },
+          "end": {
+            "column": 39,
+            "line": 3
+          }
+        },
+        "replacement": "height - 4",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/map-headings.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 4
+          },
+          "end": {
+            "column": 63,
+            "line": 4
+          }
+        },
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/map-headings.js",
+        "location": {
+          "start": {
+            "column": 11,
+            "line": 4
+          },
+          "end": {
+            "column": 18,
+            "line": 4
+          }
+        },
+        "replacement": "box.x - 4",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/map-headings.js",
+        "location": {
+          "start": {
+            "column": 28,
+            "line": 4
+          },
+          "end": {
+            "column": 62,
+            "line": 4
+          }
+        },
+        "replacement": "box.y + (box.height - height) / 2 - ascent",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/map-headings.js",
+        "location": {
+          "start": {
+            "column": 28,
+            "line": 4
+          },
+          "end": {
+            "column": 55,
+            "line": 4
+          }
+        },
+        "replacement": "box.y - (box.height - height) / 2",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/map-headings.js",
+        "location": {
+          "start": {
+            "column": 34,
+            "line": 4
+          },
+          "end": {
+            "column": 55,
+            "line": 4
+          }
+        },
+        "replacement": "(box.height - height) * 2",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/map-headings.js",
+        "location": {
+          "start": {
+            "column": 35,
+            "line": 4
+          },
+          "end": {
+            "column": 52,
+            "line": 4
+          }
+        },
+        "replacement": "box.height + height",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/view-status.js",
+        "location": {
+          "start": {
+            "column": 39,
+            "line": 0
+          },
+          "end": {
+            "column": 1,
+            "line": 2
+          }
+        },
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/view-status.js",
+        "location": {
+          "start": {
+            "column": 21,
+            "line": 1
+          },
+          "end": {
+            "column": 62,
+            "line": 1
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/view-status.js",
+        "location": {
+          "start": {
+            "column": 63,
+            "line": 1
+          },
+          "end": {
+            "column": 77,
+            "line": 1
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/view-status.js",
+        "location": {
+          "start": {
+            "column": 36,
+            "line": 3
+          },
+          "end": {
+            "column": 1,
+            "line": 7
+          }
+        },
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/view-status.js",
+        "location": {
+          "start": {
+            "column": 4,
+            "line": 4
+          },
+          "end": {
+            "column": 16,
+            "line": 4
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/view-status.js",
+        "location": {
+          "start": {
+            "column": 4,
+            "line": 4
+          },
+          "end": {
+            "column": 16,
+            "line": 4
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/view-status.js",
+        "location": {
+          "start": {
+            "column": 24,
+            "line": 4
+          },
+          "end": {
+            "column": 43,
+            "line": 4
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/view-status.js",
+        "location": {
+          "start": {
+            "column": 4,
+            "line": 5
+          },
+          "end": {
+            "column": 17,
+            "line": 5
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/view-status.js",
+        "location": {
+          "start": {
+            "column": 4,
+            "line": 5
+          },
+          "end": {
+            "column": 17,
+            "line": 5
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/view-status.js",
+        "location": {
+          "start": {
+            "column": 25,
+            "line": 5
+          },
+          "end": {
+            "column": 43,
+            "line": 5
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/view-status.js",
+        "location": {
+          "start": {
+            "column": 23,
+            "line": 6
+          },
+          "end": {
+            "column": 46,
+            "line": 6
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/view-status.js",
+        "location": {
+          "start": {
+            "column": 47,
+            "line": 6
+          },
+          "end": {
+            "column": 80,
+            "line": 6
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 16,
+            "line": 0
+          },
+          "end": {
+            "column": 66,
+            "line": 0
+          }
+        },
+        "replacement": "() => undefined",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 25,
+            "line": 0
+          },
+          "end": {
+            "column": 66,
+            "line": 0
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 25,
+            "line": 0
+          },
+          "end": {
+            "column": 66,
+            "line": 0
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 25,
+            "line": 0
+          },
+          "end": {
+            "column": 66,
+            "line": 0
+          }
+        },
+        "replacement": "Number.isSafeInteger(value) || value >= 0",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 56,
+            "line": 0
+          },
+          "end": {
+            "column": 66,
+            "line": 0
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 56,
+            "line": 0
+          },
+          "end": {
+            "column": 66,
+            "line": 0
+          }
+        },
+        "replacement": "value > 0",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 56,
+            "line": 0
+          },
+          "end": {
+            "column": 66,
+            "line": 0
+          }
+        },
+        "replacement": "value < 0",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 15,
+            "line": 1
+          },
+          "end": {
+            "column": 92,
+            "line": 1
+          }
+        },
+        "replacement": "() => undefined",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 24,
+            "line": 1
+          },
+          "end": {
+            "column": 92,
+            "line": 1
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 24,
+            "line": 1
+          },
+          "end": {
+            "column": 92,
+            "line": 1
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 24,
+            "line": 1
+          },
+          "end": {
+            "column": 92,
+            "line": 1
+          }
+        },
+        "replacement": "typeof value === \"string\" && value.length > 0 || value.length <= 256",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 24,
+            "line": 1
+          },
+          "end": {
+            "column": 69,
+            "line": 1
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 24,
+            "line": 1
+          },
+          "end": {
+            "column": 69,
+            "line": 1
+          }
+        },
+        "replacement": "typeof value === \"string\" || value.length > 0",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 24,
+            "line": 1
+          },
+          "end": {
+            "column": 49,
+            "line": 1
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 24,
+            "line": 1
+          },
+          "end": {
+            "column": 49,
+            "line": 1
+          }
+        },
+        "replacement": "typeof value !== \"string\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 41,
+            "line": 1
+          },
+          "end": {
+            "column": 49,
+            "line": 1
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 53,
+            "line": 1
+          },
+          "end": {
+            "column": 69,
+            "line": 1
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 53,
+            "line": 1
+          },
+          "end": {
+            "column": 69,
+            "line": 1
+          }
+        },
+        "replacement": "value.length >= 0",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 53,
+            "line": 1
+          },
+          "end": {
+            "column": 69,
+            "line": 1
+          }
+        },
+        "replacement": "value.length <= 0",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 73,
+            "line": 1
+          },
+          "end": {
+            "column": 92,
+            "line": 1
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 73,
+            "line": 1
+          },
+          "end": {
+            "column": 92,
+            "line": 1
+          }
+        },
+        "replacement": "value.length < 256",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 73,
+            "line": 1
+          },
+          "end": {
+            "column": 92,
+            "line": 1
+          }
+        },
+        "replacement": "value.length > 256",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 14,
+            "line": 2
+          },
+          "end": {
+            "column": 100,
+            "line": 2
+          }
+        },
+        "replacement": "() => undefined",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 23,
+            "line": 2
+          },
+          "end": {
+            "column": 48,
+            "line": 2
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 23,
+            "line": 2
+          },
+          "end": {
+            "column": 48,
+            "line": 2
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 23,
+            "line": 2
+          },
+          "end": {
+            "column": 48,
+            "line": 2
+          }
+        },
+        "replacement": "typeof value !== \"string\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 40,
+            "line": 2
+          },
+          "end": {
+            "column": 48,
+            "line": 2
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 55,
+            "line": 4
+          },
+          "end": {
+            "column": 1,
+            "line": 34
+          }
+        },
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 6
+          },
+          "end": {
+            "column": 174,
+            "line": 6
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 6
+          },
+          "end": {
+            "column": 174,
+            "line": 6
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 6
+          },
+          "end": {
+            "column": 174,
+            "line": 6
+          }
+        },
+        "replacement": "(window?.schema !== 1 || window.file !== source.id || window.version !== source.version || window.line_total !== meta.lines) && window.outline_total !== meta.declarations",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 6
+          },
+          "end": {
+            "column": 128,
+            "line": 6
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 6
+          },
+          "end": {
+            "column": 128,
+            "line": 6
+          }
+        },
+        "replacement": "(window?.schema !== 1 || window.file !== source.id || window.version !== source.version) && window.line_total !== meta.lines",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 6
+          },
+          "end": {
+            "column": 92,
+            "line": 6
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 6
+          },
+          "end": {
+            "column": 92,
+            "line": 6
+          }
+        },
+        "replacement": "(window?.schema !== 1 || window.file !== source.id) && window.version !== source.version",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 6
+          },
+          "end": {
+            "column": 55,
+            "line": 6
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 6
+          },
+          "end": {
+            "column": 55,
+            "line": 6
+          }
+        },
+        "replacement": "window?.schema !== 1 && window.file !== source.id",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 6
+          },
+          "end": {
+            "column": 26,
+            "line": 6
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 6
+          },
+          "end": {
+            "column": 26,
+            "line": 6
+          }
+        },
+        "replacement": "window?.schema === 1",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 6
+          },
+          "end": {
+            "column": 20,
+            "line": 6
+          }
+        },
+        "replacement": "window.schema",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 30,
+            "line": 6
+          },
+          "end": {
+            "column": 55,
+            "line": 6
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 30,
+            "line": 6
+          },
+          "end": {
+            "column": 55,
+            "line": 6
+          }
+        },
+        "replacement": "window.file === source.id",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 59,
+            "line": 6
+          },
+          "end": {
+            "column": 92,
+            "line": 6
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 59,
+            "line": 6
+          },
+          "end": {
+            "column": 92,
+            "line": 6
+          }
+        },
+        "replacement": "window.version === source.version",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 96,
+            "line": 6
+          },
+          "end": {
+            "column": 128,
+            "line": 6
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 96,
+            "line": 6
+          },
+          "end": {
+            "column": 128,
+            "line": 6
+          }
+        },
+        "replacement": "window.line_total === meta.lines",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 132,
+            "line": 6
+          },
+          "end": {
+            "column": 174,
+            "line": 6
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 132,
+            "line": 6
+          },
+          "end": {
+            "column": 174,
+            "line": 6
+          }
+        },
+        "replacement": "window.outline_total === meta.declarations",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 192,
+            "line": 6
+          },
+          "end": {
+            "column": 220,
+            "line": 6
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 7
+          },
+          "end": {
+            "column": 325,
+            "line": 7
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 7
+          },
+          "end": {
+            "column": 325,
+            "line": 7
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 7
+          },
+          "end": {
+            "column": 325,
+            "line": 7
+          }
+        },
+        "replacement": "(!integer(window.line_start) || window.line_start < 1 || window.line_start > Math.max(1, meta.lines) || !integer(window.outline_start) || window.outline_start > Math.max(0, meta.declarations - 1) || !Array.isArray(window.lines) || window.lines.length > 96 || !Array.isArray(window.outline)) && window.outline.length > 200",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 7
+          },
+          "end": {
+            "column": 294,
+            "line": 7
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 7
+          },
+          "end": {
+            "column": 294,
+            "line": 7
+          }
+        },
+        "replacement": "(!integer(window.line_start) || window.line_start < 1 || window.line_start > Math.max(1, meta.lines) || !integer(window.outline_start) || window.outline_start > Math.max(0, meta.declarations - 1) || !Array.isArray(window.lines) || window.lines.length > 96) && !Array.isArray(window.outline)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 7
+          },
+          "end": {
+            "column": 260,
+            "line": 7
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 7
+          },
+          "end": {
+            "column": 260,
+            "line": 7
+          }
+        },
+        "replacement": "(!integer(window.line_start) || window.line_start < 1 || window.line_start > Math.max(1, meta.lines) || !integer(window.outline_start) || window.outline_start > Math.max(0, meta.declarations - 1) || !Array.isArray(window.lines)) && window.lines.length > 96",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 7
+          },
+          "end": {
+            "column": 232,
+            "line": 7
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 7
+          },
+          "end": {
+            "column": 232,
+            "line": 7
+          }
+        },
+        "replacement": "(!integer(window.line_start) || window.line_start < 1 || window.line_start > Math.max(1, meta.lines) || !integer(window.outline_start) || window.outline_start > Math.max(0, meta.declarations - 1)) && !Array.isArray(window.lines)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 7
+          },
+          "end": {
+            "column": 200,
+            "line": 7
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 7
+          },
+          "end": {
+            "column": 200,
+            "line": 7
+          }
+        },
+        "replacement": "(!integer(window.line_start) || window.line_start < 1 || window.line_start > Math.max(1, meta.lines) || !integer(window.outline_start)) && window.outline_start > Math.max(0, meta.declarations - 1)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 7
+          },
+          "end": {
+            "column": 139,
+            "line": 7
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 7
+          },
+          "end": {
+            "column": 139,
+            "line": 7
+          }
+        },
+        "replacement": "(!integer(window.line_start) || window.line_start < 1 || window.line_start > Math.max(1, meta.lines)) && !integer(window.outline_start)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 7
+          },
+          "end": {
+            "column": 105,
+            "line": 7
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 7
+          },
+          "end": {
+            "column": 105,
+            "line": 7
+          }
+        },
+        "replacement": "(!integer(window.line_start) || window.line_start < 1) && window.line_start > Math.max(1, meta.lines)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 7
+          },
+          "end": {
+            "column": 58,
+            "line": 7
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 7
+          },
+          "end": {
+            "column": 58,
+            "line": 7
+          }
+        },
+        "replacement": "!integer(window.line_start) && window.line_start < 1",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 7
+          },
+          "end": {
+            "column": 33,
+            "line": 7
+          }
+        },
+        "replacement": "integer(window.line_start)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 37,
+            "line": 7
+          },
+          "end": {
+            "column": 58,
+            "line": 7
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 37,
+            "line": 7
+          },
+          "end": {
+            "column": 58,
+            "line": 7
+          }
+        },
+        "replacement": "window.line_start <= 1",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 37,
+            "line": 7
+          },
+          "end": {
+            "column": 58,
+            "line": 7
+          }
+        },
+        "replacement": "window.line_start >= 1",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 62,
+            "line": 7
+          },
+          "end": {
+            "column": 105,
+            "line": 7
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 62,
+            "line": 7
+          },
+          "end": {
+            "column": 105,
+            "line": 7
+          }
+        },
+        "replacement": "window.line_start >= Math.max(1, meta.lines)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 62,
+            "line": 7
+          },
+          "end": {
+            "column": 105,
+            "line": 7
+          }
+        },
+        "replacement": "window.line_start <= Math.max(1, meta.lines)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 82,
+            "line": 7
+          },
+          "end": {
+            "column": 105,
+            "line": 7
+          }
+        },
+        "replacement": "Math.min(1, meta.lines)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 109,
+            "line": 7
+          },
+          "end": {
+            "column": 139,
+            "line": 7
+          }
+        },
+        "replacement": "integer(window.outline_start)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 143,
+            "line": 7
+          },
+          "end": {
+            "column": 200,
+            "line": 7
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 143,
+            "line": 7
+          },
+          "end": {
+            "column": 200,
+            "line": 7
+          }
+        },
+        "replacement": "window.outline_start >= Math.max(0, meta.declarations - 1)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 143,
+            "line": 7
+          },
+          "end": {
+            "column": 200,
+            "line": 7
+          }
+        },
+        "replacement": "window.outline_start <= Math.max(0, meta.declarations - 1)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 166,
+            "line": 7
+          },
+          "end": {
+            "column": 200,
+            "line": 7
+          }
+        },
+        "replacement": "Math.min(0, meta.declarations - 1)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 178,
+            "line": 7
+          },
+          "end": {
+            "column": 199,
+            "line": 7
+          }
+        },
+        "replacement": "meta.declarations + 1",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 204,
+            "line": 7
+          },
+          "end": {
+            "column": 232,
+            "line": 7
+          }
+        },
+        "replacement": "Array.isArray(window.lines)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 236,
+            "line": 7
+          },
+          "end": {
+            "column": 260,
+            "line": 7
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 236,
+            "line": 7
+          },
+          "end": {
+            "column": 260,
+            "line": 7
+          }
+        },
+        "replacement": "window.lines.length >= 96",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 236,
+            "line": 7
+          },
+          "end": {
+            "column": 260,
+            "line": 7
+          }
+        },
+        "replacement": "window.lines.length <= 96",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 264,
+            "line": 7
+          },
+          "end": {
+            "column": 294,
+            "line": 7
+          }
+        },
+        "replacement": "Array.isArray(window.outline)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 298,
+            "line": 7
+          },
+          "end": {
+            "column": 325,
+            "line": 7
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 298,
+            "line": 7
+          },
+          "end": {
+            "column": 325,
+            "line": 7
+          }
+        },
+        "replacement": "window.outline.length >= 200",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 298,
+            "line": 7
+          },
+          "end": {
+            "column": 325,
+            "line": 7
+          }
+        },
+        "replacement": "window.outline.length <= 200",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 343,
+            "line": 7
+          },
+          "end": {
+            "column": 366,
+            "line": 7
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 5,
+            "line": 8
+          },
+          "end": {
+            "column": 96,
+            "line": 8
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 5,
+            "line": 8
+          },
+          "end": {
+            "column": 96,
+            "line": 8
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 5,
+            "line": 8
+          },
+          "end": {
+            "column": 96,
+            "line": 8
+          }
+        },
+        "replacement": "window.coloring !== undefined || ![\"ready\", \"limited\", \"unavailable\"].includes(window.coloring)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 5,
+            "line": 8
+          },
+          "end": {
+            "column": 32,
+            "line": 8
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 5,
+            "line": 8
+          },
+          "end": {
+            "column": 32,
+            "line": 8
+          }
+        },
+        "replacement": "window.coloring === undefined",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 36,
+            "line": 8
+          },
+          "end": {
+            "column": 96,
+            "line": 8
+          }
+        },
+        "replacement": "[\"ready\", \"limited\", \"unavailable\"].includes(window.coloring)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 37,
+            "line": 8
+          },
+          "end": {
+            "column": 70,
+            "line": 8
+          }
+        },
+        "replacement": "[]",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 38,
+            "line": 8
+          },
+          "end": {
+            "column": 45,
+            "line": 8
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 46,
+            "line": 8
+          },
+          "end": {
+            "column": 55,
+            "line": 8
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 56,
+            "line": 8
+          },
+          "end": {
+            "column": 69,
+            "line": 8
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 113,
+            "line": 8
+          },
+          "end": {
+            "column": 143,
+            "line": 8
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 54,
+            "line": 10
+          },
+          "end": {
+            "column": 3,
+            "line": 23
+          }
+        },
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 11
+          },
+          "end": {
+            "column": 331,
+            "line": 11
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 11
+          },
+          "end": {
+            "column": 331,
+            "line": 11
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 11
+          },
+          "end": {
+            "column": 331,
+            "line": 11
+          }
+        },
+        "replacement": "(!line || line.number !== window.line_start + index || line.number > meta.lines || ![line.column, line.end_column, line.line_bytes].every(integer) || line.end_column > line.line_bytes || bytes(line.text) !== line.end_column - line.column || line.left !== line.column > 0) && line.right !== line.end_column < line.line_bytes",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 11
+          },
+          "end": {
+            "column": 277,
+            "line": 11
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 11
+          },
+          "end": {
+            "column": 277,
+            "line": 11
+          }
+        },
+        "replacement": "(!line || line.number !== window.line_start + index || line.number > meta.lines || ![line.column, line.end_column, line.line_bytes].every(integer) || line.end_column > line.line_bytes || bytes(line.text) !== line.end_column - line.column) && line.left !== line.column > 0",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 11
+          },
+          "end": {
+            "column": 242,
+            "line": 11
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 11
+          },
+          "end": {
+            "column": 242,
+            "line": 11
+          }
+        },
+        "replacement": "(!line || line.number !== window.line_start + index || line.number > meta.lines || ![line.column, line.end_column, line.line_bytes].every(integer) || line.end_column > line.line_bytes) && bytes(line.text) !== line.end_column - line.column",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 11
+          },
+          "end": {
+            "column": 188,
+            "line": 11
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 11
+          },
+          "end": {
+            "column": 188,
+            "line": 11
+          }
+        },
+        "replacement": "(!line || line.number !== window.line_start + index || line.number > meta.lines || ![line.column, line.end_column, line.line_bytes].every(integer)) && line.end_column > line.line_bytes",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 11
+          },
+          "end": {
+            "column": 151,
+            "line": 11
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 11
+          },
+          "end": {
+            "column": 151,
+            "line": 11
+          }
+        },
+        "replacement": "(!line || line.number !== window.line_start + index || line.number > meta.lines) && ![line.column, line.end_column, line.line_bytes].every(integer)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 11
+          },
+          "end": {
+            "column": 86,
+            "line": 11
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 11
+          },
+          "end": {
+            "column": 86,
+            "line": 11
+          }
+        },
+        "replacement": "(!line || line.number !== window.line_start + index) && line.number > meta.lines",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 11
+          },
+          "end": {
+            "column": 58,
+            "line": 11
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 11
+          },
+          "end": {
+            "column": 58,
+            "line": 11
+          }
+        },
+        "replacement": "!line && line.number !== window.line_start + index",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 11
+          },
+          "end": {
+            "column": 13,
+            "line": 11
+          }
+        },
+        "replacement": "line",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 17,
+            "line": 11
+          },
+          "end": {
+            "column": 58,
+            "line": 11
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 17,
+            "line": 11
+          },
+          "end": {
+            "column": 58,
+            "line": 11
+          }
+        },
+        "replacement": "line.number === window.line_start + index",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 33,
+            "line": 11
+          },
+          "end": {
+            "column": 58,
+            "line": 11
+          }
+        },
+        "replacement": "window.line_start - index",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 62,
+            "line": 11
+          },
+          "end": {
+            "column": 86,
+            "line": 11
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 62,
+            "line": 11
+          },
+          "end": {
+            "column": 86,
+            "line": 11
+          }
+        },
+        "replacement": "line.number >= meta.lines",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 62,
+            "line": 11
+          },
+          "end": {
+            "column": 86,
+            "line": 11
+          }
+        },
+        "replacement": "line.number <= meta.lines",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 90,
+            "line": 11
+          },
+          "end": {
+            "column": 151,
+            "line": 11
+          }
+        },
+        "replacement": "[line.column, line.end_column, line.line_bytes].every(integer)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 91,
+            "line": 11
+          },
+          "end": {
+            "column": 151,
+            "line": 11
+          }
+        },
+        "replacement": "[line.column, line.end_column, line.line_bytes].some(integer)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 91,
+            "line": 11
+          },
+          "end": {
+            "column": 136,
+            "line": 11
+          }
+        },
+        "replacement": "[]",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 155,
+            "line": 11
+          },
+          "end": {
+            "column": 188,
+            "line": 11
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 155,
+            "line": 11
+          },
+          "end": {
+            "column": 188,
+            "line": 11
+          }
+        },
+        "replacement": "line.end_column >= line.line_bytes",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 155,
+            "line": 11
+          },
+          "end": {
+            "column": 188,
+            "line": 11
+          }
+        },
+        "replacement": "line.end_column <= line.line_bytes",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 192,
+            "line": 11
+          },
+          "end": {
+            "column": 242,
+            "line": 11
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 192,
+            "line": 11
+          },
+          "end": {
+            "column": 242,
+            "line": 11
+          }
+        },
+        "replacement": "bytes(line.text) === line.end_column - line.column",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 213,
+            "line": 11
+          },
+          "end": {
+            "column": 242,
+            "line": 11
+          }
+        },
+        "replacement": "line.end_column + line.column",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 246,
+            "line": 11
+          },
+          "end": {
+            "column": 277,
+            "line": 11
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 246,
+            "line": 11
+          },
+          "end": {
+            "column": 277,
+            "line": 11
+          }
+        },
+        "replacement": "line.left === line.column > 0",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 261,
+            "line": 11
+          },
+          "end": {
+            "column": 276,
+            "line": 11
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 261,
+            "line": 11
+          },
+          "end": {
+            "column": 276,
+            "line": 11
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 261,
+            "line": 11
+          },
+          "end": {
+            "column": 276,
+            "line": 11
+          }
+        },
+        "replacement": "line.column >= 0",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 261,
+            "line": 11
+          },
+          "end": {
+            "column": 276,
+            "line": 11
+          }
+        },
+        "replacement": "line.column <= 0",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 281,
+            "line": 11
+          },
+          "end": {
+            "column": 331,
+            "line": 11
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 281,
+            "line": 11
+          },
+          "end": {
+            "column": 331,
+            "line": 11
+          }
+        },
+        "replacement": "line.right === line.end_column < line.line_bytes",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 297,
+            "line": 11
+          },
+          "end": {
+            "column": 330,
+            "line": 11
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 297,
+            "line": 11
+          },
+          "end": {
+            "column": 330,
+            "line": 11
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 297,
+            "line": 11
+          },
+          "end": {
+            "column": 330,
+            "line": 11
+          }
+        },
+        "replacement": "line.end_column <= line.line_bytes",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 297,
+            "line": 11
+          },
+          "end": {
+            "column": 330,
+            "line": 11
+          }
+        },
+        "replacement": "line.end_column >= line.line_bytes",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 349,
+            "line": 11
+          },
+          "end": {
+            "column": 374,
+            "line": 11
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 4,
+            "line": 12
+          },
+          "end": {
+            "column": 28,
+            "line": 12
+          }
+        },
+        "replacement": "size -= bytes(line.text)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 7,
+            "line": 13
+          },
+          "end": {
+            "column": 30,
+            "line": 13
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 7,
+            "line": 13
+          },
+          "end": {
+            "column": 30,
+            "line": 13
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 7,
+            "line": 13
+          },
+          "end": {
+            "column": 30,
+            "line": 13
+          }
+        },
+        "replacement": "line.styles === undefined",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 32,
+            "line": 13
+          },
+          "end": {
+            "column": 5,
+            "line": 22
+          }
+        },
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 9,
+            "line": 14
+          },
+          "end": {
+            "column": 74,
+            "line": 14
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 9,
+            "line": 14
+          },
+          "end": {
+            "column": 74,
+            "line": 14
+          }
+        },
+        "replacement": "false",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 9,
+            "line": 14
+          },
+          "end": {
+            "column": 74,
+            "line": 14
+          }
+        },
+        "replacement": "!Array.isArray(line.styles) && line.styles.length > 1024 - styleCount",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 9,
+            "line": 14
+          },
+          "end": {
+            "column": 36,
+            "line": 14
+          }
+        },
+        "replacement": "Array.isArray(line.styles)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 40,
+            "line": 14
+          },
+          "end": {
+            "column": 74,
+            "line": 14
+          }
+        },
+        "replacement": "false",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 40,
+            "line": 14
+          },
+          "end": {
+            "column": 74,
+            "line": 14
+          }
+        },
+        "replacement": "line.styles.length >= 1024 - styleCount",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 40,
+            "line": 14
+          },
+          "end": {
+            "column": 74,
+            "line": 14
+          }
+        },
+        "replacement": "line.styles.length <= 1024 - styleCount",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 59,
+            "line": 14
+          },
+          "end": {
+            "column": 74,
+            "line": 14
+          }
+        },
+        "replacement": "1024 + styleCount",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 91,
+            "line": 14
+          },
+          "end": {
+            "column": 115,
+            "line": 14
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 21,
+            "line": 16
+          },
+          "end": {
+            "column": 83,
+            "line": 16
+          }
+        },
+        "replacement": "() => undefined",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 29,
+            "line": 16
+          },
+          "end": {
+            "column": 83,
+            "line": 16
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 29,
+            "line": 16
+          },
+          "end": {
+            "column": 83,
+            "line": 16
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 29,
+            "line": 16
+          },
+          "end": {
+            "column": 83,
+            "line": 16
+          }
+        },
+        "replacement": "offset === encoded.length && (encoded[offset] & 192) !== 128",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 29,
+            "line": 16
+          },
+          "end": {
+            "column": 52,
+            "line": 16
+          }
+        },
+        "replacement": "false",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 29,
+            "line": 16
+          },
+          "end": {
+            "column": 52,
+            "line": 16
+          }
+        },
+        "replacement": "offset !== encoded.length",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 56,
+            "line": 16
+          },
+          "end": {
+            "column": 83,
+            "line": 16
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 56,
+            "line": 16
+          },
+          "end": {
+            "column": 83,
+            "line": 16
+          }
+        },
+        "replacement": "(encoded[offset] & 192) === 128",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 37,
+            "line": 17
+          },
+          "end": {
+            "column": 7,
+            "line": 20
+          }
+        },
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 11,
+            "line": 18
+          },
+          "end": {
+            "column": 284,
+            "line": 18
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 11,
+            "line": 18
+          },
+          "end": {
+            "column": 284,
+            "line": 18
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 11,
+            "line": 18
+          },
+          "end": {
+            "column": 284,
+            "line": 18
+          }
+        },
+        "replacement": "(!span || !integer(span.start) || !integer(span.end) || span.start < end || span.start >= span.end || span.end > encoded.length || !boundary(span.start) || !boundary(span.end)) && ![\"keyword\", \"type\", \"function\", \"string\", \"comment\", \"number\", \"constant\", \"attribute\"].includes(span.kind)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 11,
+            "line": 18
+          },
+          "end": {
+            "column": 179,
+            "line": 18
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 11,
+            "line": 18
+          },
+          "end": {
+            "column": 179,
+            "line": 18
+          }
+        },
+        "replacement": "(!span || !integer(span.start) || !integer(span.end) || span.start < end || span.start >= span.end || span.end > encoded.length || !boundary(span.start)) && !boundary(span.end)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 11,
+            "line": 18
+          },
+          "end": {
+            "column": 156,
+            "line": 18
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 11,
+            "line": 18
+          },
+          "end": {
+            "column": 156,
+            "line": 18
+          }
+        },
+        "replacement": "(!span || !integer(span.start) || !integer(span.end) || span.start < end || span.start >= span.end || span.end > encoded.length) && !boundary(span.start)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 11,
+            "line": 18
+          },
+          "end": {
+            "column": 131,
+            "line": 18
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 11,
+            "line": 18
+          },
+          "end": {
+            "column": 131,
+            "line": 18
+          }
+        },
+        "replacement": "(!span || !integer(span.start) || !integer(span.end) || span.start < end || span.start >= span.end) && span.end > encoded.length",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 11,
+            "line": 18
+          },
+          "end": {
+            "column": 104,
+            "line": 18
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 11,
+            "line": 18
+          },
+          "end": {
+            "column": 104,
+            "line": 18
+          }
+        },
+        "replacement": "(!span || !integer(span.start) || !integer(span.end) || span.start < end) && span.start >= span.end",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 11,
+            "line": 18
+          },
+          "end": {
+            "column": 80,
+            "line": 18
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 11,
+            "line": 18
+          },
+          "end": {
+            "column": 80,
+            "line": 18
+          }
+        },
+        "replacement": "(!span || !integer(span.start) || !integer(span.end)) && span.start < end",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 11,
+            "line": 18
+          },
+          "end": {
+            "column": 62,
+            "line": 18
+          }
+        },
+        "replacement": "false",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 11,
+            "line": 18
+          },
+          "end": {
+            "column": 62,
+            "line": 18
+          }
+        },
+        "replacement": "(!span || !integer(span.start)) && !integer(span.end)",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 11,
+            "line": 18
+          },
+          "end": {
+            "column": 40,
+            "line": 18
+          }
+        },
+        "replacement": "false",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 11,
+            "line": 18
+          },
+          "end": {
+            "column": 40,
+            "line": 18
+          }
+        },
+        "replacement": "!span && !integer(span.start)",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 11,
+            "line": 18
+          },
+          "end": {
+            "column": 16,
+            "line": 18
+          }
+        },
+        "replacement": "span",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 20,
+            "line": 18
+          },
+          "end": {
+            "column": 40,
+            "line": 18
+          }
+        },
+        "replacement": "integer(span.start)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 44,
+            "line": 18
+          },
+          "end": {
+            "column": 62,
+            "line": 18
+          }
+        },
+        "replacement": "integer(span.end)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 66,
+            "line": 18
+          },
+          "end": {
+            "column": 80,
+            "line": 18
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 66,
+            "line": 18
+          },
+          "end": {
+            "column": 80,
+            "line": 18
+          }
+        },
+        "replacement": "span.start <= end",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 66,
+            "line": 18
+          },
+          "end": {
+            "column": 80,
+            "line": 18
+          }
+        },
+        "replacement": "span.start >= end",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 84,
+            "line": 18
+          },
+          "end": {
+            "column": 104,
+            "line": 18
+          }
+        },
+        "replacement": "false",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 84,
+            "line": 18
+          },
+          "end": {
+            "column": 104,
+            "line": 18
+          }
+        },
+        "replacement": "span.start > span.end",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 84,
+            "line": 18
+          },
+          "end": {
+            "column": 104,
+            "line": 18
+          }
+        },
+        "replacement": "span.start < span.end",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 108,
+            "line": 18
+          },
+          "end": {
+            "column": 131,
+            "line": 18
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 108,
+            "line": 18
+          },
+          "end": {
+            "column": 131,
+            "line": 18
+          }
+        },
+        "replacement": "span.end >= encoded.length",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 108,
+            "line": 18
+          },
+          "end": {
+            "column": 131,
+            "line": 18
+          }
+        },
+        "replacement": "span.end <= encoded.length",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 135,
+            "line": 18
+          },
+          "end": {
+            "column": 156,
+            "line": 18
+          }
+        },
+        "replacement": "boundary(span.start)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 160,
+            "line": 18
+          },
+          "end": {
+            "column": 179,
+            "line": 18
+          }
+        },
+        "replacement": "boundary(span.end)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 183,
+            "line": 18
+          },
+          "end": {
+            "column": 284,
+            "line": 18
+          }
+        },
+        "replacement": "[\"keyword\", \"type\", \"function\", \"string\", \"comment\", \"number\", \"constant\", \"attribute\"].includes(span.kind)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 184,
+            "line": 18
+          },
+          "end": {
+            "column": 264,
+            "line": 18
+          }
+        },
+        "replacement": "[]",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 185,
+            "line": 18
+          },
+          "end": {
+            "column": 194,
+            "line": 18
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 195,
+            "line": 18
+          },
+          "end": {
+            "column": 201,
+            "line": 18
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 202,
+            "line": 18
+          },
+          "end": {
+            "column": 212,
+            "line": 18
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 213,
+            "line": 18
+          },
+          "end": {
+            "column": 221,
+            "line": 18
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 222,
+            "line": 18
+          },
+          "end": {
+            "column": 231,
+            "line": 18
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 232,
+            "line": 18
+          },
+          "end": {
+            "column": 240,
+            "line": 18
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 241,
+            "line": 18
+          },
+          "end": {
+            "column": 251,
+            "line": 18
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 252,
+            "line": 18
+          },
+          "end": {
+            "column": 263,
+            "line": 18
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 301,
+            "line": 18
+          },
+          "end": {
+            "column": 323,
+            "line": 18
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 21
+          },
+          "end": {
+            "column": 36,
+            "line": 21
+          }
+        },
+        "replacement": "styleCount -= line.styles.length",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 24
+          },
+          "end": {
+            "column": 18,
+            "line": 24
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 24
+          },
+          "end": {
+            "column": 18,
+            "line": 24
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 24
+          },
+          "end": {
+            "column": 18,
+            "line": 24
+          }
+        },
+        "replacement": "size >= 32768",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 24
+          },
+          "end": {
+            "column": 18,
+            "line": 24
+          }
+        },
+        "replacement": "size <= 32768",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 36,
+            "line": 24
+          },
+          "end": {
+            "column": 71,
+            "line": 24
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 23,
+            "line": 25
+          },
+          "end": {
+            "column": 3,
+            "line": 29
+          }
+        },
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 26
+          },
+          "end": {
+            "column": 387,
+            "line": 26
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 26
+          },
+          "end": {
+            "column": 387,
+            "line": 26
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 26
+          },
+          "end": {
+            "column": 387,
+            "line": 26
+          }
+        },
+        "replacement": "(!row || !integer(row.index) || row.index >= meta.declarations || !integer(row.analysis) || !opaque(row.id) || bytes(row.name) > 128 || bytes(row.kind) > 32 || typeof row.name_truncated !== \"boolean\" || typeof row.kind_truncated !== \"boolean\" || !integer(row.start_line) || row.start_line < 1 || !integer(row.end_line) || row.end_line < row.start_line) && row.end_line > meta.lines",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 26
+          },
+          "end": {
+            "column": 358,
+            "line": 26
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 26
+          },
+          "end": {
+            "column": 358,
+            "line": 26
+          }
+        },
+        "replacement": "(!row || !integer(row.index) || row.index >= meta.declarations || !integer(row.analysis) || !opaque(row.id) || bytes(row.name) > 128 || bytes(row.kind) > 32 || typeof row.name_truncated !== \"boolean\" || typeof row.kind_truncated !== \"boolean\" || !integer(row.start_line) || row.start_line < 1 || !integer(row.end_line)) && row.end_line < row.start_line",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 26
+          },
+          "end": {
+            "column": 325,
+            "line": 26
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 26
+          },
+          "end": {
+            "column": 325,
+            "line": 26
+          }
+        },
+        "replacement": "(!row || !integer(row.index) || row.index >= meta.declarations || !integer(row.analysis) || !opaque(row.id) || bytes(row.name) > 128 || bytes(row.kind) > 32 || typeof row.name_truncated !== \"boolean\" || typeof row.kind_truncated !== \"boolean\" || !integer(row.start_line) || row.start_line < 1) && !integer(row.end_line)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 26
+          },
+          "end": {
+            "column": 299,
+            "line": 26
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 26
+          },
+          "end": {
+            "column": 299,
+            "line": 26
+          }
+        },
+        "replacement": "(!row || !integer(row.index) || row.index >= meta.declarations || !integer(row.analysis) || !opaque(row.id) || bytes(row.name) > 128 || bytes(row.kind) > 32 || typeof row.name_truncated !== \"boolean\" || typeof row.kind_truncated !== \"boolean\" || !integer(row.start_line)) && row.start_line < 1",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 26
+          },
+          "end": {
+            "column": 277,
+            "line": 26
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 26
+          },
+          "end": {
+            "column": 277,
+            "line": 26
+          }
+        },
+        "replacement": "(!row || !integer(row.index) || row.index >= meta.declarations || !integer(row.analysis) || !opaque(row.id) || bytes(row.name) > 128 || bytes(row.kind) > 32 || typeof row.name_truncated !== \"boolean\" || typeof row.kind_truncated !== \"boolean\") && !integer(row.start_line)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 26
+          },
+          "end": {
+            "column": 249,
+            "line": 26
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 26
+          },
+          "end": {
+            "column": 249,
+            "line": 26
+          }
+        },
+        "replacement": "(!row || !integer(row.index) || row.index >= meta.declarations || !integer(row.analysis) || !opaque(row.id) || bytes(row.name) > 128 || bytes(row.kind) > 32 || typeof row.name_truncated !== \"boolean\") && typeof row.kind_truncated !== \"boolean\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 26
+          },
+          "end": {
+            "column": 206,
+            "line": 26
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 26
+          },
+          "end": {
+            "column": 206,
+            "line": 26
+          }
+        },
+        "replacement": "(!row || !integer(row.index) || row.index >= meta.declarations || !integer(row.analysis) || !opaque(row.id) || bytes(row.name) > 128 || bytes(row.kind) > 32) && typeof row.name_truncated !== \"boolean\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 26
+          },
+          "end": {
+            "column": 163,
+            "line": 26
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 26
+          },
+          "end": {
+            "column": 163,
+            "line": 26
+          }
+        },
+        "replacement": "(!row || !integer(row.index) || row.index >= meta.declarations || !integer(row.analysis) || !opaque(row.id) || bytes(row.name) > 128) && bytes(row.kind) > 32",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 26
+          },
+          "end": {
+            "column": 139,
+            "line": 26
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 26
+          },
+          "end": {
+            "column": 139,
+            "line": 26
+          }
+        },
+        "replacement": "(!row || !integer(row.index) || row.index >= meta.declarations || !integer(row.analysis) || !opaque(row.id)) && bytes(row.name) > 128",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 26
+          },
+          "end": {
+            "column": 114,
+            "line": 26
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 26
+          },
+          "end": {
+            "column": 114,
+            "line": 26
+          }
+        },
+        "replacement": "(!row || !integer(row.index) || row.index >= meta.declarations || !integer(row.analysis)) && !opaque(row.id)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 26
+          },
+          "end": {
+            "column": 95,
+            "line": 26
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 26
+          },
+          "end": {
+            "column": 95,
+            "line": 26
+          }
+        },
+        "replacement": "(!row || !integer(row.index) || row.index >= meta.declarations) && !integer(row.analysis)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 26
+          },
+          "end": {
+            "column": 69,
+            "line": 26
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 26
+          },
+          "end": {
+            "column": 69,
+            "line": 26
+          }
+        },
+        "replacement": "(!row || !integer(row.index)) && row.index >= meta.declarations",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 26
+          },
+          "end": {
+            "column": 35,
+            "line": 26
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 26
+          },
+          "end": {
+            "column": 35,
+            "line": 26
+          }
+        },
+        "replacement": "!row && !integer(row.index)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 26
+          },
+          "end": {
+            "column": 12,
+            "line": 26
+          }
+        },
+        "replacement": "row",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 16,
+            "line": 26
+          },
+          "end": {
+            "column": 35,
+            "line": 26
+          }
+        },
+        "replacement": "integer(row.index)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 39,
+            "line": 26
+          },
+          "end": {
+            "column": 69,
+            "line": 26
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 39,
+            "line": 26
+          },
+          "end": {
+            "column": 69,
+            "line": 26
+          }
+        },
+        "replacement": "row.index > meta.declarations",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 39,
+            "line": 26
+          },
+          "end": {
+            "column": 69,
+            "line": 26
+          }
+        },
+        "replacement": "row.index < meta.declarations",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 73,
+            "line": 26
+          },
+          "end": {
+            "column": 95,
+            "line": 26
+          }
+        },
+        "replacement": "integer(row.analysis)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 99,
+            "line": 26
+          },
+          "end": {
+            "column": 114,
+            "line": 26
+          }
+        },
+        "replacement": "opaque(row.id)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 118,
+            "line": 26
+          },
+          "end": {
+            "column": 139,
+            "line": 26
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 118,
+            "line": 26
+          },
+          "end": {
+            "column": 139,
+            "line": 26
+          }
+        },
+        "replacement": "bytes(row.name) >= 128",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 118,
+            "line": 26
+          },
+          "end": {
+            "column": 139,
+            "line": 26
+          }
+        },
+        "replacement": "bytes(row.name) <= 128",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 143,
+            "line": 26
+          },
+          "end": {
+            "column": 163,
+            "line": 26
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 143,
+            "line": 26
+          },
+          "end": {
+            "column": 163,
+            "line": 26
+          }
+        },
+        "replacement": "bytes(row.kind) >= 32",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 143,
+            "line": 26
+          },
+          "end": {
+            "column": 163,
+            "line": 26
+          }
+        },
+        "replacement": "bytes(row.kind) <= 32",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 167,
+            "line": 26
+          },
+          "end": {
+            "column": 206,
+            "line": 26
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 167,
+            "line": 26
+          },
+          "end": {
+            "column": 206,
+            "line": 26
+          }
+        },
+        "replacement": "typeof row.name_truncated === \"boolean\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 197,
+            "line": 26
+          },
+          "end": {
+            "column": 206,
+            "line": 26
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 210,
+            "line": 26
+          },
+          "end": {
+            "column": 249,
+            "line": 26
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 210,
+            "line": 26
+          },
+          "end": {
+            "column": 249,
+            "line": 26
+          }
+        },
+        "replacement": "typeof row.kind_truncated === \"boolean\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 240,
+            "line": 26
+          },
+          "end": {
+            "column": 249,
+            "line": 26
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 253,
+            "line": 26
+          },
+          "end": {
+            "column": 277,
+            "line": 26
+          }
+        },
+        "replacement": "integer(row.start_line)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 281,
+            "line": 26
+          },
+          "end": {
+            "column": 299,
+            "line": 26
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 281,
+            "line": 26
+          },
+          "end": {
+            "column": 299,
+            "line": 26
+          }
+        },
+        "replacement": "row.start_line <= 1",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 281,
+            "line": 26
+          },
+          "end": {
+            "column": 299,
+            "line": 26
+          }
+        },
+        "replacement": "row.start_line >= 1",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 303,
+            "line": 26
+          },
+          "end": {
+            "column": 325,
+            "line": 26
+          }
+        },
+        "replacement": "integer(row.end_line)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 329,
+            "line": 26
+          },
+          "end": {
+            "column": 358,
+            "line": 26
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 329,
+            "line": 26
+          },
+          "end": {
+            "column": 358,
+            "line": 26
+          }
+        },
+        "replacement": "row.end_line <= row.start_line",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 329,
+            "line": 26
+          },
+          "end": {
+            "column": 358,
+            "line": 26
+          }
+        },
+        "replacement": "row.end_line >= row.start_line",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 362,
+            "line": 26
+          },
+          "end": {
+            "column": 387,
+            "line": 26
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 362,
+            "line": 26
+          },
+          "end": {
+            "column": 387,
+            "line": 26
+          }
+        },
+        "replacement": "row.end_line >= meta.lines",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 362,
+            "line": 26
+          },
+          "end": {
+            "column": 387,
+            "line": 26
+          }
+        },
+        "replacement": "row.end_line <= meta.lines",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 405,
+            "line": 26
+          },
+          "end": {
+            "column": 428,
+            "line": 26
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 7,
+            "line": 27
+          },
+          "end": {
+            "column": 195,
+            "line": 27
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 7,
+            "line": 27
+          },
+          "end": {
+            "column": 195,
+            "line": 27
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 7,
+            "line": 27
+          },
+          "end": {
+            "column": 195,
+            "line": 27
+          }
+        },
+        "replacement": "row.depth !== undefined || !integer(row.depth) || row.depth > row.index || row.depth >= meta.declarations || (row.depth === 0 ? row.scope !== null : typeof row.scope !== \"string\" || bytes(row.scope) > 24)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 7,
+            "line": 27
+          },
+          "end": {
+            "column": 28,
+            "line": 27
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 7,
+            "line": 27
+          },
+          "end": {
+            "column": 28,
+            "line": 27
+          }
+        },
+        "replacement": "row.depth === undefined",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 33,
+            "line": 27
+          },
+          "end": {
+            "column": 194,
+            "line": 27
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 33,
+            "line": 27
+          },
+          "end": {
+            "column": 194,
+            "line": 27
+          }
+        },
+        "replacement": "(!integer(row.depth) || row.depth > row.index || row.depth >= meta.declarations) && (row.depth === 0 ? row.scope !== null : typeof row.scope !== \"string\" || bytes(row.scope) > 24)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 33,
+            "line": 27
+          },
+          "end": {
+            "column": 107,
+            "line": 27
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 33,
+            "line": 27
+          },
+          "end": {
+            "column": 107,
+            "line": 27
+          }
+        },
+        "replacement": "(!integer(row.depth) || row.depth > row.index) && row.depth >= meta.declarations",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 33,
+            "line": 27
+          },
+          "end": {
+            "column": 75,
+            "line": 27
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 33,
+            "line": 27
+          },
+          "end": {
+            "column": 75,
+            "line": 27
+          }
+        },
+        "replacement": "!integer(row.depth) && row.depth > row.index",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 33,
+            "line": 27
+          },
+          "end": {
+            "column": 52,
+            "line": 27
+          }
+        },
+        "replacement": "integer(row.depth)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 56,
+            "line": 27
+          },
+          "end": {
+            "column": 75,
+            "line": 27
+          }
+        },
+        "replacement": "false",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 56,
+            "line": 27
+          },
+          "end": {
+            "column": 75,
+            "line": 27
+          }
+        },
+        "replacement": "row.depth >= row.index",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 56,
+            "line": 27
+          },
+          "end": {
+            "column": 75,
+            "line": 27
+          }
+        },
+        "replacement": "row.depth <= row.index",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 79,
+            "line": 27
+          },
+          "end": {
+            "column": 107,
+            "line": 27
+          }
+        },
+        "replacement": "false",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 79,
+            "line": 27
+          },
+          "end": {
+            "column": 107,
+            "line": 27
+          }
+        },
+        "replacement": "row.depth > meta.declarations",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 79,
+            "line": 27
+          },
+          "end": {
+            "column": 107,
+            "line": 27
+          }
+        },
+        "replacement": "row.depth < meta.declarations",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 112,
+            "line": 27
+          },
+          "end": {
+            "column": 125,
+            "line": 27
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 112,
+            "line": 27
+          },
+          "end": {
+            "column": 125,
+            "line": 27
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 112,
+            "line": 27
+          },
+          "end": {
+            "column": 125,
+            "line": 27
+          }
+        },
+        "replacement": "row.depth !== 0",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 126,
+            "line": 27
+          },
+          "end": {
+            "column": 142,
+            "line": 27
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 126,
+            "line": 27
+          },
+          "end": {
+            "column": 142,
+            "line": 27
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 126,
+            "line": 27
+          },
+          "end": {
+            "column": 142,
+            "line": 27
+          }
+        },
+        "replacement": "row.scope === null",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 143,
+            "line": 27
+          },
+          "end": {
+            "column": 193,
+            "line": 27
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 143,
+            "line": 27
+          },
+          "end": {
+            "column": 193,
+            "line": 27
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 143,
+            "line": 27
+          },
+          "end": {
+            "column": 193,
+            "line": 27
+          }
+        },
+        "replacement": "typeof row.scope !== \"string\" && bytes(row.scope) > 24",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 143,
+            "line": 27
+          },
+          "end": {
+            "column": 170,
+            "line": 27
+          }
+        },
+        "replacement": "false",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 143,
+            "line": 27
+          },
+          "end": {
+            "column": 170,
+            "line": 27
+          }
+        },
+        "replacement": "typeof row.scope === \"string\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 162,
+            "line": 27
+          },
+          "end": {
+            "column": 170,
+            "line": 27
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 174,
+            "line": 27
+          },
+          "end": {
+            "column": 193,
+            "line": 27
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 174,
+            "line": 27
+          },
+          "end": {
+            "column": 193,
+            "line": 27
+          }
+        },
+        "replacement": "bytes(row.scope) >= 24",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 174,
+            "line": 27
+          },
+          "end": {
+            "column": 193,
+            "line": 27
+          }
+        },
+        "replacement": "bytes(row.scope) <= 24",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 212,
+            "line": 27
+          },
+          "end": {
+            "column": 239,
+            "line": 27
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 7,
+            "line": 28
+          },
+          "end": {
+            "column": 53,
+            "line": 28
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 7,
+            "line": 28
+          },
+          "end": {
+            "column": 53,
+            "line": 28
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 7,
+            "line": 28
+          },
+          "end": {
+            "column": 53,
+            "line": 28
+          }
+        },
+        "replacement": "row.depth === undefined || row.scope !== undefined",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 7,
+            "line": 28
+          },
+          "end": {
+            "column": 28,
+            "line": 28
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 7,
+            "line": 28
+          },
+          "end": {
+            "column": 28,
+            "line": 28
+          }
+        },
+        "replacement": "row.depth !== undefined",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 32,
+            "line": 28
+          },
+          "end": {
+            "column": 53,
+            "line": 28
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 32,
+            "line": 28
+          },
+          "end": {
+            "column": 53,
+            "line": 28
+          }
+        },
+        "replacement": "row.scope === undefined",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 70,
+            "line": 28
+          },
+          "end": {
+            "column": 101,
+            "line": 28
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 55,
+            "line": 30
+          },
+          "end": {
+            "column": 167,
+            "line": 30
+          }
+        },
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 57,
+            "line": 30
+          },
+          "end": {
+            "column": 68,
+            "line": 30
+          }
+        },
+        "replacement": ";",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 73,
+            "line": 30
+          },
+          "end": {
+            "column": 115,
+            "line": 30
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 73,
+            "line": 30
+          },
+          "end": {
+            "column": 115,
+            "line": 30
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 73,
+            "line": 30
+          },
+          "end": {
+            "column": 115,
+            "line": 30
+          }
+        },
+        "replacement": "row.index === window.outline_start + index",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 87,
+            "line": 30
+          },
+          "end": {
+            "column": 115,
+            "line": 30
+          }
+        },
+        "replacement": "window.outline_start - index",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 133,
+            "line": 30
+          },
+          "end": {
+            "column": 163,
+            "line": 30
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 31
+          },
+          "end": {
+            "column": 58,
+            "line": 31
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 31
+          },
+          "end": {
+            "column": 58,
+            "line": 31
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 31
+          },
+          "end": {
+            "column": 58,
+            "line": 31
+          }
+        },
+        "replacement": "meta.declarations > 0 === (window.cursor !== null)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 7,
+            "line": 31
+          },
+          "end": {
+            "column": 28,
+            "line": 31
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 7,
+            "line": 31
+          },
+          "end": {
+            "column": 28,
+            "line": 31
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 7,
+            "line": 31
+          },
+          "end": {
+            "column": 28,
+            "line": 31
+          }
+        },
+        "replacement": "meta.declarations >= 0",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 7,
+            "line": 31
+          },
+          "end": {
+            "column": 28,
+            "line": 31
+          }
+        },
+        "replacement": "meta.declarations <= 0",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 35,
+            "line": 31
+          },
+          "end": {
+            "column": 57,
+            "line": 31
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 35,
+            "line": 31
+          },
+          "end": {
+            "column": 57,
+            "line": 31
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 35,
+            "line": 31
+          },
+          "end": {
+            "column": 57,
+            "line": 31
+          }
+        },
+        "replacement": "window.cursor === null",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 76,
+            "line": 31
+          },
+          "end": {
+            "column": 100,
+            "line": 31
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 32
+          },
+          "end": {
+            "column": 28,
+            "line": 32
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 32
+          },
+          "end": {
+            "column": 28,
+            "line": 32
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 32
+          },
+          "end": {
+            "column": 28,
+            "line": 32
+          }
+        },
+        "replacement": "window.cursor === null",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 30,
+            "line": 32
+          },
+          "end": {
+            "column": 51,
+            "line": 32
+          }
+        },
+        "replacement": ";",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 91,
+            "line": 36
+          },
+          "end": {
+            "column": 1,
+            "line": 65
+          }
+        },
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 52,
+            "line": 38
+          },
+          "end": {
+            "column": 3,
+            "line": 49
+          }
+        },
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 39
+          },
+          "end": {
+            "column": 28,
+            "line": 39
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 39
+          },
+          "end": {
+            "column": 28,
+            "line": 39
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 39
+          },
+          "end": {
+            "column": 28,
+            "line": 39
+          }
+        },
+        "replacement": "view.source !== null",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 41
+          },
+          "end": {
+            "column": 41,
+            "line": 41
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 41
+          },
+          "end": {
+            "column": 41,
+            "line": 41
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 41
+          },
+          "end": {
+            "column": 41,
+            "line": 41
+          }
+        },
+        "replacement": "!opaque(view.snapshot) && !source",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 41
+          },
+          "end": {
+            "column": 30,
+            "line": 41
+          }
+        },
+        "replacement": "opaque(view.snapshot)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 34,
+            "line": 41
+          },
+          "end": {
+            "column": 41,
+            "line": 41
+          }
+        },
+        "replacement": "source",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 59,
+            "line": 41
+          },
+          "end": {
+            "column": 94,
+            "line": 41
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 43
+          },
+          "end": {
+            "column": 51,
+            "line": 43
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 43
+          },
+          "end": {
+            "column": 51,
+            "line": 43
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 43
+          },
+          "end": {
+            "column": 51,
+            "line": 43
+          }
+        },
+        "replacement": "(!opaque(id) || !opaque(version)) && !summary",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 43
+          },
+          "end": {
+            "column": 39,
+            "line": 43
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 43
+          },
+          "end": {
+            "column": 39,
+            "line": 43
+          }
+        },
+        "replacement": "!opaque(id) && !opaque(version)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 43
+          },
+          "end": {
+            "column": 19,
+            "line": 43
+          }
+        },
+        "replacement": "opaque(id)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 23,
+            "line": 43
+          },
+          "end": {
+            "column": 39,
+            "line": 43
+          }
+        },
+        "replacement": "opaque(version)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 43,
+            "line": 43
+          },
+          "end": {
+            "column": 51,
+            "line": 43
+          }
+        },
+        "replacement": "summary",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 69,
+            "line": 43
+          },
+          "end": {
+            "column": 104,
+            "line": 43
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 44
+          },
+          "end": {
+            "column": 65,
+            "line": 44
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 44
+          },
+          "end": {
+            "column": 65,
+            "line": 44
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 44
+          },
+          "end": {
+            "column": 65,
+            "line": 44
+          }
+        },
+        "replacement": "!integer(summary.lines) && !integer(summary.declarations)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 44
+          },
+          "end": {
+            "column": 31,
+            "line": 44
+          }
+        },
+        "replacement": "integer(summary.lines)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 35,
+            "line": 44
+          },
+          "end": {
+            "column": 65,
+            "line": 44
+          }
+        },
+        "replacement": "integer(summary.declarations)",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 83,
+            "line": 44
+          },
+          "end": {
+            "column": 118,
+            "line": 44
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 39,
+            "line": 45
+          },
+          "end": {
+            "column": 167,
+            "line": 45
+          }
+        },
+        "replacement": "Object.entries({\n  ...query,\n  snapshot: view.snapshot,\n  file: source.id,\n  version: source.version\n})",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 54,
+            "line": 45
+          },
+          "end": {
+            "column": 130,
+            "line": 45
+          }
+        },
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 139,
+            "line": 45
+          },
+          "end": {
+            "column": 166,
+            "line": 45
+          }
+        },
+        "replacement": "() => undefined",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 153,
+            "line": 45
+          },
+          "end": {
+            "column": 166,
+            "line": 45
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 153,
+            "line": 45
+          },
+          "end": {
+            "column": 166,
+            "line": 45
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 153,
+            "line": 45
+          },
+          "end": {
+            "column": 166,
+            "line": 45
+          }
+        },
+        "replacement": "value == null",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 33,
+            "line": 46
+          },
+          "end": {
+            "column": 56,
+            "line": 46
+          }
+        },
+        "replacement": "``",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 7,
+            "line": 47
+          },
+          "end": {
+            "column": 39,
+            "line": 47
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 7,
+            "line": 47
+          },
+          "end": {
+            "column": 39,
+            "line": 47
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 7,
+            "line": 47
+          },
+          "end": {
+            "column": 39,
+            "line": 47
+          }
+        },
+        "replacement": "window?.snapshot === view.snapshot",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 7,
+            "line": 47
+          },
+          "end": {
+            "column": 23,
+            "line": 47
+          }
+        },
+        "replacement": "window.snapshot",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 56,
+            "line": 47
+          },
+          "end": {
+            "column": 84,
+            "line": 47
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 9,
+            "line": 50
+          },
+          "end": {
+            "column": 3,
+            "line": 64
+          }
+        },
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 19,
+            "line": 52
+          },
+          "end": {
+            "column": 85,
+            "line": 52
+          }
+        },
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 21,
+            "line": 52
+          },
+          "end": {
+            "column": 33,
+            "line": 52
+          }
+        },
+        "replacement": "fetch.abort",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 33,
+            "line": 53
+          },
+          "end": {
+            "column": 5,
+            "line": 63
+          }
+        },
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 50,
+            "line": 54
+          },
+          "end": {
+            "column": 62,
+            "line": 54
+          }
+        },
+        "replacement": "fetch.abort",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 10,
+            "line": 55
+          },
+          "end": {
+            "column": 7,
+            "line": 59
+          }
+        },
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 50,
+            "line": 56
+          },
+          "end": {
+            "column": 78,
+            "line": 56
+          }
+        },
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 12,
+            "line": 57
+          },
+          "end": {
+            "column": 29,
+            "line": 57
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 12,
+            "line": 57
+          },
+          "end": {
+            "column": 29,
+            "line": 57
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 12,
+            "line": 57
+          },
+          "end": {
+            "column": 29,
+            "line": 57
+          }
+        },
+        "replacement": "current === token",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 38,
+            "line": 57
+          },
+          "end": {
+            "column": 43,
+            "line": 57
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 8,
+            "line": 58
+          },
+          "end": {
+            "column": 40,
+            "line": 58
+          }
+        },
+        "replacement": ";",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 48,
+            "line": 58
+          },
+          "end": {
+            "column": 52,
+            "line": 58
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 22,
+            "line": 59
+          },
+          "end": {
+            "column": 7,
+            "line": 62
+          }
+        },
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 12,
+            "line": 60
+          },
+          "end": {
+            "column": 29,
+            "line": 60
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 12,
+            "line": 60
+          },
+          "end": {
+            "column": 29,
+            "line": 60
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 12,
+            "line": 60
+          },
+          "end": {
+            "column": 29,
+            "line": 60
+          }
+        },
+        "replacement": "current !== token",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 31,
+            "line": 60
+          },
+          "end": {
+            "column": 46,
+            "line": 60
+          }
+        },
+        "replacement": ";",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 15,
+            "line": 61
+          },
+          "end": {
+            "column": 20,
+            "line": 61
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 16,
+            "line": 62
+          },
+          "end": {
+            "column": 61,
+            "line": 62
+          }
+        },
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 22,
+            "line": 62
+          },
+          "end": {
+            "column": 39,
+            "line": 62
+          }
+        },
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 22,
+            "line": 62
+          },
+          "end": {
+            "column": 39,
+            "line": 62
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 22,
+            "line": 62
+          },
+          "end": {
+            "column": 39,
+            "line": 62
+          }
+        },
+        "replacement": "current !== token",
+        "outcome": "Killed"
+      }
+    ]
+  },
+  "javascript_follow": {
+    "raw_sha256": "f44d85cb98046947d6f01dc98de47b8b8479273535dee1dcc3c9d9e978663044",
+    "counts": {
+      "Killed": 11,
+      "Survived": 25
+    },
+    "outcomes": [
+      {
+        "file": "crates/vizzi/web/map-headings.js",
+        "location": {
+          "start": {
+            "column": 82,
+            "line": 2
+          },
+          "end": {
+            "column": 119,
+            "line": 2
+          }
+        },
+        "replacement": "metrics.actualBoundingBoxDescent && 3",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/map-headings.js",
+        "location": {
+          "start": {
+            "column": 4,
+            "line": 3
+          },
+          "end": {
+            "column": 16,
+            "line": 3
+          }
+        },
+        "replacement": "false",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/map-headings.js",
+        "location": {
+          "start": {
+            "column": 4,
+            "line": 3
+          },
+          "end": {
+            "column": 16,
+            "line": 3
+          }
+        },
+        "replacement": "box.width <= 32",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/map-headings.js",
+        "location": {
+          "start": {
+            "column": 20,
+            "line": 3
+          },
+          "end": {
+            "column": 39,
+            "line": 3
+          }
+        },
+        "replacement": "box.height <= height + 4",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 6
+          },
+          "end": {
+            "column": 20,
+            "line": 6
+          }
+        },
+        "replacement": "window.schema",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 46,
+            "line": 8
+          },
+          "end": {
+            "column": 55,
+            "line": 8
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 56,
+            "line": 8
+          },
+          "end": {
+            "column": 69,
+            "line": 8
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 113,
+            "line": 8
+          },
+          "end": {
+            "column": 143,
+            "line": 8
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 9,
+            "line": 14
+          },
+          "end": {
+            "column": 74,
+            "line": 14
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 9,
+            "line": 14
+          },
+          "end": {
+            "column": 74,
+            "line": 14
+          }
+        },
+        "replacement": "!Array.isArray(line.styles) && line.styles.length > 1024 - styleCount",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 40,
+            "line": 14
+          },
+          "end": {
+            "column": 74,
+            "line": 14
+          }
+        },
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 40,
+            "line": 14
+          },
+          "end": {
+            "column": 74,
+            "line": 14
+          }
+        },
+        "replacement": "line.styles.length >= 1024 - styleCount",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 59,
+            "line": 14
+          },
+          "end": {
+            "column": 74,
+            "line": 14
+          }
+        },
+        "replacement": "1024 + styleCount",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 91,
+            "line": 14
+          },
+          "end": {
+            "column": 115,
+            "line": 14
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 29,
+            "line": 16
+          },
+          "end": {
+            "column": 52,
+            "line": 16
+          }
+        },
+        "replacement": "false",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 11,
+            "line": 18
+          },
+          "end": {
+            "column": 62,
+            "line": 18
+          }
+        },
+        "replacement": "false",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 11,
+            "line": 18
+          },
+          "end": {
+            "column": 62,
+            "line": 18
+          }
+        },
+        "replacement": "(!span || !integer(span.start)) && !integer(span.end)",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 11,
+            "line": 18
+          },
+          "end": {
+            "column": 40,
+            "line": 18
+          }
+        },
+        "replacement": "false",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 11,
+            "line": 18
+          },
+          "end": {
+            "column": 40,
+            "line": 18
+          }
+        },
+        "replacement": "!span && !integer(span.start)",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 84,
+            "line": 18
+          },
+          "end": {
+            "column": 104,
+            "line": 18
+          }
+        },
+        "replacement": "false",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 84,
+            "line": 18
+          },
+          "end": {
+            "column": 104,
+            "line": 18
+          }
+        },
+        "replacement": "span.start > span.end",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 195,
+            "line": 18
+          },
+          "end": {
+            "column": 201,
+            "line": 18
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 202,
+            "line": 18
+          },
+          "end": {
+            "column": 212,
+            "line": 18
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 222,
+            "line": 18
+          },
+          "end": {
+            "column": 231,
+            "line": 18
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 232,
+            "line": 18
+          },
+          "end": {
+            "column": 240,
+            "line": 18
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 241,
+            "line": 18
+          },
+          "end": {
+            "column": 251,
+            "line": 18
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 252,
+            "line": 18
+          },
+          "end": {
+            "column": 263,
+            "line": 18
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 301,
+            "line": 18
+          },
+          "end": {
+            "column": 323,
+            "line": 18
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 6,
+            "line": 21
+          },
+          "end": {
+            "column": 36,
+            "line": 21
+          }
+        },
+        "replacement": "styleCount -= line.styles.length",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 56,
+            "line": 27
+          },
+          "end": {
+            "column": 75,
+            "line": 27
+          }
+        },
+        "replacement": "false",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 79,
+            "line": 27
+          },
+          "end": {
+            "column": 107,
+            "line": 27
+          }
+        },
+        "replacement": "false",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 79,
+            "line": 27
+          },
+          "end": {
+            "column": 107,
+            "line": 27
+          }
+        },
+        "replacement": "row.depth > meta.declarations",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 143,
+            "line": 27
+          },
+          "end": {
+            "column": 170,
+            "line": 27
+          }
+        },
+        "replacement": "false",
+        "outcome": "Survived"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 174,
+            "line": 27
+          },
+          "end": {
+            "column": 193,
+            "line": 27
+          }
+        },
+        "replacement": "bytes(row.scope) >= 24",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 212,
+            "line": 27
+          },
+          "end": {
+            "column": 239,
+            "line": 27
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "file": "crates/vizzi/web/windows.js",
+        "location": {
+          "start": {
+            "column": 70,
+            "line": 28
+          },
+          "end": {
+            "column": 101,
+            "line": 28
+          }
+        },
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      }
+    ]
+  },
+  "checks": {
+    "native": {
+      "raw_sha256": "4c9536f8bf67101607108a7f6844c0838cd0a92f987ae2f0442b14e3e42e350a",
+      "native_passes": 431,
+      "browser_passes": 0,
+      "failures": []
+    },
+    "browser": {
+      "raw_sha256": "20ffbaf61e4dc37774a0ab1faecc4cd7c46a1156b7d3e610f8876c37869e8ed1",
+      "native_passes": 0,
+      "browser_passes": 222,
+      "failures": []
+    }
+  },
+  "source_sha256": {
+    "crates/vizzi-core/src/model.rs": "7d44b7f56ae783c3b8454fd961cb27c1f14b46cc60675c3c7d02c14e03889520",
+    "crates/vizzi-core/src/projection.rs": "029e1b2d393b398636aef36ab6ffa7cde543a509ab40bde5600b70fadab9e5ae",
+    "crates/vizzi-core/src/syntax.rs": "190f7e14e99b51966409b7ef0132d67163ce904a546b5be08696eb1387fcfb82",
+    "crates/vizzi/web/app.js": "b24a877ba87984bd1d34b45cacf51c61b7049305fb74ab5e012912fffeb9cc58",
+    "crates/vizzi/web/review-app.js": "14a1ef772c70790d286210af029d917212088eeea7cbb6a0318a97486db78362",
+    "crates/vizzi/web/inspector.js": "b0a9f46a75f4c16e0529715a88cd6df40c2dd5946589b457fce61a762833dc61",
+    "crates/vizzi/web/windows.js": "a357966ce179d3908350bb891b53ed0a310acd8bda092314310968e606e37a83",
+    "crates/vizzi/web/map-headings.js": "4ff0b0c6e0e5686fa6f9be79f518c516677c447a68a49e88ad998d619dc1db21",
+    "crates/vizzi/web/view-status.js": "074731270fac63151a3791ba7e153a42d612a3734f89df56ba1bab8db63f1d81",
+    "crates/vizzi/web/messages.js": "853a053183e7557f5254fdfa0488943aae3f55c8b05e88a023b246b85313f18a",
+    "crates/vizzi/web/app.css": "488a46ae0f97a3c0989fc208e5da4cba23bf3a6a82790bc827509fd4b4bc7c72"
+  },
+  "performance": {
+    "schema": 1,
+    "hardware": {
+      "cpu": "13th Gen Intel(R) Core(TM) i7-13700H",
+      "logicalCpus": 20,
+      "totalMemory": 67080241152,
+      "platform": "linux",
+      "initialLoad": [
+        2.3,
+        3.14,
+        3.06
+      ]
+    },
+    "binarySha256": "03b7e4f0893b100856a940adbe78eb222c91c191b4d44cb29b6918a168bee60a",
+    "cases": [
+      {
+        "name": "2000-directories",
+        "revision": "generated-2000-directories",
+        "frames": {
+          "count": 92,
+          "p50": 16.699999999999818,
+          "p95": 16.700000000000045,
+          "p99": 16.799999999999955,
+          "max": 16.799999999999955,
+          "over33ms": 0,
+          "over50ms": 0
+        },
+        "drawCpu": {
+          "count": 90,
+          "p50": 0.7999999523162842,
+          "p95": 1.2000000476837158,
+          "p99": 2.4000000953674316,
+          "max": 2.4000000953674316,
+          "over33ms": 0,
+          "over50ms": 0
+        },
+        "longTasks": [],
+        "drawnFiles": 46,
+        "latencies": [
+          {
+            "action": "collapse",
+            "ms": 63.358884999999646
+          },
+          {
+            "action": "expand",
+            "ms": 66.82253599999967
+          },
+          {
+            "action": "move",
+            "ms": 67.01546300000018
+          },
+          {
+            "action": "focus",
+            "ms": 66.33228999999983
+          },
+          {
+            "action": "root",
+            "ms": 66.87751200000002
+          },
+          {
+            "action": "dark",
+            "ms": 33.10388300000022
+          },
+          {
+            "action": "light",
+            "ms": 33.29655999999977
+          }
+        ],
+        "dom": {
+          "directoryRows": 11,
+          "sourceRows": 2,
+          "declarations": 1,
+          "sceneFiles": 2000,
+          "groups": 2000,
+          "hidden": 0
+        },
+        "nativeRssBytes": 18132992,
+        "nativePeakBytes": 18132992,
+        "sourceSnapshotUnchanged": true
+      },
+      {
+        "name": "lpc-rs",
+        "revision": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+        "frames": {
+          "count": 93,
+          "p50": 16.699999999999818,
+          "p95": 16.799999999999727,
+          "p99": 16.800000000000182,
+          "max": 16.800000000000182,
+          "over33ms": 0,
+          "over50ms": 0
+        },
+        "drawCpu": {
+          "count": 90,
+          "p50": 0.5,
+          "p95": 0.9000000953674316,
+          "p99": 2.799999952316284,
+          "max": 2.799999952316284,
+          "over33ms": 0,
+          "over50ms": 0
+        },
+        "longTasks": [],
+        "drawnFiles": 45,
+        "latencies": [
+          {
+            "action": "collapse",
+            "ms": 80.44509999999991
+          },
+          {
+            "action": "expand",
+            "ms": 66.95016100000066
+          },
+          {
+            "action": "move",
+            "ms": 66.39510500000051
+          },
+          {
+            "action": "focus",
+            "ms": 66.27501800000027
+          },
+          {
+            "action": "root",
+            "ms": 66.8298649999997
+          },
+          {
+            "action": "dark",
+            "ms": 33.3118000000004
+          },
+          {
+            "action": "light",
+            "ms": 34.66574100000071
+          }
+        ],
+        "dom": {
+          "directoryRows": 11,
+          "sourceRows": 51,
+          "declarations": 4,
+          "sceneFiles": 552,
+          "groups": 78,
+          "hidden": 0
+        },
+        "nativeRssBytes": 34893824,
+        "nativePeakBytes": 34893824,
+        "sourceSnapshotUnchanged": true
+      }
+    ],
+    "limitations": [
+      "One parser worker; optimized native host. Normal watcher/reconciliation remains active.",
+      "rAF measures scheduling, not physical presentation. Small cohorts do not qualify tails.",
+      "Native RSS excludes browser and Git children; no 16-GB machine qualification.",
+      "No agent tests, mutations or other benchmarks overlap these observations; external host activity is uncontrolled."
+    ],
+    "sourceSha256": {
+      "crates/vizzi/web/map-scene.js": "8c66b3215300029dbd59cd807d022c3bf53f06f4a5585633f401e6852cf735fe",
+      "crates/vizzi/web/directory-controls.js": "ff3ec3b172250a566872785c1e3aeb6d6e33aab5ff6d7fd831fdf5764ab1a41c",
+      "crates/vizzi/web/messages.js": "853a053183e7557f5254fdfa0488943aae3f55c8b05e88a023b246b85313f18a",
+      "crates/vizzi/web/appearance.js": "1fce2d64f3641c5232a0e1e78ae05b0653f8bf9ad5b94cafe47a6a751dd5f4b5",
+      "crates/vizzi/web/app.js": "b24a877ba87984bd1d34b45cacf51c61b7049305fb74ab5e012912fffeb9cc58",
+      "crates/vizzi/web/theme.css": "bc89e88c59a4431024f03580a158a4bf2a1da9712e6dc5dec34e3e36c0092cda",
+      "crates/vizzi/web/app.css": "488a46ae0f97a3c0989fc208e5da4cba23bf3a6a82790bc827509fd4b4bc7c72"
+    },
+    "completed": true
+  }
+}

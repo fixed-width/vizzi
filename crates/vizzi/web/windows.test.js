@@ -97,3 +97,21 @@ test('styling accepts UTF-8 byte ranges and rejects overlap, broken characters, 
  for(const change of [w=>w.lines[0].styles[0].end=3,w=>w.lines[0].styles[1].start=0,w=>w.lines[0].styles[0].kind='injected',w=>w.lines[0].styles[1].end=7,w=>w.lines[0].styles[0].start=-1,w=>w.coloring='wrong',w=>w.lines[0].styles=null,w=>w.lines[0].styles=Array(1025).fill({start:0,end:4,kind:'string'})]){data=styled();change(data);await assert.rejects(reader.prepare(v,{}));}
  data=windowFor(v);assert.ok(await reader.prepare(v,{}),'legacy plain windows remain readable');
 });
+
+test('declaration hierarchy is bounded, context-safe and backward compatible',async()=>{
+ const v=view();let data=windowFor(v);const reader=createWindowReader({transport:async()=>data});
+ data.outline[0].depth=0;data.outline[0].scope=null;data.cursor={...data.outline[0]};assert.ok(await reader.prepare(v,{}));
+ data.outline_start=1;data.outline[0]={...data.outline[0],index:1,depth:1,scope:'Enclosing scope'};data.cursor={...data.outline[0]};assert.equal((await reader.prepare(v,{})).outline[0].scope,'Enclosing scope');
+ data.outline[0].scope='界'.repeat(8);data.cursor={...data.outline[0]};assert.equal((await reader.prepare(v,{})).outline[0].scope,'界'.repeat(8));
+ const base=structuredClone(data);
+ for(const change of [w=>w.outline[0].depth=-1,w=>w.outline[0].depth=2,w=>w.outline[0].depth=.5,w=>w.outline[0].depth=null,w=>w.outline[0].depth='1',w=>w.outline[0].scope=null,w=>w.outline[0].scope='x'.repeat(25),w=>w.outline[0].scope=7,w=>{delete w.outline[0].depth;},w=>{w.outline[0].depth=0;},w=>w.cursor={...w.cursor,depth:-1}]){data=structuredClone(base);change(data);await assert.rejects(reader.prepare(v,{}),/scope|Scope/);}
+});
+
+test('style admission accepts exactly 1024 disjoint spans and rejects valid-looking aggregate overflow',async()=>{
+ const v=view();let data=windowFor(v);const reader=createWindowReader({transport:async()=>data});
+ const line=(number,count)=>({number,column:0,end_column:count*2,line_bytes:count*2,text:'x'.repeat(count*2),left:false,right:false,styles:Array.from({length:count},(_,i)=>({start:i*2,end:i*2+1,kind:'keyword'}))});
+ data.lines=[line(1,1024)];assert.equal((await reader.prepare(v,{})).lines[0].styles.length,1024);
+ data.lines=[line(1,1025)];await assert.rejects(reader.prepare(v,{}),/styling budget/);
+ data.lines=[line(1,512),line(2,512)];assert.equal((await reader.prepare(v,{})).lines.length,2);
+ data.lines=[line(1,512),line(2,513)];await assert.rejects(reader.prepare(v,{}),/styling budget/);
+});

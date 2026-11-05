@@ -1,6 +1,8 @@
+import {headingPlacement} from "/map-headings.js";
+import {workspaceLabel} from "/view-status.js";
 import {createMapModel} from "/map-scene.js";
 import {createDirectoryControls} from "/directory-controls.js";
-import {createMessage} from "/messages.js";
+import {createMessage,textRow} from "/messages.js";
 import {installAppearance,mapPalette} from "/appearance.js";
 import {coverageLabel,fileCount} from "/presentation.js";
 import {fitCamera,zoomCamera,jumpCamera} from "/camera.js";
@@ -25,7 +27,8 @@ function sample(series, value) { series.push(value); if (series.length > 512) se
 let view = null, camera = { x: 20, y: 20, scale: 1 };
 let scheduled = false, drag = null, previousFrame = null, filterTimer = null,fitMode="readable",mapSize;
 let updates, viewFilter = "",mapModel,scene,mapWorkspace;
-const messages=Object.fromEntries([["status","workspace status"],["navigation-notice","navigation notice"],["coverage","source status"],["diagnostics","source diagnostics"],["error","workspace error"],["map-notice","map notice"],["map-help","map help"]].map(([id,label])=>[id,createMessage(element(id),{label:`Dismiss ${label}`,...(id==="map-help"?{content:element(id).querySelector("span")}:{})})]));
+const dismissible=new Set(["navigation-notice","error","map-notice"]);
+const messages=Object.fromEntries([["status","workspace status"],["navigation-notice","navigation notice"],["coverage","source status"],["diagnostics","source diagnostics"],["error","workspace error"],["map-notice","map notice"]].map(([id,label])=>[id,dismissible.has(id)?createMessage(element(id),{label:`Dismiss ${label}`}):textRow(element(id))]));
 let palette=mapPalette(canvas);
 const directories=createDirectoryControls({tree:element("directory-tree"),breadcrumbs:element("map-breadcrumbs"),onChange:()=>{refreshScene();saveMap();fit(true);}});
 function refreshScene(){scene=mapModel.project();directories.apply(mapModel);metrics.scene=scene;renderCounts();}
@@ -93,8 +96,9 @@ const controller = createController({
   onStatus: (status,info) => {
     startup.receive(status,info.stream);
     element("workspace").textContent = status.name;
-    if(status.snapshot!==null)messages.status.show(status.error ? "Refresh failed; showing captured source" : status.pending ? "Analyzing changes…" : "Source ready");
+    if(status.snapshot!==null)messages.status.show(workspaceLabel(status));
     element("status").title = status.observation;
+    element("explore-workspace").setAttribute("aria-busy",String(status.pending));
     if (status.error && !(status.snapshot===null && status.pending)) showError(new Error(status.error));
     else messages.error.show(null);
   },
@@ -134,7 +138,10 @@ function draw(timestamp) {
       const r=group.rect,x=camera.x+r.x*camera.scale,y=camera.y+r.y*camera.scale,w=r.width*camera.scale,h=r.height*camera.scale;
       if(x+w<0 || y+h<0 || x>width || y>height)continue;
       context.fillStyle=palette.group;context.fillRect(x,y,w,h);context.strokeStyle=palette.border;context.lineWidth=1;context.strokeRect(x+.5,y+.5,Math.max(0,w-1),Math.max(0,h-1));
-      if(w>50 && h>18){context.save();context.beginPath();context.rect(x+3,y,w-6,Math.min(h,group.header*camera.scale));context.clip();context.fillStyle=palette.text;context.font="600 11px 'DejaVu Sans', sans-serif";context.fillText(`${group.collapsed?"▸":"▾"} ${group.label} (${group.count})`,x+5,y+13);context.restore();}
+      const title=`${group.collapsed?"▸":"▾"} ${group.label} (${group.count})`;
+      context.font="600 11px 'DejaVu Sans', sans-serif";
+      const band={x:x+3,y,width:Math.max(0,w-6),height:Math.min(h,group.header*camera.scale)},placement=headingPlacement(band,context.measureText(title));
+      if(placement){context.save();context.beginPath();context.rect(band.x,band.y,band.width,band.height);context.clip();context.fillStyle=palette.text;context.fillText(title,placement.x,placement.baseline);context.restore();}
     }
     for (const file of scene.files) {
       const rect = file.rect, x = camera.x + rect.x * camera.scale, y = camera.y + rect.y * camera.scale, w = rect.width * camera.scale, h = rect.height * camera.scale;

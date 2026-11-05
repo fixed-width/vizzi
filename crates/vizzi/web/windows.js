@@ -25,6 +25,8 @@ export function validateDocumentWindow(source, window) {
   if (size > 32768) throw new Error("Source window exceeds byte budget");
   const entry = row => {
     if (!row || !integer(row.index) || row.index >= meta.declarations || !integer(row.analysis) || !opaque(row.id) || bytes(row.name) > 128 || bytes(row.kind) > 32 || typeof row.name_truncated !== "boolean" || typeof row.kind_truncated !== "boolean" || !integer(row.start_line) || row.start_line < 1 || !integer(row.end_line) || row.end_line < row.start_line || row.end_line > meta.lines) throw new Error("Invalid outline entry");
+    if(row.depth!==undefined && (!integer(row.depth) || row.depth>row.index || row.depth>=meta.declarations || (row.depth===0?row.scope!==null:typeof row.scope!=="string" || bytes(row.scope)>24)))throw new Error("Invalid declaration scope");
+    if(row.depth===undefined && row.scope!==undefined)throw new Error("Scope without hierarchy depth");
   };
   for (const [index, row] of window.outline.entries()) { entry(row); if (row.index !== window.outline_start + index) throw new Error("Noncontiguous outline window"); }
   if ((meta.declarations > 0) !== (window.cursor !== null)) throw new Error("Invalid outline cursor");

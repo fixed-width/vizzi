@@ -118,3 +118,11 @@ footer { min-height: 36px; padding: 10px 24px; border-top: 1px solid var(--borde
 a { color:var(--link); }
 
 .message-close::before { content:"×"; }
+
+.outline-entry button { padding:4px 7px;line-height:13px; }
+.outline-entry small { padding-top:2px;line-height:11px; }
+.outline-entry[data-depth="0"] .declaration-name { font-weight:650; }
+.scope-context { display:flex;align-items:center;gap:5px;font:9px/10px "Noto Sans",sans-serif;color:var(--muted);padding-top:2px;min-width:0; }
+.scope-depth { flex:none;font-size:8px;color:var(--subdued); }
+.scope-parent { overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0; }
+#map-notice { padding:8px 24px; }

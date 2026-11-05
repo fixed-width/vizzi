@@ -35,3 +35,18 @@ Tiny histories reproduce normal and shallow revision behaviour. Pure scene tests
 containment, order, collapse, compact paths, bounded depth and mixed directories; browser
 checks cover actual interactions, theme changes, dismissals, literal styled source and
 linked selection. Run serial lower-priority mutations and scoped release observations.
+
+## Maintainer correction after `7de79b7`
+
+Dismissal applies only to ephemeral full-width status/error banners outside the main
+panes. Persistent headings, capture labels, source evidence, outline/source empty states
+and pane help remain ordinary content. Refreshing an available view keeps its readiness
+label stable; initial capture and real errors retain explicit status. Busy state can be
+communicated without momentary replacement text.
+
+At every zoom, a directory heading is either drawn completely within its header band
+or omitted when there is insufficient room. Directory controls remain available at
+small scales. Declaration names stay aligned. A compact enclosing-scope line and depth
+indicator expose lexical structure without unbounded indentation. Keep 48-pixel virtual
+rows and the source/outline payload limits. Language adapters supply parent links; do not
+infer semantic ownership from names or arbitrary overlapping source ranges.

@@ -40,6 +40,10 @@ pub struct WindowQuery {
 /// A bounded declaration description and its logical position.
 #[derive(Clone, Debug, Serialize)]
 pub struct Entry {
+    /// Depth in the emitted lexical declaration forest.
+    pub depth: usize,
+    /// Nearest emitted enclosing scope label, at most 24 UTF-8 bytes including ellipsis.
+    pub scope: Option<String>,
     /// Logical index across all configured outlines.
     pub index: usize,
     /// Analysis ordinal, preserving context membership without copying descriptors.
@@ -139,6 +143,15 @@ impl Document {
             if let Some(fact) = analysis.facts.get(offset) {
                 let lines = self.lines(&fact.span);
                 return Some(Entry {
+                    depth: self.outline_depths[index],
+                    scope: fact.parent.map(|parent| {
+                        let name = &analysis.facts[parent].name;
+                        if name.len() <= 24 {
+                            name.clone()
+                        } else {
+                            format!("{}…", label(name, 21))
+                        }
+                    }),
                     index,
                     analysis: ordinal,
                     id: self.entity_id(analysis, fact),

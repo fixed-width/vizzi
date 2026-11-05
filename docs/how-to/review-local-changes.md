@@ -68,7 +68,12 @@ clipped; Back/Forward retains those independent reading positions. The
 both guided review variants, recordings and remaining scale/usability limits.
 
 Use **Theme** for System/Light/Dark appearance. Syntax colours and type/keyword weights
-are independent of addition/removal backgrounds. Informational and error rows have ×
-controls; closing a row keeps the current comparison and its source unchanged. Repeated
+are independent of addition/removal backgrounds. Full-width ephemeral banners outside the panes have × controls; persistent capture
+labels, source evidence and pane notes stay visible. Closing a banner keeps the current comparison and its source unchanged. Repeated
 updates of the same message/context stay dismissed; a new context or operation can show
 another message.
+
+Declaration rows show compact enclosing-scope/depth context without growing indentation.
+A refresh keeps the readiness label stable while the captured comparison remains usable;
+initial capture and real failures still have explicit status. The refresh control remains
+disabled while its operation is pending.

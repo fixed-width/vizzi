@@ -120,6 +120,9 @@ pub enum SourceEncoding {
 /// A lexical declaration before binding to a workspace path.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Fact {
+    /// Ordinal of the enclosing emitted lexical scope in this analysis, always earlier.
+    #[serde(default)]
+    pub parent: Option<usize>,
     /// Lexical qualification and kind, with a duplicate ordinal when needed.
     pub key: String,
     /// Display name.
@@ -166,6 +169,7 @@ pub struct Document {
     analyses: Vec<Analysis>,
     classification: Classification,
     pub(crate) outline_index: OnceLock<BTreeMap<String, usize>>,
+    pub(crate) outline_depths: Arc<[usize]>,
 }
 
 impl Document {
@@ -240,6 +244,7 @@ impl Document {
         }
         let text = input.map_or_else(|| source.resident_text(), |input| input.text());
         let mut contexts = BTreeSet::new();
+        let mut outline_depths = Vec::new();
         for analysis in &analyses {
             if &analysis.content != content || !contexts.insert(&analysis.context.id) {
                 return Err(ModelError("analysis content or context mismatch".into()));
@@ -257,7 +262,23 @@ impl Document {
                     "deferred analysis cannot contain facts or styles".into(),
                 ));
             }
-            for fact in &analysis.facts {
+            let analysis_start = outline_depths.len();
+            for (ordinal, fact) in analysis.facts.iter().enumerate() {
+                let depth = if let Some(parent) = fact.parent {
+                    let enclosing = analysis.facts.get(parent).filter(|p| {
+                        parent < ordinal
+                            && p.span.start <= fact.span.start
+                            && fact.span.end <= p.span.end
+                            && (p.span.start < fact.span.start || fact.span.end < p.span.end)
+                    });
+                    if enclosing.is_none() {
+                        return Err(ModelError("invalid declaration parent scope".into()));
+                    }
+                    outline_depths[analysis_start + parent] + 1
+                } else {
+                    0
+                };
+                outline_depths.push(depth);
                 if !keys.insert(&fact.key)
                     || fact.span.start >= fact.span.end
                     || !text.is_some_and(|text| text.get(fact.span.clone()).is_some())
@@ -297,6 +318,7 @@ impl Document {
             analyses,
             classification,
             outline_index: OnceLock::new(),
+            outline_depths: outline_depths.into(),
         })
     }
     /// Returns the path identity.
@@ -531,6 +553,7 @@ mod tests {
             },
             coverage: Coverage::Syntax,
             facts: vec![Fact {
+                parent: None,
                 key: "fn::f".into(),
                 name: "f".into(),
                 kind: "function".into(),

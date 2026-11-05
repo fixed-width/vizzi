@@ -49,7 +49,12 @@ Requesting one row permits a larger fragment of a generated long line.
 
 Outline replies have `outline_total`, actual `outline_start`, `outline`, and a separate
 `cursor` entry or null. Entries include global `index`, analysis ordinal, entity ID,
-name/kind, truncation flags, and inclusive one-based source line bounds. Names/kinds
+name/kind, truncation flags, and inclusive one-based source line bounds. Entries now
+also carry `depth` in the emitted lexical declaration forest and nullable `scope`,
+the nearest emitted parent's display name (at most 24 UTF-8 bytes including ellipsis).
+Parents are supplied by the syntax adapter, not inferred from overlapping spans.
+Depth is per analysis context and counts emitted named scopes, not every source block.
+Legacy adapters without parent links remain flat. Names/kinds
 are at most 128/32 UTF-8 bytes, respectively. The cursor can lie outside the page.
 
 These count/text/name limits also bound JSON escaping and fixed metadata. Adversarial

@@ -9,7 +9,9 @@ resource limits, option termination and tag peeling. Trial history preparation u
 local Git objects, preserves the pinned worktree/index, and is separate from application
 capture (which never fetches).
 
-A small message module owns text, dismissal identity and close controls. Both pages call
+Only external full-width ephemeral banners use dismissal. Persistent pane content and
+inline readiness labels use idempotent text updates. A small message module owns text,
+dismissal identity and close controls. Both pages call
 it rather than replacing entire message containers. One current dismissal is retained per
 row, not an unbounded notification history. Source availability details remain factual.
 
@@ -35,3 +37,13 @@ Default order is directories first, alphabetically within a parent. Manual order
 to siblings. Persistence is per workspace, not snapshot or filename selection. Source/filter
 requests still use native snapshot/file/version identities. Keep the current camera unless
 layout changes require a refit; restore a historical camera only for the same layout revision.
+
+The declaration refinement adds optional local-parent ordinals to facts. Built-in adapters
+link named syntax scopes during their existing tree traversal. Document admission validates
+earlier-parent ordering and strict source containment, and builds one compact depth array.
+Window projection returns only depth and a 24-byte nearest-parent label. This metadata
+participates in analysis/document identity and built-in cache fingerprints. No source parsing
+or ancestor-chain traversal occurs during viewport queries. Row height remains 48 pixels.
+Canvas headings use measured glyph ascent/descent; insufficient header bands suppress the
+label entirely rather than clipping its vertical bounds. Readiness labels stay stable while
+a captured view is usable; pending work has busy state and existing disabled controls.
