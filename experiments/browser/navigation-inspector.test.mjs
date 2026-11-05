@@ -61,7 +61,7 @@ async function fixture(initial="a") {
 test("inspector restores source, outline and cursor with bounded windows; normal selection still reveals its declaration",async()=>{
   const page=await fixture();try{
     await page.locator("#source").evaluate(n=>{n.scrollTop=880;});
-    await page.locator("#outline button").first().focus();await page.keyboard.press("End");await paint(page);
+    await page.locator("#outline button[data-declaration]").first().focus();await page.keyboard.press("End");await paint(page);
     const saved=await page.evaluate(()=>window.widget.position());
     assert.equal(saved.cursorIndex,49);
     await page.evaluate(()=>window.show(window.meta("c")));
@@ -71,13 +71,13 @@ test("inspector restores source, outline and cursor with bounded windows; normal
     await page.evaluate(saved=>window.show(window.meta("a"),saved),saved);
     assert.deepEqual(await page.evaluate(()=>window.widget.position()),saved);
     assert.ok((await page.locator("#source").textContent()).includes("line a 41"));
-    assert.ok(await page.locator(".code-line").count()<=96);assert.ok(await page.locator("#outline button").count()<=200);
+    assert.ok(await page.locator(".code-line").count()<=96);assert.ok(await page.locator("#outline button[data-declaration]").count()<=200);
     await page.evaluate(()=>window.show(window.meta("a","a","s",30)));
     assert.equal(await page.locator("#source").evaluate(n=>n.scrollTop),(241-4)*22);
     assert.equal(await page.evaluate(()=>window.widget.position().cursorIndex),30);
     assert.equal(await page.locator("#outline").evaluate(n=>{const b=n.querySelector('[aria-current="true"]').getBoundingClientRect(),r=n.getBoundingClientRect();return b.top>=r.top&&b.bottom<=r.bottom;}),true);
     await page.locator("#source").evaluate(n=>{n.scrollTop=8000;});
-    await page.locator("#outline button[tabindex='0']").focus();await page.keyboard.press("End");await paint(page);
+    await page.locator("#outline button[data-declaration][tabindex='0']").focus();await page.keyboard.press("End");await paint(page);
     const manual=await page.evaluate(()=>window.widget.position());
     await page.evaluate(()=>window.show(window.meta("b")));
     await page.evaluate(p=>window.show(window.meta("a","a","s",30),p),manual);
@@ -200,13 +200,13 @@ test("ordinary source window loads do not force horizontal reading to the end of
 test("pending keyboard activation waits for the remote cursor, stays focused and does not repeat on later windows",async()=>{
   const page=await fixture("many");try {
     await page.evaluate(()=>{window.pauseTarget=true;window.targetGate=new Promise(r=>{window.releaseTarget=r;});});
-    await page.locator("#outline button").first().focus();await page.keyboard.press("End");await page.waitForFunction(()=>window.targetRequested);await page.keyboard.press("Enter");assert.deepEqual(await page.evaluate(()=>window.activations),[]);
+    await page.locator("#outline button[data-declaration]").first().focus();await page.keyboard.press("End");await page.waitForFunction(()=>window.targetRequested);await page.keyboard.press("Enter");assert.deepEqual(await page.evaluate(()=>window.activations),[]);
     await page.evaluate(()=>{window.pauseTarget=false;window.releaseTarget();});await page.waitForFunction(()=>window.activations.length===1);
     assert.deepEqual(await page.evaluate(()=>window.activations),["many-e499"]);assert.equal(await page.evaluate(()=>document.activeElement.dataset.declaration),"many-e499");
     await page.locator("#source").evaluate(n=>{n.scrollTop=2200;});
     try{await page.waitForFunction(()=>[...document.querySelectorAll("#source .source-text")].some(n=>n.textContent==="line many 101"));}catch(error){console.log("pending-cursor diagnostic",await page.evaluate(()=>({position:window.widget.position(),calls:window.calls.slice(-4),errors:window.errors,rows:[...document.querySelectorAll("#source .source-text")].slice(0,3).map(n=>n.textContent)})));throw error;}
     assert.equal(await page.evaluate(()=>window.activations.length),1);
-    await page.locator("#outline").evaluate(n=>{n.scrollTop=0;});await paint(page);await page.waitForFunction(()=>document.querySelector('#outline button[data-index="0"]'));await page.keyboard.press("Enter");await paint(page);
+    await page.locator("#outline").evaluate(n=>{n.scrollTop=0;});await paint(page);await page.waitForFunction(()=>document.querySelector('#outline button[data-declaration][data-index="0"]'));await page.keyboard.press("Enter");await paint(page);
     assert.deepEqual(await page.evaluate(()=>window.activations),["many-e499","many-e499"]);assert.deepEqual(await page.evaluate(()=>window.errors),[]);
   } finally {await page.close();}
 });
@@ -233,8 +233,8 @@ test("restored positions clamp to the viewport; changed-version anchor adjustmen
     const saved=await page.evaluate(()=>window.widget.position());
     assert.equal(saved.sourceTop,500*22-220);assert.equal(saved.outlineTop,50*48-240);
     assert.ok((await page.locator("#source").textContent()).includes("line a 491"));
-    assert.equal(await page.locator('#outline button[data-index="45"]').count(),1);
-    await page.locator("#outline button[tabindex='0']").focus();
+    assert.equal(await page.locator('#outline button[data-declaration][data-index="45"]').count(),1);
+    await page.locator("#outline button[data-declaration][tabindex='0']").focus();
     await page.evaluate(()=>{window.adjustAnchor=true;return window.show(window.meta("a","v2","s2"));});
     const query=await page.evaluate(()=>window.calls.at(-1));
     assert.equal(query.previous_snapshot,"s");assert.equal(query.cursor,"a-e49");assert.equal(query.anchor,"a-e45");assert.equal(query.anchor_offset,"8");
@@ -243,9 +243,9 @@ test("restored positions clamp to the viewport; changed-version anchor adjustmen
     await page.evaluate(()=>window.show(window.meta("a","v3","s3")));
     assert.equal(await page.evaluate(()=>window.calls.at(-1).cursor),"a-e49");
     assert.equal(await page.evaluate(()=>document.activeElement.id),"source");
-    await page.locator("#outline button[tabindex='0']").focus();
+    await page.locator("#outline button[data-declaration][tabindex='0']").focus();
     await page.evaluate(()=>window.show({snapshot:"empty",source:null,selection:{file:null,entity:null}}));
-    assert.equal(await page.locator(".code-line").count(),0);assert.equal(await page.locator("#outline button").count(),0);
+    assert.equal(await page.locator(".code-line").count(),0);assert.equal(await page.locator("#outline button[data-declaration]").count(),0);
     assert.equal(await page.locator("#outline").evaluate(n=>document.activeElement===n),true);
     await page.evaluate(()=>window.show(window.meta("a")));
     assert.equal(await page.locator(".source-empty").count(),0);
@@ -263,7 +263,7 @@ test("preparation does not change live state and empty/restored views preserve k
     const prepared=await page.evaluate(()=>window.widget.prepare({snapshot:"empty",source:null,selection:{file:null,entity:null}}));
     assert.equal(prepared.source,null);assert.equal(prepared.inspection,null);
     assert.deepEqual(await page.evaluate(()=>window.widget.position()),before);
-    await page.evaluate(()=>{document.body.style.paddingTop="1200px";document.body.style.height="3000px";document.querySelector("#outline button").focus({preventScroll:true});});
+    await page.evaluate(()=>{document.body.style.paddingTop="1200px";document.body.style.height="3000px";document.querySelector("#outline button[data-declaration]").focus({preventScroll:true});});
     const scroll=await page.evaluate(()=>scrollY);
     await page.evaluate(()=>window.show({snapshot:"empty",source:null,selection:{file:null,entity:null}}));
     assert.equal(await page.locator("#outline").evaluate(n=>document.activeElement===n),true);
@@ -279,7 +279,7 @@ test("changed-context returns reveal current code or the file start even when fi
   const page=await fixture();try{
     await page.evaluate(()=>window.show(window.meta("a","a","s",30)));
     await page.locator("#source").evaluate(n=>{n.scrollTop=8000;});
-    await page.locator("#outline button[tabindex='0']").focus();await page.keyboard.press("End");
+    await page.locator("#outline button[data-declaration][tabindex='0']").focus();await page.keyboard.press("End");
     await page.evaluate(()=>window.show(window.meta("a","a","s",30),undefined,true));
     assert.equal(await page.locator("#source").evaluate(n=>n.scrollTop),(241-4)*22);
     assert.equal(await page.evaluate(()=>window.widget.position().cursorIndex),30);

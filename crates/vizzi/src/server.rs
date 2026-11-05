@@ -84,6 +84,12 @@ pub fn router(application: Arc<Application>) -> Router {
         .route("/presentation.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/presentation.js")) }))
         .route("/camera.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/camera.js")) }))
         .route("/splitter.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/splitter.js")) }))
+        .route("/map-scene.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/map-scene.js")) }))
+        .route("/directory-controls.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/directory-controls.js")) }))
+        .route("/messages.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/messages.js")) }))
+        .route("/appearance.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/appearance.js")) }))
+        .route("/theme-init.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/theme-init.js")) }))
+        .route("/theme.css", get(|| async { asset("text/css; charset=utf-8", include_str!("../web/theme.css")) }))
         .route("/app.css", get(|| async { asset("text/css; charset=utf-8", include_str!("../web/app.css")) }))
         .layer(axum::middleware::map_response(|mut response: Response| async move {
             response.headers_mut().insert(header::CACHE_CONTROL, header::HeaderValue::from_static("no-store"));

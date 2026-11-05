@@ -168,7 +168,8 @@ async function inspectAndPick(page, host) {
   const view = await (await fetch(`${host.url}/api/view`)).json();
   const frame = await page.evaluate(() => window.vizziMetrics.lastFrame);
   const bounds = await page.locator("#map").boundingBox();
-  const target = view.files.filter(file => file.classification.kind === "assigned" && file.coverage !== "unavailable" && file.bytes < 131072).find(file => file.rect.y * frame.camera.scale + frame.camera.y + file.rect.height * frame.camera.scale < frame.height - 20);
+  const scene=await page.evaluate(()=>window.vizziMetrics.scene);
+  const target = scene.files.filter(file => file.classification.kind === "assigned" && file.coverage !== "unavailable" && file.bytes < 131072).find(file => file.rect.y * frame.camera.scale + frame.camera.y + file.rect.height * frame.camera.scale < frame.height - 20);
   assert.ok(target);
   const x = bounds.x + frame.camera.x + (target.rect.x + target.rect.width / 2) * frame.camera.scale;
   const y = bounds.y + frame.camera.y + (target.rect.y + target.rect.height / 2) * frame.camera.scale;
@@ -240,7 +241,7 @@ async function largeSource(page, input, host, file) {
   return { path, bytes: file.bytes, openMs, editToDomAndTwoRafMs: editMs, measurements: status.measurements,
     openFrames: summary(openProbe.frames.map(frame => frame.duration)), openLongFrames: openProbe.longFrames,
     editFrames: summary(editProbe.frames.map(frame => frame.duration)), editLongFrames: editProbe.longFrames,
-    renderedLines: await page.locator(".code-line").count(), outlineButtons: await page.locator("#outline button").count() };
+    renderedLines: await page.locator(".code-line").count(), outlineButtons: await page.locator("#outline button[data-declaration]").count() };
 }
 
 async function qualify(chromium, definition) {

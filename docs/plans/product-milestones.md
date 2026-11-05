@@ -227,3 +227,8 @@ revalidation target. An experiment's unanswered follow-up is not sufficient by i
 Do not gate these milestones on exhaustive pressure testing, a GPU comparison or all
 language relationships. Reopen those questions when the workflows supply the relevant
 requirements. Stronger usability, portability and hardware claims remain separate gates.
+
+The [second maintainer orientation response](../../experiments/usability/ORIENTATION_RESULTS.md)
+adds actual directory containment and personal ordering/collapse, dismissible messages,
+system/explicit appearance and stronger syntax colours. It also corrects the trial
+history limitation; independent comprehension acceptance remains open.

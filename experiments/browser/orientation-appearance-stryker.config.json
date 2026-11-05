@@ -1,0 +1,41 @@
+{
+  "$schema": "../../node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "mutate": [
+    "crates/vizzi/web/messages.js",
+    "crates/vizzi/web/appearance.js",
+    "crates/vizzi/web/theme-init.js"
+  ],
+  "testRunner": "command",
+  "commandRunner": {
+    "command": "node experiments/browser/appearance.test.mjs"
+  },
+  "coverageAnalysis": "off",
+  "concurrency": 1,
+  "timeoutMS": 6000,
+  "reporters": [
+    "clear-text",
+    "json"
+  ],
+  "clearTextReporter": {
+    "reportMutants": false,
+    "logTests": false
+  },
+  "jsonReporter": {
+    "fileName": "experiments/browser/results/local/orientation-appearance-mutations.json"
+  },
+  "ignorePatterns": [
+    "target",
+    "docs",
+    "crates/vizzi-core",
+    "crates/vizzi-perf",
+    "crates/vizzi/src",
+    "crates/vizzi/tests",
+    "experiments/browser/results",
+    "experiments/memory-envelope",
+    "experiments/learning-workflow",
+    "experiments/review-workflow/results"
+  ],
+  "thresholds": {
+    "break": 100
+  }
+}

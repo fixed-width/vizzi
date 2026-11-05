@@ -1,0 +1,50 @@
+import {test,before,after} from 'node:test';import assert from 'node:assert/strict';import {readFile} from 'node:fs/promises';import {resolve} from 'node:path';
+import {browser,paint} from './support.mjs';import {INSTRUMENTER_CONSTANTS as stryker} from '@stryker-mutator/api/core';
+let chromium;before(async()=>{chromium=await browser({desktopBus:false});});after(async()=>{await chromium.close();});
+async function fixture(){
+ const page=await chromium.newPage();page.setDefaultTimeout(1000);page.errors=[];page.on('pageerror',e=>page.errors.push(e.message));
+ await page.addInitScript(({namespace,field,active,hitCount,hitLimit})=>{globalThis[namespace]={[field]:active,[hitCount]:0,[hitLimit]:1000000};},{namespace:stryker.NAMESPACE,field:stryker.ACTIVE_MUTANT,active:process.env[stryker.ACTIVE_MUTANT_ENV_VARIABLE],hitCount:stryker.HIT_COUNT,hitLimit:stryker.HIT_LIMIT});
+ await page.route('http://fixture/**',async route=>{const path=new URL(route.request().url()).pathname;if(path==='/')return route.fulfill({contentType:'text/html',body:'<meta charset="utf-8"><link rel="stylesheet" href="/theme.css"><link rel="stylesheet" href="/app.css"><div id="directory-tree" style="width:500px"></div><nav id="breadcrumbs"></nav>'});return route.fulfill({contentType:path.endsWith('.css')?'text/css; charset=utf-8':'text/javascript; charset=utf-8',body:await readFile(resolve('crates/vizzi/web'+path),'utf8')});});
+ await page.goto('http://fixture/');await page.evaluate(async()=>{const {createMapModel}=await import('/map-scene.js'),{createDirectoryControls}=await import('/directory-controls.js');window.files=paths=>paths.map((path,i)=>({id:'f'+i,path,bytes:10}));window.model=createMapModel(files(['src/compiler/a.rs','src/runtime/b.rs','tests/test.rs']));window.controls=createDirectoryControls({tree:document.querySelector('#directory-tree'),breadcrumbs:document.querySelector('#breadcrumbs'),onChange:()=>{window.scene=model.project();}});controls.apply(model);window.scene=model.project();});await paint(page);
+ const states=await page.locator('[data-directory]').evaluateAll(rows=>rows.map(r=>({path:r.dataset.directory,buttons:[...r.querySelectorAll('button')].map(b=>[b.getAttribute('aria-label'),b.disabled])})));
+ assert.equal(states.length,4);for(const row of states){assert.deepEqual(row.buttons.map(b=>b[0]),[`Collapse directory ${row.path}`,`Focus directory ${row.path}`,`Move ${row.path} earlier`,`Move ${row.path} later`]);}return page;
+}
+test('directory buttons collapse, expand, focus and reorder the displayed model',async()=>{const page=await fixture();try{
+ await page.getByRole('button',{name:'Collapse directory src',exact:true}).click();assert.equal(await page.getByRole('treeitem').count(),2);assert.equal(await page.evaluate(()=>scene.files.length),1);
+ await page.getByRole('button',{name:'Expand directory src',exact:true}).click();assert.equal(await page.getByRole('treeitem').count(),4);
+ await page.getByRole('button',{name:'Move src/runtime earlier',exact:true}).click();assert.deepEqual(await page.locator('[data-directory]').evaluateAll(rows=>rows.map(r=>r.dataset.directory)),['src','src/runtime','src/compiler','tests']);
+ await page.getByRole('button',{name:'Move src/runtime later',exact:true}).click();assert.deepEqual(await page.locator('[data-directory]').evaluateAll(rows=>rows.map(r=>r.dataset.directory)),['src','src/compiler','src/runtime','tests']);
+ await page.getByRole('button',{name:'Focus directory src/compiler',exact:true}).click();assert.equal(await page.evaluate(()=>scene.focus),'src/compiler');assert.equal(await page.locator('#breadcrumbs [aria-current]').textContent(),'compiler');await page.getByRole('button',{name:'Repository root',exact:true}).click();assert.equal(await page.evaluate(()=>scene.focus),'.');assert.deepEqual(page.errors,[]);
+}finally{await page.close();}});
+test('dragging and keyboard commands keep focus, order and expansion coherent',async()=>{const page=await fixture();try{
+ await page.locator('[data-directory="src/runtime"]').dragTo(page.locator('[data-directory="src/compiler"]'));assert.deepEqual(await page.locator('[data-directory]').evaluateAll(rows=>rows.map(r=>r.dataset.directory)),['src','src/runtime','src/compiler','tests']);
+ const name=page.getByRole('button',{name:'Focus directory src/runtime',exact:true});await name.focus();await page.keyboard.press('Alt+ArrowDown');assert.equal(await page.evaluate(()=>document.activeElement.dataset.focusDirectory),'src/runtime');await page.keyboard.press('Alt+ArrowUp');
+ await page.getByRole('button',{name:'Focus directory src',exact:true}).focus();await page.keyboard.press('ArrowLeft');assert.equal(await page.getByRole('treeitem').count(),2);await page.keyboard.press('ArrowRight');assert.equal(await page.getByRole('treeitem').count(),4);await page.keyboard.press('ArrowDown');assert.equal(await page.evaluate(()=>document.activeElement.dataset.focusDirectory),'src/runtime');await page.keyboard.press('Home');assert.equal(await page.evaluate(()=>document.activeElement.dataset.focusDirectory),'src');assert.deepEqual(page.errors,[]);
+}finally{await page.close();}});
+test('remote directory navigation virtualises thousands of controls and metadata updates preserve focus',async()=>{const page=await fixture();try{
+ await page.evaluate(()=>{const {createMapModel}=window;});
+ await page.evaluate(async()=>{const {createMapModel}=await import('/map-scene.js');model=createMapModel(files(Array.from({length:2000},(_,i)=>`dir${String(i).padStart(4,'0')}/a.rs`)));controls.apply(model);});
+ assert.ok(await page.getByRole('treeitem').count()<=64);await page.getByRole('button',{name:'Focus directory dir0000',exact:true}).focus();await page.keyboard.press('End');await paint(page);assert.equal(await page.evaluate(()=>document.activeElement.dataset.focusDirectory),'dir1999');assert.ok(await page.getByRole('treeitem').count()<=64);await page.keyboard.press('ArrowUp');assert.equal(await page.evaluate(()=>document.activeElement.dataset.focusDirectory),'dir1998');
+ await page.evaluate(()=>{model.setFiles(files(Array.from({length:2000},(_,i)=>`dir${String(i).padStart(4,'0')}/a.rs`)).map(f=>({...f,bytes:99})));controls.apply(model);});assert.equal(await page.evaluate(()=>document.activeElement.dataset.focusDirectory),'dir1998');await page.keyboard.press('Home');assert.equal(await page.evaluate(()=>document.activeElement.dataset.focusDirectory),'dir0000');assert.deepEqual(page.errors,[]);
+}finally{await page.close();}});
+
+test('boundary and unrelated keys are harmless; repeated collapse/expand is idempotent',async()=>{const page=await fixture();try{
+ await page.locator('#directory-tree').focus();await page.keyboard.press('ArrowDown');
+ const name=page.getByRole('button',{name:'Focus directory src',exact:true});await name.focus();await page.keyboard.press('ArrowLeft');await page.keyboard.press('ArrowLeft');assert.equal(await page.getByRole('treeitem').count(),2);await page.keyboard.press('ArrowRight');await page.keyboard.press('ArrowRight');assert.equal(await page.getByRole('treeitem').count(),4);
+ await page.keyboard.press('x');await page.keyboard.press('Home');await page.keyboard.press('ArrowUp');assert.equal(await page.evaluate(()=>document.activeElement.dataset.focusDirectory),'src');
+ await page.getByRole('button',{name:'Focus directory src/compiler',exact:true}).focus();const revision=await page.evaluate(()=>model.revision);await page.keyboard.press('Alt+ArrowUp');assert.equal(await page.evaluate(()=>model.revision),revision);
+ await page.getByRole('button',{name:'Focus directory src/runtime',exact:true}).focus();await page.keyboard.press('Alt+ArrowDown');assert.equal(await page.evaluate(()=>model.revision),revision);
+ await page.locator('[data-directory="src/runtime"]').dragTo(page.locator('[data-directory="tests"]'));assert.equal(await page.evaluate(()=>model.revision),revision);assert.deepEqual(page.errors,[]);
+}finally{await page.close();}});
+test('directory row geometry, disclosure state and complete path labels match the projected hierarchy',async()=>{const page=await fixture();try{
+ const rows=await page.locator('[data-directory]').evaluateAll(nodes=>nodes.map(n=>({path:n.dataset.directory,title:n.title,label:n.getAttribute('aria-label'),level:n.getAttribute('aria-level'),expanded:n.getAttribute('aria-expanded'),draggable:n.draggable,top:n.getBoundingClientRect().top,height:n.getBoundingClientRect().height,padding:parseFloat(getComputedStyle(n).paddingLeft)})));
+ assert.equal(rows.length,4);for(let i=0;i<rows.length;i++){assert.equal(rows[i].label,rows[i].path);assert.equal(rows[i].title,rows[i].path);assert.equal(rows[i].draggable,true);assert.equal(rows[i].expanded,'true');assert.equal(rows[i].height,28);if(i)assert.ok(rows[i].top-rows[i-1].top>=28);}
+ assert.equal(rows[0].level,'1');assert.equal(rows[1].level,'2');assert.ok(rows[1].padding-rows[0].padding>=8);assert.equal(rows[2].padding,rows[1].padding);assert.equal(rows[3].padding,rows[0].padding);
+ await page.getByRole('button',{name:'Collapse directory src',exact:true}).click();assert.equal(await page.locator('[data-directory="src"]').getAttribute('aria-expanded'),'false');assert.deepEqual(page.errors,[]);
+}finally{await page.close();}});
+
+test('later moves advance one sibling in groups with three directories',async()=>{const page=await fixture();try{
+ await page.evaluate(async()=>{const {createMapModel}=await import('/map-scene.js');model=createMapModel(files(['p/a/x.rs','p/b/y.rs','p/c/z.rs']));controls.apply(model);});
+ await page.getByRole('button',{name:'Move p/a later',exact:true}).click();assert.deepEqual(await page.locator('[data-directory]').evaluateAll(rows=>rows.map(r=>r.dataset.directory)),['p','p/b','p/a','p/c']);
+ await page.getByRole('button',{name:'Focus directory p/b',exact:true}).focus();await page.keyboard.press('Alt+ArrowDown');assert.deepEqual(await page.locator('[data-directory]').evaluateAll(rows=>rows.map(r=>r.dataset.directory)),['p','p/a','p/b','p/c']);assert.deepEqual(page.errors,[]);
+}finally{await page.close();}});

@@ -1,3 +1,4 @@
+import {createMessage} from "/messages.js";
 import {kindGroup,renderStyledText} from "/presentation.js";
 import { createWindowReader } from "/windows.js";
 
@@ -9,6 +10,8 @@ export function createInspector({ source, space, outline, transport, select, onE
   let view, data, sourceRows = new Map(), entries = new Map(), cursor = 0, scheduled = false, queuedActivation = false;
   let columnLine, column = 0;
   const sourceNodes = new Map(), outlineNodes = new Map();
+  const emptyNote=document.createElement("p");emptyNote.className="source-empty";const emptyMessage=createMessage(emptyNote,{label:"Dismiss source availability"});
+  const emptyOutline=document.createElement("p");emptyOutline.className="outline-empty";const emptyOutlineMessage=createMessage(emptyOutline,{label:"Dismiss declaration availability"});
   const focused = () => outline.contains(document.activeElement) ? document.activeElement.closest("button[data-declaration]")?.dataset.declaration : undefined;
   function ranges(sourceTop = source.scrollTop, outlineTop = outline.scrollTop) {
     return {line_start:Math.max(1,Math.floor(sourceTop/SOURCE_ROW)-16+1),line_count:96,outline_start:Math.max(0,Math.floor(outlineTop/OUTLINE_ROW)-8),outline_count:200,cursor_index:cursor,column_line:columnLine,column};
@@ -42,7 +45,7 @@ export function createInspector({ source, space, outline, transport, select, onE
   function focusCursor() { const row=entries.get(cursor); if(row)outlineNodes.get(row.id)?.button.focus({preventScroll:true}); }
   function renderSource() {
     if(!view?.source || !view.source.summary.lines) {
-      sourceNodes.clear();space.replaceChildren();const note=document.createElement("p");note.className="source-empty";note.textContent=view?.source?"Source encoding is unavailable in this inspector.":emptyText;space.append(note);return;
+      sourceNodes.clear();space.replaceChildren(emptyNote);emptyMessage.show(view?.source?"Source encoding is unavailable in this inspector.":emptyText,view?.source?.version);return;
     }
     const first=Math.max(1,Math.floor(source.scrollTop/SOURCE_ROW)-16+1),last=Math.min(view.source.summary.lines+1,Math.ceil((source.scrollTop+source.clientHeight)/SOURCE_ROW)+17,first+96);
     for(const [number,node] of sourceNodes)if(number<first || number>=last || !sourceRows.has(number)){node.row.remove();sourceNodes.delete(number);}
@@ -65,7 +68,7 @@ export function createInspector({ source, space, outline, transport, select, onE
   }
   function renderOutline() {
     const total=view?.source?.summary.declarations ?? 0;
-    if(!total) {outlineNodes.clear();outlineSpace.replaceChildren();outline.tabIndex=0;const note=document.createElement("p");note.textContent="No declarations extracted";outlineSpace.append(note);return;}
+    if(!total) {outlineNodes.clear();outlineSpace.replaceChildren(emptyOutline);outline.tabIndex=0;emptyOutlineMessage.show("No declarations extracted",view?.source?.version);return;}
     outline.tabIndex=-1;
     const first=Math.max(0,Math.floor(outline.scrollTop/OUTLINE_ROW)-8),last=Math.min(total,Math.ceil((outline.scrollTop+outline.clientHeight)/OUTLINE_ROW)+8,first+199);
     const wanted=new Set();for(let i=first;i<last;i++)if(entries.has(i))wanted.add(i);if(entries.has(cursor))wanted.add(cursor);

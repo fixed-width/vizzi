@@ -19,12 +19,13 @@ def main():
     parser.add_argument("--source", type=Path, required=True)
     parser.add_argument("--variant", choices=("variant-a", "variant-b"), required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--history", action="store_true", help="Include local source history for a maintainer revision trial; no network access")
     args = parser.parse_args()
     oracle = json.loads((FIXTURES / "oracle.json").read_text())
     pin = oracle["base_revision"]
     env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
     env.update(GIT_CONFIG_NOSYSTEM="1", GIT_CONFIG_GLOBAL="/dev/null",
-               GIT_OPTIONAL_LOCKS="0", GIT_TERMINAL_PROMPT="0")
+               GIT_OPTIONAL_LOCKS="0", GIT_TERMINAL_PROMPT="0", GIT_NO_LAZY_FETCH="1")
 
     def git(root, *command, data=None):
         return subprocess.run(
@@ -65,7 +66,16 @@ def main():
         raise ValueError("archive does not reproduce the pinned Git tree")
     if git(workspace, "hash-object", "-t", "commit", "-w", "--stdin", data=commit).strip().decode() != pin:
         raise ValueError("baseline commit identity changed")
-    (workspace / ".git" / "shallow").write_text(pin + "\n")
+    if args.history:
+        with tempfile.TemporaryFile() as pack:
+            subprocess.run(["git", "-C", str(source), "-c", "core.hooksPath=/dev/null",
+                            "pack-objects", "--stdout", "--all", "--threads=1"],
+                           stdout=pack, check=True, env=env)
+            pack.seek(0)
+            subprocess.run(["git", "-C", str(workspace), "index-pack", "--stdin"],
+                           stdin=pack, stdout=subprocess.PIPE, check=True, env=env)
+    else:
+        (workspace / ".git" / "shallow").write_text(pin + "\n")
     git(workspace, "update-ref", "refs/heads/review", pin)
     if git(workspace, "status", "--porcelain=v1", "-z"):
         raise ValueError("baseline is not clean")

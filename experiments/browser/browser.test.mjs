@@ -40,8 +40,8 @@ test("a large outline keeps bounded DOM and keyboard/source identity across edit
     await page.locator("summary").click();
     await page.getByRole("button", { name: "zzz/large.rs", exact: true }).click();
     await page.waitForFunction(() => document.getElementById("file-title").textContent === "zzz/large.rs");
-    assert.ok(await page.locator("#outline button").count() <= 200);
-    await page.locator("#outline button").first().focus();
+    assert.ok(await page.locator("#outline button[data-declaration]").count() <= 200);
+    await page.locator("#outline button[data-declaration]").first().focus();
     await page.keyboard.press("End");
     await page.waitForFunction(() => document.activeElement?.textContent.startsWith("item_49999"));
     assert.equal(await page.locator("#outline [role=listitem]").last().getAttribute("aria-setsize"), "50000");
@@ -52,7 +52,7 @@ test("a large outline keeps bounded DOM and keyboard/source identity across edit
     await writeFile(join(input.root, "zzz/large.rs"), "// moved\n" + largeOutline);
     await page.waitForFunction(previous => document.getElementById("snapshot").title !== previous, snapshot);
     assert.ok((await page.locator('#outline [aria-current=true]').textContent()).startsWith("item_49999"));
-    assert.ok(await page.locator("#outline button").count() <= 200);
+    assert.ok(await page.locator("#outline button[data-declaration]").count() <= 200);
     await page.keyboard.press("Home");
     await page.waitForFunction(() => document.activeElement?.textContent.startsWith("item_00000"));
     await page.keyboard.press("ArrowDown"); await page.keyboard.press("Space");
@@ -72,14 +72,14 @@ test("source-only headers expose reasons, encoding, and pinned metadata without 
     assert.ok((await page.locator("#coverage").textContent()).includes("Source only"));
     assert.ok((await page.locator("#diagnostics").textContent()).includes("language is unassigned"));
     assert.ok((await page.locator("#source").textContent()).includes("struct Header;"));
-    assert.equal(await page.locator("#outline button").count(), 0);
+    assert.equal(await page.locator("#outline button[data-declaration]").count(), 0);
     assert.ok((await page.locator("#counts").textContent()).includes("12 files"));
     const view = await (await fetch(`${host.url}/api/view?filter=shared.h`)).json();
     assert.equal(view.schema, 2); assert.equal(view.analyzed, 9); assert.equal(view.source_only, 3);
     assert.equal(view.source.classification.reason, "language_unassigned");
     assert.equal(view.source.encoding, "utf8");
     const full = await (await fetch(`${host.url}/api/view`)).json();
-    const tile = full.files.find(file => file.id === view.selection.file);
+    const tile = await page.evaluate(id=>window.vizziMetrics.scene.files.find(file=>file.id===id),view.selection.file);
     await paint(page);
     const bounds = await page.locator("#map").boundingBox();
     const camera = await page.evaluate(() => window.vizziMetrics.lastFrame.camera);
@@ -192,7 +192,7 @@ test("an edit preserves declaration selection and the reader's scroll position",
     await page.locator("summary").click();
     await page.getByRole("button", { name: "src/a.rs", exact: true }).click();
     await page.getByRole("button", { name: /^Reveal function anchor starting at Line/ }).click();
-    await page.waitForFunction(() => document.querySelector('#outline button[aria-current="true"]')?.textContent.startsWith("anchor"));
+    await page.waitForFunction(() => document.querySelector('#outline button[data-declaration][aria-current="true"]')?.textContent.startsWith("anchor"));
     await page.locator("#source").evaluate(node => { node.scrollTop = 150000; });
     await paint(page);
     const before = await page.locator("#source").evaluate(node => node.scrollTop);
@@ -216,7 +216,7 @@ test("map picking remains linked to source after zoom and keyboard pan", async (
   const { page } = session;
   try {
     const view = await (await fetch(`${host.url}/api/view`)).json();
-    const target = view.files.find(file => file.path === "src/b.rs");
+    const target = await page.evaluate(()=>window.vizziMetrics.scene.files.find(file=>file.path==="src/b.rs"));
     await paint(page);
     const bounds = await page.locator("#map").boundingBox();
     const position = async () => {
@@ -323,7 +323,7 @@ test("deferred files stay readable and resume outlines after an admitted edit", 
     assert.ok((await page.locator("#source").textContent()).includes("deferred source stays readable"));
     assert.ok((await page.locator("#diagnostics").textContent()).includes("per-file"));
     assert.ok((await page.locator("#counts").textContent()).includes("1 awaiting analysis"));
-    assert.equal(await page.locator("#outline button").count(),0);
+    assert.equal(await page.locator("#outline button[data-declaration]").count(),0);
     const old=await (await fetch(`${live.url}/api/view`)).json();
     assert.equal(old.deferred,1);assert.equal(old.source.classification.kind,"assigned");
     assert.equal(old.source.outlines[0].coverage,"deferred");

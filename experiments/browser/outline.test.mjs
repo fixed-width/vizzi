@@ -48,11 +48,11 @@ async function checkGeometry(page) {
 test("logical keyboard navigation reaches offscreen rows with bounded DOM and full list positions", async () => {
   const page = await fixture();
   try {
-    assert.ok(await page.locator("#outline button").count() <= 200);
-    assert.ok(await page.locator("#outline button").count() <= await page.locator("#outline").evaluate(node => Math.ceil(node.clientHeight / 48) + 18));
-    for (let index = 0; index < 7; index++) assert.equal(await page.locator(`#outline button[data-declaration="f${index}"]`).count(), 1);
+    assert.ok(await page.locator("#outline button[data-declaration]").count() <= 200);
+    assert.ok(await page.locator("#outline button[data-declaration]").count() <= await page.locator("#outline").evaluate(node => Math.ceil(node.clientHeight / 48) + 18));
+    for (let index = 0; index < 7; index++) assert.equal(await page.locator(`#outline button[data-declaration][data-declaration="f${index}"]`).count(), 1);
     assert.equal(await page.locator("#outline [role=listitem]").first().getAttribute("aria-posinset"), "1");
-    await page.locator("#outline button").first().focus();
+    await page.locator("#outline button[data-declaration]").first().focus();
     await page.evaluate(() => {
       window.keyDefaults = [];
       document.getElementById("outline").addEventListener("keydown", event => window.keyDefaults.push({ key: event.key, prevented: event.defaultPrevented }));
@@ -60,7 +60,7 @@ test("logical keyboard navigation reaches offscreen rows with bounded DOM and fu
     await page.keyboard.press("End");
     await checkGeometry(page);
     assert.ok((await page.evaluate(() => document.activeElement.textContent)).startsWith("function_49999"));
-    assert.equal(await page.locator('#outline button[data-declaration="f49999"]').locator("..").getAttribute("aria-setsize"), "50000");
+    assert.equal(await page.locator('#outline button[data-declaration][data-declaration="f49999"]').locator("..").getAttribute("aria-setsize"), "50000");
     await page.keyboard.press("ArrowDown"); await page.keyboard.press("Enter");
     assert.deepEqual(await page.evaluate(() => window.activations), ["f49999"]);
     await page.keyboard.press("ArrowUp"); await page.keyboard.press("Space");
@@ -74,9 +74,9 @@ test("logical keyboard navigation reaches offscreen rows with bounded DOM and fu
     await page.keyboard.press("Home"); await page.keyboard.press("ArrowUp");
     assert.ok((await page.evaluate(() => document.activeElement.textContent)).startsWith("function_0"));
     await checkGeometry(page);
-    assert.match(await page.locator('#outline button[data-declaration="f0"]').getAttribute("title"), /function function_0 · line 1/);
-    assert.match(await page.locator('#outline button[data-declaration="f0"]').textContent(), /function · 1/);
-    assert.equal(await page.locator('#outline button[tabindex="0"]').count(), 1);
+    assert.match(await page.locator('#outline button[data-declaration][data-declaration="f0"]').getAttribute("title"), /function function_0 · line 1/);
+    assert.match(await page.locator('#outline button[data-declaration][data-declaration="f0"]').textContent(), /function · 1/);
+    assert.equal(await page.locator('#outline button[data-declaration][tabindex="0"]').count(), 1);
     const defaults = await page.evaluate(() => window.keyDefaults);
     assert.ok(defaults.filter(event => ["ArrowDown", "ArrowUp", "PageUp", "PageDown", "Home", "End"].includes(event.key)).every(event => event.prevented));
     assert.ok(defaults.filter(event => ["Enter", " "].includes(event.key)).every(event => !event.prevented));
@@ -89,8 +89,8 @@ test("same-version selections reuse the index; background changes preserve scrol
     await page.locator("#outline").evaluate(node => { node.scrollTop = 500 * 48 + 7; }); await paint(page);
     await page.evaluate(() => window.widget.update({ id: "file", version: "v1", get outlines() { throw new Error("unchanged source must not be rescanned"); } }, "f505"));
     assert.ok((await page.locator('#outline [aria-current="true"]').textContent()).startsWith("function_505"));
-    await page.locator('#outline button[data-declaration="f505"]').focus();
-    assert.equal(await page.locator('#outline button[tabindex="0"]').getAttribute("data-declaration"), "f505");
+    await page.locator('#outline button[data-declaration][data-declaration="f505"]').focus();
+    assert.equal(await page.locator('#outline button[data-declaration][tabindex="0"]').getAttribute("data-declaration"), "f505");
     await page.keyboard.press("ArrowDown");
     assert.equal(await page.evaluate(() => document.activeElement.dataset.declaration), "f506");
     await page.keyboard.press("ArrowUp");
@@ -98,7 +98,7 @@ test("same-version selections reuse the index; background changes preserve scrol
     await page.evaluate(() => window.widget.update({ id: "file", version: "v2", outlines: [{ declarations: [{ ...window.original[0], id: "insert", name: "inserted" }, ...window.original] }] }, "f510"));
     assert.equal(await page.locator("#outline").evaluate(node => node.scrollTop), before + 48);
     assert.ok((await page.evaluate(() => document.activeElement.textContent)).startsWith("function_505"));
-    assert.equal(await page.locator('#outline button[tabindex="0"]').getAttribute("data-declaration"), "f505");
+    assert.equal(await page.locator('#outline button[data-declaration][tabindex="0"]').getAttribute("data-declaration"), "f505");
     await page.evaluate(() => window.widget.update({ id: "file", version: "v3", outlines: [{ declarations: window.original.filter(fact => !["f505", "f506"].includes(fact.id)) }] }, "f505"));
     assert.equal(await page.locator('#outline [aria-current="true"]').count(), 0);
     assert.ok((await page.evaluate(() => document.activeElement.textContent)).startsWith("function_507"));
@@ -111,15 +111,15 @@ test("same-version selections reuse the index; background changes preserve scrol
 test("scrolling and resize keep a bounded window while preserving focused controls", async () => {
   const page = await fixture();
   try {
-    await page.locator("#outline button").first().focus();
+    await page.locator("#outline button[data-declaration]").first().focus();
     await page.locator("#outline").evaluate(node => { node.scrollTop = 1000 * 48 + 7; }); await paint(page);
     assert.equal(await page.evaluate(() => document.activeElement.dataset.declaration), "f0");
-    assert.ok(await page.locator("#outline button").count() <= 200);
+    assert.ok(await page.locator("#outline button[data-declaration]").count() <= 200);
     await page.locator("nav").evaluate(node => { node.style.height = "20000px"; }); await paint(page);
-    assert.ok(await page.locator("#outline button").count() <= 200);
-    assert.equal(await page.locator('#outline button[data-declaration="f1182"]').count(), 1);
+    assert.ok(await page.locator("#outline button[data-declaration]").count() <= 200);
+    assert.equal(await page.locator('#outline button[data-declaration][data-declaration="f1182"]').count(), 1);
     await page.locator("#outline").evaluate(node => { node.scrollTop = node.scrollHeight; }); await paint(page);
-    assert.equal(await page.locator('#outline button[data-declaration="f49999"]').count(), 1);
+    assert.equal(await page.locator('#outline button[data-declaration][data-declaration="f49999"]').count(), 1);
     await page.keyboard.press("End"); assert.equal(await page.evaluate(() => window.scrollY), 0);
     await page.evaluate(() => window.widget.update({ id: "file", version: "v2", outlines: [{ declarations: window.original.slice(0, -1) }] }, null));
     assert.equal(await page.evaluate(() => document.activeElement.dataset.declaration), "f49998"); assert.equal(await page.evaluate(() => window.scrollY), 0);
@@ -143,10 +143,10 @@ test("initial and emptied lists stay small; minimal reveal and background update
     assert.equal(await page.locator("#outline").evaluate(node => node.scrollTop), 1000 * 48);
     await page.evaluate(() => window.widget.update({ id: "file", version: "v2", outlines: [{ declarations: [{ ...window.original[0], id: "insert" }, ...window.original] }] }, "f1003"));
     assert.equal(await page.evaluate(() => document.activeElement.id), "outside");
-    assert.equal(await page.locator('#outline button[tabindex="0"]').getAttribute("data-declaration"), "f1000");
+    assert.equal(await page.locator('#outline button[data-declaration][tabindex="0"]').getAttribute("data-declaration"), "f1000");
     await page.evaluate(() => window.widget.update({ id: "other", version: "v1", outlines: [{ declarations: window.original.map(fact => ({ ...fact, id: "other-" + fact.id })) }] }, null));
     assert.equal(await page.locator("#outline").evaluate(node => node.scrollTop), 0);
-    await page.locator("#outline button").first().focus();
+    await page.locator("#outline button[data-declaration]").first().focus();
     await page.evaluate(() => window.widget.update(null, null));
     assert.equal(await page.evaluate(() => document.activeElement.id), "outline");
     assert.ok(await page.locator("#outline").evaluate(node => node.scrollHeight <= node.clientHeight));
@@ -156,13 +156,13 @@ test("initial and emptied lists stay small; minimal reveal and background update
 test("backward focus recovery finds surviving earlier rows and collapsed viewports remain valid", async () => {
   const page = await fixture(20);
   try {
-    await page.locator("#outline button").first().focus(); await page.keyboard.press("End");
+    await page.locator("#outline button[data-declaration]").first().focus(); await page.keyboard.press("End");
     await page.evaluate(() => window.widget.update({ id: "file", version: "v2", outlines: [{ declarations: [{ ...window.original[1], id: "inserted" }, window.original[0]] }] }, null));
     assert.equal(await page.evaluate(() => document.activeElement.dataset.declaration), "f0");
     await page.locator("#outside").focus();
     await page.locator("nav").evaluate(node => { node.style.height = "0px"; }); await paint(page);
     await page.locator("#outline").evaluate(node => { node.scrollTop = node.scrollHeight; }); await paint(page);
-    assert.equal(await page.locator('#outline button[tabindex="0"]').count(), 1);
+    assert.equal(await page.locator('#outline button[data-declaration][tabindex="0"]').count(), 1);
     await page.locator("nav").evaluate(node => { node.style.height = "400px"; }); await paint(page);
     await page.locator("#outline").click({ position: { x: 10, y: 300 } });
     assert.deepEqual(await page.evaluate(() => window.activations), []);
@@ -177,12 +177,12 @@ test("empty, removed, unversioned, and replacement sources do not retain stale s
     await page.evaluate(() => window.widget.update({ id: "file", outlines: [{ declarations: [{ ...window.original[1], name: "replacement" }] }] }, "f1", true));
     assert.ok((await page.locator('#outline [aria-current="true"]').textContent()).includes("replacement"));
     await page.evaluate(() => window.widget.update(null, null));
-    assert.equal(await page.locator("#outline button").count(), 0); assert.match(await page.locator("#outline").textContent(), /No declarations/);
+    assert.equal(await page.locator("#outline button[data-declaration]").count(), 0); assert.match(await page.locator("#outline").textContent(), /No declarations/);
     await page.locator("#outline").press("ArrowDown");
     await page.evaluate(() => window.widget.update({ id: "other", version: "v1", outlines: [{ declarations: window.original }] }, "f3", true));
     assert.ok((await page.locator('#outline [aria-current="true"]').textContent()).startsWith("function_3"));
-    assert.equal(await page.locator("#outline button").count(), 4); assert.ok(!(await page.locator("#outline").textContent()).includes("No declarations"));
-    await page.locator('#outline button[data-declaration="f3"]').focus();
+    assert.equal(await page.locator("#outline button[data-declaration]").count(), 4); assert.ok(!(await page.locator("#outline").textContent()).includes("No declarations"));
+    await page.locator('#outline button[data-declaration][data-declaration="f3"]').focus();
     await page.evaluate(() => window.widget.update(null, null));
     assert.equal(await page.evaluate(() => document.activeElement.id), "outline");
     assert.ok(await page.locator("#outline").evaluate(node => node.scrollHeight <= node.clientHeight));
@@ -199,7 +199,7 @@ test("scroll events coalesce within a frame and initial offscreen selection is r
       return { visible: selected.top >= viewport.top && selected.bottom <= viewport.bottom, top: selected.top, bottom: selected.bottom, viewportTop: viewport.top, viewportBottom: viewport.bottom, scrollTop: document.getElementById("outline").scrollTop };
     });
     assert.equal(visible.visible, true, JSON.stringify(visible));
-    await page.locator('#outline button[data-declaration="f49999"]').focus(); await checkGeometry(page);
+    await page.locator('#outline button[data-declaration][data-declaration="f49999"]').focus(); await checkGeometry(page);
     await page.evaluate(() => {
       const original = window.requestAnimationFrame; window.renderRequests = 0;
       window.requestAnimationFrame = callback => { window.renderRequests++; return original(callback); };
@@ -210,7 +210,7 @@ test("scroll events coalesce within a frame and initial offscreen selection is r
     await page.locator("nav").evaluate(node => { node.style.height = "400px"; });
     await page.locator("#outline").evaluate(node => { node.scrollTop = 1000 * 48; }); await page.locator("h3").click(); await paint(page);
     await page.locator("#outline").dispatchEvent("scroll"); await paint(page);
-    assert.equal(await page.locator('#outline button[tabindex="0"]').getAttribute("data-declaration"), "f1000");
+    assert.equal(await page.locator('#outline button[data-declaration][tabindex="0"]').getAttribute("data-declaration"), "f1000");
   } finally { await page.close(); }
 });
 
@@ -223,7 +223,7 @@ test("removed scroll anchors retain position and offscreen empty focus does not 
     await page.evaluate(() => window.widget.update({ id: "file", version: "v2", outlines: [{ declarations: window.original.filter(fact => fact.id !== "f500") }] }, null));
     assert.equal(await page.locator("#outline").evaluate(node => node.scrollTop), before);
     await page.locator("nav").evaluate(node => { node.style.marginTop = "1000px"; });
-    await page.locator('#outline button[tabindex="0"]').evaluate(node => node.focus({ preventScroll: true }));
+    await page.locator('#outline button[data-declaration][tabindex="0"]').evaluate(node => node.focus({ preventScroll: true }));
     assert.equal(await page.evaluate(() => window.scrollY), 0);
     await page.evaluate(() => window.widget.update(null, null));
     assert.equal(await page.evaluate(() => document.activeElement.id), "outline");

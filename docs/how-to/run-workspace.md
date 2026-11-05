@@ -36,6 +36,19 @@ a width limit. Bounded width preferences persist locally when storage is availab
 Equal shown/matching counts collapse to one number; capped maps explicitly say how
 many files are shown, and filtering narrows the result.
 
+Use the directory controls above the map to collapse groups, focus a directory, or
+return through its breadcrumbs. Directory frames show containment; compact paths combine
+single-child folders. Drag directory rows/headers to reorder siblings, use the up/down
+buttons, or focus a directory name and press Alt+Up/Down. Left/Right collapses/expands;
+Up/Down and Home/End navigate the directory controls. Reordering changes the view only.
+**Reset map** restores the default order and expansion. Layout preferences belong to
+this workspace; the tree remains bounded when the overview reaches its 2,000-file cap.
+
+**Theme** defaults to **System**. Choose **Light** or **Dark** to override it; the setting
+is shared by this origin's exploration/review tabs and survives reload when storage is
+available. Close informational/error rows with their labelled × buttons. Dismissing a
+message keeps the underlying source/capture operation running; new messages can appear.
+
 Use **Back** and **Forward** in the header, or browser Back/Forward, to return to an
 earlier file/declaration and its reading position. The session keeps up to 50 visits.
 Returns follow current source: changed locations show a notice and reveal the current

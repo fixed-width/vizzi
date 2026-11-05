@@ -1096,3 +1096,61 @@ fn committed_symlinks_and_executables_and_atomic_saves_keep_correct_entry_eviden
         ReadEntry::Unobserved(Unavailability::Changing)
     ));
 }
+
+#[test]
+fn git_revision_expressions_and_short_ids_use_the_local_commit_graph() {
+    let fixture = Repo::init();
+    fixture.write("a.rs", b"fn first() {}\n");
+    fixture.commit();
+    let first = String::from_utf8(fixture.git(&["rev-parse", "HEAD"]))
+        .unwrap()
+        .trim()
+        .to_owned();
+    fixture.write("a.rs", b"fn second() {}\n");
+    fixture.commit();
+    let second = String::from_utf8(fixture.git(&["rev-parse", "HEAD"]))
+        .unwrap()
+        .trim()
+        .to_owned();
+    fixture.write("a.rs", b"fn third() {}\n");
+    fixture.commit();
+    let repo = GitRepository::open(fixture.root()).unwrap();
+    for (expression, expected) in [
+        ("HEAD~1", second.as_str()),
+        ("HEAD^^", first.as_str()),
+        (&first[..8], first.as_str()),
+    ] {
+        let pin = repo
+            .pin(expression, CaptureLimits::default(), &|| false)
+            .unwrap();
+        assert_eq!(pin.resolved(), expected, "{expression}");
+    }
+}
+
+#[test]
+fn missing_parents_in_shallow_history_have_an_actionable_resolution_error() {
+    let fixture = Repo::init();
+    fixture.write("a.rs", b"fn first() {}\n");
+    fixture.commit();
+    let head = String::from_utf8(fixture.git(&["rev-parse", "HEAD"]))
+        .unwrap()
+        .trim()
+        .to_owned();
+    std::fs::write(fixture.root().join(".git/shallow"), format!("{head}\n")).unwrap();
+    let repo = GitRepository::open(fixture.root()).unwrap();
+    let error = repo
+        .pin("HEAD~1", CaptureLimits::default(), &|| false)
+        .err()
+        .unwrap()
+        .to_string();
+    assert!(
+        error.contains("shallow") && error.contains("history"),
+        "{error}"
+    );
+    assert_eq!(
+        repo.pin(&head[..8], CaptureLimits::default(), &|| false)
+            .unwrap()
+            .resolved(),
+        head
+    );
+}

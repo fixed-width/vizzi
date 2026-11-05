@@ -22,7 +22,7 @@ async function fixture() {
   }
   async function anchor() {
     await file("aa.rs");
-    await page.locator('#outline button').filter({ hasText: "anchor" }).click();
+    await page.locator('#outline button[data-declaration]').filter({ hasText: "anchor" }).click();
     await page.waitForFunction(() => document.querySelector('#outline [aria-current="true"]')?.textContent.startsWith("anchor"));
     await page.locator("#source").evaluate(node => { node.scrollTop += 88; });
     await paint(page);
@@ -120,7 +120,7 @@ test("a failed return keeps an explicit notice through resynchronisation and can
 test("a removed declaration in the current file returns to the file start rather than an unrelated reading position",async()=>{
   const f=await fixture();const {page}=f;try{
     await f.anchor();
-    await page.locator("#outline button").filter({hasText:"start"}).click();
+    await page.locator("#outline button[data-declaration]").filter({hasText:"start"}).click();
     await page.waitForFunction(()=>document.querySelector('#outline [aria-current="true"]')?.textContent.startsWith("start"));
     await page.locator("#source").evaluate(n=>{n.scrollTop=5000;});await paint(page);
     const old=await page.locator("#snapshot").getAttribute("title");

@@ -76,16 +76,18 @@ impl GitRepository {
         limits: CaptureLimits,
         cancelled: &dyn Fn() -> bool,
     ) -> Result<GitRevision, CaptureError> {
-        let resolved = oid(&self.run(
-            &[
-                "rev-parse",
-                "--verify",
-                "--end-of-options",
-                &format!("{revision}^{{}}"),
-            ],
-            1024,
-            cancelled,
-        )?)?;
+        let resolved = oid(&self
+            .run(
+                &[
+                    "rev-parse",
+                    "--verify",
+                    "--end-of-options",
+                    &format!("{revision}^{{}}"),
+                ],
+                1024,
+                cancelled,
+            )
+            .map_err(|error| self.resolution_error(error, cancelled))?)?;
         let tree = oid(&self.run(
             &[
                 "rev-parse",
@@ -110,6 +112,20 @@ impl GitRepository {
             entries: Arc::new(entries),
             batch: None,
         })
+    }
+    fn resolution_error(&self, error: CaptureError, cancelled: &dyn Fn() -> bool) -> CaptureError {
+        if !matches!(error, CaptureError::Git(_)) {
+            return error;
+        }
+        let shallow = self.run(&["rev-parse", "--is-shallow-repository"], 1024, cancelled);
+        if matches!(shallow, Err(CaptureError::Cancelled)) {
+            return CaptureError::Cancelled;
+        }
+        if matches!(shallow.as_deref(), Ok(b"true\n")) {
+            CaptureError::Git("Revision is unavailable in this shallow checkout. Parent commits or short IDs may require more local history; fetch history outside Vizzi or choose an available commit.".into())
+        } else {
+            CaptureError::Git("Revision does not resolve to one local object. Check the revision or unique short ID against this checkout with git rev-parse --verify.".into())
+        }
     }
     /// Creates working discovery tied to this exact baseline/workspace namespace.
     pub fn working(&self, base: &GitRevision) -> Result<GitWorking, CaptureError> {

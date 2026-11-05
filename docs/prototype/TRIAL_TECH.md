@@ -54,3 +54,8 @@ keyboard adapters and small deterministic interfaces. CSS variables carry split 
 local storage contains only bounded numeric preferences. Keep source/outline windows
 virtualised and remeasure after layout/colour changes. Expose concise user-facing copy;
 developer timing samples remain available to validation without a footer.
+
+The [second orientation iteration](ORIENTATION_TECH.md) supersedes the shelf layout as
+the browser default, adds workspace-scoped personal layout, shared dismissible messages
+and CSS system/override themes. Native shelf rectangles remain a compatible diagnostic
+projection.

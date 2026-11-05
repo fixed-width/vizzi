@@ -45,7 +45,8 @@ existing eager constructors, `--once` and `--stdio` retain initial capture on st
 to 1–2,000. `total` counts all discovered supported source files; `matching` counts matches before
 limiting. The view includes world-space tile rectangles, directory cards (`path`, `x`, `y`, `width`, `height`), and overall height. Cards are
 packed deterministically across shelves sized from total tile/card area.
-`policy` identifies capture policy, including empty snapshots. `analyzed` counts all
+`workspace` is the stable opaque workspace identity, independent of snapshots, for
+scoping local presentation preferences. `policy` identifies capture policy, including empty snapshots. `analyzed` counts all
 captured files with analysis records; `source_only` counts those without records.
 These counts describe the entire snapshot, independently of filtering/overview bounds.
 Tile coverage combines all configured analysis contexts. Source outlines retain each
@@ -134,3 +135,7 @@ backing IO, short reads, integrity/internal range failures return **503**. Typed
 HTTP queries remain **400**. Summaries do not load whole source. See
 [source reads](SOURCE_READS.md) for bounds and native error types. Source IO/projection
 runs in a bounded blocking pool outside the publication lock/async executor.
+
+The browser's current [directory scene](ORIENTATION_TECH.md) derives nested, personally
+ordered geometry from the bounded file projection. Native rectangles remain a diagnostic
+projection; source/file identities are shared, rather than inferred from positions.

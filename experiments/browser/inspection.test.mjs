@@ -39,8 +39,8 @@ async function fixture(path="big.rs") {
 }
 test("remote Home/End and source linking stay bounded, including activation during pending navigation",async()=>{
   const page=await fixture();try{
-    assert.ok(await page.locator("#outline button").count()<=200);assert.ok(await page.locator(".code-line").count()<=96);
-    await page.locator("#outline button").first().focus();
+    assert.ok(await page.locator("#outline button[data-declaration]").count()<=200);assert.ok(await page.locator(".code-line").count()<=96);
+    await page.locator("#outline button[data-declaration]").first().focus();
     let held,hold=true;await page.route("**/api/window?**",async route=>{if(hold && new URL(route.request().url()).searchParams.get("cursor_index")==="49999"){held=route;}else await route.continue();});
     await page.keyboard.press("End");await page.keyboard.press("Enter");
     await page.waitForFunction(()=>window.activations.length===0);assert.deepEqual(await page.evaluate(()=>window.activations),[]);
@@ -48,7 +48,7 @@ test("remote Home/End and source linking stay bounded, including activation duri
     await page.waitForFunction(()=>window.activations.length===1);await page.waitForFunction(()=>document.getElementById("source").textContent.includes("item_49999"));
     assert.equal(await page.locator('#outline [aria-current="true"]').locator("..").getAttribute("aria-posinset"),"50000");
     await page.keyboard.press("Home");await page.waitForFunction(()=>document.activeElement?.textContent.startsWith("item_00000"));
-    assert.ok(await page.locator("#outline button").count()<=200);assert.deepEqual(await page.evaluate(()=>window.errors),[]);assert.deepEqual(page.testErrors,[]);
+    assert.ok(await page.locator("#outline button[data-declaration]").count()<=200);assert.deepEqual(await page.evaluate(()=>window.errors),[]);assert.deepEqual(page.testErrors,[]);
   }finally{await page.close();}
 });
 test("large lines remain literal and can reach their last fragment without full transfers",async()=>{
@@ -65,13 +65,13 @@ test("large lines remain literal and can reach their last fragment without full 
 });
 test("background document replacement preserves focused identity",async()=>{
   const page=await fixture();try{
-    await page.locator("#outline button").first().focus();await page.keyboard.press("ArrowDown");
+    await page.locator("#outline button[data-declaration]").first().focus();await page.keyboard.press("ArrowDown");
     const focused=await page.evaluate(()=>document.activeElement.dataset.declaration);
     const previous=await page.evaluate(()=>window.current.snapshot);
     await writeFile(join(input.root,"big.rs"),"// position shift\n"+large);
     await observation(page,previous);
     await page.evaluate(()=>window.refresh());
     assert.equal(await page.evaluate(()=>document.activeElement.dataset.declaration),focused);
-    assert.ok(await page.locator("#outline button").count()<=200);assert.deepEqual(await page.evaluate(()=>window.errors),[]);assert.deepEqual(page.testErrors,[]);
+    assert.ok(await page.locator("#outline button[data-declaration]").count()<=200);assert.deepEqual(await page.evaluate(()=>window.errors),[]);assert.deepEqual(page.testErrors,[]);
   }finally{await page.close();}
 });

@@ -131,7 +131,7 @@ try {
   const seek = async (name, fromEnd = false) => {
     const scan = { file: await page.locator("#file-title").textContent(), name, start: fromEnd ? "End" : "Home", pages: [] };
     report.outlineScans.push(scan);
-    await page.locator("#outline button").first().focus();
+    await page.locator("#outline button[data-declaration]").first().focus();
     await page.keyboard.press(fromEnd ? "End" : "Home");
     const positions = new Set();
     for (let attempt = 0; attempt < 100; attempt++) {
@@ -147,7 +147,7 @@ try {
       const target = visible.find(button => button.name === name);
       if (target) {
         scan.found = target;
-        await page.locator(`#outline button[data-declaration="${target.id}"]`).click();
+        await page.locator(`#outline button[data-declaration][data-declaration="${target.id}"]`).click();
         await page.waitForFunction(id => document.querySelector('#outline [aria-current="true"]')?.dataset.declaration === id, target.id);
         await paint(page);
         return true;

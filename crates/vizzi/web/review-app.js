@@ -1,3 +1,5 @@
+import {createMessage} from "/messages.js";
+import {installAppearance} from "/appearance.js";
 import {pageCount} from "/presentation.js";
 import {installSplitter} from "/splitter.js";
 import {createReviewController} from "/review-controller.js";
@@ -9,10 +11,12 @@ const element=id=>document.getElementById(id);
 const node=(tag,text)=>{const value=document.createElement(tag);value.textContent=text;return value;};
 const sides=["base","working"],inspectors={};
 let view,updates,filterTimer;
+installAppearance(element("theme"));
+const messages=Object.fromEntries([["review-status","review status"],["comparison-error","comparison error"],["comparison-labels","comparison details"],["review-notice","review notice"],["file-change","file status"],["diff-note","diff note"],["base-evidence","base availability"],["working-evidence","working availability"]].map(([id,label])=>[id,createMessage(element(id),{label:`Dismiss ${label}`,...(id==="review-notice"?{content:element(id).querySelector("span")}:{})})]));
 installSplitter(element("review-workspace"),{key:"review-files",label:"Review files and source widths",initial:.21,minBefore:170,minAfter:400});
 installSplitter(document.querySelector(".review-pair"),{key:"review-pair",label:"Base and target source widths",initial:.5,minBefore:220,minAfter:220});
 for(const side of sides)installSplitter(element(`${side}-outline`).closest(".source-layout"),{key:`review-${side}-outline`,label:`${side} declarations and source widths`,initial:.3,minBefore:90,minAfter:130});
-function captureError(message){element("comparison-error").hidden=!message;element("comparison-error").textContent=message ?? "";}
+function captureError(message,key){messages["comparison-error"].show(message,key);}
 function comparisonMode(){const commits=element("comparison-mode").value==="commits";element("target-field").hidden=!commits;element("target-revision").required=commits;element("compare").textContent=commits?"Compare commits":"Compare with working tree";}
 element("comparison-mode").addEventListener("change",comparisonMode);
 function cancelFilter(){clearTimeout(filterTimer);filterTimer=undefined;}
@@ -21,7 +25,7 @@ const transport=async(uri,options)=>{
   if(!response.ok){let message=await response.text();try{message=JSON.parse(message).message ?? message;}catch{}throw Object.assign(new Error(message.slice(0,512)),{status:response.status});}
   return response.status===204?null:response.json();
 };
-function notice(message) {element("review-notice").hidden=!message;element("review-notice").querySelector("span").textContent=message ?? "";}
+function notice(message) {messages["review-notice"].show(message);}
 for(const side of sides) {
   inspectors[side]=createInspector({source:element(`${side}-source`),space:element(`${side}-space`),outline:element(`${side}-outline`),transport,makeReader:createReviewWindowReader,
     emptyText:"No retained text on this side. Inspect the availability description above.",
@@ -37,8 +41,8 @@ for(const side of sides) {
 const capture=()=>Object.fromEntries(sides.map(side=>[side,inspectors[side].position()]));
 const controller=createReviewController({transport,capture,onView:render,onNotice:notice,onError:error=>captureError(error.message),
   onStatus:status=>{
-    captureError(status.error?.message);
-    element("review-status").textContent=status.error?"Comparison failed":status.pending?"Capturing and analysing comparison…":status.active?"Comparison ready":"Choose a base revision to begin";
+    captureError(status.error?.message,status.ticket);
+    messages["review-status"].show(status.error?"Comparison failed":status.pending?"Capturing and analysing comparison…":status.active?"Comparison ready":"Choose a base revision to begin");
     element("refresh-working").disabled=!status.active || status.pending || Boolean(status.active.target);element("refresh-working").hidden=Boolean(status.active?.target);element("close-comparison").disabled=!status.active;
     element("open-current").disabled=!status.active;
   },
@@ -70,17 +74,17 @@ function render(next) {
   const workspace=element("review-workspace");workspace.dataset.token=next?.metadata.token ?? "";workspace.dataset.comparison=next?.metadata.comparison ?? "";
   const files=element("review-file-list"),hunks=element("review-hunks");files.replaceChildren();hunks.replaceChildren();
   if(!next) {
-    element("comparison-labels").textContent="Comparison closed. Choose a baseline to capture another review.";
-    element("review-file-title").textContent="Choose a baseline";element("file-change").textContent="No comparison selected";
+    messages["comparison-labels"].show("Comparison closed. Choose a baseline to capture another review.");
+    element("review-file-title").textContent="Choose a baseline";messages["file-change"].show("No comparison selected");
     element("review-counts").textContent="No comparison captured";
-    element("review-status").textContent="Comparison closed";element("file-page-label").textContent="";element("hunk-page-label").textContent="";element("diff-note").textContent="";element("edit-details").hidden=true;
+    messages["review-status"].show("Comparison closed");element("file-page-label").textContent="";element("hunk-page-label").textContent="";messages["diff-note"].show(null);element("edit-details").hidden=true;
     for(const id of ["files-previous","files-next","hunks-previous","hunks-next","edits-previous","edits-next"])element(id).disabled=true;
-    for(const side of sides){inspectors[side].apply({source:null,selection:{}});element(`${side}-evidence`).textContent="No source selected";element(`${side}-contexts`).textContent="";element(`${side}-pane`).dataset.version="";}
+    for(const side of sides){inspectors[side].apply({source:null,selection:{}});messages[`${side}-evidence`].show("No source selected");element(`${side}-contexts`).textContent="";element(`${side}-pane`).dataset.version="";}
     return;
   }
   const {metadata,query,file,diff,windows,selection}=next;
   const committed=Boolean(metadata.target),right=committed?"Target":"Working";
-  element("comparison-labels").textContent=`Base ${metadata.revision} → ${metadata.resolved} · ${committed?`Target ${metadata.target.revision} → ${metadata.target.resolved}`:`Working tree observed ${new Date(metadata.working_started_ms).toISOString()} to ${new Date(metadata.working_finished_ms).toISOString()}`} · repository path ${metadata.scope}`;
+  messages["comparison-labels"].show(`Base ${metadata.revision} → ${metadata.resolved} · ${committed?`Target ${metadata.target.revision} → ${metadata.target.resolved}`:`Working tree observed ${new Date(metadata.working_started_ms).toISOString()} to ${new Date(metadata.working_finished_ms).toISOString()}`} · repository path ${metadata.scope}`);
   element("select-working").textContent=right;element("working-pane").setAttribute("aria-label",`${right} source pane`);element("working-outline").previousElementSibling.textContent=`${right} declarations`;element("working-source").setAttribute("aria-label",`${right} captured source`);
   element("refresh-working").hidden=committed;element("refresh-working").disabled=committed;
   if(filterTimer===undefined)element("review-filter").value=query.filter;element("include-unchanged").checked=query.unchanged;
@@ -94,13 +98,13 @@ function render(next) {
   if(!next.files.files.length)files.append(node("p","No paths match. Clear the filter or include unchanged context."));
   pager("files-previous","files-next",next.files.offset,next.files.next,offset=>controller.navigate({offset}));
   element("review-file-title").textContent=file?.path ?? "No file selected";
-  element("file-change").textContent=file?`${file.change}${file.path_truncated?" · path label truncated":""} · ${selection.side} side selected${selection.entity?" · lexical declaration selected":""}`:"Select a file to inspect source";
+  messages["file-change"].show(file?`${file.change}${file.path_truncated?" · path label truncated":""} · ${selection.side} side selected${selection.entity?" · lexical declaration selected":""}`:"Select a file to inspect source");
   element("hunk-page-label").textContent=diff?`${diff.hunks.length} of ${diff.hunk_total} hunks · ${diff.remaining_hunks} after this page`:"Textual changes unavailable";
   for(const [index,hunk] of (diff?.hunks ?? []).entries()) {
     const button=node("button",`${query.hunk_start+index+1}: ${header(hunk)}`);button.type="button";button.dataset.hunk=hunk.id;button.setAttribute("aria-current",String(selection.hunk===hunk.id));button.addEventListener("click",()=>controller.navigate({hunk:hunk.id}));hunks.append(button);
   }
   pager("hunks-previous","hunks-next",query.hunk_start,diff?.next_hunk,start=>controller.navigate({hunk_start:start}));
-  element("diff-note").textContent=next.diffError?`Textual changes unavailable: ${next.diffError}`:diff?.hunk_total===0?"No textual changes. File type or executable status can still differ.":"Choose a hunk to reveal both ranges, or a declaration to inspect its side. Only loaded change ranges are coloured. Line-ending edits can look equal in the preview; exact byte ranges are available below.";
+  messages["diff-note"].show(next.diffError?`Textual changes unavailable: ${next.diffError}`:diff?.hunk_total===0?"No textual changes. File type or executable status can still differ.":"Choose a hunk to reveal both ranges, or a declaration to inspect its side. Only loaded change ranges receive diff backgrounds. Line-ending edits can look equal in the preview; exact byte ranges are available below.");
   element("edit-details").hidden=!diff;
   element("edit-page-label").textContent=diff?`Change ranges ${diff.edits.length?query.edit_start+1:0}–${query.edit_start+(diff?.edits.length ?? 0)} / ${diff.edit_total}`:"";
   pager("edits-previous","edits-next",query.edit_start,diff?.next_edit,start=>controller.navigate({edit_start:start}));
@@ -109,7 +113,7 @@ function render(next) {
     const body=windows[side],window=body?.window,version=file?.[`${side}_version`];
     element(`select-${side}`).setAttribute("aria-pressed",String(selection.side===side));
     element(`${side}-pane`).dataset.version=version ?? "";
-    element(`${side}-evidence`).textContent=evidence(file?.[side],body,side);
+    messages[`${side}-evidence`].show(evidence(file?.[side],body,side),version);
     const contexts=body?.contexts ?? [];
     element(`${side}-contexts`).textContent=window?[body.classification.kind==="source_only"?"Source only; no declaration analysis assigned.":"Raw syntax; build configuration unknown.",...contexts.map(c=>`${c.language}: ${c.coverage} · ${c.declarations} declarations\n${c.description}${c.truncated?" (truncated)":""}\n${c.diagnostics.join("\n")}${c.hidden_diagnostics?`\n${c.hidden_diagnostics} more diagnostics`:""}`),body.hidden_contexts?`${body.hidden_contexts} more analysis contexts`:""].filter(Boolean).join("\n"):"No retained textual analysis for this side.";
     const active=selection.side===side && selection.entity?window?.cursor:null;

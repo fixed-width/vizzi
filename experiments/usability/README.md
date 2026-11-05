@@ -38,11 +38,16 @@ oracle, preparation console or scripted route to a participant before their answ
 
 ```sh
 python3 -B experiments/review-workflow/materialize.py \
-  --source "$LPC_SOURCE" --variant variant-a --output "$TRIAL_DIR/review"
+  --source "$LPC_SOURCE" --variant variant-a --history --output "$TRIAL_DIR/review"
 python3 -B experiments/review-workflow/verify.py --fixture "$TRIAL_DIR/review"
 ```
 
 The verifier's output includes the case label; save it with facilitator records.
+For a maintainer revision trial, `--history` includes committed objects from the local
+source repository, with one Git packing thread and no network fetch. HEAD stays at the
+task pin and the frozen working/index patches stay the same. It supports ancestor
+expressions and available short hashes; other branch names are not copied. Omitting the
+flag keeps the minimal single-commit fixture used in existing scripted review cohorts.
 The learning archive is intentionally a source copy, not the patched review repository.
 Keep the review manifest outside the source workspace. If sharing files with another
 machine, share only the assigned task/controls/notes and its source workspace, using

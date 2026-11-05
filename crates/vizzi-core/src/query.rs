@@ -137,6 +137,8 @@ pub struct Selection {
 /// A coherent response suitable for both linked views.
 #[derive(Debug, Serialize)]
 pub struct View {
+    /// Stable opaque workspace identity for local presentation preferences.
+    pub workspace: crate::model::WorkspaceId,
     /// Files with at least one deferred analysis, independently of the overview bound.
     pub deferred: usize,
     /// Version of the linked-view response schema.
@@ -345,6 +347,7 @@ impl Snapshot {
             shelf_height = shelf_height.max(height);
         }
         Ok(View {
+            workspace: self.workspace().clone(),
             deferred: self.deferred_files(),
             schema: if query.projection.is_some() { 3 } else { 2 },
             snapshot: self.id().clone(),
@@ -626,6 +629,7 @@ mod tests {
                 &Coverage::Partial
             ]
         );
+        assert_eq!(view.workspace, workspace);
         assert_eq!(view.analyzed, 3);
         assert_eq!(view.source_only, 0);
         let selected = view.files[2].id.as_str().to_owned();

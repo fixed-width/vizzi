@@ -18,6 +18,11 @@ To compare existing commits, choose **Two commits**, enter the base and **Target
 revision**, then select **Compare commits**. Both inputs resolve once, including
 branch/tag names. The right pane is labelled **Target**; working disk changes are
 excluded and working refresh is hidden. Comparing a new pair requires another submit.
+Revision expressions such as `HEAD~1`, `HEAD^^` and unique short hashes use Git's local
+revision resolution. A shallow checkout can lack the requested parents/objects. Make
+that history available outside Vizzi, or choose a locally available revision; capture
+never fetches. Errors distinguish that case from a revision unavailable in a full checkout.
+
 An invalid revision or a non-root path absent from both sides shows an error beside
 the form and keeps the previous comparison visible.
 
@@ -61,3 +66,9 @@ At paired desktop widths, pan each source pane horizontally when a long conditio
 clipped; Back/Forward retains those independent reading positions. The
 [validation record](../../experiments/review-workflow/WALKTHROUGH_RESULTS.md) includes
 both guided review variants, recordings and remaining scale/usability limits.
+
+Use **Theme** for System/Light/Dark appearance. Syntax colours and type/keyword weights
+are independent of addition/removal backgrounds. Informational and error rows have ×
+controls; closing a row keeps the current comparison and its source unchanged. Repeated
+updates of the same message/context stay dismissed; a new context or operation can show
+another message.
