@@ -1,7 +1,11 @@
 import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 
-if (process.argv.includes("--companion-replay")) {
+if (process.argv.includes("--discovery-measure")) {
+  await import("../companion/measure-discovery.mjs");
+} else if (process.argv.includes("--discovery")) {
+  const result=spawnSync(process.execPath,["experiments/browser/discovery.test.mjs",...process.argv.slice(2).filter(arg=>arg!=="--discovery")],{stdio:"inherit"});process.exit(result.status ?? 1);
+} else if (process.argv.includes("--companion-replay")) {
   await import("../companion/run.mjs");
 } else if (process.argv.includes("--companion-measure")) {
   await import("../companion/measure.mjs");
@@ -94,7 +98,7 @@ if (process.argv.includes("--companion-replay")) {
 } else if (process.argv.includes("--measure")) {
   await import("./measure.mjs");
 } else {
-  for (const file of ["experiments/browser/companion.test.mjs", "crates/vizzi/web/map-headings.test.js", "crates/vizzi/web/view-status.test.js", "experiments/browser/refinement.test.mjs", "crates/vizzi/web/map-scene.test.js", "experiments/browser/directory-controls.test.mjs", "experiments/browser/appearance.test.mjs", "experiments/browser/orientation.test.mjs", "crates/vizzi/web/presentation-dom.test.js", "crates/vizzi/web/presentation.test.js", "crates/vizzi/web/camera.test.js", "experiments/browser/trial.test.mjs", "crates/vizzi/web/startup.test.js", "crates/vizzi/web/controller.test.js", "crates/vizzi/web/navigation.test.js", "crates/vizzi/web/updates.test.js", "crates/vizzi/web/source-description.test.js", "crates/vizzi/web/review-controller.test.js", "crates/vizzi/web/review-windows.test.js", "experiments/review-workflow/walkthrough-audit.test.mjs", "experiments/browser/statistics.test.mjs", "crates/vizzi/web/windows.test.js", "experiments/browser/outline.test.mjs", "experiments/browser/inspection.test.mjs", "experiments/browser/navigation-inspector.test.mjs", "experiments/browser/startup.test.mjs", "experiments/browser/browser.test.mjs", "experiments/browser/navigation.test.mjs", "experiments/browser/review.test.mjs", "experiments/browser/review-refresh.test.mjs"]) {
+  for (const file of ["experiments/browser/discovery.test.mjs", "experiments/browser/companion.test.mjs", "crates/vizzi/web/map-headings.test.js", "crates/vizzi/web/view-status.test.js", "experiments/browser/refinement.test.mjs", "crates/vizzi/web/map-scene.test.js", "experiments/browser/directory-controls.test.mjs", "experiments/browser/appearance.test.mjs", "experiments/browser/orientation.test.mjs", "crates/vizzi/web/presentation-dom.test.js", "crates/vizzi/web/presentation.test.js", "crates/vizzi/web/camera.test.js", "experiments/browser/trial.test.mjs", "crates/vizzi/web/startup.test.js", "crates/vizzi/web/controller.test.js", "crates/vizzi/web/navigation.test.js", "crates/vizzi/web/updates.test.js", "crates/vizzi/web/source-description.test.js", "crates/vizzi/web/review-controller.test.js", "crates/vizzi/web/review-windows.test.js", "experiments/review-workflow/walkthrough-audit.test.mjs", "experiments/browser/statistics.test.mjs", "crates/vizzi/web/windows.test.js", "experiments/browser/outline.test.mjs", "experiments/browser/inspection.test.mjs", "experiments/browser/navigation-inspector.test.mjs", "experiments/browser/startup.test.mjs", "experiments/browser/browser.test.mjs", "experiments/browser/navigation.test.mjs", "experiments/browser/review.test.mjs", "experiments/browser/review-refresh.test.mjs"]) {
     const result = spawnSync(process.execPath, [file], { stdio: "inherit" });
     if (result.status !== 0) process.exit(result.status ?? 1);
   }

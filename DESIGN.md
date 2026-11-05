@@ -9,7 +9,9 @@ Contributor standards belong in [AGENTS.md](AGENTS.md).
 
 Vizzi supplements an editor by helping a developer assemble and navigate an understanding
 of a subsystem or change across files and revisions. Questions, source evidence and
-relationships are the primary working objects. The editor remains the main surface for
+relationships retain an understanding as it develops. The starting experience must
+also help readers discover an unfamiliar repository without known paths or a prewritten
+explanation. Reveal authoring controls when needed. The editor remains the main surface for
 reading and changing source. A bounded source preview supports evidence inspection and
 version accuracy. Directory/declaration browsing and conventional diffs are supporting
 views, not the product's organising workflow.

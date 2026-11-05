@@ -12,7 +12,9 @@ for either condition:
 1. **Editor only:** read and navigate in VS Code using their ordinary tools and notes.
    Record how context/evidence is retained and what must be reconstructed after leaving
    a file. Do not forbid normal editor capabilities to manufacture a Vizzi advantage.
-2. **Editor plus Vizzi:** read in VS Code; use the investigation to retain source anchors,
+2. **Editor plus Vizzi:** begin with the automatically populated source overview and
+   optional name/path search; read in VS Code and keep useful locations without typing
+   paths or lines. Use optional saved context to retain source anchors,
    interpretation and connections. Source preview is available for evidence checks, not
    a required substitute for editor reading. Record manual-transfer friction and any
    redundant work. Finish with an explanation linked to the evidence.

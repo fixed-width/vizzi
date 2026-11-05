@@ -1,7 +1,59 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Vizzi · investigation</title><script src="/theme-init.js"></script><link rel="stylesheet" href="/theme.css"><link rel="stylesheet" href="/app.css"><link rel="stylesheet" href="/companion.css"></head>
-<body class="companion-page"><header><a class="brand" href="/">vizzi<span> / investigation</span></a><nav aria-label="Workspace views"><a href="/explore">Browse source</a><a href="/review">Review changes</a></nav><span id="source-state" role="status">Source index idle</span><label class="theme-control">Theme<select id="theme" aria-label="Theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label></header>
-<p id="investigation-notice" role="status" hidden></p><p id="investigation-error" role="alert" hidden></p>
-<main class="companion-main"><aside class="question-panel"><p class="purpose">Keep the context while you read in your editor.</p><form id="question-form"><label for="question">What are you investigating?</label><textarea id="question" rows="5" maxlength="2048" placeholder="Start with a question about this subsystem or change…"></textarea><button type="submit">Save question</button></form><p id="save-mode"></p><div class="investigation-actions"><button id="add-source" type="button">Add source evidence</button><button id="index-source" type="button">Index source</button><button id="export" type="button">Export investigation</button></div><p class="working-hint">Read source in your editor. Keep the locations, your notes and the connections here. Connections are your assertions, not inferred dependencies.</p><form id="connection-form"><h2>Your connection</h2><label for="connection-from">From</label><select id="connection-from" required></select><label for="connection-to">To</label><select id="connection-to" required></select><label>What connects them?<textarea id="connection-text" rows="3" maxlength="512" required></textarea></label><button type="submit">Connect evidence</button></form></aside>
-<section class="investigation-panel" aria-label="Investigation context"><div class="investigation-heading"><div><h1 id="investigation-title">An explanation starts with a question</h1><p id="investigation-counts">No evidence yet</p></div><span>Source evidence + your interpretation</span></div><div id="evidence-map" aria-label="Source evidence map"><svg id="evidence-links" aria-hidden="true"></svg><div id="evidence-cards"></div><div id="empty-investigation"><h2>Keep the pieces that matter.</h2><p>Add an entry point, contract, implementation or test from your current reading. Then explain how they connect.</p><button id="empty-add-source" type="button">Add the first source location</button></div></div><section id="connection-list-panel"><h2>Your connections</h2><ol id="connection-list"></ol></section></section>
-<aside id="evidence-detail" aria-label="Evidence detail" hidden><div class="detail-heading"><h2 id="detail-title"></h2><button id="close-detail" type="button">Close evidence</button></div><p id="detail-location"></p><p id="detail-freshness"></p><button id="detail-editor" type="button">Open in VS Code</button><form id="note-form"><label>Your interpretation<textarea id="evidence-note" rows="5" maxlength="2048"></textarea></label><button type="submit">Save note</button></form><details id="captured-evidence"><summary>Captured source evidence</summary><p id="detail-version"></p><pre id="detail-excerpt"></pre></details><button id="remove-evidence" type="button">Remove evidence and its connections</button></aside></main>
-<dialog id="source-dialog"><form id="source-form"><h2>Add source evidence</h2><p>Copy a relative path and line from the code you are reading in your editor.</p><label>Workspace-relative path<input id="source-path" required autocomplete="off" placeholder="src/compiler/mod.rs"></label><label>Starting line<input id="source-line" type="number" min="1" value="1" required></label><label>What does this location contribute?<input id="source-title" maxlength="128" required placeholder="Entry point, reader contract, regression test…"></label><p id="source-dialog-state" role="status"></p><p id="source-dialog-error" role="alert" hidden></p><div class="dialog-actions"><button id="cancel-source" type="button">Cancel</button><button id="pin-source" type="submit">Keep source evidence</button></div></form></dialog><script type="module" src="/companion.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Vizzi · explore</title><script src="/theme-init.js"></script>
+  <link rel="stylesheet" href="/theme.css"><link rel="stylesheet" href="/app.css"><link rel="stylesheet" href="/companion.css">
+</head>
+<body class="companion-page">
+  <header>
+    <a class="brand" href="/">vizzi</a>
+    <nav aria-label="Workspace views">
+      <button id="show-discovery" type="button" aria-pressed="true">Explore repository</button>
+      <button id="show-saved" type="button" aria-pressed="false">Saved locations (0)</button>
+    </nav>
+    <span id="source-state" role="status">Mapping source…</span>
+    <details class="workspace-menu"><summary>More</summary><div>
+      <a href="/review">Review changes</a><a href="/explore">Detailed source browser</a>
+      <button id="add-source" type="button">Add a known source location</button>
+      <button id="export" type="button">Export investigation</button>
+      <label class="theme-control">Theme<select id="theme" aria-label="Theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
+    </div></details>
+  </header>
+  <p id="investigation-notice" role="status" hidden></p><p id="investigation-error" role="alert" hidden></p>
+  <main class="companion-main">
+    <section id="discovery-panel" aria-label="Repository overview">
+      <div class="discovery-heading"><h1 id="repository-title">Explore this repository</h1><p id="discovery-summary">Preparing the source overview…</p></div>
+      <label class="discovery-search" for="discover-search">Find a name or file<input id="discover-search" type="search" autocomplete="off" maxlength="256" placeholder="For example: reader, compile, test"></label>
+      <nav id="discovery-breadcrumbs" aria-label="Source areas"></nav>
+      <p id="discovery-coverage" hidden></p><p id="discovery-counts" role="status" hidden></p>
+      <div id="discovery-areas" aria-label="Source areas and names" aria-busy="true"></div>
+      <p id="discovery-empty" hidden>No matching names or files. Try a different word or return to the repository.</p>
+      <div class="discovery-paging"><button id="discovery-back" type="button" hidden>Previous results</button><button id="discovery-more" type="button" hidden>Next results</button><button id="index-source" type="button" hidden>Retry source indexing</button></div>
+    </section>
+    <aside id="source-preview" aria-label="Source preview" hidden>
+      <div class="detail-heading"><h2 id="preview-title"></h2><button id="close-preview" type="button" aria-label="Close source preview">Close</button></div>
+      <p id="preview-path"></p><p id="preview-status" role="status"></p>
+      <div id="preview-names" aria-label="Names in this file"></div><button id="preview-more-names" type="button" hidden>More names</button>
+      <pre id="preview-source"></pre>
+      <div class="preview-actions"><button id="keep-discovered" type="button">Keep this location</button><button id="preview-editor" type="button" hidden>Open in VS Code</button></div>
+    </aside>
+    <section id="saved-workspace" aria-label="Saved context" hidden>
+      <div class="saved-heading"><h1 id="investigation-title">Your saved context</h1><p id="investigation-counts">No saved locations yet</p><p id="save-mode"></p></div>
+      <div class="optional-tools">
+        <details><summary>Add or edit a question</summary><form id="question-form"><label for="question">What are you investigating?</label><textarea id="question" rows="2" maxlength="2048" placeholder="An optional question to keep with these locations"></textarea><button type="submit">Save question</button></form></details>
+        <details id="connection-tools" hidden><summary>Explain a connection</summary><form id="connection-form"><label for="connection-from">From</label><select id="connection-from" required></select><label for="connection-to">To</label><select id="connection-to" required></select><label>What connects them?<textarea id="connection-text" rows="3" maxlength="512" required></textarea></label><button type="submit">Connect evidence</button></form></details>
+      </div>
+      <div id="evidence-map" aria-label="Saved source map"><svg id="evidence-links" aria-hidden="true"></svg><div id="evidence-cards"></div><div id="empty-investigation"><h2>No saved locations yet.</h2><p>Explore the repository and keep a location when you find something useful.</p><button id="empty-add-source" type="button">Explore repository</button></div></div>
+      <section id="connection-list-panel" hidden><h2>Your connections</h2><ol id="connection-list"></ol></section>
+    </section>
+    <aside id="evidence-detail" aria-label="Evidence detail" hidden>
+      <div class="detail-heading"><h2 id="detail-title"></h2><button id="close-detail" type="button">Close evidence</button></div>
+      <p id="detail-location"></p><p id="detail-freshness"></p><button id="detail-editor" type="button">Open in VS Code</button>
+      <form id="note-form"><label>Your interpretation<textarea id="evidence-note" rows="5" maxlength="2048"></textarea></label><button type="submit">Save note</button></form>
+      <details id="captured-evidence"><summary>Captured source evidence</summary><p id="detail-version"></p><pre id="detail-excerpt"></pre></details><button id="remove-evidence" type="button">Remove evidence and its connections</button>
+    </aside>
+  </main>
+  <dialog id="source-dialog"><form id="source-form"><h2>Add a known source location</h2><p>For a location you already have open in your editor.</p><label>Workspace-relative path<input id="source-path" required autocomplete="off"></label><label>Starting line<input id="source-line" type="number" min="1" value="1" required></label><label>What does this location contribute?<input id="source-title" maxlength="128" required></label><p id="source-dialog-state" role="status"></p><p id="source-dialog-error" role="alert" hidden></p><div class="dialog-actions"><button id="cancel-source" type="button">Cancel</button><button id="pin-source" type="submit">Keep source evidence</button></div></form></dialog>
+  <script type="module" src="/companion.js"></script>
+</body></html>

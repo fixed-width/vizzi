@@ -6,8 +6,14 @@ does not establish added value alongside an editor. Further IDE-surface feature 
 paused as a delivery priority. Complete the companion slice and evaluate its contribution
 before adding more navigation, outline or diff controls.
 
-The next reviewable output is a question-centred investigation with version-bound evidence,
-reader-authored connections, an on-demand preview and a verified VS Code handoff. Reuse
+The correction after `d647a6e` is to start with automatic source discovery: the earlier
+empty question/evidence form assumed the organisation was already known and exposed too
+many inputs. The landing page now presents real source areas and names, with one optional
+search input and one-click capture. Questions and relationship authoring are disclosed
+only when wanted; stored investigations and the editor handoff remain available.
+
+Evaluate discovery with version-bound saved evidence, reader-authored connections,
+an on-demand preview and a verified VS Code handoff. Reuse
 the existing lpc-rs learning question. Read source in the editor; retain cross-file context
 and the explanation in Vizzi. Record a baseline without Vizzi, then the companion attempt,
 including duplication, lost context and unsupported questions. Reference-aware automation

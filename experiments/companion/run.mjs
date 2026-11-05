@@ -45,24 +45,35 @@ try {
   page.on('pageerror', e => report.errors.push(e.message));
   await page.goto(host.url);
   await page.waitForFunction(() => document.querySelector('#save-mode').textContent);
+  await page.waitForFunction(() => document.querySelectorAll('.discovery-entry').length > 0);
+  assert.equal(await page.locator('input:visible,textarea:visible').count(), 1);
+  await page.screenshot({path: join(output, 'overview.png'), fullPage: true});
+  const locations = [
+    ['compile_file', 'src/compiler/mod.rs', 140, 'Obtains identity and source through read_file before compiling.'],
+    ['read_file', 'src/compiler/mod.rs', 151, 'Uses the injected reader or DiskSourceReader; retries only NotFound on a path without the c extension.'],
+    ['SourceReader', 'src/compiler/source_reader.rs', 17, 'Supplies raw bytes separately from source authorization and decoding.'],
+    ['SourceReader for DiskSourceReader', 'src/compiler/source_reader.rs', 30, 'The default reader delegates the read to tokio::fs::read.'],
+    ['CompilerSource', 'src/compiler/source.rs', 12, 'Keeps the input, resolved path and diagnostic name together.'],
+    ['file_reads_stop_after_extension_fallback_and_preserve_other_io_errors', 'src/compiler/mod.rs', 2012, 'Specifies the bounded fallback and preservation of other I/O errors.'],
+  ];
+  for (const [title, path] of locations) {
+    const response = page.waitForResponse(r => {
+      const url = new URL(r.url());return url.pathname === '/api/discovery' && url.searchParams.get('search') === title && r.status() === 200;
+    });
+    await page.getByLabel('Find a name or file',{exact:true}).fill(title);
+    await response;
+    const match = page.locator('.discovery-entry').filter({has: page.getByRole('heading',{name:title,exact:true})}).filter({hasText:path}).first();
+    await match.click();
+    await page.getByRole('button',{name:'Keep this location',exact:true}).click();
+    await page.waitForFunction(() => document.querySelector('#keep-discovered').textContent === 'Kept');
+    await page.getByRole('button',{name:'Close source preview',exact:true}).click();
+  }
+  report.interaction = 'Declaration search and one-click keep; no typed paths, lines or titles.';
+  await page.locator('#show-saved').click();await page.getByText('Add or edit a question',{exact:true}).click();
   await page.getByLabel('What are you investigating?', {exact: true}).fill('How does the compiler obtain source, retry the c extension, and report read failure?');
   await page.getByRole('button', {name: 'Save question', exact: true}).click();
   await page.waitForFunction(() => document.querySelector('#investigation-title').textContent.startsWith('How does the compiler'));
-  const locations = [
-    ['Compile entry', 'src/compiler/mod.rs', 140, 'Obtains identity and source through read_file before compiling.'],
-    ['Read and retry', 'src/compiler/mod.rs', 151, 'Uses the injected reader or DiskSourceReader; retries only NotFound on a path without the c extension.'],
-    ['Reader contract', 'src/compiler/source_reader.rs', 17, 'Supplies raw bytes separately from source authorization and decoding.'],
-    ['Disk implementation', 'src/compiler/source_reader.rs', 30, 'The default reader delegates the read to tokio::fs::read.'],
-    ['Source identity', 'src/compiler/source.rs', 12, 'Keeps the input, resolved path and diagnostic name together.'],
-    ['Failure regression', 'src/compiler/mod.rs', 2012, 'Specifies the bounded fallback and preservation of other I/O errors.'],
-  ];
   for (const [title, path, line, note] of locations) {
-    await page.getByRole('button', {name: 'Add source evidence', exact: true}).click();
-    await page.getByLabel('Workspace-relative path', {exact: true}).fill(path);
-    await page.getByLabel('Starting line', {exact: true}).fill(String(line));
-    await page.getByLabel('What does this location contribute?', {exact: true}).fill(title);
-    await page.waitForFunction(() => !document.querySelector('#pin-source').disabled);
-    await page.getByRole('button', {name: 'Keep source evidence', exact: true}).click();
     const card = page.locator('.evidence-card').filter({has: page.getByRole('heading', {name: title, exact: true})});
     await card.getByRole('button', {name: 'Inspect evidence', exact: true}).click();
     await page.getByLabel('Your interpretation', {exact: true}).fill(note);
@@ -70,6 +81,7 @@ try {
     await page.waitForFunction(note => [...document.querySelectorAll('.evidence-summary')].some(n => n.textContent === note), note);
     await page.getByRole('button', {name: 'Close evidence', exact: true}).click();
   }
+  await page.getByText('Explain a connection',{exact:true}).click();
   for (const [from, to, explanation] of [
     ['1', '2', 'The compile entry delegates source acquisition to this read/retry loop.'],
     ['2', '3', 'The loop chooses an injected implementation of this reader contract.'],
@@ -89,6 +101,10 @@ try {
   assert.deepEqual(report.recordedEditorArguments, ['--reuse-window', '--goto', join(input.root, 'src/compiler/mod.rs') + ':140:1']);
   const board = JSON.parse(await readFile(join(output, 'investigation.json'), 'utf8'));
   report.anchors = board.evidence.map(e => ({id: e.id, title: e.title, ...e.source}));
+  for (let i=0;i<locations.length;i++) {
+    assert.equal(report.anchors[i].path,locations[i][1]);
+    assert.equal(report.anchors[i].line,locations[i][2]);
+  }
   assert.equal(board.evidence.length, 6);
   assert.equal(board.connections.length, 5);
   await paint(page);

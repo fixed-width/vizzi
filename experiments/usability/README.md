@@ -85,7 +85,8 @@ target/release/vizzi --root "$TRIAL_DIR/review/workspace" \
 ```
 
 Use the first printed URL for the editor-companion learning trial and append `/review`
-to the second printed URL. The companion starts empty; follow the
+to the second printed URL. The source overview populates automatically and saved context
+starts empty; follow the
 [condition/order procedure](../../docs/companion/TRIAL.md) and keep editor-only observations
 separate. For a repeat of the earlier source-browser trial, append `/explore` instead
 and label that condition explicitly.

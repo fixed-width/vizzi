@@ -17,7 +17,7 @@ Open **http://127.0.0.1:7474/explore** for source browsing. The root page is the
 server binds to loopback. Choose another port with `--port 7475` if needed. Stop it with
 Ctrl-C. The cache must be outside the inspected workspace, including through symlinks.
 
-The URL becomes available before live indexing. Opening `/explore` starts
+The URL becomes available before live indexing. Opening `/` or `/explore` starts
 that index and shows its progress. To begin a focused review directly, open
 **http://127.0.0.1:7474/review**; review captures only the explicitly selected scope,
 without starting the live index. Once exploration has activated indexing, live watching

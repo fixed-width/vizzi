@@ -3,6 +3,20 @@
 Read [the behaviour contract](PRODUCT.md) first. Source access/analysis, investigations,
 visual projection and host integration retain separate interfaces.
 
+The discovery correction after `d647a6e` adds a portable, metadata-only snapshot
+projection. It aggregates immediate directory children and file/language counts, or
+searches captured declaration names and paths, with bounded paginated results. It reads
+neither mutable files nor captured text. Exact file/version/line bindings feed existing
+bounded windows and evidence capture; a native handler runs the projection outside the
+HTTP event loop. It preserves per-language capabilities and makes no inferred dependency
+claim. No new parser, renderer or runtime dependency is needed.
+
+The browser starts read-only indexing on the discovery landing page. Review stays
+deferred. Use one optional search input, a clickable area overview and a transient
+preview; do not put question/path/line/title/connection forms on the initial screen.
+Saved state has a separate view with optional editors disclosed on request. Preserve
+stored investigations, stale-source refusal and recording-only editor verification.
+
 `vizzi-core::investigation` owns bounded question/evidence/connection data, mutation
 invariants, versioned serialisation and validation. Source anchors use existing workspace,
 file, content, document and snapshot identities. The core has no filesystem, process,
@@ -23,10 +37,10 @@ never a shell or a command supplied by an HTTP request. Tests use a recording ad
 The executable is configured at native launch (default `code`). File verification is bounded; race-free
 confirmation of editor buffer contents, including existing unsaved edits, is outside this CLI handoff's guarantee.
 
-A dedicated investigation route is the primary page; source exploration moves to
+A discovery route is the primary page; detailed source exploration stays at
 `/explore`, and review stays `/review`. Browser helpers continue to consume bounded native
-queries. The question, cards and reader connections dominate the workspace; source lookup
-and captured preview are temporary panels. Render all source, names and notes as text.
+queries. An automatically populated overview precedes optional saved interpretation;
+source previews are temporary panels. Render all source, names and notes as text.
 Do not add a diagramming dependency or another parser for this bounded first slice.
 
 Validation follows the interfaces: portable model tests for bounds, identities, links,

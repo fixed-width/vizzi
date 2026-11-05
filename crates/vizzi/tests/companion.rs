@@ -420,6 +420,20 @@ async fn investigation_http_preserves_state_on_invalid_stale_and_oversized_edits
     let reviews =
         Arc::new(ReviewApplication::start(host.clone(), CaptureLimits::default()).unwrap());
     let router = router_with_companion(host, reviews, app.clone());
+    let discovery = diagnostic(router.clone(), json!(1), "/api/discovery")
+        .await
+        .unwrap();
+    assert_eq!(discovery.status, 200);
+    let discovery: serde_json::Value = serde_json::from_str(&discovery.body).unwrap();
+    assert_eq!(discovery["scope_files"], 1);
+    assert_eq!(discovery["entries"][0]["path"], "src");
+    assert_eq!(
+        diagnostic(router.clone(), json!(1), "/api/discovery?path=../escape")
+            .await
+            .unwrap()
+            .status,
+        400
+    );
     let response = router
         .clone()
         .oneshot(

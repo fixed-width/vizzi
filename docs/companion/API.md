@@ -7,6 +7,7 @@ connection explanations at 512. Native state is outside the source checkout.
 
 | Request | Input/result |
 | --- | --- |
+| `GET /api/discovery` | Optional directory `path`, name/path `search`, and `offset` → at most 24 areas or source locations, scope/language/coverage counts, matching count and next offset. Metadata only; no source IO. |
 | `GET /api/investigation` | Saved board, persistence/editor labels and separate current-index freshness per evidence ID. Does not start indexing. |
 | `GET /api/investigation/lookup?path=…` | Normalised relative indexed path → snapshot/file/version/path/line-count. |
 | `POST /api/investigation/evidence` | JSON revision, snapshot, file, version, line, title → captured evidence ID and current view. |
@@ -26,4 +27,10 @@ verification fail explicitly. A successful CLI result does not confirm the curre
 editor buffer; unsaved edits and changes after verification need plugin-level handling.
 
 The primary page is `/` (also `/investigate`); `/explore` and `/review` are supporting
-surfaces. Existing file/window/review interfaces keep their source identities and bounds.
+surfaces. The primary page activates read-only indexing automatically; fetching saved
+state or discovery metadata does not itself start indexing. Discovery uses one immutable
+snapshot per response and returns exact file/version/line bindings for existing windows
+and evidence capture. Paths cap at 4,096 UTF-8 bytes and search at 256; invalid input is
+400 and absent live indexing is 503. Name search is case-insensitive lexical substring
+matching, not source-body or semantic search. Existing file/window/review interfaces keep
+their source identities and bounds.

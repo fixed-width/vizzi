@@ -34,6 +34,7 @@ impl IntoResponse for Error {
 pub(super) fn router(app: Arc<Companion>) -> Router {
     Router::new()
         .route("/api/investigation", get(view).post(edit))
+        .route("/api/discovery", get(discover))
         .route("/api/investigation/lookup", get(lookup))
         .route("/api/investigation/evidence", post(pin))
         .route("/api/investigation/evidence/{id}/open", post(open))
@@ -70,6 +71,12 @@ async fn work<T: Send + 'static>(
 }
 async fn view(State(app): State<Arc<Companion>>) -> Json<crate::companion::CompanionView> {
     Json(app.view())
+}
+async fn discover(
+    State(app): State<Arc<Companion>>,
+    Query(query): Query<vizzi_core::discovery::DiscoveryQuery>,
+) -> Result<Json<vizzi_core::discovery::Discovery>, Error> {
+    work(move || app.discover(&query)).await
 }
 #[derive(Deserialize)]
 struct Lookup {

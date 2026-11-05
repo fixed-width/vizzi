@@ -206,6 +206,15 @@ impl Companion {
             )
         })
     }
+    /// Orients an unfamiliar reader using only captured paths and lexical metadata.
+    pub fn discover(
+        &self,
+        query: &vizzi_core::discovery::DiscoveryQuery,
+    ) -> Result<vizzi_core::discovery::Discovery, CompanionError> {
+        self.snapshot()?
+            .discover(query)
+            .map_err(|e| CompanionError::Invalid(e.to_string()))
+    }
     fn save(&self, board: &Investigation) -> Result<(), CompanionError> {
         let data = board.encode()?;
         if let Some(path) = &self.file {

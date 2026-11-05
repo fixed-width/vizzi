@@ -6,6 +6,7 @@ pub mod capture;
 mod captured_source;
 pub mod coloring;
 pub mod comparison;
+pub mod discovery;
 pub mod investigation;
 pub mod model;
 pub mod policy;

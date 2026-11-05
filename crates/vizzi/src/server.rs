@@ -80,6 +80,7 @@ pub fn router(application: Arc<Application>) -> Router {
         .route("/explore", get(|| async { asset("text/html; charset=utf-8", include_str!("../web/index.html")) }))
         .route("/investigate", get(|| async { asset("text/html; charset=utf-8", include_str!("../web/companion.html")) }))
         .route("/companion.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/companion.js")) }))
+        .route("/discovery.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/discovery.js")) }))
         .route("/companion.css", get(|| async { asset("text/css; charset=utf-8", include_str!("../web/companion.css")) }))
         .route("/review", get(|| async { asset("text/html; charset=utf-8", include_str!("../web/review.html")) }))
         .route("/review-app.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/review-app.js")) }))
@@ -410,7 +411,7 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(page.status, 200);
-        assert!(page.body.contains("Investigation"));
+        assert!(page.body.contains("Repository overview"));
         assert_eq!(
             diagnostic(router, serde_json::Value::Null, "/absent")
                 .await

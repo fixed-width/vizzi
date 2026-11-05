@@ -1,8 +1,10 @@
 # Vizzi
 
 Coordinated views for learning source code and reviewing changes alongside your editor.
-The primary page is an investigation: a question, version-bound source evidence, notes
-and reader-authored connections. VS Code handles normal reading and editing; an explicit
+The primary page automatically maps captured source into areas and searchable names.
+Click through the overview and keep useful locations without entering paths or lines.
+Saved context offers optional questions, notes and reader-authored connections.
+VS Code handles normal reading and editing; an explicit
 handoff checks working-file content before opening a saved location. A source map,
 captured preview, declaration outline and comparison remain supporting views.
 A native Rust engine supplies immutable observations to a local browser host.

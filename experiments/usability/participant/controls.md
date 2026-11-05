@@ -5,9 +5,10 @@ Changes to that copy do not change the original checkout. The trial launch does 
 start screen/audio recording; agree separately if a recording would help. You can
 pause or stop at any time.
 
-The learning page keeps a question, source locations, your notes and your connections
-while you read in VS Code. Use **Add source evidence** to keep a relative path and line
-with a title. **Inspect evidence** opens notes and a short captured preview.
+The learning page starts with a source overview. Choose an area or use **Find a name or
+file**, then select a name and **Keep this location**. No known path or line is required.
+**Saved locations** keeps context while you read in VS Code. Questions and connection
+controls are optional and open on request. **Inspect evidence** opens notes and a short captured preview.
 Connections are your assertions. **Open in VS Code** verifies the saved source against
 the current index and working file; changed or unavailable source stays in the
 investigation and produces an explanation. The editor opens a live file and may have
