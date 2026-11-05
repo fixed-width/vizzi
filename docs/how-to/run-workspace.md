@@ -12,11 +12,12 @@ cargo run --release -p vizzi -- \
   --cache /tmp/vizzi-cache/lpc-rs
 ```
 
-Open **http://127.0.0.1:7474** in a browser. All assets and source data are local. The
+Open **http://127.0.0.1:7474/explore** for source browsing. The root page is the
+[editor-companion investigation](investigate-with-vscode.md). All assets and source data are local. The
 server binds to loopback. Choose another port with `--port 7475` if needed. Stop it with
 Ctrl-C. The cache must be outside the inspected workspace, including through symlinks.
 
-The URL becomes available before live indexing. Opening the exploration page starts
+The URL becomes available before live indexing. Opening `/explore` starts
 that index and shows its progress. To begin a focused review directly, open
 **http://127.0.0.1:7474/review**; review captures only the explicitly selected scope,
 without starting the live index. Once exploration has activated indexing, live watching

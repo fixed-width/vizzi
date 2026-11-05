@@ -21,6 +21,8 @@ let overviewTransform,overviewDrag=false;
 installSplitter(element("explore-workspace"),{key:"explore",label:"Repository map and source widths",initial:.43,minBefore:240,minAfter:320});
 installSplitter(element("outline").closest(".source-layout"),{key:"explore-outline",label:"Declarations and source widths",initial:.3,minBefore:100,minAfter:200});
 const source = element("source"), space = element("source-space");
+const keepEvidence=document.createElement("button");keepEvidence.type="button";keepEvidence.id="keep-evidence";keepEvidence.textContent="Keep as evidence";keepEvidence.disabled=true;element("snapshot").before(keepEvidence);
+keepEvidence.addEventListener("click",async()=>{if(!view?.source)return;keepEvidence.disabled=true;try{const response=await fetch('/api/investigation');if(!response.ok)throw new Error(await response.text());const state=await response.json();const active=view.source.summary.active;const kept=await fetch('/api/investigation/evidence',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({revision:state.board.revision,snapshot:view.snapshot,file:view.source.id,version:view.source.version,line:active?.start_line ?? 1,title:active?.name ?? view.source.path})});if(!kept.ok)throw new Error(await kept.text());location.assign('/');}catch(e){showError(e);keepEvidence.disabled=false;}});
 const metrics = { drawCpuMs: [], interactionFrameMs: [], requestMs: [], pickingMs: [], lastFrame: null };
 window.vizziMetrics = metrics;
 function sample(series, value) { series.push(value); if (series.length > 512) series.shift(); }
@@ -71,7 +73,7 @@ const controller = createController({
   onView: (next,info) => {
     const previousSelection=view?.selection.file;
     const first = !view, changedFilter=viewFilter!==(info.query.filter ?? "");
-    view = next;
+    view = next;keepEvidence.disabled=!next.source;
     viewFilter=info.query.filter ?? "";
     if(info.intent?.returning)element("filter").value=viewFilter;
     if(mapWorkspace!==next.workspace){let preferences={};try{const saved=localStorage.getItem(`vizzi.map.v1.${next.workspace}`);if(saved && saved.length<=65536 && new TextEncoder().encode(saved).length<=65536)preferences=JSON.parse(saved);}catch{}mapModel=createMapModel(next.files,preferences);mapWorkspace=next.workspace;}

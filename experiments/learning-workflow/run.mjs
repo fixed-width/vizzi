@@ -69,7 +69,7 @@ try {
   });
   await page.route("**/*", route => new URL(route.request().url()).origin === host.url ? route.continue() : route.abort());
   const opened = performance.now();
-  await page.goto(host.url);
+  await page.goto(host.url+"/explore");
   await page.waitForFunction(() => document.querySelectorAll(".code-line").length > 0);
   report.pageReadyMs = performance.now() - opened;
   report.hostUrl = host.url;

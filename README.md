@@ -1,8 +1,11 @@
 # Vizzi
 
-Coordinated views for exploring source code and reviewing changes.
-The current prototype links a source file map, captured source, and a lexical declaration
-outline. A native Rust engine supplies immutable observations to a local browser host.
+Coordinated views for learning source code and reviewing changes alongside your editor.
+The primary page is an investigation: a question, version-bound source evidence, notes
+and reader-authored connections. VS Code handles normal reading and editing; an explicit
+handoff checks working-file content before opening a saved location. A source map,
+captured preview, declaration outline and comparison remain supporting views.
+A native Rust engine supplies immutable observations to a local browser host.
 Rust/Python are selected by default; explicit scopes enable raw C/C++ analysis.
 
 The production renderer, compiler-backed language integrations and storage engine
@@ -12,8 +15,9 @@ are recorded; independent usability and whole-repository qualification remain op
 The Canvas2D overview is a reference view for
 validating coordination; it does not qualify large-codebase GPU performance.
 
-Next delivery follows the [product milestones](docs/plans/product-milestones.md):
-explain a real subsystem, then review a local change with surrounding context.
+The current [product checkpoint](docs/plans/product-milestones.md) evaluates the
+investigation's contribution alongside an editor. Guided functional checks do not
+establish that contribution; the editor-only comparison and maintainer trial remain open.
 The [view-selection rationale](docs/explanation/task-driven-views.md) connects these
 tasks to the literature. Further performance work is conditional on a workflow blocker.
 
@@ -44,7 +48,9 @@ zero edited-file resets across 30 scoped refreshes.
 The [human-trial kit](experiments/usability/README.md) prepares maintainer feedback and
 later unfamiliar-user evaluation with neutral tasks and separate scoring material.
 
-- [Run the workspace](docs/how-to/run-workspace.md)
+- [Keep an investigation beside VS Code](docs/how-to/investigate-with-vscode.md)
+- [Run the source and review views](docs/how-to/run-workspace.md)
+- [Companion behaviour](docs/companion/PRODUCT.md), [architecture](docs/companion/TECH.md), [API](docs/companion/API.md) and [trial procedure](docs/companion/TRIAL.md)
 - [Next product milestones](docs/plans/product-milestones.md)
 - [Why these coordinated views](docs/explanation/task-driven-views.md)
 - [Baseline learning walkthrough and recording](experiments/learning-workflow/RESULTS.md)

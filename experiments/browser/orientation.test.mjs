@@ -13,7 +13,7 @@ try{
  await writeFile(join(input.root,'src/compiler/a.rs'),code('Second'));git('add','.');git('commit','--quiet','-m','second');
  await writeFile(join(input.root,'src/compiler/a.rs'),code('Third'));git('add','.');git('commit','--quiet','-m','third');
  host=await startHost(input,1);chromium=await browser({desktopBus:false});const context=await chromium.newContext({viewport:{width:1600,height:1000},colorScheme:'dark'});const page=await context.newPage(),errors=[];page.setDefaultTimeout(8000);page.on('pageerror',e=>errors.push(e.message));
- await page.goto(host.url);await page.waitForFunction(()=>document.querySelector('#snapshot').textContent.length===8);await paint(page);
+ await page.goto(host.url+"/explore");await page.waitForFunction(()=>document.querySelector('#snapshot').textContent.length===8);await paint(page);
  assert.equal(await page.getByLabel('Theme',{exact:true}).inputValue(),'system');
  const background=()=>page.locator('body').evaluate(n=>getComputedStyle(n).backgroundColor==='rgba(0, 0, 0, 0)'?getComputedStyle(document.documentElement).backgroundColor:getComputedStyle(n).backgroundColor);
  assert.equal(await background(),'rgb(12, 19, 30)');
@@ -41,6 +41,6 @@ try{
  assert.equal(await page.locator('#comparison-labels .message-close').count(),0);assert.equal(await page.locator('#review-workspace .message-close').count(),0);
  await page.setViewportSize({width:600,height:900});await paint(page);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
  assert.deepEqual(errors,[]);
- if(process.argv.includes('--screenshots')){const dir=process.argv[process.argv.indexOf('--screenshots')+1];await mkdir(dir,{recursive:true});for(const theme of ['dark','light']){await page.setViewportSize({width:1600,height:1000});await page.getByLabel('Theme',{exact:true}).selectOption(theme);await page.screenshot({path:join(dir,theme+'-review.png'),fullPage:true});await page.goto(host.url);await page.waitForFunction(()=>document.querySelector('#snapshot').textContent.length===8);await page.screenshot({path:join(dir,theme+'-map.png'),fullPage:true});await page.goto(host.url+'/review');await page.waitForFunction(()=>document.querySelector('#review-workspace').dataset.token);}}
+ if(process.argv.includes('--screenshots')){const dir=process.argv[process.argv.indexOf('--screenshots')+1];await mkdir(dir,{recursive:true});for(const theme of ['dark','light']){await page.setViewportSize({width:1600,height:1000});await page.getByLabel('Theme',{exact:true}).selectOption(theme);await page.screenshot({path:join(dir,theme+'-review.png'),fullPage:true});await page.goto(host.url+"/explore");await page.waitForFunction(()=>document.querySelector('#snapshot').textContent.length===8);await page.screenshot({path:join(dir,theme+'-map.png'),fullPage:true});await page.goto(host.url+'/review');await page.waitForFunction(()=>document.querySelector('#review-workspace').dataset.token);}}
  console.log('orientation browser: revision syntax, themes, message dismissal, hierarchy/collapse/reordering, persisted layout, focus, source identity and narrow layout passed');
 }finally{await chromium?.close();await host?.close();await input.close();}

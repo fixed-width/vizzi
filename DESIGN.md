@@ -5,6 +5,20 @@ coordinated views of the same source material. These notes capture the current d
 direction and scope; they are not an implementation status report or a delivery plan.
 Contributor standards belong in [AGENTS.md](AGENTS.md).
 
+## Product role
+
+Vizzi supplements an editor by helping a developer assemble and navigate an understanding
+of a subsystem or change across files and revisions. Questions, source evidence and
+relationships are the primary working objects. The editor remains the main surface for
+reading and changing source. A bounded source preview supports evidence inspection and
+version accuracy. Directory/declaration browsing and conventional diffs are supporting
+views, not the product's organising workflow.
+
+The [companion workflow](docs/companion/PRODUCT.md) is the next delivery slice. Evaluate
+what it contributes alongside an editor, rather than accepting source-browsing feature
+parity as progress towards the product goal.
+
+
 ## Architecture
 
 Keep source access, language analysis, indexing, investigations, views, and host
@@ -24,8 +38,8 @@ their actual environments. The [C/C++ policy](docs/prototype/C_FAMILY_POLICY.md)
 this extension; its [rationale](docs/explanation/c-family-analysis.md) records the evidence.
 
 Initial delivery uses a local Rust engine and browser interface, with offline
-operation. Preserve an integration path for editor plugins through host interfaces.
-Editor integration is a future capability.
+operation. Use editor-neutral source-location interfaces. The first companion slice brings a minimal
+VS Code handoff forward; richer plugin integration remains a later capability.
 
 Rust with wgpu is the leading rendering candidate. Representative performance
 experiments should establish the rendering backend before it is treated as settled.

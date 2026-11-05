@@ -23,7 +23,7 @@ async function observation(page,previous=null) {
   }),previous);
 }
 async function fixture(path="big.rs") {
-  const page=await chromium.newPage();page.testErrors=[];page.on("pageerror",error=>page.testErrors.push(error.message));await page.route("**/app.js",route=>route.fulfill({body:"",contentType:"text/javascript"}));await page.goto(host.url);
+  const page=await chromium.newPage();page.testErrors=[];page.on("pageerror",error=>page.testErrors.push(error.message));await page.route("**/app.js",route=>route.fulfill({body:"",contentType:"text/javascript"}));await page.goto(host.url+"/explore");
   const activation=await page.request.post(`${host.url}/api/workspace/start`,{data:{}});assert.equal(activation.status(),202);
   await observation(page);
   await page.evaluate(async({moduleUrl,path})=>{

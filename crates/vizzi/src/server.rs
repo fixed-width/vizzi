@@ -21,6 +21,7 @@ use vizzi_core::{
 };
 
 type ApiError = (StatusCode, String);
+mod companion;
 mod review;
 
 /// Serves deferred HTTP exploration and review through one native host.
@@ -53,6 +54,15 @@ async fn start_workspace(
     )
 }
 
+/// Adds investigation and editor operations to the host-aware local transport.
+pub fn router_with_companion(
+    host: Arc<crate::host::Host>,
+    reviews: Arc<crate::review_application::ReviewApplication>,
+    investigation: Arc<crate::companion::Companion>,
+) -> Router {
+    router_with_host(host, reviews).merge(companion::router(investigation))
+}
+
 /// Adds comparison operations to the live workspace router without sharing status schemas.
 pub fn router_with_reviews(
     application: Arc<Application>,
@@ -66,7 +76,11 @@ pub fn router(application: Arc<Application>) -> Router {
     Router::new()
         .route("/api/status", get(status)).route("/api/view", get(view)).route("/api/source", get(source))
         .route("/api/events", get(events)).route("/api/window",get(window))
-        .route("/", get(|| async { asset("text/html; charset=utf-8", include_str!("../web/index.html")) }))
+        .route("/", get(|| async { asset("text/html; charset=utf-8", include_str!("../web/companion.html")) }))
+        .route("/explore", get(|| async { asset("text/html; charset=utf-8", include_str!("../web/index.html")) }))
+        .route("/investigate", get(|| async { asset("text/html; charset=utf-8", include_str!("../web/companion.html")) }))
+        .route("/companion.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/companion.js")) }))
+        .route("/companion.css", get(|| async { asset("text/css; charset=utf-8", include_str!("../web/companion.css")) }))
         .route("/review", get(|| async { asset("text/html; charset=utf-8", include_str!("../web/review.html")) }))
         .route("/review-app.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/review-app.js")) }))
         .route("/review-controller.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/review-controller.js")) }))
@@ -396,7 +410,7 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(page.status, 200);
-        assert!(page.body.contains("canvas"));
+        assert!(page.body.contains("Investigation"));
         assert_eq!(
             diagnostic(router, serde_json::Value::Null, "/absent")
                 .await

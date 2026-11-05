@@ -75,7 +75,8 @@ If needed, build Vizzi itself with `CARGO_BUILD_JOBS=1 cargo build --release --o
 
 ```sh
 target/release/vizzi --root "$TRIAL_DIR/learning/workspace" \
-  --cache "$TRIAL_DIR/learning/cache" --port 0 --workers 1
+  --cache "$TRIAL_DIR/learning/cache" \
+  --investigation-file "$TRIAL_DIR/learning/investigation.json" --port 0 --workers 1
 ```
 
 ```sh
@@ -83,7 +84,11 @@ target/release/vizzi --root "$TRIAL_DIR/review/workspace" \
   --cache "$TRIAL_DIR/review/cache" --port 0 --workers 1
 ```
 
-Use the first printed URL for learning and append `/review` to the second printed URL.
+Use the first printed URL for the editor-companion learning trial and append `/review`
+to the second printed URL. The companion starts empty; follow the
+[condition/order procedure](../../docs/companion/TRIAL.md) and keep editor-only observations
+separate. For a repeat of the earlier source-browser trial, append `/explore` instead
+and label that condition explicitly.
 The learning page's mode links stay on its learning archive; use the supplied review
 URL for the patched review task. In review, use the task's full baseline pin and subtree
 `.`. Keep C-family capture disabled for this corpus. Source and caches are disposable;

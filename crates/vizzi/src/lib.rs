@@ -5,6 +5,8 @@ mod analysis_workers;
 pub mod application;
 pub mod cache;
 pub mod changes;
+pub mod companion;
+pub mod editor;
 pub mod engine;
 pub mod host;
 mod invalidation;

@@ -177,7 +177,7 @@ test("initial map paints readable file labels", async () => {
     CanvasRenderingContext2D.prototype.fillText = function(text, ...args) { window.paintedLabels.push(String(text)); return fillText.call(this, text, ...args); };
   });
   try {
-    await page.goto(host.url);
+    await page.goto(host.url+"/explore");
     await page.waitForFunction(() => document.getElementById("snapshot").textContent.length === 8);
     await paint(page);
     assert.ok(await page.evaluate(() => window.paintedLabels.includes("a.rs")), "the initial overview should have a readable file label");

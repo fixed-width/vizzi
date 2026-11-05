@@ -22,7 +22,7 @@ try {
     if(attempts===2){entered.resolve();await gate.promise;}
     return route.continue();
   });
-  await page.goto(host.url);
+  await page.goto(host.url+"/explore");
   await page.getByRole("button",{name:"Start indexing",exact:true}).waitFor({state:"visible"});
   await page.waitForFunction(()=>!document.querySelector("#start-index").disabled && !document.querySelector("#error").hidden);
   assert.match(await page.locator("#error").textContent(),/No source observation is available/);

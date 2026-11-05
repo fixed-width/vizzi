@@ -5,7 +5,16 @@ Changes to that copy do not change the original checkout. The trial launch does 
 start screen/audio recording; agree separately if a recording would help. You can
 pause or stop at any time.
 
-The learning page links a file map, captured source and a declaration outline. Use
+The learning page keeps a question, source locations, your notes and your connections
+while you read in VS Code. Use **Add source evidence** to keep a relative path and line
+with a title. **Inspect evidence** opens notes and a short captured preview.
+Connections are your assertions. **Open in VS Code** verifies the saved source against
+the current index and working file; changed or unavailable source stays in the
+investigation and produces an explanation. The editor opens a live file and may have
+unsaved edits; this CLI handoff cannot confirm the buffer's bytes. Export keeps a
+portable copy; the save-mode label indicates whether host persistence is configured.
+
+**Browse source** at `/explore` links a file map, captured source and a declaration outline. Use
 the path filter or accessible file list to find files. Selecting a declaration reveals
 its source. Kind badges identify types and callables; **Line N** is the starting source
 line. Use the overview navigator to jump across the map, or +/− and Fit map to zoom.

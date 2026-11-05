@@ -1,0 +1,65 @@
+.companion-page header nav { display:flex;gap:22px;font-size:12px; }
+#source-state { margin-left:auto;color:var(--muted);font-size:11px; }
+#investigation-notice,#investigation-error { margin:0;padding:10px 24px;font-size:12px; }
+#investigation-notice { background:var(--warning-bg);color:var(--warning-text); }
+#investigation-error { background:var(--error-bg);color:var(--error-text); }
+.companion-main { display:flex;min-height:0;gap:0; }
+.question-panel { width:285px;flex:none;padding:24px 20px;overflow:auto;border-right:1px solid var(--border); }
+.question-panel .purpose { margin:0 0 22px;font-size:13px;line-height:1.6;color:var(--text); }
+.companion-page form label { display:flex;flex-direction:column;gap:7px;font-size:11px;line-height:1.5; }
+.companion-page textarea,.companion-page select { font:inherit;color:var(--text);background:var(--paper);border:1px solid var(--border);border-radius:4px;padding:8px;resize:vertical;max-width:100%; }
+#question-form { display:flex;flex-direction:column;gap:10px; }
+#question { font:16px/1.55 "Noto Sans",sans-serif;width:100%;min-height:120px; }
+#question-form button { align-self:start;background:var(--accent-fill);color:var(--on-accent);border-color:var(--accent-fill); }
+#save-mode,.working-hint { font-size:11px;color:var(--muted);line-height:1.65; }
+.investigation-actions { display:flex;flex-direction:column;align-items:stretch;gap:7px;margin:18px 0; }
+.investigation-actions button { text-align:left; }
+#connection-form { display:flex;flex-direction:column;gap:10px;margin-top:26px;padding-top:20px;border-top:1px solid var(--border); }
+#connection-form h2 { font:650 13px "Noto Sans",sans-serif; }
+#connection-form button { align-self:start; }
+.investigation-panel { flex:1;min-width:0;overflow:auto;padding:25px 25px 16px; }
+.investigation-heading { display:flex;justify-content:space-between;gap:20px;align-items:start;margin-bottom:24px; }
+.investigation-heading h1 { font:650 22px/1.4 "Noto Sans",sans-serif;white-space:normal;max-width:740px; }
+.investigation-heading p,.investigation-heading > span { font-size:10px;color:var(--muted); }
+#evidence-map { position:relative;min-height:340px; }
+#evidence-cards { position:relative;display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:46px 24px;align-items:start; }
+.evidence-card { min-width:0;position:relative;border:1px solid var(--border);border-top:3px solid var(--accent-fill);padding:14px 15px;background:var(--paper);min-height:170px; }
+.evidence-card h2 { font:650 15px/1.4 "Noto Sans",sans-serif;white-space:normal;margin:0 0 10px; }
+.evidence-card .evidence-path { font:10px/1.5 "DejaVu Sans Mono",monospace;overflow-wrap:anywhere;color:var(--muted);margin:0; }
+.evidence-card .evidence-summary { font-size:12px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere;margin:12px 0; }
+.evidence-card .evidence-summary:empty::before { content:"Add your interpretation";color:var(--muted);font-style:italic; }
+.evidence-card .card-actions { display:flex;gap:6px;flex-wrap:wrap;margin-top:14px; }
+.evidence-card button { font-size:10px;padding:5px 7px; }
+.evidence-card .source-freshness { display:block;color:var(--muted);font-size:10px;margin:7px 0; }
+.evidence-card[data-source-state="changed"],.evidence-card[data-source-state="missing"] { border-top-color:var(--warning-text); }
+#evidence-links { position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none; }
+#evidence-links path { fill:none;stroke:var(--muted);stroke-width:1.5;stroke-dasharray:5 4;opacity:.8; }
+#empty-investigation { padding:44px 20px;max-width:520px;margin:auto;text-align:left; }
+#empty-investigation h2 { font:650 20px "Noto Sans",sans-serif; }
+#empty-investigation p { color:var(--muted);line-height:1.8; }
+#connection-list-panel { padding-top:30px;margin-top:24px;border-top:1px solid var(--border); }
+#connection-list-panel h2 { font:650 13px "Noto Sans",sans-serif; }
+#connection-list { margin:15px 0 0;padding-left:20px; }
+#connection-list li { margin:9px 0;font-size:12px;line-height:1.6;overflow-wrap:anywhere; }
+.reader-assertion { font-size:10px;color:var(--muted);display:block; }
+#evidence-detail { flex:none;width:330px;overflow:auto;background:var(--paper);border-left:1px solid var(--border);padding:22px 18px; }
+.detail-heading { display:flex;align-items:start;gap:10px;justify-content:space-between; }
+.detail-heading h2 { font:650 16px/1.5 "Noto Sans",sans-serif;white-space:normal; }
+.detail-heading button { font-size:10px;padding:4px 6px;flex:none; }
+#detail-location,#detail-freshness,#detail-version { font-size:10px;line-height:1.7;overflow-wrap:anywhere;color:var(--muted); }
+#note-form { display:flex;flex-direction:column;gap:10px;margin-top:24px; }
+#note-form button { align-self:start; }
+#captured-evidence { margin-top:22px; }
+#detail-excerpt { font:11px/1.65 "DejaVu Sans Mono",monospace;overflow:auto;max-height:330px;tab-size:4; }
+#remove-evidence { margin-top:22px;font-size:10px;color:var(--error-text); }
+#source-dialog { background:var(--paper);color:var(--text);border:1px solid var(--border);border-radius:5px;max-width:min(520px,90vw);width:520px;padding:24px; }
+#source-dialog::backdrop { background:#0006; }
+#source-form { display:flex;flex-direction:column;gap:16px; }
+#source-form h2 { font:650 18px "Noto Sans",sans-serif; }
+#source-form p { font-size:12px;color:var(--muted);line-height:1.7; }
+#source-form #source-dialog-error { color:var(--error-text); }
+#source-form input { width:100%;flex:auto; }
+.dialog-actions { display:flex;justify-content:end;gap:8px; }
+.companion-page button:disabled { opacity:.5;cursor:default; }
+@media(max-width:1100px){#evidence-detail { position:fixed;top:80px;right:15px;bottom:15px;z-index:4;width:min(360px,calc(100vw - 30px));box-shadow:0 8px 40px #0004; } .question-panel{width:245px;} }
+@media(max-width:740px){.companion-page{height:auto;min-height:100dvh;} .companion-main{flex-direction:column;} .question-panel{width:auto;border-right:0;border-bottom:1px solid var(--border);} #question{min-height:80px;} .investigation-actions{flex-direction:row;flex-wrap:wrap;} #connection-form{max-width:480px;} .investigation-panel{overflow:visible;padding:22px 16px;} #evidence-cards{grid-template-columns:minmax(0,1fr);} .investigation-heading{flex-wrap:wrap;} #source-state{margin-left:0;} }

@@ -1,5 +1,9 @@
 # Local host API reference
 
+The [investigation API](../companion/API.md) adds question/evidence state and explicit
+verified editor handoff. `/` is the investigation; source browsing is at `/explore` and
+comparison at `/review`. Loading the investigation does not activate source indexing.
+
 The [comparison API](COMPARISON_API.md) adds separate lifecycle/status/SSE and bounded
 token/side/version-bound review queries. [Task-driven startup](STARTUP_PRODUCT.md)
 keeps the HTTP live index dormant until exploration or explicit activation requests it.

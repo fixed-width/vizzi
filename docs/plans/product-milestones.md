@@ -1,4 +1,27 @@
-# Product milestones: understand a subsystem, then review a change
+# Product milestones: companion workflow checkpoint
+
+The current delivery priority is [one editor-companion learning workflow](../companion/PRODUCT.md).
+The prototype below establishes safe browsing/comparison and performance foundations; it
+does not establish added value alongside an editor. Further IDE-surface feature work is
+paused as a delivery priority. Complete the companion slice and evaluate its contribution
+before adding more navigation, outline or diff controls.
+
+The next reviewable output is a question-centred investigation with version-bound evidence,
+reader-authored connections, an on-demand preview and a verified VS Code handoff. Reuse
+the existing lpc-rs learning question. Read source in the editor; retain cross-file context
+and the explanation in Vizzi. Record a baseline without Vizzi, then the companion attempt,
+including duplication, lost context and unsupported questions. Reference-aware automation
+checks function, not comprehension or independent acceptance.
+
+The [technical contract](../companion/TECH.md) keeps investigation state separate from
+source ownership and from the editor adapter. VS Code is the first adapter, selected by
+the maintainer. Persistence/excerpts are bounded and source changes never silently
+retarget evidence. The existing review surface remains available; a review investigation
+follows the functioning learning slice rather than expanding this slice into a full IDE.
+
+The previous milestone plan and delivery evidence follow as historical context.
+
+# Previous milestones: understand a subsystem, then review a change
 
 Status: the baseline and navigation slice are delivered, with a passing guided learning
 workflow. Independent-operator/usability acceptance remains open. The review fixture and

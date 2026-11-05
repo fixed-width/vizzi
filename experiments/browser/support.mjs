@@ -67,7 +67,7 @@ export async function openWorkspace(browser, host, viewport = { width: 1440, hei
     if (new URL(route.request().url()).origin === host.url) return route.continue();
     return route.abort();
   });
-  await page.goto(host.url);
+  await page.goto(host.url+"/explore");
   await page.bringToFront();
   await page.waitForFunction(() => document.getElementById("snapshot").textContent.length === 8);
   return { page, errors, requests, close: () => context.close() };

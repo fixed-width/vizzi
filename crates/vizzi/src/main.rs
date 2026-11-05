@@ -25,6 +25,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut analysis_input_mib = 0usize;
     let mut source_spool_mib = 0usize;
     let mut policy = PolicyConfig::default();
+    let mut investigation_file = None;
+    let mut editor_code = PathBuf::from("code");
     let mut arguments = std::env::args().skip(1);
     while let Some(argument) = arguments.next() {
         match argument.as_str() {
@@ -37,6 +39,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 cache = Some(PathBuf::from(
                     arguments.next().ok_or("--cache needs a directory")?,
                 ))
+            }
+            "--investigation-file" => {
+                investigation_file = Some(PathBuf::from(
+                    arguments
+                        .next()
+                        .ok_or("--investigation-file needs a file")?,
+                ))
+            }
+            "--editor-code" => {
+                editor_code = PathBuf::from(
+                    arguments
+                        .next()
+                        .ok_or("--editor-code needs an executable")?,
+                )
             }
             "--workers" => workers = arguments.next().ok_or("--workers needs a count")?.parse()?,
             "--port" => {
@@ -94,7 +110,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             "--help" | "-h" => {
                 println!(
-                    "vizzi --root DIR --cache DIR [--workers 1..32] [--port 7474] [--stdio | --once]\n  [--syntax-cache-mib N] (0 disables, default 0; weighted retention, not a heap cap)\n  [--analysis-input-mib N] (0 disables; active input volume, not a heap cap)\n  [--source-spool-mib N] (0 disables; private session disk capacity)\n  [--c-family-root SCOPE] [--exclude-source SCOPE] [--syntax-language SCOPE=c|cpp] (repeatable)"
+                    "vizzi --root DIR --cache DIR [--workers 1..32] [--port 7474] [--stdio | --once]\n  [--investigation-file FILE] [--editor-code EXECUTABLE]\n  [--syntax-cache-mib N] (0 disables, default 0; weighted retention, not a heap cap)\n  [--analysis-input-mib N] (0 disables; active input volume, not a heap cap)\n  [--source-spool-mib N] (0 disables; private session disk capacity)\n  [--c-family-root SCOPE] [--exclude-source SCOPE] [--syntax-language SCOPE=c|cpp] (repeatable)"
                 );
                 return Ok(());
             }
@@ -112,6 +128,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cache =
         cache.ok_or("--cache is required; choose a directory outside the analyzed workspace")?;
     let cache = vizzi::cache::external_path(&cache, directory.root())?;
+    let investigation_file = investigation_file
+        .map(|path| vizzi::cache::external_path(&path, directory.root()))
+        .transpose()?;
+    if investigation_file
+        .as_ref()
+        .is_some_and(|path| path.starts_with(&cache))
+    {
+        return Err("Investigation file must be outside the analysis cache".into());
+    }
     if source_spool_mib != 0 {
         let capacity = source_spool_mib
             .checked_mul(1024 * 1024)
@@ -150,7 +175,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         host.clone(),
         vizzi::review_source::CaptureLimits::default(),
     )?);
-    let router = vizzi::server::router_with_host(host.clone(), reviews.clone());
+    let investigation = Arc::new(vizzi::companion::Companion::new(
+        host.clone(),
+        investigation_file,
+        Arc::new(vizzi::editor::VsCode::new(editor_code)),
+    )?);
+    let router = vizzi::server::router_with_companion(host.clone(), reviews.clone(), investigation);
     if stdio {
         let stdin = std::io::stdin();
         let mut stdout = std::io::stdout().lock();
