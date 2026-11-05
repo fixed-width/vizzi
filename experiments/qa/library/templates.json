@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "templates": [
+    {
+      "id": "purpose",
+      "category": "orientation",
+      "question": "What does {project} do, and who is it intended for?"
+    },
+    {
+      "id": "language",
+      "category": "orientation",
+      "question": "What implementation language and language edition does {project} use?"
+    },
+    {
+      "id": "entry",
+      "category": "architecture",
+      "question": "Where is the main entry point, and what does it start?"
+    },
+    {
+      "id": "configuration",
+      "category": "configuration",
+      "question": "How can a user configure {setting}?"
+    },
+    {
+      "id": "validation",
+      "category": "testing",
+      "question": "Which checks are required when validating a change?"
+    },
+    {
+      "id": "safety",
+      "category": "constraints",
+      "question": "What policy governs unsafe code?"
+    },
+    {
+      "id": "flow",
+      "category": "architecture",
+      "question": "How does {input} reach {output}, and which boundaries matter?"
+    },
+    {
+      "id": "failure",
+      "category": "failure",
+      "question": "What happens when {operation} fails?"
+    },
+    {
+      "id": "extension",
+      "category": "architecture",
+      "question": "Which interface would I implement to add {capability}?"
+    },
+    {
+      "id": "persistence",
+      "category": "state",
+      "question": "Where is {state} stored, and what survives a restart?"
+    },
+    {
+      "id": "incremental",
+      "category": "state",
+      "question": "How does the project detect and reuse unchanged inputs?"
+    },
+    {
+      "id": "concurrency",
+      "category": "resources",
+      "question": "Which work can run concurrently, and how is it bounded?"
+    },
+    {
+      "id": "revision",
+      "category": "state",
+      "question": "What changes when I switch revisions or modify a file?"
+    },
+    {
+      "id": "tests",
+      "category": "testing",
+      "question": "Which tests exercise {behavior}, including its failure cases?"
+    },
+    {
+      "id": "unknown",
+      "category": "limits",
+      "question": "Can the repository establish {external_fact}?"
+    },
+    {
+      "id": "dependencies",
+      "category": "architecture",
+      "question": "Which external or internal dependency supplies {capability}?"
+    }
+  ]
+}

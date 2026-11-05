@@ -20,6 +20,12 @@ validating coordination; it does not qualify large-codebase GPU performance.
 The current [product checkpoint](docs/plans/product-milestones.md) evaluates the
 investigation's contribution alongside an editor. Guided functional checks do not
 establish that contribution; the editor-only comparison and maintainer trial remain open.
+
+The [CPU repository-question pilot](experiments/qa/RESULTS.md) now supplies a reusable
+question library and compares small local models with an external index. Both candidates
+fit the observed memory budget, but this retrieval/prompt baseline is not yet a reliable,
+fast answer feature. [Reproduce it or extend the questions](experiments/qa/README.md).
+
 The [view-selection rationale](docs/explanation/task-driven-views.md) connects these
 tasks to the literature. Further performance work is conditional on a workflow blocker.
 

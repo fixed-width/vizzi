@@ -25,6 +25,13 @@ the maintainer. Persistence/excerpts are bounded and source changes never silent
 retarget evidence. The existing review surface remains available; a review investigation
 follows the functioning learning slice rather than expanding this slice into a full IDE.
 
+The maintainer also authorised a [CPU repository-QA experiment](../qa/PRODUCT.md).
+Its [pilot results](../../experiments/qa/RESULTS.md) and versioned question library measure
+external-index retrieval, source support, answer quality, latency, memory and source
+changes separately. This does not advance a chat interface or replace source views.
+The next QA cohort should improve retrieval/context/protocol on development questions
+and retain fresh held-out evaluation before any product integration.
+
 The previous milestone plan and delivery evidence follow as historical context.
 
 # Previous milestones: understand a subsystem, then review a change

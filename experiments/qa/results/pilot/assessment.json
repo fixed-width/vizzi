@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "summaries": [
+    {
+      "model": "qwen3.5-0.8b-q4",
+      "responses": 32,
+      "answerableCases": 27,
+      "unanswerableCases": 5,
+      "reviewer": "Codex, reference-aware seed author; not independent",
+      "taskResults": {
+        "partial": 8,
+        "incorrect": 6,
+        "abstained": 13,
+        "correct": 5
+      },
+      "answerableTaskSuccess": 2,
+      "unanswerableTaskSuccess": 3,
+      "supportedFacts": 24,
+      "requiredFacts": 48,
+      "strictSourceChecks": 18,
+      "medianFirstOutputMs": 14375.648191999993,
+      "medianCompleteMs": 20065.063808000006,
+      "p95CompleteMs": 29220.36182400002,
+      "peakCombinedPssKiBWhileModelLive": 1199720,
+      "peakCombinedRssKiBWhileModelLive": 1250140,
+      "modelStartupWarmFileCacheMs": 949.7322590000003
+    },
+    {
+      "model": "qwen3.5-2b-q4",
+      "responses": 32,
+      "answerableCases": 27,
+      "unanswerableCases": 5,
+      "reviewer": "Codex, reference-aware seed author; not independent",
+      "taskResults": {
+        "incorrect": 5,
+        "correct": 10,
+        "partial": 7,
+        "abstained": 10
+      },
+      "answerableTaskSuccess": 5,
+      "unanswerableTaskSuccess": 5,
+      "supportedFacts": 28,
+      "requiredFacts": 48,
+      "strictSourceChecks": 18,
+      "medianFirstOutputMs": 34490.24221300008,
+      "medianCompleteMs": 46245.84778199997,
+      "p95CompleteMs": 57697.7899729996,
+      "peakCombinedPssKiBWhileModelLive": 2319507,
+      "peakCombinedRssKiBWhileModelLive": 2370116,
+      "modelStartupWarmFileCacheMs": 1455.228129999945
+    }
+  ],
+  "globalMemory": {
+    "cap_verified": false,
+    "child_exit_code": 0,
+    "errors": [],
+    "group_after": null,
+    "group_before": null,
+    "group_path": null,
+    "interval_ms": 250,
+    "limits": [
+      "PSS/RSS are simultaneous sampled sums, not sums of process high-water marks.",
+      "Sampling is non-atomic; transient/missed processes and short peaks can be absent.",
+      "RSS counts shared mappings repeatedly; PSS apportions mapped shared pages.",
+      "Orphaned processes can leave the observed ancestry; a verified cgroup accounts for inherited membership.",
+      "Process PSS excludes unmapped filesystem cache/kernel charges; cgroup values include controller-accounted memory.",
+      "The observer and driver contribute to samples; no editor workload or physical laptop is emulated."
+    ],
+    "mode": "observe_only",
+    "peak_pss_kib": 2319507,
+    "peak_rss_kib": 2370116,
+    "requested_cap_bytes": 12884901888,
+    "schema": 1,
+    "success": true,
+    "wall_ms": 2494920.5808860003
+  },
+  "latencyDefinition": "Upper median and nearest-rank p95; first non-reasoning JSON output includes the preamble. Complete latency is inference HTTP delivery, with retrieval recorded separately.",
+  "scoringLimits": [
+    "Seed-author agent review, not independent human evaluation.",
+    "Strict task score includes response status/source protocol; supported-fact counts are reported separately.",
+    "Oracle-source diagnostics are not a proven upper bound; missing linkage and seed ambiguity remain possible.",
+    "Both candidates use deterministic greedy decoding; this is not the authors recommended stochastic sampling or a best-capability claim.",
+    "Memory is sampled process-tree PSS/RSS with cap_verified=false; physical 16 GB laptop and kernel/PyTorch scale remain unqualified."
+  ]
+}

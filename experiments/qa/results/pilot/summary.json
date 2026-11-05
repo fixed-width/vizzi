@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "summaries": [
+    {
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "cases": 32,
+      "runtimeErrors": 0,
+      "formatErrors": 0,
+      "provenanceValid": 18,
+      "answered": 13,
+      "abstained": 19,
+      "allAnchors": 12,
+      "medianMs": 20065.063808000006,
+      "p95Ms": 29220.36182400002,
+      "medianFirstAnswerMs": 14375.648191999993,
+      "semanticCorrectness": "requires rubric grading"
+    },
+    {
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "oracle_source",
+      "cases": 16,
+      "runtimeErrors": 0,
+      "formatErrors": 0,
+      "provenanceValid": 9,
+      "answered": 8,
+      "abstained": 8,
+      "allAnchors": 16,
+      "medianMs": 9751.365649999992,
+      "p95Ms": 14269.571033000015,
+      "medianFirstAnswerMs": 5312.38818899999,
+      "semanticCorrectness": "requires rubric grading"
+    },
+    {
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "cases": 32,
+      "runtimeErrors": 0,
+      "formatErrors": 0,
+      "provenanceValid": 18,
+      "answered": 16,
+      "abstained": 16,
+      "allAnchors": 12,
+      "medianMs": 46245.84778199997,
+      "p95Ms": 57697.7899729996,
+      "medianFirstAnswerMs": 34490.24221300008,
+      "semanticCorrectness": "requires rubric grading"
+    },
+    {
+      "model": "qwen3.5-2b-q4",
+      "condition": "oracle_source",
+      "cases": 16,
+      "runtimeErrors": 0,
+      "formatErrors": 0,
+      "provenanceValid": 8,
+      "answered": 11,
+      "abstained": 5,
+      "allAnchors": 16,
+      "medianMs": 22810.507976999972,
+      "p95Ms": 32395.78070500004,
+      "medianFirstAnswerMs": 11914.67483699997,
+      "semanticCorrectness": "requires rubric grading"
+    }
+  ]
+}

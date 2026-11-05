@@ -1,0 +1,18 @@
+{
+  "answers.jsonl.gz": {
+    "sha256_uncompressed": "c61ae8eada910bf45cc1e752a87a3a202adab67c897f1d3e610ae0edb1b39da8",
+    "uncompressed_bytes": 1408188
+  },
+  "memory.json.gz": {
+    "sha256_uncompressed": "359260757e6c73c511c457a1c9ca39b5a8bae88b725112736ba168b219ed6f4f",
+    "uncompressed_bytes": 17284648
+  },
+  "qwen3.5-0.8b-q4.runtime.log.gz": {
+    "sha256_uncompressed": "ef68cf99808825946ccc2fbe60a0bbb3beb24d7999e92593f186f76186ef2bba",
+    "uncompressed_bytes": 80116
+  },
+  "qwen3.5-2b-q4.runtime.log.gz": {
+    "sha256_uncompressed": "6ab2a298f49947ab062712aa63ae3a7e0123cadb7fbd9109ee9e0f9a0d107983",
+    "uncompressed_bytes": 83329
+  }
+}

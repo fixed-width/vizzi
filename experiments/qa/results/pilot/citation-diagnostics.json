@@ -1,0 +1,1347 @@
+{
+  "schema": 1,
+  "postHocDiagnostic": true,
+  "limitations": [
+    "Whitespace-tolerant binding is diagnostic only; frozen strict results and raw responses are unchanged.",
+    "Neither literal nor whitespace-normalized source binding establishes semantic entailment or answer correctness."
+  ],
+  "summaries": [
+    {
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "cases": 32,
+      "strictSourceChecks": 18,
+      "whitespaceTolerantBinding": 19,
+      "citationKinds": {
+        "wrong_label": 5,
+        "exact": 5,
+        "edited_or_unsupported_quote": 5,
+        "whitespace_only": 1,
+        "unavailable_label": 2
+      },
+      "answerableRefusals": 14,
+      "unanswerableAnswered": 0,
+      "truncated": 0
+    },
+    {
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "oracle_source",
+      "cases": 16,
+      "strictSourceChecks": 9,
+      "whitespaceTolerantBinding": 9,
+      "citationKinds": {
+        "exact": 2,
+        "edited_or_unsupported_quote": 2
+      },
+      "answerableRefusals": 8,
+      "unanswerableAnswered": 0,
+      "truncated": 0
+    },
+    {
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "cases": 32,
+      "strictSourceChecks": 18,
+      "whitespaceTolerantBinding": 25,
+      "citationKinds": {
+        "whitespace_only": 9,
+        "exact": 22,
+        "edited_or_unsupported_quote": 2,
+        "wrong_label": 2,
+        "unavailable_label": 1
+      },
+      "answerableRefusals": 11,
+      "unanswerableAnswered": 0,
+      "truncated": 0
+    },
+    {
+      "model": "qwen3.5-2b-q4",
+      "condition": "oracle_source",
+      "cases": 16,
+      "strictSourceChecks": 8,
+      "whitespaceTolerantBinding": 13,
+      "citationKinds": {
+        "whitespace_only": 6,
+        "exact": 9,
+        "edited_or_unsupported_quote": 5
+      },
+      "answerableRefusals": 5,
+      "unanswerableAnswered": 0,
+      "truncated": 0
+    }
+  ],
+  "diagnostics": [
+    {
+      "id": "qwen3.5-0.8b-q4/vizzi.purpose/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "vizzi.purpose",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/vizzi.purpose/oracle_source",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "oracle_source",
+      "case": "vizzi.purpose",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/vizzi.language/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "vizzi.language",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [
+        "wrong_label",
+        "wrong_label",
+        "exact"
+      ],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/vizzi.language/oracle_source",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "oracle_source",
+      "case": "vizzi.language",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/vizzi.entry/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "vizzi.entry",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/vizzi.configuration/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "vizzi.configuration",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/vizzi.validation/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "vizzi.validation",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/vizzi.validation/oracle_source",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "oracle_source",
+      "case": "vizzi.validation",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/vizzi.safety/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "vizzi.safety",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/vizzi.safety/oracle_source",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "oracle_source",
+      "case": "vizzi.safety",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/vizzi.search/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "vizzi.search",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": false,
+      "citationKinds": [
+        "wrong_label",
+        "wrong_label"
+      ],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/vizzi.search/oracle_source",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "oracle_source",
+      "case": "vizzi.search",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/vizzi.connections/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "vizzi.connections",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/vizzi.connections/oracle_source",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "oracle_source",
+      "case": "vizzi.connections",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/vizzi.editor/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "vizzi.editor",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/vizzi.editor/oracle_source",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "oracle_source",
+      "case": "vizzi.editor",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/vizzi.atomic-save/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "vizzi.atomic-save",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/vizzi.unchanged/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "vizzi.unchanged",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/vizzi.unchanged/oracle_source",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "oracle_source",
+      "case": "vizzi.unchanged",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/vizzi.renderer/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "vizzi.renderer",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/vizzi.oncall/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "vizzi.oncall",
+      "expectedStatus": "insufficient_evidence",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/vizzi.production-latency/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "vizzi.production-latency",
+      "expectedStatus": "insufficient_evidence",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/lpc-rs.purpose/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "lpc-rs.purpose",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/lpc-rs.purpose/oracle_source",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "oracle_source",
+      "case": "lpc-rs.purpose",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": true,
+      "citationKinds": [
+        "exact",
+        "exact"
+      ],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/lpc-rs.language/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "lpc-rs.language",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": true,
+      "citationKinds": [
+        "exact",
+        "exact"
+      ],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/lpc-rs.language/oracle_source",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "oracle_source",
+      "case": "lpc-rs.language",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [
+        "edited_or_unsupported_quote",
+        "edited_or_unsupported_quote"
+      ],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/lpc-rs.entry/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "lpc-rs.entry",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/lpc-rs.configuration/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "lpc-rs.configuration",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/lpc-rs.configuration/oracle_source",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "oracle_source",
+      "case": "lpc-rs.configuration",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/lpc-rs.validation/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "lpc-rs.validation",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [
+        "edited_or_unsupported_quote",
+        "edited_or_unsupported_quote"
+      ],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/lpc-rs.validation/oracle_source",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "oracle_source",
+      "case": "lpc-rs.validation",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/lpc-rs.safety/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "lpc-rs.safety",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/lpc-rs.reader/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "lpc-rs.reader",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [
+        "wrong_label",
+        "exact"
+      ],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/lpc-rs.reader/oracle_source",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "oracle_source",
+      "case": "lpc-rs.reader",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/lpc-rs.fallback/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "lpc-rs.fallback",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/lpc-rs.fallback/oracle_source",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "oracle_source",
+      "case": "lpc-rs.fallback",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/lpc-rs.host-vs-game/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "lpc-rs.host-vs-game",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/lpc-rs.host-vs-game/oracle_source",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "oracle_source",
+      "case": "lpc-rs.host-vs-game",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/lpc-rs.source-identity/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "lpc-rs.source-identity",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/lpc-rs.source-identity/oracle_source",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "oracle_source",
+      "case": "lpc-rs.source-identity",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/lpc-rs.fallback-test/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "lpc-rs.fallback-test",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/lpc-rs.probe/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "lpc-rs.probe",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/lpc-rs.oncall/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "lpc-rs.oncall",
+      "expectedStatus": "insufficient_evidence",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": false,
+      "citationKinds": [
+        "edited_or_unsupported_quote",
+        "edited_or_unsupported_quote",
+        "edited_or_unsupported_quote"
+      ],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/lpc-rs.production-latency/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "lpc-rs.production-latency",
+      "expectedStatus": "insufficient_evidence",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/changing.retry-base/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "changing.retry-base",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": true,
+      "citationKinds": [
+        "exact"
+      ],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/changing.retry-updated/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "changing.retry-updated",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/changing.renamed-handler/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "changing.renamed-handler",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [
+        "whitespace_only"
+      ],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-0.8b-q4/changing.deleted-handler/retrieved",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "case": "changing.deleted-handler",
+      "expectedStatus": "insufficient_evidence",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": false,
+      "citationKinds": [
+        "unavailable_label",
+        "unavailable_label"
+      ],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/vizzi.purpose/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "vizzi.purpose",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [
+        "whitespace_only",
+        "exact"
+      ],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/vizzi.purpose/oracle_source",
+      "model": "qwen3.5-2b-q4",
+      "condition": "oracle_source",
+      "case": "vizzi.purpose",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [
+        "whitespace_only"
+      ],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/vizzi.language/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "vizzi.language",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": true,
+      "citationKinds": [
+        "exact",
+        "exact"
+      ],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/vizzi.language/oracle_source",
+      "model": "qwen3.5-2b-q4",
+      "condition": "oracle_source",
+      "case": "vizzi.language",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/vizzi.entry/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "vizzi.entry",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/vizzi.configuration/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "vizzi.configuration",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": true,
+      "citationKinds": [
+        "exact"
+      ],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/vizzi.validation/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "vizzi.validation",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [
+        "exact",
+        "whitespace_only",
+        "exact"
+      ],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/vizzi.validation/oracle_source",
+      "model": "qwen3.5-2b-q4",
+      "condition": "oracle_source",
+      "case": "vizzi.validation",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": true,
+      "citationKinds": [
+        "exact"
+      ],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/vizzi.safety/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "vizzi.safety",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [
+        "edited_or_unsupported_quote"
+      ],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/vizzi.safety/oracle_source",
+      "model": "qwen3.5-2b-q4",
+      "condition": "oracle_source",
+      "case": "vizzi.safety",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": true,
+      "citationKinds": [
+        "exact",
+        "exact"
+      ],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/vizzi.search/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "vizzi.search",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [
+        "exact"
+      ],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/vizzi.search/oracle_source",
+      "model": "qwen3.5-2b-q4",
+      "condition": "oracle_source",
+      "case": "vizzi.search",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [
+        "exact"
+      ],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/vizzi.connections/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "vizzi.connections",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/vizzi.connections/oracle_source",
+      "model": "qwen3.5-2b-q4",
+      "condition": "oracle_source",
+      "case": "vizzi.connections",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": false,
+      "citationKinds": [
+        "whitespace_only"
+      ],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/vizzi.editor/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "vizzi.editor",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [
+        "whitespace_only",
+        "whitespace_only"
+      ],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/vizzi.editor/oracle_source",
+      "model": "qwen3.5-2b-q4",
+      "condition": "oracle_source",
+      "case": "vizzi.editor",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [
+        "edited_or_unsupported_quote",
+        "whitespace_only"
+      ],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/vizzi.atomic-save/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "vizzi.atomic-save",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": false,
+      "citationKinds": [
+        "whitespace_only"
+      ],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/vizzi.unchanged/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "vizzi.unchanged",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": false,
+      "citationKinds": [
+        "wrong_label",
+        "wrong_label"
+      ],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/vizzi.unchanged/oracle_source",
+      "model": "qwen3.5-2b-q4",
+      "condition": "oracle_source",
+      "case": "vizzi.unchanged",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": false,
+      "citationKinds": [
+        "whitespace_only"
+      ],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/vizzi.renderer/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "vizzi.renderer",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": false,
+      "citationKinds": [
+        "exact",
+        "exact",
+        "exact",
+        "whitespace_only"
+      ],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/vizzi.oncall/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "vizzi.oncall",
+      "expectedStatus": "insufficient_evidence",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/vizzi.production-latency/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "vizzi.production-latency",
+      "expectedStatus": "insufficient_evidence",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/lpc-rs.purpose/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "lpc-rs.purpose",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/lpc-rs.purpose/oracle_source",
+      "model": "qwen3.5-2b-q4",
+      "condition": "oracle_source",
+      "case": "lpc-rs.purpose",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": true,
+      "citationKinds": [
+        "exact"
+      ],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/lpc-rs.language/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "lpc-rs.language",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": true,
+      "citationKinds": [
+        "exact"
+      ],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/lpc-rs.language/oracle_source",
+      "model": "qwen3.5-2b-q4",
+      "condition": "oracle_source",
+      "case": "lpc-rs.language",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": true,
+      "citationKinds": [
+        "exact"
+      ],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/lpc-rs.entry/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "lpc-rs.entry",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/lpc-rs.configuration/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "lpc-rs.configuration",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/lpc-rs.configuration/oracle_source",
+      "model": "qwen3.5-2b-q4",
+      "condition": "oracle_source",
+      "case": "lpc-rs.configuration",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/lpc-rs.validation/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "lpc-rs.validation",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": true,
+      "citationKinds": [
+        "exact",
+        "exact",
+        "exact",
+        "exact"
+      ],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/lpc-rs.validation/oracle_source",
+      "model": "qwen3.5-2b-q4",
+      "condition": "oracle_source",
+      "case": "lpc-rs.validation",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [
+        "edited_or_unsupported_quote",
+        "edited_or_unsupported_quote",
+        "edited_or_unsupported_quote",
+        "edited_or_unsupported_quote"
+      ],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/lpc-rs.safety/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "lpc-rs.safety",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/lpc-rs.reader/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "lpc-rs.reader",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": true,
+      "citationKinds": [
+        "exact",
+        "exact"
+      ],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/lpc-rs.reader/oracle_source",
+      "model": "qwen3.5-2b-q4",
+      "condition": "oracle_source",
+      "case": "lpc-rs.reader",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [
+        "exact",
+        "whitespace_only"
+      ],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/lpc-rs.fallback/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "lpc-rs.fallback",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [
+        "whitespace_only",
+        "whitespace_only"
+      ],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/lpc-rs.fallback/oracle_source",
+      "model": "qwen3.5-2b-q4",
+      "condition": "oracle_source",
+      "case": "lpc-rs.fallback",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [
+        "whitespace_only"
+      ],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/lpc-rs.host-vs-game/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "lpc-rs.host-vs-game",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [
+        "edited_or_unsupported_quote",
+        "exact"
+      ],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/lpc-rs.host-vs-game/oracle_source",
+      "model": "qwen3.5-2b-q4",
+      "condition": "oracle_source",
+      "case": "lpc-rs.host-vs-game",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/lpc-rs.source-identity/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "lpc-rs.source-identity",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": true,
+      "citationKinds": [
+        "exact",
+        "exact"
+      ],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/lpc-rs.source-identity/oracle_source",
+      "model": "qwen3.5-2b-q4",
+      "condition": "oracle_source",
+      "case": "lpc-rs.source-identity",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": true,
+      "citationKinds": [
+        "exact",
+        "exact"
+      ],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/lpc-rs.fallback-test/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "lpc-rs.fallback-test",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/lpc-rs.probe/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "lpc-rs.probe",
+      "expectedStatus": "answered",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": false,
+      "citationKinds": [
+        "whitespace_only",
+        "exact"
+      ],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/lpc-rs.oncall/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "lpc-rs.oncall",
+      "expectedStatus": "insufficient_evidence",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/lpc-rs.production-latency/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "lpc-rs.production-latency",
+      "expectedStatus": "insufficient_evidence",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/changing.retry-base/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "changing.retry-base",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/changing.retry-updated/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "changing.retry-updated",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/changing.renamed-handler/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "changing.renamed-handler",
+      "expectedStatus": "answered",
+      "reportedStatus": "answered",
+      "strictSourceChecks": false,
+      "citationKinds": [
+        "exact",
+        "unavailable_label"
+      ],
+      "whitespaceTolerantBinding": false,
+      "finish": "stop"
+    },
+    {
+      "id": "qwen3.5-2b-q4/changing.deleted-handler/retrieved",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "case": "changing.deleted-handler",
+      "expectedStatus": "insufficient_evidence",
+      "reportedStatus": "insufficient_evidence",
+      "strictSourceChecks": true,
+      "citationKinds": [],
+      "whitespaceTolerantBinding": true,
+      "finish": "stop"
+    }
+  ]
+}

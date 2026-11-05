@@ -1,0 +1,923 @@
+{
+  "schema": 1,
+  "grades": [
+    {
+      "response_id": "qwen3.5-0.8b-q4/vizzi.purpose/retrieved",
+      "case": "vizzi.purpose",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true,
+        true
+      ],
+      "task_result": "partial",
+      "rationale": "Expected purpose/editor facts are present, but no supporting citations were supplied.",
+      "provenance_valid": false,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/vizzi.language/retrieved",
+      "case": "vizzi.language",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true,
+        true
+      ],
+      "task_result": "partial",
+      "rationale": "Rust/edition facts are correct; source-label/quote bindings fail. Extra parser version is not needed.",
+      "provenance_valid": false,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/vizzi.entry/retrieved",
+      "case": "vizzi.entry",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true,
+        true
+      ],
+      "task_result": "incorrect",
+      "rationale": "Names main.rs/loopback, but invents host_start and errno 1 as startup behavior.",
+      "provenance_valid": false,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/vizzi.configuration/retrieved",
+      "case": "vizzi.configuration",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true,
+        true
+      ],
+      "task_result": "incorrect",
+      "rationale": "Port option/example are right; the claim that a root path stays at 7474 is false.",
+      "provenance_valid": false,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/vizzi.validation/retrieved",
+      "case": "vizzi.validation",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        false,
+        false,
+        false
+      ],
+      "task_result": "abstained",
+      "rationale": "No checklist answer. Retrieved context missed the preferred baseline-policy evidence.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/vizzi.safety/retrieved",
+      "case": "vizzi.safety",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        false,
+        false
+      ],
+      "task_result": "abstained",
+      "rationale": "Does not answer the policy/exception question; policy text was supplied in part.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/vizzi.search/retrieved",
+      "case": "vizzi.search",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true
+      ],
+      "task_result": "abstained",
+      "rationale": "The rationale acknowledges names/path-only search but the response still refuses a direct answer and misbinds citations.",
+      "provenance_valid": false,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/vizzi.connections/retrieved",
+      "case": "vizzi.connections",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true,
+        true
+      ],
+      "task_result": "abstained",
+      "rationale": "Acknowledges the two asserted facts but refuses. The question distinction between inference and automatic verification needs independent review.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/vizzi.editor/retrieved",
+      "case": "vizzi.editor",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        false,
+        true
+      ],
+      "task_result": "incorrect",
+      "rationale": "Says VS Code refuses unsaved buffers, which this CLI cannot inspect. Does not state working/captured verification.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/vizzi.atomic-save/retrieved",
+      "case": "vizzi.atomic-save",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        false,
+        false
+      ],
+      "task_result": "abstained",
+      "rationale": "No save-failure answer; retrieved preferred evidence was absent.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/vizzi.unchanged/retrieved",
+      "case": "vizzi.unchanged",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true
+      ],
+      "task_result": "abstained",
+      "rationale": "Starts with No but then refuses and does not explain the required content/context validity.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/vizzi.renderer/retrieved",
+      "case": "vizzi.renderer",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true,
+        false
+      ],
+      "task_result": "abstained",
+      "rationale": "Acknowledges renderer remains unsettled, omits wgpu candidate and refuses; storage-engine part is not clearly addressed.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/vizzi.oncall/retrieved",
+      "case": "vizzi.oncall",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [],
+      "task_result": "correct",
+      "rationale": "Appropriate refusal; no personnel assignment is invented.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/vizzi.production-latency/retrieved",
+      "case": "vizzi.production-latency",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [],
+      "task_result": "correct",
+      "rationale": "Appropriate refusal; distinguishes local measurements from production telemetry.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/lpc-rs.purpose/retrieved",
+      "case": "lpc-rs.purpose",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        false,
+        false
+      ],
+      "task_result": "incorrect",
+      "rationale": "Describes a low-level support library and says it is not standalone; misses LPC compiler/VM/gamedriver and application purpose.",
+      "provenance_valid": false,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/lpc-rs.language/retrieved",
+      "case": "lpc-rs.language",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true,
+        true
+      ],
+      "task_result": "correct",
+      "rationale": "Rust 2024 is supported by the supplied manifests and literal citations.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/lpc-rs.entry/retrieved",
+      "case": "lpc-rs.entry",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        false,
+        false
+      ],
+      "task_result": "incorrect",
+      "rationale": "Incorrect main location and invented cd-gamedriver backend. Does not give the actual driver main -> runtime::run -> VM boot path.",
+      "provenance_valid": false,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/lpc-rs.configuration/retrieved",
+      "case": "lpc-rs.configuration",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        false,
+        false
+      ],
+      "task_result": "abstained",
+      "rationale": "No selection/root-setting answer. Retrieval missed the required code.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/lpc-rs.validation/retrieved",
+      "case": "lpc-rs.validation",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true,
+        true
+      ],
+      "task_result": "partial",
+      "rationale": "All required commands are correct; citations are reformatted/edited rather than literal.",
+      "provenance_valid": false,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/lpc-rs.safety/retrieved",
+      "case": "lpc-rs.safety",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        false
+      ],
+      "task_result": "abstained",
+      "rationale": "Cautious about the main crate when retrieved excerpts show other crates. The answer ends abruptly.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/lpc-rs.reader/retrieved",
+      "case": "lpc-rs.reader",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true,
+        false
+      ],
+      "task_result": "partial",
+      "rationale": "Correct SourceReader/default DiskSourceReader; omits tokio::fs::read and citations fail.",
+      "provenance_valid": false,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/lpc-rs.fallback/retrieved",
+      "case": "lpc-rs.fallback",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        false,
+        false
+      ],
+      "task_result": "abstained",
+      "rationale": "Refuses even though both retry conditions occur in the supplied source.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/lpc-rs.host-vs-game/retrieved",
+      "case": "lpc-rs.host-vs-game",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        false,
+        true
+      ],
+      "task_result": "abstained",
+      "rationale": "Acknowledges in-game confinement, but does not establish the host-input distinction and adds unrelated file_name discussion.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/lpc-rs.source-identity/retrieved",
+      "case": "lpc-rs.source-identity",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true,
+        false
+      ],
+      "task_result": "incorrect",
+      "rationale": "Correct resolved-host role, but incorrectly assigns function mangling to name rather than input and reverses the disclosure direction.",
+      "provenance_valid": false,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/lpc-rs.fallback-test/retrieved",
+      "case": "lpc-rs.fallback-test",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        false
+      ],
+      "task_result": "abstained",
+      "rationale": "No regression name; retrieval missed the preferred evidence.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/lpc-rs.probe/retrieved",
+      "case": "lpc-rs.probe",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        false,
+        false
+      ],
+      "task_result": "abstained",
+      "rationale": "Does not explain the separate kind/metadata probe despite both facts in context; discusses unrelated checks.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/lpc-rs.oncall/retrieved",
+      "case": "lpc-rs.oncall",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [],
+      "task_result": "partial",
+      "rationale": "Correct refusal status but answer none is ambiguous; unrelated/invalid date-format citations are not a valid refusal explanation.",
+      "provenance_valid": false,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/lpc-rs.production-latency/retrieved",
+      "case": "lpc-rs.production-latency",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [],
+      "task_result": "correct",
+      "rationale": "Appropriate refusal without inventing production data.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/changing.retry-base/retrieved",
+      "case": "changing.retry-base",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true
+      ],
+      "task_result": "correct",
+      "rationale": "Correct value 3 with an exact source quotation.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/changing.retry-updated/retrieved",
+      "case": "changing.retry-updated",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true
+      ],
+      "task_result": "partial",
+      "rationale": "Correct updated value 7, but citations are missing.",
+      "provenance_valid": false,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/changing.renamed-handler/retrieved",
+      "case": "changing.renamed-handler",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true
+      ],
+      "task_result": "partial",
+      "rationale": "Correct renamed function/path; quotation flattens the newline and fails the strict binding protocol.",
+      "provenance_valid": false,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-0.8b-q4/changing.deleted-handler/retrieved",
+      "case": "changing.deleted-handler",
+      "model": "qwen3.5-0.8b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [],
+      "task_result": "partial",
+      "rationale": "Correct refusal after deletion; fabricated evidence labels point to question/metadata rather than supplied source.",
+      "provenance_valid": false,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/vizzi.purpose/retrieved",
+      "case": "vizzi.purpose",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true,
+        false
+      ],
+      "task_result": "incorrect",
+      "rationale": "Correct broad understanding/review role, but incorrectly calls Vizzi a primary tool for reading/changing source while also saying the editor is primary; citations have whitespace differences.",
+      "provenance_valid": false,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/vizzi.language/retrieved",
+      "case": "vizzi.language",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true,
+        true
+      ],
+      "task_result": "correct",
+      "rationale": "Correct language/edition with valid references to crate inheritance and workspace metadata.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/vizzi.entry/retrieved",
+      "case": "vizzi.entry",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        false,
+        true
+      ],
+      "task_result": "partial",
+      "rationale": "Correct loopback bind statement, but does not identify the actual main entry location and supplies no citations.",
+      "provenance_valid": false,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/vizzi.configuration/retrieved",
+      "case": "vizzi.configuration",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true,
+        true
+      ],
+      "task_result": "correct",
+      "rationale": "Correct port option/example with an exact guide citation. Launch snippet is illustrative rather than a complete root/cache invocation.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/vizzi.validation/retrieved",
+      "case": "vizzi.validation",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        false,
+        false,
+        false
+      ],
+      "task_result": "incorrect",
+      "rationale": "Confuses contributor validation with Git comparison acquisition and invents a git pin requirement.",
+      "provenance_valid": false,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/vizzi.safety/retrieved",
+      "case": "vizzi.safety",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true,
+        true
+      ],
+      "task_result": "partial",
+      "rationale": "Correct default/exception/performance policy; quoted support uses an ellipsis rather than literal source.",
+      "provenance_valid": false,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/vizzi.search/retrieved",
+      "case": "vizzi.search",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true
+      ],
+      "task_result": "abstained",
+      "rationale": "Quotes the direct names/path-only statement accurately but still refuses; wording inspect versus match deserves maintainer review.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/vizzi.connections/retrieved",
+      "case": "vizzi.connections",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true,
+        true
+      ],
+      "task_result": "abstained",
+      "rationale": "Correctly identifies assertions/no inferred proof; refuses to infer a verification mechanism. Seed question has verification-versus-inference ambiguity.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/vizzi.editor/retrieved",
+      "case": "vizzi.editor",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true,
+        true
+      ],
+      "task_result": "partial",
+      "rationale": "Correct content checks and unsaved-buffer limitation; quotations differ in line wrapping.",
+      "provenance_valid": false,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/vizzi.atomic-save/retrieved",
+      "case": "vizzi.atomic-save",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        false,
+        false
+      ],
+      "task_result": "abstained",
+      "rationale": "Cautiously declines to generalize comparison-capture failure behavior to investigation persistence; retrieval missed the required source.",
+      "provenance_valid": false,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/vizzi.unchanged/retrieved",
+      "case": "vizzi.unchanged",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        false
+      ],
+      "task_result": "abstained",
+      "rationale": "Does not answer the metadata/content guarantee; retrieves storage ownership material rather than the policy. Quotes misbind source labels.",
+      "provenance_valid": false,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/vizzi.renderer/retrieved",
+      "case": "vizzi.renderer",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true,
+        true
+      ],
+      "task_result": "incorrect",
+      "rationale": "Correct unsettled renderer/storage and leading wgpu facts, but repeats outdated claims that browser presentation/background analysis are unmeasured; status remains insufficient.",
+      "provenance_valid": false,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/vizzi.oncall/retrieved",
+      "case": "vizzi.oncall",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [],
+      "task_result": "correct",
+      "rationale": "Correct refusal without inventing personnel.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/vizzi.production-latency/retrieved",
+      "case": "vizzi.production-latency",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [],
+      "task_result": "correct",
+      "rationale": "Correct refusal without converting local timing observations into production telemetry.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/lpc-rs.purpose/retrieved",
+      "case": "lpc-rs.purpose",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        false,
+        false
+      ],
+      "task_result": "abstained",
+      "rationale": "Correctly declines to infer overall application purpose from support-crate snippets. Preferred README evidence was absent.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/lpc-rs.language/retrieved",
+      "case": "lpc-rs.language",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true,
+        true
+      ],
+      "task_result": "correct",
+      "rationale": "Correct Rust 2024 from supplied manifest evidence with an exact citation.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/lpc-rs.entry/retrieved",
+      "case": "lpc-rs.entry",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        false,
+        false
+      ],
+      "task_result": "abstained",
+      "rationale": "Appropriate caution about missing boot/entry source; preferred evidence was not retrieved.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/lpc-rs.configuration/retrieved",
+      "case": "lpc-rs.configuration",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        false,
+        false
+      ],
+      "task_result": "abstained",
+      "rationale": "Recognizes configuration references belong to LSP and declines to generalize them to the driver. Required selection and preference facts are not answered.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/lpc-rs.validation/retrieved",
+      "case": "lpc-rs.validation",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true,
+        false
+      ],
+      "task_result": "partial",
+      "rationale": "Correct workspace build/test and formatting/lint prefixes, but omits the documented -D warnings part of Clippy. Source bindings are valid.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/lpc-rs.safety/retrieved",
+      "case": "lpc-rs.safety",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        false
+      ],
+      "task_result": "abstained",
+      "rationale": "Does not generalize a sibling-crate forbid attribute to the main library. Root safety evidence was missed.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/lpc-rs.reader/retrieved",
+      "case": "lpc-rs.reader",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true,
+        true
+      ],
+      "task_result": "correct",
+      "rationale": "Correct trait/default and disk-read implementation from available source; literal source citations bind correctly.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/lpc-rs.fallback/retrieved",
+      "case": "lpc-rs.fallback",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true,
+        false
+      ],
+      "task_result": "incorrect",
+      "rationale": "Gets NotFound/non-c guard but invents a production failures counter by confusing RecoveringReader test-double code with the compiler loop.",
+      "provenance_valid": false,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/lpc-rs.host-vs-game/retrieved",
+      "case": "lpc-rs.host-vs-game",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        false,
+        true
+      ],
+      "task_result": "incorrect",
+      "rationale": "Incorrectly says both host-facing and in-game compilation are confined. Masked diagnostic naming is not access confinement.",
+      "provenance_valid": false,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/lpc-rs.source-identity/retrieved",
+      "case": "lpc-rs.source-identity",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true,
+        true
+      ],
+      "task_result": "correct",
+      "rationale": "Accurately distinguishes canonical/resolved host registration from safe diagnostic naming, with literal source support.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/lpc-rs.fallback-test/retrieved",
+      "case": "lpc-rs.fallback-test",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        false
+      ],
+      "task_result": "abstained",
+      "rationale": "Appropriate refusal for the supplied Lima/compilation context, but retrieval missed the actual regression test.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/lpc-rs.probe/retrieved",
+      "case": "lpc-rs.probe",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true,
+        false
+      ],
+      "task_result": "abstained",
+      "rationale": "Acknowledges the separate kind probe without reading contents, but does not give the metadata implementation answer and overcomplicates with unrelated save/file-view code.",
+      "provenance_valid": false,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/lpc-rs.oncall/retrieved",
+      "case": "lpc-rs.oncall",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [],
+      "task_result": "correct",
+      "rationale": "Declines to identify an on-call person. Explanation drifts toward program callers/tasks but does not invent an assignment.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/lpc-rs.production-latency/retrieved",
+      "case": "lpc-rs.production-latency",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [],
+      "task_result": "correct",
+      "rationale": "Correct refusal; does not substitute test latency metrics for production telemetry.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/changing.retry-base/retrieved",
+      "case": "changing.retry-base",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true
+      ],
+      "task_result": "partial",
+      "rationale": "Correct value 3; source citations missing.",
+      "provenance_valid": false,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/changing.retry-updated/retrieved",
+      "case": "changing.retry-updated",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true
+      ],
+      "task_result": "partial",
+      "rationale": "Correct updated value 7; source citations missing.",
+      "provenance_valid": false,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/changing.renamed-handler/retrieved",
+      "case": "changing.renamed-handler",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [
+        true
+      ],
+      "task_result": "partial",
+      "rationale": "Correct renamed function/path; invents a second source label for a line in the only supplied excerpt.",
+      "provenance_valid": false,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    },
+    {
+      "response_id": "qwen3.5-2b-q4/changing.deleted-handler/retrieved",
+      "case": "changing.deleted-handler",
+      "model": "qwen3.5-2b-q4",
+      "condition": "retrieved",
+      "required_facts_supported": [],
+      "task_result": "correct",
+      "rationale": "Correct refusal after deletion with no fabricated references.",
+      "provenance_valid": true,
+      "grader": "Codex, reference-aware agent and author of the seed cases",
+      "independent": false
+    }
+  ]
+}

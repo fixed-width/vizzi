@@ -20,6 +20,12 @@ The [companion workflow](docs/companion/PRODUCT.md) is the next delivery slice. 
 what it contributes alongside an editor, rather than accepting source-browsing feature
 parity as progress towards the product goal.
 
+Natural-language questions are being evaluated as another way into the same captured
+evidence. The [CPU question experiment](docs/qa/PRODUCT.md) separates external repository
+memory, model inference and evaluation; it does not require repository-specific model
+training or establish a production answer feature. Its question library covers reusable
+and codebase-specific probes, with source-bound answers and explicit uncertainty.
+
 
 ## Architecture
 
