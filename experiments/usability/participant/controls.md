@@ -7,13 +7,19 @@ pause or stop at any time.
 
 The learning page links a file map, captured source and a declaration outline. Use
 the path filter or accessible file list to find files. Selecting a declaration reveals
-its source. Back/Forward returns to earlier reading locations.
+its source. Kind badges identify types and callables; **Line N** is the starting source
+line. Use the overview navigator to jump across the map, or +/− and Fit map to zoom.
+Drag dividers to resize sections; focused dividers also accept Left/Right and Home/End.
+Back/Forward returns to earlier reading locations.
 
 The review page compares a baseline with captured working files. Use the baseline
-from the task, subtree `.`, and **Compare with working tree**. The file list, hunks,
+from the task, repository path `.`, and **Compare with working tree**. The file list, hunks,
 before/after panes and outlines share the same comparison. **Include unchanged
 context** makes related unchanged source available inside that capture. The panes
-scroll independently; long lines have fragment controls.
+scroll independently; long lines have fragment controls. Repository path selects a file
+or directory. **Two commits** mode instead compares an explicit base and target; its
+right pane is Target and working refresh is hidden. Invalid input appears beside the
+form while the previous capture stays visible.
 
 Source views are captured observations. **Refresh working** observes another working
 state. Availability labels distinguish absent source from empty or unsupported text.

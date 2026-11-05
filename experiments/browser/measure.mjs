@@ -115,7 +115,7 @@ async function interaction(page, host, edits) {
   let started;
   const inputs = [];
   try {
-    const bounds = await page.locator("canvas").boundingBox();
+    const bounds = await page.locator("#map").boundingBox();
     const x = bounds.x + bounds.width / 2, y = bounds.y + bounds.height / 2;
     await page.mouse.move(x, y); await page.mouse.down();
     started = performance.now();
@@ -167,7 +167,7 @@ async function interaction(page, host, edits) {
 async function inspectAndPick(page, host) {
   const view = await (await fetch(`${host.url}/api/view`)).json();
   const frame = await page.evaluate(() => window.vizziMetrics.lastFrame);
-  const bounds = await page.locator("canvas").boundingBox();
+  const bounds = await page.locator("#map").boundingBox();
   const target = view.files.filter(file => file.classification.kind === "assigned" && file.coverage !== "unavailable" && file.bytes < 131072).find(file => file.rect.y * frame.camera.scale + frame.camera.y + file.rect.height * frame.camera.scale < frame.height - 20);
   assert.ok(target);
   const x = bounds.x + frame.camera.x + (target.rect.x + target.rect.width / 2) * frame.camera.scale;

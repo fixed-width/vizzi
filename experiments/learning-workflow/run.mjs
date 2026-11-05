@@ -112,7 +112,7 @@ try {
     });
     await page.locator("#filter").fill(text);
     const data = await (await response).json();
-    await page.waitForFunction(prefix => document.querySelector("#counts").textContent.startsWith(prefix), `${data.files.length} shown / ${data.matching} matching`);
+    await page.waitForFunction(() => !document.querySelector("#navigation").getAttribute("aria-busy") || document.querySelector("#navigation").getAttribute("aria-busy")==="false");
     await paint(page);
   };
   const chooseFile = async path => {

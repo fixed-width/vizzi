@@ -40,7 +40,7 @@ try {
   for(const side of ["base","working"])assert.deepEqual(same.panes[side],before.panes[side]);
   const selected=before.panes.working.active;assert.ok(selected);
   working="// moved\n".repeat(30)+working;await writeFile(join(input.root,"z.rs"),working);await refresh();const moved=await checkpoint("moved-declaration");
-  assert.equal(moved.file,"z.rs");assert.equal(moved.panes.working.active,selected);assert.notEqual(moved.panes.working.version,before.panes.working.version);assert.match(moved.panes.working.title,/line 389$/);assert.equal(moved.panes.working.sourceLeft,0);assert.deepEqual(moved.panes.base,before.panes.base);
+  assert.equal(moved.file,"z.rs");assert.equal(moved.panes.working.active,selected);assert.notEqual(moved.panes.working.version,before.panes.working.version);assert.match(moved.panes.working.title,/Line 389$/);assert.equal(moved.panes.working.sourceLeft,0);assert.deepEqual(moved.panes.base,before.panes.base);
   assert.equal(await page.locator("#working-source").evaluate(n=>[...n.querySelectorAll(".code-line")].some(row=>{const b=row.getBoundingClientRect(),p=n.getBoundingClientRect();return row.textContent.includes("fn keep_119") && b.bottom>p.top && b.top<p.bottom;})),true);
   working=working.replace("fn keep_119()", "fn renamed_119()");await writeFile(join(input.root,"z.rs"),working);await refresh();const missing=await checkpoint("missing-declaration");
   assert.equal(missing.panes.working.active,null);assert.equal(missing.panes.working.sourceTop,0);assert.match(await page.locator("#review-notice").textContent(),/declaration.*available/);assert.deepEqual(missing.panes.base,before.panes.base);

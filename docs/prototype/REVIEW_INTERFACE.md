@@ -6,7 +6,7 @@ This reference describes the browser implementation of the
 
 ## Layout and selection
 
-`/review` has an explicit baseline/scope form, capture labels, a paged file list,
+`/review` has an explicit mode/base/optional-target/repository-path form, capture labels, a paged file list,
 hunk navigation and two captured-source inspectors. The workspace links to this page;
 review links back to exploration. Each mode owns its own session navigation policy.
 
@@ -17,11 +17,15 @@ monospaced source remain. Change labels and markers accompany colour. The useful
 distinction is the paired source; surrounding controls stay quiet and left aligned.
 
 ```text
-baseline / scope / compare / refresh / close
-resolved baseline and working observation interval
+mode / base / [target] / repository path / compare / [working refresh] / close
+resolved base and target identities, or working observation interval
 files + filter | hunks and change-page controls
               | base source + outline | working source + outline
 ```
+
+The [trial feedback contract](TRIAL_PRODUCT.md) adds pointer/keyboard width separators,
+persisted numeric layout preferences, persistent input errors and concise file counts.
+Two-commit comparisons label their right pane Target and hide working refresh.
 
 The file projection includes unchanged context when requested. Filtering never
 changes capture scope or full inventory totals. File pages and hunk/edit metadata
@@ -32,7 +36,10 @@ reuse the active expanded fragment only for the same file/version and actual byt
 File, hunk, declaration and side selection carry token, comparison ID and exact side
 document versions. Hunk selection reveals both ranges; declaration selection reveals
 only its selected side. Empty edit ranges remain anchors, not invented changed lines.
-Only returned edit metadata colours source. Further change pages are explicit.
+Only returned edit metadata gives source addition/removal backgrounds. Lexical syntax
+colours are independent and bounded by the [window style contract](WINDOWS.md#captured-syntax-styles).
+Labelled kind badges and explicit Line N links distinguish declarations. Further change
+pages are explicit.
 Byte-range details make line-ending/final-newline edits visible even when displayed
 source text looks identical. No declaration correspondence is inferred.
 

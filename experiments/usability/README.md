@@ -3,7 +3,9 @@
 This how-to is for a facilitator preparing a local session. Use the
 [protocol](PROTOCOL.md) to classify attempts and interpret observations, and keep the
 [scoring reference](facilitator/scoring.md) separate from participant material.
-The current next step is a maintainer trial; unfamiliar-user acceptance stays open.
+The first maintainer trial produced [interaction findings](FINDINGS.md), with
+[the implementation and validation response](FEEDBACK_RESULTS.md). Retest those
+interactions with the updated viewer; unfamiliar-user acceptance stays open.
 
 ## Prepare disposable inputs
 

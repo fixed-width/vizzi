@@ -9,7 +9,7 @@ and pinned document windows use schema **1**; see [WINDOWS.md](WINDOWS.md).
 Status and notification envelopes remain
 schema **1**. These prototype contracts are independent of Git. Identities are opaque
 strings. HTTP responses disable caching. The host serves `/`, `/app.js`, `/controller.js`, `/navigation.js`,
-`/updates.js`, `/startup.js`, `/source-description.js`, `/outline.js`, `/windows.js`, `/inspector.js`, and `/app.css` without external assets.
+`/presentation.js`, `/camera.js`, `/splitter.js`, `/updates.js`, `/startup.js`, `/source-description.js`, `/outline.js`, `/windows.js`, `/inspector.js`, and `/app.css` without external assets.
 
 | Request | Parameters | Response |
 | --- | --- | --- |
@@ -43,7 +43,8 @@ existing eager constructors, `--once` and `--stdio` retain initial capture on st
 
 `filter` is a case-insensitive path substring. `limit` defaults to 2,000 and is clamped
 to 1–2,000. `total` counts all discovered supported source files; `matching` counts matches before
-limiting. The view includes world-space tile rectangles, directory labels, and height.
+limiting. The view includes world-space tile rectangles, directory cards (`path`, `x`, `y`, `width`, `height`), and overall height. Cards are
+packed deterministically across shelves sized from total tile/card area.
 `policy` identifies capture policy, including empty snapshots. `analyzed` counts all
 captured files with analysis records; `source_only` counts those without records.
 These counts describe the entire snapshot, independently of filtering/overview bounds.

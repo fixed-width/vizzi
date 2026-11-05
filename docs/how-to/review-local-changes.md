@@ -1,4 +1,4 @@
-# Review local changes against a Git baseline
+# Review working changes or two Git revisions
 
 Start Vizzi with the repository as its configured root and a cache outside it:
 
@@ -8,15 +8,26 @@ cargo run --release -p vizzi -- \
 ```
 
 Append `/review` to the printed local URL to begin without starting live exploration.
-Enter a baseline revision and a literal relative subtree (`.` for the repository
-root), then select **Compare with working tree**. Check the resolved baseline and
+Enter a **Base revision** and a literal **Repository path** (`.` or blank for the
+repository root), then select **Compare with working tree**. The path selects a file
+or directory; it does not accept a revision. Check the resolved baseline and
 working observation interval above the panes. The working capture includes staged,
 unstaged and non-ignored untracked source as observed on disk.
 
+To compare existing commits, choose **Two commits**, enter the base and **Target
+revision**, then select **Compare commits**. Both inputs resolve once, including
+branch/tag names. The right pane is labelled **Target**; working disk changes are
+excluded and working refresh is hidden. Comparing a new pair requires another submit.
+An invalid revision or a non-root path absent from both sides shows an error beside
+the form and keeps the previous comparison visible.
+
 Choose a changed file, then a hunk to reveal its base and working ranges. The panes
-scroll independently. Their declaration outlines provide lexical context on each
+scroll independently. Drag the dividers to resize the file list, paired panes or
+declaration lists. Focus a divider and use Left/Right (Shift for a larger step), or
+Home/End for its width limits. Width preferences survive reload when local storage
+is available. Their declaration outlines provide lexical context on each
 side; arrow keys, Home/End and Page Up/Down move through an outline, and Enter selects
-a declaration. The **Base** and **Working** buttons select a side explicitly.
+a declaration. Each entry labels its kind and starting **Line N**. The **Base** and **Working** buttons select a side explicitly.
 
 To inspect a related contract or test, select **Include unchanged context**, filter
 its path and choose the file. The filter changes the list while retaining the same
@@ -24,7 +35,8 @@ captured scope. Back/Forward, including the browser controls, returns to accepte
 locations and their reading positions within that exact comparison.
 
 Use the page controls when more files, hunks or change ranges remain. Only loaded
-change ranges colour the source. Expand **Exact change ranges** for raw line/byte
+change ranges receive addition/removal backgrounds. Lexical syntax colours are
+independent of those backgrounds and can be unavailable when styling limits are reached. Expand **Exact change ranges** for raw line/byte
 coordinates when whitespace, line-ending or final-newline edits look alike in the
 text preview. Long source lines have First/Earlier/Later/Last fragment controls.
 

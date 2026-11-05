@@ -98,16 +98,19 @@ async fn failures_and_invalid_requests_keep_active_state_and_latest_intent_wins(
     assert!(!before.status.pending);
     for request in [
         CreateComparison {
+            target_revision: None,
             provider: "other".into(),
             revision: "HEAD".into(),
             scope: None,
         },
         CreateComparison {
+            target_revision: None,
             provider: "git".into(),
             revision: "".into(),
             scope: None,
         },
         CreateComparison {
+            target_revision: None,
             provider: "git".into(),
             revision: "HEAD".into(),
             scope: Some("../outside".into()),
@@ -120,6 +123,7 @@ async fn failures_and_invalid_requests_keep_active_state_and_latest_intent_wins(
     }
     assert_eq!(app.status().ticket, None);
     app.create(CreateComparison {
+        target_revision: None,
         provider: "git".into(),
         revision: "HEAD".into(),
         scope: None,
@@ -131,6 +135,7 @@ async fn failures_and_invalid_requests_keep_active_state_and_latest_intent_wins(
         Err(ReviewApiError::Review(vizzi::review::ReviewError::Stale))
     ));
     app.create(CreateComparison {
+        target_revision: None,
         provider: "git".into(),
         revision: "does-not-exist".into(),
         scope: None,
@@ -141,6 +146,7 @@ async fn failures_and_invalid_requests_keep_active_state_and_latest_intent_wins(
     assert_eq!(failed.error.as_ref().unwrap().code, "capture_failed");
     assert_eq!(failed.active.as_ref().unwrap().token, active.token);
     app.create(CreateComparison {
+        target_revision: None,
         provider: "git".into(),
         revision: "missing".into(),
         scope: None,
@@ -148,6 +154,7 @@ async fn failures_and_invalid_requests_keep_active_state_and_latest_intent_wins(
     .unwrap();
     let accepted = app
         .create(CreateComparison {
+            target_revision: None,
             provider: "git".into(),
             revision: "HEAD".into(),
             scope: None,
@@ -201,6 +208,7 @@ async fn inventory_pages_are_bounded_and_filters_preserve_full_scope_counts() {
     repo.git(&["commit", "--quiet", "-m", "context only", "unchanged.md"]);
     let app = repo.app();
     app.create(CreateComparison {
+        target_revision: None,
         provider: "git".into(),
         revision: "HEAD".into(),
         scope: None,
@@ -314,6 +322,7 @@ async fn diff_pages_and_source_windows_require_exact_side_versions() {
     repo.write("new.md", "added\n");
     let app = repo.app();
     app.create(CreateComparison {
+        target_revision: None,
         provider: "git".into(),
         revision: "HEAD".into(),
         scope: None,
@@ -587,6 +596,7 @@ async fn inventory_describes_literal_targets_binary_data_and_unassessed_presence
     .unwrap();
     let app = repo.app();
     app.create(CreateComparison {
+        target_revision: None,
         provider: "git".into(),
         revision: "HEAD".into(),
         scope: None,
@@ -644,6 +654,7 @@ async fn review_scope_is_literal_and_metadata_limits_do_not_mutate_capture_scope
     repo.write("src-other/a.rs", "fn changed_outside() {}\n");
     let app = repo.app();
     app.create(CreateComparison {
+        target_revision: None,
         provider: "git".into(),
         revision: "HEAD".into(),
         scope: Some("src".into()),
@@ -692,6 +703,7 @@ async fn dropping_the_application_closes_subscriptions_without_retaining_capture
     repo.write("a.rs", "fn work() {}\n");
     let app = repo.app();
     app.create(CreateComparison {
+        target_revision: None,
         provider: "git".into(),
         revision: "HEAD".into(),
         scope: None,
@@ -734,6 +746,7 @@ async fn request_lengths_and_capture_intervals_are_explicit_not_silent_truncatio
     for revision in ["x".repeat(257), "bad\0revision".into()] {
         assert!(matches!(
             app.create(CreateComparison {
+                target_revision: None,
                 provider: "git".into(),
                 revision,
                 scope: None
@@ -743,6 +756,7 @@ async fn request_lengths_and_capture_intervals_are_explicit_not_silent_truncatio
     }
     assert!(matches!(
         app.create(CreateComparison {
+            target_revision: None,
             provider: "git".into(),
             revision: "HEAD".into(),
             scope: Some("s".repeat(4097))
@@ -751,6 +765,7 @@ async fn request_lengths_and_capture_intervals_are_explicit_not_silent_truncatio
     ));
     let accepted = app
         .create(CreateComparison {
+            target_revision: None,
             provider: "git".into(),
             revision: "x".repeat(256),
             scope: None,
@@ -762,17 +777,26 @@ async fn request_lengths_and_capture_intervals_are_explicit_not_silent_truncatio
     );
     assert!(app.status().error.is_some());
     app.create(CreateComparison {
+        target_revision: None,
         provider: "git".into(),
         revision: "HEAD".into(),
         scope: Some("s".repeat(4096)),
     })
     .unwrap();
-    assert!(ready(&app).await.error.is_none());
+    assert!(
+        ready(&app)
+            .await
+            .error
+            .unwrap()
+            .message
+            .contains("Repository path")
+    );
     let started = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .unwrap()
         .as_millis() as u64;
     app.create(CreateComparison {
+        target_revision: None,
         provider: "git".into(),
         revision: "HEAD".into(),
         scope: None,
@@ -864,6 +888,7 @@ async fn source_context_descriptors_and_diagnostics_are_bounded_with_explicit_hi
         );
         let app = ReviewApplication::start(host, CaptureLimits::default()).unwrap();
         app.create(CreateComparison {
+            target_revision: None,
             provider: "git".into(),
             revision: "HEAD".into(),
             scope: None,
@@ -913,6 +938,7 @@ async fn refresh_origin_survives_working_updates_but_new_creation_gets_a_new_ori
     repo.commit();
     let app = repo.app();
     let create = || CreateComparison {
+        target_revision: None,
         provider: "git".into(),
         revision: "HEAD".into(),
         scope: None,
@@ -937,6 +963,174 @@ async fn refresh_origin_survives_working_updates_but_new_creation_gets_a_new_ori
 }
 
 #[tokio::test]
+async fn two_revisions_are_pinned_and_ignore_dirty_working_source() {
+    use serde_json::json;
+    let repo = Repo::new();
+    repo.write("a.rs", "fn before() {}\n");
+    repo.commit();
+    let base = String::from_utf8(repo.git(&["rev-parse", "HEAD"]))
+        .unwrap()
+        .trim()
+        .to_owned();
+    repo.write("a.rs", "fn committed() {}\n");
+    repo.commit();
+    let target = String::from_utf8(repo.git(&["rev-parse", "HEAD"]))
+        .unwrap()
+        .trim()
+        .to_owned();
+    repo.git(&["update-ref", "refs/heads/target", &target]);
+    repo.write("a.rs", "fn dirty() {}\n");
+    repo.write("untracked.txt", "not part of either commit\n");
+    let app = repo.app();
+    app.create(
+        serde_json::from_value(
+            json!({"provider":"git","revision":base,"target_revision":"target","scope":"."}),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    let state = ready(&app).await;
+    assert!(state.error.is_none(), "{:?}", state.error);
+    let meta = state.active.unwrap();
+    let value = serde_json::to_value(&meta).unwrap();
+    assert_eq!(value["target"]["revision"], "target");
+    assert_eq!(value["target"]["resolved"], target);
+    let query = app.query(&meta.token).unwrap();
+    let page = query.files(&ReviewPageQuery::default()).unwrap();
+    assert_eq!(page.total, 1);
+    let row = &page.files[0];
+    assert_eq!(
+        query
+            .window(
+                &row.file,
+                Side::Working,
+                row.working_version.as_deref().unwrap(),
+                &WindowQuery::default()
+            )
+            .unwrap()
+            .window
+            .lines[0]
+            .text,
+        "fn committed() {}"
+    );
+    repo.git(&["update-ref", "refs/heads/target", &base]);
+    assert_eq!(
+        query
+            .window(
+                &row.file,
+                Side::Working,
+                row.working_version.as_deref().unwrap(),
+                &WindowQuery::default()
+            )
+            .unwrap()
+            .window
+            .lines[0]
+            .text,
+        "fn committed() {}"
+    );
+    assert!(matches!(
+        app.refresh(&meta.token),
+        Err(ReviewApiError::Invalid(_))
+    ));
+    drop(query);
+    app.create(
+        serde_json::from_value(json!({"provider":"git","revision":base,"target_revision":base}))
+            .unwrap(),
+    )
+    .unwrap();
+    let same = ready(&app).await.active.unwrap();
+    assert_eq!(
+        app.query(&same.token)
+            .unwrap()
+            .files(&ReviewPageQuery::default())
+            .unwrap()
+            .total,
+        0
+    );
+}
+
+#[tokio::test]
+async fn invalid_revision_or_empty_repository_path_reports_context_and_retains_the_old_pair() {
+    use serde_json::json;
+    let repo = Repo::new();
+    repo.write("dir/a.rs", "fn base() {}\n");
+    repo.write("metadata.bin", "\0");
+    repo.write("gone.txt", "removed later");
+    repo.commit();
+    std::fs::remove_file(repo.root.path().join("gone.txt")).unwrap();
+    let app = repo.app();
+    app.create(serde_json::from_value(json!({"provider":"git","revision":"HEAD"})).unwrap())
+        .unwrap();
+    let first = ready(&app).await.active.unwrap();
+    for (request, word) in [
+        (
+            json!({"provider":"git","revision":"no-such-base"}),
+            "Base revision",
+        ),
+        (
+            json!({"provider":"git","revision":"HEAD","target_revision":"no-such-target"}),
+            "Target revision",
+        ),
+        (
+            json!({"provider":"git","revision":"HEAD","scope":"no-such-path"}),
+            "Repository path",
+        ),
+    ] {
+        app.create(serde_json::from_value(request).unwrap())
+            .unwrap();
+        let failed = ready(&app).await;
+        assert_eq!(failed.active.unwrap().token, first.token);
+        assert!(failed.error.unwrap().message.contains(word));
+    }
+    app.create(
+        serde_json::from_value(json!({"provider":"git","revision":"HEAD","scope":"dir"})).unwrap(),
+    )
+    .unwrap();
+    let valid = ready(&app).await;
+    assert!(valid.error.is_none());
+    assert_eq!(
+        app.query(&valid.active.unwrap().token)
+            .unwrap()
+            .files(&ReviewPageQuery {
+                unchanged: Some(true),
+                ..ReviewPageQuery::default()
+            })
+            .unwrap()
+            .total,
+        1
+    );
+    for path in ["metadata.bin", "gone.txt"] {
+        app.create(
+            serde_json::from_value(json!({"provider":"git","revision":"HEAD","scope":path}))
+                .unwrap(),
+        )
+        .unwrap();
+        let status = ready(&app).await;
+        assert!(status.error.is_none(), "valid inventory scope {path}");
+    }
+    for target in [String::new(), "x".repeat(257), "x\0y".into()] {
+        assert!(
+            app.create(
+                serde_json::from_value(
+                    json!({"provider":"git","revision":"HEAD","target_revision":target})
+                )
+                .unwrap()
+            )
+            .is_err()
+        );
+    }
+    app.create(
+        serde_json::from_value(
+            json!({"provider":"git","revision":"HEAD","target_revision":"x".repeat(256)}),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    let status = ready(&app).await;
+    assert!(status.error.unwrap().message.contains("Target revision"));
+}
+
+#[tokio::test]
 async fn selected_inventory_rows_resolve_fresh_versions_outside_the_projected_page_and_filter() {
     let repo = Repo::new();
     for name in ["a.txt", "z.txt", "context.txt"] {
@@ -947,6 +1141,7 @@ async fn selected_inventory_rows_resolve_fresh_versions_outside_the_projected_pa
     repo.write("z.txt", "selected\n");
     let app = repo.app();
     app.create(CreateComparison {
+        target_revision: None,
         provider: "git".into(),
         revision: "HEAD".into(),
         scope: None,
@@ -1022,6 +1217,7 @@ async fn create_refresh_and_queries_keep_the_frozen_baseline_and_source_anchors(
     repo.write("a.rs", "fn one() {}\n");
     let app = repo.app();
     app.create(CreateComparison {
+        target_revision: None,
         provider: "git".into(),
         revision: "HEAD".into(),
         scope: None,

@@ -400,6 +400,13 @@ pub struct ReviewCandidate {
 }
 
 impl ReviewCandidate {
+    /// Whether both captured inventories are empty; source-only/excluded entries count.
+    pub fn inventory_is_empty(&self) -> Result<bool, ReviewError> {
+        let base = self.base.as_ref().ok_or(ReviewError::Stage)?;
+        let working = self.working.as_ref().ok_or(ReviewError::Stage)?;
+        Ok(base.capture.observation.inventory().is_empty()
+            && working.capture.observation.inventory().is_empty())
+    }
     /// Analyses admitted bytes with the workspace engine's shared executor and plan.
     /// A failed or cancelled attempt cannot be published as source-only implicitly.
     pub fn analyze(

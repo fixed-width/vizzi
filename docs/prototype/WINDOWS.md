@@ -57,6 +57,28 @@ control-character/name tests verify a document-window body below 512 KiB. This b
 applies to the document-window reply, not the overview or explicit bulk diagnostics.
 Truncated labels do not replace full source: fragments retain complete source access.
 
+## Captured syntax styles
+
+Windows add `coloring:"ready"|"limited"|"unavailable"`. Each source fragment can carry
+`styles:[{start,end,kind}]`; offsets are relative UTF-8 bytes, sorted and non-overlapping.
+Missing styles mean plain text. Vocabulary: `keyword`, `type`, `function`, `string`,
+`comment`, `number`, `constant`, `attribute`. These are lexical categories, without
+semantic name resolution. Older plain window producers remain accepted by the client.
+
+Built-in grammar queries run over the existing captured parse once per analysis. The
+immutable sparse index retains at most **1 MiB** of packed boundaries per document and
+persists as base64 little-endian u64 data. Adjacent equal styles merge; outer captures
+take precedence over nested captures. Admission exhaustion discards the whole style
+index while preserving source and declarations. Custom adapters may omit it.
+
+Projection looks up the requested byte range with binary search. A complete window
+admits at most **1,024** style spans; exhaustion returns all its source as plain text
+with `limited` status. UTF-8 boundaries and source/version binding remain mandatory.
+Style metadata participates in document identity and built-in implementation/cache
+fingerprints. The same rules apply to resident and spooled source and both review sides.
+The browser validates styles and renders literal text nodes and spans; it never parses
+source during scrolling or treats captured text as HTML.
+
 ## Identity recovery and client application
 
 Surviving focus and top-row IDs map to current ordinals. Removed focus prefers the next

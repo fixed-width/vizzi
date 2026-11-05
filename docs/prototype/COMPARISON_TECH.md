@@ -196,8 +196,8 @@ The local transport operations are:
 
 | Operation | Contract |
 | --- | --- |
-| Create | Explicit baseline provider/revision and normalised relative subtree in the configured workspace; returns capture ticket. |
-| Refresh working | Active token required; keeps that exact base/policy, returns new capture ticket. |
+| Create | Explicit base revision, optional target revision, and normalised repository path in the configured workspace; returns capture ticket. |
+| Refresh working | Active working-tree token required; keeps that exact base/policy, returns new capture ticket. Fixed commit pairs reject refresh. |
 | Status/subscribe | Retained latest ticket, active token, pending/error state; reconnect supplies current state without replay. Comparison state is separate from live snapshot status. |
 | Inventory/changes | Token-bound, stable paged results with change/coverage totals. Filter is projection only. |
 | Source/context/hunks | Token + side + version/range validation; bounded source windows and paged hunk/declaration metadata. |

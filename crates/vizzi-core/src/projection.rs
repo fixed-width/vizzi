@@ -1,5 +1,6 @@
 //! Finite source/outline projections over an immutable captured document.
 
+use crate::coloring::StyledSpan;
 use crate::model::{Document, DocumentVersion, EntityId, FileId, SourceEncoding, SourceReadError};
 use serde::{Deserialize, Serialize};
 
@@ -9,6 +10,8 @@ pub const SOURCE_BYTES: usize = 32 * 1024;
 pub const SOURCE_ROWS: usize = 96;
 /// Maximum outline rows, excluding one separately returned cursor.
 pub const OUTLINE_ROWS: usize = 200;
+/// Maximum style spans across a complete source window.
+pub const STYLE_SPANS: usize = 1024;
 
 /// Source and outline ranges within one pinned document version.
 #[derive(Clone, Debug, Default, Deserialize)]
@@ -69,6 +72,9 @@ pub struct Summary {
 /// One bounded fragment, never a silently truncated whole line.
 #[derive(Debug, Serialize)]
 pub struct Line {
+    /// Styles in fragment-relative UTF-8 byte coordinates.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub styles: Vec<StyledSpan>,
     /// One-based source line number.
     pub number: usize,
     /// First returned UTF-8 byte column.
@@ -87,6 +93,8 @@ pub struct Line {
 /// Finite projection; the host adds the pinned snapshot identity.
 #[derive(Debug, Serialize)]
 pub struct Window {
+    /// Whether complete styling is ready, limited, or unavailable.
+    pub coloring: &'static str,
     /// Window protocol version.
     pub schema: u8,
     /// Captured file identity.
@@ -194,6 +202,11 @@ impl Document {
             .min(line_total.saturating_sub(line_start - 1));
         let allowance = SOURCE_BYTES / count.max(1);
         let mut lines = Vec::new();
+        let coloring = self.analyses().iter().find_map(|a| a.coloring.as_ref());
+        let mut coloring_status = coloring.map_or("unavailable", |c| {
+            if c.available() { "ready" } else { "limited" }
+        });
+        let mut style_count = 0;
         let mut reader = self.captured().reader();
         if self.encoding() == SourceEncoding::Utf8 {
             for number in line_start..line_start.saturating_add(count) {
@@ -213,7 +226,29 @@ impl Document {
                             .into_owned(),
                     )
                     .map_err(|_| SourceReadError::Integrity)?;
+                    let styles = if coloring_status == "ready" {
+                        match coloring.and_then(|c| {
+                            c.spans(
+                                range.start + column..range.start + end,
+                                STYLE_SPANS - style_count,
+                            )
+                        }) {
+                            Some(styles)
+                                if styles.iter().all(|s| text.get(s.start..s.end).is_some()) =>
+                            {
+                                style_count += styles.len();
+                                styles
+                            }
+                            _ => {
+                                coloring_status = "limited";
+                                Vec::new()
+                            }
+                        }
+                    } else {
+                        Vec::new()
+                    };
                     lines.push(Line {
+                        styles,
                         number,
                         column,
                         end_column: end,
@@ -226,6 +261,11 @@ impl Document {
             }
         }
         let total = self.declaration_count();
+        if coloring_status != "ready" {
+            for line in &mut lines {
+                line.styles.clear();
+            }
+        }
         let cursor = query
             .cursor
             .as_deref()
@@ -248,6 +288,7 @@ impl Document {
             )
             .min(total);
         Ok(Window {
+            coloring: coloring_status,
             schema: 1,
             file: self.id().clone(),
             version: self.version().clone(),

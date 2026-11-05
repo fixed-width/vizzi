@@ -198,7 +198,7 @@ impl IntoResponse for HttpError {
     fn into_response(self) -> Response {
         use crate::review::ReviewError;
         use vizzi_core::{model::SourceReadError, text_diff::DiffError};
-        let status = match &self.0 {
+        let status = match self.0.cause() {
             ReviewApiError::Invalid(_) => StatusCode::BAD_REQUEST,
             ReviewApiError::NotFound | ReviewApiError::Review(ReviewError::SourceUnavailable) => {
                 StatusCode::NOT_FOUND
@@ -267,6 +267,23 @@ mod tests {
         };
         for (error, status) in [
             (ReviewApiError::Invalid("request".into()), 400),
+            (
+                ReviewApiError::Context(
+                    "Base revision".into(),
+                    Box::new(ReviewApiError::Invalid("request".into())),
+                ),
+                400,
+            ),
+            (
+                ReviewApiError::Context(
+                    "Target revision".into(),
+                    Box::new(ReviewApiError::Context(
+                        "capture".into(),
+                        Box::new(ReviewApiError::Version),
+                    )),
+                ),
+                409,
+            ),
             (ReviewApiError::NotFound, 404),
             (ReviewApiError::Version, 409),
             (ReviewApiError::Review(ReviewError::Stale), 409),

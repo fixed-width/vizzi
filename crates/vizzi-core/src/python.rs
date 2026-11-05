@@ -16,6 +16,7 @@ impl LanguageAdapter for PythonAdapter {
             id: ContextId::derive(&[
                 include_bytes!("python.rs"),
                 include_bytes!("syntax.rs"),
+                include_bytes!("coloring.rs"),
                 include_bytes!("syntax_state.rs"),
                 include_bytes!("analysis.rs"),
                 include_bytes!("model.rs"),
@@ -28,6 +29,7 @@ impl LanguageAdapter for PythonAdapter {
     fn create(&self) -> Result<Box<dyn Analyzer>, ModelError> {
         Ok(Box::new(SyntaxAnalyzer::new(
             tree_sitter_python::LANGUAGE.into(),
+            tree_sitter_python::HIGHLIGHTS_QUERY,
             self.context(),
             collect,
             declaration,

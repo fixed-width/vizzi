@@ -260,6 +260,7 @@ async fn scoped_review_finishes_with_the_live_index_dormant_and_stays_readable_d
             .unwrap();
     review
         .create(CreateComparison {
+            target_revision: None,
             provider: "git".into(),
             revision: "HEAD".into(),
             scope: Some("focus".into()),

@@ -18,6 +18,7 @@ fn document(text: &str, names: &[String]) -> Arc<Document> {
             "a.rs".into(),
             text.as_bytes(),
             vec![Analysis {
+                coloring: None,
                 content: ContentId::derive(&[text.as_bytes()]),
                 context: Context {
                     language: "fixture".into(),
@@ -54,6 +55,21 @@ fn summary_omits_bulk_data_and_windows_bound_escaped_text_and_generated_names() 
         .map(|i| format!("{i}{}", "\u{1}".repeat(10000)))
         .collect();
     let file = document(&text, &names);
+    let mut analyses = file.analyses().to_vec();
+    analyses[0].coloring = Some(vizzi_core::coloring::Coloring::from_spans(
+        (0..1024).map(|i| (i * 2..i * 2 + 1, vizzi_core::coloring::Style::String)),
+        1024 * 1024,
+    ));
+    let file = Arc::new(
+        Document::capture(
+            WorkspaceId::derive(&[b"projection"]),
+            "a.rs".into(),
+            text.as_bytes(),
+            analyses,
+            file.classification().clone(),
+        )
+        .unwrap(),
+    );
     let snapshot = Snapshot::new(
         WorkspaceId::derive(&[b"projection"]),
         vec![file.clone()],
@@ -108,6 +124,10 @@ fn summary_omits_bulk_data_and_windows_bound_escaped_text_and_generated_names() 
             .outline
             .iter()
             .all(|e| e.name.len() <= 128 && e.name_truncated)
+    );
+    assert_eq!(
+        window.lines.iter().map(|l| l.styles.len()).sum::<usize>(),
+        1024
     );
     assert!(serde_json::to_vec(&window).unwrap().len() < 512 * 1024);
     assert!(window.lines[0].right);

@@ -1,3 +1,4 @@
+import {kindGroup,renderStyledText} from "/presentation.js";
 import { createWindowReader } from "/windows.js";
 
 const SOURCE_ROW = 22, OUTLINE_ROW = 48;
@@ -56,7 +57,7 @@ export function createInspector({ source, space, outline, transport, select, onE
         }
         row.append(label,controls,text);space.append(row);node={row,label,text,buttons};sourceNodes.set(number,node);
       }
-      node.row.style.top=`${(number-1)*SOURCE_ROW}px`;node.label.textContent=number;node.text.textContent=`${line.left?"…":""}${line.text}${line.right?"…":""}`;
+      node.row.style.top=`${(number-1)*SOURCE_ROW}px`;node.label.textContent=number;if(node.line!==line){renderStyledText(node.text,line);node.line=line;}
       const active=view.source.summary.active;node.row.classList.toggle("active",Boolean(active && number>=active.start_line && number<=active.end_line));
       decorateLine(node.row,number,view);
       for(const [action,button] of node.buttons)button.hidden=action==="first" || action==="previous" ? !line.left : !line.right;
@@ -74,8 +75,8 @@ export function createInspector({ source, space, outline, transport, select, onE
       const fact=entries.get(index);let node=outlineNodes.get(fact.id);
       if(!node){const row=document.createElement("div"),button=document.createElement("button"),name=document.createElement("span"),detail=document.createElement("small");row.className="outline-entry";row.setAttribute("role","listitem");button.append(name,detail);row.append(button);outlineSpace.append(row);node={row,button,name,detail};outlineNodes.set(fact.id,node);}
       node.row.style.top=`${index*OUTLINE_ROW}px`;node.row.setAttribute("aria-posinset",String(index+1));node.row.setAttribute("aria-setsize",String(total));
-      node.button.dataset.declaration=fact.id;node.button.dataset.index=index;node.button.tabIndex=index===cursor?0:-1;node.button.setAttribute("aria-current",String(view.selection.entity===fact.id));node.button.title=`${fact.kind} ${fact.name}${fact.name_truncated?"… (inspect source for full name)":""} · line ${fact.start_line}`;
-      node.name.textContent=fact.name+(fact.name_truncated?"…":"");node.detail.textContent=`${fact.kind} · ${fact.start_line}`;
+      node.button.dataset.declaration=fact.id;node.button.dataset.index=index;node.button.tabIndex=index===cursor?0:-1;node.button.setAttribute("aria-current",String(view.selection.entity===fact.id));node.button.title=`Reveal ${fact.kind} ${fact.name}${fact.name_truncated?"… (inspect source for full name)":""} starting at Line ${fact.start_line}`;node.button.setAttribute("aria-label",node.button.title);
+      node.name.textContent=fact.name+(fact.name_truncated?"…":"");node.detail.replaceChildren();const badge=document.createElement("span");badge.className=`kind-badge kind-${kindGroup(fact.kind)}`;badge.textContent=fact.kind;node.detail.append(badge,document.createTextNode(` · Line ${fact.start_line}`));
     }
   }
   function covered(query) {

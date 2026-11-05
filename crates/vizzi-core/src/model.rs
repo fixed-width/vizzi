@@ -135,6 +135,9 @@ pub struct Fact {
 /// Path-independent facts that can be persisted in an analysis cache.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Analysis {
+    /// Optional source-bound lexical styles; absent for custom or unavailable analysis.
+    #[serde(default)]
+    pub coloring: Option<crate::coloring::Coloring>,
     /// Captured byte identity to which the facts apply.
     pub content: ContentId,
     /// Analyzer configuration and implementation identity.
@@ -241,9 +244,18 @@ impl Document {
             if &analysis.content != content || !contexts.insert(&analysis.context.id) {
                 return Err(ModelError("analysis content or context mismatch".into()));
             }
+            if analysis.coloring.as_ref().is_some_and(|c| {
+                !c.valid_for(source.len()) || text.is_some_and(|t| !c.valid_text(t))
+            }) {
+                return Err(ModelError("invalid syntax styling boundaries".into()));
+            }
             let mut keys = BTreeSet::new();
-            if analysis.coverage == Coverage::Deferred && !analysis.facts.is_empty() {
-                return Err(ModelError("deferred analysis cannot contain facts".into()));
+            if analysis.coverage == Coverage::Deferred
+                && (!analysis.facts.is_empty() || analysis.coloring.is_some())
+            {
+                return Err(ModelError(
+                    "deferred analysis cannot contain facts or styles".into(),
+                ));
             }
             for fact in &analysis.facts {
                 if !keys.insert(&fact.key)
@@ -510,6 +522,7 @@ mod tests {
     }
     fn analysis(text: &[u8]) -> Analysis {
         Analysis {
+            coloring: None,
             content: ContentId::derive(&[text]),
             context: Context {
                 language: "rust".into(),
@@ -610,6 +623,7 @@ mod tests {
         assert_eq!(first.documents()[0].path(), "a.rs");
         assert!(crate::model::fixture_snapshot(workspace(), vec![a.clone(), a]).is_err());
         let changed = Analysis {
+            coloring: None,
             content: ContentId::derive(&[b""]),
             facts: vec![],
             ..analysis(b"")

@@ -20,6 +20,9 @@ pub use projection::*;
 /// Application/projection errors, shared by HTTP and native clients.
 #[derive(Debug, thiserror::Error)]
 pub enum ReviewApiError {
+    /// Input context retaining the original failure category and recovery status.
+    #[error("{0}: {1}")]
+    Context(String, #[source] Box<ReviewApiError>),
     /// Malformed or unsupported request.
     #[error("{0}")]
     Invalid(String),
@@ -54,6 +57,8 @@ pub struct CreateComparison {
     pub provider: String,
     /// Explicit revision to resolve once.
     pub revision: String,
+    /// Optional immutable right-hand revision; absent means observed working files.
+    pub target_revision: Option<String>,
     /// Relative subtree; absent or `.` means root.
     pub scope: Option<String>,
 }
@@ -82,12 +87,23 @@ pub struct ComparisonMetadata {
     pub revision: String,
     /// Resolved native object identity, unchanged by ref movement.
     pub resolved: String,
+    /// Pinned right-hand revision; absent for a working-tree comparison.
+    pub target: Option<RevisionTarget>,
     /// Literal review subtree.
     pub scope: String,
     /// Working capture start in Unix milliseconds.
     pub working_started_ms: u64,
     /// Working capture completion in Unix milliseconds, before analysis.
     pub working_finished_ms: u64,
+}
+
+/// Requested and resolved identity of an immutable comparison target.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct RevisionTarget {
+    /// Requested revision label.
+    pub revision: String,
+    /// Resolved native object identity.
+    pub resolved: String,
 }
 
 /// Bounded failure of the latest request, without replacing the active pair.
@@ -153,6 +169,7 @@ impl ReviewSubscription {
 
 struct Spec {
     pin: GitRevision,
+    target: Option<(String, GitRevision)>,
     origin: String,
     revision: String,
     scope: String,
@@ -245,6 +262,11 @@ impl ReviewApplication {
     }
     /// Captures working source again against the exact active baseline and scope.
     pub fn refresh(&self, token: &str) -> Result<ReviewAccepted, ReviewApiError> {
+        if self.query(token)?.metadata().target.is_some() {
+            return Err(ReviewApiError::Invalid(
+                "Commit comparisons are fixed. Choose new revisions to compare.".into(),
+            ));
+        }
         self.enqueue(Operation::Refresh(token.into()), Some(token))
     }
     /// Retires active lookup and cancels outstanding review intent.
@@ -406,6 +428,10 @@ fn worker_loop(shared: Arc<Shared>) {
                         provider: "git".into(),
                         revision: spec.revision.clone(),
                         resolved: spec.pin.resolved().into(),
+                        target: spec.target.as_ref().map(|(revision, pin)| RevisionTarget {
+                            revision: revision.clone(),
+                            resolved: pin.resolved().into(),
+                        }),
                         scope: spec.scope.clone(),
                         working_started_ms: started,
                         working_finished_ms: finished,
@@ -445,12 +471,33 @@ fn run_job(
             let repository = GitRepository::open(shared.host.root()).map_err(ReviewError::from)?;
             let mut pin = repository
                 .pin(&request.revision, shared.limits, &cancelled)
-                .map_err(ReviewError::from)?;
+                .map_err(|error| {
+                    ReviewApiError::Context(
+                        format!("Base revision {:?}", request.revision),
+                        Box::new(ReviewError::from(error).into()),
+                    )
+                })?;
+            let target = request
+                .target_revision
+                .as_ref()
+                .map(|revision| {
+                    repository
+                        .pin(revision, shared.limits, &cancelled)
+                        .map(|pin| (revision.clone(), pin))
+                        .map_err(|error| {
+                            ReviewApiError::Context(
+                                format!("Target revision {revision:?}"),
+                                Box::new(ReviewError::from(error).into()),
+                            )
+                        })
+                })
+                .transpose()?;
             let scope = scope(request)?;
             let policy = CapturePolicy::scope(scope, vec![]);
             candidate.capture_base(&mut pin, &policy, shared.limits, &cancelled)?;
             Arc::new(Spec {
                 pin: pin.fork(),
+                target,
                 origin: job.ticket.as_str().into(),
                 revision: request.revision.clone(),
                 scope: request.scope.as_deref().unwrap_or(".").into(),
@@ -470,10 +517,20 @@ fn run_job(
         }
     };
     let repository = GitRepository::open(shared.host.root()).map_err(ReviewError::from)?;
-    let mut working = repository.working(&spec.pin).map_err(ReviewError::from)?;
     let started = now_ms();
-    candidate.capture_working(&mut working, shared.limits, &cancelled)?;
+    if let Some((_, target)) = &spec.target {
+        candidate.capture_working(&mut target.fork(), shared.limits, &cancelled)?;
+    } else {
+        let mut working = repository.working(&spec.pin).map_err(ReviewError::from)?;
+        candidate.capture_working(&mut working, shared.limits, &cancelled)?;
+    }
     let finished = now_ms();
+    if spec.scope != "." && candidate.inventory_is_empty()? {
+        return Err(ReviewApiError::Invalid(format!(
+            "Repository path {:?} contains no files in either comparison side. Enter a file/directory path, or . for the repository root.",
+            spec.scope
+        )));
+    }
     shared.host.analyze_review(&mut candidate, &cancelled)?;
     Ok((candidate, spec, started, finished))
 }
@@ -493,6 +550,15 @@ fn validate(request: &CreateComparison) -> Result<(), ReviewApiError> {
         ));
     }
     scope(request)?;
+    if request
+        .target_revision
+        .as_ref()
+        .is_some_and(|s| s.is_empty() || s.len() > 256 || s.contains('\0'))
+    {
+        return Err(ReviewApiError::Invalid(
+            "Target revision must contain 1..256 bytes without NUL".into(),
+        ));
+    }
     Ok(())
 }
 fn scope(
@@ -526,9 +592,16 @@ pub(crate) fn clip(text: &str, max: usize) -> (String, bool) {
 }
 
 impl ReviewApiError {
+    pub(crate) fn cause(&self) -> &Self {
+        match self {
+            Self::Context(_, inner) => inner.cause(),
+            _ => self,
+        }
+    }
     /// Stable failure category, shared by status and transport errors.
     pub fn code(&self) -> &'static str {
         match self {
+            Self::Context(_, inner) => inner.code(),
             Self::Invalid(_) => "invalid",
             Self::NotFound => "not_found",
             Self::Version => "version",

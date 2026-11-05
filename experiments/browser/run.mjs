@@ -1,7 +1,14 @@
 import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 
-if (process.argv.includes("--review-scale")) {
+if (process.argv.includes("--trial")) {
+  const result=spawnSync(process.execPath,["experiments/browser/trial.test.mjs",...process.argv.slice(2).filter(arg=>arg!=="--trial")],{stdio:"inherit"});process.exit(result.status ?? 1);
+} else if (process.argv.includes("--trial-mutations")) {
+  const at=process.argv.indexOf("--output"),output=process.argv[at+1];
+  if(at<0 || !output || output.startsWith("--"))throw new Error("--trial-mutations needs --output");
+  const args=["experiments/browser/offline-mutations.mjs","experiments/browser/trial-stryker.config.json",output];
+  const result=spawnSync(process.platform==="win32"?process.execPath:"nice",process.platform==="win32"?args:["-n","10",process.execPath,...args],{stdio:"inherit"});process.exit(result.status ?? 1);
+} else if (process.argv.includes("--review-scale")) {
   await import("../review-workflow/measure.mjs");
 } else if (process.argv.includes("--review-walkthrough")) {
   await import("../review-workflow/run.mjs");
@@ -77,7 +84,7 @@ if (process.argv.includes("--review-scale")) {
 } else if (process.argv.includes("--measure")) {
   await import("./measure.mjs");
 } else {
-  for (const file of ["crates/vizzi/web/startup.test.js", "crates/vizzi/web/controller.test.js", "crates/vizzi/web/navigation.test.js", "crates/vizzi/web/updates.test.js", "crates/vizzi/web/source-description.test.js", "crates/vizzi/web/review-controller.test.js", "crates/vizzi/web/review-windows.test.js", "experiments/review-workflow/walkthrough-audit.test.mjs", "experiments/browser/statistics.test.mjs", "crates/vizzi/web/windows.test.js", "experiments/browser/outline.test.mjs", "experiments/browser/inspection.test.mjs", "experiments/browser/navigation-inspector.test.mjs", "experiments/browser/startup.test.mjs", "experiments/browser/browser.test.mjs", "experiments/browser/navigation.test.mjs", "experiments/browser/review.test.mjs", "experiments/browser/review-refresh.test.mjs"]) {
+  for (const file of ["crates/vizzi/web/presentation-dom.test.js", "crates/vizzi/web/presentation.test.js", "crates/vizzi/web/camera.test.js", "experiments/browser/trial.test.mjs", "crates/vizzi/web/startup.test.js", "crates/vizzi/web/controller.test.js", "crates/vizzi/web/navigation.test.js", "crates/vizzi/web/updates.test.js", "crates/vizzi/web/source-description.test.js", "crates/vizzi/web/review-controller.test.js", "crates/vizzi/web/review-windows.test.js", "experiments/review-workflow/walkthrough-audit.test.mjs", "experiments/browser/statistics.test.mjs", "crates/vizzi/web/windows.test.js", "experiments/browser/outline.test.mjs", "experiments/browser/inspection.test.mjs", "experiments/browser/navigation-inspector.test.mjs", "experiments/browser/startup.test.mjs", "experiments/browser/browser.test.mjs", "experiments/browser/navigation.test.mjs", "experiments/browser/review.test.mjs", "experiments/browser/review-refresh.test.mjs"]) {
     const result = spawnSync(process.execPath, [file], { stdio: "inherit" });
     if (result.status !== 0) process.exit(result.status ?? 1);
   }

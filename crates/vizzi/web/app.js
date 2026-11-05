@@ -1,3 +1,6 @@
+import {coverageLabel,fileCount} from "/presentation.js";
+import {fitCamera,zoomCamera,jumpCamera} from "/camera.js";
+import {installSplitter} from "/splitter.js";
 import { createController } from "/controller.js";
 import { followChanges } from "/updates.js";
 import { describeSource } from "/source-description.js";
@@ -7,6 +10,10 @@ import { createStartup } from "/startup.js";
 
 const element = id => document.getElementById(id);
 const canvas = element("map"), context = canvas.getContext("2d");
+const overview=element("map-overview"),overviewContext=overview.getContext("2d");
+let overviewTransform,overviewDrag=false;
+installSplitter(element("explore-workspace"),{key:"explore",label:"Repository map and source widths",initial:.43,minBefore:240,minAfter:320});
+installSplitter(element("outline").closest(".source-layout"),{key:"explore-outline",label:"Declarations and source widths",initial:.3,minBefore:100,minAfter:200});
 const source = element("source"), space = element("source-space");
 const metrics = { drawCpuMs: [], interactionFrameMs: [], requestMs: [], pickingMs: [], lastFrame: null };
 window.vizziMetrics = metrics;
@@ -47,11 +54,11 @@ const controller = createController({
     return inspector.prepare(next,{...options,restore:restore?.position.inspector,reveal:Boolean(options.intent?.returning && !restore)});
   },
   onView: (next,info) => {
-    const first = !view;
+    const first = !view, changedFilter=viewFilter!==(info.query.filter ?? "");
     view = next;
     viewFilter=info.query.filter ?? "";
     if(info.intent?.returning)element("filter").value=viewFilter;
-    element("counts").textContent = `${next.files.length} shown / ${next.matching} matching / ${next.total} source files · ${next.analyzed - (next.deferred ?? 0)} with analysis / ${next.deferred ?? 0} deferred / ${next.source_only} source only`;
+    element("counts").textContent = fileCount(next.files.length,next.matching,next.total)+(next.deferred?` · ${next.deferred} awaiting analysis`:"");
     element("empty").hidden = next.files.length > 0;
     element("file-title").textContent = next.source?.path ?? "Choose a file";
     element("snapshot").textContent = next.snapshot.slice(0, 8);
@@ -64,16 +71,14 @@ const controller = createController({
     const restore=navigation.restoration(next,info.intent);
     const sameScene=restore && restore.snapshot===next.snapshot;
     if(sameScene)camera={...restore.position.camera};
-    if (first || (info.intent?.returning && !sameScene)) fit(true); else invalidate();
+    if (first || changedFilter || (info.intent?.returning && !sameScene)) fit(true); else invalidate();
     navigation.observe(info.intent);
   },
   onStatus: (status,info) => {
     startup.receive(status,info.stream);
     element("workspace").textContent = status.name;
-    if(status.snapshot!==null)element("status").textContent = status.error ? "Refresh failed; showing captured source" : status.pending ? "Analyzing changes…" : `Observation ${status.generation}`;
+    if(status.snapshot!==null)element("status").textContent = status.error ? "Refresh failed; showing captured source" : status.pending ? "Analyzing changes…" : "Source ready";
     element("status").title = status.observation;
-    const m = status.measurements;
-    if (m) element("measurements").textContent = `${m.total_ms.toFixed(1)} ms refresh · ${m.parsed} parsed · ${m.reused} reused · ${m.cache_hits} cache hits${m.cache_warnings ? ` · ${m.cache_warnings} cache write failures` : ""}`;
     if (status.error && !(status.snapshot===null && status.pending)) showError(new Error(status.error));
     else element("error").hidden = true;
   },
@@ -94,9 +99,8 @@ function renderFileList() {
 function invalidate() { if (!scheduled) { scheduled = true; requestAnimationFrame(draw); } }
 function fit(readable = false) {
   if (!view) return;
-  const width = Math.max(1, ...view.files.map(file => file.rect.x + file.rect.width));
-  const scale = Math.min((canvas.clientWidth - 36) / width, (canvas.clientHeight - 44) / Math.max(view.height, 1), 1.5);
-  camera = { x: 18, y: 22, scale: Math.max(readable ? .55 : .001, scale) };
+  const bounds=worldBounds();
+  camera = fitCamera(bounds.width,bounds.height,canvas.clientWidth,canvas.clientHeight,readable);
   invalidate();
 }
 function draw(timestamp) {
@@ -111,7 +115,8 @@ function draw(timestamp) {
     context.font = "11px 'DejaVu Sans', sans-serif";
     for (const group of view.groups) {
       const y = camera.y + group.y * camera.scale;
-      if (camera.scale > .28 && y > -20 && y < height) { context.fillStyle = "#6b7c8f"; context.fillText(group.path, camera.x, y + 14); }
+      const x=camera.x+(group.x ?? 0)*camera.scale;
+      if (camera.scale > .28 && y > -20 && y < height) { context.save();context.beginPath();context.rect(x,y,(group.width ?? 1424)*camera.scale,25*camera.scale);context.clip();context.fillStyle = "#6b7c8f"; context.fillText(group.path, x, y + 14);context.restore(); }
     }
     for (const file of view.files) {
       const rect = file.rect, x = camera.x + rect.x * camera.scale, y = camera.y + rect.y * camera.scale, w = rect.width * camera.scale, h = rect.height * camera.scale;
@@ -129,9 +134,33 @@ function draw(timestamp) {
       }
     }
   }
+  drawOverview(dpr);
   sample(metrics.drawCpuMs, performance.now() - start);
   metrics.lastFrame = { snapshot: view?.snapshot, camera: { ...camera }, visibleFiles, labels, width, height };
 }
+function worldBounds() { return {width:Math.max(1,...(view?.groups ?? []).map(g=>(g.x ?? 0)+(g.width ?? 1424))),height:Math.max(1,view?.height ?? 1)}; }
+function drawOverview(dpr) {
+  const width=overview.clientWidth,height=overview.clientHeight;
+  overview.width=Math.round(width*dpr);overview.height=Math.round(height*dpr);
+  overviewContext.setTransform(dpr,0,0,dpr,0,0);overviewContext.clearRect(0,0,width,height);
+  if(!view)return;
+  const world=worldBounds(),scale=Math.min((width-12)/world.width,(height-12)/world.height);
+  const x=(width-world.width*scale)/2,y=(height-world.height*scale)/2;overviewTransform={x,y,scale};
+  for(const file of view.files){const r=file.rect;overviewContext.fillStyle=file.id===view.selection.file?"#265dc5":"#9fb5ca";overviewContext.fillRect(x+r.x*scale,y+r.y*scale,Math.max(1,r.width*scale),Math.max(1,r.height*scale));}
+  overviewContext.strokeStyle="#174dad";overviewContext.lineWidth=1.5;
+  overviewContext.strokeRect(x-camera.x/camera.scale*scale,y-camera.y/camera.scale*scale,canvas.clientWidth/camera.scale*scale,canvas.clientHeight/camera.scale*scale);
+}
+function jumpOverview(event) {
+  if(!overviewTransform)return;
+  const r=overview.getBoundingClientRect(),t=overviewTransform,world=worldBounds();
+  const x=Math.max(0,Math.min(world.width,(event.clientX-r.left-t.x)/t.scale)),y=Math.max(0,Math.min(world.height,(event.clientY-r.top-t.y)/t.scale));
+  camera=jumpCamera(camera,{x,y},canvas.clientWidth,canvas.clientHeight);invalidate();
+}
+overview.addEventListener("pointerdown",event=>{if(event.button!==0)return;event.preventDefault();overview.focus();overviewDrag=true;overview.setPointerCapture(event.pointerId);jumpOverview(event);});
+overview.addEventListener("pointermove",event=>{if(overviewDrag)jumpOverview(event);});
+overview.addEventListener("pointerup",()=>{overviewDrag=false;});overview.addEventListener("pointercancel",()=>{overviewDrag=false;});
+overview.addEventListener("keydown",event=>{const world=worldBounds(),step={ArrowLeft:[-world.width/8,0],ArrowRight:[world.width/8,0],ArrowUp:[0,-world.height/8],ArrowDown:[0,world.height/8]}[event.key];if(!step)return;event.preventDefault();camera.x-=step[0]*camera.scale;camera.y-=step[1]*camera.scale;invalidate();});
+for(const [id,factor] of [["zoom-in",1.5],["zoom-out",1/1.5]])element(id).addEventListener("click",()=>{camera=zoomCamera(camera,{x:canvas.clientWidth/2,y:canvas.clientHeight/2},factor);invalidate();});
 function hit(x, y) {
   if (!view) return null;
   const worldX = (x - camera.x) / camera.scale, worldY = (y - camera.y) / camera.scale;
@@ -146,15 +175,13 @@ canvas.addEventListener("pointermove", event => {
   const p = point(event);
   if (drag) { camera.x += p.x - drag.x; camera.y += p.y - drag.y; drag.moved ||= Math.hypot(p.x - drag.startX, p.y - drag.startY) > 4; drag.x = p.x; drag.y = p.y; invalidate(); return; }
   const file = hit(p.x, p.y), tooltip = element("tooltip"); tooltip.hidden = !file;
-  if (file) { tooltip.textContent = `${file.path}\n${file.bytes.toLocaleString()} bytes · ${file.classification.kind === "source_only" ? "source only" : file.coverage === "deferred" ? "analysis deferred" : `${file.coverage} syntax`}`; tooltip.style.left = `${Math.min(p.x + 12, canvas.clientWidth * .45)}px`; tooltip.style.top = `${Math.max(0, Math.min(p.y + 12, canvas.clientHeight - 65))}px`; }
+  if (file) { tooltip.textContent = `${file.path}\n${file.bytes.toLocaleString()} bytes · ${coverageLabel(file.coverage,file.classification.kind === "source_only")}`; tooltip.style.left = `${Math.min(p.x + 12, canvas.clientWidth * .45)}px`; tooltip.style.top = `${Math.max(0, Math.min(p.y + 12, canvas.clientHeight - 65))}px`; }
 });
 canvas.addEventListener("pointerup", event => { if (drag && !drag.moved) { const p = point(event), file = hit(p.x, p.y); if (file) navigate({ file: file.id, entity: null }); } drag = null; previousFrame = null; });
 canvas.addEventListener("pointercancel", () => { drag = null; previousFrame = null; });
 canvas.addEventListener("pointerleave", () => { element("tooltip").hidden = true; });
 canvas.addEventListener("wheel", event => {
-  event.preventDefault(); const p = point(event), old = camera.scale;
-  camera.scale = Math.max(.001, Math.min(4, old * Math.exp(-event.deltaY * .0015)));
-  camera.x = p.x - (p.x - camera.x) * camera.scale / old; camera.y = p.y - (p.y - camera.y) * camera.scale / old;
+  event.preventDefault();camera=zoomCamera(camera,point(event),Math.exp(-event.deltaY*.0015));
   element("tooltip").hidden = true; invalidate();
 }, { passive: false });
 canvas.addEventListener("keydown", event => { const direction = { ArrowLeft: [40, 0], ArrowRight: [-40, 0], ArrowUp: [0, 40], ArrowDown: [0, -40] }[event.key]; if (direction) { event.preventDefault(); camera.x += direction[0]; camera.y += direction[1]; invalidate(); } else if (event.key === "Home") { event.preventDefault(); fit(); } });

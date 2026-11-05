@@ -205,7 +205,9 @@ from launch, while preserving the learning/review workflows. The
 [refresh navigation contract](../prototype/REVIEW_REFRESH.md) and
 [repeated context cohort](../../experiments/review-workflow/REFRESH_RESULTS.md) now
 preserve file/side/filter, same-version pane positions and surviving exact declarations.
-All 30 working refreshes retain the edited file. Unfamiliar-operator validation remains
+All 30 working refreshes retain the edited file. The [first maintainer feedback response](../../experiments/usability/FEEDBACK_RESULTS.md)
+now adds readable syntax/kind colours, overview navigation, resizable sections, explicit
+commit pairs and visible input errors. Unfamiliar-operator validation remains
 the separate acceptance step; further views should follow demonstrated learning/review
 gaps rather than an infrastructure experiment's open questions.
 

@@ -27,6 +27,7 @@ impl RustAnalyzer {
         Ok(Self {
             syntax: SyntaxAnalyzer::new(
                 tree_sitter_rust::LANGUAGE.into(),
+                tree_sitter_rust::HIGHLIGHTS_QUERY,
                 Self::context(),
                 collect,
                 declaration,
@@ -41,6 +42,7 @@ impl RustAnalyzer {
             id: ContextId::derive(&[
                 include_bytes!("rust.rs"),
                 include_bytes!("syntax.rs"),
+                include_bytes!("coloring.rs"),
                 include_bytes!("syntax_state.rs"),
                 include_bytes!("analysis.rs"),
                 include_bytes!("model.rs"),

@@ -588,3 +588,10 @@ test("missing or ambiguous refreshed declarations clear selection and reset only
     assert.equal(v.metadata.token,"next");assert.equal(v.selection.entity,null);assert.equal(v.selection.hunk,null);assert.equal(v.windows.working.position.sourceTop,0);assert.equal(v.windows.working.position.sourceLeft,0);assert.deepEqual(v.windows.base.position,base);assert.match(f.notices.at(-1),/declaration.*(?:unavailable|available)/);
   }
 });
+
+test('creation sends an optional explicit target revision without changing working-tree requests',async()=>{
+ const sent=[];const controller=createReviewController({transport:async(uri,options)=>{sent.push(JSON.parse(options.body));}});
+ await controller.create({revision:'base',scope:'.',target_revision:'target'});
+ assert.deepEqual(sent[0],{provider:'git',revision:'base',scope:'.',target_revision:'target'});
+ await controller.create({revision:'HEAD',scope:'.'});assert.deepEqual(sent[1],{provider:'git',revision:'HEAD',scope:'.'});
+});

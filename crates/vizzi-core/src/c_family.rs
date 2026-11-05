@@ -19,6 +19,7 @@ impl LanguageAdapter for CAdapter {
     fn create(&self) -> Result<Box<dyn Analyzer>, ModelError> {
         Ok(Box::new(SyntaxAnalyzer::new(
             tree_sitter_c::LANGUAGE.into(),
+            tree_sitter_c::HIGHLIGHT_QUERY,
             self.context(),
             collect,
             scope,
@@ -37,6 +38,11 @@ impl LanguageAdapter for CppAdapter {
     fn create(&self) -> Result<Box<dyn Analyzer>, ModelError> {
         Ok(Box::new(SyntaxAnalyzer::new(
             tree_sitter_cpp::LANGUAGE.into(),
+            &format!(
+                "{}\n{}",
+                tree_sitter_c::HIGHLIGHT_QUERY,
+                tree_sitter_cpp::HIGHLIGHT_QUERY
+            ),
             self.context(),
             collect,
             scope,
@@ -52,6 +58,7 @@ fn context(language: &str, description: &str) -> Context {
             language.as_bytes(),
             include_bytes!("c_family.rs"),
             include_bytes!("syntax.rs"),
+            include_bytes!("coloring.rs"),
             include_bytes!("syntax_state.rs"),
             include_bytes!("analysis.rs"),
             include_bytes!("model.rs"),

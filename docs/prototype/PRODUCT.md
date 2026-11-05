@@ -65,3 +65,8 @@ selection reconciliation, bounded queries, syntax extraction, and corrupt cache 
 An end-to-end diagnostic run exercises cold load, warm load, and one-file updates on
 the pinned lpc-rs snapshot. Rendering and interaction budgets require actual browser
 measurements; software rendering does not qualify the GPU target.
+
+The [maintainer feedback contract](TRIAL_PRODUCT.md) covers captured syntax colours,
+labelled declaration kinds, balanced overview navigation, resizable sections, explicit
+commit-pair inputs and concise operation/count labels. Findings and validation remain
+separate from independent usability acceptance.

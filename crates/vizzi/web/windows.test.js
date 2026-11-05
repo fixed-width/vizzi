@@ -89,3 +89,11 @@ test("source coordinates and cursor ordinals are integral, and windows cannot pa
   data=windowFor(v);data.cursor=null;await assert.rejects(reader.prepare(v,{}),/cursor/);
   data=windowFor(v);data.outline[0].index=1;await assert.rejects(reader.prepare(v,{}),/outline window/);
 });
+
+test('styling accepts UTF-8 byte ranges and rejects overlap, broken characters, unknown styles and excess spans',async()=>{
+ const v=view();let data=windowFor(v);const reader=createWindowReader({transport:async()=>data});
+ const styled=()=>{const w=windowFor(v);w.coloring='ready';w.lines[0]={number:1,column:0,end_column:6,line_bytes:6,text:'🙂ab',left:false,right:false,styles:[{start:0,end:4,kind:'string'},{start:4,end:6,kind:'keyword'}]};return w;};
+ data=styled();assert.equal((await reader.prepare(v,{})).lines[0].styles.length,2);
+ for(const change of [w=>w.lines[0].styles[0].end=3,w=>w.lines[0].styles[1].start=0,w=>w.lines[0].styles[0].kind='injected',w=>w.lines[0].styles[1].end=7,w=>w.lines[0].styles[0].start=-1,w=>w.coloring='wrong',w=>w.lines[0].styles=null,w=>w.lines[0].styles=Array(1025).fill({start:0,end:4,kind:'string'})]){data=styled();change(data);await assert.rejects(reader.prepare(v,{}));}
+ data=windowFor(v);assert.ok(await reader.prepare(v,{}),'legacy plain windows remain readable');
+});

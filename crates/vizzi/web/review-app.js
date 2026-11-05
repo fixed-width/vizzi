@@ -1,3 +1,5 @@
+import {pageCount} from "/presentation.js";
+import {installSplitter} from "/splitter.js";
 import {createReviewController} from "/review-controller.js";
 import {createReviewWindowReader} from "/review-windows.js";
 import {createInspector} from "/inspector.js";
@@ -7,6 +9,12 @@ const element=id=>document.getElementById(id);
 const node=(tag,text)=>{const value=document.createElement(tag);value.textContent=text;return value;};
 const sides=["base","working"],inspectors={};
 let view,updates,filterTimer;
+installSplitter(element("review-workspace"),{key:"review-files",label:"Review files and source widths",initial:.21,minBefore:170,minAfter:400});
+installSplitter(document.querySelector(".review-pair"),{key:"review-pair",label:"Base and target source widths",initial:.5,minBefore:220,minAfter:220});
+for(const side of sides)installSplitter(element(`${side}-outline`).closest(".source-layout"),{key:`review-${side}-outline`,label:`${side} declarations and source widths`,initial:.3,minBefore:90,minAfter:130});
+function captureError(message){element("comparison-error").hidden=!message;element("comparison-error").textContent=message ?? "";}
+function comparisonMode(){const commits=element("comparison-mode").value==="commits";element("target-field").hidden=!commits;element("target-revision").required=commits;element("compare").textContent=commits?"Compare commits":"Compare with working tree";}
+element("comparison-mode").addEventListener("change",comparisonMode);
 function cancelFilter(){clearTimeout(filterTimer);filterTimer=undefined;}
 const transport=async(uri,options)=>{
   const response=await fetch(uri,options);
@@ -27,10 +35,11 @@ for(const side of sides) {
   element(`select-${side}`).addEventListener("click",()=>controller.navigate({side,entity:null}));
 }
 const capture=()=>Object.fromEntries(sides.map(side=>[side,inspectors[side].position()]));
-const controller=createReviewController({transport,capture,onView:render,onNotice:notice,
+const controller=createReviewController({transport,capture,onView:render,onNotice:notice,onError:error=>captureError(error.message),
   onStatus:status=>{
-    element("review-status").textContent=status.error?`Capture failed: ${status.error.message}`:status.pending?"Capturing and analysing comparison…":status.active?"Captured comparison · refresh to observe disk changes":"Choose a baseline to begin";
-    element("refresh-working").disabled=!status.active || status.pending;element("close-comparison").disabled=!status.active;
+    captureError(status.error?.message);
+    element("review-status").textContent=status.error?"Comparison failed":status.pending?"Capturing and analysing comparison…":status.active?"Comparison ready":"Choose a base revision to begin";
+    element("refresh-working").disabled=!status.active || status.pending || Boolean(status.active.target);element("refresh-working").hidden=Boolean(status.active?.target);element("close-comparison").disabled=!status.active;
     element("open-current").disabled=!status.active;
   },
   onHistory:state=>{element("review-back").disabled=!state.canBack;element("review-forward").disabled=!state.canForward;element("review-navigation").setAttribute("aria-busy",String(state.pending));},
@@ -70,11 +79,14 @@ function render(next) {
     return;
   }
   const {metadata,query,file,diff,windows,selection}=next;
-  element("comparison-labels").textContent=`Base ${metadata.revision} → ${metadata.resolved} · subtree ${metadata.scope} · working observed ${new Date(metadata.working_started_ms).toISOString()} to ${new Date(metadata.working_finished_ms).toISOString()}`;
+  const committed=Boolean(metadata.target),right=committed?"Target":"Working";
+  element("comparison-labels").textContent=`Base ${metadata.revision} → ${metadata.resolved} · ${committed?`Target ${metadata.target.revision} → ${metadata.target.resolved}`:`Working tree observed ${new Date(metadata.working_started_ms).toISOString()} to ${new Date(metadata.working_finished_ms).toISOString()}`} · repository path ${metadata.scope}`;
+  element("select-working").textContent=right;element("working-pane").setAttribute("aria-label",`${right} source pane`);element("working-outline").previousElementSibling.textContent=`${right} declarations`;element("working-source").setAttribute("aria-label",`${right} captured source`);
+  element("refresh-working").hidden=committed;element("refresh-working").disabled=committed;
   if(filterTimer===undefined)element("review-filter").value=query.filter;element("include-unchanged").checked=query.unchanged;
   const totals=next.files.totals;
   element("review-counts").textContent=`${totals.paths} paths · ${totals.added} added · ${totals.removed} removed · ${totals.modified} modified · ${totals.unchanged} unchanged · ${totals.unassessed} unassessed · ${totals.unavailable} unavailable`;
-  element("file-page-label").textContent=`${next.files.files.length} shown / ${next.files.total} matching · ${next.files.remaining} remaining`;
+  element("file-page-label").textContent=pageCount(next.files.offset,next.files.files.length,next.files.total);
   for(const row of next.files.files) {
     const button=node("button",`${row.path}${row.path_truncated?"…":""}`);button.type="button";button.dataset.file=row.file;
     button.append(node("small",row.change));button.setAttribute("aria-current",String(file?.file===row.file));button.addEventListener("click",()=>controller.navigate({file:row}));files.append(button);
@@ -106,7 +118,7 @@ function render(next) {
   if(fileFocus)[...files.querySelectorAll("button")].find(button=>button.dataset.file===fileFocus)?.focus({preventScroll:true});
   if(hunkFocus)[...hunks.querySelectorAll("button")].find(button=>button.dataset.hunk===hunkFocus)?.focus({preventScroll:true});
 }
-element("comparison-form").addEventListener("submit",async event=>{event.preventDefault();cancelFilter();element("compare").disabled=true;try{await controller.create({revision:element("baseline").value,scope:element("scope").value});}finally{element("compare").disabled=false;}});
+element("comparison-form").addEventListener("submit",async event=>{event.preventDefault();cancelFilter();element("compare").disabled=true;try{const commits=element("comparison-mode").value==="commits";captureError(null);await controller.create({revision:element("baseline").value,scope:element("scope").value || ".",...(commits?{target_revision:element("target-revision").value}:{})});}finally{element("compare").disabled=false;}});
 element("refresh-working").addEventListener("click",()=>controller.refresh());
 element("close-comparison").addEventListener("click",()=>{cancelFilter();void controller.close();});
 element("review-filter").addEventListener("input",()=>{cancelFilter();filterTimer=setTimeout(()=>{filterTimer=undefined;void controller.navigate({filter:element("review-filter").value,offset:0});},160);});

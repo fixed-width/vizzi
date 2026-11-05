@@ -151,7 +151,7 @@ try {
   });
   await page.route("**/*",route=>new URL(route.request().url()).origin===host.url?route.continue():route.abort());
   report.phase="walkthrough";await page.goto(`${host.url}/review`);await checkpoint("initial","Open the review page without capturing an implicit baseline.");
-  await page.getByLabel("Baseline revision",{exact:true}).fill(oracle.base_revision);await page.getByLabel("Subtree",{exact:true}).fill(".");
+  await page.getByLabel("Base revision",{exact:true}).fill(oracle.base_revision);await page.getByLabel("Repository path",{exact:true}).fill(".");
   started=performance.now();await page.getByRole("button",{name:"Compare with working tree",exact:true}).click();await page.waitForFunction(()=>Boolean(document.querySelector("#review-workspace").dataset.token));await ready();report.firstCaptureReadyMs=performance.now()-started;
   const initial=await checkpoint("comparison","Observe the frozen baseline, root scope and two changed paths.");expectedToken=initial.token;assert.equal(initial.fileButtons,oracle.changed_paths.length);
   await choose(oracle.source_path);const changed=await checkpoint("compiler-changes","Select the changed Rust source and inspect its textual hunks.");

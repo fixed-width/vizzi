@@ -46,6 +46,7 @@ function notification(change) {
   if(s?.schema!==1 || typeof s.pending!=="boolean" || !(s.ticket===null || opaque(s.ticket)) || !(s.error===null || (typeof s.error?.code==="string" && typeof s.error?.message==="string")))throw new Error("Invalid review status");
   const m=s.active;
   if(m!==null && (!m || ![m.token,m.comparison,m.provider,m.revision,m.resolved,m.scope].every(value=>typeof value==="string") || !opaque(m.token) || !opaque(m.comparison) || !integer(m.working_started_ms) || !integer(m.working_finished_ms)))throw new Error("Invalid review metadata");
+  if(m?.target!=null && (![m.target.revision,m.target.resolved].every(opaque)))throw new Error("Invalid target revision");
   if(m?.origin!==undefined && !opaque(m.origin))throw new Error("Invalid comparison origin");
   return BigInt(change.revision);
 }
@@ -210,7 +211,7 @@ export function createReviewController({transport,onView=()=>{},onStatus=()=>{},
   }
   return {
     updates,navigate,
-    create:({revision,scope})=>mutate("/api/comparisons",{provider:"git",revision,scope}),
+    create:({revision,scope,target_revision})=>mutate("/api/comparisons",{provider:"git",revision,scope,...(target_revision===undefined?{}:{target_revision})}),
     refresh:()=>latest?.active?mutate(`/api/comparisons/${encodeURIComponent(latest.active.token)}/refresh`,{}):Promise.resolve(false),
     async close() {if(!latest?.active)return false;if(!await mutate(`/api/comparisons/${encodeURIComponent(latest.active.token)}`,{},"DELETE"))return false;invalidate();view=null;onView(null);historyState();return true;},
     openCurrent() {save();return latest?.active?load(latest.active,defaults()):Promise.resolve(false);},

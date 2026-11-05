@@ -1,0 +1,5 @@
+{
+  "mutate":["crates/vizzi/web/presentation.js","crates/vizzi/web/camera.js"],
+  "offlineTestFiles":["crates/vizzi/web/presentation.test.js","crates/vizzi/web/camera.test.js","crates/vizzi/web/presentation-dom.test.js"],
+  "timeoutMS":15000
+}

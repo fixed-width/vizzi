@@ -15,7 +15,7 @@ async function fixture() {
   const page = session.page;
   async function file(path) {
     await page.locator("#filter").fill(path);
-    await page.waitForFunction(path => document.querySelector("#counts").textContent.startsWith("1 shown") && document.querySelector("#filter").value === path, path);
+    await page.waitForFunction(path => document.querySelector("#counts").textContent.startsWith("1 of ") && document.querySelector("#filter").value === path, path);
     if (!await page.locator("details").evaluate(node => node.open)) await page.locator("summary").click();
     await page.locator("#file-list").getByRole("button", { name: path, exact: true }).click();
     await page.waitForFunction(path => document.querySelector("#file-title").textContent === path, path);
@@ -63,7 +63,7 @@ test("changed declarations are revealed with a notice and missing files never su
     await page.getByRole("button", { name: "Back", exact: true }).click();
     await page.waitForFunction(() => document.querySelector("#file-title").textContent === "aa.rs");
     await page.waitForFunction(() => document.querySelector("#navigation-notice").textContent.includes("changed"));
-    assert.match(await page.locator('#outline [aria-current="true"]').getAttribute("title"), /line 303/);
+    assert.match(await page.locator('#outline [aria-current="true"]').getAttribute("title"), /Line 303/);
     await f.file("bb.rs");
     const previous = await page.locator("#snapshot").getAttribute("title");
     await unlink(join(f.input.root, "aa.rs"));

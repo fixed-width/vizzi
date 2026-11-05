@@ -81,6 +81,9 @@ pub fn router(application: Arc<Application>) -> Router {
         .route("/outline.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/outline.js")) }))
         .route("/windows.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/windows.js")) }))
         .route("/inspector.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/inspector.js")) }))
+        .route("/presentation.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/presentation.js")) }))
+        .route("/camera.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/camera.js")) }))
+        .route("/splitter.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/splitter.js")) }))
         .route("/app.css", get(|| async { asset("text/css; charset=utf-8", include_str!("../web/app.css")) }))
         .layer(axum::middleware::map_response(|mut response: Response| async move {
             response.headers_mut().insert(header::CACHE_CONTROL, header::HeaderValue::from_static("no-store"));

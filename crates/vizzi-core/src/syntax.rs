@@ -2,10 +2,12 @@
 
 use crate::{
     analysis::{AnalysisResult, Analyzer, SyntaxState},
+    coloring::{Coloring, INDEX_BYTES, Style},
     model::{Analysis, ContentId, Context, Coverage, Fact, ModelError},
     syntax_state::edit_between,
 };
 use std::{collections::BTreeMap, ops::ControlFlow};
+use tree_sitter::StreamingIterator;
 
 struct Checkpoints<'a> {
     cancelled: &'a dyn Fn() -> bool,
@@ -38,6 +40,7 @@ type Scope = fn(tree_sitter::Node<'_>, &str) -> Option<(&'static str, String)>;
 
 pub(crate) struct SyntaxAnalyzer {
     parser: tree_sitter::Parser,
+    highlights: tree_sitter::Query,
     context: Context,
     declarations: Collector,
     scope: Scope,
@@ -45,6 +48,7 @@ pub(crate) struct SyntaxAnalyzer {
 impl SyntaxAnalyzer {
     pub(crate) fn new(
         language: tree_sitter::Language,
+        highlights: &str,
         context: Context,
         declarations: Collector,
         scope: Scope,
@@ -54,6 +58,8 @@ impl SyntaxAnalyzer {
             .set_language(&language)
             .map_err(|error| ModelError(error.to_string()))?;
         Ok(Self {
+            highlights: tree_sitter::Query::new(&language, highlights)
+                .map_err(|e| ModelError(e.to_string()))?,
             parser,
             context,
             declarations,
@@ -88,6 +94,64 @@ impl Analyzer for SyntaxAnalyzer {
     }
 }
 impl SyntaxAnalyzer {
+    fn color(
+        &self,
+        tree: &tree_sitter::Tree,
+        bytes: &[u8],
+        cancelled: &dyn Fn() -> bool,
+    ) -> Option<Coloring> {
+        let mut cursor = tree_sitter::QueryCursor::new();
+        let stopped = std::cell::Cell::new(false);
+        let mut progress = |_: &tree_sitter::QueryCursorState| {
+            if cancelled() {
+                stopped.set(true);
+                ControlFlow::Break(())
+            } else {
+                ControlFlow::Continue(())
+            }
+        };
+        let mut captures = cursor.captures_with_options(
+            &self.highlights,
+            tree.root_node(),
+            bytes,
+            tree_sitter::QueryCursorOptions::new().progress_callback(&mut progress),
+        );
+        let mut checkpoints = Checkpoints {
+            cancelled,
+            ticks: 0,
+        };
+        let index = Coloring::from_spans(
+            std::iter::from_fn(|| {
+                while let Some((matched, position)) = captures.next() {
+                    if checkpoints.poll() {
+                        stopped.set(true);
+                        return None;
+                    }
+                    let capture = matched.captures()[*position];
+                    if let Some(mut kind) =
+                        Style::capture(self.highlights.capture_names()[capture.index as usize])
+                    {
+                        if matches!(capture.node.kind(), "integer_literal" | "float_literal") {
+                            kind = Style::Number;
+                        }
+                        return Some((capture.node.byte_range(), kind));
+                    }
+                }
+                None
+            }),
+            INDEX_BYTES,
+        );
+        drop(captures);
+        if stopped.get() || cancelled() {
+            None
+        } else {
+            Some(if cursor.did_exceed_match_limit() {
+                Coloring::limited()
+            } else {
+                index
+            })
+        }
+    }
     fn run(
         &mut self,
         bytes: &[u8],
@@ -99,6 +163,7 @@ impl SyntaxAnalyzer {
             return Ok(None);
         }
         let mut analysis = Analysis {
+            coloring: None,
             content: ContentId::derive(&[bytes]),
             context: self.context.clone(),
             coverage: Coverage::Syntax,
@@ -236,6 +301,10 @@ impl SyntaxAnalyzer {
                         return Ok(None);
                     }
                     drop(cursor);
+                    analysis.coloring = self.color(&tree, bytes, cancelled);
+                    if analysis.coloring.is_none() || cancelled() {
+                        return Ok(None);
+                    }
                     let state = SyntaxState::capture(
                         self.context.clone(),
                         analysis.content.clone(),
@@ -272,6 +341,7 @@ mod tests {
     fn parser_progress_interrupts_before_declaration_collection() {
         let mut analyzer = SyntaxAnalyzer::new(
             tree_sitter_rust::LANGUAGE.into(),
+            tree_sitter_rust::HIGHLIGHTS_QUERY,
             crate::rust::RustAnalyzer::context(),
             counting,
             no_scope,
@@ -300,6 +370,7 @@ mod tests {
     fn extraction_abandons_traversal_without_visiting_the_remaining_tree() {
         let mut analyzer = SyntaxAnalyzer::new(
             tree_sitter_rust::LANGUAGE.into(),
+            tree_sitter_rust::HIGHLIGHTS_QUERY,
             crate::rust::RustAnalyzer::context(),
             counting,
             no_scope,
@@ -329,6 +400,7 @@ mod tests {
     fn extraction_amortises_predicate_calls_across_many_node_visits() {
         let mut analyzer = SyntaxAnalyzer::new(
             tree_sitter_rust::LANGUAGE.into(),
+            tree_sitter_rust::HIGHLIGHTS_QUERY,
             crate::rust::RustAnalyzer::context(),
             counting,
             no_scope,

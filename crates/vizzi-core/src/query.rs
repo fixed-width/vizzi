@@ -64,6 +64,12 @@ pub struct FileTile {
 /// A directory label preceding its file tiles.
 #[derive(Debug, Serialize)]
 pub struct Group {
+    /// Horizontal coordinate of the directory card.
+    pub x: f64,
+    /// Card width in world coordinates.
+    pub width: f64,
+    /// Card height including its heading.
+    pub height: f64,
     /// Relative directory.
     pub path: String,
     /// Vertical coordinate of the label.
@@ -271,13 +277,33 @@ impl Snapshot {
         }
         let mut files = Vec::new();
         let mut groups = Vec::new();
-        let mut y = 0.0;
+        let area = directories
+            .values()
+            .map(|docs| {
+                let columns = ((docs.len() as f64 * 56.0 / 178.0).sqrt().ceil() as usize).max(1);
+                columns as f64 * 178.0 * (48.0 + docs.len().div_ceil(columns) as f64 * 56.0)
+            })
+            .sum::<f64>();
+        let columns = ((area.sqrt() / 178.0).ceil() as usize).clamp(1, 64);
+        let target_width = columns as f64 * 178.0;
+        let (mut x, mut y, mut shelf_height) = (0.0, 0.0, 0.0_f64);
         for (path, documents) in directories {
+            let cols =
+                ((documents.len() as f64 * 56.0 / 178.0).sqrt().ceil() as usize).clamp(1, columns);
+            let width = cols as f64 * 178.0;
+            let height = 30.0 + documents.len().div_ceil(cols) as f64 * 56.0 + 18.0;
+            if x > 0.0 && x + width > target_width {
+                y += shelf_height;
+                x = 0.0;
+                shelf_height = 0.0;
+            }
             groups.push(Group {
                 path: path.into(),
+                x,
                 y,
+                width,
+                height,
             });
-            y += 30.0;
             for (i, file) in documents.iter().enumerate() {
                 let coverage = if file
                     .analyses()
@@ -308,14 +334,15 @@ impl Snapshot {
                     coverage,
                     classification: file.classification().clone(),
                     rect: Rect {
-                        x: (i % 8) as f64 * 178.0,
-                        y: y + (i / 8) as f64 * 56.0,
+                        x: x + (i % cols) as f64 * 178.0,
+                        y: y + 30.0 + (i / cols) as f64 * 56.0,
                         width: 170.0,
                         height: 48.0,
                     },
                 });
             }
-            y += documents.len().div_ceil(8) as f64 * 56.0 + 18.0;
+            x += width;
+            shelf_height = shelf_height.max(height);
         }
         Ok(View {
             deferred: self.deferred_files(),
@@ -328,7 +355,7 @@ impl Snapshot {
             matching: count,
             files,
             groups,
-            height: y,
+            height: y + shelf_height,
             selection: Selection {
                 file: selected.map(|file| file.id().clone()),
                 entity,
@@ -484,7 +511,7 @@ mod tests {
             "layout wastes excessive vertical space"
         );
         assert_eq!(view.files[0].rect.x, 0.0);
-        assert_eq!(view.files[8].rect.x, 0.0);
+        assert!(view.groups.iter().all(|g| g.width > 0.0 && g.height > 0.0));
         for file in &view.files {
             let r = &file.rect;
             assert_eq!(file.bytes, 3);
@@ -496,7 +523,8 @@ mod tests {
                 .iter()
                 .find(|group| file.path.starts_with(&group.path))
                 .unwrap();
-            assert!(r.y >= group.y + 20.0);
+            assert!(r.x >= group.x && r.x + r.width <= group.x + group.width);
+            assert!(r.y >= group.y + 20.0 && r.y + r.height <= group.y + group.height);
             for other in &view.files {
                 if file.id == other.id {
                     continue;
@@ -511,6 +539,55 @@ mod tests {
                     file.path,
                     other.path
                 );
+            }
+        }
+    }
+
+    #[test]
+    fn large_maps_balance_directory_cards_in_both_dimensions() {
+        for variant in 0..3 {
+            let workspace = WorkspaceId::derive(&[b"balanced-layout"]);
+            let paths: Vec<_> = match variant {
+                0 => (0..600).map(|i| format!("src/{i}.rs")).collect(),
+                1 => (0..600).map(|i| format!("d{i}/a.rs")).collect(),
+                _ => (0..64)
+                    .flat_map(|d| (0..(d * 17 % 31 + 1)).map(move |i| format!("d{d}/{i}.rs")))
+                    .collect(),
+            };
+            let files = paths
+                .into_iter()
+                .map(|path| {
+                    Arc::new(
+                        crate::model::fixture_document(workspace.clone(), path, b"a", vec![])
+                            .unwrap(),
+                    )
+                })
+                .collect();
+            let view = crate::model::fixture_snapshot(workspace, files)
+                .unwrap()
+                .view(&ViewQuery::default())
+                .unwrap();
+            let width = view
+                .groups
+                .iter()
+                .map(|g| g.x + g.width)
+                .fold(0.0, f64::max);
+            assert!(
+                width / view.height > 0.4 && width / view.height < 2.5,
+                "unbalanced {width} x {}",
+                view.height
+            );
+            for a in &view.groups {
+                for b in &view.groups {
+                    if a.path != b.path {
+                        assert!(
+                            a.x + a.width <= b.x
+                                || b.x + b.width <= a.x
+                                || a.y + a.height <= b.y
+                                || b.y + b.height <= a.y
+                        );
+                    }
+                }
             }
         }
     }
@@ -549,6 +626,8 @@ mod tests {
                 &Coverage::Partial
             ]
         );
+        assert_eq!(view.analyzed, 3);
+        assert_eq!(view.source_only, 0);
         let selected = view.files[2].id.as_str().to_owned();
         let limited = snapshot
             .view(&ViewQuery {

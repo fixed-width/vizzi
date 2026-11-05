@@ -23,9 +23,18 @@ without starting the live index. Once exploration has activated indexing, live w
 and reconciliation continue until the host stops.
 
 Select a file on the map to open its frozen source and declaration outline. Select a
-declaration to reveal its lines. Drag to pan, scroll to zoom, or choose **Fit map**.
+declaration to reveal its lines. Kind badges distinguish types and callables; **Line N**
+is the declaration's starting line. Drag to pan, scroll to zoom, or choose **Fit map**
+for the entire overview. Use **+**/**−** for zoom and click/drag the small overview
+navigator to jump to a distant region. Arrow keys move a focused map or navigator.
 Filtering limits the overview while preserving an existing selection. The expandable
-file list provides keyboard access to file selection; arrow keys pan a focused map.
+file list provides keyboard access to file selection.
+
+Drag a divider to resize the map/source or declaration/source sections. With a divider
+focused, Left/Right changes its width, Shift makes a larger step, and Home/End chooses
+a width limit. Bounded width preferences persist locally when storage is available.
+Equal shown/matching counts collapse to one number; capped maps explicitly say how
+many files are shown, and filtering narrows the result.
 
 Use **Back** and **Forward** in the header, or browser Back/Forward, to return to an
 earlier file/declaration and its reading position. The session keeps up to 50 visits.
@@ -67,7 +76,7 @@ absolute scopes are rejected. Options can be repeated and do not depend on order
 Assigned C/C++ files now show raw definition/type-alias outlines. Unassigned `.h` files
 remain source-only and explain their ambiguity; CUDA remains an unavailable dialect.
 Source remains readable when UTF-8. The inspector shows assignment evidence, and
-counts separate captured files from files with analysis. All raw outlines state that
+availability descriptions distinguish assigned analysis from source-only capture. All raw outlines state that
 configuration coverage is unknown. See the [extraction reference](../prototype/C_FAMILY_SYNTAX.md)
 for supported forms, template/overload behavior, and limits.
 No compilation database, compiler, build, or project script is invoked.

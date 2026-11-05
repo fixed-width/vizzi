@@ -2,7 +2,7 @@
 .review-page header > a:not(.brand) { color:#265dc5;font-size:12px; }
 #review-navigation { display:flex;gap:5px; }
 #review-status { margin-left:auto;font-size:12px;color:#526a7e; }
-#comparison-form { display:flex;align-items:end;gap:12px;padding:14px 24px;background:white;border-bottom:1px solid #cdd8e2; }
+#comparison-form { display:flex;flex-wrap:wrap;align-items:end;gap:12px;padding:14px 24px;background:white;border-bottom:1px solid #cdd8e2; }
 #comparison-form label { display:flex;flex-direction:column;gap:5px;font-size:11px; }
 #comparison-form input { width:210px;flex:auto; }
 #comparison-form #scope { width:155px; }
@@ -57,3 +57,9 @@
 .review-source .code-line.active { outline:1px solid #8bb1ef;outline-offset:-1px; }
 @media(max-width:1100px) { #review-workspace { grid-template-columns:220px minmax(0,1fr); } .review-pane .source-layout { grid-template-columns:100px minmax(0,1fr); } #comparison-form { flex-wrap:wrap;gap:8px; } .review-page header { gap:12px; } }
 @media(max-width:800px) { .review-pair { display:flex;flex-direction:column; } .review-pane { height:500px;flex-shrink:0; } .review-pair { overflow:auto; } .review-content { min-height:750px; } #review-workspace { display:flex;flex-direction:column; } .review-files { max-height:360px;flex-shrink:0; } .review-page { height:auto;min-height:100dvh; } .review-page header { flex-wrap:wrap;height:auto;min-height:64px;padding-top:10px;padding-bottom:10px; } #review-status { margin-left:0; } #review-notice { flex-wrap:wrap; } .review-pane + .review-pane { border-left:0;border-top:1px solid #cdd8e2; } }
+
+#comparison-form select { border:1px solid #c3d1dc;border-radius:4px;padding:9px;color:#183044;background:white; }
+#scope-hint { color:#526a7e;font-size:10px;align-self:center;max-width:90px; }
+#comparison-error { margin:0;padding:12px 24px;background:#fff1ed;color:#803b2b;border-bottom:1px solid #e8b8a8;overflow-wrap:anywhere; }
+#review-workspace.resizable,.review-pair.resizable,.review-pane .source-layout.resizable { grid-template-columns:minmax(0,var(--split-first,1fr)) 8px minmax(0,var(--split-second,1fr)); }
+@media(max-width:800px) { #review-workspace > .splitter,.review-pair > .splitter { display:none; } }

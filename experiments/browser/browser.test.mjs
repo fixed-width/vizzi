@@ -73,7 +73,7 @@ test("source-only headers expose reasons, encoding, and pinned metadata without 
     assert.ok((await page.locator("#diagnostics").textContent()).includes("language is unassigned"));
     assert.ok((await page.locator("#source").textContent()).includes("struct Header;"));
     assert.equal(await page.locator("#outline button").count(), 0);
-    assert.ok((await page.locator("#counts").textContent()).includes("3 source only"));
+    assert.ok((await page.locator("#counts").textContent()).includes("12 files"));
     const view = await (await fetch(`${host.url}/api/view?filter=shared.h`)).json();
     assert.equal(view.schema, 2); assert.equal(view.analyzed, 9); assert.equal(view.source_only, 3);
     assert.equal(view.source.classification.reason, "language_unassigned");
@@ -81,11 +81,11 @@ test("source-only headers expose reasons, encoding, and pinned metadata without 
     const full = await (await fetch(`${host.url}/api/view`)).json();
     const tile = full.files.find(file => file.id === view.selection.file);
     await paint(page);
-    const bounds = await page.locator("canvas").boundingBox();
+    const bounds = await page.locator("#map").boundingBox();
     const camera = await page.evaluate(() => window.vizziMetrics.lastFrame.camera);
     await page.mouse.move(bounds.x + camera.x + (tile.rect.x + tile.rect.width / 2) * camera.scale, bounds.y + camera.y + (tile.rect.y + tile.rect.height / 2) * camera.scale);
     await page.waitForFunction(() => !document.getElementById("tooltip").hidden);
-    assert.ok((await page.locator("#tooltip").textContent()).includes("source only"));
+    assert.ok((await page.locator("#tooltip").textContent()).toLowerCase().includes("source only"));
     const pinned = `${host.url}/api/source?snapshot=${view.snapshot}&file=${view.selection.file}`;
     const snapshot = await page.locator("#snapshot").getAttribute("title");
     await writeFile(join(input.root, "include/shared.h"), "struct Updated;");
@@ -122,7 +122,7 @@ test("C/C++ definitions and explicitly assigned headers share source selection a
     await page.waitForFunction(() => document.getElementById("file-title").textContent === "include/assigned/defs.h");
     assert.ok((await page.locator("#coverage").textContent()).includes("assigned for include/assigned"));
     assert.ok((await page.locator("#coverage").textContent()).includes("configuration unknown"));
-    await page.getByRole("button", { name: /^read/ }).click();
+    await page.getByRole("button", { name: /^Reveal (?:function|method) read starting at Line/ }).click();
     const snapshot = await page.locator("#snapshot").getAttribute("title");
     await writeFile(join(input.root, "include/assigned/defs.h"), "// shifted\nclass Definition { public: int read() { return 1; } };");
     await page.waitForFunction(previous => document.getElementById("snapshot").title !== previous, snapshot);
@@ -140,8 +140,8 @@ test("Python source and outline share selection and update through native notifi
     await page.getByRole("button", { name: "src/z.py", exact: true }).click();
     await page.waitForFunction(() => document.getElementById("file-title").textContent === "src/z.py");
     assert.ok((await page.locator("#coverage").textContent()).includes("python"));
-    assert.ok((await page.locator("#counts").textContent()).includes("source files"));
-    await page.getByRole("button", { name: /^read/ }).click();
+    assert.ok((await page.locator("#counts").textContent()).includes("files"));
+    await page.getByRole("button", { name: /^Reveal (?:function|method) read starting at Line/ }).click();
     const selected = await page.locator('#outline [aria-current="true"]').textContent();
     const snapshot = await page.locator("#snapshot").getAttribute("title");
     await writeFile(join(input.root, "src/z.py"), "# new position\nclass Example:\n    def read(self): pass\n");
@@ -191,7 +191,7 @@ test("an edit preserves declaration selection and the reader's scroll position",
   try {
     await page.locator("summary").click();
     await page.getByRole("button", { name: "src/a.rs", exact: true }).click();
-    await page.getByRole("button", { name: /^anchor/ }).click();
+    await page.getByRole("button", { name: /^Reveal function anchor starting at Line/ }).click();
     await page.waitForFunction(() => document.querySelector('#outline button[aria-current="true"]')?.textContent.startsWith("anchor"));
     await page.locator("#source").evaluate(node => { node.scrollTop = 150000; });
     await paint(page);
@@ -205,7 +205,7 @@ test("an edit preserves declaration selection and the reader's scroll position",
     assert.ok((await page.locator("#outline [aria-current=true]").textContent()).startsWith("anchor"));
     const after = await page.locator("#source").evaluate(node => node.scrollTop);
     assert.ok(Math.abs(after - before) <= 22, `background edit moved the reader from ${before} to ${after}`);
-    await page.getByRole("button", { name: /^anchor/ }).click();
+    await page.getByRole("button", { name: /^Reveal function anchor starting at Line/ }).click();
     await page.waitForFunction(() => document.getElementById("source").scrollTop < 100);
     assert.deepEqual(session.errors, []);
   } finally { await session.close(); }
@@ -218,7 +218,7 @@ test("map picking remains linked to source after zoom and keyboard pan", async (
     const view = await (await fetch(`${host.url}/api/view`)).json();
     const target = view.files.find(file => file.path === "src/b.rs");
     await paint(page);
-    const bounds = await page.locator("canvas").boundingBox();
+    const bounds = await page.locator("#map").boundingBox();
     const position = async () => {
       const camera = await page.evaluate(() => window.vizziMetrics.lastFrame.camera);
       return { x: bounds.x + camera.x + (target.rect.x + target.rect.width / 2) * camera.scale,
@@ -228,7 +228,7 @@ test("map picking remains linked to source after zoom and keyboard pan", async (
     await page.mouse.move(point.x, point.y);
     await page.mouse.wheel(0, -200);
     await paint(page);
-    await page.locator("canvas").focus(); await page.keyboard.press("ArrowRight");
+    await page.locator("#map").focus(); await page.keyboard.press("ArrowRight");
     await paint(page);
     point = await position();
     await page.mouse.click(point.x, point.y);
@@ -253,7 +253,7 @@ test("narrow viewport preserves a bounded source view without horizontal page ov
     await paint(session.page);
     assert.ok(await session.page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), "page overflows a narrow viewport");
     assert.ok(await session.page.locator(".code-line").count() < 110);
-    const canvas = await session.page.locator("canvas").boundingBox();
+    const canvas = await session.page.locator("#map").boundingBox();
     assert.ok(canvas.width > 250 && canvas.height >= 200, `canvas is only ${canvas.width} × ${canvas.height}`);
     assert.deepEqual(session.errors, []);
   } finally { await session.close(); }
@@ -263,7 +263,7 @@ test("opening the file list resizes the canvas with its viewport", async () => {
   const session = await openWorkspace(chromium, host);
   try {
     await paint(session.page);
-    const original = await session.page.locator("canvas").evaluate(canvas => canvas.clientHeight);
+    const original = await session.page.locator("#map").evaluate(canvas => canvas.clientHeight);
     await session.page.locator("summary").click();
     await paint(session.page);
     const dimensions = await session.page.evaluate(() => ({ actual: document.getElementById("map").clientHeight, pixels: document.getElementById("map").height, dpr: Math.min(devicePixelRatio, 2), drawn: window.vizziMetrics.lastFrame.height }));
@@ -279,7 +279,7 @@ test("a live client resynchronises after host restart without polling or losing 
   try {
     await page.locator("summary").click();
     await page.getByRole("button", { name: "src/b.rs", exact: true }).click();
-    await page.getByRole("button", { name: /^beta/ }).click();
+    await page.getByRole("button", { name: /^Reveal function beta starting at Line/ }).click();
     await page.waitForFunction(() => document.querySelector('#outline [aria-current="true"]')?.textContent.startsWith("beta"));
     const before = await page.locator("#file-title").textContent();
     const port = new URL(host.url).port;
@@ -322,7 +322,7 @@ test("deferred files stay readable and resume outlines after an admitted edit", 
     await page.waitForFunction(()=>document.getElementById("coverage").textContent.includes("analysis deferred"));
     assert.ok((await page.locator("#source").textContent()).includes("deferred source stays readable"));
     assert.ok((await page.locator("#diagnostics").textContent()).includes("per-file"));
-    assert.ok((await page.locator("#counts").textContent()).includes("1 deferred"));
+    assert.ok((await page.locator("#counts").textContent()).includes("1 awaiting analysis"));
     assert.equal(await page.locator("#outline button").count(),0);
     const old=await (await fetch(`${live.url}/api/view`)).json();
     assert.equal(old.deferred,1);assert.equal(old.source.classification.kind,"assigned");
@@ -330,7 +330,7 @@ test("deferred files stay readable and resume outlines after an admitted edit", 
     await writeFile(join(fixture.root,"a.rs"),"fn resumed() {}\n");
     await page.waitForFunction(()=>document.getElementById("coverage").textContent.includes("syntax parsed"));
     assert.ok((await page.locator("#outline").textContent()).includes("resumed"));
-    assert.ok((await page.locator("#counts").textContent()).includes("0 deferred"));
+    assert.ok(!(await page.locator("#counts").textContent()).includes("awaiting analysis"));
     const pin=await (await fetch(`${live.url}/api/source?snapshot=${old.snapshot}&file=${old.selection.file}`)).json();
     assert.equal(pin.text,large);
     const oldView=await (await fetch(`${live.url}/api/view?snapshot=${old.snapshot}&file=${old.selection.file}`)).json();

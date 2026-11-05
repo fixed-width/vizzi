@@ -1,0 +1,375 @@
+{
+  "schema": 1,
+  "scope": "Maintainer feedback after a59890e",
+  "checks": {
+    "workspaceTests": 422,
+    "browserCases": 188,
+    "doctests": "passed",
+    "formatting": "passed",
+    "clippyAllTargetsAllFeatures": "passed"
+  },
+  "performance": [
+    {
+      "name": "linux",
+      "revision": "cbbddb6b08cc9900a87cccaa9b22bbe06aa4f50a",
+      "scope": "kernel/sched",
+      "indexPaths": 97345,
+      "scopePaths": 54,
+      "binarySha256": "393399d2b18faa310611da6491143123b6a9badbf6599d2a9806f8b8a6ffe77d",
+      "rawSha256": "75ea70e2f176fdc36ee8d22f0a067bf9801d3342d152e6caa2de4bb566c322a2",
+      "sourceSha256": {
+        "crates/vizzi-core/src/coloring.rs": "875a9153c33b710bc7c3cd5ce1d06855a8ea71214b016efc4297fde0ab92e779",
+        "crates/vizzi-core/src/projection.rs": "9ba5bf633a59f967c87849e2f989e0e3b222a6f80fa3c02bd8cbc0b84aeb7e21",
+        "crates/vizzi-core/src/syntax.rs": "91d7d3a5865bcd692a731e38d8bf628396b43e52a1457fb173d6b047858873fc",
+        "crates/vizzi/web/presentation.js": "ec9915d09209ebe2978a161e3368ef5ffd37190bb2e67c0cf1c041e1e20cfbca",
+        "crates/vizzi/web/camera.js": "e752813a6ed4445b9e36f37aa6adab05b12524880dd27e925808a7c15207130b",
+        "crates/vizzi/web/splitter.js": "3ff01deef743c3d3706f77ddfcb3bc9cb49685b22cd3ccabb034560b36bda7f3",
+        "crates/vizzi/web/app.css": "2a4b8f0564f853fa9e8eba3aa0ba8d9a5166952a0d2a37ec5b59b5b7284f86c4",
+        "crates/vizzi/web/review.css": "32426051a59b31cd78f688cf4f6c77e50b2b18bc0012f1c420ad3cc772adcf75",
+        "experiments/review-workflow/measure.mjs": "75d3d9aa170e9da4c5bee1865ba945be490bda68c9060f61437b11ea6f98eebe",
+        "experiments/review-workflow/scale_fixture.py": "ed6f2be748f2b8abe6c5a15749695db767206645c2b0ae8935bc7e8b0f10541e",
+        "experiments/review-workflow/scale-profiles.json": "659b8dca5440cc7b1ba524a25747722f46d4ba1bbbb96053945d1bfd75149670",
+        "experiments/review-workflow/walkthrough-audit.js": "9d1409449fc42f050d446f1fec1f81f52986d030fc818f8aeded365b6937897b",
+        "experiments/browser/statistics.mjs": "9446fcbd9eb13a55353478c5eb51f13027322233b29116d8627095d6fe527623",
+        "crates/vizzi/web/review-app.js": "4be48e2754c56745545a707700978a168a5a95ac858b7c4de5a5593f1979fef0",
+        "crates/vizzi/web/review-controller.js": "7bf12a8a86d8f59f08d68660c89c88488eb10f322198a1c656667f7995918440",
+        "crates/vizzi/web/inspector.js": "4b4501f3bc428b54545b744e7aaf577a73baa23a1cf928073885f583f3c210fa",
+        "crates/vizzi/src/host.rs": "6f217ac6dd6c3e3cb23ee8edcecb11c4fb1aa56011ce3d974b30ea2472ae946e",
+        "crates/vizzi/src/application.rs": "a2809f3a4fa2562379e214db5f02bf95192e134331fa34bbbd64eb38cd51f7f6",
+        "crates/vizzi/src/server.rs": "ab40b20832f1f37c6b97f16d118a2ac97efaeed7cdebb93d5e3a100edd091803",
+        "crates/vizzi/src/main.rs": "21ea2da8231486be4fe59e9194aba31f5106420bc8bb2c1e4bc5c5100f1b414c",
+        "crates/vizzi/web/startup.js": "6cabefb4b291024117ee505a8c63d90013d47be909f430c6be9a9372b96c7bb4",
+        "crates/vizzi/src/review.rs": "ed016c1e0711c05aaff5d662515058c516a73d42f749e23a8962db7c813735b8",
+        "crates/vizzi/src/review_application.rs": "bfa319b0b7e978b65990193a3254664edddd1246de4f4d389e8a9e883f9e53f5",
+        "crates/vizzi/src/review_application/projection.rs": "379d15efd6c93066ef470c3394b10f22d117ca6e4b9e2872507cd745a1645b79"
+      },
+      "hardware": {
+        "platform": "linux",
+        "release": "6.8.0-147-lowlatency",
+        "cpu": "13th Gen Intel(R) Core(TM) i7-13700H",
+        "logicalCpus": 20,
+        "totalMemory": 67080241152,
+        "initialLoad": [
+          3.2,
+          3.46,
+          3.28
+        ]
+      },
+      "firstComparison": {
+        "count": 3,
+        "p50": 864.9000000953674,
+        "p95": 1213.1999998092651,
+        "p99": 1213.1999998092651,
+        "max": 1213.1999998092651,
+        "over33ms": 3,
+        "over50ms": 3
+      },
+      "hostReady": {
+        "count": 3,
+        "p50": 3.913155000002007,
+        "p95": 4.821956,
+        "p99": 4.821956,
+        "max": 4.821956,
+        "over33ms": 0,
+        "over50ms": 0
+      },
+      "editedSourceReady": {
+        "count": 15,
+        "p50": 346.7000000476837,
+        "p95": 381.5,
+        "p99": 381.5,
+        "max": 381.5,
+        "over33ms": 15,
+        "over50ms": 15
+      },
+      "frames": {
+        "count": 1753,
+        "p50": 16.699999999999818,
+        "p95": 16.700000000000728,
+        "p99": 16.800000000000182,
+        "max": 16.80000000000109,
+        "over33ms": 0,
+        "over50ms": 0
+      },
+      "longTasks": [],
+      "selection": {
+        "file": {
+          "count": 36,
+          "p50": 66.29999995231628,
+          "p95": 67.60000014305115,
+          "p99": 67.70000004768372,
+          "max": 67.70000004768372,
+          "over33ms": 36,
+          "over50ms": 36
+        },
+        "hunk": {
+          "count": 36,
+          "p50": 66.20000004768372,
+          "p95": 67.29999995231628,
+          "p99": 81,
+          "max": 81,
+          "over33ms": 36,
+          "over50ms": 36
+        },
+        "declaration": {
+          "count": 36,
+          "p50": 64.59999990463257,
+          "p95": 65.19999980926514,
+          "p99": 80,
+          "max": 80,
+          "over33ms": 36,
+          "over50ms": 36
+        }
+      },
+      "selectionResets": 0,
+      "refreshCount": 15,
+      "nativeHighWaterBytes": 98983936,
+      "rendererHeapAfterBytes": 6477644,
+      "payloadBytesMax": 64365,
+      "sourceRowsMax": 57,
+      "outlineRowsMax": 19,
+      "renderedStyleSpansMax": 88,
+      "verifiedRows": 600,
+      "proofStyleAvailability": [
+        "ready"
+      ],
+      "proofStyleSpansMax": 165,
+      "previousRefreshCohort": {
+        "editedSourceReady": {
+          "count": 15,
+          "p50": 365.60000014305115,
+          "p95": 415.59999990463257,
+          "p99": 415.59999990463257,
+          "max": 415.59999990463257,
+          "over33ms": 15,
+          "over50ms": 15
+        },
+        "frames": {
+          "count": 1772,
+          "p50": 16.699999999999818,
+          "p95": 16.700000000000728,
+          "p99": 16.800000000000182,
+          "max": 16.80000000000109,
+          "over33ms": 0,
+          "over50ms": 0
+        },
+        "nativeHighWaterBytes": 87592960
+      },
+      "liveIndexStayedDormant": true,
+      "originalCheckoutUnchanged": true,
+      "limitations": [
+        "Full working tree and Git index, but a focused review scope; this is not full-repository comparison or interaction.",
+        "Fresh analysis caches, but checkout/Git reads warm filesystem caches.",
+        "One parser worker; default resident source and disabled syntax/input retention options.",
+        "Primary latency starts at the browser trusted click and ends after matching DOM, automation observation and two rAF callbacks, not physical presentation. Command elapsed time is retained separately. Finite percentiles do not qualify timing tails.",
+        "Native RSS excludes Git children; renderer heap is a point sample, not browser RSS or a 16-GB/editor envelope.",
+        "Agent tests/mutations/other benchmarks do not overlap measurement; external host activity is uncontrolled."
+      ]
+    },
+    {
+      "name": "pytorch",
+      "revision": "1f4d2d5e820dd870626dca4f9603e3a49879dbde",
+      "scope": "torch/_inductor/codegen",
+      "indexPaths": 22762,
+      "scopePaths": 109,
+      "binarySha256": "393399d2b18faa310611da6491143123b6a9badbf6599d2a9806f8b8a6ffe77d",
+      "rawSha256": "3ecb905de8ca41fa44bc590136ffe0c9d9d9ac3e6607cf5bcaa23647734b1308",
+      "sourceSha256": {
+        "crates/vizzi-core/src/coloring.rs": "875a9153c33b710bc7c3cd5ce1d06855a8ea71214b016efc4297fde0ab92e779",
+        "crates/vizzi-core/src/projection.rs": "9ba5bf633a59f967c87849e2f989e0e3b222a6f80fa3c02bd8cbc0b84aeb7e21",
+        "crates/vizzi-core/src/syntax.rs": "91d7d3a5865bcd692a731e38d8bf628396b43e52a1457fb173d6b047858873fc",
+        "crates/vizzi/web/presentation.js": "ec9915d09209ebe2978a161e3368ef5ffd37190bb2e67c0cf1c041e1e20cfbca",
+        "crates/vizzi/web/camera.js": "e752813a6ed4445b9e36f37aa6adab05b12524880dd27e925808a7c15207130b",
+        "crates/vizzi/web/splitter.js": "3ff01deef743c3d3706f77ddfcb3bc9cb49685b22cd3ccabb034560b36bda7f3",
+        "crates/vizzi/web/app.css": "2a4b8f0564f853fa9e8eba3aa0ba8d9a5166952a0d2a37ec5b59b5b7284f86c4",
+        "crates/vizzi/web/review.css": "32426051a59b31cd78f688cf4f6c77e50b2b18bc0012f1c420ad3cc772adcf75",
+        "experiments/review-workflow/measure.mjs": "75d3d9aa170e9da4c5bee1865ba945be490bda68c9060f61437b11ea6f98eebe",
+        "experiments/review-workflow/scale_fixture.py": "ed6f2be748f2b8abe6c5a15749695db767206645c2b0ae8935bc7e8b0f10541e",
+        "experiments/review-workflow/scale-profiles.json": "659b8dca5440cc7b1ba524a25747722f46d4ba1bbbb96053945d1bfd75149670",
+        "experiments/review-workflow/walkthrough-audit.js": "9d1409449fc42f050d446f1fec1f81f52986d030fc818f8aeded365b6937897b",
+        "experiments/browser/statistics.mjs": "9446fcbd9eb13a55353478c5eb51f13027322233b29116d8627095d6fe527623",
+        "crates/vizzi/web/review-app.js": "4be48e2754c56745545a707700978a168a5a95ac858b7c4de5a5593f1979fef0",
+        "crates/vizzi/web/review-controller.js": "7bf12a8a86d8f59f08d68660c89c88488eb10f322198a1c656667f7995918440",
+        "crates/vizzi/web/inspector.js": "4b4501f3bc428b54545b744e7aaf577a73baa23a1cf928073885f583f3c210fa",
+        "crates/vizzi/src/host.rs": "6f217ac6dd6c3e3cb23ee8edcecb11c4fb1aa56011ce3d974b30ea2472ae946e",
+        "crates/vizzi/src/application.rs": "a2809f3a4fa2562379e214db5f02bf95192e134331fa34bbbd64eb38cd51f7f6",
+        "crates/vizzi/src/server.rs": "ab40b20832f1f37c6b97f16d118a2ac97efaeed7cdebb93d5e3a100edd091803",
+        "crates/vizzi/src/main.rs": "21ea2da8231486be4fe59e9194aba31f5106420bc8bb2c1e4bc5c5100f1b414c",
+        "crates/vizzi/web/startup.js": "6cabefb4b291024117ee505a8c63d90013d47be909f430c6be9a9372b96c7bb4",
+        "crates/vizzi/src/review.rs": "ed016c1e0711c05aaff5d662515058c516a73d42f749e23a8962db7c813735b8",
+        "crates/vizzi/src/review_application.rs": "bfa319b0b7e978b65990193a3254664edddd1246de4f4d389e8a9e883f9e53f5",
+        "crates/vizzi/src/review_application/projection.rs": "379d15efd6c93066ef470c3394b10f22d117ca6e4b9e2872507cd745a1645b79"
+      },
+      "hardware": {
+        "platform": "linux",
+        "release": "6.8.0-147-lowlatency",
+        "cpu": "13th Gen Intel(R) Core(TM) i7-13700H",
+        "logicalCpus": 20,
+        "totalMemory": 67080241152,
+        "initialLoad": [
+          2.11,
+          3.06,
+          3.15
+        ]
+      },
+      "firstComparison": {
+        "count": 3,
+        "p50": 931.2000000476837,
+        "p95": 947.8999998569489,
+        "p99": 947.8999998569489,
+        "max": 947.8999998569489,
+        "over33ms": 3,
+        "over50ms": 3
+      },
+      "hostReady": {
+        "count": 3,
+        "p50": 3.946831999999631,
+        "p95": 4.204085999999961,
+        "p99": 4.204085999999961,
+        "max": 4.204085999999961,
+        "over33ms": 0,
+        "over50ms": 0
+      },
+      "editedSourceReady": {
+        "count": 15,
+        "p50": 215,
+        "p95": 248.79999995231628,
+        "p99": 248.79999995231628,
+        "max": 248.79999995231628,
+        "over33ms": 15,
+        "over50ms": 15
+      },
+      "frames": {
+        "count": 1632,
+        "p50": 16.699999999999818,
+        "p95": 16.799999999999272,
+        "p99": 16.800000000000182,
+        "max": 16.80000000000109,
+        "over33ms": 0,
+        "over50ms": 0
+      },
+      "longTasks": [],
+      "selection": {
+        "file": {
+          "count": 36,
+          "p50": 66.39999985694885,
+          "p95": 67,
+          "p99": 70,
+          "max": 70,
+          "over33ms": 36,
+          "over50ms": 36
+        },
+        "hunk": {
+          "count": 36,
+          "p50": 66.20000004768372,
+          "p95": 67.10000014305115,
+          "p99": 67.69999980926514,
+          "max": 67.69999980926514,
+          "over33ms": 36,
+          "over50ms": 36
+        },
+        "declaration": {
+          "count": 36,
+          "p50": 64.5,
+          "p95": 65.29999995231628,
+          "p99": 65.39999985694885,
+          "max": 65.39999985694885,
+          "over33ms": 36,
+          "over50ms": 36
+        }
+      },
+      "selectionResets": 0,
+      "refreshCount": 15,
+      "nativeHighWaterBytes": 72101888,
+      "rendererHeapAfterBytes": 11590144,
+      "payloadBytesMax": 86472,
+      "sourceRowsMax": 57,
+      "outlineRowsMax": 18,
+      "renderedStyleSpansMax": 60,
+      "verifiedRows": 600,
+      "proofStyleAvailability": [
+        "ready"
+      ],
+      "proofStyleSpansMax": 127,
+      "previousRefreshCohort": {
+        "editedSourceReady": {
+          "count": 15,
+          "p50": 198.70000004768372,
+          "p95": 232,
+          "p99": 232,
+          "max": 232,
+          "over33ms": 15,
+          "over50ms": 15
+        },
+        "frames": {
+          "count": 1623,
+          "p50": 16.699999999999818,
+          "p95": 16.700000000000728,
+          "p99": 16.800000000000182,
+          "max": 16.80000000000109,
+          "over33ms": 0,
+          "over50ms": 0
+        },
+        "nativeHighWaterBytes": 56217600
+      },
+      "liveIndexStayedDormant": true,
+      "originalCheckoutUnchanged": true,
+      "limitations": [
+        "Full working tree and Git index, but a focused review scope; this is not full-repository comparison or interaction.",
+        "Fresh analysis caches, but checkout/Git reads warm filesystem caches.",
+        "One parser worker; default resident source and disabled syntax/input retention options.",
+        "Primary latency starts at the browser trusted click and ends after matching DOM, automation observation and two rAF callbacks, not physical presentation. Command elapsed time is retained separately. Finite percentiles do not qualify timing tails.",
+        "Native RSS excludes Git children; renderer heap is a point sample, not browser RSS or a 16-GB/editor envelope.",
+        "Agent tests/mutations/other benchmarks do not overlap measurement; external host activity is uncontrolled."
+      ]
+    }
+  ],
+  "guidedReplays": [
+    {
+      "kind": "learning",
+      "completed": true,
+      "binarySha256": "0dbbdcee4f1ecdd7bcccaefb405b27ec710439d0dbdc37e6fe240cd8999225dc",
+      "rawSha256": "ae5a0b3fc41348df836baaf7263ebdadfcd91b18b46f337bddaca88a5dbd6348",
+      "steps": 13,
+      "verifiedVisibleRows": 429,
+      "snapshotConsistent": true,
+      "responseErrors": [
+        "response.json: Protocol error (Network.getResponseBody): No data found for resource with given identifier\nResponse body is not available for a response that was navigated away from. Read response.body() before triggering any navigation."
+      ],
+      "limitations": [
+        "Navigation uses UI controls and rendered DOM; response metadata is used only to audit snapshot binding/readiness.",
+        "Actions are scripted and paced for recording; elapsed times are not human task-completion or performance measurements.",
+        "Deliberate search/back probes are capability checks, not spontaneous user errors.",
+        "No source is edited and no analysed project tooling is executed."
+      ]
+    },
+    {
+      "kind": "review A",
+      "completed": true,
+      "binarySha256": "0dbbdcee4f1ecdd7bcccaefb405b27ec710439d0dbdc37e6fe240cd8999225dc",
+      "rawSha256": "3dd831cce400175fd26d6659785c8fbf04a647bf0c3d2000082f6f354574cf54",
+      "steps": 19,
+      "responseErrors": [],
+      "cleanupErrors": [],
+      "limitations": [
+        "Navigation uses rendered controls; response data is used only to audit identity, bounds and visible source.",
+        "Timing includes scripted pacing and is task friction evidence, not human task time or a latency qualification.",
+        "No analysed-project build, hooks or scripts execute. The prepared fixture is verified before and after execution."
+      ]
+    },
+    {
+      "kind": "review B",
+      "completed": true,
+      "binarySha256": "0dbbdcee4f1ecdd7bcccaefb405b27ec710439d0dbdc37e6fe240cd8999225dc",
+      "rawSha256": "87634f8568b24a6614a9bfce2325baceed40b63f1df84e09df421c4b0c8b8026",
+      "steps": 18,
+      "responseErrors": [],
+      "cleanupErrors": [],
+      "limitations": [
+        "Navigation uses rendered controls; response data is used only to audit identity, bounds and visible source.",
+        "Timing includes scripted pacing and is task friction evidence, not human task time or a latency qualification.",
+        "No analysed-project build, hooks or scripts execute. The prepared fixture is verified before and after execution."
+      ]
+    }
+  ]
+}

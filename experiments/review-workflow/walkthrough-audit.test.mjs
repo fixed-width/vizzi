@@ -107,3 +107,10 @@ test("invalid UTF-8 never becomes replacement text, and embedded CR remains sour
   const t=state();t.panes.working.rows=[{number:1,text:"te\rxt"}];const internal=window("working");internal.window.lines=[{...row,text:"te\rxt",line_bytes:5,end_column:5}];
   assert.equal(auditCheckpoint(t,file,[window(),internal],{...sources,working:Buffer.from("te\rxt\n")}).verifiedRows,2);
 });
+
+test('style audits enforce UTF-8 ranges, lexical vocabulary and the whole-window span allowance',()=>{
+ const uri='/api/comparisons/pair/window?side=base&file=file&version=base-version';
+ const styled=()=>{const w=structuredClone(window());w.window.coloring='ready';w.window.lines=[{...row,text:'🙂ab',end_column:6,line_bytes:6,styles:[{start:0,end:4,kind:'string'},{start:4,end:6,kind:'keyword'}]}];return w;};
+ assert.equal(auditResponse(uri,styled()).styleSpans,2);
+ for(const change of [w=>w.window.lines[0].styles[0].end=3,w=>w.window.lines[0].styles[0].kind='unknown',w=>w.window.lines[0].styles[1].start=0,w=>w.window.lines[0].styles=Array(1025).fill({start:0,end:4,kind:'string'})]){const w=styled();change(w);assert.throws(()=>auditResponse(uri,w));}
+});

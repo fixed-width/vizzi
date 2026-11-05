@@ -156,3 +156,7 @@ follow-up work.
 The UI uses a cool light workspace palette, blue selection, amber partial analysis,
 and green change feedback. The overview is the primary visual object; source and its
 outline stay adjacent. System-local sans and monospace fonts keep the prototype offline.
+
+The [trial implementation contract](TRIAL_TECH.md) adds bounded immutable style indexes,
+balanced native directory-card geometry, shared browser presentation/layout modules and
+an optional pinned target revision through the existing source-provider seam.

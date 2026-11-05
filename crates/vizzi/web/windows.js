@@ -6,10 +6,21 @@ export function validateDocumentWindow(source, window) {
   const meta = source.summary;
   if (window?.schema !== 1 || window.file !== source.id || window.version !== source.version || window.line_total !== meta.lines || window.outline_total !== meta.declarations) throw new Error("Mismatched captured window");
   if (!integer(window.line_start) || window.line_start < 1 || window.line_start > Math.max(1, meta.lines) || !integer(window.outline_start) || window.outline_start > Math.max(0, meta.declarations - 1) || !Array.isArray(window.lines) || window.lines.length > 96 || !Array.isArray(window.outline) || window.outline.length > 200) throw new Error("Invalid window bounds");
-  let size = 0;
+  if(window.coloring!==undefined && !["ready","limited","unavailable"].includes(window.coloring))throw new Error("Invalid styling availability");
+  let size = 0, styleCount=0;
   for (const [index, line] of window.lines.entries()) {
     if (!line || line.number !== window.line_start + index || line.number > meta.lines || ![line.column,line.end_column,line.line_bytes].every(integer) || line.end_column > line.line_bytes || bytes(line.text) !== line.end_column - line.column || line.left !== (line.column > 0) || line.right !== (line.end_column < line.line_bytes)) throw new Error("Invalid source fragment");
     size += bytes(line.text);
+    if(line.styles!==undefined) {
+      if(!Array.isArray(line.styles) || line.styles.length>1024-styleCount)throw new Error("Invalid styling budget");
+      const encoded=new TextEncoder().encode(line.text);let end=0;
+      const boundary=offset=>offset===encoded.length || (encoded[offset]&192)!==128;
+      for(const span of line.styles) {
+        if(!span || !integer(span.start) || !integer(span.end) || span.start<end || span.start>=span.end || span.end>encoded.length || !boundary(span.start) || !boundary(span.end) || !["keyword","type","function","string","comment","number","constant","attribute"].includes(span.kind))throw new Error("Invalid syntax style");
+        end=span.end;
+      }
+      styleCount+=line.styles.length;
+    }
   }
   if (size > 32768) throw new Error("Source window exceeds byte budget");
   const entry = row => {

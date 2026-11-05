@@ -1,0 +1,2594 @@
+{
+  "schema": 1,
+  "scope": "Maintainer feedback after a59890e",
+  "native_runs": [
+    {
+      "scope": "core broad",
+      "tool": "cargo-mutants 27.1.0",
+      "raw_sha256": "f2d05fadc7bc827e2b14762656c4c0fe83ff9d63c15d4f658ef05b7355abf1d6",
+      "counts": {
+        "total_mutants": 262,
+        "caught": 203,
+        "missed": 40,
+        "timeout": 2,
+        "unviable": 17
+      },
+      "outcomes": [
+        {
+          "name": "unmodified baseline",
+          "outcome": "Success"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:7:37: replace * with +",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:7:37: replace * with /",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:32:9: replace Style::capture -> Option<Self> with None",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:32:9: replace Style::capture -> Option<Self> with Some(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:33:13: delete match arm \"keyword\" in Style::capture",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:34:13: delete match arm \"type\" | \"constructor\" in Style::capture",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:35:13: delete match arm \"function\" in Style::capture",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:36:13: delete match arm \"string\" | \"character\" in Style::capture",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:37:13: delete match arm \"comment\" in Style::capture",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:38:13: delete match arm \"number\" | \"float\" in Style::capture",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:39:13: delete match arm \"constant\" | \"boolean\" in Style::capture",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:40:13: delete match arm \"attribute\" in Style::capture",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:45:9: replace Style::tag -> Option<Self> with None",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:45:9: replace Style::tag -> Option<Self> with Some(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:46:13: delete match arm 1 in Style::tag",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:47:13: delete match arm 2 in Style::tag",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:48:13: delete match arm 3 in Style::tag",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:49:13: delete match arm 4 in Style::tag",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:50:13: delete match arm 5 in Style::tag",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:51:13: delete match arm 6 in Style::tag",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:52:13: delete match arm 7 in Style::tag",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:53:13: delete match arm 8 in Style::tag",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:81:9: replace Coloring::from_spans -> Self with Default::default()",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:82:49: replace / with % in Coloring::from_spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:82:49: replace / with * in Coloring::from_spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:85:41: replace || with && in Coloring::from_spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:85:28: replace >= with < in Coloring::from_spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:85:56: replace < with == in Coloring::from_spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:85:56: replace < with > in Coloring::from_spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:85:56: replace < with <= in Coloring::from_spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:100:35: replace && with || in Coloring::from_spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:100:28: replace == with != in Coloring::from_spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:100:38: delete ! in Coloring::from_spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:103:50: replace != with == in Coloring::from_spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:103:45: replace & with | in Coloring::from_spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:103:45: replace & with ^ in Coloring::from_spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:104:33: replace | with & in Coloring::from_spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:104:33: replace | with ^ in Coloring::from_spans",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:107:27: replace > with == in Coloring::from_spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:107:27: replace > with < in Coloring::from_spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:107:27: replace > with >= in Coloring::from_spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:118:9: replace Coloring::limited -> Self with Default::default()",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:125:9: replace Coloring::available -> bool with true",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:125:9: replace Coloring::available -> bool with false",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:125:9: delete ! in Coloring::available",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:129:9: replace Coloring::valid_for -> bool with true",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:129:9: replace Coloring::valid_for -> bool with false",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:129:48: replace <= with > in Coloring::valid_for",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:129:43: replace >> with << in Coloring::valid_for",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:132:9: replace Coloring::valid_text -> bool with true",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:132:9: replace Coloring::valid_text -> bool with false",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:134:47: replace >> with << in Coloring::valid_text",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:138:9: replace Coloring::spans -> Option<Vec<StyledSpan>> with None",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:138:9: replace Coloring::spans -> Option<Vec<StyledSpan>> with Some(vec![])",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:138:9: replace Coloring::spans -> Option<Vec<StyledSpan>> with Some(vec![Default::default()])",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:144:41: replace <= with > in Coloring::spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:144:36: replace >> with << in Coloring::spans",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:147:34: replace >> with << in Coloring::spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:148:22: replace >= with < in Coloring::spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:151:52: replace & with | in Coloring::spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:151:52: replace & with ^ in Coloring::spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:152:37: replace >> with << in Coloring::spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:154:26: replace < with == in Coloring::spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:154:26: replace < with > in Coloring::spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:154:26: replace < with <= in Coloring::spans",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:155:36: replace == with != in Coloring::spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:159:38: replace - with + in Coloring::spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:159:38: replace - with / in Coloring::spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:160:34: replace - with + in Coloring::spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:160:34: replace - with / in Coloring::spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:177:9: replace <impl Serialize for Coloring>::serialize -> Result<S::Ok, S::Error> with Ok(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:187:9: replace <impl Deserialize<'de> for Coloring>::deserialize -> Result<Self, D::Error> with Ok(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:188:31: replace > with == in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:188:31: replace > with < in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:188:31: replace > with >= in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:188:57: replace * with + in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:188:57: replace * with / in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:192:38: replace || with && in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:192:24: replace > with == in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:192:24: replace > with < in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:192:24: replace > with >= in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:192:57: replace != with == in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:192:53: replace % with / in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:192:53: replace % with + in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:207:13: replace || with && in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:206:13: replace || with && in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:203:13: replace || with && in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:202:13: replace || with && in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:201:29: replace && with || in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:201:32: delete ! in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:202:43: replace > with == in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:202:43: replace > with < in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:202:43: replace > with >= in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:202:38: replace & with | in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:202:38: replace & with ^ in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:205:49: replace || with && in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:205:36: replace >= with < in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:205:31: replace >> with << in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:205:44: replace >> with << in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:205:62: replace == with != in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:205:57: replace & with | in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:205:57: replace & with ^ in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:205:70: replace & with | in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:205:70: replace & with ^ in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:206:52: replace == with != in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:206:47: replace & with | in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:206:47: replace & with ^ in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:207:51: replace != with == in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:207:46: replace & with | in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:207:46: replace & with ^ in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:8:36: replace * with +",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:8:36: replace * with /",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:120:5: replace floor -> usize with 0",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:120:5: replace floor -> usize with 1",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:121:11: delete ! in floor",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:122:16: replace -= with += in floor",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:122:16: replace -= with /= in floor",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:127:5: replace label -> String with String::new()",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:127:5: replace label -> String with \"xyzzy\".into()",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:133:9: replace Document::declaration_count -> usize with 0",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:133:9: replace Document::declaration_count -> usize with 1",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:137:9: replace Document::entry -> Option<Entry> with None",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:137:9: replace Document::entry -> Option<Entry> with Some(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:146:53: replace > with == in Document::entry",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:146:53: replace > with < in Document::entry",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:146:53: replace > with >= in Document::entry",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:148:53: replace > with == in Document::entry",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:148:53: replace > with < in Document::entry",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:148:53: replace > with >= in Document::entry",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:153:20: replace -= with += in Document::entry",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:153:20: replace -= with /= in Document::entry",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:158:9: replace Document::entity_position -> Option<usize> with None",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:158:9: replace Document::entity_position -> Option<usize> with Some(0)",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:158:9: replace Document::entity_position -> Option<usize> with Some(1)",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:165:33: replace += with -= in Document::entity_position",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:165:33: replace += with *= in Document::entity_position",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:174:9: replace Document::recover -> Option<usize> with None",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:174:9: replace Document::recover -> Option<usize> with Some(0)",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:174:9: replace Document::recover -> Option<usize> with Some(1)",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:174:37: replace == with != in Document::recover",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:180:50: replace == with != in Document::recover",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:196:9: replace Document::window -> Result<Window, SourceReadError> with Ok(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:202:55: replace - with + in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:202:55: replace - with / in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:203:38: replace / with % in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:203:38: replace / with * in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:211:28: replace == with != in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:216:46: replace == with != in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:225:47: replace + with - in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:225:47: replace + with * in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:225:69: replace + with - in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:225:69: replace + with * in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:229:53: replace == with != in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:237:36: replace match guard styles.iter().all(|s| text.get(s.start..s.end).is_some()) with true in Document::window",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:237:36: replace match guard styles.iter().all(|s| text.get(s.start..s.end).is_some()) with false in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:232:45: replace + with - in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:232:45: replace + with * in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:232:67: replace + with - in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:232:67: replace + with * in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:233:45: replace - with + in Document::window",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:233:45: replace - with / in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:239:45: replace += with -= in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:239:45: replace += with *= in Document::window",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:257:38: replace > with == in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:257:38: replace > with < in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:257:38: replace > with >= in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:258:36: replace < with == in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:258:36: replace < with > in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:258:36: replace < with <= in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:264:28: replace != with == in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:171:9: replace Snapshot::view -> Result<View, SourceReadError> with Ok(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:179:9: replace Snapshot::view_with_limit -> Result<View, SourceReadError> with Ok(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:198:48: replace == with != in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:264:58: replace == with != in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:283:58: replace / with % in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:283:58: replace / with * in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:283:51: replace * with + in Snapshot::view_with_limit",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:283:51: replace * with / in Snapshot::view_with_limit",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:284:40: replace * with + in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:284:40: replace * with / in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:284:32: replace * with + in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:284:32: replace * with / in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:284:48: replace + with - in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:284:48: replace + with * in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:284:86: replace * with + in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:284:86: replace * with / in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:287:37: replace / with % in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:287:37: replace / with * in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:288:43: replace * with + in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:288:43: replace * with / in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:292:49: replace / with % in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:292:49: replace / with * in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:292:42: replace * with + in Snapshot::view_with_limit",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:292:42: replace * with / in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:293:37: replace * with + in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:293:37: replace * with / in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:294:78: replace + with - in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:294:78: replace + with * in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:294:31: replace + with - in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:294:31: replace + with * in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:294:71: replace * with + in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:294:71: replace * with / in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:295:24: replace && with || in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:295:18: replace > with == in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:295:18: replace > with < in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:295:18: replace > with >= in Snapshot::view_with_limit",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:295:37: replace > with == in Snapshot::view_with_limit",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:295:37: replace > with < in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:295:37: replace > with >= in Snapshot::view_with_limit",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:295:29: replace + with - in Snapshot::view_with_limit",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:295:29: replace + with * in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:296:19: replace += with -= in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:296:19: replace += with *= in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:311:55: replace == with != in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:315:21: replace || with && in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:318:59: replace == with != in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:324:55: replace == with != in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:337:30: replace + with - in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:337:30: replace + with * in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:337:50: replace * with + in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:337:50: replace * with / in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:337:35: replace % with / in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:337:35: replace % with + in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:338:37: replace + with - in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:338:37: replace + with * in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:338:30: replace + with - in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:338:30: replace + with * in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:338:57: replace * with + in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:338:57: replace * with / in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:338:42: replace / with % in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:338:42: replace / with * in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:344:15: replace += with -= in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:344:15: replace += with *= in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:354:49: replace - with + in Snapshot::view_with_limit",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:354:49: replace - with / in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:358:23: replace + with - in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:358:23: replace + with * in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:18:9: replace Checkpoints<'_>::poll -> bool with true",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:18:9: replace Checkpoints<'_>::poll -> bool with false",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:19:25: replace && with || in Checkpoints<'_>::poll",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:19:20: replace == with != in Checkpoints<'_>::poll",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:30:9: replace Declaration::at -> Self with Default::default()",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:73:9: replace <impl Analyzer for SyntaxAnalyzer>::analyze -> Result<Analysis, ModelError> with Ok(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:82:9: replace <impl Analyzer for SyntaxAnalyzer>::analyze_cancellable -> Result<Option<Analysis>, ModelError> with Ok(None)",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:82:9: replace <impl Analyzer for SyntaxAnalyzer>::analyze_cancellable -> Result<Option<Analysis>, ModelError> with Ok(Some(Default::default()))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:93:9: replace <impl Analyzer for SyntaxAnalyzer>::analyze_with_state -> Result<Option<AnalysisResult>, ModelError> with Ok(None)",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:93:9: replace <impl Analyzer for SyntaxAnalyzer>::analyze_with_state -> Result<Option<AnalysisResult>, ModelError> with Ok(Some(Default::default()))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:103:9: replace SyntaxAnalyzer::color -> Option<Coloring> with None",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:103:9: replace SyntaxAnalyzer::color -> Option<Coloring> with Some(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:145:26: replace || with && in SyntaxAnalyzer::color",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:162:9: replace SyntaxAnalyzer::run -> Result<Option<AnalysisResult>, ModelError> with Ok(None)",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:162:9: replace SyntaxAnalyzer::run -> Result<Option<AnalysisResult>, ModelError> with Ok(Some(Default::default()))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:178:24: delete ! in SyntaxAnalyzer::run",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:193:68: replace == with != in SyntaxAnalyzer::run",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:240:16: delete ! in SyntaxAnalyzer::run",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:280:20: delete ! in SyntaxAnalyzer::run",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:286:70: replace += with -= in SyntaxAnalyzer::run",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:286:70: replace += with *= in SyntaxAnalyzer::run",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:293:57: replace == with != in SyntaxAnalyzer::run",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:297:34: replace += with -= in SyntaxAnalyzer::run",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:297:34: replace += with *= in SyntaxAnalyzer::run",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:305:52: replace || with && in SyntaxAnalyzer::run",
+          "outcome": "MissedMutant"
+        }
+      ]
+    },
+    {
+      "scope": "core follow-up",
+      "tool": "cargo-mutants 27.1.0",
+      "raw_sha256": "97f660489d8aa016c4ca1f54554a12e1f3c99cb1574493e770830cae53d2d951",
+      "counts": {
+        "total_mutants": 59,
+        "caught": 39,
+        "missed": 19,
+        "timeout": 0,
+        "unviable": 1
+      },
+      "outcomes": [
+        {
+          "name": "unmodified baseline",
+          "outcome": "Success"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:7:37: replace * with +",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:7:37: replace * with /",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:34:13: delete match arm \"type\" | \"constructor\" in Style::capture",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:35:13: delete match arm \"function\" in Style::capture",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:40:13: delete match arm \"attribute\" in Style::capture",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:52:13: delete match arm 7 in Style::tag",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:53:13: delete match arm 8 in Style::tag",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:104:33: replace | with & in Coloring::from_spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:104:33: replace | with ^ in Coloring::from_spans",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:132:9: replace Coloring::valid_text -> bool with true",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:132:9: replace Coloring::valid_text -> bool with false",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:144:36: replace >> with << in Coloring::spans",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:154:26: replace < with == in Coloring::spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:154:26: replace < with > in Coloring::spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:154:26: replace < with <= in Coloring::spans",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:188:31: replace > with == in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:188:31: replace > with < in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:188:31: replace > with >= in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:188:57: replace * with + in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:188:57: replace * with / in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:192:24: replace > with == in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:192:24: replace > with < in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:192:24: replace > with >= in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:207:13: replace || with && in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:202:43: replace > with == in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:202:43: replace > with < in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:202:43: replace > with >= in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:205:44: replace >> with << in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:205:57: replace & with | in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:205:57: replace & with ^ in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:205:70: replace & with | in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:205:70: replace & with ^ in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:206:47: replace & with | in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:206:47: replace & with ^ in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:237:36: replace match guard styles.iter().all(|s| text.get(s.start..s.end).is_some()) with true in Document::window",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:237:36: replace match guard styles.iter().all(|s| text.get(s.start..s.end).is_some()) with false in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:233:45: replace - with + in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:233:45: replace - with / in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:239:45: replace += with -= in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:239:45: replace += with *= in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:283:51: replace * with + in Snapshot::view_with_limit",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:283:51: replace * with / in Snapshot::view_with_limit",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:292:42: replace * with + in Snapshot::view_with_limit",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:292:42: replace * with / in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:295:18: replace > with == in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:295:18: replace > with < in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:295:18: replace > with >= in Snapshot::view_with_limit",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:295:37: replace > with == in Snapshot::view_with_limit",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:295:37: replace > with < in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:295:37: replace > with >= in Snapshot::view_with_limit",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:295:29: replace + with - in Snapshot::view_with_limit",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:295:29: replace + with * in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:354:49: replace - with + in Snapshot::view_with_limit",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:354:49: replace - with / in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:93:9: replace <impl Analyzer for SyntaxAnalyzer>::analyze_with_state -> Result<Option<AnalysisResult>, ModelError> with Ok(None)",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:93:9: replace <impl Analyzer for SyntaxAnalyzer>::analyze_with_state -> Result<Option<AnalysisResult>, ModelError> with Ok(Some(Default::default()))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:145:26: replace || with && in SyntaxAnalyzer::color",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:193:68: replace == with != in SyntaxAnalyzer::run",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:305:52: replace || with && in SyntaxAnalyzer::run",
+          "outcome": "MissedMutant"
+        }
+      ]
+    },
+    {
+      "scope": "core final follow-up",
+      "tool": "cargo-mutants 27.1.0",
+      "raw_sha256": "66d0f81540ff40ff22f7187956ceb0c6db1f3374ccc58d55ef541397fd525cae",
+      "counts": {
+        "total_mutants": 29,
+        "caught": 18,
+        "missed": 11,
+        "timeout": 0,
+        "unviable": 0
+      },
+      "outcomes": [
+        {
+          "name": "unmodified baseline",
+          "outcome": "Success"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:104:33: replace | with & in Coloring::from_spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:104:33: replace | with ^ in Coloring::from_spans",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:144:36: replace >> with << in Coloring::spans",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:154:26: replace < with == in Coloring::spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:154:26: replace < with > in Coloring::spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:154:26: replace < with <= in Coloring::spans",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:205:44: replace >> with << in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:205:57: replace & with | in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:205:57: replace & with ^ in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:205:70: replace & with | in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/coloring.rs:205:70: replace & with ^ in <impl Deserialize<'de> for Coloring>::deserialize",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:237:36: replace match guard styles.iter().all(|s| text.get(s.start..s.end).is_some()) with true in Document::window",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/projection.rs:237:36: replace match guard styles.iter().all(|s| text.get(s.start..s.end).is_some()) with false in Document::window",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:283:51: replace * with + in Snapshot::view_with_limit",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:283:51: replace * with / in Snapshot::view_with_limit",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:292:42: replace * with + in Snapshot::view_with_limit",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:292:42: replace * with / in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:295:18: replace > with == in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:295:18: replace > with < in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:295:18: replace > with >= in Snapshot::view_with_limit",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:295:37: replace > with == in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:295:37: replace > with < in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:295:37: replace > with >= in Snapshot::view_with_limit",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:295:29: replace + with - in Snapshot::view_with_limit",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:295:29: replace + with * in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:354:49: replace - with + in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/query.rs:354:49: replace - with / in Snapshot::view_with_limit",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:145:26: replace || with && in SyntaxAnalyzer::color",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-core/src/syntax.rs:305:52: replace || with && in SyntaxAnalyzer::run",
+          "outcome": "MissedMutant"
+        }
+      ]
+    },
+    {
+      "scope": "comparison broad",
+      "tool": "cargo-mutants 27.1.0",
+      "raw_sha256": "2eec58d7430bbf7a4677c47e1263991befbb39eb7c5402aab935fd1d74b86cf6",
+      "counts": {
+        "total_mutants": 65,
+        "caught": 40,
+        "missed": 1,
+        "timeout": 6,
+        "unviable": 18
+      },
+      "outcomes": [
+        {
+          "name": "unmodified baseline",
+          "outcome": "Success"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:155:9: replace ReviewSubscription::next -> Option<Arc<ReviewChange>> with None",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:155:9: replace ReviewSubscription::next -> Option<Arc<ReviewChange>> with Some(Arc::new(Default::default()))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:214:9: replace ReviewApplication::start -> Result<Self, ReviewApiError> with Ok(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:260:9: replace ReviewApplication::create -> Result<ReviewAccepted, ReviewApiError> with Ok(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:265:9: replace ReviewApplication::refresh -> Result<ReviewAccepted, ReviewApiError> with Ok(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:274:9: replace ReviewApplication::close -> Result<(), ReviewApiError> with Ok(())",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:293:9: replace ReviewApplication::status -> ReviewStatus with Default::default()",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:297:9: replace ReviewApplication::subscribe -> ReviewSubscription with Default::default()",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:305:9: replace ReviewApplication::query -> Result<ComparisonQuery, ReviewApiError> with Ok(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:314:58: replace == with != in ReviewApplication::query",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:321:9: replace ReviewApplication::shutdown with ()",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:334:9: replace ReviewApplication::enqueue -> Result<ReviewAccepted, ReviewApiError> with Ok(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:364:9: replace <impl Drop for ReviewApplication>::drop with ()",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:373:9: replace Shared::changed with ()",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:379:12: delete ! in Shared::changed",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:389:9: replace Shared::fail with ()",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:402:5: replace worker_loop with ()",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:405:42: replace && with || in worker_loop",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:405:45: delete ! in worker_loop",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:463:5: replace run_job -> Result<(crate::review::ReviewCandidate, Arc<Spec>, u64, u64), ReviewApiError> with Ok((Default::default(), Arc::new(Default::default()), 0, 0))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:463:5: replace run_job -> Result<(crate::review::ReviewCandidate, Arc<Spec>, u64, u64), ReviewApiError> with Ok((Default::default(), Arc::new(Default::default()), 0, 1))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:463:5: replace run_job -> Result<(crate::review::ReviewCandidate, Arc<Spec>, u64, u64), ReviewApiError> with Ok((Default::default(), Arc::new(Default::default()), 1, 0))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:463:5: replace run_job -> Result<(crate::review::ReviewCandidate, Arc<Spec>, u64, u64), ReviewApiError> with Ok((Default::default(), Arc::new(Default::default()), 1, 1))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:463:24: delete ! in run_job",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:513:60: replace == with != in run_job",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:528:26: replace && with || in run_job",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:528:19: replace != with == in run_job",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:539:5: replace validate -> Result<(), ReviewApiError> with Ok(())",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:539:25: replace != with == in validate",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:546:9: replace || with && in validate",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:545:9: replace || with && in validate",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:545:35: replace > with == in validate",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:545:35: replace > with < in validate",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:545:35: replace > with >= in validate",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:556:56: replace || with && in validate",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:556:39: replace || with && in validate",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:556:50: replace > with == in validate",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:556:50: replace > with < in validate",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:556:50: replace > with >= in validate",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:567:5: replace scope -> Result<Option<vizzi_core::comparison::ReviewPath>, ReviewApiError> with Ok(None)",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:567:5: replace scope -> Result<Option<vizzi_core::comparison::ReviewPath>, ReviewApiError> with Ok(Some(Default::default()))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:568:9: delete match arm None | Some(\".\") in scope",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:569:24: replace match guard value.len() <= 4096 with true in scope",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:569:24: replace match guard value.len() <= 4096 with false in scope",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:569:36: replace <= with > in scope",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:580:5: replace now_ms -> u64 with 0",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:580:5: replace now_ms -> u64 with 1",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:587:5: replace clip -> (String, bool) with (String::new(), true)",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:587:5: replace clip -> (String, bool) with (String::new(), false)",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:587:5: replace clip -> (String, bool) with (\"xyzzy\".into(), true)",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:587:5: replace clip -> (String, bool) with (\"xyzzy\".into(), false)",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:588:11: delete ! in clip",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:589:13: replace -= with += in clip",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:589:13: replace -= with /= in clip",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:591:30: replace < with == in clip",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:591:30: replace < with > in clip",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:591:30: replace < with <= in clip",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:596:9: replace ReviewApiError::cause -> &Self with Box::leak(Box::new(Default::default()))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:597:13: delete match arm Self::Context(_, inner) in ReviewApiError::cause",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:603:9: replace ReviewApiError::code -> &'static str with \"\"",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:603:9: replace ReviewApiError::code -> &'static str with \"xyzzy\"",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:624:5: replace lock -> MutexGuard<'_, T> with MutexGuard::new()",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:624:5: replace lock -> MutexGuard<'_, T> with MutexGuard::from_iter([Default::default()])",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:624:5: replace lock -> MutexGuard<'_, T> with MutexGuard::new(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:624:5: replace lock -> MutexGuard<'_, T> with MutexGuard::from(Default::default())",
+          "outcome": "Unviable"
+        }
+      ]
+    },
+    {
+      "scope": "comparison context follow-up",
+      "tool": "cargo-mutants 27.1.0",
+      "raw_sha256": "1f4a1b97a8838cf86a43cb14e598be61d76b67cafb35531e2cf141276fa4f3ed",
+      "counts": {
+        "total_mutants": 2,
+        "caught": 1,
+        "missed": 0,
+        "timeout": 0,
+        "unviable": 1
+      },
+      "outcomes": [
+        {
+          "name": "unmodified baseline",
+          "outcome": "Success"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:596:9: replace ReviewApiError::cause -> &Self with Box::leak(Box::new(Default::default()))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi/src/review_application.rs:597:13: delete match arm Self::Context(_, inner) in ReviewApiError::cause",
+          "outcome": "CaughtMutant"
+        }
+      ]
+    }
+  ],
+  "latest_outcomes_by_mutant": {
+    "core": {
+      "counts": {
+        "CaughtMutant": 232,
+        "Unviable": 17,
+        "MissedMutant": 11,
+        "Timeout": 2
+      },
+      "survivors": [
+        "crates/vizzi-core/src/coloring.rs:104:33: replace | with ^ in Coloring::from_spans",
+        "crates/vizzi-core/src/coloring.rs:144:36: replace >> with << in Coloring::spans",
+        "crates/vizzi-core/src/projection.rs:237:36: replace match guard styles.iter().all(|s| text.get(s.start..s.end).is_some()) with true in Document::window",
+        "crates/vizzi-core/src/query.rs:283:51: replace * with + in Snapshot::view_with_limit",
+        "crates/vizzi-core/src/query.rs:283:51: replace * with / in Snapshot::view_with_limit",
+        "crates/vizzi-core/src/query.rs:292:42: replace * with + in Snapshot::view_with_limit",
+        "crates/vizzi-core/src/query.rs:295:18: replace > with >= in Snapshot::view_with_limit",
+        "crates/vizzi-core/src/query.rs:295:37: replace > with >= in Snapshot::view_with_limit",
+        "crates/vizzi-core/src/query.rs:295:29: replace + with - in Snapshot::view_with_limit",
+        "crates/vizzi-core/src/syntax.rs:145:26: replace || with && in SyntaxAnalyzer::color",
+        "crates/vizzi-core/src/syntax.rs:305:52: replace || with && in SyntaxAnalyzer::run"
+      ]
+    },
+    "comparison": {
+      "counts": {
+        "CaughtMutant": 41,
+        "Unviable": 18,
+        "Timeout": 6
+      },
+      "survivors": []
+    }
+  },
+  "javascript": {
+    "tool": "Stryker 10.1.1 instrumenter, serial Node and Chromium commands",
+    "raw_sha256": "4733d2abcfb6b63f196c891687b13ba47410c7fb71893a3f938f6da3afd8849b",
+    "counts": {
+      "Killed": 149,
+      "Survived": 2
+    },
+    "source_sha256": {
+      "crates/vizzi/web/presentation.js": "ec9915d09209ebe2978a161e3368ef5ffd37190bb2e67c0cf1c041e1e20cfbca",
+      "crates/vizzi/web/camera.js": "e752813a6ed4445b9e36f37aa6adab05b12524880dd27e925808a7c15207130b",
+      "crates/vizzi/web/presentation.test.js": "3d09056752ade8ffdd6d98e501f1317d794eeb0f7dc6e13e670057d37c8284aa",
+      "crates/vizzi/web/camera.test.js": "f1550a08c8047b395bd3777e654505ea0fba26b3d9300bf3e8812cb027e2bf8e",
+      "crates/vizzi/web/presentation-dom.test.js": "33d115737ad6eae41d19b117d7f743b41f48d2deb53b212f77ff97bf0c0194ec"
+    },
+    "outcomes": [
+      {
+        "name": "crates/vizzi/web/presentation.js:0:14",
+        "replacement": "() => undefined",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:0:44",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:1:13",
+        "replacement": "() => undefined",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:1:22",
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:1:22",
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:1:22",
+        "replacement": "value !== 1",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:1:32",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:1:39",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:2:50",
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:2:57",
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:3:5",
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:3:5",
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:3:23",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:4:9",
+        "replacement": "{\n  syntax: 'Syntax available',\n  partial: 'Syntax with recovery',\n  deferred: 'Analysis deferred'\n}[coverage] && 'Analysis unavailable'",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:4:9",
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:4:17",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:4:44",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:4:76",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:4:110",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:6:48",
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:7:5",
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:7:5",
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:7:5",
+        "replacement": "shown <= matching",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:7:5",
+        "replacement": "shown >= matching",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:7:27",
+        "replacement": "``",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:7:75",
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:7:75",
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:7:75",
+        "replacement": "matching <= total",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:7:75",
+        "replacement": "matching >= total",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:7:90",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:7:102",
+        "replacement": "\"Stryker was here!\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:8:9",
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:8:9",
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:8:9",
+        "replacement": "matching <= total",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:8:9",
+        "replacement": "matching >= total",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:8:24",
+        "replacement": "``",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:8:79",
+        "replacement": "``",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:10:46",
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:11:9",
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:11:9",
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:11:9",
+        "replacement": "shown !== total",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:11:23",
+        "replacement": "``",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:11:56",
+        "replacement": "``",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:11:71",
+        "replacement": "offset - 1",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:11:92",
+        "replacement": "offset - shown",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:13:32",
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:14:5",
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:14:5",
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:14:5",
+        "replacement": "[]",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:14:6",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:14:15",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:14:22",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:14:30",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:14:38",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:14:46",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:14:53",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:14:66",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:14:99",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:15:5",
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:15:5",
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:15:5",
+        "replacement": "[]",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:15:6",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:15:17",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:15:26",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:15:57",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:16:5",
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:16:5",
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:16:5",
+        "replacement": "[]",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:16:6",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:16:17",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:16:25",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:16:34",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:16:45",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:16:76",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:17:5",
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:17:5",
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:17:5",
+        "replacement": "[]",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:17:6",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:17:15",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:17:50",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:18:9",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:20:44",
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:21:102",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:21:110",
+        "replacement": "{}",
+        "outcome": "Survived"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:21:117",
+        "replacement": "false",
+        "outcome": "Survived"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:22:17",
+        "replacement": "[\"Stryker was here\"]",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:23:5",
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:23:5",
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:23:53",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:24:21",
+        "replacement": "line.styles && []",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:24:36",
+        "replacement": "[\"Stryker was here\"]",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:24:40",
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:25:4",
+        "replacement": ";",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:26:38",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:26:61",
+        "replacement": "``",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:26:155",
+        "replacement": ";",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:28:2",
+        "replacement": ";",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:29:5",
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:29:5",
+        "replacement": "false",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:29:54",
+        "replacement": "\"\"",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/presentation.js:30:2",
+        "replacement": ";",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:0:12",
+        "replacement": "() => undefined",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:0:29",
+        "replacement": "Math.min(min, Math.min(max, value))",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:0:42",
+        "replacement": "Math.max(max, value)",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:1:71",
+        "replacement": "true",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:1:78",
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:2:20",
+        "replacement": "Math.max(Math.max(1, width - 36) / Math.max(1, worldWidth), Math.max(1, height - 44) / Math.max(1, worldHeight))",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:2:29",
+        "replacement": "Math.max(1, width - 36) * Math.max(1, worldWidth)",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:2:29",
+        "replacement": "Math.min(1, width - 36)",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:2:40",
+        "replacement": "width + 36",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:2:50",
+        "replacement": "Math.min(1, worldWidth)",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:2:73",
+        "replacement": "Math.max(1, height - 44) * Math.max(1, worldHeight)",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:2:73",
+        "replacement": "Math.min(1, height - 44)",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:2:84",
+        "replacement": "height + 44",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:2:95",
+        "replacement": "Math.min(1, worldHeight)",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:3:9",
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:3:12",
+        "replacement": "Math.min(18, (width - worldWidth * scale) / 2)",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:3:24",
+        "replacement": "(width - worldWidth * scale) * 2",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:3:25",
+        "replacement": "width + worldWidth * scale",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:3:31",
+        "replacement": "worldWidth / scale",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:3:54",
+        "replacement": "Math.min(22, (height - worldHeight * scale) / 2)",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:3:66",
+        "replacement": "(height - worldHeight * scale) * 2",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:3:67",
+        "replacement": "height + worldHeight * scale",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:3:74",
+        "replacement": "worldHeight / scale",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:5:48",
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:6:20",
+        "replacement": "camera.scale / factor",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:7:9",
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:7:12",
+        "replacement": "point.x + (point.x - camera.x) * scale / camera.scale",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:7:20",
+        "replacement": "(point.x - camera.x) * scale * camera.scale",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:7:20",
+        "replacement": "(point.x - camera.x) / scale",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:7:21",
+        "replacement": "point.x + camera.x",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:7:60",
+        "replacement": "point.y + (point.y - camera.y) * scale / camera.scale",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:7:68",
+        "replacement": "(point.y - camera.y) * scale * camera.scale",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:7:68",
+        "replacement": "(point.y - camera.y) / scale",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:7:69",
+        "replacement": "point.y + camera.y",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:9:54",
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:10:9",
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:10:12",
+        "replacement": "width / 2 + world.x * camera.scale",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:10:12",
+        "replacement": "width * 2",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:10:20",
+        "replacement": "world.x / camera.scale",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:10:43",
+        "replacement": "height / 2 + world.y * camera.scale",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:10:43",
+        "replacement": "height * 2",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:10:52",
+        "replacement": "world.y / camera.scale",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:12:57",
+        "replacement": "{}",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:13:16",
+        "replacement": "Math.max(.45, before / Math.max(1, extent))",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:13:29",
+        "replacement": "before * Math.max(1, extent)",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:13:36",
+        "replacement": "Math.min(1, extent)",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:13:64",
+        "replacement": "1 + Math.min(.45, after / Math.max(1, extent))",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:13:66",
+        "replacement": "Math.max(.45, after / Math.max(1, extent))",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:13:79",
+        "replacement": "after * Math.max(1, extent)",
+        "outcome": "Killed"
+      },
+      {
+        "name": "crates/vizzi/web/camera.js:13:85",
+        "replacement": "Math.min(1, extent)",
+        "outcome": "Killed"
+      }
+    ]
+  },
+  "limits": [
+    "Each native run passed its unmodified baseline. Initial setup using a nonexistent python test target failed before mutation execution; corrected to languages.",
+    "No mutation exclusions. Timeouts and build failures are separate from caught mutations.",
+    "Latest outcomes reconcile overlapping runs by mutation identity; counts are not added across reruns.",
+    "Test fixtures were strengthened between native runs. Only the latest test/source hashes are recorded here; raw outcome hashes identify earlier runs.",
+    "These runs provide behavioral evidence, not complete coverage or proof of correctness."
+  ],
+  "final_source_sha256": {
+    "crates/vizzi-core/src/coloring.rs": "875a9153c33b710bc7c3cd5ce1d06855a8ea71214b016efc4297fde0ab92e779",
+    "crates/vizzi-core/src/projection.rs": "9ba5bf633a59f967c87849e2f989e0e3b222a6f80fa3c02bd8cbc0b84aeb7e21",
+    "crates/vizzi-core/src/query.rs": "09c13f9dc90539bcabbe6873c634c5f7f6f257db11ac81647c437ed667bd106e",
+    "crates/vizzi-core/src/syntax.rs": "91d7d3a5865bcd692a731e38d8bf628396b43e52a1457fb173d6b047858873fc",
+    "crates/vizzi-core/src/model.rs": "04ac70e501b7e617df421974672e53fb7b618fd91c21c17213eec5207db792a1",
+    "crates/vizzi/src/review_application.rs": "bfa319b0b7e978b65990193a3254664edddd1246de4f4d389e8a9e883f9e53f5",
+    "crates/vizzi/src/server/review.rs": "6255a93e48fd298e2c24e919f38c4e9c69066cc1afd95bc306354e328962b22b",
+    "crates/vizzi/web/presentation.js": "ec9915d09209ebe2978a161e3368ef5ffd37190bb2e67c0cf1c041e1e20cfbca",
+    "crates/vizzi/web/camera.js": "e752813a6ed4445b9e36f37aa6adab05b12524880dd27e925808a7c15207130b",
+    "crates/vizzi/web/splitter.js": "3ff01deef743c3d3706f77ddfcb3bc9cb49685b22cd3ccabb034560b36bda7f3",
+    "crates/vizzi/web/inspector.js": "4b4501f3bc428b54545b744e7aaf577a73baa23a1cf928073885f583f3c210fa",
+    "crates/vizzi/web/app.js": "f5d2190cd48266c240779a39095c67a883c28f441b7051f12c4b7e1212b9658d",
+    "crates/vizzi/web/review-app.js": "4be48e2754c56745545a707700978a168a5a95ac858b7c4de5a5593f1979fef0",
+    "crates/vizzi/web/review-controller.js": "7bf12a8a86d8f59f08d68660c89c88488eb10f322198a1c656667f7995918440",
+    "crates/vizzi/web/windows.js": "c90c7d7dd07db91ad286dbd93108bd15ce792b5df5c0c43f54d5082688898783",
+    "crates/vizzi-core/tests/coloring.rs": "45fd786d9620d0bb940f9c6bc3f760404e31532d2dc851161e7047da4c4c1847",
+    "crates/vizzi-core/tests/projection.rs": "68115b0fbd157a1c73e397869c46675ff66f2323f4637c45ffeba50b3e4b3a13",
+    "crates/vizzi/tests/review_application.rs": "074f7e1dd27ea53c6835af40d3a2f3dd088b8820f5b485e5470f8e1687fc8ab6"
+  }
+}

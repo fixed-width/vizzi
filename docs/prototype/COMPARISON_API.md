@@ -10,7 +10,7 @@ Wire schema is **1**. Identities are opaque strings and responses disable cachin
 
 | Request | Input | Result |
 | --- | --- | --- |
-| `POST /api/comparisons` | JSON `provider`, `revision`, optional `scope` | **202**, `{schema:1,ticket}`. |
+| `POST /api/comparisons` | JSON `provider`, `revision`, optional `target_revision`, `scope` | **202**, `{schema:1,ticket}`. |
 | `GET /api/comparisons/status` | None | Latest complete review status. |
 | `GET /api/comparisons/events` | None | Latest-state SSE `comparison` events. |
 | `GET /api/comparisons/{token}` | Current token | Immutable pair labels. |
@@ -18,8 +18,11 @@ Wire schema is **1**. Identities are opaque strings and responses disable cachin
 | `DELETE /api/comparisons/{token}` | JSON `{}` | **204**; retire lookup and cancel pending intent. |
 
 Create requires `provider:"git"` and an explicit revision containing 1–256 bytes
-without NUL. Scope is a literal normalised relative path, at most 4,096 bytes; absent
+without NUL. An optional `target_revision` has the same limits and selects a second
+pinned revision instead of working source. Scope is a literal normalised relative path, at most 4,096 bytes; absent
 or `.` means root. Dot components, absolute paths, empty components and traversal fail.
+A non-root scope with no inventory on either side fails capture, including a
+syntactically valid but nonexistent path. An empty repository root remains valid.
 Capture roots cannot be supplied by a request. JSON denies unknown lifecycle fields.
 Mutations require JSON content type; no CORS/preflight grant is added. The lifecycle
 body limit is 8 KiB.
@@ -35,6 +38,11 @@ Status contains `schema`, latest `ticket`, `pending`, `active` pair labels and o
 portable comparison ID, provider, requested revision, resolved object, literal scope,
 and working capture start/completion in Unix milliseconds. These describe an observed
 interval, not an atomic filesystem transaction or a promise that disk is unchanged.
+Labels include nullable `target:{revision,resolved}`. A non-null target identifies a
+commit comparison; both revision inputs resolve once. Capture times then describe
+reading the committed target. Refresh rejects these fixed pairs with **400**; create
+a new comparison instead. The wire side `working` means the right/target observation
+in either mode; UI labels distinguish **Working** and **Target**.
 
 Labels also include `origin`, the initial baseline capture's opaque token. It remains
 fixed across working refreshes, including identical-content refreshes, and differs for
@@ -88,7 +96,8 @@ even when textual inspection is unavailable.
 
 Window responses include token, comparison ID, explicit side, existing bounded window,
 bounded classification, context descriptors and hidden-context count. Source stays
-within 96 rows/32 KiB and outline within 200 entries. At most four contexts are emitted;
+within 96 rows/32 KiB, at most 1,024 fragment-relative syntax-style spans, and outline
+within 200 entries; see [colour metadata](WINDOWS.md#captured-syntax-styles). At most four contexts are emitted;
 language labels cap at 32 bytes, descriptions at 512, classification provenance at 256.
 Each context includes coverage, declaration total, at most three 512-byte diagnostics,
 hidden diagnostic count and truncation indicators. No unbounded fact list is copied.

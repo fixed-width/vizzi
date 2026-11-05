@@ -38,16 +38,24 @@ export function auditResponse(uri,body) {
   assert.equal(window.schema,1,"document schema");
   assert.ok(Array.isArray(window.lines) && window.lines.length<=96,"source row bound");
   assert.ok(Array.isArray(window.outline) && window.outline.length<=200,"outline page bound");
-  let bytes=0;
+  let bytes=0,styleSpans=0;
   for(const row of window.lines) {
     assert.ok(integer(row.number) && row.number>0,"source line number");
     assert.ok([row.column,row.end_column,row.line_bytes].every(integer) && row.column<=row.end_column && row.end_column<=row.line_bytes,"fragment byte coordinates");
     assert.equal(byteLength(row.text),row.end_column-row.column,"fragment UTF-8 bytes");
     assert.equal(row.left,row.column>0,"earlier-fragment flag");assert.equal(row.right,row.end_column<row.line_bytes,"later-fragment flag");
     bytes+=byteLength(row.text);
+    const raw=Buffer.from(row.text,"utf8");let end=0;
+    assert.ok(row.styles===undefined || Array.isArray(row.styles),"style array");
+    for(const span of row.styles ?? []) {
+      assert.ok(integer(span.start) && integer(span.end) && span.start>=end && span.start<span.end && span.end<=raw.length,"style byte coordinates");
+      assert.ok((raw[span.start]&192)!==128 && (span.end===raw.length || (raw[span.end]&192)!==128),"style UTF-8 boundaries");
+      assert.ok(["keyword","type","function","string","comment","number","constant","attribute"].includes(span.kind),"style vocabulary");end=span.end;styleSpans++;
+    }
   }
   assert.ok(bytes<=32768,"source byte bound");
-  return {...result,file:window.file,version:window.version,side:body.side,sourceBytes:bytes,rows:window.lines.length,outlineRows:window.outline.length};
+  assert.ok(styleSpans<=1024,"style window bound");
+  return {...result,file:window.file,version:window.version,side:body.side,styleSpans,sourceBytes:bytes,rows:window.lines.length,outlineRows:window.outline.length};
 }
 
 export function auditCheckpoint(state,file,windows,sources) {

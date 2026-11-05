@@ -9,11 +9,17 @@ The [technical contract](COMPARISON_TECH.md) defines identities, ownership and l
 ## Comparison scope
 
 A developer selects an explicit Git baseline in the configured workspace and a
-workspace-relative subtree, defaulting to the repository root. The host resolves the
+workspace-relative repository path, defaulting to the repository root. The host resolves the
 baseline once and displays its resolved identity. Moving that ref later does not change
 the comparison. The working side captures tracked paths and non-ignored untracked
 additions as observed on disk, including staged and unstaged edits together. The index
 can identify candidate paths; its staged bytes are not the working source.
+
+The [trial feedback contract](TRIAL_PRODUCT.md) adds **Two commits** mode: an explicit
+base and target each resolve once, independently of dirty working source. The right
+pane is labelled Target and has no working refresh. Invalid revision/path input is a
+persistent form error; failed capture keeps the old pair. A repository path is a file
+or directory scope, not another revision.
 
 Both sides are immutable observations. The interface labels the baseline, subtree and
 working capture time. Filesystem capture is not an atomic transaction across files.

@@ -4,6 +4,7 @@ pub mod analysis;
 pub mod c_family;
 pub mod capture;
 mod captured_source;
+pub mod coloring;
 pub mod comparison;
 pub mod model;
 pub mod policy;
