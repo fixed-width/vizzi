@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "rust": "453 workspace tests including doctests, formatting and all-target Clippy pass. Rust source/dependencies and release binaries unchanged from 21504f9.",
+  "node": "Nine serial QA test files pass, including expected-failure then passing order/study/assessment tests and localhost streaming request/response checks.",
+  "mutation": "No Rust change; no redundant cargo-mutants run. Retain prior source-pack selection/provenance round: 52 caught, 3 unviable, no survivors/timeouts within that relevant scope; untouched ranking remains unqualified.",
+  "measurement": "All correctness/build work completed before serial two-thread nice-10 CPU-only inference. Server closed."
+}

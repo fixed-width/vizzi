@@ -12,11 +12,16 @@ export function prompt({repository,question},context,{protocol='quotes',metadata
  return [{role:'system',content:instructions},{role:'user',content:`Repository: ${repository}\nSnapshot: ${context.snapshot}\n\nSUPPLIED EXCERPTS\n${context.evidence.map(e=>`[${e.label}] ${e.path}:${e.start_line}-${e.end_line}${metadata?` role=${e.role} basis=${e.role_basis}${e.scope?` scope=${[...e.scope.parents,e.scope.name].join('::')}`:''}`:''}\n${e.text}`).join('\n\n')}\n\nQUESTION\n${question}`}];
 }
 export const schema={type:'object',additionalProperties:false,required:['status','answer','citations'],properties:{status:{type:'string',enum:['answered','insufficient_evidence']},answer:{type:'string',minLength:1,maxLength:2000},citations:{type:'array',maxItems:4,items:{type:'object',additionalProperties:false,required:['label','quote'],properties:{label:{type:'integer',minimum:1,maximum:8},quote:{type:'string',minLength:1,maxLength:120}}}}}};
-export function schemaFor(protocol='quotes',citationLimit=4){
+export function schemaFor(protocol='quotes',citationLimit=4,fieldOrder='status_first'){
  assert.ok(Number.isInteger(citationLimit) && citationLimit>=1 && citationLimit<=8,'invalid citation allowance');
- if(protocol==='quotes')return citationLimit===4?schema:{...schema,properties:{...schema.properties,citations:{...schema.properties.citations,maxItems:citationLimit}}};
- if(protocol==='ids')return {...schema,properties:{...schema.properties,citations:{type:'array',maxItems:citationLimit,items:{type:'integer',minimum:1,maximum:8}}}};
- throw new Error(`Unknown citation protocol: ${protocol}`);
+ assert.ok(['status_first','answer_first'].includes(fieldOrder),'invalid output field order');
+ let result;
+ if(protocol==='quotes')result=citationLimit===4?schema:{...schema,properties:{...schema.properties,citations:{...schema.properties.citations,maxItems:citationLimit}}};
+ else if(protocol==='ids')result={...schema,properties:{...schema.properties,citations:{type:'array',maxItems:citationLimit,items:{type:'integer',minimum:1,maximum:8}}}};
+ else throw new Error(`Unknown citation protocol: ${protocol}`);
+ if(fieldOrder==='status_first')return result;
+ const order=['answer','status','citations'];
+ return {...result,required:order,properties:Object.fromEntries(order.map(key=>[key,result.properties[key]]))};
 }
 export async function server(runtime,model,limits,logPath){
  const portProbe=net.createServer();await new Promise((resolve,reject)=>{portProbe.once('error',reject);portProbe.listen(0,'127.0.0.1',resolve);});const port=portProbe.address().port;await new Promise(done=>portProbe.close(done));
@@ -36,7 +41,7 @@ export async function server(runtime,model,limits,logPath){
  return {pid:child.pid,args,url,startupMs:performance.now()-started,async close(){if(child.exitCode===null){const ended=once(child,'exit');child.kill('SIGTERM');const timer=setTimeout(()=>child.kill('SIGKILL'),5000);try{await ended;}finally{clearTimeout(timer);}}await log.close();}};
 }
 export async function generate(host,item,context,limits,options={}){
- const messages=prompt(item,context,options),body={messages,temperature:0,seed:42,max_tokens:limits.output_tokens,stream:true,stream_options:{include_usage:true},response_format:{type:'json_object',schema:schemaFor(options.protocol,options.citationLimit)},chat_template_kwargs:{enable_thinking:false},cache_prompt:true};
+ const messages=prompt(item,context,options),body={messages,temperature:0,seed:42,max_tokens:limits.output_tokens,stream:true,stream_options:{include_usage:true},response_format:{type:'json_object',schema:schemaFor(options.protocol,options.citationLimit,options.fieldOrder)},chat_template_kwargs:{enable_thinking:false},cache_prompt:true};
  const start=performance.now(),response=await fetch(host.url+'/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(limits.request_timeout_ms)});
  if(!response.ok)throw new Error(`${response.status}: ${await response.text()}`);
  let content='',reasoning='',buffer='',firstTokenMs=null,firstAnswerMs=null,usage=null,finish=null;const decoder=new TextDecoder();

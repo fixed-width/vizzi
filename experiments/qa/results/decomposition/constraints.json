@@ -1,0 +1,519 @@
+{
+  "schema": 1,
+  "records": [
+    {
+      "id": "decomp.add-efun.full/status_first",
+      "granularity": "broad",
+      "promptTokens": 3148,
+      "cachedTokens": 0,
+      "outputTokens": 106,
+      "answerCharacters": 352,
+      "whitespaceWords": 58,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "status",
+        "answer",
+        "citations"
+      ],
+      "sourceChecks": true
+    },
+    {
+      "id": "decomp.add-efun.full/answer_first",
+      "granularity": "broad",
+      "promptTokens": 3148,
+      "cachedTokens": 3144,
+      "outputTokens": 150,
+      "answerCharacters": 502,
+      "whitespaceWords": 81,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "answer",
+        "status",
+        "citations"
+      ],
+      "sourceChecks": true
+    },
+    {
+      "id": "decomp.add-efun.handler/answer_first",
+      "granularity": "narrow",
+      "promptTokens": 3159,
+      "cachedTokens": 3016,
+      "outputTokens": 62,
+      "answerCharacters": 151,
+      "whitespaceWords": 21,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "answer",
+        "status",
+        "citations"
+      ],
+      "sourceChecks": true
+    },
+    {
+      "id": "decomp.add-efun.handler/status_first",
+      "granularity": "narrow",
+      "promptTokens": 3159,
+      "cachedTokens": 3155,
+      "outputTokens": 80,
+      "answerCharacters": 245,
+      "whitespaceWords": 32,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "status",
+        "answer",
+        "citations"
+      ],
+      "sourceChecks": true
+    },
+    {
+      "id": "decomp.add-efun.registration/status_first",
+      "granularity": "narrow",
+      "promptTokens": 3159,
+      "cachedTokens": 3027,
+      "outputTokens": 137,
+      "answerCharacters": 375,
+      "whitespaceWords": 52,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "status",
+        "answer",
+        "citations"
+      ],
+      "sourceChecks": true
+    },
+    {
+      "id": "decomp.add-efun.registration/answer_first",
+      "granularity": "narrow",
+      "promptTokens": 3159,
+      "cachedTokens": 3155,
+      "outputTokens": 165,
+      "answerCharacters": 501,
+      "whitespaceWords": 70,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "answer",
+        "status",
+        "citations"
+      ],
+      "sourceChecks": true
+    },
+    {
+      "id": "decomp.transaction-creation.full/answer_first",
+      "granularity": "broad",
+      "promptTokens": 1577,
+      "cachedTokens": 129,
+      "outputTokens": 186,
+      "answerCharacters": 580,
+      "whitespaceWords": 76,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "answer",
+        "status",
+        "citations"
+      ],
+      "sourceChecks": true
+    },
+    {
+      "id": "decomp.transaction-creation.full/status_first",
+      "granularity": "broad",
+      "promptTokens": 1577,
+      "cachedTokens": 1573,
+      "outputTokens": 201,
+      "answerCharacters": 698,
+      "whitespaceWords": 89,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "status",
+        "answer",
+        "citations"
+      ],
+      "sourceChecks": true
+    },
+    {
+      "id": "decomp.transaction-creation.task-entry/status_first",
+      "granularity": "narrow",
+      "promptTokens": 1586,
+      "cachedTokens": 1445,
+      "outputTokens": 116,
+      "answerCharacters": 333,
+      "whitespaceWords": 47,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "status",
+        "answer",
+        "citations"
+      ],
+      "sourceChecks": true
+    },
+    {
+      "id": "decomp.transaction-creation.task-entry/answer_first",
+      "granularity": "narrow",
+      "promptTokens": 1586,
+      "cachedTokens": 1582,
+      "outputTokens": 113,
+      "answerCharacters": 362,
+      "whitespaceWords": 52,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "answer",
+        "status",
+        "citations"
+      ],
+      "sourceChecks": true
+    },
+    {
+      "id": "decomp.transaction-creation.start-message/answer_first",
+      "granularity": "narrow",
+      "promptTokens": 1592,
+      "cachedTokens": 1454,
+      "outputTokens": 87,
+      "answerCharacters": 223,
+      "whitespaceWords": 26,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "answer",
+        "status",
+        "citations"
+      ],
+      "sourceChecks": true
+    },
+    {
+      "id": "decomp.transaction-creation.start-message/status_first",
+      "granularity": "narrow",
+      "promptTokens": 1592,
+      "cachedTokens": 1588,
+      "outputTokens": 84,
+      "answerCharacters": 201,
+      "whitespaceWords": 23,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "status",
+        "answer",
+        "citations"
+      ],
+      "sourceChecks": true
+    },
+    {
+      "id": "decomp.commit-checks.full/status_first",
+      "granularity": "broad",
+      "promptTokens": 3329,
+      "cachedTokens": 129,
+      "outputTokens": 200,
+      "answerCharacters": 780,
+      "whitespaceWords": 105,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "status",
+        "answer",
+        "citations"
+      ],
+      "sourceChecks": true
+    },
+    {
+      "id": "decomp.commit-checks.full/answer_first",
+      "granularity": "broad",
+      "promptTokens": 3329,
+      "cachedTokens": 3325,
+      "outputTokens": 198,
+      "answerCharacters": 767,
+      "whitespaceWords": 99,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "answer",
+        "status",
+        "citations"
+      ],
+      "sourceChecks": true
+    },
+    {
+      "id": "decomp.commit-checks.future-base/answer_first",
+      "granularity": "narrow",
+      "promptTokens": 3329,
+      "cachedTokens": 3197,
+      "outputTokens": 80,
+      "answerCharacters": 268,
+      "whitespaceWords": 40,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "answer",
+        "status",
+        "citations"
+      ],
+      "sourceChecks": true
+    },
+    {
+      "id": "decomp.commit-checks.future-base/status_first",
+      "granularity": "narrow",
+      "promptTokens": 3329,
+      "cachedTokens": 3325,
+      "outputTokens": 145,
+      "answerCharacters": 582,
+      "whitespaceWords": 78,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "status",
+        "answer",
+        "citations"
+      ],
+      "sourceChecks": false
+    },
+    {
+      "id": "decomp.commit-checks.old-base/status_first",
+      "granularity": "narrow",
+      "promptTokens": 3328,
+      "cachedTokens": 3197,
+      "outputTokens": 215,
+      "answerCharacters": 921,
+      "whitespaceWords": 126,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "status",
+        "answer",
+        "citations"
+      ],
+      "sourceChecks": true
+    },
+    {
+      "id": "decomp.commit-checks.old-base/answer_first",
+      "granularity": "narrow",
+      "promptTokens": 3328,
+      "cachedTokens": 3324,
+      "outputTokens": 83,
+      "answerCharacters": 278,
+      "whitespaceWords": 41,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "answer",
+        "status",
+        "citations"
+      ],
+      "sourceChecks": true
+    },
+    {
+      "id": "decomp.commit-checks.read-conflict/answer_first",
+      "granularity": "narrow",
+      "promptTokens": 3329,
+      "cachedTokens": 3197,
+      "outputTokens": 116,
+      "answerCharacters": 434,
+      "whitespaceWords": 66,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "answer",
+        "status",
+        "citations"
+      ],
+      "sourceChecks": true
+    },
+    {
+      "id": "decomp.commit-checks.read-conflict/status_first",
+      "granularity": "narrow",
+      "promptTokens": 3329,
+      "cachedTokens": 3325,
+      "outputTokens": 101,
+      "answerCharacters": 362,
+      "whitespaceWords": 53,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "status",
+        "answer",
+        "citations"
+      ],
+      "sourceChecks": true
+    },
+    {
+      "id": "decomp.commit-checks.merge-check/status_first",
+      "granularity": "narrow",
+      "promptTokens": 3327,
+      "cachedTokens": 3197,
+      "outputTokens": 113,
+      "answerCharacters": 425,
+      "whitespaceWords": 59,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "status",
+        "answer",
+        "citations"
+      ],
+      "sourceChecks": true
+    },
+    {
+      "id": "decomp.commit-checks.merge-check/answer_first",
+      "granularity": "narrow",
+      "promptTokens": 3327,
+      "cachedTokens": 3323,
+      "outputTokens": 114,
+      "answerCharacters": 409,
+      "whitespaceWords": 56,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "answer",
+        "status",
+        "citations"
+      ],
+      "sourceChecks": true
+    },
+    {
+      "id": "decomp.commit-checks.commit-receiver/answer_first",
+      "granularity": "narrow",
+      "promptTokens": 3334,
+      "cachedTokens": 3197,
+      "outputTokens": 77,
+      "answerCharacters": 196,
+      "whitespaceWords": 23,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "answer",
+        "status",
+        "citations"
+      ],
+      "sourceChecks": true
+    },
+    {
+      "id": "decomp.commit-checks.commit-receiver/status_first",
+      "granularity": "narrow",
+      "promptTokens": 3334,
+      "cachedTokens": 3330,
+      "outputTokens": 79,
+      "answerCharacters": 215,
+      "whitespaceWords": 27,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "status",
+        "answer",
+        "citations"
+      ],
+      "sourceChecks": true
+    },
+    {
+      "id": "decomp.commit-checks.read-only/status_first",
+      "granularity": "narrow",
+      "promptTokens": 3329,
+      "cachedTokens": 3202,
+      "outputTokens": 124,
+      "answerCharacters": 496,
+      "whitespaceWords": 73,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "status",
+        "answer",
+        "citations"
+      ],
+      "sourceChecks": true
+    },
+    {
+      "id": "decomp.commit-checks.read-only/answer_first",
+      "granularity": "narrow",
+      "promptTokens": 3329,
+      "cachedTokens": 3325,
+      "outputTokens": 140,
+      "answerCharacters": 483,
+      "whitespaceWords": 65,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "answer",
+        "status",
+        "citations"
+      ],
+      "sourceChecks": true
+    },
+    {
+      "id": "decomp.commit-checks.effects/answer_first",
+      "granularity": "narrow",
+      "promptTokens": 3331,
+      "cachedTokens": 3202,
+      "outputTokens": 186,
+      "answerCharacters": 656,
+      "whitespaceWords": 86,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "answer",
+        "status",
+        "citations"
+      ],
+      "sourceChecks": true
+    },
+    {
+      "id": "decomp.commit-checks.effects/status_first",
+      "granularity": "narrow",
+      "promptTokens": 3331,
+      "cachedTokens": 3327,
+      "outputTokens": 103,
+      "answerCharacters": 335,
+      "whitespaceWords": 51,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "status",
+        "answer",
+        "citations"
+      ],
+      "sourceChecks": true
+    },
+    {
+      "id": "decomp.commit-checks.base-pin/status_first",
+      "granularity": "narrow",
+      "promptTokens": 3332,
+      "cachedTokens": 3202,
+      "outputTokens": 156,
+      "answerCharacters": 610,
+      "whitespaceWords": 87,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "status",
+        "answer",
+        "citations"
+      ],
+      "sourceChecks": true
+    },
+    {
+      "id": "decomp.commit-checks.base-pin/answer_first",
+      "granularity": "narrow",
+      "promptTokens": 3332,
+      "cachedTokens": 3328,
+      "outputTokens": 139,
+      "answerCharacters": 533,
+      "whitespaceWords": 73,
+      "finish": "stop",
+      "orderCompliant": true,
+      "generatedFieldOrder": [
+        "answer",
+        "status",
+        "citations"
+      ],
+      "sourceChecks": true
+    }
+  ],
+  "limitations": [
+    "Cached prefix usage makes times warm-session descriptions, not broad/narrow cold-cache comparisons.",
+    "Whitespace word counts are descriptive. Output/schema caps and order compliance remain separate from accuracy."
+  ]
+}

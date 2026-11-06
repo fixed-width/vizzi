@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import {diagnose} from './decomposition-assess.mjs';
+const library={cases:[{id:'b',parent_case:'family',granularity:'broad',expected_status:'answered',required_facts:[{text:'fact'}]},{id:'n',parent_case:'family',granularity:'narrow',expected_status:'answered',required_facts:[{text:'fact'}]}]};
+const row=(id,arm,status='answered')=>({id:`${id}/${arm}`,case:id,repository:'lpc-rs',split:'diagnostic',arm,contextSha256:'same',messages:[{role:'user',content:id}],provenanceValid:true,finish:'stop',orderCompliant:true,answer:{answer:'fact',status,citations:[1]}});
+const rows=[row('b','status_first','insufficient_evidence'),row('b','answer_first'),row('n','status_first'),row('n','answer_first')];
+const grades={grader:'synthetic',limitations:['fixture'],grades:rows.map(r=>({id:r.id,facts:['supported'],unsupportedClaims:[],citationsSupport:true,roleConfusion:false,notes:'fixture'}))};
+const result=diagnose(rows,library,grades);
+assert.equal(result.summaries.find(s=>s.granularity==='broad' && s.arm==='answer_first').successes,1);
+assert.equal(result.summaries.find(s=>s.granularity==='broad' && s.arm==='status_first').falseRefusals,1);
+assert.equal(result.paired.find(s=>s.granularity==='broad').helped,1);
+assert.equal(result.paired.find(s=>s.granularity==='narrow').bothSucceeded,1);
+const invalid=structuredClone(rows);invalid[1].contextSha256='different';assert.throws(()=>diagnose(invalid,library,grades));
+const changedPrompt=structuredClone(rows);changedPrompt[1].messages[0].content='altered';assert.throws(()=>diagnose(changedPrompt,library,grades));
+const orderFailure=structuredClone(rows);orderFailure[0].orderCompliant=false;assert.equal(diagnose(orderFailure,library,grades).orderCompliance[0].compliant,1);
+console.log('decomposition assessment: paired outcomes, distinct granularity, false refusals, shared source/prompts and order compliance');

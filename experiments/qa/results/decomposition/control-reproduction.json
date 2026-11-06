@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "controls": [
+    {
+      "case": "decomp.add-efun.full",
+      "sourceSame": true,
+      "messagesSame": true,
+      "rawSame": true
+    },
+    {
+      "case": "decomp.transaction-creation.full",
+      "sourceSame": true,
+      "messagesSame": true,
+      "rawSame": true
+    },
+    {
+      "case": "decomp.commit-checks.full",
+      "sourceSame": true,
+      "messagesSame": true,
+      "rawSame": true
+    }
+  ],
+  "limitation": "Same known inputs and one fixed runtime/host; not a repeatability or model-generalisation qualification."
+}

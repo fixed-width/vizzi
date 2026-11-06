@@ -9,10 +9,12 @@ console.log('model prompt: only question and supplied source cross the inference
 const observed=[];
 const stub=createServer((request,response)=>{
  let body='';request.on('data',b=>body+=b);
- request.on('end',()=>observed.push(JSON.parse(body)));
- response.setHeader('content-type','text/event-stream');response.flushHeaders();
- response.write('data: '+JSON.stringify({choices:[{delta:{content:'{"status":"insufficient_evidence",'}}]})+'\n\n');
- setTimeout(()=>{response.write('data: '+JSON.stringify({choices:[{delta:{content:'"answer":"Not established","citations":[]}'},finish_reason:'stop'}],usage:{prompt_tokens:10,completion_tokens:10}})+'\n\n');response.end('data: [DONE]\n\n');},200);
+ request.on('end',()=>{
+  const data=JSON.parse(body);observed.push(data);const answerFirst=data.response_format.schema.required[0]==='answer';
+  response.setHeader('content-type','text/event-stream');response.flushHeaders();
+  response.write('data: '+JSON.stringify({choices:[{delta:{content:answerFirst?'{"answer":"Not established",':'{"status":"insufficient_evidence",'}}]})+'\n\n');
+  setTimeout(()=>{response.write('data: '+JSON.stringify({choices:[{delta:{content:answerFirst?'"status":"insufficient_evidence","citations":[]}':'"answer":"Not established","citations":[]}'},finish_reason:'stop'}],usage:{prompt_tokens:10,completion_tokens:10}})+'\n\n');response.end('data: [DONE]\n\n');},200);
+ });
 });
 await new Promise((resolve,reject)=>{stub.once('error',reject);stub.listen(0,'127.0.0.1',resolve);});
 try{
@@ -22,10 +24,13 @@ try{
  assert.equal(ids.answer.status,'insufficient_evidence');assert.deepEqual(ids.answer.citations,[]);
  const longer=await generate({url:`http://127.0.0.1:${stub.address().port}`},item,context,{request_timeout_ms:3000,output_tokens:1024},{protocol:'ids',metadata:true,wordLimit:300,citationLimit:8});
  assert.equal(longer.answer.status,'insufficient_evidence');
- for(const data of observed){assert.equal(data.temperature,0);assert.equal(data.seed,42);assert.deepEqual(Object.keys(data.response_format.schema.properties),['status','answer','citations']);assert.ok(!JSON.stringify(data.messages).includes(hidden));}
- assert.deepEqual(observed.map(d=>d.max_tokens),[384,384,1024]);
- assert.deepEqual(observed.map(d=>d.response_format.schema.properties.citations.maxItems),[4,4,8]);
+ const reordered=await generate({url:`http://127.0.0.1:${stub.address().port}`},item,context,{request_timeout_ms:3000,output_tokens:1024},{protocol:'ids',metadata:true,wordLimit:300,citationLimit:8,fieldOrder:'answer_first'});
+ assert.deepEqual(Object.keys(reordered.answer),['answer','status','citations']);
+ for(const [i,data]of observed.entries()){assert.equal(data.temperature,0);assert.equal(data.seed,42);assert.deepEqual(Object.keys(data.response_format.schema.properties),i===3?['answer','status','citations']:['status','answer','citations']);assert.ok(!JSON.stringify(data.messages).includes(hidden));}
+ assert.deepEqual(observed.map(d=>d.max_tokens),[384,384,1024,1024]);
+ assert.deepEqual(observed.map(d=>d.response_format.schema.properties.citations.maxItems),[4,4,8,8]);
  assert.equal(observed[2].messages[0].content,observed[1].messages[0].content.replace('100 words','300 words'));
  assert.deepEqual(observed[2].messages[1],observed[1].messages[1]);
+ assert.deepEqual(observed[3].messages,observed[2].messages,'field order must not alter prompt text');
  console.log('model streaming: first answer token is observed before complete delivery');
 }finally{await new Promise(resolve=>stub.close(resolve));}

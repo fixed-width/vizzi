@@ -17,6 +17,9 @@ questions and distinguish faster, valid references from correct answers.
 The subsequent [complete-source diagnostic](SOURCE_PACK_RESULTS.md) separates selection
 misses from remaining model/prompt limits; follow its [procedure](SOURCE_PACKS.md) to
 repeat the known-question control.
+The [focused-question/output-order follow-up](DECOMPOSITION_RESULTS.md) keeps source and
+prompts fixed within schema-order pairs. Its [procedure](DECOMPOSITION.md) reports broad
+and narrow results separately and does not implement an automatic planner.
 
 Build with one compiler task and run the normal correctness checks:
 

@@ -122,6 +122,10 @@ known cases, not held-out accuracy. Consider task-shaped retrieval or model chan
 after measuring which missing operations they must support. No fine-tuning is justified
 by this cohort alone.
 
+The subsequent [focused-question/output-order diagnostic](DECOMPOSITION_RESULTS.md)
+carries out those controls. It preserves these source-pack outputs and does not treat
+guided subanswers as completed original workflows.
+
 Formatting, **453 workspace tests including doctests**, workspace all-target Clippy and
 six serial Node test files pass. No dependencies or unsafe code were added. The native
 range operation and protocol have failing-then-passing tests for exact literal selection,

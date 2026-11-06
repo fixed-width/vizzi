@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import {schemaFor,prompt} from './model.mjs';
+const original=schemaFor('ids',8),changed=schemaFor('ids',8,'answer_first');
+assert.deepEqual(Object.keys(changed.properties),['answer','status','citations']);
+assert.deepEqual(changed.required,['answer','status','citations']);
+for(const field of original.required)assert.deepEqual(original.properties[field],changed.properties[field]);
+assert.deepEqual(Object.keys(schemaFor('ids',8).properties),['status','answer','citations'],'do not mutate defaults');
+assert.deepEqual(schemaFor('quotes'),schemaFor('quotes',4,'status_first'));
+assert.throws(()=>schemaFor('ids',8,'unordered'));
+const item={repository:'fixture',question:'Which method handles the message?',required_facts:[{text:'HIDDEN_RUBRIC'}]};
+const context={snapshot:'source',evidence:[{label:1,path:'a.rs',start_line:1,end_line:1,text:'fn process() {}',role:'code',role_basis:'raw_lexical_scope',scope:null}]};
+assert.deepEqual(prompt(item,context,{protocol:'ids',fieldOrder:'status_first',wordLimit:300,metadata:true}),prompt(item,context,{protocol:'ids',fieldOrder:'answer_first',wordLimit:300,metadata:true}));
+assert.ok(!JSON.stringify(prompt(item,context)).includes('HIDDEN_RUBRIC'));
+console.log('output order: only property/required order changes; prompts, meanings, limits and old defaults are unchanged');

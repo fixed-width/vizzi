@@ -36,9 +36,13 @@ not; none of the three maintainer workflows is completed. Keep QA outside the vi
 The [source-complete diagnostic](../../experiments/qa/SOURCE_PACK_RESULTS.md) now supplies
 whole relevant definitions and caller/branch context. Partial facts improve, but full
 tasks remain incomplete; extra answer allowance does not fix invented caller links or
-false refusals. Next, isolate narrow subquestions and answer/status ordering before
-choosing another retrieval/model change. Retain new maintainer questions for subsequent
-fresh evaluation. None of these agent-graded diagnostics establishes product acceptance.
+false refusals. The [focused-question/output-order diagnostic](../../experiments/qa/DECOMPOSITION_RESULTS.md)
+now tests the same whole source with guided questions and paired JSON field order.
+Answer-first raises supported narrow tasks from 2/12 to 4/12 and removes false refusals,
+but both orders still fail all three original workflows. Before adding a planner or chat
+interface, compare a bounded alternative CPU-capable model on these fixed error patterns.
+Retain new maintainer questions for subsequent fresh evaluation. None of these
+agent-graded diagnostics establishes product acceptance.
 
 The previous milestone plan and delivery evidence follow as historical context.
 

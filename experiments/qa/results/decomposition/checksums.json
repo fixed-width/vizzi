@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "sha256": {
+    "answers.jsonl.gz": "d97b7780ceec38373f9b3219519cd4a17e5c87b31e9ca1a445a8aac8ee5acf5f",
+    "assessment.json": "a7881ddd3fb6291f89c07e80f1d5cc5df8dcff6834a1c31efd04857af3255473",
+    "constraints.json": "18dce3974a4b8537bdf71d4d5f09c72916a632b425fcd78da18d78b45f5556e3",
+    "control-reproduction.json": "9eab0aea38171359076a2ff9b617f5cad9427169146bafcec84b02cdb94a38e8",
+    "grades.json": "974212da3ae93bdb1a078c4629d9ad227e3c4a606d5d744a33b7e6f7e9e0a75a",
+    "manifest.json": "9fbc9f5ef24eeb3f1dae49caf4138a2ddc0d815716a0ba853fc9ba0304bb1ace",
+    "memory.json.gz": "8447a4384f7a8351b22dd26ea01350cca69126b22370fe8787982a219a6c4541",
+    "prepared.json.gz": "ea4255d12ff591756ac7296e1b2162a172be0cacb856fe2cc154c0ae94032430",
+    "review.md": "b42281f5ddd404f57eaffbbe25124462da3ee620039a6b0d91c4e9b98a6f126f",
+    "runtime.json": "cb226d8d1bc127b39bafd1725bced0bff4ce091306a4205c799329f57a9c3f1d",
+    "runtime.log.gz": "075f832e3f4c6eb0313cfd805cdd836fb88d0fb8dd30f625ab098ac55fcccb26",
+    "validation.json": "d646a74cc430eda009090db352d8da5fc4ec95f14244e640cec4bb689e408e2d"
+  }
+}
