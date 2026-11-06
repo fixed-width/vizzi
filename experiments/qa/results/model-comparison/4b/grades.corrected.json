@@ -1,0 +1,177 @@
+{
+  "schema": 1,
+  "grader": "Codex, source-aware pack/question/rubric author; preliminary manual 4B review, not independent acceptance",
+  "limitations": [
+    "Same known-source guided diagnostic and frozen rubric as the live 2B control; not held-out accuracy.",
+    "Grade requested material facts, equivalent wording, unsupported claims and citation support separately. Handler Result<()> spelling is not required for the narrow interface question; explicit false API/layout claims remain failures.",
+    "Model/capacity/quantization/template bundle changes; this is not a pure parameter-count law or best vendor configuration."
+  ],
+  "grades": [
+    {
+      "id": "decomp.add-efun.full/answer_first",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "supported",
+        "missing"
+      ],
+      "notes": "Correct native handler/context interface, efuns! registration/dispatch and Markdown path. Treat Rust module creation plus cited declaration as sufficient for the handler/module portion. The procedure omits adding tests, so the combined tests/documentation fact and full workflow remain incomplete. Existing signature is clearly an example, not a claim that every efun needs these types."
+    },
+    {
+      "id": "decomp.add-efun.handler/answer_first",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Correct EfunContext, arg(index), return_efun_result and abs example, directly supported by handler source 1. LpcRef names the argument value type; no unsupported owned-versus-borrowed assertion is inferred."
+    },
+    {
+      "id": "decomp.add-efun.registration/answer_first",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "notes": "Correct efuns! source-row registration and generated call_efun dispatch, supported by macro definition 3 and example 5. Interpret EFUN_PROTOTYPES section as the generated prototype portion of this macro, not an instruction to maintain a separate map. Matching the efun name describes generated enum variants, not an asserted string-map lookup."
+    },
+    {
+      "id": "decomp.transaction-creation.full/answer_first",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "missing"
+      ],
+      "notes": "Correct constructor location and high-level task/Start/current-world-snapshot creation sequence. Interpret cloning a LiveSnapshot as cloning its inner snapshot data, not an explicit call to LiveSnapshot::clone. It names Task and command callers but not the required Task::open_attempt entry method; useful partial creation survey under the unchanged two-part rubric. Inline source [2]/[5] mentions are retained, while structured citations support the constructor and Start handling."
+    },
+    {
+      "id": "decomp.transaction-creation.task-entry/answer_first",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Correct Task::open_attempt, non-joining condition and LiveSnapshot-to-Transaction/TxnHandle sequence, supported by actual task method 2 and helper 3."
+    },
+    {
+      "id": "decomp.transaction-creation.start-message/answer_first",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "notes": "Correct caller/client Start request with reply channel and committer LiveSnapshot reply; sources 3 and 4 directly show both sides."
+    },
+    {
+      "id": "decomp.commit-checks.full/answer_first",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "notes": "Correct body/phase-to-channel-to-committer validator path, without the invented dispatch method. Accept the structural receiver/validator separation without requiring literal process spelling. All four rejection criteria are accurately described; exact FutureVersion spelling is not required for the full trace when its condition is clear. It omits the read-only no-version branch, effect/retry outcome and pin-release/eviction ordering. The unqualified new-version sentence is treated as ordinary write-path description, not completion of the missing read-only fact, consistently with the baseline grading."
+    },
+    {
+      "id": "decomp.commit-checks.future-base/answer_first",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Correct FutureVersion rejection, base/current version meanings and future-base rationale, directly supported by gate source 5."
+    },
+    {
+      "id": "decomp.commit-checks.old-base/answer_first",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Correct HistoryUnavailable rejection and retained-history rationale, supported by source 5."
+    },
+    {
+      "id": "decomp.commit-checks.read-conflict/answer_first",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "notes": "Correct effective write-history range, explicitly skips the base, and rejects tracked-read conflicts as ReadInvalidated with version/writer details. It cites the actual validation block 5."
+    },
+    {
+      "id": "decomp.commit-checks.merge-check/answer_first",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "notes": "Correct fold_merges against current committed snapshot values and whole-changeset rejection as MergeMismatch before publication, supported by actual gate block 5."
+    },
+    {
+      "id": "decomp.commit-checks.commit-receiver/answer_first",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Correct direct handler is Committer::dispatch, which process wraps; it calls commit for validation. This exposes and corrects the earlier oracle error. Source 4 native scope is dispatch, and source code confirms process -> dispatch -> commit. Apply the published dispatch erratum instead of the erroneous frozen prohibition."
+    },
+    {
+      "id": "decomp.commit-checks.read-only/answer_first",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Correct empty-write early return: no new version, snapshot application or write-history insertion, after the read-only statistic. Correct source 5."
+    },
+    {
+      "id": "decomp.commit-checks.effects/answer_first",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "notes": "Correct accepted-commit delivery, no effects on rejected attempts, conflict tracking and retry. Accept ordinary retry/backoff summary without requiring every admission/deadline spelling; it does not claim the loop breaks on rejection. Task and runner references 1/2 support the requested lifecycle."
+    },
+    {
+      "id": "decomp.commit-checks.base-pin/answer_first",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "notes": "Correct dispatch handler, releases_base condition, post-validation release and live_versions-empty eviction, all in source 4. Read returns successfully as normal completion of the validation call, not an only-Ok restriction, because the next sentence explicitly says release is unconditional when flagged. Source also releases after Err. Apply the dispatch oracle erratum; naming the actual handler is correct."
+    }
+  ]
+}

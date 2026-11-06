@@ -1,0 +1,145 @@
+{
+  "schema": 1,
+  "grader": "Codex, source-aware pack and rubric author; preliminary manual diagnostic review, not independent human grading",
+  "limitations": [
+    "Three previously observed maintainer questions; manually selected source is an oracle diagnostic, not a deployable retrieval benchmark.",
+    "Existing maintainer facts and question wording remain unchanged; judge facts, status, source support and task completeness separately.",
+    "Long allowance changes word and token caps together; all arms use an eight-ID schema. Character cap and context constraints are reported separately.",
+    "Explicit dispatch-scope source-audit correction; original grades/raw outputs/frozen rubrics are retained. This revised grading supersedes affected original judgments."
+  ],
+  "grades": [
+    {
+      "id": "maintainer.lpc-rs.add-efun/retrieved_ids",
+      "unsupportedClaims": [
+        "Presents registering a command pattern/handler through add_rule as adding a native efun."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "notes": "Control repeats the target-language command-registration procedure; no native module/handler, efuns! table row, tests or documentation extension path is supplied."
+    },
+    {
+      "id": "maintainer.lpc-rs.add-efun/curated_ids",
+      "unsupportedClaims": [
+        "Says arity and argument types are required by the macro, although its documented syntax permits omitting them."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "missing",
+        "supported",
+        "missing"
+      ],
+      "notes": "Correctly finds the native efuns! registry and gives the existing abs signature example. It omits implementing/declaring the Rust handler and adding tests/documentation, so the full extension procedure is incomplete. Treat LpcType::Mixed as shorthand for the supplied variant rather than a complete compiling code example."
+    },
+    {
+      "id": "maintainer.lpc-rs.add-efun/curated_long",
+      "unsupportedClaims": [
+        "Claims no prototype/registration examples or guidance are supplied despite the macro syntax documentation, generated prototype/dispatch definitions and registration rows."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "notes": "Refuses with complete relevant source available. It generates only 106 tokens, below even the short output cap; no context overflow or truncation explains this failure."
+    },
+    {
+      "id": "maintainer.lpc-rs.transaction-creation/curated_ids",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "missing"
+      ],
+      "notes": "Correctly locates Transaction::new and its snapshot/Changeset initialization. Does not identify Task::open_attempt as the normal owning-task creation path, although that full method is supplied. Useful constructor lookup, incomplete under the frozen two-part rubric."
+    },
+    {
+      "id": "maintainer.lpc-rs.transaction-creation/curated_long",
+      "unsupportedClaims": [
+        "Attributes a start_txn definition to Task::open_attempt source lines and reverses the Start message direction: the client sends Start to the committer, which returns a LiveSnapshot."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "contradicted"
+      ],
+      "notes": "Correct constructor, Changeset initialization and command begin_attempt example. The normal Task::open_attempt caller chain is misnamed/misdirected despite all relevant definitions being supplied. 201 tokens, below the original token cap."
+    },
+    {
+      "id": "maintainer.lpc-rs.transaction-creation/retrieved_ids",
+      "unsupportedClaims": [
+        "Presents the cfg(test)-gated Pending::new fixture in presence/transaction_tests.rs as the production transaction creation entry point."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": true,
+      "facts": [
+        "missing",
+        "contradicted"
+      ],
+      "notes": "Control continues to select an unrecognised test-module filename and omits both Transaction::new location and the normal owning Task entry point. The available ID does not establish the production-role claim."
+    },
+    {
+      "id": "maintainer.lpc-rs.commit-checks/curated_long",
+      "unsupportedClaims": [
+        "Conflates dispatch protocol handling with commit validation.",
+        "Describes the committer receiving a reply rather than processing a request and sending its result."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "contradicted",
+        "supported",
+        "supported",
+        "supported",
+        "missing",
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "notes": "Dispatch exists; its prior invention finding was wrong. The response still misattributes protocol fields to commit, reverses request/reply handling and omits several required branches. Corrected under the dispatch-scope erratum."
+    },
+    {
+      "id": "maintainer.lpc-rs.commit-checks/retrieved_ids",
+      "unsupportedClaims": [],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "missing",
+        "missing",
+        "missing",
+        "missing",
+        "missing",
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "notes": "Faithfully refuses on class/illustration excerpts that do not show the commit implementation. The repository task remains unanswered."
+    },
+    {
+      "id": "maintainer.lpc-rs.commit-checks/curated_ids",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "missing",
+        "supported",
+        "supported",
+        "supported",
+        "supported",
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "notes": "Dispatch is the real direct Commit handler, called by process. Remove the erroneous invention finding. This response accurately describes all four gates and normal write publication with relevant references; it still omits the incoming submission chain, read-only branch, delivery/retry and pin/eviction details. Corrected by dispatch-scope erratum; raw response unchanged."
+    }
+  ]
+}

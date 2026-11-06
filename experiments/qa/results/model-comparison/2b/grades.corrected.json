@@ -1,0 +1,195 @@
+{
+  "schema": 1,
+  "grader": "Codex, source-aware original grader. Reused only after identical raw response, source, messages, finish and native validation were verified.",
+  "limitations": [
+    "Three original maintainer controls plus twelve guided agent subquestions on known complete source; not held-out accuracy or automatic decomposition.",
+    "Grade material requested facts and equivalent wording; do not require literal helper names when the meaning is correct. For the handler-interface question, Result<()> spelling is not a separate requirement beyond the EfunContext/argument/result mechanism.",
+    "Facts, unsupported claims, status, source binding and actual requested field-order compliance remain separate. No post-hoc status or citation repair.",
+    "Live control reproduction is a fixed-input/host check, not independent grading or a general determinism guarantee.",
+    "Dispatch source-audit erratum applied transparently; original copied grades are preserved separately. Prompts and raw responses were not changed."
+  ],
+  "grades": [
+    {
+      "id": "decomp.add-efun.full/answer_first",
+      "unsupportedClaims": [
+        "Says only prototype definition is needed, omitting the native handler/module required by generated dispatch.",
+        "Overstates optional arity/argument-type fields as mandatory."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "missing",
+        "supported",
+        "missing"
+      ],
+      "notes": "Finds the efuns! signature row mechanism but misses handler and tests/documentation. The hypothetical string-absolute-value example is not counted as a repository fact or a complete implementation. Correct answered status alone does not make the procedure correct."
+    },
+    {
+      "id": "decomp.add-efun.handler/answer_first",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Correct EfunContext, arg and return_efun_result. Label 1 supports all material claims; extra label 5 is unnecessary but does not replace that supporting reference."
+    },
+    {
+      "id": "decomp.add-efun.registration/answer_first",
+      "unsupportedClaims": [],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "notes": "Correct efuns! row and generated dispatch mechanism, unlike its status-first partner. However, citations 5 and 6 cover the example row and abs Markdown; they do not establish the requested dispatch/prototype-generation relationship in macro source 3. Factual content is credited separately from complete citation support."
+    },
+    {
+      "id": "decomp.transaction-creation.full/answer_first",
+      "unsupportedClaims": [
+        "Claims Transaction::new is called from start_txn and that the committer passes its LiveSnapshot directly into that constructor."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "contradicted"
+      ],
+      "notes": "Correctly locates the constructor; accept location without requiring unasked initializer-field spelling. It names open_attempt and improves the Start sender direction, but wrongly attributes transaction construction to the helper/committer instead of the owning caller."
+    },
+    {
+      "id": "decomp.transaction-creation.task-entry/answer_first",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Correct Task::open_attempt and the sequence of obtaining a LiveSnapshot then creating the Transaction. Source 2 directly supports the requested method/creation step; the ancillary Start helper description is also established elsewhere in the supplied context."
+    },
+    {
+      "id": "decomp.transaction-creation.start-message/answer_first",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "notes": "Correct sender and typed LiveSnapshot reply from sources 3/4. Transaction handle is ambiguous shorthand for the reply/release handle; it does not explicitly assert a TxnHandle field. Do not penalise an unasked internal-layout interpretation."
+    },
+    {
+      "id": "decomp.commit-checks.full/answer_first",
+      "unsupportedClaims": [
+        "Conflates the dispatch protocol handler with commit validation and assigns base-pin release to the wrong method."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "contradicted",
+        "supported",
+        "supported",
+        "supported",
+        "missing",
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "notes": "dispatch exists; remove the erroneous invention finding. The response still conflates the commit validator with protocol handling and release ownership, so the broad task remains incorrect."
+    },
+    {
+      "id": "decomp.commit-checks.future-base/answer_first",
+      "unsupportedClaims": [
+        "Explains a newer-than-current base as a change that predates the current state, reversing the version relationship."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Correctly states FutureVersion with base/current details, but adds the wrong rationale and cites transport helper 3 instead of validation block 5."
+    },
+    {
+      "id": "decomp.commit-checks.old-base/answer_first",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Direct, correct HistoryUnavailable rejection and missing-history rationale, with the actual validation source 5."
+    },
+    {
+      "id": "decomp.commit-checks.read-conflict/answer_first",
+      "unsupportedClaims": [],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "missing",
+        "supported"
+      ],
+      "notes": "Same missing base-skip detail and wrong supporting block as status-first. Interpret time of write as logical written_at version, not an invented wall-clock timestamp."
+    },
+    {
+      "id": "decomp.commit-checks.merge-check/answer_first",
+      "unsupportedClaims": [
+        "Conflates read-invalidation history checks with merge-fold validation against committed values."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "contradicted",
+        "supported"
+      ],
+      "notes": "Correct mismatch error, but the operation and citation are wrong. No improvement from field order on this pair."
+    },
+    {
+      "id": "decomp.commit-checks.commit-receiver/answer_first",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Correct dispatch receiver and commit validator, supported by actual dispatch scope/block 4 and validator 5. Earlier rejection was an oracle error: process wraps dispatch. Corrected under the explicit dispatch erratum; raw response is unchanged."
+    },
+    {
+      "id": "decomp.commit-checks.read-only/answer_first",
+      "unsupportedClaims": [
+        "Claims a new version/snapshot is created for an empty write set even though publish returns before those statements."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "contradicted"
+      ],
+      "notes": "Cites the correct block but reverses its early-return effect. Ordering does not correct this control-flow error."
+    },
+    {
+      "id": "decomp.commit-checks.effects/answer_first",
+      "unsupportedClaims": [
+        "Says backoff is applied before breaking the attempt loop, although the loop continues after a conflict.",
+        "Invents exact retry.rs line positions for delivery/retry-cell operations."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "contradicted"
+      ],
+      "notes": "Correct accepted-commit delivery and some conflict/admission details. The claimed loop exit and inline locations are wrong despite a supporting full-runner reference."
+    },
+    {
+      "id": "decomp.commit-checks.base-pin/answer_first",
+      "unsupportedClaims": [],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "notes": "Correct release flag/phase and live_versions-empty eviction. dispatch is the real handler, not an invented method. Citation support still fails because labels 3/5 omit actual release/eviction block 4. Corrected under the dispatch erratum."
+    }
+  ]
+}

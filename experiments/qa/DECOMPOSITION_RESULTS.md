@@ -1,5 +1,9 @@
 # Focused questions and output order: diagnostic results
 
+**Grading corrected:** the [dispatch oracle erratum](DISPATCH_ERRATUM.md) withdraws the
+false method-invention finding. Tables below use revised judgments; original frozen
+artifacts remain unchanged and the erratum links corrected assessments.
+
 For contributors deciding whether guided questions or response order explain the fixed
 2B model's failures. Answer-first helps two narrow tasks and reduces false refusals, but
 does not repair broad workflows or basic control-flow/method-ownership errors. This is
@@ -42,23 +46,23 @@ Grading is preliminary manual work by the source-aware question/pack author. A c
 task needs correct material facts/status, no unsupported claims and supporting valid
 citations. Correct statements are recorded separately from contradictory caveats and
 wrong citations. Equivalent wording is accepted; ambiguity and interpretation choices
-are preserved in [the review](results/decomposition/review.md).
+are preserved in [the preserved review and its erratum](DISPATCH_ERRATUM.md).
 
 | Measurement | Status-first | Answer-first |
 | --- | ---: | ---: |
 | Complete original workflows | 0/3 | 0/3 |
-| Complete focused tasks | 2/12 | 4/12 |
+| Complete focused tasks | 3/12 | 5/12 |
 | Supported broad facts | 4/13 | 5/13 |
-| Supported focused facts | 10/18 | 13/18 |
+| Supported focused facts | 11/18 | 14/18 |
 | False refusals, broad | 1/3 | 0/3 |
 | False refusals, focused | 2/12 | 0/12 |
-| Answers with unsupported claims, all questions | 12/15 | 9/15 |
+| Answers with unsupported claims, all questions | 11/15 | 7/15 |
 | Native reference checks | 14/15 | 15/15 |
 | Generated order compliance | 15/15 | 15/15 |
 
-Of twelve focused pairs, answer-first helps **two**, hurts **zero**, both succeed on two,
-and both fail on eight. Both orders succeed on the native handler-interface question and
-the Start-request/LiveSnapshot-reply question. Answer-first additionally completes the
+Of twelve focused pairs, answer-first helps **two**, hurts **zero**, both succeed on three,
+and both fail on seven. Both orders succeed on the native handler-interface,
+Start-request/LiveSnapshot-reply and Commit-message receiver questions. Answer-first additionally completes the
 normal Task creation-method question and the unavailable-history rejection question.
 The original three workflows remain incomplete in both orders.
 
@@ -67,7 +71,7 @@ the `efuns!` registration/dispatch mechanism but cites the example row and Markd
 instead of the macro-definition block needed to support the dispatch relationship. Its
 factual improvement is credited, while complete task success still fails.
 
-The four incorrect broad creation/commit answers still contain invented caller or message
+The four incorrect broad creation/commit answers still contain incorrect caller or message
 ownership. Answer-first also turns the broad efun refusal into an asserted procedure that
 wrongly says defining the prototype is sufficient. Removing a false refusal is not enough
 to establish a correct answer.
@@ -80,8 +84,9 @@ to establish a correct answer.
 - **Correct fact followed by refusal:** the unavailable-history status-first answer names
   `HistoryUnavailable` and then claims the outcome is unknown. Answer-first states the
   rejection directly and cites the correct validation block.
-- **Method ownership:** both receiver answers invent `Committer::dispatch`; the provided
-  lexical scope and source identify `Committer::process` calling `Committer::commit`.
+- **Receiver oracle error (corrected):** both receiver answers correctly name
+  `Committer::dispatch`, wrapped by `process`, calling `commit`. This was an evaluator
+  error, not a remaining model failure.
 - **Early-return reasoning:** both read-only answers claim a new version is created even
   though `publish` returns before `Version::new()` and snapshot application.
 - **Operation conflation:** both merge answers describe write-history/read-invalidation
@@ -89,8 +94,8 @@ to establish a correct answer.
 - **Retry control flow:** both physical-effect answers describe breaking the attempt loop
   after rejection, although conflicts continue through admission/backoff to another attempt.
 - **Eviction:** status-first mistakes the unavailable-history rejection condition for an
-  eviction trigger. Answer-first gives the live-snapshot-empty condition but still invents
-  the receive-method name and omits its relevant citation.
+  eviction trigger. Answer-first gives the live-snapshot-empty condition but omits
+  its relevant citation. Its receive-method name is correct.
 
 Some correct core answers use loose terminology. The handler-interface score does not
 require the unasked Rust `Result<()>` spelling. The typed `LiveSnapshot` reply is accepted
@@ -128,6 +133,10 @@ frozen error patterns and source packs, under a declared memory/thread budget. A
 further prompt-only polishing or an automatic planner until basic method ownership and
 control-flow answers are reliable. Any later acceptance evaluation needs fresh maintainer
 questions and independent review; these cases are development diagnostics now.
+
+The subsequent [fixed-source 2B/4B comparison](MODEL_COMPARISON_RESULTS.md) carries out a
+larger-candidate test and also identifies the dispatch oracle error. The corrected
+receiver scores above and linked erratum supersede those original judgments.
 
 Formatting, **453 workspace tests including doctests**, all-target workspace Clippy and
 **nine serial Node test files** pass. The new ordering, study-validation and paired-scoring

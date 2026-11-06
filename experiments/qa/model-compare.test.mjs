@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {compareModels} from './model-compare.mjs';
+const library={cases:[{id:'b',granularity:'broad',expected_status:'answered',required_facts:[{text:'f'}]},{id:'n',granularity:'narrow',expected_status:'answered',required_facts:[{text:'f'}]}]};
+const rows=model=>library.cases.map(c=>({id:c.id,case:c.id,model,arm:'answer_first',wordLimit:300,outputTokenLimit:1024,fieldOrder:'answer_first',contextSha256:c.id,messages:[{role:'user',content:c.id}],answer:{answer:'f',status:'answered',citations:[1]},provenanceValid:true,orderCompliant:true,finish:'stop',repository:'lpc-rs',split:'diagnostic'}));
+const grades=rows=>({grader:'synthetic',limitations:['fixture'],grades:rows.map(r=>({id:r.id,facts:['supported'],unsupportedClaims:[],citationsSupport:true,roleConfusion:false,notes:'fixture'}))});
+const a=rows('a'),b=rows('b'),ga=grades(a),gb=grades(b);ga.grades[1].facts=['missing'];
+const result=compareModels(a,b,library,ga,gb);
+assert.equal(result.summaries.find(r=>r.model==='a' && r.granularity==='narrow').successes,0);
+assert.equal(result.summaries.find(r=>r.model==='b' && r.granularity==='narrow').successes,1);
+assert.equal(result.paired.find(r=>r.granularity==='all').helped,1);
+assert.equal(result.paired.find(r=>r.granularity==='all').bothSucceeded,1);
+const wrong=structuredClone(b);wrong[0].messages[0].content='different';assert.throws(()=>compareModels(a,wrong,library,ga,gb));
+const changed=structuredClone(b);changed[0].contextSha256='different';assert.throws(()=>compareModels(a,changed,library,ga,gb));
+const order=structuredClone(b);order[0].fieldOrder='status_first';assert.throws(()=>compareModels(a,order,library,ga,gb));
+assert.throws(()=>compareModels(a,b.slice(1),library,ga,{...gb,grades:gb.grades.slice(1)}));
+console.log('model comparison: per-model grades, paired task changes, identical prompts/evidence and fixed response settings');

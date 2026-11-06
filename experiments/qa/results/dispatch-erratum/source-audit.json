@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "sourceRevision": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+  "path": "src/interpreter/stm/committer.rs",
+  "sha256": "8af6ecf73933ee5446a55a6e6880eebe24231a77ca9c2a1ae90ac1b32042f789",
+  "wrapperLines": [
+    263,
+    277
+  ],
+  "handlerDeclarationLine": 279,
+  "commitArmLines": [
+    302,
+    321
+  ],
+  "literalSource": "\n    /// Process one message. Returns `false` on `Close`.\n    pub(crate) fn process(\n        &mut self,\n        msg: CommitProtocol,\n        tx: &flume::Sender<CommitProtocol>,\n    ) -> bool {\n        // A Stats read accrues nothing: two reads with no work between\n        // them must compare equal.\n        if matches!(msg, CommitProtocol::Stats { .. }) {\n            return self.dispatch(msg, tx);\n        }\n        let started = std::time::Instant::now();\n        let keep_running = self.dispatch(msg, tx);\n        self.stats.busy_ns += started.elapsed().as_nanos() as u64;\n        keep_running\n    }\n\n    fn dispatch(&mut self, msg: CommitProtocol, tx: &flume::Sender<CommitProtocol>) -> bool {\n        match msg {\n            CommitProtocol::BootstrapObject(change) => {\n                let mut changeset = Changeset::new(self.snapshot.version());\n                changeset.object_changes.push(change);\n                self.publish(changeset, false);\n                if self.live_versions.is_empty() {\n                    self.evict_old_versions();\n                }\n            }\n            CommitProtocol::Start { reply } => {\n                // Count before hand-out: a failed reply drops the\n                // LiveSnapshot, which self-releases.\n                *self\n                    .live_versions\n                    .entry(self.snapshot.version())\n                    .or_insert(0) += 1;\n                let live_snapshot = LiveSnapshot::new(self.snapshot.clone(), tx.clone());\n                reply.send(live_snapshot).unwrap_or_else(|e| {\n                    error!(\"Failed to send live snapshot: {e}\");\n                    self.stats.reply_failure()\n                });\n            }\n            CommitProtocol::Commit {\n                changeset,\n                releases_base,\n                reply,\n            } => {\n                let started = std::time::Instant::now();\n                let base = changeset.base_version();\n                let result = self.commit(changeset);\n                if releases_base {\n                    self.release(base);\n                }\n                if self.live_versions.is_empty() {\n                    self.evict_old_versions();\n                }\n                reply.send(result).unwrap_or_else(|e| {\n                    error!(\"Failed to send commit result: {e}\");\n                    self.stats.reply_failure()\n                });\n                self.stats.commit_service_ns += started.elapsed().as_nanos() as u64;\n            }",
+  "correctPath": "Committer::run -> process -> dispatch (Commit arm) -> commit -> publish",
+  "scopeEvidence": "The native source-pack evidence for lines 302-321 already identifies scope Committer::dispatch. The model-facing evidence was right; evaluator rejection was wrong.",
+  "inferenceImpact": "None. Gold facts/forbidden claims were not sent to inference, so no model rerun or prompt change is needed.",
+  "preservation": "Original frozen libraries, grades, raw responses, source/hash freezes and original assessments remain intact. Revised artifacts and marked report errata supersede affected judgments."
+}

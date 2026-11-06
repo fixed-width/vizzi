@@ -20,6 +20,9 @@ repeat the known-question control.
 The [focused-question/output-order follow-up](DECOMPOSITION_RESULTS.md) keeps source and
 prompts fixed within schema-order pairs. Its [procedure](DECOMPOSITION.md) reports broad
 and narrow results separately and does not implement an automatic planner.
+The [fixed-source model comparison](MODEL_COMPARISON_RESULTS.md) measures a pinned 4B
+candidate against a reproduced live 2B control. Read the [dispatch source-audit erratum](DISPATCH_ERRATUM.md)
+before interpreting older receiver-method grades; original frozen artifacts are retained.
 
 Build with one compiler task and run the normal correctness checks:
 

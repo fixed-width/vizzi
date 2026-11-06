@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "rust": "453 workspace tests/doctests, formatting and all-target workspace Clippy passed. Native Rust code and binaries unchanged; prior provenance mutations remain 52 caught/3 unviable within that relevant scope, not ranking/JS qualification.",
+  "node": "12 serial QA test files pass, including model/config/paired scoring and dispatch source-oracle regression.",
+  "sourceCorrection": "Original frozen runs/libraries/grades retained; corrected scoring and report errata explicitly supersede affected dispatch judgments.",
+  "measurement": "Only one resident model at a time; two CPU threads, nice 10, serial requests, no GPU. Downloads/build/tests finished before inference; both servers closed.",
+  "budget": "2B passes four-GiB observed PSS target; 4B misses at 4.76 GiB. No cap enforced or quantization/runtime settings silently changed."
+}

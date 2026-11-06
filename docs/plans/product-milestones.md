@@ -38,9 +38,13 @@ whole relevant definitions and caller/branch context. Partial facts improve, but
 tasks remain incomplete; extra answer allowance does not fix invented caller links or
 false refusals. The [focused-question/output-order diagnostic](../../experiments/qa/DECOMPOSITION_RESULTS.md)
 now tests the same whole source with guided questions and paired JSON field order.
-Answer-first raises supported narrow tasks from 2/12 to 4/12 and removes false refusals,
-but both orders still fail all three original workflows. Before adding a planner or chat
-interface, compare a bounded alternative CPU-capable model on these fixed error patterns.
+After the [dispatch oracle correction](../../experiments/qa/DISPATCH_ERRATUM.md), answer-first
+raises supported narrow tasks from 3/12 to 5/12 and removes false refusals, but both orders
+still fail all three original workflows. The [fixed-source 2B/4B comparison](../../experiments/qa/MODEL_COMPARISON_RESULTS.md)
+now improves guided narrow tasks from 5/12 to 12/12, while the 4B model uses 4.76 GiB PSS
+and misses the declared 4 GiB target. Neither completes the original workflows under
+the rubric. A bounded prefill batch/microbatch memory experiment is the next resource
+check; do not add a planner or chat interface on these diagnostics alone.
 Retain new maintainer questions for subsequent fresh evaluation. None of these
 agent-graded diagnostics establishes product acceptance.
 

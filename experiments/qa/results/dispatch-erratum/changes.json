@@ -1,0 +1,256 @@
+{
+  "schema": 1,
+  "cause": "Agent source audit mistook process, a public timing wrapper, for the direct dispatch message handler; actual native scope and code were correct.",
+  "changes": [
+    {
+      "cohort": "source-packs",
+      "id": "maintainer.lpc-rs.commit-checks/curated_long",
+      "before": {
+        "id": "maintainer.lpc-rs.commit-checks/curated_long",
+        "unsupportedClaims": [
+          "Invents Committer::dispatch and conflates Committer::process message handling with Committer::commit.",
+          "Describes the committer receiving a reply rather than processing a request and sending its result."
+        ],
+        "citationsSupport": false,
+        "roleConfusion": false,
+        "facts": [
+          "contradicted",
+          "supported",
+          "supported",
+          "supported",
+          "missing",
+          "missing",
+          "missing",
+          "missing"
+        ],
+        "notes": "Names future-version, unavailable-history and read-invalidation gates. Acknowledges folding but omits merge/type rejection, the read-only publication branch, physical-effect/retry outcome and pin-release/eviction ordering. Generic write publication is not counted as the complete frozen publication fact. Only 200 tokens / 780 answer characters were used."
+      },
+      "after": {
+        "id": "maintainer.lpc-rs.commit-checks/curated_long",
+        "unsupportedClaims": [
+          "Conflates dispatch protocol handling with commit validation.",
+          "Describes the committer receiving a reply rather than processing a request and sending its result."
+        ],
+        "citationsSupport": false,
+        "roleConfusion": false,
+        "facts": [
+          "contradicted",
+          "supported",
+          "supported",
+          "supported",
+          "missing",
+          "missing",
+          "missing",
+          "missing"
+        ],
+        "notes": "Dispatch exists; its prior invention finding was wrong. The response still misattributes protocol fields to commit, reverses request/reply handling and omits several required branches. Corrected under the dispatch-scope erratum."
+      }
+    },
+    {
+      "cohort": "source-packs",
+      "id": "maintainer.lpc-rs.commit-checks/curated_ids",
+      "before": {
+        "id": "maintainer.lpc-rs.commit-checks/curated_ids",
+        "unsupportedClaims": [
+          "Invents a Committer::dispatch handler; the supplied receiver is Committer::process, which invokes Committer::commit."
+        ],
+        "citationsSupport": false,
+        "roleConfusion": false,
+        "facts": [
+          "contradicted",
+          "supported",
+          "supported",
+          "supported",
+          "supported",
+          "missing",
+          "missing",
+          "missing"
+        ],
+        "notes": "Accurately names future-base, unavailable-history, read-invalidation and merge/type rejection before publication. It omits the actual submission chain, read-only no-version branch, effect-delivery/retry and pin-release/eviction ordering. Normal write publication alone does not satisfy the full frozen publication fact."
+      },
+      "after": {
+        "id": "maintainer.lpc-rs.commit-checks/curated_ids",
+        "unsupportedClaims": [],
+        "citationsSupport": true,
+        "roleConfusion": false,
+        "facts": [
+          "missing",
+          "supported",
+          "supported",
+          "supported",
+          "supported",
+          "missing",
+          "missing",
+          "missing"
+        ],
+        "notes": "Dispatch is the real direct Commit handler, called by process. Remove the erroneous invention finding. This response accurately describes all four gates and normal write publication with relevant references; it still omits the incoming submission chain, read-only branch, delivery/retry and pin/eviction details. Corrected by dispatch-scope erratum; raw response unchanged."
+      }
+    },
+    {
+      "cohort": "decomposition",
+      "id": "decomp.commit-checks.full/status_first",
+      "before": {
+        "id": "decomp.commit-checks.full/status_first",
+        "unsupportedClaims": [
+          "Invents Committer::dispatch and conflates process message handling with commit validation.",
+          "Describes the committer receiving a reply rather than a request."
+        ],
+        "citationsSupport": false,
+        "roleConfusion": false,
+        "facts": [
+          "contradicted",
+          "supported",
+          "supported",
+          "supported",
+          "missing",
+          "missing",
+          "missing",
+          "missing"
+        ],
+        "notes": "Same partial gate summary and wrong caller/handler directions as the prior long status-first control. Omits merge/type rejection, read-only behavior, delivery/retry and pin-release/eviction ordering."
+      },
+      "after": {
+        "id": "decomp.commit-checks.full/status_first",
+        "unsupportedClaims": [
+          "Conflates dispatch protocol handling with commit validation.",
+          "Describes the committer receiving a reply rather than a request."
+        ],
+        "citationsSupport": false,
+        "roleConfusion": false,
+        "facts": [
+          "contradicted",
+          "supported",
+          "supported",
+          "supported",
+          "missing",
+          "missing",
+          "missing",
+          "missing"
+        ],
+        "notes": "Dispatch is real, not invented. Gate summary remains partial and receive/validation method ownership is still conflated; remaining direction/lifecycle failures are unchanged."
+      }
+    },
+    {
+      "cohort": "decomposition",
+      "id": "decomp.commit-checks.full/answer_first",
+      "before": {
+        "id": "decomp.commit-checks.full/answer_first",
+        "unsupportedClaims": [
+          "Invents Committer::dispatch and attributes receive/release behavior to the wrong functions."
+        ],
+        "citationsSupport": false,
+        "roleConfusion": false,
+        "facts": [
+          "contradicted",
+          "supported",
+          "supported",
+          "supported",
+          "missing",
+          "missing",
+          "missing",
+          "missing"
+        ],
+        "notes": "Similar three-gate partial summary to status-first. The submission chain and lifecycle branches remain incomplete; output ordering does not correct the broad trace."
+      },
+      "after": {
+        "id": "decomp.commit-checks.full/answer_first",
+        "unsupportedClaims": [
+          "Conflates dispatch protocol handling with commit validation and attributes base-pin release to the wrong method."
+        ],
+        "citationsSupport": false,
+        "roleConfusion": false,
+        "facts": [
+          "contradicted",
+          "supported",
+          "supported",
+          "supported",
+          "missing",
+          "missing",
+          "missing",
+          "missing"
+        ],
+        "notes": "Dispatch is real. Remove the invention finding; the response still conflates the validator with protocol handling/release and omits material lifecycle facts."
+      }
+    },
+    {
+      "cohort": "decomposition",
+      "id": "decomp.commit-checks.commit-receiver/answer_first",
+      "before": {
+        "id": "decomp.commit-checks.commit-receiver/answer_first",
+        "unsupportedClaims": [
+          "Invents Committer::dispatch; the supplied receiver method is Committer::process."
+        ],
+        "citationsSupport": false,
+        "roleConfusion": false,
+        "facts": [
+          "contradicted"
+        ],
+        "notes": "Correct downstream commit validator name does not fix the explicitly requested receive-method ownership error."
+      },
+      "after": {
+        "id": "decomp.commit-checks.commit-receiver/answer_first",
+        "unsupportedClaims": [],
+        "citationsSupport": true,
+        "roleConfusion": false,
+        "facts": [
+          "supported"
+        ],
+        "notes": "Correct direct receiver is Committer::dispatch, wrapped by process, and it calls commit for validation. The supplied source/native scope supports this. Earlier failure was a source-audit/oracle error, not a model error."
+      }
+    },
+    {
+      "cohort": "decomposition",
+      "id": "decomp.commit-checks.commit-receiver/status_first",
+      "before": {
+        "id": "decomp.commit-checks.commit-receiver/status_first",
+        "unsupportedClaims": [
+          "Invents Committer::dispatch instead of the supplied Committer::process receiver."
+        ],
+        "citationsSupport": false,
+        "roleConfusion": false,
+        "facts": [
+          "contradicted"
+        ],
+        "notes": "Same receiver-name error as answer-first despite the direct method-ownership question and native scope metadata."
+      },
+      "after": {
+        "id": "decomp.commit-checks.commit-receiver/status_first",
+        "unsupportedClaims": [],
+        "citationsSupport": true,
+        "roleConfusion": false,
+        "facts": [
+          "supported"
+        ],
+        "notes": "Correct direct receiver is Committer::dispatch, wrapped by process, and it calls commit for validation. The supplied source/native scope supports this. Earlier failure was a source-audit/oracle error, not a model error."
+      }
+    },
+    {
+      "cohort": "decomposition",
+      "id": "decomp.commit-checks.base-pin/answer_first",
+      "before": {
+        "id": "decomp.commit-checks.base-pin/answer_first",
+        "unsupportedClaims": [
+          "Invents Committer::dispatch as the receiving handler."
+        ],
+        "citationsSupport": false,
+        "roleConfusion": false,
+        "facts": [
+          "supported",
+          "supported"
+        ],
+        "notes": "Correct release flag/phase and live_versions-empty eviction condition. The source also applies release/eviction after rejection; the success phrasing is incomplete but not read as an explicit only-success assertion. The invented handler and citations omitting actual process block 4 prevent task success."
+      },
+      "after": {
+        "id": "decomp.commit-checks.base-pin/answer_first",
+        "unsupportedClaims": [],
+        "citationsSupport": false,
+        "roleConfusion": false,
+        "facts": [
+          "supported",
+          "supported"
+        ],
+        "notes": "Release flag/phase and live_versions-empty eviction are correct. Dispatch is the actual handler. Citation support still fails because references 3/5 omit release/eviction block 4. Success wording is not read as an explicit only-Ok assertion."
+      }
+    }
+  ]
+}

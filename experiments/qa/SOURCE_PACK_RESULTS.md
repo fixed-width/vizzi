@@ -1,5 +1,9 @@
 # Source-complete diagnostic results
 
+**Grading erratum:** `Committer::dispatch` is a real handler wrapped by `process`.
+The earlier invention finding is withdrawn; see the [source-audit correction](DISPATCH_ERRATUM.md).
+Raw/frozen artifacts are unchanged. Overall complete-task and fact counts remain the same.
+
 For contributors deciding whether retrieval alone explains the failed maintainer tasks.
 Complete source improves relevant factual content, but **none of the three full tasks is
 completed in any condition**. A larger answer allowance does not fix the remaining
@@ -96,9 +100,9 @@ reverses the Start message direction. More text does not establish the correct c
 
 **Commit trace:** retrieval cannot find the implementation and refuses. The short curated
 answer identifies all four real validation gates: future base, unavailable history,
-invalidated reads and merge/type mismatch. It still invents `Committer::dispatch`, omits
+invalidated reads and merge/type mismatch. It omits
 the submission chain, read-only no-version branch, delivery/retry outcome and pin-release /
-eviction ordering. The longer answer gives three gates but omits the merge/type rejection
+eviction ordering. The actual `dispatch` name is correct. The longer answer gives three gates but omits the merge/type rejection
 and confuses the handler/message direction. Neither completes the requested trace.
 
 All three conditions have valid IDs, including wrong procedures and invented caller links.

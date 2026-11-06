@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "records": [
+    {
+      "case": "decomp.add-efun.full",
+      "sourceAndPromptSame": true,
+      "rawSame": true,
+      "gradeReusable": true
+    },
+    {
+      "case": "decomp.add-efun.handler",
+      "sourceAndPromptSame": true,
+      "rawSame": true,
+      "gradeReusable": true
+    },
+    {
+      "case": "decomp.add-efun.registration",
+      "sourceAndPromptSame": true,
+      "rawSame": true,
+      "gradeReusable": true
+    },
+    {
+      "case": "decomp.transaction-creation.full",
+      "sourceAndPromptSame": true,
+      "rawSame": true,
+      "gradeReusable": true
+    },
+    {
+      "case": "decomp.transaction-creation.task-entry",
+      "sourceAndPromptSame": true,
+      "rawSame": true,
+      "gradeReusable": true
+    },
+    {
+      "case": "decomp.transaction-creation.start-message",
+      "sourceAndPromptSame": true,
+      "rawSame": true,
+      "gradeReusable": true
+    },
+    {
+      "case": "decomp.commit-checks.full",
+      "sourceAndPromptSame": true,
+      "rawSame": true,
+      "gradeReusable": true
+    },
+    {
+      "case": "decomp.commit-checks.future-base",
+      "sourceAndPromptSame": true,
+      "rawSame": true,
+      "gradeReusable": true
+    },
+    {
+      "case": "decomp.commit-checks.old-base",
+      "sourceAndPromptSame": true,
+      "rawSame": true,
+      "gradeReusable": true
+    },
+    {
+      "case": "decomp.commit-checks.read-conflict",
+      "sourceAndPromptSame": true,
+      "rawSame": true,
+      "gradeReusable": true
+    },
+    {
+      "case": "decomp.commit-checks.merge-check",
+      "sourceAndPromptSame": true,
+      "rawSame": true,
+      "gradeReusable": true
+    },
+    {
+      "case": "decomp.commit-checks.commit-receiver",
+      "sourceAndPromptSame": true,
+      "rawSame": true,
+      "gradeReusable": true
+    },
+    {
+      "case": "decomp.commit-checks.read-only",
+      "sourceAndPromptSame": true,
+      "rawSame": true,
+      "gradeReusable": true
+    },
+    {
+      "case": "decomp.commit-checks.effects",
+      "sourceAndPromptSame": true,
+      "rawSame": true,
+      "gradeReusable": true
+    },
+    {
+      "case": "decomp.commit-checks.base-pin",
+      "sourceAndPromptSame": true,
+      "rawSame": true,
+      "gradeReusable": true
+    }
+  ]
+}

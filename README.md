@@ -21,14 +21,14 @@ The current [product checkpoint](docs/plans/product-milestones.md) evaluates the
 investigation's contribution alongside an editor. Guided functional checks do not
 establish that contribution; the editor-only comparison and maintainer trial remain open.
 
-The [CPU repository-question experiment](experiments/qa/DECOMPOSITION_RESULTS.md) supplies a
+The [CPU repository-question experiment](experiments/qa/MODEL_COMPARISON_RESULTS.md) supplies a
 versioned question library and compares small local models with an external index.
 Smaller evidence and host-resolved references cut fixed-model latency, but none of the
 three exact maintainer workflow probes is completed correctly, even when complete source
-is supplied. Complete evidence and guided questions improve some partial/local answers;
-answer-first output reduces false refusals but leaves common factual and citation errors.
-This remains an isolated experiment, with no chat interface.
-[Reproduce the latest diagnostic](experiments/qa/DECOMPOSITION.md) or inspect the
+is supplied. A 4B candidate improves guided lookups but misses the 4 GiB target and costs
+more latency; earlier receiver-method grading is corrected in an explicit source-audit
+erratum. This remains an isolated experiment, with no chat interface.
+[Reproduce the latest comparison](experiments/qa/MODEL_COMPARISON.md) or inspect the
 [compact comparison](experiments/qa/COMPACT_RESULTS.md) and [original pilot](experiments/qa/RESULTS.md).
 
 The [view-selection rationale](docs/explanation/task-driven-views.md) connects these

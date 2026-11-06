@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "checked_on": "2026-11-05",
+  "upstream": "https://huggingface.co/Qwen/Qwen3.5-4B",
+  "distribution": "https://huggingface.co/bartowski/Qwen_Qwen3.5-4B-GGUF",
+  "distributionRevision": "4168f45a16a1290d65a4ec0fa312ae917a4c15d6",
+  "ggufArchitecture": "qwen35",
+  "ggufParameterCount": 4326350848,
+  "selectedFile": {
+    "path": "Qwen_Qwen3.5-4B-Q4_K_M.gguf",
+    "bytes": 3013027808,
+    "sha256": "13c16f426047e2de38cd075bdade4a7bcbc8c774384876f677740cda65f8a983"
+  },
+  "runtimePolicy": "Pinned b12110 already loads qwen35 for 2B; verify 4B load and measured resources. No runtime upgrade or projector/GPU loading.",
+  "caveat": "The packaged template/tokenizer/quantization and architecture may differ; compare the model bundle, not parameter count alone."
+}

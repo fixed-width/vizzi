@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "sha256": {
+    "changes.json": "b159ce0862f59f60e5aa0772b94cdea5ada30683842c38326305c5538b9d76ac",
+    "decomposition-assessment.corrected.json": "f3ada18a0e38973af3486b2d585746253c574b291412cab8725dbb6c0540ab5f",
+    "decomposition-grades.corrected.json": "bd84f5c8dd5641d1d0d8cbf942c03ede2ece9bf5f98c9ceacc059e4966827d0e",
+    "decomposition-library.corrected.json": "825175a26a18a62dbcccf506e0ab343f36f1bb3e614eb07917938c37b394dced",
+    "source-audit.json": "f0af1832027fba18f14951a61812d66de77e9745b7784d2efe449a2f802bc1ce",
+    "source-packs-assessment.corrected.json": "ebe5d99540853002da192b20a717e316339b0bdc1a90b0481decdcc6dbe02b25",
+    "source-packs-grades.corrected.json": "83c2dc30abca4af81dff67df5a333e28233a20c0610491f7d1dbf7487ae260df"
+  }
+}
