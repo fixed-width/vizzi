@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "rust": "453 workspace tests/doctests, formatting and all-target Clippy pass before inference. Native source/binaries and application dependencies unchanged.",
+  "node": "13 serial QA test files pass before inference. Existing runner/model/paired-scoring interfaces reused.",
+  "python": "Focused audit test initially fails with missing implementation; 8 tests pass, including real GGUF CLI fixtures for accepted two-tensor edits and rejection of extra changes, lost edits and changed metadata.",
+  "mutation": "No new native mutation cohort because Rust is unchanged. Python audit fixtures are not mutation coverage.",
+  "artifactIdentity": "All build and prepared files rehashed after inference; exact base/edited source hashes match publication, 488 source tensors/335 GGUF tensors audited, only two declared tensors differ at source/BF16/Q4 stages, all other payloads/layouts/metadata identical.",
+  "pairedIdentity": "15/15 contexts/messages/response settings identical. Actual runtime argv differs only in model path and ephemeral port. All 15 raw responses change and were manually reviewed; no grades reused.",
+  "measurement": "Two serial model runs; CPU-only, two inference/prefill threads, nice 10; all downloads/conversions/build/tests finished beforehand. No viewer/editor or inspected-project build invoked.",
+  "shutdown": "Both recorded server PIDs absent after normal run completion.",
+  "limits": "Observe-only 250-ms process-tree sampling on a larger host; no cap/laptop emulation, no sampling errors, no repeated-trial latency distribution. Prefix caching enabled within families. Inactive requested_cap_bytes observer default is not the four-GiB QA target.",
+  "history": "All prior model-comparison, prefill and dispatch-erratum payload checksums verified unchanged."
+}

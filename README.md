@@ -31,7 +31,8 @@ erratum. This remains an isolated experiment, with no chat interface.
 The [physical batch follow-up](experiments/qa/PREFILL_RESULTS.md) still exceeds 4 GiB;
 smaller physical batches save little memory and increase latency. A separate
 [weight-space investigation](docs/explanation/model-weight-optimisation.md) considers
-targeted behavioural edits for the QA task.
+targeted behavioural edits. A [paired test of the published 0.8B patch](experiments/qa/WEIGHT_EDIT_RESULTS.md)
+finds no complete-task improvement under the current CPU Q4 non-thinking conditions.
 [Reproduce the latest comparison](experiments/qa/MODEL_COMPARISON.md) or inspect the
 [compact comparison](experiments/qa/COMPACT_RESULTS.md) and [original pilot](experiments/qa/RESULTS.md).
 

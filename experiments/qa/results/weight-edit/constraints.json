@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "inferenceFailures": [],
+  "formatErrors": 0,
+  "truncations": 0,
+  "observedFit": [
+    true,
+    true
+  ],
+  "preparationNotes": [
+    "GitHub contents API failed while retrieving the binary patch; the same immutable file was retrieved successfully through the raw endpoint.",
+    "HF verified all 10 downloaded files. Missing image-preprocessing files and local cache/conversion outputs were reported separately; they are not corrupt downloaded inputs.",
+    "The converter does not store general.parameter_count. The model manifest gguf_parameter_count is the sum of stored GGUF tensor elements, not a count of unique upstream parameters.",
+    "The published 131072 touched coordinates include values rounded back to their original BF16 bits; the published manifest and source audit have 130188 actually changed BF16 entries. Q4 block quantization can change additional positions within those same two tensors."
+  ]
+}

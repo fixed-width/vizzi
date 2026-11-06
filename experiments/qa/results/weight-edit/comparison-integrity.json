@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "cases": 15,
+  "matchingMessages": 15,
+  "matchingContexts": 15,
+  "matchingLimits": 15,
+  "identicalRawOutputs": 0,
+  "sourceAuditPassed": true,
+  "bf16AuditPassed": true,
+  "q4AuditPassed": true,
+  "actualArgvOnlyModelAndPortDiffer": true,
+  "allPriorArchiveChecksumsValid": true
+}

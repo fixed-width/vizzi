@@ -1,0 +1,98 @@
+{
+  "schema": 1,
+  "createdAt": "2026-11-06T17:22:28.290Z",
+  "preparedSha256": "32cbf0f3a9767773745b177ac6669f62eafb61b952179edf0668492fc69a2e66",
+  "qaBinarySha256": "7f6dc5107cfb5bffad3cb162394113671ab50282214e5735e4147743f3050b38",
+  "model": {
+    "id": "qwen3.5-0.8b-base-local-q4",
+    "repository": "Qwen/Qwen3.5-0.8B",
+    "revision": "2fc06364715b967f1860aea9cf38778875588b17",
+    "filename": "model-q4.gguf",
+    "bytes": 541903872,
+    "sha256": "94d3009ee9cfca48d7d852bf0fe6c14c6f4f2506e818ca63f8c873fa46320a0a",
+    "directory": "base",
+    "artifact_kind": "Locally built GGUF; repository/revision identify source, not a downloadable GGUF",
+    "gguf_architecture": "qwen35",
+    "gguf_parameter_count": 772845888,
+    "chat_template_sha256": "273d8e0e683b885071fb17e08d71e5f2a5ddfb5309756181681de4f5a1822d80"
+  },
+  "runtime": {
+    "release": "v0.9.0",
+    "build": "b12110",
+    "commit": "cd959bae99ff4bed22bef2604f45241c09bbb8c8",
+    "archive": "llama-b12110-bin-ubuntu-x64.tar.gz",
+    "archive_sha256": "368227edcc229be5f9bed16a2223d79b5e41d0ac2e19bcf5825e82291c060e55"
+  },
+  "runtimeSha256": "eaf9c1c664cc0ae1f4dea4b171bb91aac8409fcfea0574c9b6bcc93792ce2400",
+  "limits": {
+    "threads": 2,
+    "context_tokens": 8192,
+    "output_tokens": 384,
+    "evidence_bytes": 8000,
+    "evidence_items": 6,
+    "request_timeout_ms": 360000,
+    "sampled_memory_target_bytes": 4294967296
+  },
+  "profileId": null,
+  "caseIds": [
+    "decomp.add-efun.full",
+    "decomp.add-efun.handler",
+    "decomp.add-efun.registration",
+    "decomp.transaction-creation.full",
+    "decomp.transaction-creation.task-entry",
+    "decomp.transaction-creation.start-message",
+    "decomp.commit-checks.full",
+    "decomp.commit-checks.future-base",
+    "decomp.commit-checks.old-base",
+    "decomp.commit-checks.read-conflict",
+    "decomp.commit-checks.merge-check",
+    "decomp.commit-checks.commit-receiver",
+    "decomp.commit-checks.read-only",
+    "decomp.commit-checks.effects",
+    "decomp.commit-checks.base-pin"
+  ],
+  "arms": [
+    {
+      "id": "answer_first",
+      "selection": "pack",
+      "fieldOrder": "answer_first",
+      "wordLimit": 300,
+      "outputTokens": 1024
+    }
+  ],
+  "citationLimit": 8,
+  "environment": {
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13700H",
+    "os": "linux",
+    "arch": "x64",
+    "physicalMemoryBytes": 67080241152
+  },
+  "sourceRevision": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+  "initial": {
+    "capture": {
+      "candidates": 1032,
+      "omitted": 101,
+      "selected": 931
+    },
+    "index_ms": 12117.819510000001,
+    "ready": true,
+    "schema": 1,
+    "snapshot": "32e85124e908b80f91952c6b91e4c8737ffec2c6118b70f8f50738f980444241",
+    "stats": {
+      "bytes": 10754851,
+      "changed": 931,
+      "chunks": 22808,
+      "files": 931,
+      "removed": 0,
+      "reused": 0
+    }
+  },
+  "limitations": [
+    "Known maintainer broad controls and expert-guided agent subquestions; not held-out accuracy or automatic decomposition.",
+    "Every question in a family uses the same whole source pack; no gold facts or subanswers enter prompts.",
+    "Requested output order is recorded; compare models only with matching order, messages and source.",
+    "Prefix caching remains enabled and cases share family context. Latency is descriptive, not cold-cache or broad/narrow speed qualification."
+  ],
+  "completed": 15,
+  "incomplete": false
+}

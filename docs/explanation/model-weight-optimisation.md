@@ -52,18 +52,19 @@ size needed for acceptable quality. They do not inherently increase tokens per s
 solve the 4B memory miss. Discovering a patch can use a larger model offline without
 requiring that larger model in the deployed inference path.
 
-A bounded next investigation would compare the released 0.8B edit with its exact base
-under our CPU QA conditions before attempting our own edits. Both need matched conversion,
-quantization and runtime settings. A result in the published thinking configuration and
-one in our non-thinking configuration would be distinct conditions. Quantization can
-change or erase a small edit, so a BF16 result alone would not validate deployment in Q4.
+The [paired CPU comparison](../../experiments/qa/WEIGHT_EDIT_RESULTS.md) now tests the
+released 0.8B edit against its exact base with matched local conversion/quantization.
+The edit survives Q4, but complete tasks do not improve in our non-thinking diagnostic
+and false insufficient-evidence statuses increase. Results in the published thinking
+configuration would be a distinct condition. Quantization can change or erase a small
+edit, so a BF16 result alone would not validate deployment in Q4.
 
 Any custom edit needs an observed development-set failure, a mechanistic hypothesis and a
 reversible, hashed patch. Judge it on fresh source-bound questions and regressions for
 missing evidence, misleading names, changed revisions and incomplete call paths. Measure
 unsupported claims and completeness as well as speed; fewer refusals alone is not
 success. The fifteen already-inspected questions remain diagnostics, not fresh held-outs.
-No custom weight patch or checkpoint comparison has been run here.
+The published patch is evaluated; no custom weight edit has been discovered here.
 
 ## Practical weight transformations
 
@@ -125,5 +126,6 @@ The physical-batch cohort missed its memory target. Further runtime allocation w
 lower-bit artifacts and behavioural edits would answer different questions and deserve
 separate conditions. The released behavioural patch offers a concrete test of the
 maintainer's idea; allocation profiling or matched lower-bit comparisons address memory
-more directly. Preserve the distinction between fewer bytes, fewer operations, lower
+more directly. The published patch comparison does not improve complete QA tasks; a custom
+edit would need a separate failure hypothesis. Preserve the distinction between fewer bytes, fewer operations, lower
 observed memory, faster tokens and correct source-specific answers.

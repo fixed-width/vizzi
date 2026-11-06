@@ -27,6 +27,9 @@ The [physical batch resource screen](PREFILL_RESULTS.md) keeps 4B weights fixed 
 misses the 4 GiB target at all three sizes; follow its [procedure](PREFILL.md) to repeat it.
 The [weight-space explanation](../../docs/explanation/model-weight-optimisation.md)
 distinguishes targeted behavioural edits from compression and runtime allocation changes.
+The [published weight-edit comparison](WEIGHT_EDIT_RESULTS.md) reconstructs and audits a
+matched 0.8B pair. It finds no complete-task improvement in Q4 non-thinking QA; the
+[procedure](WEIGHT_EDIT.md) records artifact construction and evaluation separately.
 
 Build with one compiler task and run the normal correctness checks:
 

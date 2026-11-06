@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "catalog_checked_on": "2026-11-06",
+  "selection_reason": "Paired local conversion and quantization of the exact published 0.8B base and p50c behavioural edit; isolate weight changes rather than third-party quantization bundles.",
+  "runtime": {
+    "release": "v0.9.0",
+    "build": "b12110",
+    "commit": "cd959bae99ff4bed22bef2604f45241c09bbb8c8",
+    "archive": "llama-b12110-bin-ubuntu-x64.tar.gz",
+    "archive_sha256": "368227edcc229be5f9bed16a2223d79b5e41d0ac2e19bcf5825e82291c060e55"
+  },
+  "limits": {
+    "threads": 2,
+    "context_tokens": 8192,
+    "output_tokens": 384,
+    "evidence_bytes": 8000,
+    "evidence_items": 6,
+    "request_timeout_ms": 180000,
+    "sampled_memory_target_bytes": 4294967296
+  },
+  "buildSha256": "3e53ce9e00bd5181506b107e8f902ab5cb087f97f86000bae907ad8a1e641276",
+  "comparison": {
+    "fieldOrder": "answer_first",
+    "thinking": false,
+    "source_suite": "experiments/qa/library/decomposition/cases.json",
+    "grading_library": "experiments/qa/results/dispatch-erratum/decomposition-library.corrected.json",
+    "memory_target_bytes": 4294967296,
+    "memory_cap_enforced": false,
+    "known_questions": true
+  },
+  "models": [
+    {
+      "id": "qwen3.5-0.8b-base-local-q4",
+      "repository": "Qwen/Qwen3.5-0.8B",
+      "revision": "2fc06364715b967f1860aea9cf38778875588b17",
+      "filename": "model-q4.gguf",
+      "bytes": 541903872,
+      "sha256": "94d3009ee9cfca48d7d852bf0fe6c14c6f4f2506e818ca63f8c873fa46320a0a",
+      "directory": "base",
+      "artifact_kind": "Locally built GGUF; repository/revision identify source, not a downloadable GGUF",
+      "gguf_architecture": "qwen35",
+      "gguf_parameter_count": 772845888,
+      "chat_template_sha256": "273d8e0e683b885071fb17e08d71e5f2a5ddfb5309756181681de4f5a1822d80"
+    },
+    {
+      "id": "qwen3.5-0.8b-edited-local-q4",
+      "repository": "RikiyaT/lm_understand-logs",
+      "revision": "4d09ba6d6a7e891dd8063974dfe81b3d78e3494f",
+      "filename": "model-q4.gguf",
+      "bytes": 541903872,
+      "sha256": "d18f0ffdc661ebcadd2fdb6adfd7cfd6cb98e46af8e0e0a186d9c6c16e43e2cd",
+      "directory": "edited",
+      "artifact_kind": "Locally built GGUF; repository/revision identify source, not a downloadable GGUF",
+      "gguf_architecture": "qwen35",
+      "gguf_parameter_count": 772845888,
+      "chat_template_sha256": "273d8e0e683b885071fb17e08d71e5f2a5ddfb5309756181681de4f5a1822d80"
+    }
+  ]
+}

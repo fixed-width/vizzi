@@ -1,0 +1,913 @@
+{
+  "schema": 1,
+  "models": [
+    "qwen3.5-0.8b-base-local-q4",
+    "qwen3.5-0.8b-edited-local-q4"
+  ],
+  "graders": [
+    "Codex, source-aware question/pack/rubric author; preliminary manual paired 0.8B review, not independent acceptance",
+    "Codex, source-aware question/pack/rubric author; preliminary manual paired 0.8B review, not independent acceptance"
+  ],
+  "limitations": [
+    [
+      "Fifteen previously observed maintainer/agent-guided questions, not held-out accuracy or cross-repository generalisation.",
+      "Facts, citation support, false status and unsupported claims are graded separately; equivalent wording is accepted without requiring literal API spellings.",
+      "Corrected dispatch oracle applies. One paired Q4 non-thinking run, not the published thinking/math evaluation."
+    ],
+    [
+      "Fifteen previously observed maintainer/agent-guided questions, not held-out accuracy or cross-repository generalisation.",
+      "Facts, citation support, false status and unsupported claims are graded separately; equivalent wording is accepted without requiring literal API spellings.",
+      "Corrected dispatch oracle applies. One paired Q4 non-thinking run, not the published thinking/math evaluation."
+    ]
+  ],
+  "summaries": [
+    {
+      "model": "qwen3.5-0.8b-base-local-q4",
+      "granularity": "all",
+      "cases": 15,
+      "successes": 1,
+      "supportedFacts": 7,
+      "facts": 31,
+      "falseRefusals": 4,
+      "unsupportedAnswers": 9,
+      "sourceChecks": 15,
+      "orderCompliance": 15
+    },
+    {
+      "model": "qwen3.5-0.8b-edited-local-q4",
+      "granularity": "all",
+      "cases": 15,
+      "successes": 1,
+      "supportedFacts": 8,
+      "facts": 31,
+      "falseRefusals": 11,
+      "unsupportedAnswers": 12,
+      "sourceChecks": 15,
+      "orderCompliance": 15
+    },
+    {
+      "model": "qwen3.5-0.8b-base-local-q4",
+      "granularity": "broad",
+      "cases": 3,
+      "successes": 0,
+      "supportedFacts": 0,
+      "facts": 13,
+      "falseRefusals": 0,
+      "unsupportedAnswers": 3,
+      "sourceChecks": 3,
+      "orderCompliance": 3
+    },
+    {
+      "model": "qwen3.5-0.8b-edited-local-q4",
+      "granularity": "broad",
+      "cases": 3,
+      "successes": 0,
+      "supportedFacts": 0,
+      "facts": 13,
+      "falseRefusals": 3,
+      "unsupportedAnswers": 3,
+      "sourceChecks": 3,
+      "orderCompliance": 3
+    },
+    {
+      "model": "qwen3.5-0.8b-base-local-q4",
+      "granularity": "narrow",
+      "cases": 12,
+      "successes": 1,
+      "supportedFacts": 7,
+      "facts": 18,
+      "falseRefusals": 4,
+      "unsupportedAnswers": 6,
+      "sourceChecks": 12,
+      "orderCompliance": 12
+    },
+    {
+      "model": "qwen3.5-0.8b-edited-local-q4",
+      "granularity": "narrow",
+      "cases": 12,
+      "successes": 1,
+      "supportedFacts": 8,
+      "facts": 18,
+      "falseRefusals": 8,
+      "unsupportedAnswers": 9,
+      "sourceChecks": 12,
+      "orderCompliance": 12
+    }
+  ],
+  "paired": [
+    {
+      "granularity": "all",
+      "cases": 15,
+      "helped": 0,
+      "hurt": 0,
+      "bothSucceeded": 1,
+      "bothFailed": 14
+    },
+    {
+      "granularity": "broad",
+      "cases": 3,
+      "helped": 0,
+      "hurt": 0,
+      "bothSucceeded": 0,
+      "bothFailed": 3
+    },
+    {
+      "granularity": "narrow",
+      "cases": 12,
+      "helped": 0,
+      "hurt": 0,
+      "bothSucceeded": 1,
+      "bothFailed": 11
+    }
+  ],
+  "pairs": [
+    {
+      "case": "decomp.add-efun.full",
+      "granularity": "broad",
+      "baseline": false,
+      "candidate": false
+    },
+    {
+      "case": "decomp.add-efun.handler",
+      "granularity": "narrow",
+      "baseline": false,
+      "candidate": false
+    },
+    {
+      "case": "decomp.add-efun.registration",
+      "granularity": "narrow",
+      "baseline": false,
+      "candidate": false
+    },
+    {
+      "case": "decomp.transaction-creation.full",
+      "granularity": "broad",
+      "baseline": false,
+      "candidate": false
+    },
+    {
+      "case": "decomp.transaction-creation.task-entry",
+      "granularity": "narrow",
+      "baseline": true,
+      "candidate": true
+    },
+    {
+      "case": "decomp.transaction-creation.start-message",
+      "granularity": "narrow",
+      "baseline": false,
+      "candidate": false
+    },
+    {
+      "case": "decomp.commit-checks.full",
+      "granularity": "broad",
+      "baseline": false,
+      "candidate": false
+    },
+    {
+      "case": "decomp.commit-checks.future-base",
+      "granularity": "narrow",
+      "baseline": false,
+      "candidate": false
+    },
+    {
+      "case": "decomp.commit-checks.old-base",
+      "granularity": "narrow",
+      "baseline": false,
+      "candidate": false
+    },
+    {
+      "case": "decomp.commit-checks.read-conflict",
+      "granularity": "narrow",
+      "baseline": false,
+      "candidate": false
+    },
+    {
+      "case": "decomp.commit-checks.merge-check",
+      "granularity": "narrow",
+      "baseline": false,
+      "candidate": false
+    },
+    {
+      "case": "decomp.commit-checks.commit-receiver",
+      "granularity": "narrow",
+      "baseline": false,
+      "candidate": false
+    },
+    {
+      "case": "decomp.commit-checks.read-only",
+      "granularity": "narrow",
+      "baseline": false,
+      "candidate": false
+    },
+    {
+      "case": "decomp.commit-checks.effects",
+      "granularity": "narrow",
+      "baseline": false,
+      "candidate": false
+    },
+    {
+      "case": "decomp.commit-checks.base-pin",
+      "granularity": "narrow",
+      "baseline": false,
+      "candidate": false
+    }
+  ],
+  "performance": [
+    {
+      "model": "qwen3.5-0.8b-base-local-q4",
+      "summary": {
+        "split": "all",
+        "population": "all",
+        "arm": "answer_first",
+        "cases": 15,
+        "answerable": 15,
+        "taskSuccess": 1,
+        "unanswerable": 0,
+        "correctRefusals": 0,
+        "supportedFacts": 7,
+        "facts": 31,
+        "allFacts": 4,
+        "statusCorrect": 11,
+        "unsupportedAnswers": 9,
+        "roleConfusions": 6,
+        "sourceChecks": 15,
+        "answerableRefusals": 4,
+        "truncated": 0,
+        "formatErrors": 0,
+        "runtimeErrors": 0,
+        "medianEvidenceBytes": 12993,
+        "medianPromptTokens": 3328,
+        "medianOutputTokens": 121,
+        "medianRetrievalMs": 0.073364,
+        "medianFirstOutputMs": 1248.5880980000074,
+        "medianMs": 6346.770827,
+        "p95Ms": 30991.771978000004
+      }
+    },
+    {
+      "model": "qwen3.5-0.8b-edited-local-q4",
+      "summary": {
+        "split": "all",
+        "population": "all",
+        "arm": "answer_first",
+        "cases": 15,
+        "answerable": 15,
+        "taskSuccess": 1,
+        "unanswerable": 0,
+        "correctRefusals": 0,
+        "supportedFacts": 8,
+        "facts": 31,
+        "allFacts": 4,
+        "statusCorrect": 4,
+        "unsupportedAnswers": 12,
+        "roleConfusions": 9,
+        "sourceChecks": 15,
+        "answerableRefusals": 11,
+        "truncated": 0,
+        "formatErrors": 0,
+        "runtimeErrors": 0,
+        "medianEvidenceBytes": 12993,
+        "medianPromptTokens": 3328,
+        "medianOutputTokens": 190,
+        "medianRetrievalMs": 0.070015,
+        "medianFirstOutputMs": 1145.1685799999977,
+        "medianMs": 8298.606843999994,
+        "p95Ms": 35998.82172200001
+      }
+    }
+  ],
+  "decisions": [
+    {
+      "model": "qwen3.5-0.8b-base-local-q4",
+      "decisions": [
+        {
+          "id": "decomp.add-efun.full/answer_first",
+          "facts": [
+            "contradicted",
+            "contradicted",
+            "missing"
+          ],
+          "unsupportedClaims": [
+            "Says every new efun must be declared as mod abs, confusing the example name with the new handler.",
+            "Treats @arity/@dispatch as creating the native function body and assembly from a prototype entry."
+          ],
+          "citationsSupport": false,
+          "roleConfusion": true,
+          "notes": "No EfunContext/return_efun_result implementation procedure or efuns! row is supplied. Macro helper arms generate registration/dispatch machinery, not the native efun implementation or assembly. Tests and documentation are omitted. Source 2 is a module list and 5 the abs signature row; neither supports the invented procedure.",
+          "case": "decomp.add-efun.full",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": true,
+          "supportedFacts": 0,
+          "taskSuccess": false
+        },
+        {
+          "id": "decomp.add-efun.handler/answer_first",
+          "facts": [
+            "contradicted"
+          ],
+          "unsupportedClaims": [
+            "Substitutes LpcRef conversions for the EfunContext arg/return_efun_result interface.",
+            "Claims LpcRef is defined in efun_context.rs and that the abs signature row implements type-dependent LpcRef conversion."
+          ],
+          "citationsSupport": false,
+          "roleConfusion": true,
+          "notes": "Sources 1 and 5 are valid references but do not support these claims. Handler source 1 directly shows EfunContext.arg and return_efun_result. LpcRef is an imported value type, not the context interface or a type defined in efun_context.rs.",
+          "case": "decomp.add-efun.handler",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": true,
+          "supportedFacts": 0,
+          "taskSuccess": false
+        },
+        {
+          "id": "decomp.add-efun.registration/answer_first",
+          "facts": [
+            "supported",
+            "supported"
+          ],
+          "unsupportedClaims": [],
+          "citationsSupport": false,
+          "roleConfusion": false,
+          "notes": "Credit the correct concrete abs signature row and assertion that the registration generates call_efun dispatch, without requiring the literal efuns! spelling. Type-dependent abs behaviour is interpreted as its handler behaviour rather than a separate registration step. As in the prior 2B grading, references 5/6 establish the example row and Markdown semantics, but not macro generation in source 3; complete citation support fails.",
+          "case": "decomp.add-efun.registration",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": true,
+          "supportedFacts": 2,
+          "taskSuccess": false
+        },
+        {
+          "id": "decomp.transaction-creation.full/answer_first",
+          "facts": [
+            "missing",
+            "contradicted"
+          ],
+          "unsupportedClaims": [
+            "Says open_attempt returns a LiveSnapshot only after the commit reply; it opens the attempt before commit."
+          ],
+          "citationsSupport": false,
+          "roleConfusion": false,
+          "notes": "Correct open_attempt starting point, but no Transaction::new constructor/Changeset initialisation. The required normal owning-task creation sequence is incomplete and its claimed return timing is wrong. Source 2 does show the constructor call before the attempt runs.",
+          "case": "decomp.transaction-creation.full",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": true,
+          "supportedFacts": 0,
+          "taskSuccess": false
+        },
+        {
+          "id": "decomp.transaction-creation.task-entry/answer_first",
+          "facts": [
+            "supported"
+          ],
+          "unsupportedClaims": [],
+          "citationsSupport": true,
+          "roleConfusion": false,
+          "notes": "Correct requested Task::open_attempt method, start_txn/LiveSnapshot and fresh TxnHandle creation for a non-joining attempt, supported by source 2. Accept the compressed snapshot-to-handle description as omitting the Transaction::new wrapper rather than asserting an explicit ill-typed call expression.",
+          "case": "decomp.transaction-creation.task-entry",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": true,
+          "supportedFacts": 1,
+          "taskSuccess": true
+        },
+        {
+          "id": "decomp.transaction-creation.start-message/answer_first",
+          "facts": [
+            "contradicted",
+            "contradicted"
+          ],
+          "unsupportedClaims": [
+            "Reverses Start sender/receiver by naming Committer::dispatch as the sender.",
+            "Says LiveSnapshot is returned to a flume::Sender<CommitProtocol> instead of the caller's reply receiver."
+          ],
+          "citationsSupport": false,
+          "roleConfusion": true,
+          "notes": "The real dispatch method exists; the error is its assigned role. Source 3 is the caller helper sending Start, not dispatch sending to itself. The current-world snapshot comes back over the reply channel to that caller.",
+          "case": "decomp.transaction-creation.start-message",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": true,
+          "supportedFacts": 0,
+          "taskSuccess": false
+        },
+        {
+          "id": "decomp.commit-checks.full/answer_first",
+          "facts": [
+            "contradicted",
+            "contradicted",
+            "missing",
+            "missing",
+            "missing",
+            "missing",
+            "missing",
+            "missing"
+          ],
+          "unsupportedClaims": [
+            "Locates commit_changeset in committer.rs rather than retry.rs.",
+            "Reverses the version gate by requiring the changeset version to be greater than or equal to the current world version."
+          ],
+          "citationsSupport": false,
+          "roleConfusion": true,
+          "notes": "No task/body phase, Commit message or actual receiver path. Generic history/read/merge checks do not cover the requested retained-history, strictly-after-base scan or current-value merge/rejection rules. Publication prose omits read-only behaviour, physical effects/retry and pin lifetime. Sources 3/4 are the submission helper/receiver, not validation range 5 cited in the prose.",
+          "case": "decomp.commit-checks.full",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": true,
+          "supportedFacts": 0,
+          "taskSuccess": false
+        },
+        {
+          "id": "decomp.commit-checks.future-base/answer_first",
+          "facts": [
+            "supported"
+          ],
+          "unsupportedClaims": [],
+          "citationsSupport": false,
+          "roleConfusion": false,
+          "notes": "Correct FutureVersion rejection in answer text, but false insufficient_evidence status. Reference 2 is the task commit phase, not the future-version check in source 5. Fact credit remains separate from status and citation support.",
+          "case": "decomp.commit-checks.future-base",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": false,
+          "supportedFacts": 1,
+          "taskSuccess": false
+        },
+        {
+          "id": "decomp.commit-checks.old-base/answer_first",
+          "facts": [
+            "supported"
+          ],
+          "unsupportedClaims": [],
+          "citationsSupport": false,
+          "roleConfusion": false,
+          "notes": "Correct HistoryUnavailable rejection and changeset_version/oldest_retained rationale. Saying commit_changeset returns the error is accepted as propagation through the helper, not an explicit claim that it owns the check. Citation 3 covers that helper, not the validation gate in source 5.",
+          "case": "decomp.commit-checks.old-base",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": true,
+          "supportedFacts": 1,
+          "taskSuccess": false
+        },
+        {
+          "id": "decomp.commit-checks.read-conflict/answer_first",
+          "facts": [
+            "missing",
+            "supported"
+          ],
+          "unsupportedClaims": [],
+          "citationsSupport": false,
+          "roleConfusion": false,
+          "notes": "Credits conflict rejection with cell/base information as the ReadInvalidated behaviour without requiring the literal variant name. Omits which versions are scanned and skipping the base. Reference 3 is the submission helper, not the read-validation loop in source 5.",
+          "case": "decomp.commit-checks.read-conflict",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": true,
+          "supportedFacts": 1,
+          "taskSuccess": false
+        },
+        {
+          "id": "decomp.commit-checks.merge-check/answer_first",
+          "facts": [
+            "contradicted",
+            "contradicted"
+          ],
+          "unsupportedClaims": [
+            "Replaces current-value fold_merges/type mismatch checks with write-history version equality and skipping the current version."
+          ],
+          "citationsSupport": false,
+          "roleConfusion": true,
+          "notes": "Wrong check and conflict condition; no MergeMismatch/whole-changeset rejection. It also falsely reports insufficient evidence. Source 4 is the Commit receiver, not support for the invented validation algorithm.",
+          "case": "decomp.commit-checks.merge-check",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": false,
+          "supportedFacts": 0,
+          "taskSuccess": false
+        },
+        {
+          "id": "decomp.commit-checks.commit-receiver/answer_first",
+          "facts": [
+            "contradicted"
+          ],
+          "unsupportedClaims": [
+            "Names Committer::commit as the protocol receiver that calls itself, conflating receiver dispatch with validation."
+          ],
+          "citationsSupport": false,
+          "roleConfusion": true,
+          "notes": "The actual process/dispatch handler receives Commit and invokes commit for validation. Credit commit as the validator, but not as the protocol receiver. Reference 3 is retry::commit_changeset and does not establish the requested receiver/validation pair.",
+          "case": "decomp.commit-checks.commit-receiver",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": true,
+          "supportedFacts": 0,
+          "taskSuccess": false
+        },
+        {
+          "id": "decomp.commit-checks.read-only/answer_first",
+          "facts": [
+            "contradicted"
+          ],
+          "unsupportedClaims": [
+            "Says a read-only commit creates a new version."
+          ],
+          "citationsSupport": false,
+          "roleConfusion": false,
+          "notes": "No write-history entry is correct, but the combined fact requires no new version. The actual empty changeset returns the existing version without publication. Reference 4 is not the supporting validation/publication branch in source 5.",
+          "case": "decomp.commit-checks.read-only",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": true,
+          "supportedFacts": 0,
+          "taskSuccess": false
+        },
+        {
+          "id": "decomp.commit-checks.effects/answer_first",
+          "facts": [
+            "supported",
+            "missing"
+          ],
+          "unsupportedClaims": [],
+          "citationsSupport": true,
+          "roleConfusion": false,
+          "notes": "Correct accepted-commit delivery and retry-until-success/deadline outline, supported by source 1. The if retry_cell.is_none branch really does apply deadline-bounded backoff, so do not count that as invented. The second material fact remains incomplete because the description omits re-evaluation of a fresh admitted/backed-off attempt. Status is falsely insufficient_evidence.",
+          "case": "decomp.commit-checks.effects",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": false,
+          "supportedFacts": 1,
+          "taskSuccess": false
+        },
+        {
+          "id": "decomp.commit-checks.base-pin/answer_first",
+          "facts": [
+            "contradicted",
+            "contradicted"
+          ],
+          "unsupportedClaims": [
+            "Says pin release happens only on successful commit and an error returns without releasing it.",
+            "Says conflict detection or unavailable history triggers old-history eviction."
+          ],
+          "citationsSupport": false,
+          "roleConfusion": false,
+          "notes": "The receiver disarms/drops the changeset pin after validation, including error, then evicts only with no live snapshots. Source 4 shows this sequence. Both claims are reversed and status is falsely insufficient_evidence.",
+          "case": "decomp.commit-checks.base-pin",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": false,
+          "supportedFacts": 0,
+          "taskSuccess": false
+        }
+      ]
+    },
+    {
+      "model": "qwen3.5-0.8b-edited-local-q4",
+      "decisions": [
+        {
+          "id": "decomp.add-efun.full/answer_first",
+          "facts": [
+            "contradicted",
+            "contradicted",
+            "missing"
+          ],
+          "unsupportedClaims": [
+            "Places new efuns inside a mod abs block and invents a user-facing @prototypes registration syntax.",
+            "The invented example uses LpcType::Float without its required flag and does not define a native handler."
+          ],
+          "citationsSupport": false,
+          "roleConfusion": true,
+          "notes": "Module declarations and internal macro arms are confused with the handler/efuns! row workflow. No tests/documentation procedure. References 1/2/3 are real but do not support this instruction, and status falsely claims insufficient evidence.",
+          "case": "decomp.add-efun.full",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": false,
+          "supportedFacts": 0,
+          "taskSuccess": false
+        },
+        {
+          "id": "decomp.add-efun.handler/answer_first",
+          "facts": [
+            "contradicted"
+          ],
+          "unsupportedClaims": [
+            "Substitutes LpcRef/LpcFloat value types for the EfunContext arg/return_efun_result interface.",
+            "Describes LpcRef arguments as raw pointer data and abs as returning LpcFloat rather than Result<()> with a context result; integer abs also exists."
+          ],
+          "citationsSupport": false,
+          "roleConfusion": true,
+          "notes": "The signature mentions EfunContext, but the answer explicitly identifies the wrong argument/result interface and adds unsupported pointer/type semantics. Source 1 directly shows the correct context operations.",
+          "case": "decomp.add-efun.handler",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": true,
+          "supportedFacts": 0,
+          "taskSuccess": false
+        },
+        {
+          "id": "decomp.add-efun.registration/answer_first",
+          "facts": [
+            "contradicted",
+            "missing"
+          ],
+          "unsupportedClaims": [
+            "Treats pub(crate) mod abs as a function signature and raw lexical scope function that registers the native signature.",
+            "Claims generated dispatch cannot be established despite the supplied efuns! macro implementation."
+          ],
+          "citationsSupport": false,
+          "roleConfusion": true,
+          "notes": "Does not identify the actual signature row or generated dispatch/prototype relationship. The cited handler/macro sources do not establish the claimed module-registration semantics. False insufficient_evidence status.",
+          "case": "decomp.add-efun.registration",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": false,
+          "supportedFacts": 0,
+          "taskSuccess": false
+        },
+        {
+          "id": "decomp.transaction-creation.full/answer_first",
+          "facts": [
+            "missing",
+            "contradicted"
+          ],
+          "unsupportedClaims": [
+            "Identifies LiveSnapshot as the transaction and routes the Task snapshot into CommandTask::begin_attempt.",
+            "Claims CommandTask has the primary open_attempt method and locates the start_txn helper within the task module."
+          ],
+          "citationsSupport": false,
+          "roleConfusion": true,
+          "notes": "No Transaction::new/Changeset constructor description. Correct Task open_attempt starting name is mixed into a false Task/CommandTask creation sequence. Reference 1 is the transaction constructor, not the claimed cross-file flow. False insufficient_evidence status.",
+          "case": "decomp.transaction-creation.full",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": false,
+          "supportedFacts": 0,
+          "taskSuccess": false
+        },
+        {
+          "id": "decomp.transaction-creation.task-entry/answer_first",
+          "facts": [
+            "supported"
+          ],
+          "unsupportedClaims": [],
+          "citationsSupport": true,
+          "roleConfusion": false,
+          "notes": "Correct Task::open_attempt, cloning the live snapshot and creating the transaction/origin from the seed. Source 2 supports this method. Accept compressed constructor wording as for the control. The template/actor contrast describes the supplied CommandTask::begin_attempt, not an explicit assertion that Task's delegating begin_attempt owns those fields.",
+          "case": "decomp.transaction-creation.task-entry",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": true,
+          "supportedFacts": 1,
+          "taskSuccess": true
+        },
+        {
+          "id": "decomp.transaction-creation.start-message/answer_first",
+          "facts": [
+            "supported",
+            "supported"
+          ],
+          "unsupportedClaims": [],
+          "citationsSupport": false,
+          "roleConfusion": false,
+          "notes": "Correct caller-side sender and returned LiveSnapshot; sender variable wording is sufficient to distinguish the committer. False insufficient_evidence status and citation 1 to the Transaction constructor, not the Start helper/receiver, prevent task success.",
+          "case": "decomp.transaction-creation.start-message",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": false,
+          "supportedFacts": 2,
+          "taskSuccess": false
+        },
+        {
+          "id": "decomp.commit-checks.full/answer_first",
+          "facts": [
+            "contradicted",
+            "contradicted",
+            "missing",
+            "missing",
+            "missing",
+            "missing",
+            "missing",
+            "contradicted"
+          ],
+          "unsupportedClaims": [
+            "Reverses the future-version comparison.",
+            "Says Committer::commit calls commit_changeset and that the whole validation sequence lives in commit_changeset.",
+            "Makes publication the trigger for base-pin release, omitting release after rejection."
+          ],
+          "citationsSupport": false,
+          "roleConfusion": true,
+          "notes": "Correct helper path and some validation terms, but wrong call direction/gate and no task/message receiver path, retained-history rule, scan range, current-value merge semantics, read-only or effects/retry rules. Source 1 is the attempt runner, not the claimed detailed validation proof. False insufficient_evidence status.",
+          "case": "decomp.commit-checks.full",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": false,
+          "supportedFacts": 0,
+          "taskSuccess": false
+        },
+        {
+          "id": "decomp.commit-checks.future-base/answer_first",
+          "facts": [
+            "supported"
+          ],
+          "unsupportedClaims": [],
+          "citationsSupport": false,
+          "roleConfusion": false,
+          "notes": "Correct FutureVersion rejection, now with answered status. Reference 4 is the Commit message receiver, not the future-base validation in source 5, so complete citation support still fails.",
+          "case": "decomp.commit-checks.future-base",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": true,
+          "supportedFacts": 1,
+          "taskSuccess": false
+        },
+        {
+          "id": "decomp.commit-checks.old-base/answer_first",
+          "facts": [
+            "supported"
+          ],
+          "unsupportedClaims": [
+            "Says self.stats.conflict() returns Err(Conflict::HistoryUnavailable), conflating the counter update with the subsequent error return."
+          ],
+          "citationsSupport": false,
+          "roleConfusion": false,
+          "notes": "Credit the correct HistoryUnavailable/missing-history fact and comparison. The claimed counter-return behaviour is false; source 5 increments statistics then returns the error. Reference 2 is Task's commit phase, not the old-history gate.",
+          "case": "decomp.commit-checks.old-base",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": true,
+          "supportedFacts": 1,
+          "taskSuccess": false
+        },
+        {
+          "id": "decomp.commit-checks.read-conflict/answer_first",
+          "facts": [
+            "contradicted",
+            "supported"
+          ],
+          "unsupportedClaims": [
+            "Checks a version matching the changeset base, whereas validation skips that version and scans strictly later writes."
+          ],
+          "citationsSupport": false,
+          "roleConfusion": false,
+          "notes": "Correct ReadInvalidated with cell/base and rejection on conflict, but wrong scan predicate. Reference 1 is the attempt runner rather than the validation loop, and status is falsely insufficient_evidence.",
+          "case": "decomp.commit-checks.read-conflict",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": false,
+          "supportedFacts": 1,
+          "taskSuccess": false
+        },
+        {
+          "id": "decomp.commit-checks.merge-check/answer_first",
+          "facts": [
+            "contradicted",
+            "contradicted"
+          ],
+          "unsupportedClaims": [
+            "Replaces fold_merges/type validation with immediate Conflict on differing history versions.",
+            "Calls nonempty object_changes read-only and invents system_publications and a transaction=true publication flag."
+          ],
+          "citationsSupport": false,
+          "roleConfusion": true,
+          "notes": "Skipping the base version is a read-validation detail, not the requested current-value merge check. No correct MergeMismatch/atomic rejection rule. Source 4 does not support this invented publication/merge algorithm. False insufficient_evidence status.",
+          "case": "decomp.commit-checks.merge-check",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": false,
+          "supportedFacts": 0,
+          "taskSuccess": false
+        },
+        {
+          "id": "decomp.commit-checks.commit-receiver/answer_first",
+          "facts": [
+            "contradicted"
+          ],
+          "unsupportedClaims": [
+            "Names Committer::commit as the protocol receiver that calls itself, conflating dispatch with validation."
+          ],
+          "citationsSupport": false,
+          "roleConfusion": true,
+          "notes": "As in the control, commit is the validator but not the Commit protocol receiver; the corrected combined fact is not satisfied. No references are supplied, and status is falsely insufficient_evidence. The actual dispatch method is never treated as invented.",
+          "case": "decomp.commit-checks.commit-receiver",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": false,
+          "supportedFacts": 0,
+          "taskSuccess": false
+        },
+        {
+          "id": "decomp.commit-checks.read-only/answer_first",
+          "facts": [
+            "contradicted"
+          ],
+          "unsupportedClaims": [
+            "First claims a read-only commit creates a version, then contradicts that conclusion.",
+            "Locates commit_changeset in committer.rs and treats the read-only path as applying a new version before skipping a write."
+          ],
+          "citationsSupport": false,
+          "roleConfusion": false,
+          "notes": "The final sentence partly recovers no new version, but the answer's incompatible claims and invented path prevent a consistent supported combined fact. The real empty commit returns the existing version without publication. Citation 4 is the receiver rather than source 5's branch. False insufficient_evidence status.",
+          "case": "decomp.commit-checks.read-only",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": false,
+          "supportedFacts": 0,
+          "taskSuccess": false
+        },
+        {
+          "id": "decomp.commit-checks.effects/answer_first",
+          "facts": [
+            "supported",
+            "contradicted"
+          ],
+          "unsupportedClaims": [
+            "Calls deliver on LiveSnapshot instead of the attempt body.",
+            "Stores a Conflict in retry_cell, which actually holds a VarId for owning ReadInvalidated retries."
+          ],
+          "citationsSupport": false,
+          "roleConfusion": true,
+          "notes": "Credit accepted-commit-only physical delivery. The rejection sequence mixes world acquisition, conflict reply and retry state, with no fresh admitted/backed-off evaluation or deadline. Source 1 shows the real runner; it does not support the wrong receivers/types. False insufficient_evidence status.",
+          "case": "decomp.commit-checks.effects",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": false,
+          "supportedFacts": 1,
+          "taskSuccess": false
+        },
+        {
+          "id": "decomp.commit-checks.base-pin/answer_first",
+          "facts": [
+            "supported",
+            "contradicted"
+          ],
+          "unsupportedClaims": [
+            "Makes unavailable retained history the eviction condition and invents a nested commit_changeset/gc_pass check path."
+          ],
+          "citationsSupport": false,
+          "roleConfusion": true,
+          "notes": "Credit release after both successful validation and rejection, without requiring exact Rust result-wrapper spelling. Eviction requires live_versions to be empty, not an old changeset. Sources 1/4 support release but not the claimed eviction/path. False insufficient_evidence status.",
+          "case": "decomp.commit-checks.base-pin",
+          "arm": "answer_first",
+          "split": "diagnostic",
+          "answerable": true,
+          "statusCorrect": false,
+          "supportedFacts": 1,
+          "taskSuccess": false
+        }
+      ]
+    }
+  ],
+  "memory": [
+    {
+      "model": "qwen3.5-0.8b-base-local-q4",
+      "observedPeakPssGiB": 1.1943140029907227,
+      "peakPssKiB": 1252329,
+      "peakRssKiB": 1294932,
+      "withinFourGiBTarget": true,
+      "capVerified": false,
+      "intervalMs": 250,
+      "success": true,
+      "errors": []
+    },
+    {
+      "model": "qwen3.5-0.8b-edited-local-q4",
+      "observedPeakPssGiB": 1.1984224319458008,
+      "peakPssKiB": 1256637,
+      "peakRssKiB": 1295696,
+      "withinFourGiBTarget": true,
+      "capVerified": false,
+      "intervalMs": 250,
+      "success": true,
+      "errors": []
+    }
+  ]
+}

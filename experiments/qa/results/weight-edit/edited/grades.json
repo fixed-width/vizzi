@@ -1,0 +1,131 @@
+{
+  "schema": 1,
+  "grader": "Codex, source-aware question/pack/rubric author; preliminary manual paired 0.8B review, not independent acceptance",
+  "limitations": [
+    "Fifteen previously observed maintainer/agent-guided questions, not held-out accuracy or cross-repository generalisation.",
+    "Facts, citation support, false status and unsupported claims are graded separately; equivalent wording is accepted without requiring literal API spellings.",
+    "Corrected dispatch oracle applies. One paired Q4 non-thinking run, not the published thinking/math evaluation."
+  ],
+  "grades": [
+    {
+      "id": "decomp.add-efun.full/answer_first",
+      "facts": ["contradicted", "contradicted", "missing"],
+      "unsupportedClaims": ["Places new efuns inside a mod abs block and invents a user-facing @prototypes registration syntax.", "The invented example uses LpcType::Float without its required flag and does not define a native handler."],
+      "citationsSupport": false,
+      "roleConfusion": true,
+      "notes": "Module declarations and internal macro arms are confused with the handler/efuns! row workflow. No tests/documentation procedure. References 1/2/3 are real but do not support this instruction, and status falsely claims insufficient evidence."
+    },
+    {
+      "id": "decomp.add-efun.handler/answer_first",
+      "facts": ["contradicted"],
+      "unsupportedClaims": ["Substitutes LpcRef/LpcFloat value types for the EfunContext arg/return_efun_result interface.", "Describes LpcRef arguments as raw pointer data and abs as returning LpcFloat rather than Result<()> with a context result; integer abs also exists."],
+      "citationsSupport": false,
+      "roleConfusion": true,
+      "notes": "The signature mentions EfunContext, but the answer explicitly identifies the wrong argument/result interface and adds unsupported pointer/type semantics. Source 1 directly shows the correct context operations."
+    },
+    {
+      "id": "decomp.add-efun.registration/answer_first",
+      "facts": ["contradicted", "missing"],
+      "unsupportedClaims": ["Treats pub(crate) mod abs as a function signature and raw lexical scope function that registers the native signature.", "Claims generated dispatch cannot be established despite the supplied efuns! macro implementation."],
+      "citationsSupport": false,
+      "roleConfusion": true,
+      "notes": "Does not identify the actual signature row or generated dispatch/prototype relationship. The cited handler/macro sources do not establish the claimed module-registration semantics. False insufficient_evidence status."
+    },
+    {
+      "id": "decomp.transaction-creation.full/answer_first",
+      "facts": ["missing", "contradicted"],
+      "unsupportedClaims": ["Identifies LiveSnapshot as the transaction and routes the Task snapshot into CommandTask::begin_attempt.", "Claims CommandTask has the primary open_attempt method and locates the start_txn helper within the task module."],
+      "citationsSupport": false,
+      "roleConfusion": true,
+      "notes": "No Transaction::new/Changeset constructor description. Correct Task open_attempt starting name is mixed into a false Task/CommandTask creation sequence. Reference 1 is the transaction constructor, not the claimed cross-file flow. False insufficient_evidence status."
+    },
+    {
+      "id": "decomp.transaction-creation.task-entry/answer_first",
+      "facts": ["supported"],
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "notes": "Correct Task::open_attempt, cloning the live snapshot and creating the transaction/origin from the seed. Source 2 supports this method. Accept compressed constructor wording as for the control. The template/actor contrast describes the supplied CommandTask::begin_attempt, not an explicit assertion that Task's delegating begin_attempt owns those fields."
+    },
+    {
+      "id": "decomp.transaction-creation.start-message/answer_first",
+      "facts": ["supported", "supported"],
+      "unsupportedClaims": [],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "notes": "Correct caller-side sender and returned LiveSnapshot; sender variable wording is sufficient to distinguish the committer. False insufficient_evidence status and citation 1 to the Transaction constructor, not the Start helper/receiver, prevent task success."
+    },
+    {
+      "id": "decomp.commit-checks.full/answer_first",
+      "facts": ["contradicted", "contradicted", "missing", "missing", "missing", "missing", "missing", "contradicted"],
+      "unsupportedClaims": ["Reverses the future-version comparison.", "Says Committer::commit calls commit_changeset and that the whole validation sequence lives in commit_changeset.", "Makes publication the trigger for base-pin release, omitting release after rejection."],
+      "citationsSupport": false,
+      "roleConfusion": true,
+      "notes": "Correct helper path and some validation terms, but wrong call direction/gate and no task/message receiver path, retained-history rule, scan range, current-value merge semantics, read-only or effects/retry rules. Source 1 is the attempt runner, not the claimed detailed validation proof. False insufficient_evidence status."
+    },
+    {
+      "id": "decomp.commit-checks.future-base/answer_first",
+      "facts": ["supported"],
+      "unsupportedClaims": [],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "notes": "Correct FutureVersion rejection, now with answered status. Reference 4 is the Commit message receiver, not the future-base validation in source 5, so complete citation support still fails."
+    },
+    {
+      "id": "decomp.commit-checks.old-base/answer_first",
+      "facts": ["supported"],
+      "unsupportedClaims": ["Says self.stats.conflict() returns Err(Conflict::HistoryUnavailable), conflating the counter update with the subsequent error return."],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "notes": "Credit the correct HistoryUnavailable/missing-history fact and comparison. The claimed counter-return behaviour is false; source 5 increments statistics then returns the error. Reference 2 is Task's commit phase, not the old-history gate."
+    },
+    {
+      "id": "decomp.commit-checks.read-conflict/answer_first",
+      "facts": ["contradicted", "supported"],
+      "unsupportedClaims": ["Checks a version matching the changeset base, whereas validation skips that version and scans strictly later writes."],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "notes": "Correct ReadInvalidated with cell/base and rejection on conflict, but wrong scan predicate. Reference 1 is the attempt runner rather than the validation loop, and status is falsely insufficient_evidence."
+    },
+    {
+      "id": "decomp.commit-checks.merge-check/answer_first",
+      "facts": ["contradicted", "contradicted"],
+      "unsupportedClaims": ["Replaces fold_merges/type validation with immediate Conflict on differing history versions.", "Calls nonempty object_changes read-only and invents system_publications and a transaction=true publication flag."],
+      "citationsSupport": false,
+      "roleConfusion": true,
+      "notes": "Skipping the base version is a read-validation detail, not the requested current-value merge check. No correct MergeMismatch/atomic rejection rule. Source 4 does not support this invented publication/merge algorithm. False insufficient_evidence status."
+    },
+    {
+      "id": "decomp.commit-checks.commit-receiver/answer_first",
+      "facts": ["contradicted"],
+      "unsupportedClaims": ["Names Committer::commit as the protocol receiver that calls itself, conflating dispatch with validation."],
+      "citationsSupport": false,
+      "roleConfusion": true,
+      "notes": "As in the control, commit is the validator but not the Commit protocol receiver; the corrected combined fact is not satisfied. No references are supplied, and status is falsely insufficient_evidence. The actual dispatch method is never treated as invented."
+    },
+    {
+      "id": "decomp.commit-checks.read-only/answer_first",
+      "facts": ["contradicted"],
+      "unsupportedClaims": ["First claims a read-only commit creates a version, then contradicts that conclusion.", "Locates commit_changeset in committer.rs and treats the read-only path as applying a new version before skipping a write."],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "notes": "The final sentence partly recovers no new version, but the answer's incompatible claims and invented path prevent a consistent supported combined fact. The real empty commit returns the existing version without publication. Citation 4 is the receiver rather than source 5's branch. False insufficient_evidence status."
+    },
+    {
+      "id": "decomp.commit-checks.effects/answer_first",
+      "facts": ["supported", "contradicted"],
+      "unsupportedClaims": ["Calls deliver on LiveSnapshot instead of the attempt body.", "Stores a Conflict in retry_cell, which actually holds a VarId for owning ReadInvalidated retries."],
+      "citationsSupport": false,
+      "roleConfusion": true,
+      "notes": "Credit accepted-commit-only physical delivery. The rejection sequence mixes world acquisition, conflict reply and retry state, with no fresh admitted/backed-off evaluation or deadline. Source 1 shows the real runner; it does not support the wrong receivers/types. False insufficient_evidence status."
+    },
+    {
+      "id": "decomp.commit-checks.base-pin/answer_first",
+      "facts": ["supported", "contradicted"],
+      "unsupportedClaims": ["Makes unavailable retained history the eviction condition and invents a nested commit_changeset/gc_pass check path."],
+      "citationsSupport": false,
+      "roleConfusion": true,
+      "notes": "Credit release after both successful validation and rejection, without requiring exact Rust result-wrapper spelling. Eviction requires live_versions to be empty, not an old changeset. Sources 1/4 support release but not the claimed eviction/path. False insufficient_evidence status."
+    }
+  ]
+}

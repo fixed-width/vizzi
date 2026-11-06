@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "base": {
+    "repository": "Qwen/Qwen3.5-0.8B",
+    "revision": "2fc06364715b967f1860aea9cf38778875588b17"
+  },
+  "patch": {
+    "repository": "https://github.com/RikiyaT/lm_understand-logs",
+    "revision": "4d09ba6d6a7e891dd8063974dfe81b3d78e3494f",
+    "run": "exp8_math/runs/p50c"
+  },
+  "publishedCheckpoint": {
+    "repository": "RikiyaT/Qwen3.5-0.8B-weight-space-programming",
+    "revision": "d1671a178705bcab7644806d23c535517f35723b",
+    "downloadedWeights": false
+  },
+  "conversion": {
+    "llamaCppRevision": "cd959bae99ff4bed22bef2604f45241c09bbb8c8",
+    "outtype": "bf16",
+    "modelName": "Vizzi Qwen3.5-0.8B paired diagnostic",
+    "python": "3.13.12 (main, Mar 10 2026, 18:17:38) [Clang 21.1.4 ]",
+    "cpuTorch": true,
+    "latestResolvedStablePackages": true,
+    "notes": "Pinned converter source with current compatible Python packages rather than its older exact development pins; both conversions and strict metadata/payload audits pass."
+  },
+  "quantization": {
+    "format": "Q4_K_M",
+    "threads": 2,
+    "importanceMatrix": null,
+    "source": "Fresh BF16, not requantized Q4"
+  },
+  "audit": {
+    "sourceTensors": 488,
+    "ggufTensors": 335,
+    "changedTensors": 2,
+    "sourceChangedBF16Entries": 130188,
+    "allOtherPayloadsAndGGUFMetadataIdentical": true
+  },
+  "files": {
+    "/tmp/vizzi-qa-weight-edit/patch/apply_edit.py": "d2b627a6cf344f309cca4bcab4ff6ccc6ad1c8f29cabda78d11f99c19d1b1c5d",
+    "/tmp/vizzi-qa-weight-edit/patch/manifest.json": "83185c1db46e3dafb34af645f8c5ce033c09cc99d4512b9e1b8e3aba9d269225",
+    "/tmp/vizzi-qa-weight-edit/patch/st_numpy.py": "3c4e532fb8edf374e1a4636aa806a04d062f824943eaf4bca0d3af5b0e7dca40",
+    "/tmp/vizzi-qa-weight-edit/patch/edit.npz": "e92a92aafd1f1068b4fd94aa0fbe081ba3ddea2047ee7bcac7161d861be299e7",
+    "/tmp/vizzi-qa-weight-edit/source-audit.json": "0af12d5ef4e55234a93596486c926ada38baf90e94c84cc57c1953deaa129335",
+    "/tmp/vizzi-qa-weight-edit/bf16-audit.json": "08b5a85d13c87e983b0c5b9206e3fc3e438d25d73f011c86ef2e0da6077d5100",
+    "/tmp/vizzi-qa-weight-edit/q4-audit.json": "43f34715501fd3158f22b32fd3176ce95f50ab343df084830790c9fa7815b9c3",
+    "/tmp/vizzi-qa-weight-edit/build-requirements.txt": "2a27ad84044ba2af1fd4f7e22e4459583eab29910a1ed2a7b3abbaaef394111a",
+    "/tmp/vizzi-qa-weight-edit/llama-source.tar.gz": "fbe74146a3cdc00f706773eb233bc4aedb7d8c3c7e2122440e492a99c1ec5a76",
+    "/tmp/vizzi-qa-weight-edit/base/model-bf16.gguf": "5ef57c11d9ace33999da529924bc62e6b6dd3ba4b3d02a19fd966ff83f8336d7",
+    "/tmp/vizzi-qa-weight-edit/base/model.safetensors.index.json": "d8a08838a613b025eb7952ed9db11696213e57e76a375661ef5c12f9dd5dcf4e",
+    "/tmp/vizzi-qa-weight-edit/base/tokenizer_config.json": "49e2b6e395f959f077f1e992b338919c0d4a9732fc6e613995e06557f843500c",
+    "/tmp/vizzi-qa-weight-edit/base/merges.txt": "a9d356d7bdf1ef4949e3e748e95b8e10ad9d4e2e838eddc38a0a7b6b94d1db8d",
+    "/tmp/vizzi-qa-weight-edit/base/LICENSE": "bbedc3fda3305820b977265f01b8619d87570a6739de3a5582c3464840f1e57a",
+    "/tmp/vizzi-qa-weight-edit/base/README.md": "87a163af54f32fa608a0f8d3ac67945c53dd2b4a7c96740b3d7fdc28e8458864",
+    "/tmp/vizzi-qa-weight-edit/base/tokenizer.json": "5f9e4d4901a92b997e463c1f46055088b6cca5ca61a6522d1b9f64c4bb81cb42",
+    "/tmp/vizzi-qa-weight-edit/base/vocab.json": "ce99b4cb2983d118806ce0a8b777a35b093e2000a503ebde25853284c9dfa003",
+    "/tmp/vizzi-qa-weight-edit/base/config.json": "b90b86f35c8e6925ef74ee04d0e758f0a845c83a42089ad82bbaa948de9b4204",
+    "/tmp/vizzi-qa-weight-edit/base/model.safetensors-00001-of-00001.safetensors": "04b1c301231dd422b8860db31311ab2721511346a32cb1e079c4c4e5f1fe4696",
+    "/tmp/vizzi-qa-weight-edit/base/chat_template.jinja": "273d8e0e683b885071fb17e08d71e5f2a5ddfb5309756181681de4f5a1822d80",
+    "/tmp/vizzi-qa-weight-edit/edited/model.safetensors-00001-of-00001.safetensors": "fd1e42acdd118ac1b300d37500fd2885e75f5a09de3a33010d802bf7f737b553",
+    "/tmp/vizzi-qa-weight-edit/edited/model-bf16.gguf": "e8e656e2ed7fa223fd57fb8ded7a9154f5bc3e538b934c5f0ae8447cb98b56fa",
+    "/home/mpd/git-sources/vizzi/experiments/qa/weight_edit_audit.py": "fb51be7e3c74ac46247e18f4da24cb6f83c90e1abd407bf1e335324bc622c8b6",
+    "/home/mpd/git-sources/vizzi/docs/qa/WEIGHT_EDIT.md": "a100aab6231760bc30524836635d34321efdd6f81692edd1c88a23216467981b",
+    "/tmp/vizzi-qa-runtime/llama-b12110/llama-quantize": "67bf58a275e44df48dfd5299f66f6abcdfae820230b2b6904fb6a1e7b0e636b5",
+    "/tmp/vizzi-qa-runtime/llama-b12110/libllama-quantize-impl.so": "79d821e4e88ebc408f52a1b3d7d13f44aeb6f71bba13574e7d395608b671775a"
+  }
+}

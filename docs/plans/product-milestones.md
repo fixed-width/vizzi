@@ -48,9 +48,11 @@ observes 4.658/4.651/4.645 GiB at sizes 128/32/8 with logical batch fixed at 512
 profile qualifies, so the cohort stops before full-suite validation. Further allocation
 work needs a separate condition. The maintainer's
 [weight-space programming proposal](../explanation/model-weight-optimisation.md)
-is a distinct quality hypothesis; the released 0.8B repair offers a concrete comparison
-before custom edits. Neither those edits nor a planner/chat interface follow from these
-diagnostics alone.
+is now tested in a [paired local 0.8B comparison](../../experiments/qa/WEIGHT_EDIT_RESULTS.md).
+Both variants complete 1/12 guided tasks and 0/3 broad workflows; false insufficient-evidence
+statuses increase from 4/15 to 11/15 with the published edit. A custom edit needs a separate
+evidence-use failure hypothesis and development/fresh evaluation split. No planner/chat
+interface or production QA acceptance follows from these diagnostics.
 Retain new maintainer questions for subsequent fresh evaluation. None of these
 agent-graded diagnostics establishes product acceptance.
 
