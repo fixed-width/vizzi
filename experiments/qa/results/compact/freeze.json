@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "createdAt": "2026-11-06T00:47:42.572Z",
+  "preparedPath": "/tmp/vizzi-qa-v2-final/prepared.json",
+  "files": {
+    "/home/mpd/git-sources/vizzi/crates/vizzi-qa/src/compact.rs": "ce6d769b80375c01206579e0bf6b820651e1f6b93da3f30359ab73e08336b008",
+    "/home/mpd/git-sources/vizzi/crates/vizzi-qa/src/lib.rs": "8fdfda21f240d078bc0252d02d5b749955bde75bdb9546e2a82d7e6ff269b7c5",
+    "/home/mpd/git-sources/vizzi/crates/vizzi-qa/src/main.rs": "f1f3e03eab11f28d98b3f435abdf8eb7bc2a3c7689a63c9abb602e8f6aebff3b",
+    "/home/mpd/git-sources/vizzi/crates/vizzi-qa/src/metadata.rs": "41076b17d033398eacc596e30703db5c4b3a95156cc68a8e1d82144d768b3caf",
+    "/home/mpd/git-sources/vizzi/crates/vizzi-qa/src/native.rs": "8562161d6843b01f145365ad0e70699cce8bdc3cafd68da2bc7af6afde657b38",
+    "/home/mpd/git-sources/vizzi/crates/vizzi-qa/Cargo.toml": "d11423a61a17e1dd0f9acf74216982556435ac16cfb8e779916946672517d88d",
+    "/home/mpd/git-sources/vizzi/Cargo.lock": "38c796e08d9779134fe4635de351b3018b27ff2d68feb72230c7e99fcb155f98",
+    "/home/mpd/git-sources/vizzi/experiments/qa/support.mjs": "273417232b72a1a2522d3b5d46d67895079f83870c3328dc375a2b1bfb4ee1d8",
+    "/home/mpd/git-sources/vizzi/experiments/qa/model.mjs": "cb51b617e5c1b2ce50e6448952afbe9c1aa41b804d4d365386bebea283351337",
+    "/home/mpd/git-sources/vizzi/experiments/qa/compact-support.mjs": "fca8329cc1f3fe2c67778b5338f000b896fcc6dd354df855b4662483d4d82a48",
+    "/home/mpd/git-sources/vizzi/experiments/qa/compact.mjs": "b0380e8aa905f1f67e1ca9f520fab5a3cf2e16fc55f38fbac00d2201da4588c4",
+    "/home/mpd/git-sources/vizzi/experiments/qa/library/v2/cases.json": "5c28798284369a4a1256f2780995c8a5d9b1f681c6a71cd74938c016bac933ba",
+    "/home/mpd/git-sources/vizzi/experiments/qa/library/v2/cohort.json": "d0edc0ae1f3a8222ada866c790f03ecbf3acced4feb5bf1c2694834a48dbad5d",
+    "/home/mpd/git-sources/vizzi/experiments/qa/library/templates.json": "c87e8bfccd18385c7da8207e9717f5149f75d0aec47fd3c17ed8debcc4668ac9",
+    "/home/mpd/git-sources/vizzi/experiments/qa/models.json": "78e5ef6f07c49827810a7a83809b128c5514af8694fa222d4b5c045df1ce3ded",
+    "/tmp/vizzi-qa-v2-final/prepared.json": "0382142cefa763cf14779e3a7566192352b8f25c6847415b6537ceb04be0af63",
+    "/home/mpd/git-sources/vizzi/target/release/vizzi-qa": "a36a5ddbba17257c7b63320a31d94305303f249ff3c9dc9c0f1cc2709d8e8e77",
+    "/home/mpd/git-sources/vizzi/target/release/vizzi-envelope": "4348433c09b341418ca0f8b87df36fedf1a872d00b0d9eb3ebf93b622548b537"
+  },
+  "sourceRevisions": {
+    "vizzi": "5ee084d9e7d6876a61af627403ca99fe208d043f",
+    "lpc-rs": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+    "changing": "deterministic content-update fixture; labels are not Git commits"
+  },
+  "development": "Only the 32 previously observed formulations were available for retrieval tuning. Fresh gold anchors were audited, but their candidate retrieval/model outputs were not inspected before this freeze.",
+  "authorship": "Fresh cases are agent-authored and source-aware, not independent maintainer questions."
+}

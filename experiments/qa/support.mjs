@@ -43,7 +43,7 @@ export async function corpus(root,binary=resolve('target/release/vizzi-qa')){
  const ready=await next();assert.equal(ready.ready,true,JSON.stringify(ready));
  return {ready,pid:child.pid,async request(body){const response=next();child.stdin.write(JSON.stringify(body)+'\n');return response;},async close(){if(child.exitCode!==null)return;const stopped=once(child,'exit');child.stdin.end();const timer=setTimeout(()=>child.kill('SIGKILL'),5000);try{await stopped;}finally{clearTimeout(timer);lines.close();}}};
 }
-export const anchors=item=>item.required_facts.flatMap(f=>f.evidence.slice(0,1).map(a=>[a.path,a.needle]));
+export const anchors=item=>[...item.required_facts.flatMap(f=>f.evidence.slice(0,1)),...(item.supporting_evidence??[])].map(a=>[a.path,a.needle]);
 export function coverage(item,context){
  const matches=item.required_facts.map(fact=>fact.evidence.some(anchor=>context.evidence.some(e=>e.path===anchor.path && e.text.includes(anchor.needle))));
  return {facts:matches.length,matched:matches.filter(Boolean).length,all:matches.length?matches.every(Boolean):null};
@@ -58,8 +58,8 @@ export async function changing(root,state){
  if(state==='deleted')await rm(join(root,'src/transport.rs'),{force:true});
  else await writeFile(join(root,'src/transport.rs'),`/// The packet loading handler.\npub fn ${state==='renamed'?'load_packet':'fetch_packet'}() {}\n`);
 }
-export async function prepare(output,roots){
- const library=validateLibrary(await json(libraryPath),await json(templatesPath));
+export async function prepare(output,roots,{questionsPath=libraryPath,retrieveHeldOut=true}={}){
+ const library=validateLibrary(await json(questionsPath),await json(templatesPath));
  await mkdir(output);
  const sources={};
  for(const name of ['vizzi','lpc-rs']){
@@ -78,11 +78,15 @@ export async function prepare(output,roots){
    for(const item of library.cases.filter(c=>c.repository===name)){
     if(item.fixture_state){await changing(source.root,item.fixture_state);const update=await index.request({op:'refresh'});assert.ok(!update.error,update.error);}
     const oracle=await index.request({op:'oracle',id:item.id,anchors:anchors(item)});assert.ok(!oracle.error,`${item.id}: ${oracle.error}`);if(item.required_facts.length)assert.equal(coverage(item,oracle.context).all,true,`${item.id}: oracle excerpt omitted a required anchor`);
-    const retrieved=await index.request({op:'retrieve',id:item.id,question:item.question});assert.ok(!retrieved.error,retrieved.error);
-    checks.push({id:item.id,evidence_audited:true,retrieval:coverage(item,retrieved.context)});
+    let retrieval;
+    if(retrieveHeldOut || item.split!=='held_out'){
+     const retrieved=await index.request({op:'retrieve',id:item.id,question:item.question});assert.ok(!retrieved.error,retrieved.error);
+     retrieval=coverage(item,retrieved.context);
+    }
+    checks.push({id:item.id,evidence_audited:true,retrieval});
    }
   }finally{await index.close();}
  }
- const result={schema:1,sources,checks,questionsSha256:await digest(libraryPath),templatesSha256:await digest(templatesPath),modelsSha256:await digest(modelPath),qaBinarySha256:await digest('target/release/vizzi-qa')};
+ const result={schema:1,sources,checks,questionsSha256:await digest(questionsPath),templatesSha256:await digest(templatesPath),modelsSha256:await digest(modelPath),qaBinarySha256:await digest('target/release/vizzi-qa')};
  await writeFile(join(output,'prepared.json'),JSON.stringify(result,null,2)+'\n');return result;
 }

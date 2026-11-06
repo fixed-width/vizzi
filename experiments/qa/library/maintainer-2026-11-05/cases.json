@@ -1,0 +1,209 @@
+{
+  "schema": 1,
+  "sources": {
+    "lpc-rs": {
+      "revision": "1a4f5b65dd2a269298748df2dfd68092a169a8d9"
+    }
+  },
+  "question_authorship": "Maintainer, exact wording preserved.",
+  "rubric_authorship": "Codex, source-aware; not independent human grading.",
+  "frozen_selection": "Use the v2 retriever/model/prompt without changes or tuning on these questions.",
+  "cases": [
+    {
+      "id": "maintainer.lpc-rs.add-efun",
+      "question": "how do i add a new efun?",
+      "repository": "lpc-rs",
+      "split": "held_out",
+      "expected_status": "answered",
+      "template": null,
+      "category": "maintainer_workflow",
+      "required_facts": [
+        {
+          "text": "Implement the native handler under src/interpreter/efun using EfunContext, return_efun_result and Result, and declare a new handler module when needed.",
+          "evidence": [
+            {
+              "path": "src/interpreter/efun/abs.rs",
+              "needle": "pub fn abs<const N: usize>(context: &mut EfunContext<'_, N>) -> Result<()>"
+            }
+          ]
+        },
+        {
+          "text": "Add an efuns! table row in src/interpreter/efun/mod.rs with return/argument types and arity, choosing async/grouped options when appropriate. The macro generates dispatch and EFUN_PROTOTYPES; these are not separate hand-maintained registrations.",
+          "evidence": [
+            {
+              "path": "src/interpreter/efun/mod.rs",
+              "needle": "/// The efun table: one row per efun expands to its dispatch arm and its"
+            }
+          ]
+        },
+        {
+          "text": "Add tests that exercise calls and errors, and add doc/efun/<name>.md documentation; efun Markdown files are automatically bundled for the language server.",
+          "evidence": [
+            {
+              "path": "src/interpreter/efun/abs.rs",
+              "needle": "async fn abs_of_a_string_is_an_error()"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        "Treat adding a mudlib command or an add_action call as sufficient to add a native efun.",
+        "Invent a separate manually maintained efun-prototype registry file or require manual bytecode opcode assignment."
+      ],
+      "author": "maintainer supplied the exact question; Codex authored and source-audited the rubric",
+      "scope_note": "Native built-in efuns in the Rust driver; simulated efuns may be mentioned as an alternative but do not replace the native extension path.",
+      "supporting_evidence": [
+        {
+          "path": "src/interpreter/efun/mod.rs",
+          "needle": "pub(crate) mod abs;"
+        },
+        {
+          "path": "lpc-rs-lsp/build.rs",
+          "needle": "let directory = PathBuf::from(\"../doc/efun\");"
+        }
+      ]
+    },
+    {
+      "id": "maintainer.lpc-rs.transaction-creation",
+      "question": "where are new transactions created?",
+      "repository": "lpc-rs",
+      "split": "held_out",
+      "expected_status": "answered",
+      "template": null,
+      "category": "maintainer_workflow",
+      "required_facts": [
+        {
+          "text": "The transaction constructor is Transaction::new(snapshot) in src/interpreter/stm/mod.rs; it starts a Changeset at that snapshot version.",
+          "evidence": [
+            {
+              "path": "src/interpreter/stm/mod.rs",
+              "needle": "pub(crate) fn new(snapshot: Snapshot) -> Self {"
+            }
+          ]
+        },
+        {
+          "text": "A normal owning Task creates a fresh transaction in Task::open_attempt in src/interpreter/task/mod.rs: start_txn obtains the current LiveSnapshot and the context receives TxnHandle::new(Transaction::new(live.inner.clone())).",
+          "evidence": [
+            {
+              "path": "src/interpreter/task/mod.rs",
+              "needle": "async fn open_attempt("
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        "Claim that every nested/joining task unconditionally creates an independent transaction.",
+        "Offer a constructor in a test fixture as the only production creation path."
+      ],
+      "author": "maintainer supplied the exact question; Codex authored and source-audited the rubric",
+      "scope_note": "Runtime STM world-state transactions. Require the constructor and the normal owning-task attempt entry point, not an exhaustive inventory of every constructor call or test fixture.",
+      "supporting_evidence": [
+        {
+          "path": "src/command/command_task.rs",
+          "needle": "template.txn = TxnHandle::new(Transaction::new(live.inner.clone()));"
+        }
+      ]
+    },
+    {
+      "id": "maintainer.lpc-rs.commit-checks",
+      "question": "show me the codepath that transaction commits take, with all the checks they go through",
+      "repository": "lpc-rs",
+      "split": "held_out",
+      "expected_status": "answered",
+      "template": null,
+      "category": "maintainer_workflow",
+      "required_facts": [
+        {
+          "text": "The attempt runner calls the task/body commit_phase; it submits the changeset through retry::commit_changeset as CommitProtocol::Commit, which Committer::process sends to Committer::commit.",
+          "evidence": [
+            {
+              "path": "src/interpreter/stm/retry.rs",
+              "needle": "request(tx, |reply| CommitProtocol::Commit {"
+            }
+          ]
+        },
+        {
+          "text": "Before publishing, a base version ahead of the current world is rejected as FutureVersion.",
+          "evidence": [
+            {
+              "path": "src/interpreter/stm/committer.rs",
+              "needle": "if current_version < changeset_version {"
+            }
+          ]
+        },
+        {
+          "text": "A base version older than retained history is rejected as HistoryUnavailable.",
+          "evidence": [
+            {
+              "path": "src/interpreter/stm/committer.rs",
+              "needle": "if changeset_version < self.oldest_retained {"
+            }
+          ]
+        },
+        {
+          "text": "Validation scans writes after the base version and rejects invalidated reads as ReadInvalidated, skipping the base version itself.",
+          "evidence": [
+            {
+              "path": "src/interpreter/stm/committer.rs",
+              "needle": "if let Some(cell) = changeset.conflicting_read(&written.vars) {"
+            }
+          ]
+        },
+        {
+          "text": "Merges are folded against committed values before any publication; a merge/type mismatch rejects the whole changeset as MergeMismatch.",
+          "evidence": [
+            {
+              "path": "src/interpreter/stm/committer.rs",
+              "needle": "if let Err(cell) = changeset.fold_merges"
+            }
+          ]
+        },
+        {
+          "text": "Only validated changes are published. Read-only changes create no new version; writes apply a new snapshot, record write history and notify commit watchers.",
+          "evidence": [
+            {
+              "path": "src/interpreter/stm/committer.rs",
+              "needle": "fn publish(&mut self, mut changeset: Changeset, transaction: bool)"
+            }
+          ]
+        },
+        {
+          "text": "Physical effects are delivered only after a successful commit; conflicts lead to a new attempt with admission/backoff and an evaluation deadline rather than publishing the rejected attempt.",
+          "evidence": [
+            {
+              "path": "src/interpreter/stm/retry.rs",
+              "needle": "let committed = body.commit_phase(&self.tx, live).await;"
+            }
+          ]
+        },
+        {
+          "text": "The commit processing path releases the disarmed base pin after validation, including rejection, and evicts history only when no live snapshots remain.",
+          "evidence": [
+            {
+              "path": "src/interpreter/stm/committer.rs",
+              "needle": "let result = self.commit(changeset);"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        "Claim that read-only transactions bypass validation.",
+        "Claim rejected attempts publish physical effects.",
+        "Claim the commit itself is cancelled merely because its reply crosses the evaluation deadline.",
+        "Invent validation of every possible write/write overlap rather than the actual read-set and merge rules."
+      ],
+      "author": "maintainer supplied the exact question; Codex authored and source-audited the rubric",
+      "scope_note": "The STM commit path from an owning attempt through Committer::commit/publish, including its rejection gates and delivery/retry outcome. Not every arbitrary LPC operation or permission check executed earlier in the VM.",
+      "supporting_evidence": [
+        {
+          "path": "src/interpreter/task/mod.rs",
+          "needle": "let changeset = self.context.txn.with(|t| t.clone_changeset());"
+        },
+        {
+          "path": "src/interpreter/stm/retry.rs",
+          "needle": "// The commit releases the pin, including when its reply crosses the deadline."
+        }
+      ]
+    }
+  ]
+}

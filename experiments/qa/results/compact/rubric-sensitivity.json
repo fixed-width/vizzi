@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "postHocDiagnostic": true,
+  "changes": [
+    "Waive the unasked Tokio API fact on reader; accept the requested stored-base names/roles without construction-helper spellings on relative-source-bases.",
+    "No quote repair, status repair or unsupported-claim forgiveness. Primary frozen results remain unchanged."
+  ],
+  "summaries": [
+    {
+      "arm": "legacy_quotes",
+      "realRepositoryQuestions": 19,
+      "intentSensitiveSuccesses": 1
+    },
+    {
+      "arm": "compact_quotes",
+      "realRepositoryQuestions": 19,
+      "intentSensitiveSuccesses": 4
+    },
+    {
+      "arm": "compact_ids",
+      "realRepositoryQuestions": 19,
+      "intentSensitiveSuccesses": 9
+    }
+  ]
+}

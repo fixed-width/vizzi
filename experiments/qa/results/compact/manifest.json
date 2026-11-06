@@ -1,0 +1,256 @@
+{
+  "schema": 1,
+  "createdAt": "2026-11-06T00:50:38.140Z",
+  "freezeSha256": "f048167b654c749b8bc7db7bcde49d1aa6a4b1b1573a81fbcde37faf223d1377",
+  "qaBinarySha256": "a36a5ddbba17257c7b63320a31d94305303f249ff3c9dc9c0f1cc2709d8e8e77",
+  "questionsSha256": "5c28798284369a4a1256f2780995c8a5d9b1f681c6a71cd74938c016bac933ba",
+  "model": {
+    "id": "qwen3.5-2b-q4",
+    "repository": "bartowski/Qwen_Qwen3.5-2B-GGUF",
+    "revision": "7d26695454df6de5fbcce2e58681e62dae06ce43",
+    "filename": "Qwen_Qwen3.5-2B-Q4_K_M.gguf",
+    "bytes": 1396198496,
+    "sha256": "57a1085840f497d764a7fc5d346922dbde961efb54cc792ea81d694fd846a1d8",
+    "directory": "2b"
+  },
+  "limits": {
+    "threads": 2,
+    "context_tokens": 8192,
+    "output_tokens": 384,
+    "evidence_bytes": 8000,
+    "evidence_items": 6,
+    "request_timeout_ms": 180000,
+    "sampled_memory_target_bytes": 4294967296
+  },
+  "runtime": {
+    "release": "v0.9.0",
+    "build": "b12110",
+    "commit": "cd959bae99ff4bed22bef2604f45241c09bbb8c8",
+    "archive": "llama-b12110-bin-ubuntu-x64.tar.gz",
+    "archive_sha256": "368227edcc229be5f9bed16a2223d79b5e41d0ac2e19bcf5825e82291c060e55"
+  },
+  "runtimeSha256": "eaf9c1c664cc0ae1f4dea4b171bb91aac8409fcfea0574c9b6bcc93792ce2400",
+  "sources": {
+    "vizzi": {
+      "root": "/tmp/vizzi-qa-v2-final/vizzi",
+      "revision": "5ee084d9e7d6876a61af627403ca99fe208d043f",
+      "archiveSha256": "3cd7ad35019fe15b5fb3d56a4fd806209bfc61aaedb88421000c613c5e3cb15a",
+      "initial": {
+        "capture": {
+          "candidates": 945,
+          "omitted": 535,
+          "selected": 410
+        },
+        "index_ms": 2984.8091839999997,
+        "ready": true,
+        "schema": 1,
+        "snapshot": "84a449bc83e7c94e62bfea160a81a5e9a4b2a223df334a3d5470739c9df07c10",
+        "stats": {
+          "bytes": 3110772,
+          "changed": 410,
+          "chunks": 4839,
+          "files": 410,
+          "removed": 0,
+          "reused": 0
+        }
+      }
+    },
+    "lpc-rs": {
+      "root": "/tmp/vizzi-qa-v2-final/lpc-rs",
+      "revision": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+      "archiveSha256": "03b3b09405358aaa67457b306a86497f44e2bc3597a63ba720fd28cdaf7a56a0",
+      "initial": {
+        "capture": {
+          "candidates": 1032,
+          "omitted": 101,
+          "selected": 931
+        },
+        "index_ms": 12065.946989,
+        "ready": true,
+        "schema": 1,
+        "snapshot": "695591054b4f439029c4710d834242372e03069be3de921a5fd12e20dfadf299",
+        "stats": {
+          "bytes": 10754851,
+          "changed": 931,
+          "chunks": 22808,
+          "files": 931,
+          "removed": 0,
+          "reused": 0
+        }
+      }
+    },
+    "changing": {
+      "root": "/tmp/vizzi-qa-v2-final/changing",
+      "revision": "deterministic content-update fixture; labels are not Git commits",
+      "initial": {
+        "capture": {
+          "candidates": 3,
+          "omitted": 0,
+          "selected": 3
+        },
+        "index_ms": 14.116446,
+        "ready": true,
+        "schema": 1,
+        "snapshot": "7e5dd4f73a8cac15dfe10a05d8500760b870a3454b72dedd0d684eeedfde2a0c",
+        "stats": {
+          "bytes": 139,
+          "changed": 3,
+          "chunks": 4,
+          "files": 3,
+          "removed": 0,
+          "reused": 0
+        }
+      }
+    }
+  },
+  "cohort": {
+    "schema": 1,
+    "rationale": "All revised seed cases, three known production/test-role regressions, four temporal regressions and all fresh held-outs. Other observed v1 cases remain retrieval-only development regressions. Selection uses prior/development diagnostics and is fixed before any model outputs or fresh candidate retrieval in this iteration.",
+    "case_ids": [
+      "v2.vizzi.language",
+      "v2.lpc-rs.language",
+      "v2.lpc-rs.purpose",
+      "v2.vizzi.validation",
+      "v2.vizzi.search",
+      "v2.vizzi.connections",
+      "v2.lpc-rs.configuration",
+      "v2.lpc-rs.host-vs-game",
+      "v2.lpc-rs.reader",
+      "v2.lpc-rs.fallback",
+      "v2.lpc-rs.fallback-test",
+      "v2.changing.retry-base",
+      "v2.changing.retry-updated",
+      "v2.changing.renamed-handler",
+      "v2.changing.deleted-handler",
+      "v2.vizzi.fresh-review-startup",
+      "v2.vizzi.fresh-header-language",
+      "v2.vizzi.fresh-cache-source",
+      "v2.vizzi.fresh-working-input",
+      "v2.lpc-rs.fresh-source-decoding",
+      "v2.lpc-rs.fresh-driver-config-failure",
+      "v2.lpc-rs.fresh-relative-source-bases",
+      "v2.lpc-rs.fresh-compiled-port"
+    ],
+    "model": "qwen3.5-2b-q4",
+    "arms": [
+      {
+        "id": "legacy_quotes",
+        "selector": "legacy",
+        "budget": 8000,
+        "limit": 6,
+        "protocol": "quotes"
+      },
+      {
+        "id": "compact_quotes",
+        "selector": "compact",
+        "budget": 2500,
+        "limit": 3,
+        "protocol": "quotes"
+      },
+      {
+        "id": "compact_ids",
+        "selector": "compact",
+        "budget": 2500,
+        "limit": 3,
+        "protocol": "ids"
+      }
+    ],
+    "runtime_binary_sha256": "eaf9c1c664cc0ae1f4dea4b171bb91aac8409fcfea0574c9b6bcc93792ce2400"
+  },
+  "schemas": {
+    "quotes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "answer",
+        "citations"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "answered",
+            "insufficient_evidence"
+          ]
+        },
+        "answer": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "citations": {
+          "type": "array",
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "label",
+              "quote"
+            ],
+            "properties": {
+              "label": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 8
+              },
+              "quote": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              }
+            }
+          }
+        }
+      }
+    },
+    "ids": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "answer",
+        "citations"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "answered",
+            "insufficient_evidence"
+          ]
+        },
+        "answer": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "citations": {
+          "type": "array",
+          "maxItems": 4,
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 8
+          }
+        }
+      }
+    }
+  },
+  "environment": {
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13700H",
+    "os": "linux",
+    "arch": "x64",
+    "physicalMemoryBytes": 67080241152
+  },
+  "completed": 69,
+  "incomplete": false,
+  "limitations": [
+    "Controlled 23-question subset, not a representative benchmark. Eight fresh questions are agent-authored with knowledge of the source.",
+    "The compact/legacy comparison bundles retrieval, excerpt size and metadata; the compact quote/ID comparison holds contexts fixed.",
+    "Canonical citation identity does not establish claim support. Case-author semantic grading is separate.",
+    "Cache reuse is enabled as in v1; arm order rotates by case. No separate cold-cache latency qualification.",
+    "CPU-only two-thread serial inference; observed memory is not an enforced device qualification."
+  ]
+}

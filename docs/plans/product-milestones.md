@@ -29,8 +29,13 @@ The maintainer also authorised a [CPU repository-QA experiment](../qa/PRODUCT.md
 Its [pilot results](../../experiments/qa/RESULTS.md) and versioned question library measure
 external-index retrieval, source support, answer quality, latency, memory and source
 changes separately. This does not advance a chat interface or replace source views.
-The next QA cohort should improve retrieval/context/protocol on development questions
-and retain fresh held-out evaluation before any product integration.
+The [compact-evidence follow-up](../../experiments/qa/COMPACT_RESULTS.md) preserves v1,
+reviews the seed, freezes fresh formulations and separately tests exact maintainer
+questions. Fixed-model latency and source binding improve, while factual coverage does
+not; none of the three maintainer workflows is completed. Keep QA outside the viewer.
+Next, use source-complete, source-only diagnostic packs for those workflows to separate
+retrieval misses from model limits before choosing another retrieval/model change.
+Retain new maintainer questions for subsequent fresh evaluation.
 
 The previous milestone plan and delivery evidence follow as historical context.
 

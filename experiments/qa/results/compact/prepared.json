@@ -1,0 +1,402 @@
+{
+  "schema": 1,
+  "sources": {
+    "vizzi": {
+      "root": "/tmp/vizzi-qa-v2-final/vizzi",
+      "revision": "5ee084d9e7d6876a61af627403ca99fe208d043f",
+      "archiveSha256": "3cd7ad35019fe15b5fb3d56a4fd806209bfc61aaedb88421000c613c5e3cb15a",
+      "initial": {
+        "capture": {
+          "candidates": 945,
+          "omitted": 535,
+          "selected": 410
+        },
+        "index_ms": 2984.8091839999997,
+        "ready": true,
+        "schema": 1,
+        "snapshot": "84a449bc83e7c94e62bfea160a81a5e9a4b2a223df334a3d5470739c9df07c10",
+        "stats": {
+          "bytes": 3110772,
+          "changed": 410,
+          "chunks": 4839,
+          "files": 410,
+          "removed": 0,
+          "reused": 0
+        }
+      }
+    },
+    "lpc-rs": {
+      "root": "/tmp/vizzi-qa-v2-final/lpc-rs",
+      "revision": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+      "archiveSha256": "03b3b09405358aaa67457b306a86497f44e2bc3597a63ba720fd28cdaf7a56a0",
+      "initial": {
+        "capture": {
+          "candidates": 1032,
+          "omitted": 101,
+          "selected": 931
+        },
+        "index_ms": 12065.946989,
+        "ready": true,
+        "schema": 1,
+        "snapshot": "695591054b4f439029c4710d834242372e03069be3de921a5fd12e20dfadf299",
+        "stats": {
+          "bytes": 10754851,
+          "changed": 931,
+          "chunks": 22808,
+          "files": 931,
+          "removed": 0,
+          "reused": 0
+        }
+      }
+    },
+    "changing": {
+      "root": "/tmp/vizzi-qa-v2-final/changing",
+      "revision": "deterministic content-update fixture; labels are not Git commits",
+      "initial": {
+        "capture": {
+          "candidates": 3,
+          "omitted": 0,
+          "selected": 3
+        },
+        "index_ms": 14.116446,
+        "ready": true,
+        "schema": 1,
+        "snapshot": "7e5dd4f73a8cac15dfe10a05d8500760b870a3454b72dedd0d684eeedfde2a0c",
+        "stats": {
+          "bytes": 139,
+          "changed": 3,
+          "chunks": 4,
+          "files": 3,
+          "removed": 0,
+          "reused": 0
+        }
+      }
+    }
+  },
+  "checks": [
+    {
+      "id": "v2.vizzi.purpose",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 2,
+        "matched": 2,
+        "all": true
+      }
+    },
+    {
+      "id": "v2.vizzi.language",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 2,
+        "matched": 0,
+        "all": false
+      }
+    },
+    {
+      "id": "v2.vizzi.entry",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 2,
+        "matched": 1,
+        "all": false
+      }
+    },
+    {
+      "id": "v2.vizzi.configuration",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 2,
+        "matched": 1,
+        "all": false
+      }
+    },
+    {
+      "id": "v2.vizzi.validation",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 3,
+        "matched": 0,
+        "all": false
+      }
+    },
+    {
+      "id": "v2.vizzi.safety",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 2,
+        "matched": 1,
+        "all": false
+      }
+    },
+    {
+      "id": "v2.vizzi.search",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 1,
+        "matched": 0,
+        "all": false
+      }
+    },
+    {
+      "id": "v2.vizzi.connections",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 2,
+        "matched": 0,
+        "all": false
+      }
+    },
+    {
+      "id": "v2.vizzi.editor",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 2,
+        "matched": 2,
+        "all": true
+      }
+    },
+    {
+      "id": "v2.vizzi.atomic-save",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 2,
+        "matched": 0,
+        "all": false
+      }
+    },
+    {
+      "id": "v2.vizzi.unchanged",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 1,
+        "matched": 0,
+        "all": false
+      }
+    },
+    {
+      "id": "v2.vizzi.renderer",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 2,
+        "matched": 0,
+        "all": false
+      }
+    },
+    {
+      "id": "v2.vizzi.oncall",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 0,
+        "matched": 0,
+        "all": null
+      }
+    },
+    {
+      "id": "v2.vizzi.production-latency",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 0,
+        "matched": 0,
+        "all": null
+      }
+    },
+    {
+      "id": "v2.vizzi.fresh-review-startup",
+      "evidence_audited": true
+    },
+    {
+      "id": "v2.vizzi.fresh-header-language",
+      "evidence_audited": true
+    },
+    {
+      "id": "v2.vizzi.fresh-cache-source",
+      "evidence_audited": true
+    },
+    {
+      "id": "v2.vizzi.fresh-working-input",
+      "evidence_audited": true
+    },
+    {
+      "id": "v2.lpc-rs.purpose",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 2,
+        "matched": 0,
+        "all": false
+      }
+    },
+    {
+      "id": "v2.lpc-rs.language",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 2,
+        "matched": 0,
+        "all": false
+      }
+    },
+    {
+      "id": "v2.lpc-rs.entry",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 2,
+        "matched": 0,
+        "all": false
+      }
+    },
+    {
+      "id": "v2.lpc-rs.configuration",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 2,
+        "matched": 0,
+        "all": false
+      }
+    },
+    {
+      "id": "v2.lpc-rs.validation",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 2,
+        "matched": 2,
+        "all": true
+      }
+    },
+    {
+      "id": "v2.lpc-rs.safety",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 1,
+        "matched": 0,
+        "all": false
+      }
+    },
+    {
+      "id": "v2.lpc-rs.reader",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 2,
+        "matched": 1,
+        "all": false
+      }
+    },
+    {
+      "id": "v2.lpc-rs.fallback",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 2,
+        "matched": 2,
+        "all": true
+      }
+    },
+    {
+      "id": "v2.lpc-rs.host-vs-game",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 2,
+        "matched": 0,
+        "all": false
+      }
+    },
+    {
+      "id": "v2.lpc-rs.source-identity",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 2,
+        "matched": 2,
+        "all": true
+      }
+    },
+    {
+      "id": "v2.lpc-rs.fallback-test",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 1,
+        "matched": 0,
+        "all": false
+      }
+    },
+    {
+      "id": "v2.lpc-rs.probe",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 2,
+        "matched": 2,
+        "all": true
+      }
+    },
+    {
+      "id": "v2.lpc-rs.oncall",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 0,
+        "matched": 0,
+        "all": null
+      }
+    },
+    {
+      "id": "v2.lpc-rs.production-latency",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 0,
+        "matched": 0,
+        "all": null
+      }
+    },
+    {
+      "id": "v2.lpc-rs.fresh-source-decoding",
+      "evidence_audited": true
+    },
+    {
+      "id": "v2.lpc-rs.fresh-driver-config-failure",
+      "evidence_audited": true
+    },
+    {
+      "id": "v2.lpc-rs.fresh-relative-source-bases",
+      "evidence_audited": true
+    },
+    {
+      "id": "v2.lpc-rs.fresh-compiled-port",
+      "evidence_audited": true
+    },
+    {
+      "id": "v2.changing.retry-base",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 1,
+        "matched": 1,
+        "all": true
+      }
+    },
+    {
+      "id": "v2.changing.retry-updated",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 1,
+        "matched": 1,
+        "all": true
+      }
+    },
+    {
+      "id": "v2.changing.renamed-handler",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 1,
+        "matched": 1,
+        "all": true
+      }
+    },
+    {
+      "id": "v2.changing.deleted-handler",
+      "evidence_audited": true,
+      "retrieval": {
+        "facts": 0,
+        "matched": 0,
+        "all": null
+      }
+    }
+  ],
+  "questionsSha256": "5c28798284369a4a1256f2780995c8a5d9b1f681c6a71cd74938c016bac933ba",
+  "templatesSha256": "c87e8bfccd18385c7da8207e9717f5149f75d0aec47fd3c17ed8debcc4668ac9",
+  "modelsSha256": "78e5ef6f07c49827810a7a83809b128c5514af8694fa222d4b5c045df1ce3ded",
+  "qaBinarySha256": "a36a5ddbba17257c7b63320a31d94305303f249ff3c9dc9c0f1cc2709d8e8e77"
+}

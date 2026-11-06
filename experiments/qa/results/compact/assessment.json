@@ -1,0 +1,1717 @@
+{
+  "schema": 1,
+  "grader": "Codex, source-aware case author; preliminary manual rubric review, not independent human grading",
+  "limitations": [
+    "The evaluator authored the seed and knows the source/rubric; preserve raw outputs for maintainer and independent review.",
+    "Facts are assessed independently of status and strict native reference checks. Literal preferred-anchor coverage is not semantic accuracy.",
+    "Primary task success requires the frozen status, all required facts, no unsupported claims, supporting citations and native source binding; no quotation/status repair is applied."
+  ],
+  "summaries": [
+    {
+      "split": "all",
+      "population": "all",
+      "arm": "legacy_quotes",
+      "cases": 23,
+      "answerable": 22,
+      "taskSuccess": 2,
+      "unanswerable": 1,
+      "correctRefusals": 1,
+      "supportedFacts": 23,
+      "facts": 36,
+      "allFacts": 11,
+      "statusCorrect": 17,
+      "unsupportedAnswers": 8,
+      "roleConfusions": 2,
+      "sourceChecks": 10,
+      "answerableRefusals": 6,
+      "truncated": 0,
+      "formatErrors": 0,
+      "runtimeErrors": 0,
+      "medianEvidenceBytes": 7877,
+      "medianPromptTokens": 2195,
+      "medianOutputTokens": 120,
+      "medianRetrievalMs": 0.825133,
+      "medianFirstOutputMs": 34853.992373000016,
+      "medianMs": 48166.04657200002,
+      "p95Ms": 55413.528495999984
+    },
+    {
+      "split": "all",
+      "population": "all",
+      "arm": "compact_quotes",
+      "cases": 23,
+      "answerable": 22,
+      "taskSuccess": 6,
+      "unanswerable": 1,
+      "correctRefusals": 1,
+      "supportedFacts": 23,
+      "facts": 36,
+      "allFacts": 11,
+      "statusCorrect": 18,
+      "unsupportedAnswers": 10,
+      "roleConfusions": 0,
+      "sourceChecks": 13,
+      "answerableRefusals": 5,
+      "truncated": 0,
+      "formatErrors": 0,
+      "runtimeErrors": 0,
+      "medianEvidenceBytes": 2267,
+      "medianPromptTokens": 848,
+      "medianOutputTokens": 110,
+      "medianRetrievalMs": 277.468261,
+      "medianFirstOutputMs": 12368.632890000008,
+      "medianMs": 22266.01024199999,
+      "p95Ms": 32658.093837000022
+    },
+    {
+      "split": "all",
+      "population": "all",
+      "arm": "compact_ids",
+      "cases": 23,
+      "answerable": 22,
+      "taskSuccess": 10,
+      "unanswerable": 1,
+      "correctRefusals": 1,
+      "supportedFacts": 21,
+      "facts": 36,
+      "allFacts": 11,
+      "statusCorrect": 17,
+      "unsupportedAnswers": 9,
+      "roleConfusions": 0,
+      "sourceChecks": 23,
+      "answerableRefusals": 6,
+      "truncated": 0,
+      "formatErrors": 0,
+      "runtimeErrors": 0,
+      "medianEvidenceBytes": 2267,
+      "medianPromptTokens": 844,
+      "medianOutputTokens": 70,
+      "medianRetrievalMs": 284.799847,
+      "medianFirstOutputMs": 13129.74217099999,
+      "medianMs": 19122.182197000133,
+      "p95Ms": 24591.553697000025
+    },
+    {
+      "split": "development",
+      "population": "all",
+      "arm": "legacy_quotes",
+      "cases": 15,
+      "answerable": 14,
+      "taskSuccess": 2,
+      "unanswerable": 1,
+      "correctRefusals": 1,
+      "supportedFacts": 16,
+      "facts": 24,
+      "allFacts": 7,
+      "statusCorrect": 11,
+      "unsupportedAnswers": 5,
+      "roleConfusions": 2,
+      "sourceChecks": 8,
+      "answerableRefusals": 4,
+      "truncated": 0,
+      "formatErrors": 0,
+      "runtimeErrors": 0,
+      "medianEvidenceBytes": 7685,
+      "medianPromptTokens": 2007,
+      "medianOutputTokens": 112,
+      "medianRetrievalMs": 0.7799280000000001,
+      "medianFirstOutputMs": 32127.360636000056,
+      "medianMs": 44049.206645,
+      "p95Ms": 55413.528495999984
+    },
+    {
+      "split": "development",
+      "population": "all",
+      "arm": "compact_quotes",
+      "cases": 15,
+      "answerable": 14,
+      "taskSuccess": 6,
+      "unanswerable": 1,
+      "correctRefusals": 1,
+      "supportedFacts": 17,
+      "facts": 24,
+      "allFacts": 8,
+      "statusCorrect": 14,
+      "unsupportedAnswers": 5,
+      "roleConfusions": 0,
+      "sourceChecks": 9,
+      "answerableRefusals": 1,
+      "truncated": 0,
+      "formatErrors": 0,
+      "runtimeErrors": 0,
+      "medianEvidenceBytes": 2267,
+      "medianPromptTokens": 849,
+      "medianOutputTokens": 110,
+      "medianRetrievalMs": 258.683634,
+      "medianFirstOutputMs": 12368.632890000008,
+      "medianMs": 22145.850440000067,
+      "p95Ms": 35659.56777100009
+    },
+    {
+      "split": "development",
+      "population": "all",
+      "arm": "compact_ids",
+      "cases": 15,
+      "answerable": 14,
+      "taskSuccess": 8,
+      "unanswerable": 1,
+      "correctRefusals": 1,
+      "supportedFacts": 16,
+      "facts": 24,
+      "allFacts": 8,
+      "statusCorrect": 13,
+      "unsupportedAnswers": 4,
+      "roleConfusions": 0,
+      "sourceChecks": 15,
+      "answerableRefusals": 2,
+      "truncated": 0,
+      "formatErrors": 0,
+      "runtimeErrors": 0,
+      "medianEvidenceBytes": 2267,
+      "medianPromptTokens": 845,
+      "medianOutputTokens": 62,
+      "medianRetrievalMs": 270.297085,
+      "medianFirstOutputMs": 13619.440869000042,
+      "medianMs": 18633.90739800001,
+      "p95Ms": 26845.14227099996
+    },
+    {
+      "split": "held_out",
+      "population": "all",
+      "arm": "legacy_quotes",
+      "cases": 8,
+      "answerable": 8,
+      "taskSuccess": 0,
+      "unanswerable": 0,
+      "correctRefusals": 0,
+      "supportedFacts": 7,
+      "facts": 12,
+      "allFacts": 4,
+      "statusCorrect": 6,
+      "unsupportedAnswers": 3,
+      "roleConfusions": 0,
+      "sourceChecks": 2,
+      "answerableRefusals": 2,
+      "truncated": 0,
+      "formatErrors": 0,
+      "runtimeErrors": 0,
+      "medianEvidenceBytes": 7882,
+      "medianPromptTokens": 2225,
+      "medianOutputTokens": 157,
+      "medianRetrievalMs": 1.7515495,
+      "medianFirstOutputMs": 37119.20083949994,
+      "medianMs": 49379.54503649997,
+      "p95Ms": 64161.43079599994
+    },
+    {
+      "split": "held_out",
+      "population": "all",
+      "arm": "compact_quotes",
+      "cases": 8,
+      "answerable": 8,
+      "taskSuccess": 0,
+      "unanswerable": 0,
+      "correctRefusals": 0,
+      "supportedFacts": 6,
+      "facts": 12,
+      "allFacts": 3,
+      "statusCorrect": 4,
+      "unsupportedAnswers": 5,
+      "roleConfusions": 0,
+      "sourceChecks": 4,
+      "answerableRefusals": 4,
+      "truncated": 0,
+      "formatErrors": 0,
+      "runtimeErrors": 0,
+      "medianEvidenceBytes": 2247.5,
+      "medianPromptTokens": 841.5,
+      "medianOutputTokens": 108,
+      "medianRetrievalMs": 391.540978,
+      "medianFirstOutputMs": 12383.429160999949,
+      "medianMs": 23693.91156799998,
+      "p95Ms": 31452.477399999974
+    },
+    {
+      "split": "held_out",
+      "population": "all",
+      "arm": "compact_ids",
+      "cases": 8,
+      "answerable": 8,
+      "taskSuccess": 2,
+      "unanswerable": 0,
+      "correctRefusals": 0,
+      "supportedFacts": 5,
+      "facts": 12,
+      "allFacts": 3,
+      "statusCorrect": 4,
+      "unsupportedAnswers": 5,
+      "roleConfusions": 0,
+      "sourceChecks": 8,
+      "answerableRefusals": 4,
+      "truncated": 0,
+      "formatErrors": 0,
+      "runtimeErrors": 0,
+      "medianEvidenceBytes": 2247.5,
+      "medianPromptTokens": 837.5,
+      "medianOutputTokens": 79.5,
+      "medianRetrievalMs": 399.30541949999997,
+      "medianFirstOutputMs": 12056.426074999967,
+      "medianMs": 19282.599251500098,
+      "p95Ms": 24591.553697000025
+    },
+    {
+      "split": "all",
+      "population": "repository",
+      "arm": "legacy_quotes",
+      "cases": 19,
+      "answerable": 19,
+      "taskSuccess": 1,
+      "unanswerable": 0,
+      "correctRefusals": 0,
+      "supportedFacts": 20,
+      "facts": 33,
+      "allFacts": 8,
+      "statusCorrect": 13,
+      "unsupportedAnswers": 8,
+      "roleConfusions": 2,
+      "sourceChecks": 8,
+      "answerableRefusals": 6,
+      "truncated": 0,
+      "formatErrors": 0,
+      "runtimeErrors": 0,
+      "medianEvidenceBytes": 7907,
+      "medianPromptTokens": 2213,
+      "medianOutputTokens": 133,
+      "medianRetrievalMs": 2.5512799999999998,
+      "medianFirstOutputMs": 36539.25325999997,
+      "medianMs": 49896.02305399999,
+      "p95Ms": 64161.43079599994
+    },
+    {
+      "split": "all",
+      "population": "repository",
+      "arm": "compact_quotes",
+      "cases": 19,
+      "answerable": 19,
+      "taskSuccess": 3,
+      "unanswerable": 0,
+      "correctRefusals": 0,
+      "supportedFacts": 20,
+      "facts": 33,
+      "allFacts": 8,
+      "statusCorrect": 14,
+      "unsupportedAnswers": 10,
+      "roleConfusions": 0,
+      "sourceChecks": 9,
+      "answerableRefusals": 5,
+      "truncated": 0,
+      "formatErrors": 0,
+      "runtimeErrors": 0,
+      "medianEvidenceBytes": 2345,
+      "medianPromptTokens": 854,
+      "medianOutputTokens": 113,
+      "medianRetrievalMs": 505.61369499999995,
+      "medianFirstOutputMs": 12877.123827999923,
+      "medianMs": 24233.607809999958,
+      "p95Ms": 35659.56777100009
+    },
+    {
+      "split": "all",
+      "population": "repository",
+      "arm": "compact_ids",
+      "cases": 19,
+      "answerable": 19,
+      "taskSuccess": 7,
+      "unanswerable": 0,
+      "correctRefusals": 0,
+      "supportedFacts": 18,
+      "facts": 33,
+      "allFacts": 8,
+      "statusCorrect": 13,
+      "unsupportedAnswers": 9,
+      "roleConfusions": 0,
+      "sourceChecks": 19,
+      "answerableRefusals": 6,
+      "truncated": 0,
+      "formatErrors": 0,
+      "runtimeErrors": 0,
+      "medianEvidenceBytes": 2345,
+      "medianPromptTokens": 850,
+      "medianOutputTokens": 74,
+      "medianRetrievalMs": 510.43560899999994,
+      "medianFirstOutputMs": 13619.440869000042,
+      "medianMs": 19555.252703000093,
+      "p95Ms": 26845.14227099996
+    },
+    {
+      "split": "all",
+      "population": "temporal",
+      "arm": "legacy_quotes",
+      "cases": 4,
+      "answerable": 3,
+      "taskSuccess": 1,
+      "unanswerable": 1,
+      "correctRefusals": 1,
+      "supportedFacts": 3,
+      "facts": 3,
+      "allFacts": 3,
+      "statusCorrect": 4,
+      "unsupportedAnswers": 0,
+      "roleConfusions": 0,
+      "sourceChecks": 2,
+      "answerableRefusals": 0,
+      "truncated": 0,
+      "formatErrors": 0,
+      "runtimeErrors": 0,
+      "medianEvidenceBytes": 16,
+      "medianPromptTokens": 243.5,
+      "medianOutputTokens": 64,
+      "medianRetrievalMs": 0.0127825,
+      "medianFirstOutputMs": 2951.0137549999636,
+      "medianMs": 6756.39287900005,
+      "p95Ms": 11187.50019699987
+    },
+    {
+      "split": "all",
+      "population": "temporal",
+      "arm": "compact_quotes",
+      "cases": 4,
+      "answerable": 3,
+      "taskSuccess": 3,
+      "unanswerable": 1,
+      "correctRefusals": 1,
+      "supportedFacts": 3,
+      "facts": 3,
+      "allFacts": 3,
+      "statusCorrect": 4,
+      "unsupportedAnswers": 0,
+      "roleConfusions": 0,
+      "sourceChecks": 4,
+      "answerableRefusals": 0,
+      "truncated": 0,
+      "formatErrors": 0,
+      "runtimeErrors": 0,
+      "medianEvidenceBytes": 16,
+      "medianPromptTokens": 250.5,
+      "medianOutputTokens": 59,
+      "medianRetrievalMs": 0.017827500000000003,
+      "medianFirstOutputMs": 1866.6853625000222,
+      "medianMs": 5490.415539500071,
+      "p95Ms": 8833.343389000045
+    },
+    {
+      "split": "all",
+      "population": "temporal",
+      "arm": "compact_ids",
+      "cases": 4,
+      "answerable": 3,
+      "taskSuccess": 3,
+      "unanswerable": 1,
+      "correctRefusals": 1,
+      "supportedFacts": 3,
+      "facts": 3,
+      "allFacts": 3,
+      "statusCorrect": 4,
+      "unsupportedAnswers": 0,
+      "roleConfusions": 0,
+      "sourceChecks": 4,
+      "answerableRefusals": 0,
+      "truncated": 0,
+      "formatErrors": 0,
+      "runtimeErrors": 0,
+      "medianEvidenceBytes": 16,
+      "medianPromptTokens": 246.5,
+      "medianOutputTokens": 50,
+      "medianRetrievalMs": 0.010963500000000001,
+      "medianFirstOutputMs": 3890.835712000029,
+      "medianMs": 7042.859233000083,
+      "p95Ms": 7900.245636000065
+    }
+  ],
+  "decisions": [
+    {
+      "id": "v2.vizzi.language/legacy_quotes",
+      "unsupportedClaims": [
+        "The browser interface uses Python. The cited report describes supported analysis languages, not the browser implementation."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": true,
+      "facts": [
+        "contradicted",
+        "supported"
+      ],
+      "notes": "Rust/2024 is supported by AGENTS. Python is a mistaken transfer from an analysis-language report; one quote also loses the literal line wrapping.",
+      "case": "v2.vizzi.language",
+      "arm": "legacy_quotes",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.vizzi.language/compact_quotes",
+      "unsupportedClaims": [
+        "Claims that the excerpts do not explicitly state the Rust edition despite Cargo.toml edition = 2024."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "missing",
+        "missing"
+      ],
+      "notes": "The browser language is absent, but the supplied manifest plainly establishes the edition. Refusal misses both required facts.",
+      "case": "v2.vizzi.language",
+      "arm": "compact_quotes",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.vizzi.language/compact_ids",
+      "unsupportedClaims": [
+        "Claims that the excerpts do not explicitly state the Rust edition despite Cargo.toml edition = 2024."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "missing",
+        "missing"
+      ],
+      "notes": "Same material refusal as the compact quote arm. Empty references are structurally valid for insufficient_evidence, not a correct answer.",
+      "case": "v2.vizzi.language",
+      "arm": "compact_ids",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.lpc-rs.language/compact_quotes",
+      "unsupportedClaims": [
+        "The implementation language is claimed to be LPC; the package description identifies compiler purpose, not its implementation language."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "contradicted",
+        "supported"
+      ],
+      "notes": "Correct edition, incorrect language. Both quotations bind exactly but the package-description citation does not establish the claim.",
+      "case": "v2.lpc-rs.language",
+      "arm": "compact_quotes",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.lpc-rs.language/compact_ids",
+      "unsupportedClaims": [
+        "The repository/package name lpc-rs is presented as an implementation language."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "contradicted",
+        "supported"
+      ],
+      "notes": "Correct edition. Canonical manifest IDs do not support treating the package name as a language.",
+      "case": "v2.lpc-rs.language",
+      "arm": "compact_ids",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.lpc-rs.language/legacy_quotes",
+      "unsupportedClaims": [
+        "LPC is claimed as the implementation language; the cited description is the language implemented by the compiler."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "contradicted",
+        "supported"
+      ],
+      "notes": "Edition 2024 is explicit. Confuses target language with implementation language despite valid literal citations.",
+      "case": "v2.lpc-rs.language",
+      "arm": "legacy_quotes",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.lpc-rs.purpose/compact_ids",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "notes": "The root introduction establishes compiler/VM/gamedriver and persistent multiplayer worlds; the workspace table establishes the named binaries/components. Accept the loose extra list as a project-level component summary, not a claim about their implementation language.",
+      "case": "v2.lpc-rs.purpose",
+      "arm": "compact_ids",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 2,
+      "taskSuccess": true
+    },
+    {
+      "id": "v2.lpc-rs.purpose/legacy_quotes",
+      "unsupportedClaims": [
+        "Treats support-crate descriptions as the overall lpc-rs project purpose."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "missing",
+        "missing"
+      ],
+      "notes": "Retrieval supplies support crates and an unrelated partial-application test, not the root project introduction. Refusal misses the question.",
+      "case": "v2.lpc-rs.purpose",
+      "arm": "legacy_quotes",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.lpc-rs.purpose/compact_quotes",
+      "unsupportedClaims": [],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "notes": "Both material purpose facts are correctly stated from the root introduction. Extra executable names come from the workspace table. The second quotation is fabricated/ellipsized and assigned to a different excerpt, so strict reference binding and citation support fail.",
+      "case": "v2.lpc-rs.purpose",
+      "arm": "compact_quotes",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 2,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.vizzi.validation/legacy_quotes",
+      "unsupportedClaims": [
+        "Feature-specific test matrices from implementation plans are presented as requirements for every contributor change."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": true,
+      "facts": [
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "notes": "Names all baseline checks, but imports a specialised implementation-plan test matrix as global contributor policy. The second quote also fails exact binding.",
+      "case": "v2.vizzi.validation",
+      "arm": "legacy_quotes",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 3,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.vizzi.validation/compact_quotes",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "notes": "Accurately gives formatting, workspace tests including doctests and Clippy from AGENTS, with a literal source quote. Mutation-tool references are also present in the supplied policy excerpt.",
+      "case": "v2.vizzi.validation",
+      "arm": "compact_quotes",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 3,
+      "taskSuccess": true
+    },
+    {
+      "id": "v2.vizzi.validation/compact_ids",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "supported",
+        "supported"
+      ],
+      "notes": "Correct baseline checks plus affected-target validation and cargo-mutants. Workspace tests are accepted as the documented baseline including doctests; no omission/bypass is claimed.",
+      "case": "v2.vizzi.validation",
+      "arm": "compact_ids",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 3,
+      "taskSuccess": true
+    },
+    {
+      "id": "v2.vizzi.search/compact_quotes",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Exactly distinguishes declaration/path matching from arbitrary body text and quotes the relevant guide.",
+      "case": "v2.vizzi.search",
+      "arm": "compact_quotes",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": true
+    },
+    {
+      "id": "v2.vizzi.search/compact_ids",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "The guide at label 2 explicitly supports both fields and the exclusion of full source text.",
+      "case": "v2.vizzi.search",
+      "arm": "compact_ids",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": true
+    },
+    {
+      "id": "v2.vizzi.search/legacy_quotes",
+      "unsupportedClaims": [],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "missing"
+      ],
+      "notes": "Refuses rather than establish the match fields; the selected control context lacks the direct guide statement used by the compact arms.",
+      "case": "v2.vizzi.search",
+      "arm": "legacy_quotes",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.vizzi.connections/compact_ids",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "notes": "Correctly gives reader-authored interpretation and excludes resolved/inferred dependency proof; guide and contract directly support both.",
+      "case": "v2.vizzi.connections",
+      "arm": "compact_ids",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 2,
+      "taskSuccess": true
+    },
+    {
+      "id": "v2.vizzi.connections/legacy_quotes",
+      "unsupportedClaims": [],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "notes": "Body correctly states the distinction, but the quote repeats/invents the ending (a call, a call) and fails exact source binding.",
+      "case": "v2.vizzi.connections",
+      "arm": "legacy_quotes",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 2,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.vizzi.connections/compact_quotes",
+      "unsupportedClaims": [],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "notes": "Correct interpretation and lack of inferred dependency proof, but both copied references are edited or miscopied; one repeats fragments and the other flattens source wrapping.",
+      "case": "v2.vizzi.connections",
+      "arm": "compact_quotes",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 2,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.lpc-rs.configuration/legacy_quotes",
+      "unsupportedClaims": [
+        "Uses the language-server --config option as the gamedriver option; the driver uses --env."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "contradicted",
+        "supported"
+      ],
+      "notes": "The general LPC_-prefix precedence rule is accepted as establishing LPC_LIB_DIR over LIB_DIR in this context. The environment-file flag is for the wrong executable, and exact quote binding fails.",
+      "case": "v2.lpc-rs.configuration",
+      "arm": "legacy_quotes",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.lpc-rs.configuration/compact_quotes",
+      "unsupportedClaims": [
+        "Says LIB_DIR determines mudlib-root precedence, overlooking the higher-precedence LPC_LIB_DIR form."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "contradicted"
+      ],
+      "notes": "Correct --env selection, incorrect precedence despite the excerpt explicitly stating the prefix rule. The abstract command quote is also assigned to an unrelated excerpt.",
+      "case": "v2.lpc-rs.configuration",
+      "arm": "compact_quotes",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.lpc-rs.configuration/compact_ids",
+      "unsupportedClaims": [
+        "Says LIB_DIR determines mudlib-root precedence, overlooking the higher-precedence LPC_LIB_DIR form."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "contradicted"
+      ],
+      "notes": "Same substantive answer as the compact quote arm. Canonical labels are available but do not establish the claimed precedence.",
+      "case": "v2.lpc-rs.configuration",
+      "arm": "compact_ids",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.lpc-rs.host-vs-game/compact_quotes",
+      "unsupportedClaims": [
+        "Explains in-game confinement through class/source-identity rules rather than the configured-root path validation; its account of compilation-local IDs and identity is also inconsistent with the class excerpt."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "contradicted"
+      ],
+      "notes": "The coarse host/outside and game/boundary distinction is partly right, but the claimed enforcement mechanism is unsupported. Literal reference binding also fails.",
+      "case": "v2.lpc-rs.host-vs-game",
+      "arm": "compact_quotes",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.lpc-rs.host-vs-game/compact_ids",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "missing",
+        "missing"
+      ],
+      "notes": "Faithfully limits itself to the macro-label statement and identifies the missing path-validation evidence. It does not answer either material part of the repository task.",
+      "case": "v2.lpc-rs.host-vs-game",
+      "arm": "compact_ids",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.lpc-rs.host-vs-game/legacy_quotes",
+      "unsupportedClaims": [],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "missing"
+      ],
+      "notes": "Explicitly accepts host paths outside the mudlib but cannot establish the in-game path validation entry point; status is insufficient_evidence and references are empty.",
+      "case": "v2.lpc-rs.host-vs-game",
+      "arm": "legacy_quotes",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.lpc-rs.reader/compact_ids",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "missing"
+      ],
+      "intentSatisfied": true,
+      "rubricIssue": "The frozen second fact requires the tokio::fs::read API although the question asks only for the abstraction and default implementation.",
+      "notes": "Accurately answers the actual wording with the trait, concrete implementation and host-facing disk doc comment at label 1. Strict frozen scoring still fails the unasked I/O API fact; no post-hoc rubric edit is applied.",
+      "case": "v2.lpc-rs.reader",
+      "arm": "compact_ids",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.lpc-rs.reader/legacy_quotes",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "intentSatisfied": true,
+      "notes": "Correct trait, concrete disk implementation and tokio::fs::read; the full supplied source-reader excerpt includes the implementation body. The host-facing disk doc comment is accepted as sufficient for the default-role interpretation.",
+      "case": "v2.lpc-rs.reader",
+      "arm": "legacy_quotes",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 2,
+      "taskSuccess": true
+    },
+    {
+      "id": "v2.lpc-rs.reader/compact_quotes",
+      "unsupportedClaims": [],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "missing"
+      ],
+      "rubricIssue": "The frozen second fact requires the tokio::fs::read API although the question asks only for the abstraction and default implementation.",
+      "notes": "Correct requested trait/default. The frozen extra API detail is not stated, and the implementation quote is assigned to the unrelated preprocess_source excerpt instead of label 1.",
+      "case": "v2.lpc-rs.reader",
+      "arm": "compact_quotes",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.lpc-rs.fallback/legacy_quotes",
+      "unsupportedClaims": [],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "notes": "The first sentence correctly includes NotFound and the not-already-c guard, which bounds the retry. The additional PermissionDenied example is valid. The copied combined guard loses literal source wrapping and fails binding.",
+      "case": "v2.lpc-rs.fallback",
+      "arm": "legacy_quotes",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 2,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.lpc-rs.fallback/compact_quotes",
+      "unsupportedClaims": [
+        "Reverses the extension guard: it says a non-c extension terminates the loop, whereas that condition permits the extension fallback."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "contradicted"
+      ],
+      "notes": "Finds the actual production read_file scope but misinterprets the guard. The excerpt also ends before the final error branch; do not attribute this solely to model reasoning. The quote is fabricated/ellipsized.",
+      "case": "v2.lpc-rs.fallback",
+      "arm": "compact_quotes",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.lpc-rs.fallback/compact_ids",
+      "unsupportedClaims": [
+        "Reverses the extension guard, claiming that the retry stops when the extension is not c."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "contradicted"
+      ],
+      "notes": "Same guard inversion as compact quotes despite canonical source binding. The selected excerpt omits the final error branch.",
+      "case": "v2.lpc-rs.fallback",
+      "arm": "compact_ids",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.lpc-rs.fallback-test/compact_quotes",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Correctly names and quotes the actual regression test; selecting a test is appropriate for this question.",
+      "case": "v2.lpc-rs.fallback-test",
+      "arm": "compact_quotes",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": true
+    },
+    {
+      "id": "v2.lpc-rs.fallback-test/compact_ids",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Correct test name, supported by the raw lexical test scope at label 1.",
+      "case": "v2.lpc-rs.fallback-test",
+      "arm": "compact_ids",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": true
+    },
+    {
+      "id": "v2.lpc-rs.fallback-test/legacy_quotes",
+      "unsupportedClaims": [],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "missing"
+      ],
+      "notes": "Control retrieval supplies historical port reports and an LSP guide, so it refuses instead of identifying the test.",
+      "case": "v2.lpc-rs.fallback-test",
+      "arm": "legacy_quotes",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.changing.retry-base/compact_ids",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Correct current captured value/name with a valid source reference.",
+      "case": "v2.changing.retry-base",
+      "arm": "compact_ids",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": true
+    },
+    {
+      "id": "v2.changing.retry-base/legacy_quotes",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Correct current captured value/name with a valid source reference.",
+      "case": "v2.changing.retry-base",
+      "arm": "legacy_quotes",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": true
+    },
+    {
+      "id": "v2.changing.retry-base/compact_quotes",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Correct current captured value/name with a valid source reference.",
+      "case": "v2.changing.retry-base",
+      "arm": "compact_quotes",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": true
+    },
+    {
+      "id": "v2.changing.retry-updated/legacy_quotes",
+      "unsupportedClaims": [],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Correct current captured value/name, but the updated answer omits citations or the rename answer invents a second source label.",
+      "case": "v2.changing.retry-updated",
+      "arm": "legacy_quotes",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.changing.retry-updated/compact_quotes",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Correct current captured value/name with a valid source reference.",
+      "case": "v2.changing.retry-updated",
+      "arm": "compact_quotes",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": true
+    },
+    {
+      "id": "v2.changing.retry-updated/compact_ids",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Correct current captured value/name with a valid source reference.",
+      "case": "v2.changing.retry-updated",
+      "arm": "compact_ids",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": true
+    },
+    {
+      "id": "v2.changing.renamed-handler/compact_quotes",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Correct current captured value/name with a valid source reference.",
+      "case": "v2.changing.renamed-handler",
+      "arm": "compact_quotes",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": true
+    },
+    {
+      "id": "v2.changing.renamed-handler/compact_ids",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Correct current captured value/name with a valid source reference.",
+      "case": "v2.changing.renamed-handler",
+      "arm": "compact_ids",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": true
+    },
+    {
+      "id": "v2.changing.renamed-handler/legacy_quotes",
+      "unsupportedClaims": [],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Correct current captured value/name, but the updated answer omits citations or the rename answer invents a second source label.",
+      "case": "v2.changing.renamed-handler",
+      "arm": "legacy_quotes",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.changing.deleted-handler/compact_ids",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [],
+      "notes": "Correctly refuses to invent a definition after the handler source file is removed.",
+      "case": "v2.changing.deleted-handler",
+      "arm": "compact_ids",
+      "split": "development",
+      "answerable": false,
+      "statusCorrect": true,
+      "supportedFacts": 0,
+      "taskSuccess": true
+    },
+    {
+      "id": "v2.changing.deleted-handler/legacy_quotes",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [],
+      "notes": "Correctly refuses to invent a definition after the handler source file is removed.",
+      "case": "v2.changing.deleted-handler",
+      "arm": "legacy_quotes",
+      "split": "development",
+      "answerable": false,
+      "statusCorrect": true,
+      "supportedFacts": 0,
+      "taskSuccess": true
+    },
+    {
+      "id": "v2.changing.deleted-handler/compact_quotes",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [],
+      "notes": "Correctly refuses to invent a definition after the handler source file is removed.",
+      "case": "v2.changing.deleted-handler",
+      "arm": "compact_quotes",
+      "split": "development",
+      "answerable": false,
+      "statusCorrect": true,
+      "supportedFacts": 0,
+      "taskSuccess": true
+    },
+    {
+      "id": "v2.vizzi.fresh-review-startup/legacy_quotes",
+      "unsupportedClaims": [
+        "Claims the excerpts do not establish the review-only/live-index distinction while explicitly quoting that distinction."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "The body states the negative startup fact but then refuses the actual yes/no question. Also fabricates/ellipsizes the quote. Record factual content separately from the wrong status and contradictory caveat.",
+      "case": "v2.vizzi.fresh-review-startup",
+      "arm": "legacy_quotes",
+      "split": "held_out",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.vizzi.fresh-review-startup/compact_quotes",
+      "unsupportedClaims": [
+        "Claims the causal distinction is not established despite the explicit review-only rule and guide statement without starting the live index."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Repeats the required negative fact, then refuses; the supplied guide and contract are sufficient.",
+      "case": "v2.vizzi.fresh-review-startup",
+      "arm": "compact_quotes",
+      "split": "held_out",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.vizzi.fresh-review-startup/compact_ids",
+      "unsupportedClaims": [
+        "Claims the review/exploration distinction is unclear despite the explicit contract and guide statements."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Correct negative fact appears in the body, but the status and subsequent caveat contradict the available evidence.",
+      "case": "v2.vizzi.fresh-review-startup",
+      "arm": "compact_ids",
+      "split": "held_out",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.vizzi.fresh-header-language/compact_quotes",
+      "unsupportedClaims": [
+        "Claims no exact outcome is supplied even though the policy table explicitly describes an enabled include/shared.h without assignment."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "missing"
+      ],
+      "notes": "Acknowledges source-only/unassigned classification but fails the task and does not establish the no-nearest-file/majority-guess rule.",
+      "case": "v2.vizzi.fresh-header-language",
+      "arm": "compact_quotes",
+      "split": "held_out",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.vizzi.fresh-header-language/compact_ids",
+      "unsupportedClaims": [
+        "Claims there are no specific examples/rules, overlooking the explicit ambiguous-header example and suffix table."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "missing"
+      ],
+      "notes": "Acknowledges the source-only classification in reported context, then refuses and omits the no-guessing behavior.",
+      "case": "v2.vizzi.fresh-header-language",
+      "arm": "compact_ids",
+      "split": "held_out",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.vizzi.fresh-header-language/legacy_quotes",
+      "unsupportedClaims": [],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "notes": "Correct source-only/unassigned behavior and no automatic header assignment. The quote assigned to the test excerpt belongs to policy text instead, so source binding fails.",
+      "case": "v2.vizzi.fresh-header-language",
+      "arm": "legacy_quotes",
+      "split": "held_out",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 2,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.vizzi.fresh-cache-source/compact_ids",
+      "unsupportedClaims": [
+        "Claims cache authority is not explicitly defined despite the Cache documentation saying it is never authoritative source text."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "missing",
+        "missing"
+      ],
+      "notes": "The origin evidence is incomplete, but the cache-authority statement is explicitly available and overlooked.",
+      "case": "v2.vizzi.fresh-cache-source",
+      "arm": "compact_ids",
+      "split": "held_out",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.vizzi.fresh-cache-source/legacy_quotes",
+      "unsupportedClaims": [
+        "Says preview source is retrieved from the current working directory through the editor adapter instead of immutable captured source."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "contradicted",
+        "supported"
+      ],
+      "notes": "Correctly rejects the analysis cache as authoritative, but gives the wrong source ownership/acquisition mechanism despite valid cache quotes.",
+      "case": "v2.vizzi.fresh-cache-source",
+      "arm": "legacy_quotes",
+      "split": "held_out",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.vizzi.fresh-cache-source/compact_quotes",
+      "unsupportedClaims": [
+        "Claims the excerpts do not confirm cache authority, then quotes the explicit statement that the cache is never authoritative."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "missing",
+        "supported"
+      ],
+      "notes": "No captured-source ownership answer; the correct cache-authority negative appears inside an otherwise contradictory refusal.",
+      "case": "v2.vizzi.fresh-cache-source",
+      "arm": "compact_quotes",
+      "split": "held_out",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.vizzi.fresh-working-input/legacy_quotes",
+      "unsupportedClaims": [
+        "After correctly listing included edits, explicitly says staged and unstaged changes are excluded from the working tree comparison."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "contradicted"
+      ],
+      "notes": "The first clause is right, but the final exclusion contradicts it. The literal quote also flattens a line break.",
+      "case": "v2.vizzi.fresh-working-input",
+      "arm": "legacy_quotes",
+      "split": "held_out",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.vizzi.fresh-working-input/compact_quotes",
+      "unsupportedClaims": [],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Correctly lists staged/unstaged edits, tracked deletions and non-ignored untracked source as observed on disk. The copied guide quote fails exact wrapping.",
+      "case": "v2.vizzi.fresh-working-input",
+      "arm": "compact_quotes",
+      "split": "held_out",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.vizzi.fresh-working-input/compact_ids",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Complete and supported working-input description; all three supplied documents support the answer.",
+      "case": "v2.vizzi.fresh-working-input",
+      "arm": "compact_ids",
+      "split": "held_out",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": true
+    },
+    {
+      "id": "v2.lpc-rs.fresh-source-decoding/compact_quotes",
+      "unsupportedClaims": [
+        "Describes invalid UTF-8 bytes as converted to ASCII, whereas byte-to-char mapping preserves the Latin-1 byte values including 128-255."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "contradicted",
+        "supported"
+      ],
+      "notes": "The complete short decoding method is supplied. Newline handling is right; decoding semantics and quote copying are wrong.",
+      "case": "v2.lpc-rs.fresh-source-decoding",
+      "arm": "compact_quotes",
+      "split": "held_out",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.lpc-rs.fresh-source-decoding/compact_ids",
+      "unsupportedClaims": [
+        "Claims an error string representation is used and bytes are collected into Vec<u8>; the code recovers original bytes and maps them directly to characters collected into a String."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "contradicted",
+        "supported"
+      ],
+      "notes": "Correct newline handling, incorrect interpretation of the fully supplied Latin-1 fallback.",
+      "case": "v2.lpc-rs.fresh-source-decoding",
+      "arm": "compact_ids",
+      "split": "held_out",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.lpc-rs.fresh-source-decoding/legacy_quotes",
+      "unsupportedClaims": [],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "notes": "Correct Latin-1 fallback and newline normalization. Ellipsized/flattened code quotes are not literal and fail source binding.",
+      "case": "v2.lpc-rs.fresh-source-decoding",
+      "arm": "legacy_quotes",
+      "split": "held_out",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 2,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.lpc-rs.fresh-driver-config-failure/compact_ids",
+      "unsupportedClaims": [
+        "Claims the driver error handling is not described despite the complete Err branch at label 1."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "missing"
+      ],
+      "notes": "The supplied gamedriver function explicitly emits diagnostics and exits 1. The response instead discusses the different lpcc question-mark path.",
+      "case": "v2.lpc-rs.fresh-driver-config-failure",
+      "arm": "compact_ids",
+      "split": "held_out",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.lpc-rs.fresh-driver-config-failure/legacy_quotes",
+      "unsupportedClaims": [],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "missing"
+      ],
+      "notes": "Refuses on control excerpts that do not show the driver error branch.",
+      "case": "v2.lpc-rs.fresh-driver-config-failure",
+      "arm": "legacy_quotes",
+      "split": "held_out",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.lpc-rs.fresh-driver-config-failure/compact_quotes",
+      "unsupportedClaims": [
+        "Claims no failure action is specified even while its own citation contains emit_diagnostics and process::exit(1)."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "missing"
+      ],
+      "notes": "The full driver failure branch is available. Its narrative refuses the task; copied code in a citation is not treated as an affirmative answer and also fails literal wrapping.",
+      "case": "v2.lpc-rs.fresh-driver-config-failure",
+      "arm": "compact_quotes",
+      "split": "held_out",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.lpc-rs.fresh-relative-source-bases/legacy_quotes",
+      "unsupportedClaims": [],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "missing",
+        "missing"
+      ],
+      "rubricIssue": "The frozen facts additionally specify root.source_cwd/root.inheritance_cwd derivation helpers, while the question asks which stored relative bases are kept.",
+      "notes": "Correct include_cwd/inheritance_cwd names, roles and PathBuf fields. Strict scoring retains the additional derivation details as missing; quotes are also malformed.",
+      "case": "v2.lpc-rs.fresh-relative-source-bases",
+      "arm": "legacy_quotes",
+      "split": "held_out",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.lpc-rs.fresh-relative-source-bases/compact_quotes",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "missing",
+        "missing"
+      ],
+      "intentSatisfied": true,
+      "rubricIssue": "The frozen facts additionally specify construction helper names that the question does not ask for.",
+      "notes": "Correctly answers the asked field/role mapping with valid getter-doc citations. It does not state the extra root.source_cwd/root.inheritance_cwd derivation details, so strict frozen scoring fails.",
+      "case": "v2.lpc-rs.fresh-relative-source-bases",
+      "arm": "compact_quotes",
+      "split": "held_out",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.lpc-rs.fresh-relative-source-bases/compact_ids",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "missing",
+        "missing"
+      ],
+      "intentSatisfied": true,
+      "rubricIssue": "The frozen facts additionally specify construction helper names that the question does not ask for.",
+      "notes": "Same correct requested field/role mapping as compact quotes, with canonical references; preserves the strict extra derivation requirement as missing.",
+      "case": "v2.lpc-rs.fresh-relative-source-bases",
+      "arm": "compact_ids",
+      "split": "held_out",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.lpc-rs.fresh-compiled-port/compact_quotes",
+      "unsupportedClaims": [],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Correct compile-time literal behavior supported by the macro reference, but the copied quote is not a literal supplied substring.",
+      "case": "v2.lpc-rs.fresh-compiled-port",
+      "arm": "compact_quotes",
+      "split": "held_out",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "v2.lpc-rs.fresh-compiled-port/compact_ids",
+      "unsupportedClaims": [],
+      "citationsSupport": true,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Correctly states compile-time capture and retention until recompilation, exactly supported by the supplied macro reference.",
+      "case": "v2.lpc-rs.fresh-compiled-port",
+      "arm": "compact_ids",
+      "split": "held_out",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": true
+    },
+    {
+      "id": "v2.lpc-rs.fresh-compiled-port/legacy_quotes",
+      "unsupportedClaims": [],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "facts": [
+        "supported"
+      ],
+      "notes": "Correct compile-time retention across runtime configurations; exact copied quotes fail wrapping/label matching.",
+      "case": "v2.lpc-rs.fresh-compiled-port",
+      "arm": "legacy_quotes",
+      "split": "held_out",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    }
+  ],
+  "memory": {
+    "peakPssKiB": 2368167,
+    "peakRssKiB": 2419172,
+    "observedPeakPssGiB": 2.25846004486084,
+    "capVerified": false,
+    "mode": "observe_only",
+    "intervalMs": 250,
+    "samples": 6720,
+    "observerErrors": [],
+    "success": true,
+    "childExitCode": 0
+  }
+}

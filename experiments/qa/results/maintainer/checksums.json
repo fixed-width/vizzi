@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "sha256": {
+    "answers.jsonl.gz": "1c214f05190be436d56bb018c23a7d896c65b5c7350e3a2e6d8e2e6f4628a787",
+    "assessment.json": "dc178d9ec3f59fe4f31e698062003bbe2ca3ff2b45ca6a86c6695a4c6b7defc3",
+    "freeze.json": "85c549bc86b16add8de910c64b08ba150ce86fc49a006151e51dc6319b537a93",
+    "grades.json": "c2f6f6ac8ebae581d2fe78e31b16710a0b062835d689d2c78a4610e1f390b1fe",
+    "manifest.json": "86f8d5eedb102801cc22bdef73e2b9a341f0f19a4349beb7d92efa2ee37a01a2",
+    "memory.json.gz": "76d359a272fe46358723e3b9953429ee87bbcb590c4f7ce0aa9d5ea1abc286c5",
+    "review.md": "0bac249809d9ee238c0e560d092c98aa006eac16a530a84591409fb9a39d6be1",
+    "runtime.json": "1c0faaeb9b63e7bdf6c84899108bc562ed6f6fd425999874976252a0c04c3c9d",
+    "runtime.log.gz": "c70a98b50f6038eeda11d1d4f440c9ca18c4decad230c9cfe9d8fc0c0106d747"
+  }
+}

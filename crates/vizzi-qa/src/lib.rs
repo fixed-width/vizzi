@@ -1,5 +1,8 @@
 //! Experimental CPU repository QA: retrieval and source binding, separate from inference.
+mod compact;
+mod metadata;
 pub mod native;
+pub use metadata::{SourceRole, SourceScope};
 use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, BTreeSet, HashMap},
@@ -46,6 +49,7 @@ struct IndexedFile {
     content: blake3::Hash,
     text: String,
     ranges: Vec<Range<usize>>,
+    metadata: metadata::Metadata,
 }
 struct Window {
     file: Arc<IndexedFile>,
@@ -69,6 +73,12 @@ pub struct Evidence {
     pub end_line: usize,
     /// Exact literal excerpt, never normalized for matching quotes.
     pub text: String,
+    /// Source-role hint from path or raw lexical scope, not a resolved semantic guarantee.
+    pub role: SourceRole,
+    /// Smallest captured lexical scope at the excerpt start, when available.
+    pub scope: Option<SourceScope>,
+    /// Basis for the source-role hint.
+    pub role_basis: &'static str,
 }
 /// A source-bound context; callers cannot deserialize or construct unchecked contexts.
 #[derive(Debug, Serialize)]
@@ -90,7 +100,7 @@ impl Context {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Status {
-    /// An answer requiring at least one valid source quote.
+    /// An answer requiring at least one valid source reference.
     Answered,
     /// Explicit abstention; this is not automatically correct.
     InsufficientEvidence,
@@ -114,6 +124,35 @@ pub struct Answer {
     pub answer: String,
     /// Literal source references.
     pub citations: Vec<Citation>,
+}
+/// Model response using only supplied integer evidence labels.
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct IdAnswer {
+    /// Model's answerability decision.
+    pub status: Status,
+    /// Model's answer or explanation of missing evidence.
+    pub answer: String,
+    /// Prompt-local labels; source locations are resolved by the host.
+    pub citations: Vec<usize>,
+}
+/// Canonical reference resolved from a native-held context, not model-generated text.
+#[derive(Debug, Serialize)]
+pub struct SourceReference<'a> {
+    /// Prompt-local source label.
+    pub label: usize,
+    /// Source/index observation.
+    pub snapshot: &'a str,
+    /// Content/path/range identity of the excerpt.
+    pub id: &'a str,
+    /// Repository-relative source path.
+    pub path: &'a str,
+    /// Full captured file content identity.
+    pub content: &'a str,
+    /// One-based first excerpt line.
+    pub start_line: usize,
+    /// Inclusive last excerpt line.
+    pub end_line: usize,
 }
 /// A content-addressed corpus and deterministic lexical search index.
 pub struct Corpus {
@@ -206,6 +245,9 @@ fn excerpt(file: &IndexedFile, range: &Range<usize>, label: usize) -> Evidence {
         start_line,
         end_line,
         text: text.into(),
+        role: file.metadata.role_for(range),
+        scope: file.metadata.scope(range.start).map(|s| s.label.clone()),
+        role_basis: file.metadata.basis,
     }
 }
 impl Corpus {
@@ -255,6 +297,7 @@ impl Corpus {
             } else {
                 None
             };
+            let mut captured_analysis = None;
             if let Some(adapter) = language.and_then(|name| self.languages.select(name)) {
                 let mut analyzer = adapter.create().map_err(|e| Error(e.to_string()))?;
                 let analysis = analyzer
@@ -263,7 +306,10 @@ impl Corpus {
                 for fact in analysis.facts.iter().take(4096) {
                     starts.insert(fact.span.start);
                 }
+                captured_analysis = Some(analysis);
             }
+            let metadata =
+                metadata::Metadata::new(&input.path, &input.text, captured_analysis.as_ref());
             let ranges = starts
                 .into_iter()
                 .filter_map(|start| {
@@ -278,6 +324,7 @@ impl Corpus {
                     content,
                     text: input.text,
                     ranges,
+                    metadata,
                 }),
             );
             changed += 1;
@@ -289,6 +336,8 @@ impl Corpus {
             .count();
         let mut hash = blake3::Hasher::new();
         hash.update(include_bytes!("lib.rs"));
+        hash.update(include_bytes!("compact.rs"));
+        hash.update(include_bytes!("metadata.rs"));
         for name in self.languages.names() {
             if let Some(language) = self.languages.select(name) {
                 hash.update(language.context().id.as_str().as_bytes());
@@ -337,16 +386,7 @@ impl Corpus {
         self.postings = postings;
         Ok(stats)
     }
-    /// Ranks lexical matches under an explicit excerpt and byte budget; no match is an empty context.
-    pub fn retrieve(&self, question: &str, limit: usize, budget: usize) -> Result<Context, Error> {
-        require(
-            !question.trim().is_empty() && question.len() <= 4096,
-            "Question must contain 1–4,096 UTF-8 bytes",
-        )?;
-        require(
-            (1..=8).contains(&limit) && (1..=16000).contains(&budget),
-            "Invalid QA context allowance",
-        )?;
+    fn lexical_scores(&self, question: &str) -> BTreeMap<usize, f64> {
         let mut scores: BTreeMap<usize, f64> = BTreeMap::new();
         for term in terms(question).keys().take(64) {
             if let Some(postings) = self.postings.get(term) {
@@ -362,6 +402,19 @@ impl Corpus {
                 }
             }
         }
+        scores
+    }
+    /// Ranks lexical matches under an explicit excerpt and byte budget; no match is an empty context.
+    pub fn retrieve(&self, question: &str, limit: usize, budget: usize) -> Result<Context, Error> {
+        require(
+            !question.trim().is_empty() && question.len() <= 4096,
+            "Question must contain 1–4,096 UTF-8 bytes",
+        )?;
+        require(
+            (1..=8).contains(&limit) && (1..=16000).contains(&budget),
+            "Invalid QA context allowance",
+        )?;
+        let scores = self.lexical_scores(question);
         let mut ranked: Vec<_> = scores.into_iter().collect();
         ranked.sort_by(|a, b| b.1.total_cmp(&a.1).then(a.0.cmp(&b.0)));
         let mut selected: Vec<usize> = vec![];
@@ -481,5 +534,47 @@ impl Corpus {
             )?;
         }
         Ok(())
+    }
+    /// Resolves current, available evidence IDs; this does not check semantic support.
+    pub fn validate_ids<'a>(
+        &self,
+        context: &'a Context,
+        answer: &IdAnswer,
+    ) -> Result<Vec<SourceReference<'a>>, Error> {
+        require(
+            context.snapshot == self.snapshot,
+            "Context belongs to a different source snapshot",
+        )?;
+        require(
+            !answer.answer.trim().is_empty()
+                && answer.answer.len() <= 4096
+                && answer.citations.len() <= 8,
+            "Invalid answer bounds",
+        )?;
+        if matches!(answer.status, Status::Answered) {
+            require(
+                !answer.citations.is_empty(),
+                "An answer needs cited evidence",
+            )?;
+        }
+        let mut seen = BTreeSet::new();
+        let mut references = Vec::new();
+        for &label in &answer.citations {
+            require(seen.insert(label), "Duplicate citation label")?;
+            let source = label
+                .checked_sub(1)
+                .and_then(|n| context.evidence.get(n))
+                .ok_or_else(|| Error("Citation label is unavailable".into()))?;
+            references.push(SourceReference {
+                label,
+                snapshot: &context.snapshot,
+                id: &source.id,
+                path: &source.path,
+                content: &source.content,
+                start_line: source.start_line,
+                end_line: source.end_line,
+            });
+        }
+        Ok(references)
     }
 }

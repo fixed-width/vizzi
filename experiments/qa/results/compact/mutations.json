@@ -1,0 +1,1369 @@
+{
+  "schema": 1,
+  "limits": {
+    "mutant_jobs": 1,
+    "jobserver_tasks": 1,
+    "cargo_build_jobs": 1,
+    "rust_test_threads": 1,
+    "nice": 10
+  },
+  "rounds": {
+    "ids": {
+      "outcomes": {
+        "CaughtMutant": 8,
+        "Unviable": 1
+      },
+      "baseline_passed": true,
+      "mutations": [
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:548:9: replace Corpus::validate_ids -> Result<Vec<SourceReference<'a>>, Error> with Ok(vec![])",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:548:9: replace Corpus::validate_ids -> Result<Vec<SourceReference<'a>>, Error> with Ok(vec![Default::default()])",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:549:30: replace == with != in Corpus::validate_ids",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:555:17: replace && with || in Corpus::validate_ids",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:554:17: replace && with || in Corpus::validate_ids",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:553:13: delete ! in Corpus::validate_ids",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:554:40: replace <= with > in Corpus::validate_ids",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:555:43: replace <= with > in Corpus::validate_ids",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:560:17: delete ! in Corpus::validate_ids",
+          "outcome": "CaughtMutant"
+        }
+      ]
+    },
+    "broad": {
+      "outcomes": {
+        "CaughtMutant": 125,
+        "Timeout": 2,
+        "MissedMutant": 91,
+        "Unviable": 19
+      },
+      "baseline_passed": true,
+      "mutations": [
+        {
+          "name": "crates/vizzi-qa/src/main.rs:19:5: replace default_limit -> usize with 0",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/main.rs:19:5: replace default_limit -> usize with 1",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/main.rs:22:5: replace default_budget -> usize with 0",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/main.rs:22:5: replace default_budget -> usize with 1",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/main.rs:52:5: replace main -> Result<(), Box<dyn std::error::Error>> with Ok(())",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/main.rs:72:51: replace + with - in main",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/main.rs:72:51: replace + with * in main",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/main.rs:72:44: replace * with + in main",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/main.rs:72:44: replace * with / in main",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi-qa/src/main.rs:73:14: replace == with != in main",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/main.rs:76:14: replace > with == in main",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/main.rs:76:14: replace > with < in main",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/main.rs:76:14: replace > with >= in main",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/main.rs:76:20: replace * with + in main",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/main.rs:76:20: replace * with / in main",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/main.rs:90:33: replace > with == in main",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/main.rs:90:33: replace > with < in main",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/main.rs:90:33: replace > with >= in main",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/main.rs:111:46: replace == with != in main",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/main.rs:123:46: replace == with != in main",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/main.rs:138:30: replace > with == in main",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/main.rs:138:30: replace > with < in main",
+          "outcome": "Timeout"
+        },
+        {
+          "name": "crates/vizzi-qa/src/main.rs:138:30: replace > with >= in main",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:16:5: replace stem -> String with String::new()",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:16:5: replace stem -> String with \"xyzzy\".into()",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:17:9: delete match arm \"configuration\" | \"configured\" | \"configure\" in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:18:9: delete match arm \"environment\" in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:19:9: delete match arm \"error\" | \"errors\" | \"err\" | \"failed\" | \"fails\" | \"failure\" in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:20:9: delete match arm \"validation\" | \"validating\" | \"validate\" in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:24:20: replace && with || in stem",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:24:16: replace > with == in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:24:16: replace > with < in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:24:16: replace > with >= in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:25:28: replace - with + in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:25:28: replace - with / in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:27:27: replace && with || in stem",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:27:23: replace > with == in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:27:23: replace > with < in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:27:23: replace > with >= in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:28:28: replace - with + in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:28:28: replace - with / in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:30:29: replace && with || in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:30:24: replace == with != in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:30:41: replace == with != in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:33:27: replace && with || in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:33:23: replace > with == in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:33:23: replace > with < in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:33:23: replace > with >= in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:36:20: replace && with || in stem",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:36:16: replace > with == in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:36:16: replace > with < in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:36:16: replace > with >= in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:42:5: replace words -> BTreeSet<String> with BTreeSet::new()",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:42:5: replace words -> BTreeSet<String> with BTreeSet::from_iter([String::new()])",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:42:5: replace words -> BTreeSet<String> with BTreeSet::from_iter([\"xyzzy\".into()])",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:45:5: replace hits -> usize with 0",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:45:5: replace hits -> usize with 1",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:48:5: replace intent -> Intent with Default::default()",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:63:9: replace || with && in intent",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:63:29: replace && with || in intent",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:68:22: replace && with || in intent",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:68:15: delete ! in intent",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:75:5: replace package_words -> BTreeSet<String> with BTreeSet::new()",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:75:5: replace package_words -> BTreeSet<String> with BTreeSet::from_iter([String::new()])",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:75:5: replace package_words -> BTreeSet<String> with BTreeSet::from_iter([\"xyzzy\".into()])",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:87:28: replace == with != in package_words",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:91:45: replace && with || in package_words",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:108:5: replace scope_range -> Range<usize> with Range::new()",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:108:5: replace scope_range -> Range<usize> with Range::from_iter([0])",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:108:5: replace scope_range -> Range<usize> with Range::new(0)",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:108:5: replace scope_range -> Range<usize> with Range::from(0)",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:108:5: replace scope_range -> Range<usize> with Range::from_iter([1])",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:108:5: replace scope_range -> Range<usize> with Range::new(1)",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:108:5: replace scope_range -> Range<usize> with Range::from(1)",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:109:30: replace <= with > in scope_range",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:122:5: replace select_range -> Range<usize> with Range::new()",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:122:5: replace select_range -> Range<usize> with Range::from_iter([0])",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:122:5: replace select_range -> Range<usize> with Range::new(0)",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:122:5: replace select_range -> Range<usize> with Range::from(0)",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:122:5: replace select_range -> Range<usize> with Range::from_iter([1])",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:122:5: replace select_range -> Range<usize> with Range::new(1)",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:122:5: replace select_range -> Range<usize> with Range::from(1)",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:122:22: replace <= with > in select_range",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:129:18: replace > with == in select_range",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:129:18: replace > with < in select_range",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:129:18: replace > with >= in select_range",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:132:16: replace += with -= in select_range",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:132:16: replace += with *= in select_range",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:134:50: replace / with % in select_range",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:134:50: replace / with * in select_range",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:136:14: replace > with == in select_range",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:136:14: replace > with < in select_range",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:136:14: replace > with >= in select_range",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:138:19: replace += with -= in select_range",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:138:19: replace += with *= in select_range",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:138:27: replace + with - in select_range",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:138:27: replace + with * in select_range",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:142:22: replace < with == in select_range",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:142:22: replace < with > in select_range",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:142:22: replace < with <= in select_range",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:145:28: replace > with == in select_range",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:145:28: replace > with < in select_range",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:145:28: replace > with >= in select_range",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:145:40: replace / with % in select_range",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:145:40: replace / with * in select_range",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:146:40: replace + with - in select_range",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:146:40: replace + with * in select_range",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:146:36: replace + with - in select_range",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:146:36: replace + with * in select_range",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:153:5: replace role_weight -> f64 with 0.0",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:153:5: replace role_weight -> f64 with 1.0",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:153:5: replace role_weight -> f64 with -1.0",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:156:23: replace == with != in role_weight",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:164:23: replace == with != in role_weight",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:171:23: replace == with != in role_weight",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:195:9: replace Corpus::retrieve_compact -> Result<Context, Error> with Ok(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:196:41: replace && with || in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:196:13: delete ! in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:196:59: replace <= with > in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:200:38: replace && with || in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:213:21: replace && with || in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:211:21: replace && with || in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:210:36: replace >= with < in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:212:25: replace || with && in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:216:35: replace && with || in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:216:17: replace == with != in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:233:17: replace || with && in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:232:53: replace == with != in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:236:37: replace match guard root_readme with true in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:236:37: replace match guard root_readme with false in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:237:37: replace match guard file.path == \"Cargo.toml\" with true in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:237:37: replace match guard file.path == \"Cargo.toml\" with false in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:238:35: replace match guard file.metadata.role == SourceRole::Policy with true in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:238:35: replace match guard file.metadata.role == SourceRole::Policy with false in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:239:34: replace match guard main with true in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:239:34: replace match guard main with false in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:237:47: replace == with != in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:238:54: replace == with != in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:239:46: replace + with - in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:239:46: replace + with * in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:239:77: replace * with + in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:239:77: replace * with / in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:242:56: replace && with || in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:242:41: replace && with || in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:242:16: delete ! in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:242:49: replace == with != in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:242:86: replace == with != in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:246:37: replace / with % in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:246:37: replace / with * in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:247:71: replace && with || in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:247:44: replace && with || in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:247:66: replace == with != in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:247:79: replace == with != in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:260:56: replace && with || in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:260:51: replace == with != in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:260:39: replace + with - in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:260:39: replace + with * in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:260:26: replace + with - in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:260:26: replace + with * in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:260:64: replace == with != in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:264:68: replace && with || in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:264:41: replace && with || in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:264:63: replace == with != in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:264:76: replace == with != in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:275:17: replace * with + in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:275:17: replace * with / in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:274:17: replace + with - in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:274:17: replace + with * in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:273:17: replace + with - in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:273:17: replace + with * in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:272:17: replace + with - in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:272:17: replace + with * in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:271:17: replace + with - in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:271:17: replace + with * in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:270:17: replace + with - in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:270:17: replace + with * in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:269:43: replace * with + in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:269:43: replace * with / in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:270:37: replace * with + in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:270:37: replace * with / in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:272:58: replace * with + in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:272:58: replace * with / in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:284:35: replace > with == in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:284:35: replace > with < in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:284:35: replace > with >= in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:284:21: replace + with - in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:284:21: replace + with * in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:289:21: replace && with || in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:288:22: replace == with != in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:294:25: replace > with == in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:294:25: replace > with < in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:294:25: replace > with >= in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:293:25: replace * with + in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:293:25: replace * with / in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:298:18: replace += with -= in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:298:18: replace += with *= in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:299:64: replace + with - in Corpus::retrieve_compact",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:299:64: replace + with * in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:301:31: replace == with != in Corpus::retrieve_compact",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:45:5: replace bounded -> String with String::new()",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:45:5: replace bounded -> String with \"xyzzy\".into()",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:49:28: replace <= with > in bounded",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:55:5: replace path_role -> SourceRole with Default::default()",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:60:9: replace || with && in path_role",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:59:9: replace || with && in path_role",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:58:9: replace || with && in path_role",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:57:46: replace || with && in path_role",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:57:35: replace == with != in path_role",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:57:51: replace == with != in path_role",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:68:13: replace || with && in path_role",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:67:13: replace || with && in path_role",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:66:13: replace || with && in path_role",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:80:13: replace || with && in path_role",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:95:5: replace test_attribute -> bool with true",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:95:5: replace test_attribute -> bool with false",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:96:11: delete ! in test_attribute",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:97:16: replace += with -= in test_attribute",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:97:16: replace += with *= in test_attribute",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:101:28: replace || with && in test_attribute",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:104:12: delete ! in test_attribute",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:107:66: replace || with && in test_attribute",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:107:39: replace || with && in test_attribute",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:143:9: replace Metadata::scope -> Option<&Scope> with None",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:143:9: replace Metadata::scope -> Option<&Scope> with Some(Box::leak(Box::new(Default::default())))",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:149:9: replace Metadata::role_for -> SourceRole with Default::default()",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:149:22: replace != with == in Metadata::role_for",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:154:49: replace && with || in Metadata::role_for",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:154:34: replace <= with > in Metadata::role_for",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:154:62: replace <= with > in Metadata::role_for",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:157:24: replace |= with &= in Metadata::role_for",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:157:57: replace && with || in Metadata::role_for",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:157:45: replace < with == in Metadata::role_for",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:157:45: replace < with > in Metadata::role_for",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:157:45: replace < with <= in Metadata::role_for",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:157:72: replace < with == in Metadata::role_for",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:157:72: replace < with > in Metadata::role_for",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:157:72: replace < with <= in Metadata::role_for",
+          "outcome": "MissedMutant"
+        }
+      ]
+    },
+    "followup": {
+      "outcomes": {
+        "Unviable": 10,
+        "CaughtMutant": 62,
+        "MissedMutant": 12
+      },
+      "baseline_passed": true,
+      "mutations": [
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:223:5: replace excerpt -> Evidence with Default::default()",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:229:24: replace + with - in excerpt",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:229:24: replace + with * in excerpt",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:231:24: replace == with != in excerpt",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:234:9: replace + with - in excerpt",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:234:9: replace + with * in excerpt",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:238:28: replace == with != in excerpt",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:16:5: replace stem -> String with String::new()",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:16:5: replace stem -> String with \"xyzzy\".into()",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:17:9: delete match arm \"configuration\" | \"configured\" | \"configure\" in stem",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:18:9: delete match arm \"environment\" in stem",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:19:9: delete match arm \"error\" | \"errors\" | \"err\" | \"failed\" | \"fails\" | \"failure\" in stem",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:20:9: delete match arm \"validation\" | \"validating\" | \"validate\" in stem",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:24:20: replace && with || in stem",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:24:16: replace > with == in stem",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:24:16: replace > with < in stem",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:24:16: replace > with >= in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:25:28: replace - with + in stem",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:25:28: replace - with / in stem",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:27:27: replace && with || in stem",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:27:23: replace > with == in stem",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:27:23: replace > with < in stem",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:27:23: replace > with >= in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:28:28: replace - with + in stem",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:28:28: replace - with / in stem",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:30:29: replace && with || in stem",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:30:24: replace == with != in stem",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:30:41: replace == with != in stem",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:33:27: replace && with || in stem",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:33:23: replace > with == in stem",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:33:23: replace > with < in stem",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:33:23: replace > with >= in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:36:20: replace && with || in stem",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:36:16: replace > with == in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:36:16: replace > with < in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:36:16: replace > with >= in stem",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:122:5: replace select_range -> Range<usize> with Range::new()",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:122:5: replace select_range -> Range<usize> with Range::from_iter([0])",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:122:5: replace select_range -> Range<usize> with Range::new(0)",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:122:5: replace select_range -> Range<usize> with Range::from(0)",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:122:5: replace select_range -> Range<usize> with Range::from_iter([1])",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:122:5: replace select_range -> Range<usize> with Range::new(1)",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:122:5: replace select_range -> Range<usize> with Range::from(1)",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:122:22: replace <= with > in select_range",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:129:18: replace > with == in select_range",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:129:18: replace > with < in select_range",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:129:18: replace > with >= in select_range",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:132:16: replace += with -= in select_range",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:132:16: replace += with *= in select_range",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:134:50: replace / with % in select_range",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:134:50: replace / with * in select_range",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:137:9: replace && with || in select_range",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:136:14: replace > with == in select_range",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:136:14: replace > with < in select_range",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:136:14: replace > with >= in select_range",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:139:15: replace += with -= in select_range",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:139:15: replace += with *= in select_range",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:139:23: replace + with - in select_range",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:139:23: replace + with * in select_range",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:142:22: replace < with == in select_range",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:142:22: replace < with > in select_range",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:142:22: replace < with <= in select_range",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:145:28: replace > with == in select_range",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:145:28: replace > with < in select_range",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:145:28: replace > with >= in select_range",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:145:40: replace / with % in select_range",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:145:40: replace / with * in select_range",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:146:40: replace + with - in select_range",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:146:40: replace + with * in select_range",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:146:36: replace + with - in select_range",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/compact.rs:146:36: replace + with * in select_range",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:159:9: replace Metadata::role_for -> SourceRole with Default::default()",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:159:22: replace != with == in Metadata::role_for",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:164:49: replace && with || in Metadata::role_for",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:164:34: replace <= with > in Metadata::role_for",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:164:62: replace <= with > in Metadata::role_for",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:167:24: replace |= with &= in Metadata::role_for",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:167:57: replace && with || in Metadata::role_for",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:167:45: replace < with == in Metadata::role_for",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:167:45: replace < with > in Metadata::role_for",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:167:45: replace < with <= in Metadata::role_for",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:167:72: replace < with == in Metadata::role_for",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:167:72: replace < with > in Metadata::role_for",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/metadata.rs:167:72: replace < with <= in Metadata::role_for",
+          "outcome": "CaughtMutant"
+        }
+      ]
+    }
+  },
+  "exclusions": [],
+  "limitations": [
+    "Rounds overlap and tests/source evolved; counts must not be summed as unique coverage.",
+    "The broad round predates the evidence-basis fix, Clippy refactor and added word-form/excerpt/boundary tests. The follow-up uses the corrected source.",
+    "Remaining ranking and boundary mutations are not proven equivalent. This does not establish full coverage or production retrieval qualification.",
+    "Unviable mutations and protocol timeouts are separate from catches by failing tests."
+  ]
+}

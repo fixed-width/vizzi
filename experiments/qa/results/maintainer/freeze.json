@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "createdAt": "2026-11-06T01:23:07.289Z",
+  "baseFreezePath": "/tmp/vizzi-qa-v2-freeze.json",
+  "baseFreezeSha256": "f048167b654c749b8bc7db7bcde49d1aa6a4b1b1573a81fbcde37faf223d1377",
+  "files": {
+    "/home/mpd/git-sources/vizzi/experiments/qa/library/maintainer-2026-11-05/questions.json": "014df788f0e010c77860087810b0a82c89f4af5219862977c689e8966ce88471",
+    "/home/mpd/git-sources/vizzi/experiments/qa/library/maintainer-2026-11-05/cases.json": "39b5454f9cef1e61471097eda4b3d8bec21387c6cd3665abf4cc46bc128d4ba7",
+    "/home/mpd/git-sources/vizzi/experiments/qa/maintainer.mjs": "5614eee69aa8b80b53f37d9f49731feac88ba6539b3a794bd43c0dfbfdffd35d",
+    "/home/mpd/git-sources/vizzi/experiments/qa/maintainer-cases.mjs": "95bdc68a5ce12ab94ca7cb6d9f54cd98f562c98345a61a65d70535e50cbfc730"
+  },
+  "audit": [
+    {
+      "id": "maintainer.lpc-rs.add-efun",
+      "sourceAnchors": 5,
+      "audited": true,
+      "candidateRetrievalInspected": false
+    },
+    {
+      "id": "maintainer.lpc-rs.transaction-creation",
+      "sourceAnchors": 3,
+      "audited": true,
+      "candidateRetrievalInspected": false
+    },
+    {
+      "id": "maintainer.lpc-rs.commit-checks",
+      "sourceAnchors": 10,
+      "audited": true,
+      "candidateRetrievalInspected": false
+    }
+  ],
+  "conditions": "Same fixed native selector, prompt adapter, runtime, 2B weights, resource limits and three arms as the v2 freeze. No tuning on maintainer questions."
+}

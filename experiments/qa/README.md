@@ -3,12 +3,17 @@
 This how-to is for contributors reproducing the experiment in
 [PRODUCT](../../docs/qa/PRODUCT.md) and [TECH](../../docs/qa/TECH.md). The experiment is
 isolated from the viewer and opens no editor/browser. Candidates answer locally;
-repository source is never sent to a hosted inference service or executed.
+the experiment runner does not upload source or execute inspected project code.
 
 The [question templates](library/templates.json) are reusable probes. The
 [concrete cases](library/cases.json) bind questions to pinned source, factual checklists,
 forbidden claims and exact source needles. A general question needs a separate oracle
 for each repository. Development and held-out cases are marked before inference.
+
+For the fixed-model, versioned retrieval and citation comparison, follow the
+[compact-evidence procedure](COMPACT.md). The original library and pilot results remain
+unchanged. The [follow-up results](COMPACT_RESULTS.md) include exact maintainer workflow
+questions and distinguish faster, valid references from correct answers.
 
 Build with one compiler task and run the normal correctness checks:
 

@@ -1,0 +1,147 @@
+{
+  "schema": 1,
+  "grader": "Codex, source-aware oracle author. Questions supplied independently by the maintainer, but grading is not independent human review.",
+  "limitations": [
+    "Three exact workflow questions, not a representative accuracy benchmark.",
+    "Case scope and source oracles were recorded before candidate retrieval; the retriever/model/prompt remained fixed.",
+    "Source binding is separate from claim support and task completion. Refusing on missing context can be faithful but does not complete an answerable workflow task."
+  ],
+  "grades": [
+    {
+      "id": "maintainer.lpc-rs.add-efun/legacy_quotes",
+      "facts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "unsupportedClaims": [
+        "Claims registering parser/command rules with parse_add_rule/add_rule/add_action adds a native efun."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "notes": "No native handler/module, efuns! signature/dispatch registration, or tests/documentation extension path is supplied. Selected excerpts concern using existing efuns, not extending the native set."
+    },
+    {
+      "id": "maintainer.lpc-rs.add-efun/compact_quotes",
+      "facts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "unsupportedClaims": [
+        "Claims registering parser/command rules with parse_add_rule/add_rule/add_action adds a native efun."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "notes": "No native handler/module, efuns! signature/dispatch registration, or tests/documentation extension path is supplied. Selected excerpts concern using existing efuns, not extending the native set."
+    },
+    {
+      "id": "maintainer.lpc-rs.add-efun/compact_ids",
+      "facts": [
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "unsupportedClaims": [
+        "Claims registering parser/command rules with parse_add_rule/add_rule/add_action adds a native efun."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "notes": "No native handler/module, efuns! signature/dispatch registration, or tests/documentation extension path is supplied. Selected excerpts concern using existing efuns, not extending the native set."
+    },
+    {
+      "id": "maintainer.lpc-rs.transaction-creation/legacy_quotes",
+      "facts": [
+        "missing",
+        "missing"
+      ],
+      "unsupportedClaims": [
+        "Treats connection-cell writes in attach/exec/destruct paths as the transaction allocation entry point."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "notes": "Does not locate Transaction::new or normal Task::open_attempt creation; the quote is also not literal."
+    },
+    {
+      "id": "maintainer.lpc-rs.transaction-creation/compact_quotes",
+      "facts": [
+        "missing",
+        "contradicted"
+      ],
+      "unsupportedClaims": [
+        "Treats Pending::new in transaction_tests.rs, an externally cfg(test)-gated module, as the production transaction entry point.",
+        "Attributes Pending::new to TaskTemplate::new."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": true,
+      "notes": "The filename heuristic misses _tests.rs and does not propagate the parent module cfg(test), so the selected test helper is incorrectly labelled code. No normal owning-task path is supplied."
+    },
+    {
+      "id": "maintainer.lpc-rs.transaction-creation/compact_ids",
+      "facts": [
+        "missing",
+        "contradicted"
+      ],
+      "unsupportedClaims": [
+        "Treats Pending::new in transaction_tests.rs, an externally cfg(test)-gated module, as the production transaction entry point.",
+        "Describes a txn field on TxnHandle rather than the TaskTemplate field, and cites unrelated load_object documentation at label 2."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": true,
+      "notes": "The filename heuristic misses _tests.rs and does not propagate the parent module cfg(test), so the selected test helper is incorrectly labelled code. No normal owning-task path is supplied."
+    },
+    {
+      "id": "maintainer.lpc-rs.commit-checks/legacy_quotes",
+      "facts": [
+        "missing",
+        "missing",
+        "missing",
+        "missing",
+        "missing",
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "unsupportedClaims": [],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "notes": "Faithful refusal to invent a complete commit codepath from insufficient context. No submission chain, four validation gates, publication, delivery/retry, or pin-release ordering is established by the answer. The source-specific task remains unanswered."
+    },
+    {
+      "id": "maintainer.lpc-rs.commit-checks/compact_quotes",
+      "facts": [
+        "missing",
+        "missing",
+        "missing",
+        "missing",
+        "missing",
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "unsupportedClaims": [
+        "Mentions a role=transaction annotation that is not one of the supplied role hints."
+      ],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "notes": "Faithful refusal to invent a complete commit codepath from insufficient context. No submission chain, four validation gates, publication, delivery/retry, or pin-release ordering is established by the answer. The source-specific task remains unanswered."
+    },
+    {
+      "id": "maintainer.lpc-rs.commit-checks/compact_ids",
+      "facts": [
+        "missing",
+        "missing",
+        "missing",
+        "missing",
+        "missing",
+        "missing",
+        "missing",
+        "missing"
+      ],
+      "unsupportedClaims": [],
+      "citationsSupport": false,
+      "roleConfusion": false,
+      "notes": "Faithful refusal to invent a complete commit codepath from insufficient context. No submission chain, four validation gates, publication, delivery/retry, or pin-release ordering is established by the answer. The source-specific task remains unanswered."
+    }
+  ]
+}

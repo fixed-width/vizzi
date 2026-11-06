@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "rust_format": "cargo fmt --all -- --check: passed",
+  "workspace_tests": {
+    "command": "CARGO_BUILD_JOBS=1 RUST_TEST_THREADS=1 nice -n 10 cargo test --workspace",
+    "passed": 449,
+    "failed": 0,
+    "ignored": 0,
+    "includes_doctests": true
+  },
+  "qa_package_tests": 42,
+  "clippy": "CARGO_BUILD_JOBS=1 nice -n 10 cargo clippy --workspace --all-targets -- -D warnings: passed",
+  "node": "node --test --test-concurrency=1: five QA test files passed, including localhost SSE stub",
+  "performance": "Optimized native binaries; correctness/build/mutation jobs completed before each model measurement. Two CPU threads, serial requests, nice 10.",
+  "targets": "Native QA engine and Node inference/evaluation adapters; browser application unchanged.",
+  "dependencies": "No new dependencies or dependency-version changes.",
+  "unsafe_code": "No unsafe code introduced; workspace lint remains inherited deny."
+}

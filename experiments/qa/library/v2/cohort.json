@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "rationale": "All revised seed cases, three known production/test-role regressions, four temporal regressions and all fresh held-outs. Other observed v1 cases remain retrieval-only development regressions. Selection uses prior/development diagnostics and is fixed before any model outputs or fresh candidate retrieval in this iteration.",
+  "case_ids": [
+    "v2.vizzi.language",
+    "v2.lpc-rs.language",
+    "v2.lpc-rs.purpose",
+    "v2.vizzi.validation",
+    "v2.vizzi.search",
+    "v2.vizzi.connections",
+    "v2.lpc-rs.configuration",
+    "v2.lpc-rs.host-vs-game",
+    "v2.lpc-rs.reader",
+    "v2.lpc-rs.fallback",
+    "v2.lpc-rs.fallback-test",
+    "v2.changing.retry-base",
+    "v2.changing.retry-updated",
+    "v2.changing.renamed-handler",
+    "v2.changing.deleted-handler",
+    "v2.vizzi.fresh-review-startup",
+    "v2.vizzi.fresh-header-language",
+    "v2.vizzi.fresh-cache-source",
+    "v2.vizzi.fresh-working-input",
+    "v2.lpc-rs.fresh-source-decoding",
+    "v2.lpc-rs.fresh-driver-config-failure",
+    "v2.lpc-rs.fresh-relative-source-bases",
+    "v2.lpc-rs.fresh-compiled-port"
+  ],
+  "model": "qwen3.5-2b-q4",
+  "arms": [
+    {
+      "id": "legacy_quotes",
+      "selector": "legacy",
+      "budget": 8000,
+      "limit": 6,
+      "protocol": "quotes"
+    },
+    {
+      "id": "compact_quotes",
+      "selector": "compact",
+      "budget": 2500,
+      "limit": 3,
+      "protocol": "quotes"
+    },
+    {
+      "id": "compact_ids",
+      "selector": "compact",
+      "budget": 2500,
+      "limit": 3,
+      "protocol": "ids"
+    }
+  ],
+  "runtime_binary_sha256": "eaf9c1c664cc0ae1f4dea4b171bb91aac8409fcfea0574c9b6bcc93792ce2400"
+}

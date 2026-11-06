@@ -7,13 +7,32 @@ use std::{
     path::PathBuf,
     time::Instant,
 };
-use vizzi_qa::{Answer, Context, Corpus, native::capture};
+use vizzi_qa::{Answer, Context, Corpus, IdAnswer, native::capture};
+#[derive(Default, Deserialize)]
+#[serde(rename_all = "snake_case")]
+enum Selector {
+    #[default]
+    Legacy,
+    Compact,
+}
+fn default_limit() -> usize {
+    6
+}
+fn default_budget() -> usize {
+    8000
+}
 #[derive(Deserialize)]
 #[serde(tag = "op", rename_all = "snake_case", deny_unknown_fields)]
 enum Request {
     Retrieve {
         id: String,
         question: String,
+        #[serde(default)]
+        selector: Selector,
+        #[serde(default = "default_limit")]
+        limit: usize,
+        #[serde(default = "default_budget")]
+        budget: usize,
     },
     Oracle {
         id: String,
@@ -22,6 +41,10 @@ enum Request {
     Validate {
         id: String,
         answer: Answer,
+    },
+    ValidateIds {
+        id: String,
+        answer: IdAnswer,
     },
     Refresh,
 }
@@ -57,11 +80,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let result = (|| -> Result<Value, Box<dyn std::error::Error>> {
             let request: Request = serde_json::from_slice(&bytes)?;
             match request {
-                Request::Retrieve { id, question } => {
+                Request::Retrieve {
+                    id,
+                    question,
+                    selector,
+                    limit,
+                    budget,
+                } => {
                     if id.len() > 256 {
                         return Err("request id exceeds 256 bytes".into());
                     }
-                    let context = corpus.retrieve(&question, 6, 8000)?;
+                    let context = match selector {
+                        Selector::Legacy => corpus.retrieve(&question, limit, budget)?,
+                        Selector::Compact => corpus.retrieve_compact(&question, limit, budget)?,
+                    };
                     let response = json!({"id":id,"context":context});
                     contexts.push_back((id, context));
                     Ok(response)
@@ -82,6 +114,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     corpus.validate(context, &answer)?;
                     Ok(
                         json!({"id":id,"provenance_valid":true,"semantic_correctness":"not_checked"}),
+                    )
+                }
+                Request::ValidateIds { id, answer } => {
+                    let context = &contexts
+                        .iter()
+                        .rev()
+                        .find(|(key, _)| key == &id)
+                        .ok_or("Context expired or unknown")?
+                        .1;
+                    let references = corpus.validate_ids(context, &answer)?;
+                    Ok(
+                        json!({"id":id,"provenance_valid":true,"references":references,"semantic_correctness":"not_checked"}),
                     )
                 }
                 Request::Refresh => {

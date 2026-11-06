@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "author": "maintainer, supplied directly in conversation",
+  "repository": "lpc-rs",
+  "source_revision": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+  "retriever_freeze": "v2 frozen before these questions arrived; no tuning on these formulations",
+  "questions": [
+    {
+      "id": "maintainer.lpc-rs.add-efun",
+      "question": "how do i add a new efun?"
+    },
+    {
+      "id": "maintainer.lpc-rs.transaction-creation",
+      "question": "where are new transactions created?"
+    },
+    {
+      "id": "maintainer.lpc-rs.commit-checks",
+      "question": "show me the codepath that transaction commits take, with all the checks they go through"
+    }
+  ]
+}

@@ -1,0 +1,1242 @@
+{
+  "schema": 1,
+  "sources": {
+    "vizzi": {
+      "revision": "5ee084d9e7d6876a61af627403ca99fe208d043f"
+    },
+    "lpc-rs": {
+      "revision": "1a4f5b65dd2a269298748df2dfd68092a169a8d9"
+    },
+    "changing": {
+      "revision": "deterministic content-update fixture; labels are not Git commits"
+    }
+  },
+  "cases": [
+    {
+      "id": "v2.vizzi.purpose",
+      "repository": "vizzi",
+      "question": "What is Vizzi intended to help developers do, and how does it fit alongside an editor?",
+      "template": "purpose",
+      "split": "development",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "It supports learning unfamiliar code and reviewing changes.",
+          "evidence": [
+            {
+              "path": "DESIGN.md",
+              "needle": "The project supports learning unfamiliar codebases"
+            }
+          ]
+        },
+        {
+          "text": "It supplements the editor; normal source reading/editing remain in the editor.",
+          "evidence": [
+            {
+              "path": "DESIGN.md",
+              "needle": "Vizzi supplements an editor"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "oracle_diagnostic": true,
+      "category": "orientation",
+      "origin_id": "vizzi.purpose",
+      "origin": "observed_v1_regression"
+    },
+    {
+      "id": "v2.vizzi.language",
+      "repository": "vizzi",
+      "question": "What implementation languages are used by the native engine and browser interface, and which language edition is declared for the native workspace?",
+      "template": "language",
+      "split": "development",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "The native implementation uses Rust and the browser adapter uses JavaScript.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "needle": "The browser adapter uses plain"
+            }
+          ]
+        },
+        {
+          "text": "The workspace declares Rust edition 2024.",
+          "evidence": [
+            {
+              "path": "Cargo.toml",
+              "needle": "edition = \"2024\""
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "oracle_diagnostic": true,
+      "category": "orientation",
+      "origin_id": "vizzi.language",
+      "origin": "reviewed_v1_case",
+      "review_note": "Remove the language hint from the question and distinguish native/browser implementation scope."
+    },
+    {
+      "id": "v2.vizzi.entry",
+      "repository": "vizzi",
+      "question": "Where does the native Vizzi server start, and which interface does it bind to?",
+      "template": "entry",
+      "split": "development",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "The native entry is crates/vizzi/src/main.rs.",
+          "evidence": [
+            {
+              "path": "crates/vizzi/src/main.rs",
+              "needle": "async fn main() -> Result<(), Box<dyn std::error::Error>>"
+            }
+          ]
+        },
+        {
+          "text": "The HTTP listener binds IPv4 localhost/loopback.",
+          "evidence": [
+            {
+              "path": "crates/vizzi/src/main.rs",
+              "needle": "tokio::net::TcpListener::bind((std::net::Ipv4Addr::LOCALHOST, port))"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "oracle_diagnostic": false,
+      "category": "architecture",
+      "origin_id": "vizzi.entry",
+      "origin": "observed_v1_regression"
+    },
+    {
+      "id": "v2.vizzi.configuration",
+      "repository": "vizzi",
+      "question": "How can I choose a different HTTP port when launching Vizzi?",
+      "template": "configuration",
+      "split": "development",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "Use the --port command-line option.",
+          "evidence": [
+            {
+              "path": "crates/vizzi/src/main.rs",
+              "needle": "\"--port\" => {"
+            }
+          ]
+        },
+        {
+          "text": "The guide gives --port 7475 as an example.",
+          "evidence": [
+            {
+              "path": "docs/how-to/run-workspace.md",
+              "needle": "--port 7475"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "oracle_diagnostic": false,
+      "category": "configuration",
+      "origin_id": "vizzi.configuration",
+      "origin": "observed_v1_regression"
+    },
+    {
+      "id": "v2.vizzi.validation",
+      "repository": "vizzi",
+      "question": "Which checks must a contributor run before submitting a change?",
+      "template": "validation",
+      "split": "development",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "Formatting is a baseline check.",
+          "evidence": [
+            {
+              "path": "AGENTS.md",
+              "needle": "Baseline checks are formatting"
+            }
+          ]
+        },
+        {
+          "text": "Workspace tests including doctests are required.",
+          "evidence": [
+            {
+              "path": "AGENTS.md",
+              "needle": "workspace tests (including doctests)"
+            }
+          ]
+        },
+        {
+          "text": "Clippy is required.",
+          "evidence": [
+            {
+              "path": "AGENTS.md",
+              "needle": "and Clippy."
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "oracle_diagnostic": true,
+      "category": "testing",
+      "origin_id": "vizzi.validation",
+      "origin": "reviewed_v1_case",
+      "review_note": "Avoid baseline wording that ambiguously refers to Git comparison acquisition."
+    },
+    {
+      "id": "v2.vizzi.safety",
+      "repository": "vizzi",
+      "question": "What is the policy on unsafe Rust, and are performance gains enough to justify an exception?",
+      "template": "safety",
+      "split": "development",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "Safe Rust and inherited deny unsafe_code are the default.",
+          "evidence": [
+            {
+              "path": "Cargo.toml",
+              "needle": "unsafe_code = \"deny\""
+            }
+          ]
+        },
+        {
+          "text": "Exceptions need a requirement with no viable safe interface; performance or convenience alone do not justify them.",
+          "evidence": [
+            {
+              "path": "AGENTS.md",
+              "needle": "Performance gains or convenience alone do not justify unsafe code."
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "oracle_diagnostic": true,
+      "category": "constraints",
+      "origin_id": "vizzi.safety",
+      "origin": "observed_v1_regression"
+    },
+    {
+      "id": "v2.vizzi.search",
+      "repository": "vizzi",
+      "question": "Which text does 'Find a name or file' match: paths and declaration names, arbitrary function-body text, or both?",
+      "template": null,
+      "split": "development",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "Search matches captured declaration names and paths, not full source bodies.",
+          "evidence": [
+            {
+              "path": "docs/how-to/investigate-with-vscode.md",
+              "needle": "Search matches declaration names and paths, not full source text."
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        "Claims full-text or semantic source-body search."
+      ],
+      "oracle_diagnostic": true,
+      "category": "discovery",
+      "origin_id": "vizzi.search",
+      "origin": "reviewed_v1_case",
+      "review_note": "Distinguish query matching from the fact that initial indexing parses source bodies."
+    },
+    {
+      "id": "v2.vizzi.connections",
+      "repository": "vizzi",
+      "question": "What does a saved connection mean in Vizzi: a resolved call/dependency relationship, or the reader's interpretation?",
+      "template": null,
+      "split": "development",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "Connections are reader-authored assertions.",
+          "evidence": [
+            {
+              "path": "docs/companion/PRODUCT.md",
+              "needle": "Every connection is explicitly"
+            }
+          ]
+        },
+        {
+          "text": "They are not inferred call, dependency or impact claims.",
+          "evidence": [
+            {
+              "path": "docs/companion/PRODUCT.md",
+              "needle": "not an inferred call/dependency/impact claim."
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        "Presents a reader connection as a verified call graph."
+      ],
+      "oracle_diagnostic": true,
+      "category": "relationships",
+      "origin_id": "vizzi.connections",
+      "origin": "reviewed_v1_case",
+      "review_note": "Ask the documented relationship meaning rather than an unspecified verification mechanism."
+    },
+    {
+      "id": "v2.vizzi.editor",
+      "repository": "vizzi",
+      "question": "What does Open in VS Code verify, and can it guarantee what an existing unsaved editor buffer displays?",
+      "template": null,
+      "split": "development",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "It checks captured/current and actual working-file content before handoff.",
+          "evidence": [
+            {
+              "path": "docs/companion/PRODUCT.md",
+              "needle": "checks current captured and actual working content"
+            }
+          ]
+        },
+        {
+          "text": "The CLI cannot inspect an existing unsaved buffer or guarantee bytes after launch.",
+          "evidence": [
+            {
+              "path": "docs/how-to/investigate-with-vscode.md",
+              "needle": "it cannot inspect an existing unsaved editor buffer"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        "Guarantees the editor displays the pinned bytes."
+      ],
+      "oracle_diagnostic": true,
+      "category": "integration",
+      "origin_id": "vizzi.editor",
+      "origin": "observed_v1_regression"
+    },
+    {
+      "id": "v2.vizzi.atomic-save",
+      "repository": "vizzi",
+      "question": "If saving an investigation to disk fails, does the pending edit replace the active investigation?",
+      "template": null,
+      "split": "development",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "Saving the staged copy occurs before publishing it as current.",
+          "evidence": [
+            {
+              "path": "crates/vizzi/src/companion.rs",
+              "needle": "self.save(&next)?;"
+            }
+          ]
+        },
+        {
+          "text": "Write failure preserves the last saved investigation.",
+          "evidence": [
+            {
+              "path": "docs/companion/PRODUCT.md",
+              "needle": "write failure preserves the last saved investigation."
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "oracle_diagnostic": false,
+      "category": "state",
+      "origin_id": "vizzi.atomic-save",
+      "origin": "observed_v1_regression"
+    },
+    {
+      "id": "v2.vizzi.unchanged",
+      "repository": "vizzi",
+      "question": "Is matching file metadata enough to prove that source content has not changed?",
+      "template": null,
+      "split": "development",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "Metadata alone is not proof; contents and analysis context determine validity.",
+          "evidence": [
+            {
+              "path": "DESIGN.md",
+              "needle": "File metadata alone"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        "Treats matching mtime/size as proof that bytes are identical."
+      ],
+      "oracle_diagnostic": true,
+      "category": "state",
+      "origin_id": "vizzi.unchanged",
+      "origin": "observed_v1_regression"
+    },
+    {
+      "id": "v2.vizzi.renderer",
+      "repository": "vizzi",
+      "question": "Has the project settled on a production GPU renderer and storage engine?",
+      "template": null,
+      "split": "development",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "The rendering backend and storage engine remain open choices.",
+          "evidence": [
+            {
+              "path": "DESIGN.md",
+              "needle": "The rendering backend, storage engine"
+            }
+          ]
+        },
+        {
+          "text": "Rust with wgpu is a leading candidate subject to representative measurements.",
+          "evidence": [
+            {
+              "path": "DESIGN.md",
+              "needle": "Rust with wgpu is the leading rendering candidate."
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        "Claims the production renderer is already settled."
+      ],
+      "oracle_diagnostic": false,
+      "category": "architecture",
+      "origin_id": "vizzi.renderer",
+      "origin": "observed_v1_regression"
+    },
+    {
+      "id": "v2.vizzi.oncall",
+      "repository": "vizzi",
+      "question": "Who is on call for Vizzi this week?",
+      "template": "unknown",
+      "split": "development",
+      "expected_status": "insufficient_evidence",
+      "required_facts": [],
+      "forbidden_claims": [
+        "Infers an on-call assignment from authorship."
+      ],
+      "oracle_diagnostic": false,
+      "category": "limits",
+      "origin_id": "vizzi.oncall",
+      "origin": "observed_v1_regression"
+    },
+    {
+      "id": "v2.vizzi.production-latency",
+      "repository": "vizzi",
+      "question": "What was the exact production p99 request latency of the last Vizzi deployment?",
+      "template": "unknown",
+      "split": "development",
+      "expected_status": "insufficient_evidence",
+      "required_facts": [],
+      "forbidden_claims": [
+        "Uses local benchmark numbers as production telemetry."
+      ],
+      "oracle_diagnostic": false,
+      "category": "limits",
+      "origin_id": "vizzi.production-latency",
+      "origin": "observed_v1_regression"
+    },
+    {
+      "id": "v2.lpc-rs.purpose",
+      "repository": "lpc-rs",
+      "question": "What is lpc-rs, and what kind of applications is it intended to run?",
+      "template": "purpose",
+      "split": "development",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "It is an LPC compiler, virtual machine and gamedriver for MUDs.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "needle": "An LPC compiler, virtual machine and gamedriver for multi-user dungeons (MUDs)."
+            }
+          ]
+        },
+        {
+          "text": "It runs persistent multiplayer text worlds, including rooms, creatures, commands and game rules.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "needle": "LPC is a language for building persistent, multiplayer text worlds."
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "oracle_diagnostic": true,
+      "category": "orientation",
+      "origin_id": "lpc-rs.purpose",
+      "origin": "reviewed_v1_case",
+      "review_note": "Require the application purpose actually asked for, not an extra mudlib definition."
+    },
+    {
+      "id": "v2.lpc-rs.language",
+      "repository": "lpc-rs",
+      "question": "What implementation language and language edition does the project declare?",
+      "template": "language",
+      "split": "development",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "Its implementation uses Rust.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "needle": "You need a current stable Rust toolchain"
+            }
+          ]
+        },
+        {
+          "text": "The package declares edition 2024.",
+          "evidence": [
+            {
+              "path": "Cargo.toml",
+              "needle": "edition = \"2024\""
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "oracle_diagnostic": true,
+      "category": "orientation",
+      "origin_id": "lpc-rs.language",
+      "origin": "reviewed_v1_case",
+      "review_note": "Remove the answer-bearing Rust wording from the question."
+    },
+    {
+      "id": "v2.lpc-rs.entry",
+      "repository": "lpc-rs",
+      "question": "Where does the gamedriver executable start, and how does it boot the runtime?",
+      "template": "entry",
+      "split": "development",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "The entry is lpc-rs-driver/src/main.rs and calls runtime::run.",
+          "evidence": [
+            {
+              "path": "lpc-rs-driver/src/main.rs",
+              "needle": "lpc_rs::runtime::run(run());"
+            }
+          ]
+        },
+        {
+          "text": "It creates a VM from configuration and calls boot.",
+          "evidence": [
+            {
+              "path": "lpc-rs-driver/src/main.rs",
+              "needle": "let mut vm = Vm::new(config);"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "oracle_diagnostic": false,
+      "category": "architecture",
+      "origin_id": "lpc-rs.entry",
+      "origin": "observed_v1_regression"
+    },
+    {
+      "id": "v2.lpc-rs.configuration",
+      "repository": "lpc-rs",
+      "question": "How can I select the gamedriver environment file, and which environment setting has precedence for its mudlib root?",
+      "template": "configuration",
+      "split": "development",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "Use --env to select the gamedriver environment file, passed to ConfigBuilder.load_env.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "needle": "cargo run -p lpc-rs-driver -- --env .env"
+            }
+          ]
+        },
+        {
+          "text": "LPC_LIB_DIR has precedence, with LIB_DIR as fallback.",
+          "evidence": [
+            {
+              "path": "lpc-rs-utils/src/config.rs",
+              "needle": ".get(\"LPC_LIB_DIR\")"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "oracle_diagnostic": true,
+      "category": "configuration",
+      "origin_id": "lpc-rs.configuration",
+      "origin": "reviewed_v1_case",
+      "review_note": "Include driver-role/CLI linkage rather than relying only on an internal load_env call.",
+      "supporting_evidence": [
+        {
+          "path": "lpc-rs-driver/src/main.rs",
+          "needle": ".load_env(config_override)"
+        }
+      ]
+    },
+    {
+      "id": "v2.lpc-rs.validation",
+      "repository": "lpc-rs",
+      "question": "Which commands does the project document for workspace builds, tests, linting and formatting?",
+      "template": "validation",
+      "split": "development",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "Use cargo build --workspace and cargo test --workspace.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "needle": "cargo build --workspace\ncargo test --workspace"
+            }
+          ]
+        },
+        {
+          "text": "Use cargo clippy --workspace --all-targets -- -D warnings and cargo fmt --check.",
+          "evidence": [
+            {
+              "path": "README.md",
+              "needle": "cargo clippy --workspace --all-targets -- -D warnings"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "oracle_diagnostic": true,
+      "category": "testing",
+      "origin_id": "lpc-rs.validation",
+      "origin": "observed_v1_regression"
+    },
+    {
+      "id": "v2.lpc-rs.safety",
+      "repository": "lpc-rs",
+      "question": "Does the main lpc-rs library permit unsafe Rust?",
+      "template": "safety",
+      "split": "development",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "The library explicitly forbids unsafe code.",
+          "evidence": [
+            {
+              "path": "src/lib.rs",
+              "needle": "#![forbid(unsafe_code)]"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "oracle_diagnostic": false,
+      "category": "constraints",
+      "origin_id": "lpc-rs.safety",
+      "origin": "observed_v1_regression"
+    },
+    {
+      "id": "v2.lpc-rs.reader",
+      "repository": "lpc-rs",
+      "question": "Which abstraction supplies compiler source bytes, and what is the default implementation?",
+      "template": null,
+      "split": "development",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "Compiler.read_file uses the injected SourceReader or DiskSourceReader.",
+          "evidence": [
+            {
+              "path": "src/compiler/mod.rs",
+              "needle": "let reader = self.source_reader.as_deref().unwrap_or(&DiskSourceReader);"
+            }
+          ]
+        },
+        {
+          "text": "DiskSourceReader reads bytes using tokio::fs::read.",
+          "evidence": [
+            {
+              "path": "src/compiler/source_reader.rs",
+              "needle": "tokio::fs::read(path).await"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "oracle_diagnostic": true,
+      "category": "interfaces",
+      "origin_id": "lpc-rs.reader",
+      "origin": "observed_v1_regression"
+    },
+    {
+      "id": "v2.lpc-rs.fallback",
+      "repository": "lpc-rs",
+      "question": "When does the compiler retry a source path with the c extension, and what prevents an endless retry?",
+      "template": null,
+      "split": "development",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "Retry is limited to NotFound errors.",
+          "evidence": [
+            {
+              "path": "src/compiler/mod.rs",
+              "needle": "if error.kind() == ErrorKind::NotFound"
+            }
+          ]
+        },
+        {
+          "text": "It retries only when the extension is not already c.",
+          "evidence": [
+            {
+              "path": "src/compiler/mod.rs",
+              "needle": "absolute.extension().and_then(OsStr::to_str) != Some(\"c\")"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        "Retries permission errors or repeatedly retries an already-c path."
+      ],
+      "oracle_diagnostic": true,
+      "category": "failure",
+      "origin_id": "lpc-rs.fallback",
+      "origin": "observed_v1_regression"
+    },
+    {
+      "id": "v2.lpc-rs.host-vs-game",
+      "repository": "lpc-rs",
+      "question": "Can the host-facing compiler accept a source path outside the mudlib, and how does in-game compilation enforce its boundary?",
+      "template": null,
+      "split": "development",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "CompilerSource permits host-facing compiler input identity without imposing confinement.",
+          "evidence": [
+            {
+              "path": "src/compiler/source.rs",
+              "needle": "Establish an input's identity without restricting host-facing compiler inputs."
+            }
+          ]
+        },
+        {
+          "text": "compile_in_game_file validates the in-game path before compilation.",
+          "evidence": [
+            {
+              "path": "src/compiler/mod.rs",
+              "needle": "self.config.validate_in_game_path(path, span)?;"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        "Claims all host-facing compile_file calls are confined by the same validation."
+      ],
+      "oracle_diagnostic": true,
+      "category": "constraints",
+      "origin_id": "lpc-rs.host-vs-game",
+      "origin": "reviewed_v1_case",
+      "review_note": "Keep the host/in-game distinction and supply caller linkage for the diagnostic.",
+      "supporting_evidence": [
+        {
+          "path": "src/compiler/mod.rs",
+          "needle": "let (identity, source) = self.read_file(path.into()).await?;"
+        }
+      ]
+    },
+    {
+      "id": "v2.lpc-rs.source-identity",
+      "repository": "lpc-rs",
+      "question": "Why does CompilerSource keep both a resolved host location and a separate diagnostic name?",
+      "template": null,
+      "split": "development",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "resolved holds the host location used to read/register source.",
+          "evidence": [
+            {
+              "path": "src/compiler/source.rs",
+              "needle": "The host location and canonical diagnostic location"
+            }
+          ]
+        },
+        {
+          "text": "name is a safe input spelling for file errors and permission applies.",
+          "evidence": [
+            {
+              "path": "src/compiler/source.rs",
+              "needle": "The safe input spelling used in file errors"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "oracle_diagnostic": true,
+      "category": "state",
+      "origin_id": "lpc-rs.source-identity",
+      "origin": "observed_v1_regression"
+    },
+    {
+      "id": "v2.lpc-rs.fallback-test",
+      "repository": "lpc-rs",
+      "question": "Which regression test covers stopping source retries and preserving other I/O errors?",
+      "template": null,
+      "split": "development",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "The named test is file_reads_stop_after_extension_fallback_and_preserve_other_io_errors in src/compiler/mod.rs.",
+          "evidence": [
+            {
+              "path": "src/compiler/mod.rs",
+              "needle": "async fn file_reads_stop_after_extension_fallback_and_preserve_other_io_errors()"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "oracle_diagnostic": false,
+      "category": "testing",
+      "origin_id": "lpc-rs.fallback-test",
+      "origin": "observed_v1_regression"
+    },
+    {
+      "id": "v2.lpc-rs.probe",
+      "repository": "lpc-rs",
+      "question": "Does checking whether a path is a file or directory require reading its source bytes?",
+      "template": null,
+      "split": "development",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "SourceReader exposes a separate kind probe.",
+          "evidence": [
+            {
+              "path": "src/compiler/source_reader.rs",
+              "needle": "Probe a path without reading its contents"
+            }
+          ]
+        },
+        {
+          "text": "DiskSourceReader.kind uses filesystem metadata.",
+          "evidence": [
+            {
+              "path": "src/compiler/source_reader.rs",
+              "needle": "let metadata = tokio::fs::metadata(path).await?;"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "oracle_diagnostic": false,
+      "category": "implementation",
+      "origin_id": "lpc-rs.probe",
+      "origin": "observed_v1_regression"
+    },
+    {
+      "id": "v2.lpc-rs.oncall",
+      "repository": "lpc-rs",
+      "question": "Who is on call for lpc-rs this week?",
+      "template": "unknown",
+      "split": "development",
+      "expected_status": "insufficient_evidence",
+      "required_facts": [],
+      "forbidden_claims": [
+        "Infers an on-call assignment from package authors."
+      ],
+      "oracle_diagnostic": false,
+      "category": "limits",
+      "origin_id": "lpc-rs.oncall",
+      "origin": "observed_v1_regression"
+    },
+    {
+      "id": "v2.lpc-rs.production-latency",
+      "repository": "lpc-rs",
+      "question": "What was the exact production p99 request latency of the last lpc-rs deployment?",
+      "template": "unknown",
+      "split": "development",
+      "expected_status": "insufficient_evidence",
+      "required_facts": [],
+      "forbidden_claims": [
+        "Invents production telemetry from benchmarks or configuration."
+      ],
+      "oracle_diagnostic": false,
+      "category": "limits",
+      "origin_id": "lpc-rs.production-latency",
+      "origin": "observed_v1_regression"
+    },
+    {
+      "id": "v2.changing.retry-base",
+      "repository": "changing",
+      "question": "What is the configured retry_limit?",
+      "template": "revision",
+      "split": "development",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "retry_limit is 3.",
+          "evidence": [
+            {
+              "path": "config.toml",
+              "needle": "retry_limit = 3"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        "Uses facts or source definitions from an earlier fixture revision."
+      ],
+      "oracle_diagnostic": false,
+      "fixture_state": "base",
+      "category": "state",
+      "origin_id": "changing.retry-base",
+      "origin": "observed_v1_regression"
+    },
+    {
+      "id": "v2.changing.retry-updated",
+      "repository": "changing",
+      "question": "What is the configured retry_limit?",
+      "template": "revision",
+      "split": "development",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "retry_limit is 7.",
+          "evidence": [
+            {
+              "path": "config.toml",
+              "needle": "retry_limit = 7"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        "Uses facts or source definitions from an earlier fixture revision."
+      ],
+      "oracle_diagnostic": false,
+      "fixture_state": "updated",
+      "category": "state",
+      "origin_id": "changing.retry-updated",
+      "origin": "observed_v1_regression"
+    },
+    {
+      "id": "v2.changing.renamed-handler",
+      "repository": "changing",
+      "question": "What function is the packet loading handler now, and where is it defined?",
+      "template": "revision",
+      "split": "development",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "load_packet is defined in src/transport.rs.",
+          "evidence": [
+            {
+              "path": "src/transport.rs",
+              "needle": "pub fn load_packet()"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [
+        "Uses facts or source definitions from an earlier fixture revision."
+      ],
+      "oracle_diagnostic": false,
+      "fixture_state": "renamed",
+      "category": "state",
+      "origin_id": "changing.renamed-handler",
+      "origin": "observed_v1_regression"
+    },
+    {
+      "id": "v2.changing.deleted-handler",
+      "repository": "changing",
+      "question": "Where is load_packet currently defined?",
+      "template": "revision",
+      "split": "development",
+      "expected_status": "insufficient_evidence",
+      "required_facts": [],
+      "forbidden_claims": [
+        "Uses facts or source definitions from an earlier fixture revision."
+      ],
+      "oracle_diagnostic": false,
+      "fixture_state": "deleted",
+      "category": "state",
+      "origin_id": "changing.deleted-handler",
+      "origin": "observed_v1_regression"
+    },
+    {
+      "id": "v2.vizzi.fresh-review-startup",
+      "repository": "vizzi",
+      "question": "Does opening the review page start live indexing of the whole workspace?",
+      "template": null,
+      "category": "resources",
+      "split": "held_out",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "A focused review can open without starting the live source index.",
+          "evidence": [
+            {
+              "path": "docs/how-to/run-workspace.md",
+              "needle": "without starting the live index."
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "oracle_diagnostic": false,
+      "origin": "fresh_agent_formulation",
+      "author": "Codex; source-aware, not maintainer-authored"
+    },
+    {
+      "id": "v2.vizzi.fresh-header-language",
+      "repository": "vizzi",
+      "question": "How is an ambiguous .h header treated when C-family source is selected but no language assignment is provided?",
+      "template": null,
+      "category": "constraints",
+      "split": "held_out",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "It is retained source-only with language unassigned.",
+          "evidence": [
+            {
+              "path": "docs/prototype/C_FAMILY_POLICY.md",
+              "needle": "`.h`, `.H` | Source-only"
+            }
+          ]
+        },
+        {
+          "text": "The language is not guessed from the nearest C/C++ source or majority language.",
+          "evidence": [
+            {
+              "path": "docs/prototype/C_FAMILY_POLICY.md",
+              "needle": "A header is never classified by its nearest"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "oracle_diagnostic": false,
+      "origin": "fresh_agent_formulation",
+      "author": "Codex; source-aware, not maintainer-authored"
+    },
+    {
+      "id": "v2.vizzi.fresh-cache-source",
+      "repository": "vizzi",
+      "question": "Where does preview source text come from, and is the analysis cache authoritative for it?",
+      "template": null,
+      "category": "state",
+      "split": "held_out",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "CapturedSource owns immutable captured source bytes and source identity.",
+          "evidence": [
+            {
+              "path": "docs/prototype/CAPTURED_SOURCE.md",
+              "needle": "owns immutable source bytes"
+            }
+          ]
+        },
+        {
+          "text": "Analysis cache data is not authoritative source text.",
+          "evidence": [
+            {
+              "path": "crates/vizzi/src/cache.rs",
+              "needle": "cache data is never authoritative source text."
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "oracle_diagnostic": false,
+      "origin": "fresh_agent_formulation",
+      "author": "Codex; source-aware, not maintainer-authored"
+    },
+    {
+      "id": "v2.vizzi.fresh-working-input",
+      "repository": "vizzi",
+      "question": "Which staged, unstaged and untracked changes are included in a working-tree comparison?",
+      "template": null,
+      "category": "review",
+      "split": "held_out",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "The working capture includes staged, unstaged and non-ignored untracked source observed on disk.",
+          "evidence": [
+            {
+              "path": "docs/how-to/review-local-changes.md",
+              "needle": "unstaged and non-ignored untracked source as observed on disk."
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "oracle_diagnostic": false,
+      "origin": "fresh_agent_formulation",
+      "author": "Codex; source-aware, not maintainer-authored"
+    },
+    {
+      "id": "v2.lpc-rs.fresh-source-decoding",
+      "repository": "lpc-rs",
+      "question": "How are non-UTF-8 source bytes decoded before compilation, and what happens to a missing trailing newline?",
+      "template": null,
+      "category": "implementation",
+      "split": "held_out",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "LpcSource falls back to Latin-1, mapping each byte to a code point and setting latin1.",
+          "evidence": [
+            {
+              "path": "lpc-rs-utils/src/lib.rs",
+              "needle": "e.into_bytes().into_iter().map(|b| b as char).collect()"
+            }
+          ]
+        },
+        {
+          "text": "A trailing newline is appended only when missing.",
+          "evidence": [
+            {
+              "path": "lpc-rs-utils/src/lib.rs",
+              "needle": "if !text.ends_with('\\n')"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "oracle_diagnostic": false,
+      "origin": "fresh_agent_formulation",
+      "author": "Codex; source-aware, not maintainer-authored"
+    },
+    {
+      "id": "v2.lpc-rs.fresh-driver-config-failure",
+      "repository": "lpc-rs",
+      "question": "What does the gamedriver executable do if building its configuration fails?",
+      "template": null,
+      "category": "failure",
+      "split": "held_out",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "It emits diagnostics and exits with status 1.",
+          "evidence": [
+            {
+              "path": "lpc-rs-driver/src/main.rs",
+              "needle": "e.emit_diagnostics();"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "oracle_diagnostic": false,
+      "origin": "fresh_agent_formulation",
+      "author": "Codex; source-aware, not maintainer-authored"
+    },
+    {
+      "id": "v2.lpc-rs.fresh-relative-source-bases",
+      "repository": "lpc-rs",
+      "question": "Which relative-path bases does CompilerSource keep for include directives and inheritance?",
+      "template": null,
+      "category": "architecture",
+      "split": "held_out",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "include_cwd is derived using root.source_cwd for relative includes.",
+          "evidence": [
+            {
+              "path": "src/compiler/source.rs",
+              "needle": "include_cwd: root.source_cwd(&input)"
+            }
+          ]
+        },
+        {
+          "text": "inheritance_cwd is derived using root.inheritance_cwd for relative inheritance.",
+          "evidence": [
+            {
+              "path": "src/compiler/source.rs",
+              "needle": "inheritance_cwd: root.inheritance_cwd(&input)"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "oracle_diagnostic": false,
+      "origin": "fresh_agent_formulation",
+      "author": "Codex; source-aware, not maintainer-authored"
+    },
+    {
+      "id": "v2.lpc-rs.fresh-compiled-port",
+      "repository": "lpc-rs",
+      "question": "Is the LPC __PORT__ constant fixed when a program is compiled, or looked up from a different runtime configuration each time?",
+      "template": null,
+      "category": "state",
+      "split": "held_out",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "It is fixed by compilation; a later VM runtime port does not replace the compiled integer.",
+          "evidence": [
+            {
+              "path": "src/compiler/mod.rs",
+              "needle": "async fn configured_port_is_an_integer_fixed_by_compilation()"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "oracle_diagnostic": false,
+      "origin": "fresh_agent_formulation",
+      "author": "Codex; source-aware, not maintainer-authored"
+    }
+  ],
+  "version": "2",
+  "parent_sha256": "fd45f478f432ff6b024f28f7e37502eb5bf592e3d3adbd5412b76ec8b91c7bf8",
+  "reviewer": "Codex, source-aware seed author; not independent human review",
+  "review_notes": [
+    {
+      "case": "v2.vizzi.language",
+      "reason": "Remove the language hint from the question and distinguish native/browser implementation scope."
+    },
+    {
+      "case": "v2.lpc-rs.language",
+      "reason": "Remove the answer-bearing Rust wording from the question."
+    },
+    {
+      "case": "v2.lpc-rs.purpose",
+      "reason": "Require the application purpose actually asked for, not an extra mudlib definition."
+    },
+    {
+      "case": "v2.vizzi.validation",
+      "reason": "Avoid baseline wording that ambiguously refers to Git comparison acquisition."
+    },
+    {
+      "case": "v2.vizzi.search",
+      "reason": "Distinguish query matching from the fact that initial indexing parses source bodies."
+    },
+    {
+      "case": "v2.vizzi.connections",
+      "reason": "Ask the documented relationship meaning rather than an unspecified verification mechanism."
+    },
+    {
+      "case": "v2.lpc-rs.configuration",
+      "reason": "Include driver-role/CLI linkage rather than relying only on an internal load_env call."
+    },
+    {
+      "case": "v2.lpc-rs.host-vs-game",
+      "reason": "Keep the host/in-game distinction and supply caller linkage for the diagnostic."
+    }
+  ]
+}
