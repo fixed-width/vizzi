@@ -1,7 +1,9 @@
 //! Experimental CPU repository QA: retrieval and source binding, separate from inference.
 mod compact;
+mod curated;
 mod metadata;
 pub mod native;
+pub use curated::SourceRange;
 pub use metadata::{SourceRole, SourceScope};
 use serde::{Deserialize, Serialize};
 use std::{
@@ -338,6 +340,7 @@ impl Corpus {
         hash.update(include_bytes!("lib.rs"));
         hash.update(include_bytes!("compact.rs"));
         hash.update(include_bytes!("metadata.rs"));
+        hash.update(include_bytes!("curated.rs"));
         for name in self.languages.names() {
             if let Some(language) = self.languages.select(name) {
                 hash.update(language.context().id.as_str().as_bytes());

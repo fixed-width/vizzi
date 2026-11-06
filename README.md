@@ -21,12 +21,14 @@ The current [product checkpoint](docs/plans/product-milestones.md) evaluates the
 investigation's contribution alongside an editor. Guided functional checks do not
 establish that contribution; the editor-only comparison and maintainer trial remain open.
 
-The [CPU repository-question experiment](experiments/qa/COMPACT_RESULTS.md) supplies a
+The [CPU repository-question experiment](experiments/qa/SOURCE_PACK_RESULTS.md) supplies a
 versioned question library and compares small local models with an external index.
 Smaller evidence and host-resolved references cut fixed-model latency, but none of the
-three exact maintainer workflow probes is completed correctly. This remains an isolated
-experiment, with no chat interface. [Reproduce the measurements](experiments/qa/COMPACT.md)
-or inspect the [original pilot](experiments/qa/RESULTS.md).
+three exact maintainer workflow probes is completed correctly, even when complete source
+is supplied. Complete evidence improves partial facts at a larger prefill cost. This
+remains an isolated experiment, with no chat interface.
+[Reproduce the diagnostic](experiments/qa/SOURCE_PACKS.md) or inspect the
+[compact comparison](experiments/qa/COMPACT_RESULTS.md) and [original pilot](experiments/qa/RESULTS.md).
 
 The [view-selection rationale](docs/explanation/task-driven-views.md) connects these
 tasks to the literature. Further performance work is conditional on a workflow blocker.

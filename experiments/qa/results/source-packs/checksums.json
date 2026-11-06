@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "sha256": {
+    "answers.jsonl.gz": "cb0397f50d7371c46d84a98458e0e8fc2bf1693455cad72490233ba3ecefbc5f",
+    "assessment.json": "26712e652a58581b19f848e8177c6ad46d5b29dcf614dc55176feef9cbdadddc",
+    "constraints.json": "f8fadcab15351f08de621090990f75b3c327e8c505a1760f9d52d0e4fe1e4c3e",
+    "grades.json": "5a29bb0d8c9625fc6550dc7337821c917e2b22554db07e25c2249cc1f76e7463",
+    "manifest.json": "c15e14c3bcca882bab8394716f24ecf0ffb9e5ac328f88ee7a8ddd8ed496f472",
+    "memory.json.gz": "48d983c447be0483af7b93b6fc0b7503202c876e6353d2527dd1975d9e09bf2b",
+    "mutations.json": "957d9e5602786279a81acb87d3e8a034ae751ee6f71773482d8f3cc16d3db960",
+    "prepared.json": "8064bed87d0fc6263dbdc1af01ed501bde85175cb044bf0a904c38b9c56167df",
+    "review.md": "2bed5a4966a1bf4c7a68a629b6b6de47f147d7347d2205f93c0996bae6914263",
+    "runtime.json": "1738eb7ef27be646f590f3c3d3bd49b0d8f447f3c86c19903c123694285689be",
+    "runtime.log.gz": "a9a42edaa347b5772199d4b0bab54b63bfd9797c5063e21b33c1c8cf93632086",
+    "validation.json": "76c801fd82352a0fdedde23fa77f7183bf5f66987fb66d587e5802d9e109bd34"
+  }
+}

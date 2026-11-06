@@ -7,7 +7,7 @@ use std::{
     path::PathBuf,
     time::Instant,
 };
-use vizzi_qa::{Answer, Context, Corpus, IdAnswer, native::capture};
+use vizzi_qa::{Answer, Context, Corpus, IdAnswer, SourceRange, native::capture};
 #[derive(Default, Deserialize)]
 #[serde(rename_all = "snake_case")]
 enum Selector {
@@ -37,6 +37,12 @@ enum Request {
     Oracle {
         id: String,
         anchors: Vec<(String, String)>,
+    },
+    Select {
+        id: String,
+        snapshot: String,
+        ranges: Vec<SourceRange>,
+        budget: usize,
     },
     Validate {
         id: String,
@@ -100,6 +106,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
                 Request::Oracle { id, anchors } => {
                     let context = corpus.oracle(&anchors, 8000)?;
+                    let response = json!({"id":id,"context":context});
+                    contexts.push_back((id, context));
+                    Ok(response)
+                }
+                Request::Select {
+                    id,
+                    snapshot,
+                    ranges,
+                    budget,
+                } => {
+                    if id.len() > 256 {
+                        return Err("request id exceeds 256 bytes".into());
+                    }
+                    let context = corpus.select_ranges(&snapshot, &ranges, budget)?;
                     let response = json!({"id":id,"context":context});
                     contexts.push_back((id, context));
                     Ok(response)

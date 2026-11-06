@@ -33,9 +33,12 @@ The [compact-evidence follow-up](../../experiments/qa/COMPACT_RESULTS.md) preser
 reviews the seed, freezes fresh formulations and separately tests exact maintainer
 questions. Fixed-model latency and source binding improve, while factual coverage does
 not; none of the three maintainer workflows is completed. Keep QA outside the viewer.
-Next, use source-complete, source-only diagnostic packs for those workflows to separate
-retrieval misses from model limits before choosing another retrieval/model change.
-Retain new maintainer questions for subsequent fresh evaluation.
+The [source-complete diagnostic](../../experiments/qa/SOURCE_PACK_RESULTS.md) now supplies
+whole relevant definitions and caller/branch context. Partial facts improve, but full
+tasks remain incomplete; extra answer allowance does not fix invented caller links or
+false refusals. Next, isolate narrow subquestions and answer/status ordering before
+choosing another retrieval/model change. Retain new maintainer questions for subsequent
+fresh evaluation. None of these agent-graded diagnostics establishes product acceptance.
 
 The previous milestone plan and delivery evidence follow as historical context.
 

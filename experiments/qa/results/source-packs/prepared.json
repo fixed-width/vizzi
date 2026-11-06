@@ -1,0 +1,424 @@
+{
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "status",
+      "answer",
+      "citations"
+    ],
+    "properties": {
+      "status": {
+        "type": "string",
+        "enum": [
+          "answered",
+          "insufficient_evidence"
+        ]
+      },
+      "answer": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 2000
+      },
+      "citations": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        }
+      }
+    }
+  },
+  "createdAt": "2026-11-06T03:10:55.655Z",
+  "sourceRoot": "/tmp/vizzi-qa-packs-prepared/lpc-rs",
+  "sourceRevision": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+  "archiveSha256": "03b3b09405358aaa67457b306a86497f44e2bc3597a63ba720fd28cdaf7a56a0",
+  "initial": {
+    "capture": {
+      "candidates": 1032,
+      "omitted": 101,
+      "selected": 931
+    },
+    "index_ms": 13058.681443,
+    "ready": true,
+    "schema": 1,
+    "snapshot": "32e85124e908b80f91952c6b91e4c8737ffec2c6118b70f8f50738f980444241",
+    "stats": {
+      "bytes": 10754851,
+      "changed": 931,
+      "chunks": 22808,
+      "files": 931,
+      "removed": 0,
+      "reused": 0
+    }
+  },
+  "files": {
+    "/home/mpd/git-sources/vizzi/crates/vizzi-qa/src/compact.rs": "ce6d769b80375c01206579e0bf6b820651e1f6b93da3f30359ab73e08336b008",
+    "/home/mpd/git-sources/vizzi/crates/vizzi-qa/src/curated.rs": "2fe97d597f92cceb73700bd63514663a21679cbbaca29cd8d339052aba51a62c",
+    "/home/mpd/git-sources/vizzi/crates/vizzi-qa/src/lib.rs": "d8d5a4cea817eeabf85764f64c70df06cf5de83a3c70abf09550ff4f41911117",
+    "/home/mpd/git-sources/vizzi/crates/vizzi-qa/src/main.rs": "1a1b0ccc3e656c236de20f5ab7e9e847eea9336191834639c0fe0b2a6dc1eb8d",
+    "/home/mpd/git-sources/vizzi/crates/vizzi-qa/src/metadata.rs": "41076b17d033398eacc596e30703db5c4b3a95156cc68a8e1d82144d768b3caf",
+    "/home/mpd/git-sources/vizzi/crates/vizzi-qa/src/native.rs": "8562161d6843b01f145365ad0e70699cce8bdc3cafd68da2bc7af6afde657b38",
+    "/home/mpd/git-sources/vizzi/Cargo.lock": "38c796e08d9779134fe4635de351b3018b27ff2d68feb72230c7e99fcb155f98",
+    "/home/mpd/git-sources/vizzi/crates/vizzi-qa/Cargo.toml": "d11423a61a17e1dd0f9acf74216982556435ac16cfb8e779916946672517d88d",
+    "/home/mpd/git-sources/vizzi/experiments/qa/library/source-packs/packs.json": "b73a4b9aad26635c43293f29afc38a6fdcd47c64cccf87c0b431e30eef3b0e75",
+    "/home/mpd/git-sources/vizzi/experiments/qa/library/maintainer-2026-11-05/questions.json": "014df788f0e010c77860087810b0a82c89f4af5219862977c689e8966ce88471",
+    "/home/mpd/git-sources/vizzi/experiments/qa/library/maintainer-2026-11-05/cases.json": "39b5454f9cef1e61471097eda4b3d8bec21387c6cd3665abf4cc46bc128d4ba7",
+    "/home/mpd/git-sources/vizzi/experiments/qa/models.json": "78e5ef6f07c49827810a7a83809b128c5514af8694fa222d4b5c045df1ce3ded",
+    "/home/mpd/git-sources/vizzi/experiments/qa/library/v2/cohort.json": "d0edc0ae1f3a8222ada866c790f03ecbf3acced4feb5bf1c2694834a48dbad5d",
+    "/home/mpd/git-sources/vizzi/experiments/qa/packs.mjs": "1481b5f4eb8450a106f37d7854f9f8f51984707560ffa782a2db14426bfb0d5e",
+    "/home/mpd/git-sources/vizzi/experiments/qa/packs-support.mjs": "5f2eb597ee4de07453dcc917a65a2b5263ec1801aeee94fd08466eaffb9ef279",
+    "/home/mpd/git-sources/vizzi/experiments/qa/model.mjs": "cdf9c365a4d234492af41cae0d2626e9b72ff203088199f51e528575961b76c7",
+    "/home/mpd/git-sources/vizzi/experiments/qa/support.mjs": "273417232b72a1a2522d3b5d46d67895079f83870c3328dc375a2b1bfb4ee1d8",
+    "/home/mpd/git-sources/vizzi/experiments/qa/compact-support.mjs": "fca8329cc1f3fe2c67778b5338f000b896fcc6dd354df855b4662483d4d82a48",
+    "/home/mpd/git-sources/vizzi/experiments/qa/maintainer-cases.mjs": "95bdc68a5ce12ab94ca7cb6d9f54cd98f562c98345a61a65d70535e50cbfc730",
+    "/home/mpd/git-sources/vizzi/target/release/vizzi-qa": "7f6dc5107cfb5bffad3cb162394113671ab50282214e5735e4147743f3050b38",
+    "/home/mpd/git-sources/vizzi/target/release/vizzi-envelope": "4348433c09b341418ca0f8b87df36fedf1a872d00b0d9eb3ebf93b622548b537"
+  },
+  "audit": [
+    {
+      "id": "maintainer.lpc-rs.add-efun",
+      "complete": true,
+      "facts": 3,
+      "supportingAnchors": 2,
+      "limitation": "Literal anchors supplement the manual whole-definition/caller/branch audit; they do not prove semantic completeness.",
+      "context": {
+        "evidence": [
+          {
+            "content": "135c0502836b702bb669c6741874a56b1ae5469be2f64319ab24193b08f1dc46",
+            "end_line": 69,
+            "id": "a7b19e917d7f17269edd7af400eb21ff1d23d8ce071a98264c205b0622a7db49",
+            "label": 1,
+            "path": "src/interpreter/efun/abs.rs",
+            "role": "mixed",
+            "role_basis": "raw_lexical_scope",
+            "scope": null,
+            "start_line": 1,
+            "text": "use lpc_rs_errors::Result;\n\nuse crate::interpreter::{efun::efun_context::EfunContext, lpc_float::LpcFloat, lpc_ref::LpcRef};\n\n/// `abs(x)`: the magnitude of an int or float, as the same type. The most\n/// negative int is its own magnitude, as `-` wraps.\npub fn abs<const N: usize>(context: &mut EfunContext<'_, N>) -> Result<()> {\n    let result = match context.arg(0) {\n        LpcRef::Int(x) => LpcRef::from(x.0.wrapping_abs()),\n        LpcRef::Float(x) => LpcRef::Float(LpcFloat::from(x.0.into_inner().abs())),\n        other => {\n            return Err(\n                context.runtime_error(format!(\"abs: {} is not a number\", other.type_name()))\n            );\n        }\n    };\n    context.return_efun_result(result);\n    Ok(())\n}\n\n#[cfg(test)]\nmod tests {\n    use lpc_rs_core::LpcIntInner;\n\n    use crate::{\n        interpreter::lpc_ref::LpcRef,\n        test_support::{run_prog, try_run_prog},\n    };\n\n    #[tokio::test]\n    async fn abs_of_a_negative_int_is_positive() {\n        let code = \"int create() { return abs(-5); }\";\n        assert_eq!(run_prog(code).await.result(), Some(LpcRef::from(5)));\n    }\n\n    #[tokio::test]\n    async fn abs_of_a_positive_int_is_itself() {\n        let code = \"int create() { return abs(5); }\";\n        assert_eq!(run_prog(code).await.result(), Some(LpcRef::from(5)));\n    }\n\n    #[tokio::test]\n    async fn abs_of_the_smallest_int_wraps_to_itself() {\n        let code = \"int create() { return abs(-9223372036854775807 - 1); }\";\n        assert_eq!(\n            run_prog(code).await.result(),\n            Some(LpcRef::from(LpcIntInner::MIN))\n        );\n    }\n\n    #[tokio::test]\n    async fn abs_of_float_zero_preserves_its_type() {\n        let code = \"float create() { return abs(0.0); }\";\n        assert_eq!(run_prog(code).await.result(), Some(LpcRef::from(0.0)));\n    }\n\n    #[tokio::test]\n    async fn abs_of_a_negative_float_is_positive() {\n        let code = \"float create() { return abs(-1.5); }\";\n        assert_eq!(run_prog(code).await.result(), Some(LpcRef::from(1.5)));\n    }\n\n    #[tokio::test]\n    async fn abs_of_a_string_is_an_error() {\n        let code = r#\"mixed create() { mixed s = \"a\"; return abs(s); }\"#;\n        let err = try_run_prog(code).await.unwrap_err().to_string();\n        assert!(err.contains(\"abs: string is not a number\"), \"{err}\");\n    }\n}\n"
+          },
+          {
+            "content": "0b5b429a2ee045847fe049b221065c2affb9ceace6b37ceb329d5dafddca1e1f",
+            "end_line": 3,
+            "id": "a49cea838e65d197f489779258a1a3cedda2073d8cd44250c1700a55df476639",
+            "label": 2,
+            "path": "src/interpreter/efun/mod.rs",
+            "role": "code",
+            "role_basis": "raw_lexical_scope",
+            "scope": {
+              "kind": "module",
+              "name": "abs",
+              "parents": []
+            },
+            "start_line": 3,
+            "text": "pub(crate) mod abs;\n"
+          },
+          {
+            "content": "0b5b429a2ee045847fe049b221065c2affb9ceace6b37ceb329d5dafddca1e1f",
+            "end_line": 331,
+            "id": "7c471823dd93f9fea99a3aefaa06326e66698b206c61d68f18b1b39b54e5929f",
+            "label": 3,
+            "path": "src/interpreter/efun/mod.rs",
+            "role": "code",
+            "role_basis": "raw_lexical_scope",
+            "scope": null,
+            "start_line": 199,
+            "text": "/// The efun table: one row per efun expands to its dispatch arm and its\n/// [`EFUN_PROTOTYPES`] entry.\n///\n/// Row: `name [option] => { returns: <LpcType>, arity: <arity>, args: [<LpcType>, ..] }`.\n/// A name that is a Rust keyword is spelled raw (`r#typeof`).\n/// `arity` is `n` (n arguments), `(n, d)` (the last `d` defaulted) or\n/// `(n, d, ellipsis)`, which also sets the prototype's ellipsis flag;\n/// `arity` and `args` may be omitted.\n/// `[in module]` dispatches to `module::name` instead of `name::name`;\n/// `[async]` (or `[async in module]`) marks an efun that can suspend; an\n/// unmarked one is a plain `fn` run inside\n/// [`Task::step`](crate::interpreter::task::Task::step), no future built;\n/// `[prototype only]` marks a special form: no module, no dispatch.\n/// `refs: from N` marks every argument from index `N` (0-based) as an\n/// lvalue the efun writes back through `write_ref`.\nmacro_rules! efuns {\n    (@dispatch $name:ident, $context:ident) => {\n        $name::$name($context)\n    };\n    (@dispatch $name:ident [in $module:ident], $context:ident) => {\n        $module::$name($context)\n    };\n    (@dispatch $name:ident [async], $context:ident) => {\n        $name::$name($context).await\n    };\n    (@dispatch $name:ident [async in $module:ident], $context:ident) => {\n        $module::$name($context).await\n    };\n    // Unreachable: the compiler never emits `CallEfun` for a special form.\n    (@dispatch $name:ident [prototype only], $context:ident) => {\n        Err($context.runtime_error(format!(\"Unknown efun: {}\", stringify!($name))))\n    };\n\n    (@sync $name:ident [async $($rest:tt)*], $context:ident) => {\n        None\n    };\n    (@sync $name:ident $([$($option:tt)*])?, $context:ident) => {\n        Some(efuns!(@dispatch $name $([$($option)*])?, $context))\n    };\n\n    (@suspends [async $($rest:tt)*]) => {\n        true\n    };\n    (@suspends $([$($option:tt)*])?) => {\n        false\n    };\n\n    (@arity) => {\n        FunctionArity::default()\n    };\n    (@arity $n:literal) => {\n        FunctionArity::new($n)\n    };\n    (@arity ($n:literal, $d:literal $(, ellipsis)?)) => {\n        FunctionArity {\n            num_args: $n,\n            num_default_args: $d,\n        }\n    };\n\n    (@flags ($n:literal, $d:literal, ellipsis)) => {\n        FunctionFlags::default().with_ellipsis(true)\n    };\n    (@flags $($arity:tt)?) => {\n        FunctionFlags::default()\n    };\n\n    (@prototype $name:ident {\n        returns: $returns:expr\n        $(, arity: $arity:tt)?\n        $(, args: [$($arg:expr),* $(,)?])?\n        $(, refs: from $ref_from:literal)?\n        $(,)?\n    }) => {\n        FunctionPrototypeBuilder::default()\n            .name(efun_name(stringify!($name)))\n            .filename(LpcPath::in_game(\"\".into()))\n            .return_type($returns)\n            .kind(FunctionKind::Efun)\n            .arity(efuns!(@arity $($arity)?))\n            .arg_types(vec![$($($arg),*)?])\n            .flags(efuns!(@flags $($arity)?))\n            .ref_tail(None $(.or(Some($ref_from)))?)\n            .build()\n            .expect(concat!(\"failed to build \", stringify!($name)))\n    };\n\n    ($( $name:ident $([$($option:tt)*])? => { $($row:tt)* } ),+ $(,)?) => {\n        /// Every efun; the discriminant is its [`EFUN_PROTOTYPES`] index,\n        /// the one a [`CallEfun`](lpc_rs_asm::instruction::Instruction::CallEfun)\n        /// carries.\n        #[derive(Debug, Clone, Copy, PartialEq, Eq)]\n        #[expect(non_camel_case_types, reason = \"one variant per efun, spelled as its table row is\")]\n        pub enum Efun {\n            $( $name, )+\n        }\n\n        impl Efun {\n            const ALL: &'static [Efun] = &[$( Efun::$name, )+];\n            const SUSPENDS: &'static [bool] = &[$( efuns!(@suspends $([$($option)*])?), )+];\n        }\n\n        /// Run `efun` against `efun_context`.\n        pub async fn call_efun<const STACKSIZE: usize>(\n            efun: Efun,\n            efun_context: &mut EfunContext<'_, STACKSIZE>,\n        ) -> Result<()> {\n            match efun {\n                $( Efun::$name => efuns!(@dispatch $name $([$($option)*])?, efun_context), )+\n            }\n        }\n\n        /// Run `efun` when it never suspends; `None` for one that awaits,\n        /// which only [`call_efun`] runs.\n        pub fn call_efun_sync<const STACKSIZE: usize>(\n            efun: Efun,\n            efun_context: &mut EfunContext<'_, STACKSIZE>,\n        ) -> Option<Result<()>> {\n            match efun {\n                $( Efun::$name => efuns!(@sync $name $([$($option)*])?, efun_context), )+\n            }\n        }\n\n        /// Every efun prototype, in table order.\n        /// [`Instruction::CallEfun`](lpc_rs_asm::instruction::Instruction::CallEfun)\n        /// indexes into this map; a reorder invalidates compiled code.\n        pub static EFUN_PROTOTYPES: LazyLock<IndexMap<&'static str, FunctionPrototype>> = LazyLock::new(|| {\n            let mut m = IndexMap::new();\n            $( m.insert(efun_name(stringify!($name)), efuns!(@prototype $name { $($row)* })); )+\n            m\n        });\n    };\n}\n"
+          },
+          {
+            "content": "0b5b429a2ee045847fe049b221065c2affb9ceace6b37ceb329d5dafddca1e1f",
+            "end_line": 356,
+            "id": "a1ecd627d9e4e03669d49ee14112b29af4bbe7568433d56cf2fba894613946cf",
+            "label": 4,
+            "path": "src/interpreter/efun/mod.rs",
+            "role": "code",
+            "role_basis": "raw_lexical_scope",
+            "scope": null,
+            "start_line": 347,
+            "text": "efuns! {\n    add_action => {\n        returns: LpcType::Void,\n        arity: (3, 1),\n        args: [\n            LpcType::Function(false) | LpcType::String(false),\n            LpcType::String(false) | LpcType::String(true),\n            LpcType::Int(false),\n        ],\n    },\n"
+          },
+          {
+            "content": "0b5b429a2ee045847fe049b221065c2affb9ceace6b37ceb329d5dafddca1e1f",
+            "end_line": 763,
+            "id": "3e80337d0e3ff6e0a6dc3b0a4bea2180841877db410b1bba8ee7f955b49dfa63",
+            "label": 5,
+            "path": "src/interpreter/efun/mod.rs",
+            "role": "code",
+            "role_basis": "raw_lexical_scope",
+            "scope": null,
+            "start_line": 759,
+            "text": "    abs => {\n        returns: LpcType::Mixed(false),\n        arity: 1,\n        args: [LpcType::Int(false) | LpcType::Float(false)],\n    },\n"
+          },
+          {
+            "content": "557b900fecdbdd1250d2bca6fb1fc8fb2836bc826649086e91946aacbe150d39",
+            "end_line": 11,
+            "id": "f6a10bf41f129af561f35686779b25b6d228a350e4f7cbe423480541638b0291",
+            "label": 6,
+            "path": "doc/efun/abs.md",
+            "role": "guide",
+            "role_basis": "path_convention",
+            "scope": null,
+            "start_line": 1,
+            "text": "# abs\n\n`int | float abs(int | float x)`\n\nReturn the magnitude of `x`, as the same type: `abs(-5)` is `5` and\n`abs(-1.5)` is `1.5`. The most negative int is its own magnitude, since\nnegation wraps. A non-number is an error.\n\n### See also\n\n`min`, `max`\n"
+          },
+          {
+            "content": "1fe41cc7dc721d73d3b684df6e4b4574cc0750e5a261504c07ff5db9aa0107b6",
+            "end_line": 25,
+            "id": "a50e8ae153697e3b673262f9fdfff1d6986fd138f3e3a58cdd560592b4343803",
+            "label": 7,
+            "path": "lpc-rs-lsp/build.rs",
+            "role": "code",
+            "role_basis": "raw_lexical_scope",
+            "scope": null,
+            "start_line": 1,
+            "text": "use std::{env, fs, path::PathBuf};\n\nfn main() {\n    let directory = PathBuf::from(\"../doc/efun\");\n    println!(\"cargo:rerun-if-changed={}\", directory.display());\n    let mut files: Vec<_> = fs::read_dir(directory)\n        .expect(\"efun documentation directory\")\n        .map(|entry| entry.expect(\"efun documentation file\").path())\n        .filter(|path| path.extension().is_some_and(|ext| ext == \"md\"))\n        .collect();\n    files.sort();\n    let mut code =\n        String::from(\"fn documentation(name: &str) -> Option<&'static str> { match name {\\n\");\n    for path in files {\n        let name = path.file_stem().unwrap().to_string_lossy();\n        let text = fs::read_to_string(&path).expect(\"UTF-8 efun documentation\");\n        code.push_str(&format!(\"{name:?} => Some({text:?}),\\n\"));\n    }\n    code.push_str(\"_ => None, } }\\n\");\n    fs::write(\n        PathBuf::from(env::var_os(\"OUT_DIR\").unwrap()).join(\"efun_docs.rs\"),\n        code,\n    )\n    .expect(\"generated efun documentation\");\n}\n"
+          }
+        ],
+        "snapshot": "32e85124e908b80f91952c6b91e4c8737ffec2c6118b70f8f50738f980444241"
+      },
+      "manualAudit": {
+        "complete": true,
+        "facts": 3,
+        "supportingAnchors": 2,
+        "limitation": "Literal anchors supplement the manual whole-definition/caller/branch audit; they do not prove semantic completeness."
+      }
+    },
+    {
+      "id": "maintainer.lpc-rs.transaction-creation",
+      "complete": true,
+      "facts": 2,
+      "supportingAnchors": 1,
+      "limitation": "Literal anchors supplement the manual whole-definition/caller/branch audit; they do not prove semantic completeness.",
+      "context": {
+        "evidence": [
+          {
+            "content": "fda6eb270cee7c857948c021422a1c2e08ef5e9101884f5e2087a03abb7c68a6",
+            "end_line": 143,
+            "id": "79dcf56799108a42eb9bedc3c89df43323ca885b7158642c34b1d98b8e58a0af",
+            "label": 1,
+            "path": "src/interpreter/stm/mod.rs",
+            "role": "code",
+            "role_basis": "raw_lexical_scope",
+            "scope": {
+              "kind": "implementation",
+              "name": "Transaction",
+              "parents": []
+            },
+            "start_line": 127,
+            "text": "impl Transaction {\n    pub(crate) fn new(snapshot: Snapshot) -> Self {\n        let version = snapshot.version();\n        Self {\n            snapshot,\n            changeset: Changeset::new(version),\n            effects: Vec::new(),\n            pending_call_outs: Vec::new(),\n            cancelled_call_outs: HashSet::new(),\n            joinable: true,\n            interrupted: None,\n            compilation: diagnostics::CompilationTiming::default(),\n            presence_revision: 0,\n            recompile_preparing: false,\n            view: None,\n        }\n    }\n"
+          },
+          {
+            "content": "ee4dff8d6425dad7f044aba98084036704ad9bad3142a01bc60baaca72170fdd",
+            "end_line": 442,
+            "id": "bc8540a308204440558ea041ddd1bad991b76ae880894ba813c82eee07a29c36",
+            "label": 2,
+            "path": "src/interpreter/task/mod.rs",
+            "role": "code",
+            "role_basis": "raw_lexical_scope",
+            "scope": {
+              "kind": "implementation",
+              "name": "Task<STACKSIZE>",
+              "parents": []
+            },
+            "start_line": 377,
+            "text": "    /// Open a transaction against the current world and run one attempt to\n    /// completion. Returns the attempt's\n    /// [`LiveSnapshot`], to be released only after the commit reply, or\n    /// `None` for a joiner.\n    async fn open_attempt(\n        &mut self,\n        tx: &flume::Sender<CommitProtocol>,\n    ) -> Result<Option<LiveSnapshot>> {\n        let live = if self.joins_parent {\n            None\n        } else {\n            Some(start_txn(tx).await?)\n        };\n\n        if let Some(live) = &live {\n            self.context.txn = TxnHandle::new(Transaction::new(live.inner.clone()));\n            self.context.clear_commands();\n        }\n\n        let seed = self\n            .seed\n            .clone()\n            .expect(\"top-level attempt has a seed; joiners never open\");\n\n        if live.is_some() {\n            self.context\n                .txn\n                .with(|txn| txn.set_origin(&seed.process, seed.entry.name()));\n        }\n\n        self.reset();\n        self.stack.cleanup_target =\n            matches!(seed.entry, SeedEntry::CleanUp).then(|| seed.process.clone());\n\n        if live.is_some() && matches!(seed.entry, SeedEntry::SystemInitializer(_)) {\n            let space = self.context.object_space();\n            if space.is_system_key(&space.process_key(&seed.process))\n                && !seed.process.is_initialized(&self.context.txn)\n            {\n                self.context.insert_process_transactional(&seed.process);\n            }\n        }\n\n        // Claimed inside the attempt, so a rejected initialization re-runs\n        // instead of staying marked.\n        if seed.initializes && !seed.process.claim_init(&self.context.txn) {\n            return Ok(live);\n        }\n\n        let result = {\n            let mut running = RunningTask {\n                task: self,\n                finished: false,\n            };\n            let result = running.task.run_entry(&seed).await;\n            running.finished = true;\n            result\n        };\n        if let Err(e) = result {\n            // A failed run holds nothing the committer needs.\n            drop(live);\n            return Err(e);\n        }\n\n        Ok(live)\n    }\n"
+          },
+          {
+            "content": "3106b137fc6641dba6914aafb8231d7b375e49818794fe2475c9b23adacdba45",
+            "end_line": 494,
+            "id": "d0b9b397a6ffbca54e143b1723a4732a83a2831d145ab0aceb0b75d20e542d32",
+            "label": 3,
+            "path": "src/interpreter/stm/retry.rs",
+            "role": "code",
+            "role_basis": "raw_lexical_scope",
+            "scope": {
+              "kind": "function",
+              "name": "request",
+              "parents": []
+            },
+            "start_line": 477,
+            "text": "async fn request<R: Send + 'static>(\n    tx: &flume::Sender<CommitProtocol>,\n    message: impl FnOnce(flume::Sender<R>) -> CommitProtocol,\n) -> Result<R> {\n    let (reply_tx, reply_rx) = flume::bounded(1);\n    tx.send(message(reply_tx))\n        .map_err(|_| -> lpc_rs_errors::LpcError { lpc_error!(\"committer channel closed\") })?;\n    reply_rx\n        .recv_async()\n        .await\n        .map_err(|_| -> lpc_rs_errors::LpcError { lpc_error!(\"no reply from committer\") })\n}\n\n/// Start a transaction against the committer's current world and hand back\n/// the release handle.\npub(crate) async fn start_txn(tx: &flume::Sender<CommitProtocol>) -> Result<LiveSnapshot> {\n    request(tx, |reply| CommitProtocol::Start { reply }).await\n}\n"
+          },
+          {
+            "content": "36b126eeea5e83f4ae16e6ad91f2a16e0fa2041facd489ab327cd4230bf73c3d",
+            "end_line": 301,
+            "id": "51761676b1a57de1e1320a1c90bc54ff5fe018b553188902ef062986ca4276bf",
+            "label": 4,
+            "path": "src/interpreter/stm/committer.rs",
+            "role": "code",
+            "role_basis": "raw_lexical_scope",
+            "scope": {
+              "kind": "function",
+              "name": "dispatch",
+              "parents": [
+                "Committer"
+              ]
+            },
+            "start_line": 289,
+            "text": "            CommitProtocol::Start { reply } => {\n                // Count before hand-out: a failed reply drops the\n                // LiveSnapshot, which self-releases.\n                *self\n                    .live_versions\n                    .entry(self.snapshot.version())\n                    .or_insert(0) += 1;\n                let live_snapshot = LiveSnapshot::new(self.snapshot.clone(), tx.clone());\n                reply.send(live_snapshot).unwrap_or_else(|e| {\n                    error!(\"Failed to send live snapshot: {e}\");\n                    self.stats.reply_failure()\n                });\n            }\n"
+          },
+          {
+            "content": "687e5279a3807089c5cffcb45c7a139d0cb91a8f10a51249964d77f8188aed2b",
+            "end_line": 108,
+            "id": "26df857987f94029ed5d90f9cff96a9202faa0d8d3207be961b47db9b4b92940",
+            "label": 5,
+            "path": "src/command/command_task.rs",
+            "role": "code",
+            "role_basis": "raw_lexical_scope",
+            "scope": {
+              "kind": "implementation",
+              "name": "AttemptBody for CommandTask",
+              "parents": []
+            },
+            "start_line": 84,
+            "text": "    async fn begin_attempt(\n        &mut self,\n        tx: &flume::Sender<CommitProtocol>,\n    ) -> Result<Option<LiveSnapshot>> {\n        let live = start_txn(tx).await?;\n        let mut template = self.template.clone();\n        template.txn = TxnHandle::new(Transaction::new(live.inner.clone()));\n        template\n            .txn\n            .with(|txn| txn.set_origin(&self.actor, \"command\"));\n        template.set_this_player(Some(self.actor.clone()));\n        let ctx = template.into_task_context(self.actor.clone());\n        let ctx = self.context.insert(ctx);\n        match dispatch_from_connection(ctx, self.actor.clone(), &self.line).await {\n            Ok(outcome) => {\n                self.outcome = outcome;\n                Ok(Some(live))\n            }\n            Err(e) => {\n                // A failed attempt holds nothing the committer needs.\n                drop(live);\n                Err(e)\n            }\n        }\n    }\n"
+          }
+        ],
+        "snapshot": "32e85124e908b80f91952c6b91e4c8737ffec2c6118b70f8f50738f980444241"
+      },
+      "manualAudit": {
+        "complete": true,
+        "facts": 2,
+        "supportingAnchors": 1,
+        "limitation": "Literal anchors supplement the manual whole-definition/caller/branch audit; they do not prove semantic completeness."
+      }
+    },
+    {
+      "id": "maintainer.lpc-rs.commit-checks",
+      "complete": true,
+      "facts": 8,
+      "supportingAnchors": 2,
+      "limitation": "Literal anchors supplement the manual whole-definition/caller/branch audit; they do not prove semantic completeness.",
+      "context": {
+        "evidence": [
+          {
+            "content": "3106b137fc6641dba6914aafb8231d7b375e49818794fe2475c9b23adacdba45",
+            "end_line": 416,
+            "id": "0c00727f6980d41773f5c936c267fd9a2bfad0aa1327177dd791bce2080d4054",
+            "label": 1,
+            "path": "src/interpreter/stm/retry.rs",
+            "role": "code",
+            "role_basis": "raw_lexical_scope",
+            "scope": {
+              "kind": "implementation",
+              "name": "AttemptRunner",
+              "parents": []
+            },
+            "start_line": 277,
+            "text": "    /// Execute an owner or joiner within its original evaluation allowance.\n    pub(crate) async fn run<B: AttemptBody>(&self, body: &mut B) -> (Result<()>, RetryStats) {\n        self.execute(body, &self.telemetry).await\n    }\n\n    async fn execute<B: AttemptBody>(\n        &self,\n        body: &mut B,\n        telemetry: &AttemptTelemetry,\n    ) -> (Result<()>, RetryStats) {\n        let started = std::time::Instant::now();\n        let owning = !body.is_nested();\n        let timeout_ms = body.timeout_ms();\n        let deadline =\n            (timeout_ms != 0).then(|| Instant::now() + Duration::from_millis(timeout_ms));\n        let mut attempts = 0u64;\n        let mut conflicts = 0u64;\n        let mut phases = PhaseTimes::default();\n        let mut admission = AdmissionStats::default();\n        let mut last_conflict = None;\n        let mut retry_cell = None;\n        let mut backoff = match self.commit_watch.clone() {\n            Some(watch) => Backoff::watching(watch),\n            None => Backoff::new(),\n        };\n\n        let mut result = loop {\n            if deadline.is_some_and(|deadline| Instant::now() >= deadline) {\n                break Err(attempt_timeout(body, attempts, conflicts));\n            }\n            let turn = if let Some(cell) = retry_cell.take() {\n                let waiting = Instant::now();\n                let acquired = match deadline {\n                    Some(deadline) => timeout_at(deadline, self.admission.acquire(cell)).await,\n                    None => Ok(self.admission.acquire(cell).await),\n                };\n                admission.waited += waiting.elapsed();\n                match acquired {\n                    Ok(Ok(turn)) => {\n                        admission.acquisitions += 1;\n                        if deadline.is_some_and(|deadline| Instant::now() >= deadline) {\n                            admission.timeouts += 1;\n                            break Err(attempt_timeout(body, attempts, conflicts));\n                        }\n                        Some(turn)\n                    }\n                    Ok(Err(error)) => break Err(error),\n                    Err(_) => {\n                        admission.timeouts += 1;\n                        break Err(attempt_timeout(body, attempts, conflicts));\n                    }\n                }\n            } else {\n                None\n            };\n            attempts += 1;\n\n            let attempt_started = Instant::now();\n            let attempt = match deadline {\n                Some(deadline) => match timeout_at(deadline, body.begin_attempt(&self.tx)).await {\n                    Ok(attempt) => attempt,\n                    Err(_) => Err(attempt_timeout(body, attempts, conflicts)),\n                },\n                None => body.begin_attempt(&self.tx).await,\n            };\n            phases.attempt += attempt_started.elapsed();\n            if owning {\n                phases.compilation += body.take_compilation_time();\n            }\n            let live = match attempt {\n                Ok(live) => live,\n                Err(e) => break Err(e),\n            };\n\n            let Some(mut live) = live else {\n                break Ok(());\n            };\n\n            // The commit releases the pin, including when its reply crosses the deadline.\n            live.disarm();\n            let commit_started = Instant::now();\n            let committed = body.commit_phase(&self.tx, live).await;\n            phases.commit += commit_started.elapsed();\n            drop(turn);\n            let (commit, effects) = match committed {\n                Ok(c) => c,\n                Err(e) => break Err(e),\n            };\n\n            match commit {\n                Ok(()) => {\n                    let delivery_started = Instant::now();\n                    let delivered = body.deliver(effects).await;\n                    phases.delivery += delivery_started.elapsed();\n                    break delivered;\n                }\n                Err(conflict) => {\n                    conflicts += 1;\n                    if owning && let Conflict::ReadInvalidated { cell, .. } = &conflict {\n                        retry_cell = Some(*cell);\n                    }\n                    last_conflict = Some(conflict);\n                }\n            }\n            if retry_cell.is_none() {\n                match deadline {\n                    Some(deadline) => {\n                        if timeout_at(deadline, backoff.stagger(conflicts))\n                            .await\n                            .is_err()\n                        {\n                            break Err(attempt_timeout(body, attempts, conflicts));\n                        }\n                    }\n                    None => backoff.stagger(conflicts).await,\n                }\n            }\n        };\n\n        let stats = RetryStats {\n            attempts,\n            conflicts,\n            duration: started.elapsed(),\n            backoff: backoff.spent(),\n            phases,\n            last_conflict,\n            admission,\n        };\n        telemetry.record(&stats, result.is_err(), owning);\n        if owning && (result.is_err() || stats.conflicts > 0) {\n            if let Err(error) = result {\n                let summary = diagnostic_summary(body, &stats);\n                tracing::warn!(target: \"lpc_rs::transactions\", diagnostic = %summary, error = %error, \"Transaction failed\");\n                result = Err(error.with_note(summary));\n            } else if tracing::enabled!(target: \"lpc_rs::transactions\", tracing::Level::DEBUG) {\n                tracing::debug!(target: \"lpc_rs::transactions\", diagnostic = %diagnostic_summary(body, &stats), \"Transaction committed after retries\");\n            }\n        }\n        (result, stats)\n    }\n"
+          },
+          {
+            "content": "ee4dff8d6425dad7f044aba98084036704ad9bad3142a01bc60baaca72170fdd",
+            "end_line": 1083,
+            "id": "fa4eaa18f61ca609b519d5b5f543044c7864516de70a4f6ceecc26181ac0735e",
+            "label": 2,
+            "path": "src/interpreter/task/mod.rs",
+            "role": "code",
+            "role_basis": "raw_lexical_scope",
+            "scope": {
+              "kind": "implementation",
+              "name": "AttemptBody for Task<STACKSIZE>",
+              "parents": []
+            },
+            "start_line": 1054,
+            "text": "    async fn begin_attempt(\n        &mut self,\n        tx: &flume::Sender<CommitProtocol>,\n    ) -> Result<Option<LiveSnapshot>> {\n        self.open_attempt(tx).await\n    }\n\n    async fn commit_phase(\n        &mut self,\n        tx: &flume::Sender<CommitProtocol>,\n        _live: LiveSnapshot,\n    ) -> Result<(\n        std::result::Result<(), crate::interpreter::stm::Conflict>,\n        Vec<Effect>,\n    )> {\n        // Clone the changeset, not take it: the result's payload is read\n        // through this handle after the commit, against the pre-commit\n        // snapshot plus this changeset.\n        let changeset = self.context.txn.with(|t| t.clone_changeset());\n        let commit = commit_changeset(tx, changeset).await?;\n        let effects = self.context.txn.with(|t| t.take_effects());\n        Ok((commit, effects))\n    }\n\n    async fn deliver(&mut self, effects: Vec<Effect>) -> Result<()> {\n        if !effects.is_empty() {\n            flush_effects(&self.context.global_state, effects).await;\n        }\n        Ok(())\n    }\n"
+          },
+          {
+            "content": "3106b137fc6641dba6914aafb8231d7b375e49818794fe2475c9b23adacdba45",
+            "end_line": 523,
+            "id": "b17d30c4431d4df72dc1e3ad301c352479687dd70124235ab8db4faa4e722a8a",
+            "label": 3,
+            "path": "src/interpreter/stm/retry.rs",
+            "role": "code",
+            "role_basis": "raw_lexical_scope",
+            "scope": {
+              "kind": "function",
+              "name": "request",
+              "parents": []
+            },
+            "start_line": 477,
+            "text": "async fn request<R: Send + 'static>(\n    tx: &flume::Sender<CommitProtocol>,\n    message: impl FnOnce(flume::Sender<R>) -> CommitProtocol,\n) -> Result<R> {\n    let (reply_tx, reply_rx) = flume::bounded(1);\n    tx.send(message(reply_tx))\n        .map_err(|_| -> lpc_rs_errors::LpcError { lpc_error!(\"committer channel closed\") })?;\n    reply_rx\n        .recv_async()\n        .await\n        .map_err(|_| -> lpc_rs_errors::LpcError { lpc_error!(\"no reply from committer\") })\n}\n\n/// Start a transaction against the committer's current world and hand back\n/// the release handle.\npub(crate) async fn start_txn(tx: &flume::Sender<CommitProtocol>) -> Result<LiveSnapshot> {\n    request(tx, |reply| CommitProtocol::Start { reply }).await\n}\n\n/// Client side of a GC pass: send the [`CommitProtocol::GcPass`] message\n/// and await its reply. `Ok(Err(_))` = refused, not quiescent.\npub(crate) async fn gc_pass(\n    tx: &flume::Sender<CommitProtocol>,\n    roots: Vec<WorldRoot>,\n) -> Result<GcPassReply> {\n    request(tx, |reply| CommitProtocol::GcPass { roots, reply }).await\n}\n\n/// The committer's lifetime commit totals; for bench measurement and tooling, not the hot path.\npub(crate) async fn committer_stats(tx: &flume::Sender<CommitProtocol>) -> Result<CommitterStats> {\n    request(tx, |reply| CommitProtocol::Stats { reply }).await\n}\n\n/// Commit a changeset from a disarmed attempt and await the reply; the\n/// commit carries the release of the base version's pin. `Ok(())` =\n/// committed; `Ok(Err(Conflict))` = rejected.\npub(crate) async fn commit_changeset(\n    tx: &flume::Sender<CommitProtocol>,\n    changeset: Changeset,\n) -> Result<std::result::Result<(), Conflict>> {\n    request(tx, |reply| CommitProtocol::Commit {\n        changeset,\n        releases_base: true,\n        reply,\n    })\n    .await\n}\n"
+          },
+          {
+            "content": "36b126eeea5e83f4ae16e6ad91f2a16e0fa2041facd489ab327cd4230bf73c3d",
+            "end_line": 321,
+            "id": "2aa9b35df6abd359288547bb948e0e8dfabb3ee4cb16c5d2cf66198240a0bf1d",
+            "label": 4,
+            "path": "src/interpreter/stm/committer.rs",
+            "role": "code",
+            "role_basis": "raw_lexical_scope",
+            "scope": {
+              "kind": "function",
+              "name": "dispatch",
+              "parents": [
+                "Committer"
+              ]
+            },
+            "start_line": 302,
+            "text": "            CommitProtocol::Commit {\n                changeset,\n                releases_base,\n                reply,\n            } => {\n                let started = std::time::Instant::now();\n                let base = changeset.base_version();\n                let result = self.commit(changeset);\n                if releases_base {\n                    self.release(base);\n                }\n                if self.live_versions.is_empty() {\n                    self.evict_old_versions();\n                }\n                reply.send(result).unwrap_or_else(|e| {\n                    error!(\"Failed to send commit result: {e}\");\n                    self.stats.reply_failure()\n                });\n                self.stats.commit_service_ns += started.elapsed().as_nanos() as u64;\n            }\n"
+          },
+          {
+            "content": "36b126eeea5e83f4ae16e6ad91f2a16e0fa2041facd489ab327cd4230bf73c3d",
+            "end_line": 709,
+            "id": "e2b9a8367137666bc58c0431304620d397e1fac18cc41b0ce9eb95204a3e1361",
+            "label": 5,
+            "path": "src/interpreter/stm/committer.rs",
+            "role": "code",
+            "role_basis": "raw_lexical_scope",
+            "scope": {
+              "kind": "implementation",
+              "name": "Committer",
+              "parents": []
+            },
+            "start_line": 611,
+            "text": "    pub(crate) fn commit(&mut self, mut changeset: Changeset) -> Result<(), Conflict> {\n        let current_version = self.snapshot.version();\n        let changeset_version = changeset.base_version();\n\n        // Should not occur in practice - it implies versions are being created in more than one place.\n        if current_version < changeset_version {\n            self.stats.conflict();\n            return Err(Conflict::FutureVersion {\n                base: changeset_version,\n                current: current_version,\n            });\n        }\n\n        // changeset's base evicted → not enough history to resolve the conflict rule\n        if changeset_version < self.oldest_retained {\n            self.stats.conflict();\n            return Err(Conflict::HistoryUnavailable {\n                base: changeset_version,\n                oldest: self.oldest_retained,\n                current: current_version,\n            });\n        }\n\n        // check the conflict rule\n        for (version, written) in self\n            .write_history\n            .range(changeset_version..=current_version)\n        {\n            if *version == changeset_version {\n                continue;\n            }\n\n            self.stats.validation_scanned_versions += 1;\n            if let Some(cell) = changeset.conflicting_read(&written.vars) {\n                self.stats.conflict();\n                return Err(Conflict::ReadInvalidated {\n                    cell,\n                    base: changeset_version,\n                    current: current_version,\n                    written_at: *version,\n                    writer: written.origin.clone(),\n                });\n            }\n        }\n\n        // The merges fold onto the committed values here, where a type\n        // mismatch rejects the whole changeset before anything applies.\n        if let Err(cell) = changeset.fold_merges(|var_id| self.snapshot.peek(var_id).cloned()) {\n            self.stats.conflict();\n            return Err(Conflict::MergeMismatch {\n                cell,\n                base: changeset_version,\n                current: current_version,\n            });\n        }\n\n        self.publish(changeset, true);\n        Ok(())\n    }\n\n    fn publish(&mut self, mut changeset: Changeset, transaction: bool) {\n        let mut written_vars = changeset.touched_vars();\n        if !changeset.object_changes.is_empty() {\n            written_vars.insert(self.snapshot.object_membership);\n        }\n        if written_vars.is_empty() {\n            // Conflict-free read-only changeset: no new version, no history.\n            self.stats.read_only_commit();\n            return;\n        }\n\n        let new_version = Version::new();\n        let origin = changeset.origin.clone();\n        let publications = std::mem::take(&mut changeset.system_publications);\n        let socket_publications = std::mem::take(&mut changeset.socket_publications);\n        let new_snapshot = self.snapshot.apply(new_version, changeset);\n        self.snapshot = new_snapshot;\n        for publication in publications {\n            publication.apply();\n        }\n        for publication in socket_publications {\n            publication.apply();\n        }\n\n        // Keep history insert after the snapshot apply, else a problem in apply leads to\n        // all transactions conflicting in the future.\n        self.write_history.insert(\n            new_version,\n            CommittedWrite {\n                vars: written_vars,\n                origin,\n            },\n        );\n        if transaction {\n            self.stats.commit();\n        }\n        self.commit_watch.send_replace(new_version);\n    }\n}\n"
+          }
+        ],
+        "snapshot": "32e85124e908b80f91952c6b91e4c8737ffec2c6118b70f8f50738f980444241"
+      },
+      "manualAudit": {
+        "complete": true,
+        "facts": 8,
+        "supportingAnchors": 2,
+        "limitation": "Literal anchors supplement the manual whole-definition/caller/branch audit; they do not prove semantic completeness."
+      }
+    }
+  ],
+  "arms": [
+    {
+      "id": "retrieved_ids",
+      "selection": "compact",
+      "wordLimit": 100,
+      "outputTokens": 384
+    },
+    {
+      "id": "curated_ids",
+      "selection": "pack",
+      "wordLimit": 100,
+      "outputTokens": 384
+    },
+    {
+      "id": "curated_long",
+      "selection": "pack",
+      "wordLimit": 300,
+      "outputTokens": 1024
+    }
+  ],
+  "limits": {
+    "threads": 2,
+    "context_tokens": 8192,
+    "output_tokens": 384,
+    "evidence_bytes": 8000,
+    "evidence_items": 6,
+    "request_timeout_ms": 360000,
+    "sampled_memory_target_bytes": 4294967296
+  },
+  "citationLimit": 8,
+  "limitations": [
+    "Known maintainer questions; source-complete diagnostic, not new held-out accuracy.",
+    "Curated evidence changes relevance, completeness and size together.",
+    "The uniform eight-ID schema and request timeout differ from earlier cohorts; defaults of older runners are unchanged.",
+    "Long response changes word and token allowances together; schema answer length stays 2,000 characters."
+  ]
+}

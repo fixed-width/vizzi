@@ -14,6 +14,9 @@ For the fixed-model, versioned retrieval and citation comparison, follow the
 [compact-evidence procedure](COMPACT.md). The original library and pilot results remain
 unchanged. The [follow-up results](COMPACT_RESULTS.md) include exact maintainer workflow
 questions and distinguish faster, valid references from correct answers.
+The subsequent [complete-source diagnostic](SOURCE_PACK_RESULTS.md) separates selection
+misses from remaining model/prompt limits; follow its [procedure](SOURCE_PACKS.md) to
+repeat the known-question control.
 
 Build with one compiler task and run the normal correctness checks:
 

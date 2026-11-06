@@ -1,0 +1,366 @@
+{
+  "schema": 1,
+  "limits": {
+    "mutant_jobs": 1,
+    "jobserver_tasks": 1,
+    "cargo_build_jobs": 1,
+    "test_threads": 1,
+    "nice": 10
+  },
+  "rounds": {
+    "focused": {
+      "baseline_passed": true,
+      "outcomes": {
+        "Unviable": 1,
+        "CaughtMutant": 25,
+        "MissedMutant": 1
+      },
+      "mutations": [
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:27:9: replace Corpus::select_ranges -> Result<Context, Error> with Ok(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:28:22: replace == with != in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:32:45: replace && with || in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:43:34: replace == with != in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:47:47: replace && with || in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:47:32: replace < with == in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:47:32: replace < with > in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:47:32: replace < with <= in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:47:63: replace <= with > in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:52:21: replace && with || in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:56:17: delete ! in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:59:25: replace && with || in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:58:25: replace && with || in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:57:32: replace == with != in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:58:40: replace < with == in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:58:40: replace < with > in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:58:40: replace < with <= in Corpus::select_ranges",
+          "outcome": "MissedMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:59:43: replace < with == in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:59:43: replace < with > in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:59:43: replace < with <= in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:63:18: replace += with -= in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:63:18: replace += with *= in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:63:34: replace - with + in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:63:34: replace - with / in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:64:26: replace <= with > in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:65:80: replace + with - in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:65:80: replace + with * in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        }
+      ]
+    },
+    "broader_after_reverse_adjacency_test": {
+      "baseline_passed": true,
+      "outcomes": {
+        "Unviable": 3,
+        "CaughtMutant": 52
+      },
+      "mutations": [
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:225:5: replace excerpt -> Evidence with Default::default()",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:231:24: replace + with - in excerpt",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:231:24: replace + with * in excerpt",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:233:24: replace == with != in excerpt",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:236:9: replace + with - in excerpt",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:236:9: replace + with * in excerpt",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:240:28: replace == with != in excerpt",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:510:9: replace Corpus::validate -> Result<(), Error> with Ok(())",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:511:30: replace == with != in Corpus::validate",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:517:17: replace && with || in Corpus::validate",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:516:17: replace && with || in Corpus::validate",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:515:13: delete ! in Corpus::validate",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:516:40: replace <= with > in Corpus::validate",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:517:43: replace <= with > in Corpus::validate",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:522:17: delete ! in Corpus::validate",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:535:21: replace && with || in Corpus::validate",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:534:21: replace && with || in Corpus::validate",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:533:17: delete ! in Corpus::validate",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:534:45: replace <= with > in Corpus::validate",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:547:9: replace Corpus::validate_ids -> Result<Vec<SourceReference<'a>>, Error> with Ok(vec![])",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:547:9: replace Corpus::validate_ids -> Result<Vec<SourceReference<'a>>, Error> with Ok(vec![Default::default()])",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:548:30: replace == with != in Corpus::validate_ids",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:554:17: replace && with || in Corpus::validate_ids",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:553:17: replace && with || in Corpus::validate_ids",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:552:13: delete ! in Corpus::validate_ids",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:553:40: replace <= with > in Corpus::validate_ids",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:554:43: replace <= with > in Corpus::validate_ids",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/lib.rs:559:17: delete ! in Corpus::validate_ids",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:27:9: replace Corpus::select_ranges -> Result<Context, Error> with Ok(Default::default())",
+          "outcome": "Unviable"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:28:22: replace == with != in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:32:45: replace && with || in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:43:34: replace == with != in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:47:47: replace && with || in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:47:32: replace < with == in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:47:32: replace < with > in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:47:32: replace < with <= in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:47:63: replace <= with > in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:52:21: replace && with || in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:56:17: delete ! in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:59:25: replace && with || in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:58:25: replace && with || in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:57:32: replace == with != in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:58:40: replace < with == in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:58:40: replace < with > in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:58:40: replace < with <= in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:59:43: replace < with == in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:59:43: replace < with > in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:59:43: replace < with <= in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:63:18: replace += with -= in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:63:18: replace += with *= in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:63:34: replace - with + in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:63:34: replace - with / in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:64:26: replace <= with > in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:65:80: replace + with - in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        },
+        {
+          "name": "crates/vizzi-qa/src/curated.rs:65:80: replace + with * in Corpus::select_ranges",
+          "outcome": "CaughtMutant"
+        }
+      ]
+    }
+  },
+  "exclusions": [],
+  "limitations": [
+    "Rounds overlap; do not sum as unique coverage.",
+    "Focused survivor was reverse-adjacent ordering and is caught after the added public-interface test.",
+    "Broader round covers exact selection, quote/ID validation and canonical excerpt construction, not untouched ranking algorithms.",
+    "Build failures are distinct from assertion catches; mutation evidence does not prove correctness."
+  ]
+}

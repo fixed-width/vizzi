@@ -142,6 +142,10 @@ Then improve task-shaped retrieval, source-role provenance and answer/status cal
 using new maintainer questions for a fresh evaluation. Repository-specific training and
 a chat UI are not supported as next steps by these results.
 
+The subsequent [source-complete diagnostic](SOURCE_PACK_RESULTS.md) carries out that
+comparison and separately tests a larger response allowance. It retains this cohort's
+frozen results and rubrics.
+
 [Reproduction procedure](COMPACT.md). Preserved artifacts include
 [main assessment](results/compact/assessment.json), [maintainer assessment](results/maintainer/assessment.json),
 [raw main responses](results/compact/answers.jsonl.gz),

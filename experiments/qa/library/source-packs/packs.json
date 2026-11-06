@@ -1,0 +1,166 @@
+{
+  "schema": 1,
+  "sourceRevision": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+  "selectionAuthorship": "Codex, source-aware manual definition/caller/branch audit before new diagnostic inference. These known questions are diagnostic regressions.",
+  "selectionBudget": 16000,
+  "cases": [
+    {
+      "id": "maintainer.lpc-rs.add-efun",
+      "ranges": [
+        {
+          "path": "src/interpreter/efun/abs.rs",
+          "first": 1,
+          "last": 69,
+          "sha256": "755de735b764cfff16979935ac35dfc00d26b0ea7d2cb2da23f00b8fc1896039",
+          "content": "135c0502836b702bb669c6741874a56b1ae5469be2f64319ab24193b08f1dc46"
+        },
+        {
+          "path": "src/interpreter/efun/mod.rs",
+          "first": 3,
+          "last": 3,
+          "sha256": "367de7da9ea0ed96d61b05a5f784245d32ed5078fed6d64f5ae4d3dffe4464db",
+          "content": "0b5b429a2ee045847fe049b221065c2affb9ceace6b37ceb329d5dafddca1e1f"
+        },
+        {
+          "path": "src/interpreter/efun/mod.rs",
+          "first": 199,
+          "last": 331,
+          "sha256": "367de7da9ea0ed96d61b05a5f784245d32ed5078fed6d64f5ae4d3dffe4464db",
+          "content": "0b5b429a2ee045847fe049b221065c2affb9ceace6b37ceb329d5dafddca1e1f"
+        },
+        {
+          "path": "src/interpreter/efun/mod.rs",
+          "first": 347,
+          "last": 356,
+          "sha256": "367de7da9ea0ed96d61b05a5f784245d32ed5078fed6d64f5ae4d3dffe4464db",
+          "content": "0b5b429a2ee045847fe049b221065c2affb9ceace6b37ceb329d5dafddca1e1f"
+        },
+        {
+          "path": "src/interpreter/efun/mod.rs",
+          "first": 759,
+          "last": 763,
+          "sha256": "367de7da9ea0ed96d61b05a5f784245d32ed5078fed6d64f5ae4d3dffe4464db",
+          "content": "0b5b429a2ee045847fe049b221065c2affb9ceace6b37ceb329d5dafddca1e1f"
+        },
+        {
+          "path": "doc/efun/abs.md",
+          "first": 1,
+          "last": 11,
+          "sha256": "8285de4cd1d37c89a8801242c03a710a0774d9ca480d703f3b2301d4d00454e7",
+          "content": "557b900fecdbdd1250d2bca6fb1fc8fb2836bc826649086e91946aacbe150d39"
+        },
+        {
+          "path": "lpc-rs-lsp/build.rs",
+          "first": 1,
+          "last": 25,
+          "sha256": "8f0c3860cadc6f5a5768b457171e9ebb0351738f14b7865ef789e44758968fc1",
+          "content": "1fe41cc7dc721d73d3b684df6e4b4574cc0750e5a261504c07ff5db9aa0107b6"
+        }
+      ],
+      "audit": {
+        "complete": true,
+        "facts": 3,
+        "supportingAnchors": 2,
+        "limitation": "Literal anchors supplement the manual whole-definition/caller/branch audit; they do not prove semantic completeness."
+      },
+      "evidenceBytes": 9026,
+      "manualReview": "Whole native handler including errors/tests; complete efuns macro definition; invocation opening/complete first row and abs row; whole Markdown and documentation generator. Other table entries are outside the required extension procedure."
+    },
+    {
+      "id": "maintainer.lpc-rs.transaction-creation",
+      "ranges": [
+        {
+          "path": "src/interpreter/stm/mod.rs",
+          "first": 127,
+          "last": 143,
+          "sha256": "ed1b15f1375301095debf9abfc0f7ecd7bfea4b412454780181e5b440dff3baa",
+          "content": "fda6eb270cee7c857948c021422a1c2e08ef5e9101884f5e2087a03abb7c68a6"
+        },
+        {
+          "path": "src/interpreter/task/mod.rs",
+          "first": 377,
+          "last": 442,
+          "sha256": "bf3a2aefa7a069c40966f38b2c537b333fe9d593c9695fa19ce3e71f251933ee",
+          "content": "ee4dff8d6425dad7f044aba98084036704ad9bad3142a01bc60baaca72170fdd"
+        },
+        {
+          "path": "src/interpreter/stm/retry.rs",
+          "first": 477,
+          "last": 494,
+          "sha256": "03cd614cf949bd057636ee8abbf91d8e05bea86c80b96b044ee4d0fd4de3c0c1",
+          "content": "3106b137fc6641dba6914aafb8231d7b375e49818794fe2475c9b23adacdba45"
+        },
+        {
+          "path": "src/interpreter/stm/committer.rs",
+          "first": 289,
+          "last": 301,
+          "sha256": "8af6ecf73933ee5446a55a6e6880eebe24231a77ca9c2a1ae90ac1b32042f789",
+          "content": "36b126eeea5e83f4ae16e6ad91f2a16e0fa2041facd489ab327cd4230bf73c3d"
+        },
+        {
+          "path": "src/command/command_task.rs",
+          "first": 84,
+          "last": 108,
+          "sha256": "34b79a996f9217859a29b2abb140cf3da65c70fe59ee9a78d97ff05e2438865d",
+          "content": "687e5279a3807089c5cffcb45c7a139d0cb91a8f10a51249964d77f8188aed2b"
+        }
+      ],
+      "audit": {
+        "complete": true,
+        "facts": 2,
+        "supportingAnchors": 1,
+        "limitation": "Literal anchors supplement the manual whole-definition/caller/branch audit; they do not prove semantic completeness."
+      },
+      "evidenceBytes": 5024,
+      "manualReview": "Complete Transaction constructor, Task::open_attempt including joining/error/initialization branches, transport/start helper, complete committer Start arm, and command-attempt constructor."
+    },
+    {
+      "id": "maintainer.lpc-rs.commit-checks",
+      "ranges": [
+        {
+          "path": "src/interpreter/stm/retry.rs",
+          "first": 277,
+          "last": 416,
+          "sha256": "03cd614cf949bd057636ee8abbf91d8e05bea86c80b96b044ee4d0fd4de3c0c1",
+          "content": "3106b137fc6641dba6914aafb8231d7b375e49818794fe2475c9b23adacdba45"
+        },
+        {
+          "path": "src/interpreter/task/mod.rs",
+          "first": 1054,
+          "last": 1083,
+          "sha256": "bf3a2aefa7a069c40966f38b2c537b333fe9d593c9695fa19ce3e71f251933ee",
+          "content": "ee4dff8d6425dad7f044aba98084036704ad9bad3142a01bc60baaca72170fdd"
+        },
+        {
+          "path": "src/interpreter/stm/retry.rs",
+          "first": 477,
+          "last": 523,
+          "sha256": "03cd614cf949bd057636ee8abbf91d8e05bea86c80b96b044ee4d0fd4de3c0c1",
+          "content": "3106b137fc6641dba6914aafb8231d7b375e49818794fe2475c9b23adacdba45"
+        },
+        {
+          "path": "src/interpreter/stm/committer.rs",
+          "first": 302,
+          "last": 321,
+          "sha256": "8af6ecf73933ee5446a55a6e6880eebe24231a77ca9c2a1ae90ac1b32042f789",
+          "content": "36b126eeea5e83f4ae16e6ad91f2a16e0fa2041facd489ab327cd4230bf73c3d"
+        },
+        {
+          "path": "src/interpreter/stm/committer.rs",
+          "first": 611,
+          "last": 709,
+          "sha256": "8af6ecf73933ee5446a55a6e6880eebe24231a77ca9c2a1ae90ac1b32042f789",
+          "content": "36b126eeea5e83f4ae16e6ad91f2a16e0fa2041facd489ab327cd4230bf73c3d"
+        }
+      ],
+      "audit": {
+        "complete": true,
+        "facts": 8,
+        "supportingAnchors": 2,
+        "limitation": "Literal anchors supplement the manual whole-definition/caller/branch audit; they do not prove semantic completeness."
+      },
+      "evidenceBytes": 12993,
+      "manualReview": "Complete AttemptRunner::run/execute including timeouts/admission/retry/delivery; complete task commit/deliver methods; transport/commit helpers; complete Commit arm; all of Committer::commit and publish."
+    }
+  ]
+}

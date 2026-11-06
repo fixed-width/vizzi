@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "native": "453 workspace tests including doctests, formatting and workspace all-target Clippy with warnings denied passed. Focused selection tests passed after test-only borrowing cleanup.",
+  "node": "Six serial Node test files passed, including exact UTF-8/CRLF ranges and HTTP streaming request/schema/word/token allowance checks.",
+  "safety": "Rust 2024 and inherited unsafe_code deny retained. No dependencies added.",
+  "targets": "Experimental native corpus and Node adapters; browser unchanged.",
+  "measurement": "Correctness/build/mutation work completed before optimized CPU-only inference; two threads, one request at a time, nice 10.",
+  "mutationLimitations": "Focused and broader rounds overlap. Broader relevant selection/quote/ID/excerpt scope: 52 caught, 3 unviable, zero survivors/timeouts; not untouched ranking coverage."
+}

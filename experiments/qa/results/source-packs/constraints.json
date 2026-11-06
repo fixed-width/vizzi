@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "records": [
+    {
+      "id": "maintainer.lpc-rs.add-efun/retrieved_ids",
+      "promptTokens": 974,
+      "outputTokens": 62,
+      "outputTokenLimit": 384,
+      "answerCharacters": 180,
+      "answerCharacterLimit": 2000,
+      "whitespaceSeparatedWords": 32,
+      "promptWordLimit": 100,
+      "finish": "stop",
+      "nativeSourceChecks": true
+    },
+    {
+      "id": "maintainer.lpc-rs.add-efun/curated_ids",
+      "promptTokens": 3148,
+      "outputTokens": 138,
+      "outputTokenLimit": 384,
+      "answerCharacters": 363,
+      "answerCharacterLimit": 2000,
+      "whitespaceSeparatedWords": 53,
+      "promptWordLimit": 100,
+      "finish": "stop",
+      "nativeSourceChecks": true
+    },
+    {
+      "id": "maintainer.lpc-rs.add-efun/curated_long",
+      "promptTokens": 3148,
+      "outputTokens": 106,
+      "outputTokenLimit": 1024,
+      "answerCharacters": 352,
+      "answerCharacterLimit": 2000,
+      "whitespaceSeparatedWords": 58,
+      "promptWordLimit": 300,
+      "finish": "stop",
+      "nativeSourceChecks": true
+    },
+    {
+      "id": "maintainer.lpc-rs.transaction-creation/curated_ids",
+      "promptTokens": 1577,
+      "outputTokens": 71,
+      "outputTokenLimit": 384,
+      "answerCharacters": 187,
+      "answerCharacterLimit": 2000,
+      "whitespaceSeparatedWords": 24,
+      "promptWordLimit": 100,
+      "finish": "stop",
+      "nativeSourceChecks": true
+    },
+    {
+      "id": "maintainer.lpc-rs.transaction-creation/curated_long",
+      "promptTokens": 1577,
+      "outputTokens": 201,
+      "outputTokenLimit": 1024,
+      "answerCharacters": 698,
+      "answerCharacterLimit": 2000,
+      "whitespaceSeparatedWords": 89,
+      "promptWordLimit": 300,
+      "finish": "stop",
+      "nativeSourceChecks": true
+    },
+    {
+      "id": "maintainer.lpc-rs.transaction-creation/retrieved_ids",
+      "promptTokens": 773,
+      "outputTokens": 76,
+      "outputTokenLimit": 384,
+      "answerCharacters": 222,
+      "answerCharacterLimit": 2000,
+      "whitespaceSeparatedWords": 22,
+      "promptWordLimit": 100,
+      "finish": "stop",
+      "nativeSourceChecks": true
+    },
+    {
+      "id": "maintainer.lpc-rs.commit-checks/curated_long",
+      "promptTokens": 3329,
+      "outputTokens": 200,
+      "outputTokenLimit": 1024,
+      "answerCharacters": 780,
+      "answerCharacterLimit": 2000,
+      "whitespaceSeparatedWords": 105,
+      "promptWordLimit": 300,
+      "finish": "stop",
+      "nativeSourceChecks": true
+    },
+    {
+      "id": "maintainer.lpc-rs.commit-checks/retrieved_ids",
+      "promptTokens": 845,
+      "outputTokens": 91,
+      "outputTokenLimit": 384,
+      "answerCharacters": 344,
+      "answerCharacterLimit": 2000,
+      "whitespaceSeparatedWords": 49,
+      "promptWordLimit": 100,
+      "finish": "stop",
+      "nativeSourceChecks": true
+    },
+    {
+      "id": "maintainer.lpc-rs.commit-checks/curated_ids",
+      "promptTokens": 3329,
+      "outputTokens": 171,
+      "outputTokenLimit": 384,
+      "answerCharacters": 662,
+      "answerCharacterLimit": 2000,
+      "whitespaceSeparatedWords": 99,
+      "promptWordLimit": 100,
+      "finish": "stop",
+      "nativeSourceChecks": true
+    }
+  ],
+  "limitations": [
+    "Whitespace word counts are descriptive, not a language-aware tokenizer.",
+    "No answer reaches the 2,000-character schema cap or output token cap; prompt word allowance is an instruction, not a truncating formatter."
+  ]
+}
