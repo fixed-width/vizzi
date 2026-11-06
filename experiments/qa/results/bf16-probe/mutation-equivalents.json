@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "scope": "Whole token-probe-support.mjs and precision-probe-support.mjs; CLI transport outside mutation scope.",
+  "counts": {
+    "caught": 300,
+    "equivalentSurvivors": 3,
+    "timeouts": 0,
+    "errors": 0,
+    "noCoverage": 0
+  },
+  "rawScore": 99.01,
+  "rawToolExit": 1,
+  "sourceSha256": {
+    "experiments/qa/precision-probe-support.mjs": "cfa09d6b84e221464610ced94f1faebb5d102033ef27f75a21a98a7d22cd3135",
+    "experiments/qa/token-probe-support.mjs": "4ae8272916222e742dbecb3702b498d2cb290e29b94bcb639a11fdbedec00750"
+  },
+  "exclusions": [
+    {
+      "file": "experiments/qa/precision-probe-support.mjs",
+      "id": "6",
+      "location": {
+        "end": {
+          "column": 55,
+          "line": 5
+        },
+        "start": {
+          "column": 43,
+          "line": 5
+        }
+      },
+      "mutator": "EqualityOperator",
+      "replacement": "p.repeat !== 1",
+      "reason": "probePlan requires exactly two complete passes with identical condition sets. Selecting pass 2 instead of pass 1 yields the same sorted condition keys; no probabilities or row pairing use this filter."
+    },
+    {
+      "file": "experiments/qa/token-probe-support.mjs",
+      "id": "241",
+      "location": {
+        "end": {
+          "column": 95,
+          "line": 33
+        },
+        "start": {
+          "column": 85,
+          "line": 33
+        }
+      },
+      "mutator": "ConditionalExpression",
+      "replacement": "true",
+      "reason": "After the earlier both-observed branch fails, an observed finite No implies Yes is censored. The null check is redundant for parser-produced finite/null choices."
+    },
+    {
+      "file": "experiments/qa/token-probe-support.mjs",
+      "id": "303",
+      "location": {
+        "end": {
+          "column": 61,
+          "line": 44
+        },
+        "start": {
+          "column": 48,
+          "line": 44
+        }
+      },
+      "mutator": "CallExpression",
+      "replacement": ";",
+      "reason": "A missing planned row is still rejected immediately at the following r.case property access; only rejection diagnostics change."
+    }
+  ]
+}

@@ -1,0 +1,210 @@
+[
+  {
+    "system": "production",
+    "prefix": "json",
+    "repeat": 1,
+    "originalMargin": {
+      "value": -0.1785184144973755,
+      "lower": -0.1785184144973755,
+      "upper": -0.1785184144973755
+    },
+    "changedMargin": {
+      "value": -0.5258215665817261,
+      "lower": -0.5258215665817261,
+      "upper": -0.5258215665817261
+    },
+    "sourceShift": {
+      "value": 0.3473031520843506,
+      "lower": 0.3473031520843506,
+      "upper": 0.3473031520843506
+    },
+    "permutationShift": {
+      "value": -0.8965436220169067,
+      "lower": -0.8965436220169067,
+      "upper": -0.8965436220169067
+    },
+    "missingWinner": "Yes"
+  },
+  {
+    "system": "production",
+    "prefix": "json",
+    "repeat": 2,
+    "originalMargin": {
+      "value": -0.1785184144973755,
+      "lower": -0.1785184144973755,
+      "upper": -0.1785184144973755
+    },
+    "changedMargin": {
+      "value": -0.5258215665817261,
+      "lower": -0.5258215665817261,
+      "upper": -0.5258215665817261
+    },
+    "sourceShift": {
+      "value": 0.3473031520843506,
+      "lower": 0.3473031520843506,
+      "upper": 0.3473031520843506
+    },
+    "permutationShift": {
+      "value": -0.8965436220169067,
+      "lower": -0.8965436220169067,
+      "upper": -0.8965436220169067
+    },
+    "missingWinner": "Yes"
+  },
+  {
+    "system": "production",
+    "prefix": "prose",
+    "repeat": 1,
+    "originalMargin": {
+      "value": -0.580053448677063,
+      "lower": -0.580053448677063,
+      "upper": -0.580053448677063
+    },
+    "changedMargin": {
+      "value": -0.8648375868797302,
+      "lower": -0.8648375868797302,
+      "upper": -0.8648375868797302
+    },
+    "sourceShift": {
+      "value": 0.28478413820266724,
+      "lower": 0.28478413820266724,
+      "upper": 0.28478413820266724
+    },
+    "permutationShift": {
+      "value": -0.946203351020813,
+      "lower": -0.946203351020813,
+      "upper": -0.946203351020813
+    },
+    "missingWinner": null
+  },
+  {
+    "system": "production",
+    "prefix": "prose",
+    "repeat": 2,
+    "originalMargin": {
+      "value": -0.580053448677063,
+      "lower": -0.580053448677063,
+      "upper": -0.580053448677063
+    },
+    "changedMargin": {
+      "value": -0.8648375868797302,
+      "lower": -0.8648375868797302,
+      "upper": -0.8648375868797302
+    },
+    "sourceShift": {
+      "value": 0.28478413820266724,
+      "lower": 0.28478413820266724,
+      "upper": 0.28478413820266724
+    },
+    "permutationShift": {
+      "value": -0.946203351020813,
+      "lower": -0.946203351020813,
+      "upper": -0.946203351020813
+    },
+    "missingWinner": null
+  },
+  {
+    "system": "diagnostic",
+    "prefix": "json",
+    "repeat": 1,
+    "originalMargin": {
+      "value": -1.2825469970703125,
+      "lower": -1.2825469970703125,
+      "upper": -1.2825469970703125
+    },
+    "changedMargin": {
+      "value": -1.4215775728225708,
+      "lower": -1.4215775728225708,
+      "upper": -1.4215775728225708
+    },
+    "sourceShift": {
+      "value": 0.1390305757522583,
+      "lower": 0.1390305757522583,
+      "upper": 0.1390305757522583
+    },
+    "permutationShift": {
+      "value": -0.8143272399902344,
+      "lower": -0.8143272399902344,
+      "upper": -0.8143272399902344
+    },
+    "missingWinner": "No"
+  },
+  {
+    "system": "diagnostic",
+    "prefix": "json",
+    "repeat": 2,
+    "originalMargin": {
+      "value": -1.2825469970703125,
+      "lower": -1.2825469970703125,
+      "upper": -1.2825469970703125
+    },
+    "changedMargin": {
+      "value": -1.4215775728225708,
+      "lower": -1.4215775728225708,
+      "upper": -1.4215775728225708
+    },
+    "sourceShift": {
+      "value": 0.1390305757522583,
+      "lower": 0.1390305757522583,
+      "upper": 0.1390305757522583
+    },
+    "permutationShift": {
+      "value": -0.8143272399902344,
+      "lower": -0.8143272399902344,
+      "upper": -0.8143272399902344
+    },
+    "missingWinner": "No"
+  },
+  {
+    "system": "diagnostic",
+    "prefix": "prose",
+    "repeat": 1,
+    "originalMargin": {
+      "value": -0.6542129814624786,
+      "lower": -0.6542129814624786,
+      "upper": -0.6542129814624786
+    },
+    "changedMargin": {
+      "value": -0.7530669867992401,
+      "lower": -0.7530669867992401,
+      "upper": -0.7530669867992401
+    },
+    "sourceShift": {
+      "value": 0.09885400533676147,
+      "lower": 0.09885400533676147,
+      "upper": 0.09885400533676147
+    },
+    "permutationShift": {
+      "value": -0.7524223625659943,
+      "lower": -0.7524223625659943,
+      "upper": -0.7524223625659943
+    },
+    "missingWinner": "Yes"
+  },
+  {
+    "system": "diagnostic",
+    "prefix": "prose",
+    "repeat": 2,
+    "originalMargin": {
+      "value": -0.6542129814624786,
+      "lower": -0.6542129814624786,
+      "upper": -0.6542129814624786
+    },
+    "changedMargin": {
+      "value": -0.7530669867992401,
+      "lower": -0.7530669867992401,
+      "upper": -0.7530669867992401
+    },
+    "sourceShift": {
+      "value": 0.09885400533676147,
+      "lower": 0.09885400533676147,
+      "upper": 0.09885400533676147
+    },
+    "permutationShift": {
+      "value": -0.7524223625659943,
+      "lower": -0.7524223625659943,
+      "upper": -0.7524223625659943
+    },
+    "missingWinner": "Yes"
+  }
+]

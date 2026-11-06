@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "createdAt": "2026-11-06T23:44:31.700Z",
+  "preparedSha256": "1df29d9d1299864c06b7a3d825601e6d040f59ef62b4716b7e7cac247694420f",
+  "model": {
+    "id": "qwen3.5-0.8b-base-local-bf16",
+    "repository": "Qwen/Qwen3.5-0.8B",
+    "revision": "2fc06364715b967f1860aea9cf38778875588b17",
+    "filename": "model-bf16.gguf",
+    "bytes": 1557662720,
+    "sha256": "5ef57c11d9ace33999da529924bc62e6b6dd3ba4b3d02a19fd966ff83f8336d7",
+    "directory": "base",
+    "artifact_kind": "Locally converted BF16 intermediate, including F32 tensors; same source as Q4 derivative",
+    "gguf_architecture": "qwen35",
+    "gguf_parameter_count": 772845888,
+    "chat_template_sha256": "273d8e0e683b885071fb17e08d71e5f2a5ddfb5309756181681de4f5a1822d80"
+  },
+  "runtimeSha256": "eaf9c1c664cc0ae1f4dea4b171bb91aac8409fcfea0574c9b6bcc93792ce2400",
+  "limits": {
+    "threads": 2,
+    "context_tokens": 8192,
+    "output_tokens": 384,
+    "evidence_bytes": 8000,
+    "evidence_items": 6,
+    "request_timeout_ms": 360000,
+    "sampled_memory_target_bytes": 4294967296,
+    "batch_tokens": 512,
+    "ubatch_tokens": 128
+  },
+  "expectedObservations": 32,
+  "reservedGenerations": 0,
+  "environment": {
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13700H",
+    "physicalMemoryBytes": 67080241152
+  },
+  "completed": 32,
+  "incomplete": false
+}

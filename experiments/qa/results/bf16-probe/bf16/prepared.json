@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "createdAt": "2026-11-06T23:38:03.787Z",
+  "files": {
+    "/home/mpd/git-sources/vizzi/experiments/qa/library/token-bf16/bf16.json": "94b685fe8beade7e45d392e671b1fdccf5c388945894642bdb6e006eaa1842e5",
+    "/home/mpd/git-sources/vizzi/experiments/qa/library/token-bf16/models.json": "4ab05877f926196f47c1c30bb947e11b1d457aec704121505b0fd2cde70861f7",
+    "/home/mpd/git-sources/vizzi/experiments/qa/results/evidence-use/inputs.json.gz": "072b65f7441c622e6e20f387a33506c9899a3b99ab10061eec1590cd3797459e",
+    "/home/mpd/git-sources/vizzi/experiments/qa/results/evidence-use/checksums.json": "d7301eae9984e1b41d0eb70acd6bbf50e627753dfbee7736b1a60fea37bc39ae",
+    "/home/mpd/git-sources/vizzi/docs/qa/BF16_PROBE.md": "fceeb8ac84478180c4f83d1951b2bda82a7ff5d1858ff3505bbd3b69ef3b9fc3",
+    "/home/mpd/git-sources/vizzi/experiments/qa/token-probe.mjs": "95027a677b4783e4ea5faa7febca40ea34df0ae1b69d7109722dbdae08aade3e",
+    "/home/mpd/git-sources/vizzi/experiments/qa/token-probe-support.mjs": "4ae8272916222e742dbecb3702b498d2cb290e29b94bcb639a11fdbedec00750",
+    "/home/mpd/git-sources/vizzi/experiments/qa/precision-probe-support.mjs": "cfa09d6b84e221464610ced94f1faebb5d102033ef27f75a21a98a7d22cd3135",
+    "/home/mpd/git-sources/vizzi/experiments/qa/model.mjs": "0247754a2c14e88a223485a9ef1aa9426944f8bb8af2414aa263090e014e54e1",
+    "/home/mpd/git-sources/vizzi/experiments/qa/runtime-profile.mjs": "b66963fbb69f7905ef09b67275fa88e343ab0235458356b2780b26a7c08ed6af",
+    "/home/mpd/git-sources/vizzi/experiments/qa/support.mjs": "273417232b72a1a2522d3b5d46d67895079f83870c3328dc375a2b1bfb4ee1d8",
+    "/home/mpd/git-sources/vizzi/experiments/qa/compact-support.mjs": "fca8329cc1f3fe2c67778b5338f000b896fcc6dd354df855b4662483d4d82a48",
+    "/home/mpd/git-sources/vizzi/target/release/vizzi-envelope": "4348433c09b341418ca0f8b87df36fedf1a872d00b0d9eb3ebf93b622548b537",
+    "/tmp/vizzi-qa-bf16-candidate-prepared/inputs.json": "038e75b0a290bbf079ff0eede628d17e89c1f619d744408156b9b8db5079825c",
+    "/home/mpd/git-sources/vizzi/experiments/qa/results/token-probe/preflight.json.gz": "0080dc5ae79a3c2d2c1660fca4e2c9e6972d6d92befb9dfbfe39563676e46430",
+    "/home/mpd/git-sources/vizzi/experiments/qa/results/token-probe/checksums.json": "288000d8a0e2f573f7d035c821b989c800be09ab4c13f5c9d0ae149daab6deef",
+    "/tmp/vizzi-qa-bf16-candidate-prepared/reference.json": "b0dad6847b5fa55af77409f647fdf320368ad781906cd2b71fb8b447614ad9b9"
+  },
+  "model": {
+    "id": "qwen3.5-0.8b-base-local-bf16",
+    "repository": "Qwen/Qwen3.5-0.8B",
+    "revision": "2fc06364715b967f1860aea9cf38778875588b17",
+    "filename": "model-bf16.gguf",
+    "bytes": 1557662720,
+    "sha256": "5ef57c11d9ace33999da529924bc62e6b6dd3ba4b3d02a19fd966ff83f8336d7",
+    "directory": "base",
+    "artifact_kind": "Locally converted BF16 intermediate, including F32 tensors; same source as Q4 derivative",
+    "gguf_architecture": "qwen35",
+    "gguf_parameter_count": 772845888,
+    "chat_template_sha256": "273d8e0e683b885071fb17e08d71e5f2a5ddfb5309756181681de4f5a1822d80"
+  },
+  "limits": {
+    "threads": 2,
+    "context_tokens": 8192,
+    "output_tokens": 384,
+    "evidence_bytes": 8000,
+    "evidence_items": 6,
+    "request_timeout_ms": 360000,
+    "sampled_memory_target_bytes": 4294967296,
+    "batch_tokens": 512,
+    "ubatch_tokens": 128
+  },
+  "expectedObservations": 32,
+  "reservedGenerations": 0,
+  "inputArchiveSha256": "072b65f7441c622e6e20f387a33506c9899a3b99ab10061eec1590cd3797459e"
+}

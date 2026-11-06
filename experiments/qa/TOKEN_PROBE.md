@@ -6,6 +6,9 @@ two answer prefixes and two passes: 32 one-token observations. These are conditi
 readouts, not complete QA responses or calibrated confidence.
 The [completed probe](TOKEN_PROBE_RESULTS.md) records weak source shifts, larger layout
 effects and persistent No preference without identifying a weight edit.
+The [matched precision procedure](BF16_PROBE.md) reuses this runner with explicit cohorts
+and an archived preflight reference. Its mutation configuration now covers the
+precision-pairing helper as well as the original token-probe helper.
 
 Run the serial QA tests and the focused helper mutation configuration before inference:
 

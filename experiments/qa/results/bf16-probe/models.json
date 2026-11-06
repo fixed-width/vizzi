@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "catalog_checked_on": "2026-11-06",
+  "selection_reason": "Matched cached BF16 intermediate and Q4_K_M derivative from the same source/converter; no model-generation change.",
+  "runtime": {
+    "release": "v0.9.0",
+    "build": "b12110",
+    "commit": "cd959bae99ff4bed22bef2604f45241c09bbb8c8",
+    "archive": "llama-b12110-bin-ubuntu-x64.tar.gz",
+    "archive_sha256": "368227edcc229be5f9bed16a2223d79b5e41d0ac2e19bcf5825e82291c060e55"
+  },
+  "limits": {
+    "threads": 2,
+    "context_tokens": 8192,
+    "output_tokens": 384,
+    "evidence_bytes": 8000,
+    "evidence_items": 6,
+    "request_timeout_ms": 180000,
+    "sampled_memory_target_bytes": 4294967296
+  },
+  "artifactAuditSha256": "8c0f2810410f994ac7ceb3aa1ddd96815bc26cba59c1f55390487566cd20eee9",
+  "models": [
+    {
+      "id": "qwen3.5-0.8b-base-local-q4",
+      "repository": "Qwen/Qwen3.5-0.8B",
+      "revision": "2fc06364715b967f1860aea9cf38778875588b17",
+      "filename": "model-q4.gguf",
+      "bytes": 541903872,
+      "sha256": "94d3009ee9cfca48d7d852bf0fe6c14c6f4f2506e818ca63f8c873fa46320a0a",
+      "directory": "models/base",
+      "artifact_kind": "Locally built GGUF; repository/revision identify source, not a downloadable GGUF",
+      "gguf_architecture": "qwen35",
+      "gguf_parameter_count": 772845888,
+      "chat_template_sha256": "273d8e0e683b885071fb17e08d71e5f2a5ddfb5309756181681de4f5a1822d80"
+    },
+    {
+      "id": "qwen3.5-0.8b-base-local-bf16",
+      "repository": "Qwen/Qwen3.5-0.8B",
+      "revision": "2fc06364715b967f1860aea9cf38778875588b17",
+      "filename": "model-bf16.gguf",
+      "bytes": 1557662720,
+      "sha256": "5ef57c11d9ace33999da529924bc62e6b6dd3ba4b3d02a19fd966ff83f8336d7",
+      "directory": "base",
+      "artifact_kind": "Locally converted BF16 intermediate, including F32 tensors; same source as Q4 derivative",
+      "gguf_architecture": "qwen35",
+      "gguf_parameter_count": 772845888,
+      "chat_template_sha256": "273d8e0e683b885071fb17e08d71e5f2a5ddfb5309756181681de4f5a1822d80"
+    }
+  ]
+}

@@ -44,6 +44,11 @@ classifications without changing experiment answers or scores.
 The [conditional token probe](TOKEN_PROBE_RESULTS.md) then tests the persistent pin error:
 the source contrast moves Yes/No margins in the expected direction but does not flip the
 unconditional original, and source permutation has a larger effect. No edit is selected.
+The [matched BF16/Q4 control](BF16_PROBE_RESULTS.md) then changes precision with exact
+preflight matching. BF16 changes preferences but resolves none of the four original/guarded
+pairs: its diagnostic/prose readout flips both to Yes. It costs more time and memory;
+the production defaults and eight reserved cases remain unchanged. Follow
+[the procedure](BF16_PROBE.md) to repeat the control.
 
 Build with one compiler task and run the normal correctness checks:
 

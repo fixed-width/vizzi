@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "testsRerun": false,
+  "retainedPassingTests": 453,
+  "reason": "Production Rust/Cargo inputs unchanged from d15a56d; this change adds only Node probe code, tests and docs.",
+  "nativeTree": "60b67306e50b3b0557e57ed5f122bb5b566e101c",
+  "testLog": "experiments/qa/results/json-object/validation/workspace.log.gz",
+  "testLogSha256": "4bd6650a8d90e238e3ba1be437502bf0789fb83d2d64e4bec3eb787215b91e5f",
+  "freshChecks": "Workspace formatting, all-target Clippy, affected Node tests and mutation runs."
+}

@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "modelSha256AfterInference": {
+    "qwen3.5-0.8b-base-local-q4": "94d3009ee9cfca48d7d852bf0fe6c14c6f4f2506e818ca63f8c873fa46320a0a",
+    "qwen3.5-0.8b-base-local-bf16": "5ef57c11d9ace33999da529924bc62e6b6dd3ba4b3d02a19fd966ff83f8336d7"
+  },
+  "runtimeSha256AfterInference": "eaf9c1c664cc0ae1f4dea4b171bb91aac8409fcfea0574c9b6bcc93792ce2400",
+  "originalBF16BuildRecordMatches": true,
+  "originalQ4ComparisonManifestMatches": true,
+  "allPreparedFileHashesStillMatch": true,
+  "nativeRustAndCargoDiffFrom": "d15a56d",
+  "nativeInputsUnchanged": true,
+  "nativeTree": "60b67306e50b3b0557e57ed5f122bb5b566e101c",
+  "formattingExitCode": 0,
+  "observedInferenceCompleteBeforePostflight": true
+}

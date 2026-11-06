@@ -1,0 +1,1231 @@
+{
+  "schema": 1,
+  "inputs": {
+    "conditions": 16,
+    "candidateSpellings": 6
+  },
+  "pairs": [
+    {
+      "id": "evidence.pins.original/production/json/repeat-1",
+      "case": "evidence.pins.original",
+      "system": "production",
+      "prefix": "json",
+      "repeat": 1,
+      "expected": "Yes",
+      "control": {
+        "value": -0.1785184144973755,
+        "lower": -0.1785184144973755,
+        "upper": -0.1785184144973755
+      },
+      "candidate": {
+        "value": -0.2418365478515625,
+        "lower": -0.2418365478515625,
+        "upper": -0.2418365478515625
+      },
+      "delta": {
+        "value": -0.06331813335418701,
+        "lower": -0.06331813335418701,
+        "upper": -0.06331813335418701
+      },
+      "controlWinner": "No",
+      "candidateWinner": "No"
+    },
+    {
+      "id": "evidence.pins.original/production/prose/repeat-1",
+      "case": "evidence.pins.original",
+      "system": "production",
+      "prefix": "prose",
+      "repeat": 1,
+      "expected": "Yes",
+      "control": {
+        "value": -0.580053448677063,
+        "lower": -0.580053448677063,
+        "upper": -0.580053448677063
+      },
+      "candidate": {
+        "value": -0.7506104111671448,
+        "lower": -0.7506104111671448,
+        "upper": -0.7506104111671448
+      },
+      "delta": {
+        "value": -0.1705569624900818,
+        "lower": -0.1705569624900818,
+        "upper": -0.1705569624900818
+      },
+      "controlWinner": null,
+      "candidateWinner": null
+    },
+    {
+      "id": "evidence.pins.original/diagnostic/json/repeat-1",
+      "case": "evidence.pins.original",
+      "system": "diagnostic",
+      "prefix": "json",
+      "repeat": 1,
+      "expected": "Yes",
+      "control": {
+        "value": -1.2825469970703125,
+        "lower": -1.2825469970703125,
+        "upper": -1.2825469970703125
+      },
+      "candidate": {
+        "value": -0.8177146911621094,
+        "lower": -0.8177146911621094,
+        "upper": -0.8177146911621094
+      },
+      "delta": {
+        "value": 0.4648323059082031,
+        "lower": 0.4648323059082031,
+        "upper": 0.4648323059082031
+      },
+      "controlWinner": "No",
+      "candidateWinner": "No"
+    },
+    {
+      "id": "evidence.pins.original/diagnostic/prose/repeat-1",
+      "case": "evidence.pins.original",
+      "system": "diagnostic",
+      "prefix": "prose",
+      "repeat": 1,
+      "expected": "Yes",
+      "control": {
+        "value": -0.6542129814624786,
+        "lower": -0.6542129814624786,
+        "upper": -0.6542129814624786
+      },
+      "candidate": {
+        "value": 0.5715979933738708,
+        "lower": 0.5715979933738708,
+        "upper": 0.5715979933738708
+      },
+      "delta": {
+        "value": 1.2258109748363495,
+        "lower": 1.2258109748363495,
+        "upper": 1.2258109748363495
+      },
+      "controlWinner": "No",
+      "candidateWinner": "Yes"
+    },
+    {
+      "id": "evidence.pins.changed/production/json/repeat-1",
+      "case": "evidence.pins.changed",
+      "system": "production",
+      "prefix": "json",
+      "repeat": 1,
+      "expected": "No",
+      "control": {
+        "value": -0.5258215665817261,
+        "lower": -0.5258215665817261,
+        "upper": -0.5258215665817261
+      },
+      "candidate": {
+        "value": -0.5458164811134338,
+        "lower": -0.5458164811134338,
+        "upper": -0.5458164811134338
+      },
+      "delta": {
+        "value": -0.019994914531707764,
+        "lower": -0.019994914531707764,
+        "upper": -0.019994914531707764
+      },
+      "controlWinner": "No",
+      "candidateWinner": "No"
+    },
+    {
+      "id": "evidence.pins.changed/production/prose/repeat-1",
+      "case": "evidence.pins.changed",
+      "system": "production",
+      "prefix": "prose",
+      "repeat": 1,
+      "expected": "No",
+      "control": {
+        "value": -0.8648375868797302,
+        "lower": -0.8648375868797302,
+        "upper": -0.8648375868797302
+      },
+      "candidate": {
+        "value": -0.9693584442138672,
+        "lower": -0.9693584442138672,
+        "upper": -0.9693584442138672
+      },
+      "delta": {
+        "value": -0.10452085733413696,
+        "lower": -0.10452085733413696,
+        "upper": -0.10452085733413696
+      },
+      "controlWinner": null,
+      "candidateWinner": null
+    },
+    {
+      "id": "evidence.pins.changed/diagnostic/json/repeat-1",
+      "case": "evidence.pins.changed",
+      "system": "diagnostic",
+      "prefix": "json",
+      "repeat": 1,
+      "expected": "No",
+      "control": {
+        "value": -1.4215775728225708,
+        "lower": -1.4215775728225708,
+        "upper": -1.4215775728225708
+      },
+      "candidate": {
+        "value": -0.9490088820457458,
+        "lower": -0.9490088820457458,
+        "upper": -0.9490088820457458
+      },
+      "delta": {
+        "value": 0.47256869077682495,
+        "lower": 0.47256869077682495,
+        "upper": 0.47256869077682495
+      },
+      "controlWinner": "No",
+      "candidateWinner": "No"
+    },
+    {
+      "id": "evidence.pins.changed/diagnostic/prose/repeat-1",
+      "case": "evidence.pins.changed",
+      "system": "diagnostic",
+      "prefix": "prose",
+      "repeat": 1,
+      "expected": "No",
+      "control": {
+        "value": -0.7530669867992401,
+        "lower": -0.7530669867992401,
+        "upper": -0.7530669867992401
+      },
+      "candidate": {
+        "value": 0.4564761519432068,
+        "lower": 0.4564761519432068,
+        "upper": 0.4564761519432068
+      },
+      "delta": {
+        "value": 1.209543138742447,
+        "lower": 1.209543138742447,
+        "upper": 1.209543138742447
+      },
+      "controlWinner": "No",
+      "candidateWinner": "Yes"
+    },
+    {
+      "id": "evidence.pins.relabel/production/json/repeat-1",
+      "case": "evidence.pins.relabel",
+      "system": "production",
+      "prefix": "json",
+      "repeat": 1,
+      "expected": "Yes",
+      "control": {
+        "value": 0.7180252075195312,
+        "lower": 0.7180252075195312,
+        "upper": 0.7180252075195312
+      },
+      "candidate": {
+        "value": 0.8461990356445312,
+        "lower": 0.8461990356445312,
+        "upper": 0.8461990356445312
+      },
+      "delta": {
+        "value": 0.128173828125,
+        "lower": 0.128173828125,
+        "upper": 0.128173828125
+      },
+      "controlWinner": "Yes",
+      "candidateWinner": "Yes"
+    },
+    {
+      "id": "evidence.pins.relabel/production/prose/repeat-1",
+      "case": "evidence.pins.relabel",
+      "system": "production",
+      "prefix": "prose",
+      "repeat": 1,
+      "expected": "Yes",
+      "control": {
+        "value": 0.36614990234375,
+        "lower": 0.36614990234375,
+        "upper": 0.36614990234375
+      },
+      "candidate": {
+        "value": 0.06008350849151611,
+        "lower": 0.06008350849151611,
+        "upper": 0.06008350849151611
+      },
+      "delta": {
+        "value": -0.3060663938522339,
+        "lower": -0.3060663938522339,
+        "upper": -0.3060663938522339
+      },
+      "controlWinner": null,
+      "candidateWinner": null
+    },
+    {
+      "id": "evidence.pins.relabel/diagnostic/json/repeat-1",
+      "case": "evidence.pins.relabel",
+      "system": "diagnostic",
+      "prefix": "json",
+      "repeat": 1,
+      "expected": "Yes",
+      "control": {
+        "value": -0.4682197570800781,
+        "lower": -0.4682197570800781,
+        "upper": -0.4682197570800781
+      },
+      "candidate": {
+        "value": 0.23520082235336304,
+        "lower": 0.23520082235336304,
+        "upper": 0.23520082235336304
+      },
+      "delta": {
+        "value": 0.7034205794334412,
+        "lower": 0.7034205794334412,
+        "upper": 0.7034205794334412
+      },
+      "controlWinner": "No",
+      "candidateWinner": "Yes"
+    },
+    {
+      "id": "evidence.pins.relabel/diagnostic/prose/repeat-1",
+      "case": "evidence.pins.relabel",
+      "system": "diagnostic",
+      "prefix": "prose",
+      "repeat": 1,
+      "expected": "Yes",
+      "control": {
+        "value": 0.09820938110351562,
+        "lower": 0.09820938110351562,
+        "upper": 0.09820938110351562
+      },
+      "candidate": {
+        "value": 1.3388653099536896,
+        "lower": 1.3388653099536896,
+        "upper": 1.3388653099536896
+      },
+      "delta": {
+        "value": 1.240655928850174,
+        "lower": 1.240655928850174,
+        "upper": 1.240655928850174
+      },
+      "controlWinner": "Yes",
+      "candidateWinner": "Yes"
+    },
+    {
+      "id": "evidence.pins.missing/production/json/repeat-1",
+      "case": "evidence.pins.missing",
+      "system": "production",
+      "prefix": "json",
+      "repeat": 1,
+      "expected": "Unknown",
+      "control": {
+        "value": 0.10889434814453125,
+        "lower": 0.10889434814453125,
+        "upper": 0.10889434814453125
+      },
+      "candidate": {
+        "value": -0.13455593585968018,
+        "lower": -0.13455593585968018,
+        "upper": -0.13455593585968018
+      },
+      "delta": {
+        "value": -0.24345028400421143,
+        "lower": -0.24345028400421143,
+        "upper": -0.24345028400421143
+      },
+      "controlWinner": "Yes",
+      "candidateWinner": "No"
+    },
+    {
+      "id": "evidence.pins.missing/production/prose/repeat-1",
+      "case": "evidence.pins.missing",
+      "system": "production",
+      "prefix": "prose",
+      "repeat": 1,
+      "expected": "Unknown",
+      "control": {
+        "value": -0.3679466247558594,
+        "lower": -0.3679466247558594,
+        "upper": -0.3679466247558594
+      },
+      "candidate": {
+        "value": -0.6035957932472229,
+        "lower": -0.6035957932472229,
+        "upper": -0.6035957932472229
+      },
+      "delta": {
+        "value": -0.23564916849136353,
+        "lower": -0.23564916849136353,
+        "upper": -0.23564916849136353
+      },
+      "controlWinner": null,
+      "candidateWinner": null
+    },
+    {
+      "id": "evidence.pins.missing/diagnostic/json/repeat-1",
+      "case": "evidence.pins.missing",
+      "system": "diagnostic",
+      "prefix": "json",
+      "repeat": 1,
+      "expected": "Unknown",
+      "control": {
+        "value": -1.1690731346607208,
+        "lower": -1.1690731346607208,
+        "upper": -1.1690731346607208
+      },
+      "candidate": {
+        "value": -0.850620299577713,
+        "lower": -0.850620299577713,
+        "upper": -0.850620299577713
+      },
+      "delta": {
+        "value": 0.3184528350830078,
+        "lower": 0.3184528350830078,
+        "upper": 0.3184528350830078
+      },
+      "controlWinner": "No",
+      "candidateWinner": "No"
+    },
+    {
+      "id": "evidence.pins.missing/diagnostic/prose/repeat-1",
+      "case": "evidence.pins.missing",
+      "system": "diagnostic",
+      "prefix": "prose",
+      "repeat": 1,
+      "expected": "Unknown",
+      "control": {
+        "value": 0.1421089768409729,
+        "lower": 0.1421089768409729,
+        "upper": 0.1421089768409729
+      },
+      "candidate": {
+        "value": 0.9323273301124573,
+        "lower": 0.9323273301124573,
+        "upper": 0.9323273301124573
+      },
+      "delta": {
+        "value": 0.7902183532714844,
+        "lower": 0.7902183532714844,
+        "upper": 0.7902183532714844
+      },
+      "controlWinner": "Yes",
+      "candidateWinner": "Yes"
+    },
+    {
+      "id": "evidence.pins.missing/diagnostic/prose/repeat-2",
+      "case": "evidence.pins.missing",
+      "system": "diagnostic",
+      "prefix": "prose",
+      "repeat": 2,
+      "expected": "Unknown",
+      "control": {
+        "value": 0.1421089768409729,
+        "lower": 0.1421089768409729,
+        "upper": 0.1421089768409729
+      },
+      "candidate": {
+        "value": 0.9323273301124573,
+        "lower": 0.9323273301124573,
+        "upper": 0.9323273301124573
+      },
+      "delta": {
+        "value": 0.7902183532714844,
+        "lower": 0.7902183532714844,
+        "upper": 0.7902183532714844
+      },
+      "controlWinner": "Yes",
+      "candidateWinner": "Yes"
+    },
+    {
+      "id": "evidence.pins.missing/diagnostic/json/repeat-2",
+      "case": "evidence.pins.missing",
+      "system": "diagnostic",
+      "prefix": "json",
+      "repeat": 2,
+      "expected": "Unknown",
+      "control": {
+        "value": -1.1690731346607208,
+        "lower": -1.1690731346607208,
+        "upper": -1.1690731346607208
+      },
+      "candidate": {
+        "value": -0.850620299577713,
+        "lower": -0.850620299577713,
+        "upper": -0.850620299577713
+      },
+      "delta": {
+        "value": 0.3184528350830078,
+        "lower": 0.3184528350830078,
+        "upper": 0.3184528350830078
+      },
+      "controlWinner": "No",
+      "candidateWinner": "No"
+    },
+    {
+      "id": "evidence.pins.missing/production/prose/repeat-2",
+      "case": "evidence.pins.missing",
+      "system": "production",
+      "prefix": "prose",
+      "repeat": 2,
+      "expected": "Unknown",
+      "control": {
+        "value": -0.3679466247558594,
+        "lower": -0.3679466247558594,
+        "upper": -0.3679466247558594
+      },
+      "candidate": {
+        "value": -0.6035957932472229,
+        "lower": -0.6035957932472229,
+        "upper": -0.6035957932472229
+      },
+      "delta": {
+        "value": -0.23564916849136353,
+        "lower": -0.23564916849136353,
+        "upper": -0.23564916849136353
+      },
+      "controlWinner": null,
+      "candidateWinner": null
+    },
+    {
+      "id": "evidence.pins.missing/production/json/repeat-2",
+      "case": "evidence.pins.missing",
+      "system": "production",
+      "prefix": "json",
+      "repeat": 2,
+      "expected": "Unknown",
+      "control": {
+        "value": 0.10889434814453125,
+        "lower": 0.10889434814453125,
+        "upper": 0.10889434814453125
+      },
+      "candidate": {
+        "value": -0.13455593585968018,
+        "lower": -0.13455593585968018,
+        "upper": -0.13455593585968018
+      },
+      "delta": {
+        "value": -0.24345028400421143,
+        "lower": -0.24345028400421143,
+        "upper": -0.24345028400421143
+      },
+      "controlWinner": "Yes",
+      "candidateWinner": "No"
+    },
+    {
+      "id": "evidence.pins.relabel/diagnostic/prose/repeat-2",
+      "case": "evidence.pins.relabel",
+      "system": "diagnostic",
+      "prefix": "prose",
+      "repeat": 2,
+      "expected": "Yes",
+      "control": {
+        "value": 0.09820938110351562,
+        "lower": 0.09820938110351562,
+        "upper": 0.09820938110351562
+      },
+      "candidate": {
+        "value": 1.3388653099536896,
+        "lower": 1.3388653099536896,
+        "upper": 1.3388653099536896
+      },
+      "delta": {
+        "value": 1.240655928850174,
+        "lower": 1.240655928850174,
+        "upper": 1.240655928850174
+      },
+      "controlWinner": "Yes",
+      "candidateWinner": "Yes"
+    },
+    {
+      "id": "evidence.pins.relabel/diagnostic/json/repeat-2",
+      "case": "evidence.pins.relabel",
+      "system": "diagnostic",
+      "prefix": "json",
+      "repeat": 2,
+      "expected": "Yes",
+      "control": {
+        "value": -0.4682197570800781,
+        "lower": -0.4682197570800781,
+        "upper": -0.4682197570800781
+      },
+      "candidate": {
+        "value": 0.23520082235336304,
+        "lower": 0.23520082235336304,
+        "upper": 0.23520082235336304
+      },
+      "delta": {
+        "value": 0.7034205794334412,
+        "lower": 0.7034205794334412,
+        "upper": 0.7034205794334412
+      },
+      "controlWinner": "No",
+      "candidateWinner": "Yes"
+    },
+    {
+      "id": "evidence.pins.relabel/production/prose/repeat-2",
+      "case": "evidence.pins.relabel",
+      "system": "production",
+      "prefix": "prose",
+      "repeat": 2,
+      "expected": "Yes",
+      "control": {
+        "value": 0.36614990234375,
+        "lower": 0.36614990234375,
+        "upper": 0.36614990234375
+      },
+      "candidate": {
+        "value": 0.06008350849151611,
+        "lower": 0.06008350849151611,
+        "upper": 0.06008350849151611
+      },
+      "delta": {
+        "value": -0.3060663938522339,
+        "lower": -0.3060663938522339,
+        "upper": -0.3060663938522339
+      },
+      "controlWinner": null,
+      "candidateWinner": null
+    },
+    {
+      "id": "evidence.pins.relabel/production/json/repeat-2",
+      "case": "evidence.pins.relabel",
+      "system": "production",
+      "prefix": "json",
+      "repeat": 2,
+      "expected": "Yes",
+      "control": {
+        "value": 0.7180252075195312,
+        "lower": 0.7180252075195312,
+        "upper": 0.7180252075195312
+      },
+      "candidate": {
+        "value": 0.8461990356445312,
+        "lower": 0.8461990356445312,
+        "upper": 0.8461990356445312
+      },
+      "delta": {
+        "value": 0.128173828125,
+        "lower": 0.128173828125,
+        "upper": 0.128173828125
+      },
+      "controlWinner": "Yes",
+      "candidateWinner": "Yes"
+    },
+    {
+      "id": "evidence.pins.changed/diagnostic/prose/repeat-2",
+      "case": "evidence.pins.changed",
+      "system": "diagnostic",
+      "prefix": "prose",
+      "repeat": 2,
+      "expected": "No",
+      "control": {
+        "value": -0.7530669867992401,
+        "lower": -0.7530669867992401,
+        "upper": -0.7530669867992401
+      },
+      "candidate": {
+        "value": 0.4564761519432068,
+        "lower": 0.4564761519432068,
+        "upper": 0.4564761519432068
+      },
+      "delta": {
+        "value": 1.209543138742447,
+        "lower": 1.209543138742447,
+        "upper": 1.209543138742447
+      },
+      "controlWinner": "No",
+      "candidateWinner": "Yes"
+    },
+    {
+      "id": "evidence.pins.changed/diagnostic/json/repeat-2",
+      "case": "evidence.pins.changed",
+      "system": "diagnostic",
+      "prefix": "json",
+      "repeat": 2,
+      "expected": "No",
+      "control": {
+        "value": -1.4215775728225708,
+        "lower": -1.4215775728225708,
+        "upper": -1.4215775728225708
+      },
+      "candidate": {
+        "value": -0.9490088820457458,
+        "lower": -0.9490088820457458,
+        "upper": -0.9490088820457458
+      },
+      "delta": {
+        "value": 0.47256869077682495,
+        "lower": 0.47256869077682495,
+        "upper": 0.47256869077682495
+      },
+      "controlWinner": "No",
+      "candidateWinner": "No"
+    },
+    {
+      "id": "evidence.pins.changed/production/prose/repeat-2",
+      "case": "evidence.pins.changed",
+      "system": "production",
+      "prefix": "prose",
+      "repeat": 2,
+      "expected": "No",
+      "control": {
+        "value": -0.8648375868797302,
+        "lower": -0.8648375868797302,
+        "upper": -0.8648375868797302
+      },
+      "candidate": {
+        "value": -0.9693584442138672,
+        "lower": -0.9693584442138672,
+        "upper": -0.9693584442138672
+      },
+      "delta": {
+        "value": -0.10452085733413696,
+        "lower": -0.10452085733413696,
+        "upper": -0.10452085733413696
+      },
+      "controlWinner": null,
+      "candidateWinner": null
+    },
+    {
+      "id": "evidence.pins.changed/production/json/repeat-2",
+      "case": "evidence.pins.changed",
+      "system": "production",
+      "prefix": "json",
+      "repeat": 2,
+      "expected": "No",
+      "control": {
+        "value": -0.5258215665817261,
+        "lower": -0.5258215665817261,
+        "upper": -0.5258215665817261
+      },
+      "candidate": {
+        "value": -0.5458164811134338,
+        "lower": -0.5458164811134338,
+        "upper": -0.5458164811134338
+      },
+      "delta": {
+        "value": -0.019994914531707764,
+        "lower": -0.019994914531707764,
+        "upper": -0.019994914531707764
+      },
+      "controlWinner": "No",
+      "candidateWinner": "No"
+    },
+    {
+      "id": "evidence.pins.original/diagnostic/prose/repeat-2",
+      "case": "evidence.pins.original",
+      "system": "diagnostic",
+      "prefix": "prose",
+      "repeat": 2,
+      "expected": "Yes",
+      "control": {
+        "value": -0.6542129814624786,
+        "lower": -0.6542129814624786,
+        "upper": -0.6542129814624786
+      },
+      "candidate": {
+        "value": 0.5715979933738708,
+        "lower": 0.5715979933738708,
+        "upper": 0.5715979933738708
+      },
+      "delta": {
+        "value": 1.2258109748363495,
+        "lower": 1.2258109748363495,
+        "upper": 1.2258109748363495
+      },
+      "controlWinner": "No",
+      "candidateWinner": "Yes"
+    },
+    {
+      "id": "evidence.pins.original/diagnostic/json/repeat-2",
+      "case": "evidence.pins.original",
+      "system": "diagnostic",
+      "prefix": "json",
+      "repeat": 2,
+      "expected": "Yes",
+      "control": {
+        "value": -1.2825469970703125,
+        "lower": -1.2825469970703125,
+        "upper": -1.2825469970703125
+      },
+      "candidate": {
+        "value": -0.8177146911621094,
+        "lower": -0.8177146911621094,
+        "upper": -0.8177146911621094
+      },
+      "delta": {
+        "value": 0.4648323059082031,
+        "lower": 0.4648323059082031,
+        "upper": 0.4648323059082031
+      },
+      "controlWinner": "No",
+      "candidateWinner": "No"
+    },
+    {
+      "id": "evidence.pins.original/production/prose/repeat-2",
+      "case": "evidence.pins.original",
+      "system": "production",
+      "prefix": "prose",
+      "repeat": 2,
+      "expected": "Yes",
+      "control": {
+        "value": -0.580053448677063,
+        "lower": -0.580053448677063,
+        "upper": -0.580053448677063
+      },
+      "candidate": {
+        "value": -0.7506104111671448,
+        "lower": -0.7506104111671448,
+        "upper": -0.7506104111671448
+      },
+      "delta": {
+        "value": -0.1705569624900818,
+        "lower": -0.1705569624900818,
+        "upper": -0.1705569624900818
+      },
+      "controlWinner": null,
+      "candidateWinner": null
+    },
+    {
+      "id": "evidence.pins.original/production/json/repeat-2",
+      "case": "evidence.pins.original",
+      "system": "production",
+      "prefix": "json",
+      "repeat": 2,
+      "expected": "Yes",
+      "control": {
+        "value": -0.1785184144973755,
+        "lower": -0.1785184144973755,
+        "upper": -0.1785184144973755
+      },
+      "candidate": {
+        "value": -0.2418365478515625,
+        "lower": -0.2418365478515625,
+        "upper": -0.2418365478515625
+      },
+      "delta": {
+        "value": -0.06331813335418701,
+        "lower": -0.06331813335418701,
+        "upper": -0.06331813335418701
+      },
+      "controlWinner": "No",
+      "candidateWinner": "No"
+    }
+  ],
+  "effects": {
+    "control": [
+      {
+        "system": "production",
+        "prefix": "json",
+        "repeat": 1,
+        "originalMargin": {
+          "value": -0.1785184144973755,
+          "lower": -0.1785184144973755,
+          "upper": -0.1785184144973755
+        },
+        "changedMargin": {
+          "value": -0.5258215665817261,
+          "lower": -0.5258215665817261,
+          "upper": -0.5258215665817261
+        },
+        "sourceShift": {
+          "value": 0.3473031520843506,
+          "lower": 0.3473031520843506,
+          "upper": 0.3473031520843506
+        },
+        "permutationShift": {
+          "value": -0.8965436220169067,
+          "lower": -0.8965436220169067,
+          "upper": -0.8965436220169067
+        },
+        "missingWinner": "Yes"
+      },
+      {
+        "system": "production",
+        "prefix": "json",
+        "repeat": 2,
+        "originalMargin": {
+          "value": -0.1785184144973755,
+          "lower": -0.1785184144973755,
+          "upper": -0.1785184144973755
+        },
+        "changedMargin": {
+          "value": -0.5258215665817261,
+          "lower": -0.5258215665817261,
+          "upper": -0.5258215665817261
+        },
+        "sourceShift": {
+          "value": 0.3473031520843506,
+          "lower": 0.3473031520843506,
+          "upper": 0.3473031520843506
+        },
+        "permutationShift": {
+          "value": -0.8965436220169067,
+          "lower": -0.8965436220169067,
+          "upper": -0.8965436220169067
+        },
+        "missingWinner": "Yes"
+      },
+      {
+        "system": "production",
+        "prefix": "prose",
+        "repeat": 1,
+        "originalMargin": {
+          "value": -0.580053448677063,
+          "lower": -0.580053448677063,
+          "upper": -0.580053448677063
+        },
+        "changedMargin": {
+          "value": -0.8648375868797302,
+          "lower": -0.8648375868797302,
+          "upper": -0.8648375868797302
+        },
+        "sourceShift": {
+          "value": 0.28478413820266724,
+          "lower": 0.28478413820266724,
+          "upper": 0.28478413820266724
+        },
+        "permutationShift": {
+          "value": -0.946203351020813,
+          "lower": -0.946203351020813,
+          "upper": -0.946203351020813
+        },
+        "missingWinner": null
+      },
+      {
+        "system": "production",
+        "prefix": "prose",
+        "repeat": 2,
+        "originalMargin": {
+          "value": -0.580053448677063,
+          "lower": -0.580053448677063,
+          "upper": -0.580053448677063
+        },
+        "changedMargin": {
+          "value": -0.8648375868797302,
+          "lower": -0.8648375868797302,
+          "upper": -0.8648375868797302
+        },
+        "sourceShift": {
+          "value": 0.28478413820266724,
+          "lower": 0.28478413820266724,
+          "upper": 0.28478413820266724
+        },
+        "permutationShift": {
+          "value": -0.946203351020813,
+          "lower": -0.946203351020813,
+          "upper": -0.946203351020813
+        },
+        "missingWinner": null
+      },
+      {
+        "system": "diagnostic",
+        "prefix": "json",
+        "repeat": 1,
+        "originalMargin": {
+          "value": -1.2825469970703125,
+          "lower": -1.2825469970703125,
+          "upper": -1.2825469970703125
+        },
+        "changedMargin": {
+          "value": -1.4215775728225708,
+          "lower": -1.4215775728225708,
+          "upper": -1.4215775728225708
+        },
+        "sourceShift": {
+          "value": 0.1390305757522583,
+          "lower": 0.1390305757522583,
+          "upper": 0.1390305757522583
+        },
+        "permutationShift": {
+          "value": -0.8143272399902344,
+          "lower": -0.8143272399902344,
+          "upper": -0.8143272399902344
+        },
+        "missingWinner": "No"
+      },
+      {
+        "system": "diagnostic",
+        "prefix": "json",
+        "repeat": 2,
+        "originalMargin": {
+          "value": -1.2825469970703125,
+          "lower": -1.2825469970703125,
+          "upper": -1.2825469970703125
+        },
+        "changedMargin": {
+          "value": -1.4215775728225708,
+          "lower": -1.4215775728225708,
+          "upper": -1.4215775728225708
+        },
+        "sourceShift": {
+          "value": 0.1390305757522583,
+          "lower": 0.1390305757522583,
+          "upper": 0.1390305757522583
+        },
+        "permutationShift": {
+          "value": -0.8143272399902344,
+          "lower": -0.8143272399902344,
+          "upper": -0.8143272399902344
+        },
+        "missingWinner": "No"
+      },
+      {
+        "system": "diagnostic",
+        "prefix": "prose",
+        "repeat": 1,
+        "originalMargin": {
+          "value": -0.6542129814624786,
+          "lower": -0.6542129814624786,
+          "upper": -0.6542129814624786
+        },
+        "changedMargin": {
+          "value": -0.7530669867992401,
+          "lower": -0.7530669867992401,
+          "upper": -0.7530669867992401
+        },
+        "sourceShift": {
+          "value": 0.09885400533676147,
+          "lower": 0.09885400533676147,
+          "upper": 0.09885400533676147
+        },
+        "permutationShift": {
+          "value": -0.7524223625659943,
+          "lower": -0.7524223625659943,
+          "upper": -0.7524223625659943
+        },
+        "missingWinner": "Yes"
+      },
+      {
+        "system": "diagnostic",
+        "prefix": "prose",
+        "repeat": 2,
+        "originalMargin": {
+          "value": -0.6542129814624786,
+          "lower": -0.6542129814624786,
+          "upper": -0.6542129814624786
+        },
+        "changedMargin": {
+          "value": -0.7530669867992401,
+          "lower": -0.7530669867992401,
+          "upper": -0.7530669867992401
+        },
+        "sourceShift": {
+          "value": 0.09885400533676147,
+          "lower": 0.09885400533676147,
+          "upper": 0.09885400533676147
+        },
+        "permutationShift": {
+          "value": -0.7524223625659943,
+          "lower": -0.7524223625659943,
+          "upper": -0.7524223625659943
+        },
+        "missingWinner": "Yes"
+      }
+    ],
+    "candidate": [
+      {
+        "system": "production",
+        "prefix": "json",
+        "repeat": 1,
+        "originalMargin": {
+          "value": -0.2418365478515625,
+          "lower": -0.2418365478515625,
+          "upper": -0.2418365478515625
+        },
+        "changedMargin": {
+          "value": -0.5458164811134338,
+          "lower": -0.5458164811134338,
+          "upper": -0.5458164811134338
+        },
+        "sourceShift": {
+          "value": 0.30397993326187134,
+          "lower": 0.30397993326187134,
+          "upper": 0.30397993326187134
+        },
+        "permutationShift": {
+          "value": -1.0880355834960938,
+          "lower": -1.0880355834960938,
+          "upper": -1.0880355834960938
+        },
+        "missingWinner": "No"
+      },
+      {
+        "system": "production",
+        "prefix": "json",
+        "repeat": 2,
+        "originalMargin": {
+          "value": -0.2418365478515625,
+          "lower": -0.2418365478515625,
+          "upper": -0.2418365478515625
+        },
+        "changedMargin": {
+          "value": -0.5458164811134338,
+          "lower": -0.5458164811134338,
+          "upper": -0.5458164811134338
+        },
+        "sourceShift": {
+          "value": 0.30397993326187134,
+          "lower": 0.30397993326187134,
+          "upper": 0.30397993326187134
+        },
+        "permutationShift": {
+          "value": -1.0880355834960938,
+          "lower": -1.0880355834960938,
+          "upper": -1.0880355834960938
+        },
+        "missingWinner": "No"
+      },
+      {
+        "system": "production",
+        "prefix": "prose",
+        "repeat": 1,
+        "originalMargin": {
+          "value": -0.7506104111671448,
+          "lower": -0.7506104111671448,
+          "upper": -0.7506104111671448
+        },
+        "changedMargin": {
+          "value": -0.9693584442138672,
+          "lower": -0.9693584442138672,
+          "upper": -0.9693584442138672
+        },
+        "sourceShift": {
+          "value": 0.2187480330467224,
+          "lower": 0.2187480330467224,
+          "upper": 0.2187480330467224
+        },
+        "permutationShift": {
+          "value": -0.8106939196586609,
+          "lower": -0.8106939196586609,
+          "upper": -0.8106939196586609
+        },
+        "missingWinner": null
+      },
+      {
+        "system": "production",
+        "prefix": "prose",
+        "repeat": 2,
+        "originalMargin": {
+          "value": -0.7506104111671448,
+          "lower": -0.7506104111671448,
+          "upper": -0.7506104111671448
+        },
+        "changedMargin": {
+          "value": -0.9693584442138672,
+          "lower": -0.9693584442138672,
+          "upper": -0.9693584442138672
+        },
+        "sourceShift": {
+          "value": 0.2187480330467224,
+          "lower": 0.2187480330467224,
+          "upper": 0.2187480330467224
+        },
+        "permutationShift": {
+          "value": -0.8106939196586609,
+          "lower": -0.8106939196586609,
+          "upper": -0.8106939196586609
+        },
+        "missingWinner": null
+      },
+      {
+        "system": "diagnostic",
+        "prefix": "json",
+        "repeat": 1,
+        "originalMargin": {
+          "value": -0.8177146911621094,
+          "lower": -0.8177146911621094,
+          "upper": -0.8177146911621094
+        },
+        "changedMargin": {
+          "value": -0.9490088820457458,
+          "lower": -0.9490088820457458,
+          "upper": -0.9490088820457458
+        },
+        "sourceShift": {
+          "value": 0.13129419088363647,
+          "lower": 0.13129419088363647,
+          "upper": 0.13129419088363647
+        },
+        "permutationShift": {
+          "value": -1.0529155135154724,
+          "lower": -1.0529155135154724,
+          "upper": -1.0529155135154724
+        },
+        "missingWinner": "No"
+      },
+      {
+        "system": "diagnostic",
+        "prefix": "json",
+        "repeat": 2,
+        "originalMargin": {
+          "value": -0.8177146911621094,
+          "lower": -0.8177146911621094,
+          "upper": -0.8177146911621094
+        },
+        "changedMargin": {
+          "value": -0.9490088820457458,
+          "lower": -0.9490088820457458,
+          "upper": -0.9490088820457458
+        },
+        "sourceShift": {
+          "value": 0.13129419088363647,
+          "lower": 0.13129419088363647,
+          "upper": 0.13129419088363647
+        },
+        "permutationShift": {
+          "value": -1.0529155135154724,
+          "lower": -1.0529155135154724,
+          "upper": -1.0529155135154724
+        },
+        "missingWinner": "No"
+      },
+      {
+        "system": "diagnostic",
+        "prefix": "prose",
+        "repeat": 1,
+        "originalMargin": {
+          "value": 0.5715979933738708,
+          "lower": 0.5715979933738708,
+          "upper": 0.5715979933738708
+        },
+        "changedMargin": {
+          "value": 0.4564761519432068,
+          "lower": 0.4564761519432068,
+          "upper": 0.4564761519432068
+        },
+        "sourceShift": {
+          "value": 0.11512184143066406,
+          "lower": 0.11512184143066406,
+          "upper": 0.11512184143066406
+        },
+        "permutationShift": {
+          "value": -0.7672673165798187,
+          "lower": -0.7672673165798187,
+          "upper": -0.7672673165798187
+        },
+        "missingWinner": "Yes"
+      },
+      {
+        "system": "diagnostic",
+        "prefix": "prose",
+        "repeat": 2,
+        "originalMargin": {
+          "value": 0.5715979933738708,
+          "lower": 0.5715979933738708,
+          "upper": 0.5715979933738708
+        },
+        "changedMargin": {
+          "value": 0.4564761519432068,
+          "lower": 0.4564761519432068,
+          "upper": 0.4564761519432068
+        },
+        "sourceShift": {
+          "value": 0.11512184143066406,
+          "lower": 0.11512184143066406,
+          "upper": 0.11512184143066406
+        },
+        "permutationShift": {
+          "value": -0.7672673165798187,
+          "lower": -0.7672673165798187,
+          "upper": -0.7672673165798187
+        },
+        "missingWinner": "Yes"
+      }
+    ]
+  }
+}

@@ -73,6 +73,11 @@ model-side control is the cached BF16 version of the same base: keep these reado
 and measure whether Q4 quantization contributes before choosing parameter interventions.
 Any later edit still needs fresh/count-matched evaluation and regression coverage.
 
+The subsequent [matched BF16/Q4 control](BF16_PROBE_RESULTS.md) completes that check with
+exact preflight matching. BF16 changes preferences but does not resolve the four
+original/guarded pairs; production readouts still favour No for both. Historical data and
+the observations in this report remain unchanged.
+
 ## Runtime and verification
 
 The [cohort](library/token-probe/cohort.json) uses the unchanged cached 0.8B Q4 base and

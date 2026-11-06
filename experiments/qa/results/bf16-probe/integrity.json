@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "matchedArtifactBuild": true,
+  "metadataOnlyFileTypeDiffers": true,
+  "logicalTensorShapesIdentical": 335,
+  "preflightConditionsByteAndTokenIdentical": 16,
+  "candidateSpellingsIdentical": 6,
+  "historicalQ4MeasurementsIdentical": 32,
+  "rawAndParsedResponsesMatch": 64,
+  "allMeasuredCacheReuseZero": true,
+  "allPromptTokenCountsMatch": true,
+  "backendSampling": false,
+  "identicalRepeatPairs": 32,
+  "ownedServersStopped": true,
+  "reservedGenerations": 0,
+  "historicalChecksumsVerified": [
+    {
+      "archive": "compact",
+      "files": 15
+    },
+    {
+      "archive": "decoding",
+      "files": 36
+    },
+    {
+      "archive": "decomposition",
+      "files": 12
+    },
+    {
+      "archive": "dispatch-erratum",
+      "files": 7
+    },
+    {
+      "archive": "evidence-use",
+      "files": 36
+    },
+    {
+      "archive": "json-object",
+      "files": 29
+    },
+    {
+      "archive": "maintainer",
+      "files": 9
+    },
+    {
+      "archive": "model-comparison",
+      "files": 19
+    },
+    {
+      "archive": "pilot",
+      "files": 4
+    },
+    {
+      "archive": "prefill",
+      "files": 25
+    },
+    {
+      "archive": "source-packs",
+      "files": 12
+    },
+    {
+      "archive": "token-probe",
+      "files": 37
+    },
+    {
+      "archive": "weight-edit",
+      "files": 39
+    }
+  ]
+}

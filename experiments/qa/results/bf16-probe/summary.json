@@ -1,0 +1,803 @@
+{
+  "schema": 1,
+  "reservedGenerations": 0,
+  "observationsPerArtifact": 32,
+  "uniqueConditionsPerArtifact": 16,
+  "historicalQ4MeasurementsExactlyReproduced": 32,
+  "pairedInputs": {
+    "conditions": 16,
+    "candidateSpellings": 6
+  },
+  "models": {
+    "q4": {
+      "model": {
+        "id": "qwen3.5-0.8b-base-local-q4",
+        "repository": "Qwen/Qwen3.5-0.8B",
+        "revision": "2fc06364715b967f1860aea9cf38778875588b17",
+        "filename": "model-q4.gguf",
+        "bytes": 541903872,
+        "sha256": "94d3009ee9cfca48d7d852bf0fe6c14c6f4f2506e818ca63f8c873fa46320a0a",
+        "directory": "models/base",
+        "artifact_kind": "Locally built GGUF; repository/revision identify source, not a downloadable GGUF",
+        "gguf_architecture": "qwen35",
+        "gguf_parameter_count": 772845888,
+        "chat_template_sha256": "273d8e0e683b885071fb17e08d71e5f2a5ddfb5309756181681de4f5a1822d80"
+      },
+      "resource": {
+        "peakPssKiB": 1083199,
+        "peakPssGiB": 1.0330190658569336,
+        "peakRssKiB": 1120332,
+        "wallMs": 82916.47472,
+        "startupMs": 946.70171,
+        "medianObservationMs": 2580.2134124999984,
+        "p95ObservationMs": 3003.647837999997,
+        "within4GiBObservedTarget": true,
+        "samplingErrors": 0,
+        "samples": 309
+      },
+      "censoring": {
+        "Yes": 0,
+        "No": 0,
+        "Unknown": 8
+      },
+      "identicalRepeatPairs": 16,
+      "observedChoiceMass": {
+        "production": {
+          "min": 0.44703823613594806,
+          "max": 0.5677231085733898
+        },
+        "diagnostic": {
+          "min": 0.8675137052461335,
+          "max": 0.948273248769977
+        }
+      },
+      "firstPass": [
+        {
+          "case": "evidence.pins.original",
+          "system": "production",
+          "prefix": "json",
+          "margin": {
+            "value": -0.1785184144973755,
+            "lower": -0.1785184144973755,
+            "upper": -0.1785184144973755
+          },
+          "globalTop": {
+            "id": 2665,
+            "token": "No",
+            "bytes": [
+              78,
+              111
+            ],
+            "logprob": -1.2505879402160645
+          },
+          "choiceWinner": "No",
+          "observedChoiceMass": 0.5258744052365635
+        },
+        {
+          "case": "evidence.pins.original",
+          "system": "production",
+          "prefix": "prose",
+          "margin": {
+            "value": -0.580053448677063,
+            "lower": -0.580053448677063,
+            "upper": -0.580053448677063
+          },
+          "globalTop": {
+            "id": 2233,
+            "token": " No",
+            "bytes": [
+              32,
+              78,
+              111
+            ],
+            "logprob": -1.0208981037139893
+          },
+          "choiceWinner": null,
+          "observedChoiceMass": 0.5619757281557498
+        },
+        {
+          "case": "evidence.pins.original",
+          "system": "diagnostic",
+          "prefix": "json",
+          "margin": {
+            "value": -1.2825469970703125,
+            "lower": -1.2825469970703125,
+            "upper": -1.2825469970703125
+          },
+          "globalTop": {
+            "id": 2665,
+            "token": "No",
+            "bytes": [
+              78,
+              111
+            ],
+            "logprob": -0.34716594219207764
+          },
+          "choiceWinner": "No",
+          "observedChoiceMass": 0.9106993359027313
+        },
+        {
+          "case": "evidence.pins.original",
+          "system": "diagnostic",
+          "prefix": "prose",
+          "margin": {
+            "value": -0.6542129814624786,
+            "lower": -0.6542129814624786,
+            "upper": -0.6542129814624786
+          },
+          "globalTop": {
+            "id": 2233,
+            "token": " No",
+            "bytes": [
+              32,
+              78,
+              111
+            ],
+            "logprob": -0.477701872587204
+          },
+          "choiceWinner": "No",
+          "observedChoiceMass": 0.94284426204794
+        },
+        {
+          "case": "evidence.pins.changed",
+          "system": "production",
+          "prefix": "json",
+          "margin": {
+            "value": -0.5258215665817261,
+            "lower": -0.5258215665817261,
+            "upper": -0.5258215665817261
+          },
+          "globalTop": {
+            "id": 2665,
+            "token": "No",
+            "bytes": [
+              78,
+              111
+            ],
+            "logprob": -1.2695589065551758
+          },
+          "choiceWinner": "No",
+          "observedChoiceMass": 0.44703823613594806
+        },
+        {
+          "case": "evidence.pins.changed",
+          "system": "production",
+          "prefix": "prose",
+          "margin": {
+            "value": -0.8648375868797302,
+            "lower": -0.8648375868797302,
+            "upper": -0.8648375868797302
+          },
+          "globalTop": {
+            "id": 2233,
+            "token": " No",
+            "bytes": [
+              32,
+              78,
+              111
+            ],
+            "logprob": -0.91756671667099
+          },
+          "choiceWinner": null,
+          "observedChoiceMass": 0.5677231085733898
+        },
+        {
+          "case": "evidence.pins.changed",
+          "system": "diagnostic",
+          "prefix": "json",
+          "margin": {
+            "value": -1.4215775728225708,
+            "lower": -1.4215775728225708,
+            "upper": -1.4215775728225708
+          },
+          "globalTop": {
+            "id": 2665,
+            "token": "No",
+            "bytes": [
+              78,
+              111
+            ],
+            "logprob": -0.3571063280105591
+          },
+          "choiceWinner": "No",
+          "observedChoiceMass": 0.8781574635234278
+        },
+        {
+          "case": "evidence.pins.changed",
+          "system": "diagnostic",
+          "prefix": "prose",
+          "margin": {
+            "value": -0.7530669867992401,
+            "lower": -0.7530669867992401,
+            "upper": -0.7530669867992401
+          },
+          "globalTop": {
+            "id": 2233,
+            "token": " No",
+            "bytes": [
+              32,
+              78,
+              111
+            ],
+            "logprob": -0.4393167793750763
+          },
+          "choiceWinner": "No",
+          "observedChoiceMass": 0.948273248769977
+        },
+        {
+          "case": "evidence.pins.relabel",
+          "system": "production",
+          "prefix": "json",
+          "margin": {
+            "value": 0.7180252075195312,
+            "lower": 0.7180252075195312,
+            "upper": 0.7180252075195312
+          },
+          "globalTop": {
+            "id": 9175,
+            "token": "Yes",
+            "bytes": [
+              89,
+              101,
+              115
+            ],
+            "logprob": -1.0865557193756104
+          },
+          "choiceWinner": "Yes",
+          "observedChoiceMass": 0.5019362181093693
+        },
+        {
+          "case": "evidence.pins.relabel",
+          "system": "production",
+          "prefix": "prose",
+          "margin": {
+            "value": 0.36614990234375,
+            "lower": 0.36614990234375,
+            "upper": 0.36614990234375
+          },
+          "globalTop": {
+            "id": 7179,
+            "token": " Yes",
+            "bytes": [
+              32,
+              89,
+              101,
+              115
+            ],
+            "logprob": -1.2855275869369507
+          },
+          "choiceWinner": null,
+          "observedChoiceMass": 0.46823268191176676
+        },
+        {
+          "case": "evidence.pins.relabel",
+          "system": "diagnostic",
+          "prefix": "json",
+          "margin": {
+            "value": -0.4682197570800781,
+            "lower": -0.4682197570800781,
+            "upper": -0.4682197570800781
+          },
+          "globalTop": {
+            "id": 2665,
+            "token": "No",
+            "bytes": [
+              78,
+              111
+            ],
+            "logprob": -0.5829466581344604
+          },
+          "choiceWinner": "No",
+          "observedChoiceMass": 0.9145347722332609
+        },
+        {
+          "case": "evidence.pins.relabel",
+          "system": "diagnostic",
+          "prefix": "prose",
+          "margin": {
+            "value": 0.09820938110351562,
+            "lower": 0.09820938110351562,
+            "upper": 0.09820938110351562
+          },
+          "globalTop": {
+            "id": 7179,
+            "token": " Yes",
+            "bytes": [
+              32,
+              89,
+              101,
+              115
+            ],
+            "logprob": -0.6989822387695312
+          },
+          "choiceWinner": "Yes",
+          "observedChoiceMass": 0.9479496181224357
+        },
+        {
+          "case": "evidence.pins.missing",
+          "system": "production",
+          "prefix": "json",
+          "margin": {
+            "value": 0.10889434814453125,
+            "lower": 0.10889434814453125,
+            "upper": 0.10889434814453125
+          },
+          "globalTop": {
+            "id": 9175,
+            "token": "Yes",
+            "bytes": [
+              89,
+              101,
+              115
+            ],
+            "logprob": -1.3388736248016357
+          },
+          "choiceWinner": "Yes",
+          "observedChoiceMass": 0.497261436424807
+        },
+        {
+          "case": "evidence.pins.missing",
+          "system": "production",
+          "prefix": "prose",
+          "margin": {
+            "value": -0.3679466247558594,
+            "lower": -0.3679466247558594,
+            "upper": -0.3679466247558594
+          },
+          "globalTop": {
+            "id": 2233,
+            "token": " No",
+            "bytes": [
+              32,
+              78,
+              111
+            ],
+            "logprob": -1.2217985391616821
+          },
+          "choiceWinner": null,
+          "observedChoiceMass": 0.4986772470782231
+        },
+        {
+          "case": "evidence.pins.missing",
+          "system": "diagnostic",
+          "prefix": "json",
+          "margin": {
+            "value": -1.1690731346607208,
+            "lower": -1.1690731346607208,
+            "upper": -1.1690731346607208
+          },
+          "globalTop": {
+            "id": 2665,
+            "token": "No",
+            "bytes": [
+              78,
+              111
+            ],
+            "logprob": -0.4345475137233734
+          },
+          "choiceWinner": "No",
+          "observedChoiceMass": 0.8675137052461335
+        },
+        {
+          "case": "evidence.pins.missing",
+          "system": "diagnostic",
+          "prefix": "prose",
+          "margin": {
+            "value": 0.1421089768409729,
+            "lower": 0.1421089768409729,
+            "upper": 0.1421089768409729
+          },
+          "globalTop": {
+            "id": 7179,
+            "token": " Yes",
+            "bytes": [
+              32,
+              89,
+              101,
+              115
+            ],
+            "logprob": -0.6935559511184692
+          },
+          "choiceWinner": "Yes",
+          "observedChoiceMass": 0.9343692792334506
+        }
+      ]
+    },
+    "bf16": {
+      "model": {
+        "id": "qwen3.5-0.8b-base-local-bf16",
+        "repository": "Qwen/Qwen3.5-0.8B",
+        "revision": "2fc06364715b967f1860aea9cf38778875588b17",
+        "filename": "model-bf16.gguf",
+        "bytes": 1557662720,
+        "sha256": "5ef57c11d9ace33999da529924bc62e6b6dd3ba4b3d02a19fd966ff83f8336d7",
+        "directory": "base",
+        "artifact_kind": "Locally converted BF16 intermediate, including F32 tensors; same source as Q4 derivative",
+        "gguf_architecture": "qwen35",
+        "gguf_parameter_count": 772845888,
+        "chat_template_sha256": "273d8e0e683b885071fb17e08d71e5f2a5ddfb5309756181681de4f5a1822d80"
+      },
+      "resource": {
+        "peakPssKiB": 1830003,
+        "peakPssGiB": 1.7452268600463867,
+        "peakRssKiB": 1867136,
+        "wallMs": 144780.897455,
+        "startupMs": 948.2996850000001,
+        "medianObservationMs": 4490.757026500003,
+        "p95ObservationMs": 5180.740022000002,
+        "within4GiBObservedTarget": true,
+        "samplingErrors": 0,
+        "samples": 531
+      },
+      "censoring": {
+        "Yes": 0,
+        "No": 0,
+        "Unknown": 8
+      },
+      "identicalRepeatPairs": 16,
+      "observedChoiceMass": {
+        "production": {
+          "min": 0.5362027427112199,
+          "max": 0.6669836217373435
+        },
+        "diagnostic": {
+          "min": 0.8133846040105623,
+          "max": 0.9696404600221691
+        }
+      },
+      "firstPass": [
+        {
+          "case": "evidence.pins.original",
+          "system": "production",
+          "prefix": "json",
+          "margin": {
+            "value": -0.2418365478515625,
+            "lower": -0.2418365478515625,
+            "upper": -0.2418365478515625
+          },
+          "globalTop": {
+            "id": 2665,
+            "token": "No",
+            "bytes": [
+              78,
+              111
+            ],
+            "logprob": -0.9921514987945557
+          },
+          "choiceWinner": "No",
+          "observedChoiceMass": 0.6619229455719524
+        },
+        {
+          "case": "evidence.pins.original",
+          "system": "production",
+          "prefix": "prose",
+          "margin": {
+            "value": -0.7506104111671448,
+            "lower": -0.7506104111671448,
+            "upper": -0.7506104111671448
+          },
+          "globalTop": {
+            "id": 2233,
+            "token": " No",
+            "bytes": [
+              32,
+              78,
+              111
+            ],
+            "logprob": -0.8737460970878601
+          },
+          "choiceWinner": null,
+          "observedChoiceMass": 0.6144234790454873
+        },
+        {
+          "case": "evidence.pins.original",
+          "system": "diagnostic",
+          "prefix": "json",
+          "margin": {
+            "value": -0.8177146911621094,
+            "lower": -0.8177146911621094,
+            "upper": -0.8177146911621094
+          },
+          "globalTop": {
+            "id": 2665,
+            "token": "No",
+            "bytes": [
+              78,
+              111
+            ],
+            "logprob": -0.4111185073852539
+          },
+          "choiceWinner": "No",
+          "observedChoiceMass": 0.9556512419659684
+        },
+        {
+          "case": "evidence.pins.original",
+          "system": "diagnostic",
+          "prefix": "prose",
+          "margin": {
+            "value": 0.5715979933738708,
+            "lower": 0.5715979933738708,
+            "upper": 0.5715979933738708
+          },
+          "globalTop": {
+            "id": 7179,
+            "token": " Yes",
+            "bytes": [
+              32,
+              89,
+              101,
+              115
+            ],
+            "logprob": -0.6038462519645691
+          },
+          "choiceWinner": "Yes",
+          "observedChoiceMass": 0.8553910813174811
+        },
+        {
+          "case": "evidence.pins.changed",
+          "system": "production",
+          "prefix": "json",
+          "margin": {
+            "value": -0.5458164811134338,
+            "lower": -0.5458164811134338,
+            "upper": -0.5458164811134338
+          },
+          "globalTop": {
+            "id": 2665,
+            "token": "No",
+            "bytes": [
+              78,
+              111
+            ],
+            "logprob": -0.9024932980537415
+          },
+          "choiceWinner": "No",
+          "observedChoiceMass": 0.6405390171971383
+        },
+        {
+          "case": "evidence.pins.changed",
+          "system": "production",
+          "prefix": "prose",
+          "margin": {
+            "value": -0.9693584442138672,
+            "lower": -0.9693584442138672,
+            "upper": -0.9693584442138672
+          },
+          "globalTop": {
+            "id": 2233,
+            "token": " No",
+            "bytes": [
+              32,
+              78,
+              111
+            ],
+            "logprob": -0.8033126592636108
+          },
+          "choiceWinner": null,
+          "observedChoiceMass": 0.6177215719362605
+        },
+        {
+          "case": "evidence.pins.changed",
+          "system": "diagnostic",
+          "prefix": "json",
+          "margin": {
+            "value": -0.9490088820457458,
+            "lower": -0.9490088820457458,
+            "upper": -0.9490088820457458
+          },
+          "globalTop": {
+            "id": 2665,
+            "token": "No",
+            "bytes": [
+              78,
+              111
+            ],
+            "logprob": -0.3721296191215515
+          },
+          "choiceWinner": "No",
+          "observedChoiceMass": 0.9562311319341593
+        },
+        {
+          "case": "evidence.pins.changed",
+          "system": "diagnostic",
+          "prefix": "prose",
+          "margin": {
+            "value": 0.4564761519432068,
+            "lower": 0.4564761519432068,
+            "upper": 0.4564761519432068
+          },
+          "globalTop": {
+            "id": 7179,
+            "token": " Yes",
+            "bytes": [
+              32,
+              89,
+              101,
+              115
+            ],
+            "logprob": -0.6412518620491028
+          },
+          "choiceWinner": "Yes",
+          "observedChoiceMass": 0.8602652859092235
+        },
+        {
+          "case": "evidence.pins.relabel",
+          "system": "production",
+          "prefix": "json",
+          "margin": {
+            "value": 0.8461990356445312,
+            "lower": 0.8461990356445312,
+            "upper": 0.8461990356445312
+          },
+          "globalTop": {
+            "id": 9175,
+            "token": "Yes",
+            "bytes": [
+              89,
+              101,
+              115
+            ],
+            "logprob": -0.848564863204956
+          },
+          "choiceWinner": "Yes",
+          "observedChoiceMass": 0.611694632182302
+        },
+        {
+          "case": "evidence.pins.relabel",
+          "system": "production",
+          "prefix": "prose",
+          "margin": {
+            "value": 0.06008350849151611,
+            "lower": 0.06008350849151611,
+            "upper": 0.06008350849151611
+          },
+          "globalTop": {
+            "id": 7179,
+            "token": " Yes",
+            "bytes": [
+              32,
+              89,
+              101,
+              115
+            ],
+            "logprob": -1.2867995500564575
+          },
+          "choiceWinner": null,
+          "observedChoiceMass": 0.5362027427112199
+        },
+        {
+          "case": "evidence.pins.relabel",
+          "system": "diagnostic",
+          "prefix": "json",
+          "margin": {
+            "value": 0.23520082235336304,
+            "lower": 0.23520082235336304,
+            "upper": 0.23520082235336304
+          },
+          "globalTop": {
+            "id": 9175,
+            "token": "Yes",
+            "bytes": [
+              89,
+              101,
+              115
+            ],
+            "logprob": -0.6133370995521545
+          },
+          "choiceWinner": "Yes",
+          "observedChoiceMass": 0.9696404600221691
+        },
+        {
+          "case": "evidence.pins.relabel",
+          "system": "diagnostic",
+          "prefix": "prose",
+          "margin": {
+            "value": 1.3388653099536896,
+            "lower": 1.3388653099536896,
+            "upper": 1.3388653099536896
+          },
+          "globalTop": {
+            "id": 7179,
+            "token": " Yes",
+            "bytes": [
+              32,
+              89,
+              101,
+              115
+            ],
+            "logprob": -0.38548848032951355
+          },
+          "choiceWinner": "Yes",
+          "observedChoiceMass": 0.8584104467828084
+        },
+        {
+          "case": "evidence.pins.missing",
+          "system": "production",
+          "prefix": "json",
+          "margin": {
+            "value": -0.13455593585968018,
+            "lower": -0.13455593585968018,
+            "upper": -0.13455593585968018
+          },
+          "globalTop": {
+            "id": 2665,
+            "token": "No",
+            "bytes": [
+              78,
+              111
+            ],
+            "logprob": -1.0331950187683105
+          },
+          "choiceWinner": "No",
+          "observedChoiceMass": 0.6669836217373435
+        },
+        {
+          "case": "evidence.pins.missing",
+          "system": "production",
+          "prefix": "prose",
+          "margin": {
+            "value": -0.6035957932472229,
+            "lower": -0.6035957932472229,
+            "upper": -0.6035957932472229
+          },
+          "globalTop": {
+            "id": 2233,
+            "token": " No",
+            "bytes": [
+              32,
+              78,
+              111
+            ],
+            "logprob": -0.9352342486381531
+          },
+          "choiceWinner": null,
+          "observedChoiceMass": 0.6071259787134777
+        },
+        {
+          "case": "evidence.pins.missing",
+          "system": "diagnostic",
+          "prefix": "json",
+          "margin": {
+            "value": -0.850620299577713,
+            "lower": -0.850620299577713,
+            "upper": -0.850620299577713
+          },
+          "globalTop": {
+            "id": 2665,
+            "token": "No",
+            "bytes": [
+              78,
+              111
+            ],
+            "logprob": -0.4095153510570526
+          },
+          "choiceWinner": "No",
+          "observedChoiceMass": 0.9482496766297586
+        },
+        {
+          "case": "evidence.pins.missing",
+          "system": "diagnostic",
+          "prefix": "prose",
+          "margin": {
+            "value": 0.9323273301124573,
+            "lower": 0.9323273301124573,
+            "upper": 0.9323273301124573
+          },
+          "globalTop": {
+            "id": 7179,
+            "token": " Yes",
+            "bytes": [
+              32,
+              89,
+              101,
+              115
+            ],
+            "logprob": -0.5384747385978699
+          },
+          "choiceWinner": "Yes",
+          "observedChoiceMass": 0.8133846040105623
+        }
+      ]
+    }
+  }
+}

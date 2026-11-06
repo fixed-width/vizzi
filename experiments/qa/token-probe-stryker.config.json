@@ -1,22 +1,25 @@
 {
   "$schema": "../../node_modules/@stryker-mutator/core/schema/stryker-schema.json",
-  "mutate": ["experiments/qa/token-probe-support.mjs"],
+  "mutate": ["experiments/qa/token-probe-support.mjs", "experiments/qa/precision-probe-support.mjs"],
   "files": [
     "package.json",
     "experiments/qa/token-probe-support.mjs",
     "experiments/qa/token-probe.test.mjs",
+    "experiments/qa/bf16-probe.test.mjs",
+    "experiments/qa/precision-probe-support.mjs",
     "experiments/qa/model.mjs",
     "experiments/qa/runtime-profile.mjs",
     "experiments/qa/support.mjs",
-    "experiments/qa/library/token-probe/cohort.json"
+    "experiments/qa/library/token-probe/cohort.json",
+    "experiments/qa/results/token-probe/preflight.json.gz"
   ],
   "testRunner": "command",
-  "commandRunner": {"command": "node experiments/qa/token-probe.test.mjs"},
+  "commandRunner": {"command": "node experiments/qa/token-probe.test.mjs && node experiments/qa/bf16-probe.test.mjs"},
   "coverageAnalysis": "off",
   "concurrency": 1,
   "timeoutMS": 5000,
   "reporters": ["clear-text", "json"],
   "clearTextReporter": {"reportMutants": false, "logTests": false},
-  "jsonReporter": {"fileName": "/tmp/vizzi-qa-token-probe-mutations.json"},
+  "jsonReporter": {"fileName": "/tmp/vizzi-qa-bf16-probe-mutations.json"},
   "thresholds": {"break": 100}
 }

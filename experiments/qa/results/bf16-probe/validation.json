@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "node": "18 serial QA test files pass; focused tests first fail without the new helper, then pass. Model integration: 64 successful one-token observations with matching preflights.",
+  "native": "Production Rust/Cargo inputs match d15a56d. Retain its passing 453-test/doctest baseline, not rerun; fresh workspace formatting/all-target Clippy pass.",
+  "mutations": "300 caught, 3 documented equivalents; zero timeouts/errors/no-coverage. Single low-priority worker; raw 99.01, exit 1 at threshold 100. CLI transport outside mutation scope.",
+  "measurement": "All correctness/mutation work finishes before serial Q4 then BF16 measurement. CPU-only, two inference/prefill threads, nice 10, cold prefill, one owned server resident at a time. Both servers stopped.",
+  "limitations": "Known synthetic conditional next-token readouts, not complete QA, calibrated confidence, or causal circuit evidence. Source metadata and prefix/instruction interventions remain. No new weights, dependencies, training or reserved inference.",
+  "testAndConfigSha256": {
+    "experiments/qa/bf16-probe.test.mjs": "64f273a5b926e9d5421cb856f4beb4a924c485d26f6a739428c26c939a6806c9",
+    "experiments/qa/token-probe.test.mjs": "d15051bafe21904148b5d49fd112772854d4e87f55977e8360f7dddd0c435de0",
+    "experiments/qa/token-probe-stryker.config.json": "7683f8553cd6433078d7864d500ac83cc4462ef0b71d65630b0ca7bb9f154e28",
+    "package-lock.json": "e7ff76f17d7408c0b6dfd075c564ba31fec03cc838be612a008cf5bd343e291f"
+  }
+}

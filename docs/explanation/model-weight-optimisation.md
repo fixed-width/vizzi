@@ -86,7 +86,12 @@ the source contrast shifts selected Yes/No log-probability margins in the expect
 direction, while No still wins for the unconditional original. Layout shifts are larger
 in this example, and explicit choice instructions do not recover the expected preference.
 These conditional lexical readouts expose sensitivity, not a causal parameter mechanism.
-A matched BF16/Q4 control is useful before attributing the error to editable weight features.
+The [matched BF16/Q4 control](../../experiments/qa/BF16_PROBE_RESULTS.md) now repeats those
+exact prompts and token IDs. Higher precision changes preferences but does not separate
+the unconditional/guarded pair correctly under any readout: diagnostic prose flips both
+to Yes, while the others keep both at No. BF16 also costs more time and memory here.
+Quantization affects the readout without explaining the failure as a simple precision
+loss, and no editable weight feature has been identified.
 
 ## Practical weight transformations
 

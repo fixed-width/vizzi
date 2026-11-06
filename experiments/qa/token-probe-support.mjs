@@ -35,7 +35,7 @@ export function readProbe(response,candidates,promptTokens,topCount){
  const winner=ranked.length===3 && ranked[0][1].logprob!==ranked[1][1].logprob?ranked[0][0]:null;
  return {choices,marginYesNo,winner,top:top[0],sampled:{id:position.id,token:position.token},observedChoiceMass:ranked.reduce((n,[,v])=>n+Math.exp(v.logprob),0),cutoff};
 }
-function difference(a,b){
+export function marginDifference(a,b){
  return {value:a.value!==null && b.value!==null?a.value-b.value:null,lower:a.lower!==null && b.upper!==null?a.lower-b.upper:null,upper:a.upper!==null && b.lower!==null?a.upper-b.lower:null};
 }
 export function probeEffects(rows,spec){
@@ -44,6 +44,6 @@ export function probeEffects(rows,spec){
  for(const p of plan){const r=lookup.get(p.id);assert.ok(r);assert.equal(r.case,p.case.id);assert.equal(r.system,p.system.id);assert.equal(r.prefix,p.prefix.id);assert.equal(r.repeat,p.repeat);}
  return spec.systems.flatMap(system=>spec.prefixes.flatMap(prefix=>[1,2].map(repeat=>{
   const row=condition=>lookup.get(`evidence.pins.${condition}/${system.id}/${prefix.id}/repeat-${repeat}`),margin=condition=>row(condition).measurement.marginYesNo;
-  return {system:system.id,prefix:prefix.id,repeat,originalMargin:margin('original'),changedMargin:margin('changed'),sourceShift:difference(margin('original'),margin('changed')),permutationShift:difference(margin('original'),margin('relabel')),missingWinner:row('missing').measurement.winner};
+  return {system:system.id,prefix:prefix.id,repeat,originalMargin:margin('original'),changedMargin:margin('changed'),sourceShift:marginDifference(margin('original'),margin('changed')),permutationShift:marginDifference(margin('original'),margin('relabel')),missingWinner:row('missing').measurement.winner};
  })));
 }
