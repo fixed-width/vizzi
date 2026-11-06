@@ -1,0 +1,24 @@
+{
+  "$schema": "../../node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "mutate": ["experiments/qa/evidence-study.mjs"],
+  "files": [
+    "package.json",
+    "experiments/qa/evidence-study.mjs",
+    "experiments/qa/evidence-study.test.mjs",
+    "experiments/qa/model.mjs",
+    "experiments/qa/runtime-profile.mjs",
+    "experiments/qa/compact-assess.mjs",
+    "experiments/qa/compact-support.mjs",
+    "experiments/qa/support.mjs",
+    "experiments/qa/library/evidence-use/*.json"
+  ],
+  "testRunner": "command",
+  "commandRunner": {"command": "node experiments/qa/evidence-study.test.mjs"},
+  "coverageAnalysis": "off",
+  "concurrency": 1,
+  "timeoutMS": 5000,
+  "reporters": ["clear-text", "json"],
+  "clearTextReporter": {"reportMutants": false, "logTests": false},
+  "jsonReporter": {"fileName": "/tmp/vizzi-qa-evidence-mutations.json"},
+  "thresholds": {"break": 100}
+}

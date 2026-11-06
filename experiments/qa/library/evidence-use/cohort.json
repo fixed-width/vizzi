@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "repeats": 2,
+  "authorship": "Codex, source-aware fixture/question/oracle author; not independent human evaluation",
+  "sources": {
+    "a": {
+      "kind": "fixture",
+      "root": "experiments/qa/fixtures/evidence-use/a",
+      "revision": "synthetic state a; not a Git commit",
+      "files": {
+        "routing.rs": {
+          "sha256": "9c8dfd537449706173017c47c7137c0f80f0a3c43746f19d660f440155945532",
+          "identityNeedle": "pub struct Coordinator"
+        },
+        "versions.rs": {
+          "sha256": "e319fc1af36ec5ad0e2eaa9f03d5472f8fb3a7c4445a80231bb4d6d68becd40d",
+          "identityNeedle": "pub fn check_requested"
+        },
+        "delivery.rs": {
+          "sha256": "fa35c94580378edb74b3a5519351ab1c9185c47cc0159a54da03f370c7ffda7b",
+          "identityNeedle": "pub fn run_once"
+        },
+        "pins.rs": {
+          "sha256": "0f69610306eeacc7062c3927a2eabd56b3aa27f536187e3068248cbb617a136b",
+          "identityNeedle": "pub fn finish"
+        }
+      }
+    },
+    "b": {
+      "kind": "fixture",
+      "root": "experiments/qa/fixtures/evidence-use/b",
+      "revision": "synthetic state b; not a Git commit",
+      "files": {
+        "routing.rs": {
+          "sha256": "dd2c054b1e608a1a0b136fc6c5c33735ae4b5a33e627c27d08595606ffe2d1a4",
+          "identityNeedle": "pub struct Coordinator"
+        },
+        "versions.rs": {
+          "sha256": "d5848ae360373a7ec828d811b94759aef09b9260b06b6385af5a823f16e1039d",
+          "identityNeedle": "pub fn check_requested"
+        },
+        "delivery.rs": {
+          "sha256": "b57d0fd85be0d05eff69f5dbe4b9fea7365ea34acc1e119363c0914ad490f33a",
+          "identityNeedle": "pub fn run_once"
+        },
+        "pins.rs": {
+          "sha256": "787c2a7bf3cd1716b53d87022b37a898ff6b2f9a6b50379ca3b8441a986a364f",
+          "identityNeedle": "pub fn finish"
+        }
+      }
+    },
+    "pytorch": {
+      "kind": "git",
+      "revision": "1f4d2d5e820dd870626dca4f9603e3a49879dbde",
+      "files": {
+        "torch/utils/hooks.py": {
+          "sha256": "064ae1092e3f8ca6653a1ad56fe4b2d586303fe232ba1865505efd1be1e910c5",
+          "identityNeedle": "class RemovableHandle:"
+        },
+        "torch/_utils.py": {
+          "sha256": "e3802579087887b51f80779bc96b8bd3de7248c1fffd43aab400a73c4c801215",
+          "identityNeedle": "def _get_device_index("
+        }
+      }
+    },
+    "vizzi": {
+      "kind": "git",
+      "revision": "611e40cc12622248fb12830593a14d75a84e25ca",
+      "files": {
+        "crates/vizzi-core/src/investigation.rs": {
+          "sha256": "0b7eea5f7c0eba94f454de89baad059c83c5d04d01745e98ed2927d373406a49",
+          "identityNeedle": "pub struct Investigation {"
+        },
+        "crates/vizzi-core/src/text_diff.rs": {
+          "sha256": "4a4b12e56056dfd568f759c856553833f6fd946a58feeff70f50e737393bfd48",
+          "identityNeedle": "pub enum DiffError"
+        }
+      }
+    }
+  },
+  "model": "qwen3.5-0.8b-base-local-q4",
+  "models": "experiments/qa/library/weight-edit/models.json",
+  "runtime_binary_sha256": "eaf9c1c664cc0ae1f4dea4b171bb91aac8409fcfea0574c9b6bcc93792ce2400"
+}

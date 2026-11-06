@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "rust": "453 workspace tests/doctests, formatting and all-target Clippy passed before inference. Eight safe Rust 2024 input fixtures format and compile; they are data, not new workspace implementation crates.",
+  "node": "14 serial QA test files passed after mutation-driven additions; focused test first failed without implementation and cross-family regression first failed before the fix.",
+  "mutations": "Entire evidence-study.mjs: 333 caught, 10 documented equivalent survivors, zero timeouts/errors/no-coverage. Raw score 97.08, raw exit 1 at threshold 100. Equivalents remain survivors, not caught. Runner orchestration is integration-checked but outside this mutation scope; no native mutation cohort because production Rust is unchanged.",
+  "preparation": "24 contexts audited against copied source, full-file SHA/native content identities and literal ranges. Initial preparation rejected a nonunique identity needle before any generation; final unique source declaration passes. No inspected project tooling executed.",
+  "measurement": "Unchanged cached base model, CPU-only, two threads, serial low-priority inference after correctness/mutation work. One owned model server and two development fixture indexes; reserved source indexes are preparation-only.",
+  "limits": "Observed process-tree PSS at 250 ms on a larger host, no enforced cap/laptop/editor emulation. Greedy prefix-cached replays are not independent samples or a latency distribution.",
+  "assessment": "Preliminary author grading. Delivery wording ambiguity and the post hoc clarity subset are explicit. Reserved gold/source were authored/audited but have no model outputs. No training, custom edit or production QA integration.",
+  "testAndConfigSha256": {
+    "experiments/qa/evidence-study.test.mjs": "dfaaf727a225dbb1b8b1f1496cd383e25ef53c545e64083449ad0b073a1eb125",
+    "experiments/qa/evidence-stryker.config.json": "63cd4e8e36af0f89a7e77f090f65f821ec592d06bec14beb1e795958cf1fa122",
+    "package-lock.json": "e7ff76f17d7408c0b6dfd075c564ba31fec03cc838be612a008cf5bd343e291f"
+  }
+}

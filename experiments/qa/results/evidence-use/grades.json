@@ -1,0 +1,354 @@
+{
+  "schema": 1,
+  "grader": "Codex, source-aware fixture/question/oracle author; preliminary manual grading, not independent acceptance",
+  "limitations": [
+    "Agent-authored synthetic development cases. Reserved real-code cases have zero model outputs.",
+    "All sixteen second-pass answers exactly reproduce first-pass content/context/messages/native validation; not independent samples.",
+    "Delivery physical-effect wording is underspecified for an in-memory marker. Full-set grades use the intended simulation reading; a post-output clarity-checked subset excludes that family without altering the frozen library or raw data.",
+    "A bare No with insufficient-evidence status is treated as an unsupported yes/no conclusion when the decisive function is missing; recorded explicitly for human review."
+  ],
+  "grades": [
+    {
+      "id": "evidence.routing.original/repeat-1",
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct dispatch receiver and validate call, directly supported by target label 1.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.routing.changed/repeat-1",
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correctly follows the swapped roles: validate receives Apply and calls dispatch. Labels 1/2 support the receiver and token check; ancillary zero-token description is true.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.routing.relabel/repeat-1",
+      "facts": [
+        "contradicted",
+        "contradicted"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Names validate as the protocol receiver.",
+        "Invents a call to pending as token validation; pending merely returns zero."
+      ],
+      "notes": "Wrong roles/call after source order changes. Decisive dispatch definition is label 3; cited label 1 only defines pending. False insufficient-evidence status.",
+      "roleConfusion": true
+    },
+    {
+      "id": "evidence.routing.missing/repeat-1",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Claims validate handles Apply and calls pending although the receiver definition is withheld."
+      ],
+      "notes": "Expected insufficient evidence. The visible token validator does not handle Request or call pending. Answered status and specific invented flow fail abstention.",
+      "roleConfusion": true
+    },
+    {
+      "id": "evidence.versions.original/repeat-1",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct strict greater-than error condition; equality is excluded by this strict relation. Ancillary propagation/describe statements match sources. Label 1 supports the requested predicate.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.versions.changed/repeat-1",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correctly changes to requested < committed and explicitly accepts equality. Target label 1 supports the new rule.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.versions.relabel/repeat-1",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct greater-than rule and target label 3 after permutation. Err(\"rejected\") is accepted as an error value description rather than a claim about a named Rust type.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.versions.missing/repeat-1",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Asserts greater-than and then less-than-or-equal rejection rules without the check_requested definition."
+      ],
+      "notes": "The helper delegates to an unseen check; neither relation can be established. The answer is also internally inconsistent and falsely reports answered.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.delivery.original/repeat-1",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Under the intended effect-marker interpretation, No and the early-error explanation answer the question. The explanation stops mid Err expression with normal finish; retain that usability issue without inventing a token-limit truncation. Primary 1 and validator 2 support the fact.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.delivery.changed/repeat-1",
+      "facts": [
+        "contradicted"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Under the intended marker interpretation deliver runs before validation, so No is wrong. However physical effect is not defined in the question and the function only mutates an in-memory vector. This family is ambiguous and excluded from the clarity-checked diagnosis; do not use this contradiction as clean evidence of a weight mechanism.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.delivery.relabel/repeat-1",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Says deliver is called only after run_once completes successfully, whereas it is called inside run_once before returning."
+      ],
+      "notes": "Credit No/early-return under the intended marker reading. False insufficient status and label 1 (deliver only) do not establish ordering in target label 3. Physical-effect terminology remains an ambiguity.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.delivery.missing/repeat-1",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Treats the visible deliver helper as the withheld run_once definition.",
+        "Says incrementing the delivered vector does not modify state."
+      ],
+      "notes": "Expected insufficient evidence; specific run_once behaviour is not supplied. Separate this missing-definition error from the ambiguous term physical effect.",
+      "roleConfusion": true
+    },
+    {
+      "id": "evidence.pins.original/repeat-1",
+      "facts": [
+        "contradicted"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Answers No despite the unconditional release call after validate."
+      ],
+      "notes": "The target calls release even if result is Err. A bare No does not establish the correct behaviour or explain any missing evidence. False insufficient status.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.pins.changed/repeat-1",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "No is correct: result.is_ok guards release, so an Err skips it. Label 1 is the decisive function. Task fails only because status falsely says insufficient evidence.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.pins.relabel/repeat-1",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Yes is correct for unconditional release, but cited label 1 only defines validate. Target finish is label 3. This is correct prose with unsupported citation selection.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.pins.missing/repeat-1",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Gives a definitive No to the release-on-error question while finish is withheld."
+      ],
+      "notes": "The insufficient-evidence status is correct, but bare No does not explain the missing definition and reads as an unsupported behavioural conclusion. This interpretation is explicitly recorded for human review.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.routing.original/repeat-2",
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct dispatch receiver and validate call, directly supported by target label 1. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.routing.changed/repeat-2",
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correctly follows the swapped roles: validate receives Apply and calls dispatch. Labels 1/2 support the receiver and token check; ancillary zero-token description is true. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.routing.relabel/repeat-2",
+      "facts": [
+        "contradicted",
+        "contradicted"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Names validate as the protocol receiver.",
+        "Invents a call to pending as token validation; pending merely returns zero."
+      ],
+      "notes": "Wrong roles/call after source order changes. Decisive dispatch definition is label 3; cited label 1 only defines pending. False insufficient-evidence status. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused.",
+      "roleConfusion": true
+    },
+    {
+      "id": "evidence.routing.missing/repeat-2",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Claims validate handles Apply and calls pending although the receiver definition is withheld."
+      ],
+      "notes": "Expected insufficient evidence. The visible token validator does not handle Request or call pending. Answered status and specific invented flow fail abstention. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused.",
+      "roleConfusion": true
+    },
+    {
+      "id": "evidence.versions.original/repeat-2",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct strict greater-than error condition; equality is excluded by this strict relation. Ancillary propagation/describe statements match sources. Label 1 supports the requested predicate. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.versions.changed/repeat-2",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correctly changes to requested < committed and explicitly accepts equality. Target label 1 supports the new rule. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.versions.relabel/repeat-2",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct greater-than rule and target label 3 after permutation. Err(\"rejected\") is accepted as an error value description rather than a claim about a named Rust type. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.versions.missing/repeat-2",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Asserts greater-than and then less-than-or-equal rejection rules without the check_requested definition."
+      ],
+      "notes": "The helper delegates to an unseen check; neither relation can be established. The answer is also internally inconsistent and falsely reports answered. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.delivery.original/repeat-2",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Under the intended effect-marker interpretation, No and the early-error explanation answer the question. The explanation stops mid Err expression with normal finish; retain that usability issue without inventing a token-limit truncation. Primary 1 and validator 2 support the fact. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.delivery.changed/repeat-2",
+      "facts": [
+        "contradicted"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Under the intended marker interpretation deliver runs before validation, so No is wrong. However physical effect is not defined in the question and the function only mutates an in-memory vector. This family is ambiguous and excluded from the clarity-checked diagnosis; do not use this contradiction as clean evidence of a weight mechanism. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.delivery.relabel/repeat-2",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Says deliver is called only after run_once completes successfully, whereas it is called inside run_once before returning."
+      ],
+      "notes": "Credit No/early-return under the intended marker reading. False insufficient status and label 1 (deliver only) do not establish ordering in target label 3. Physical-effect terminology remains an ambiguity. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.delivery.missing/repeat-2",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Treats the visible deliver helper as the withheld run_once definition.",
+        "Says incrementing the delivered vector does not modify state."
+      ],
+      "notes": "Expected insufficient evidence; specific run_once behaviour is not supplied. Separate this missing-definition error from the ambiguous term physical effect. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused.",
+      "roleConfusion": true
+    },
+    {
+      "id": "evidence.pins.original/repeat-2",
+      "facts": [
+        "contradicted"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Answers No despite the unconditional release call after validate."
+      ],
+      "notes": "The target calls release even if result is Err. A bare No does not establish the correct behaviour or explain any missing evidence. False insufficient status. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.pins.changed/repeat-2",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "No is correct: result.is_ok guards release, so an Err skips it. Label 1 is the decisive function. Task fails only because status falsely says insufficient evidence. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.pins.relabel/repeat-2",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Yes is correct for unconditional release, but cited label 1 only defines validate. Target finish is label 3. This is correct prose with unsupported citation selection. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.pins.missing/repeat-2",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Gives a definitive No to the release-on-error question while finish is withheld."
+      ],
+      "notes": "The insufficient-evidence status is correct, but bare No does not explain the missing definition and reads as an unsupported behavioural conclusion. This interpretation is explicitly recorded for human review. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused.",
+      "roleConfusion": false
+    }
+  ]
+}

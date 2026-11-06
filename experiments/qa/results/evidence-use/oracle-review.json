@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "stage": "Post-output source/question audit; frozen libraries and raw answers unchanged.",
+  "ambiguousFamily": "delivery",
+  "reason": "Physical effect is used for an in-memory vector marker without defining that representation in the question. A literal external-I/O interpretation differs from the intended call-order test.",
+  "handling": "Keep all 32 raw responses and intended-reading grades. Publish a separately labelled post hoc clarity-checked subset for routing/versions/pins (24 responses); do not use delivery as clean evidence for a custom weight-edit target.",
+  "otherJudgment": "A bare No on the missing-pin question is treated as an unsupported release-behaviour conclusion rather than a sufficient explanation of missing evidence; graders can inspect this judgment. Missing routing/version answers give unambiguous detailed unsupported claims independently of that case.",
+  "formatLimit": "Missing-source cases have two excerpts and complete cases three. Future qualification needs count-matched controls and a new pre-edit freeze; this starter reservation alone is not a robust generalisation test."
+}

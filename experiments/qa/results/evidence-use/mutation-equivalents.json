@@ -1,0 +1,177 @@
+{
+  "schema": 1,
+  "sourceSha256": "939d670308d01543f1c238d80731652b3f92df62bb98c31e95a2a03e5dd317a4",
+  "scope": "Entire evidence-study.mjs, including validation, development-only admission and repeat-aware scoring. Runner orchestration is not mutation-tested.",
+  "counts": {
+    "caught": 333,
+    "equivalentSurvivors": 10,
+    "timeouts": 0,
+    "errors": 0,
+    "noCoverage": 0
+  },
+  "rawToolScore": 97.08,
+  "rawToolExit": 1,
+  "thresholdExplanation": "Raw Stryker threshold is 100. The command exits 1 for these documented equivalents; they remain survivors in the original report and are not counted as caught.",
+  "exclusions": [
+    {
+      "id": "66",
+      "location": {
+        "end": {
+          "column": 102,
+          "line": 18
+        },
+        "start": {
+          "column": 63,
+          "line": 18
+        }
+      },
+      "mutator": "CallExpression",
+      "replacement": ";",
+      "reason": "Removing the explicit source-existence assertion still rejects an unknown source at the following files lookup; only exception type/message changes."
+    },
+    {
+      "id": "70",
+      "location": {
+        "end": {
+          "column": 108,
+          "line": 19
+        },
+        "start": {
+          "column": 78,
+          "line": 19
+        }
+      },
+      "mutator": "StringLiteral",
+      "replacement": "\"\"",
+      "reason": "Changes an exception diagnostic string only; no acceptance, selection or scoring decision changes."
+    },
+    {
+      "id": "106",
+      "location": {
+        "end": {
+          "column": 78,
+          "line": 26
+        },
+        "start": {
+          "column": 62,
+          "line": 26
+        }
+      },
+      "mutator": "CallExpression",
+      "replacement": ";",
+      "reason": "Removing the explicit selected-file assertion still rejects an absent file when its sha256 is accessed; no invalid library is accepted."
+    },
+    {
+      "id": "139",
+      "location": {
+        "end": {
+          "column": 161,
+          "line": 28
+        },
+        "start": {
+          "column": 134,
+          "line": 28
+        }
+      },
+      "mutator": "StringLiteral",
+      "replacement": "\"\"",
+      "reason": "Changes an exception diagnostic string only; no acceptance, selection or scoring decision changes."
+    },
+    {
+      "id": "143",
+      "location": {
+        "end": {
+          "column": 102,
+          "line": 29
+        },
+        "start": {
+          "column": 75,
+          "line": 29
+        }
+      },
+      "mutator": "StringLiteral",
+      "replacement": "\"\"",
+      "reason": "Changes an exception diagnostic string only; no acceptance, selection or scoring decision changes."
+    },
+    {
+      "id": "151",
+      "location": {
+        "end": {
+          "column": 114,
+          "line": 31
+        },
+        "start": {
+          "column": 63,
+          "line": 31
+        }
+      },
+      "mutator": "StringLiteral",
+      "replacement": "\"\"",
+      "reason": "Changes an exception diagnostic string only; no acceptance, selection or scoring decision changes."
+    },
+    {
+      "id": "227",
+      "location": {
+        "end": {
+          "column": 111,
+          "line": 41
+        },
+        "start": {
+          "column": 72,
+          "line": 41
+        }
+      },
+      "mutator": "StringLiteral",
+      "replacement": "\"\"",
+      "reason": "Changes an exception diagnostic string only; no acceptance, selection or scoring decision changes."
+    },
+    {
+      "id": "236",
+      "location": {
+        "end": {
+          "column": 91,
+          "line": 44
+        },
+        "start": {
+          "column": 56,
+          "line": 44
+        }
+      },
+      "mutator": "StringLiteral",
+      "replacement": "\"\"",
+      "reason": "Changes an exception diagnostic string only; no acceptance, selection or scoring decision changes."
+    },
+    {
+      "id": "264",
+      "location": {
+        "end": {
+          "column": 118,
+          "line": 58
+        },
+        "start": {
+          "column": 80,
+          "line": 58
+        }
+      },
+      "mutator": "CallExpression",
+      "replacement": ";",
+      "reason": "Removing the response-count assertion still rejects an incomplete ledger when a required contrast decision is missing, or duplicate/extra IDs are rejected by subsequent checks."
+    },
+    {
+      "id": "266",
+      "location": {
+        "end": {
+          "column": 67,
+          "line": 59
+        },
+        "start": {
+          "column": 54,
+          "line": 59
+        }
+      },
+      "mutator": "CallExpression",
+      "replacement": ";",
+      "reason": "Removing the explicit planned-ID assertion still rejects an unknown row ID when p.case/p.repeat is read; only exception type/message changes."
+    }
+  ]
+}

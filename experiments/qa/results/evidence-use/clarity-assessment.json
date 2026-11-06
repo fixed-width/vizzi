@@ -1,0 +1,893 @@
+{
+  "schema": 1,
+  "grader": "Codex, source-aware fixture/question/oracle author; preliminary manual grading, not independent acceptance",
+  "limitations": [
+    "Agent-authored synthetic development cases. Reserved real-code cases have zero model outputs.",
+    "All sixteen second-pass answers exactly reproduce first-pass content/context/messages/native validation; not independent samples.",
+    "Delivery physical-effect wording is underspecified for an in-memory marker. Full-set grades use the intended simulation reading; a post-output clarity-checked subset excludes that family without altering the frozen library or raw data.",
+    "A bare No with insufficient-evidence status is treated as an unsupported yes/no conclusion when the decisive function is missing; recorded explicitly for human review."
+  ],
+  "summaries": [
+    {
+      "split": "all",
+      "population": "all",
+      "arm": "answer_first",
+      "cases": 24,
+      "answerable": 18,
+      "taskSuccess": 10,
+      "unanswerable": 6,
+      "correctRefusals": 0,
+      "supportedFacts": 18,
+      "facts": 24,
+      "allFacts": 14,
+      "statusCorrect": 14,
+      "unsupportedAnswers": 10,
+      "roleConfusions": 4,
+      "sourceChecks": 24,
+      "answerableRefusals": 6,
+      "truncated": 0,
+      "formatErrors": 0,
+      "runtimeErrors": 0,
+      "medianEvidenceBytes": 384,
+      "medianPromptTokens": 415,
+      "medianOutputTokens": 60.5,
+      "medianRetrievalMs": null,
+      "medianFirstOutputMs": 1898.7608874999992,
+      "medianMs": 3498.486926999998,
+      "p95Ms": 6379.984954999993
+    },
+    {
+      "split": "development",
+      "population": "all",
+      "arm": "answer_first",
+      "cases": 24,
+      "answerable": 18,
+      "taskSuccess": 10,
+      "unanswerable": 6,
+      "correctRefusals": 0,
+      "supportedFacts": 18,
+      "facts": 24,
+      "allFacts": 14,
+      "statusCorrect": 14,
+      "unsupportedAnswers": 10,
+      "roleConfusions": 4,
+      "sourceChecks": 24,
+      "answerableRefusals": 6,
+      "truncated": 0,
+      "formatErrors": 0,
+      "runtimeErrors": 0,
+      "medianEvidenceBytes": 384,
+      "medianPromptTokens": 415,
+      "medianOutputTokens": 60.5,
+      "medianRetrievalMs": null,
+      "medianFirstOutputMs": 1898.7608874999992,
+      "medianMs": 3498.486926999998,
+      "p95Ms": 6379.984954999993
+    },
+    {
+      "split": "all",
+      "population": "repository",
+      "arm": "answer_first",
+      "cases": 24,
+      "answerable": 18,
+      "taskSuccess": 10,
+      "unanswerable": 6,
+      "correctRefusals": 0,
+      "supportedFacts": 18,
+      "facts": 24,
+      "allFacts": 14,
+      "statusCorrect": 14,
+      "unsupportedAnswers": 10,
+      "roleConfusions": 4,
+      "sourceChecks": 24,
+      "answerableRefusals": 6,
+      "truncated": 0,
+      "formatErrors": 0,
+      "runtimeErrors": 0,
+      "medianEvidenceBytes": 384,
+      "medianPromptTokens": 415,
+      "medianOutputTokens": 60.5,
+      "medianRetrievalMs": null,
+      "medianFirstOutputMs": 1898.7608874999992,
+      "medianMs": 3498.486926999998,
+      "p95Ms": 6379.984954999993
+    }
+  ],
+  "decisions": [
+    {
+      "id": "evidence.routing.original/repeat-1",
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct dispatch receiver and validate call, directly supported by target label 1.",
+      "roleConfusion": false,
+      "case": "evidence.routing.original",
+      "arm": "answer_first",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 2,
+      "taskSuccess": true
+    },
+    {
+      "id": "evidence.routing.changed/repeat-1",
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correctly follows the swapped roles: validate receives Apply and calls dispatch. Labels 1/2 support the receiver and token check; ancillary zero-token description is true.",
+      "roleConfusion": false,
+      "case": "evidence.routing.changed",
+      "arm": "answer_first",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 2,
+      "taskSuccess": true
+    },
+    {
+      "id": "evidence.routing.relabel/repeat-1",
+      "facts": [
+        "contradicted",
+        "contradicted"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Names validate as the protocol receiver.",
+        "Invents a call to pending as token validation; pending merely returns zero."
+      ],
+      "notes": "Wrong roles/call after source order changes. Decisive dispatch definition is label 3; cited label 1 only defines pending. False insufficient-evidence status.",
+      "roleConfusion": true,
+      "case": "evidence.routing.relabel",
+      "arm": "answer_first",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.routing.missing/repeat-1",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Claims validate handles Apply and calls pending although the receiver definition is withheld."
+      ],
+      "notes": "Expected insufficient evidence. The visible token validator does not handle Request or call pending. Answered status and specific invented flow fail abstention.",
+      "roleConfusion": true,
+      "case": "evidence.routing.missing",
+      "arm": "answer_first",
+      "split": "development",
+      "answerable": false,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.versions.original/repeat-1",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct strict greater-than error condition; equality is excluded by this strict relation. Ancillary propagation/describe statements match sources. Label 1 supports the requested predicate.",
+      "roleConfusion": false,
+      "case": "evidence.versions.original",
+      "arm": "answer_first",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": true
+    },
+    {
+      "id": "evidence.versions.changed/repeat-1",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correctly changes to requested < committed and explicitly accepts equality. Target label 1 supports the new rule.",
+      "roleConfusion": false,
+      "case": "evidence.versions.changed",
+      "arm": "answer_first",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": true
+    },
+    {
+      "id": "evidence.versions.relabel/repeat-1",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct greater-than rule and target label 3 after permutation. Err(\"rejected\") is accepted as an error value description rather than a claim about a named Rust type.",
+      "roleConfusion": false,
+      "case": "evidence.versions.relabel",
+      "arm": "answer_first",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": true
+    },
+    {
+      "id": "evidence.versions.missing/repeat-1",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Asserts greater-than and then less-than-or-equal rejection rules without the check_requested definition."
+      ],
+      "notes": "The helper delegates to an unseen check; neither relation can be established. The answer is also internally inconsistent and falsely reports answered.",
+      "roleConfusion": false,
+      "case": "evidence.versions.missing",
+      "arm": "answer_first",
+      "split": "development",
+      "answerable": false,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.pins.original/repeat-1",
+      "facts": [
+        "contradicted"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Answers No despite the unconditional release call after validate."
+      ],
+      "notes": "The target calls release even if result is Err. A bare No does not establish the correct behaviour or explain any missing evidence. False insufficient status.",
+      "roleConfusion": false,
+      "case": "evidence.pins.original",
+      "arm": "answer_first",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.pins.changed/repeat-1",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "No is correct: result.is_ok guards release, so an Err skips it. Label 1 is the decisive function. Task fails only because status falsely says insufficient evidence.",
+      "roleConfusion": false,
+      "case": "evidence.pins.changed",
+      "arm": "answer_first",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.pins.relabel/repeat-1",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Yes is correct for unconditional release, but cited label 1 only defines validate. Target finish is label 3. This is correct prose with unsupported citation selection.",
+      "roleConfusion": false,
+      "case": "evidence.pins.relabel",
+      "arm": "answer_first",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.pins.missing/repeat-1",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Gives a definitive No to the release-on-error question while finish is withheld."
+      ],
+      "notes": "The insufficient-evidence status is correct, but bare No does not explain the missing definition and reads as an unsupported behavioural conclusion. This interpretation is explicitly recorded for human review.",
+      "roleConfusion": false,
+      "case": "evidence.pins.missing",
+      "arm": "answer_first",
+      "split": "development",
+      "answerable": false,
+      "statusCorrect": true,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.routing.original/repeat-2",
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct dispatch receiver and validate call, directly supported by target label 1. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.routing.original",
+      "arm": "answer_first",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 2,
+      "taskSuccess": true
+    },
+    {
+      "id": "evidence.routing.changed/repeat-2",
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correctly follows the swapped roles: validate receives Apply and calls dispatch. Labels 1/2 support the receiver and token check; ancillary zero-token description is true. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.routing.changed",
+      "arm": "answer_first",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 2,
+      "taskSuccess": true
+    },
+    {
+      "id": "evidence.routing.relabel/repeat-2",
+      "facts": [
+        "contradicted",
+        "contradicted"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Names validate as the protocol receiver.",
+        "Invents a call to pending as token validation; pending merely returns zero."
+      ],
+      "notes": "Wrong roles/call after source order changes. Decisive dispatch definition is label 3; cited label 1 only defines pending. False insufficient-evidence status. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused.",
+      "roleConfusion": true,
+      "case": "evidence.routing.relabel",
+      "arm": "answer_first",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.routing.missing/repeat-2",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Claims validate handles Apply and calls pending although the receiver definition is withheld."
+      ],
+      "notes": "Expected insufficient evidence. The visible token validator does not handle Request or call pending. Answered status and specific invented flow fail abstention. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused.",
+      "roleConfusion": true,
+      "case": "evidence.routing.missing",
+      "arm": "answer_first",
+      "split": "development",
+      "answerable": false,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.versions.original/repeat-2",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct strict greater-than error condition; equality is excluded by this strict relation. Ancillary propagation/describe statements match sources. Label 1 supports the requested predicate. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.versions.original",
+      "arm": "answer_first",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": true
+    },
+    {
+      "id": "evidence.versions.changed/repeat-2",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correctly changes to requested < committed and explicitly accepts equality. Target label 1 supports the new rule. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.versions.changed",
+      "arm": "answer_first",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": true
+    },
+    {
+      "id": "evidence.versions.relabel/repeat-2",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct greater-than rule and target label 3 after permutation. Err(\"rejected\") is accepted as an error value description rather than a claim about a named Rust type. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.versions.relabel",
+      "arm": "answer_first",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": true
+    },
+    {
+      "id": "evidence.versions.missing/repeat-2",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Asserts greater-than and then less-than-or-equal rejection rules without the check_requested definition."
+      ],
+      "notes": "The helper delegates to an unseen check; neither relation can be established. The answer is also internally inconsistent and falsely reports answered. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.versions.missing",
+      "arm": "answer_first",
+      "split": "development",
+      "answerable": false,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.pins.original/repeat-2",
+      "facts": [
+        "contradicted"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Answers No despite the unconditional release call after validate."
+      ],
+      "notes": "The target calls release even if result is Err. A bare No does not establish the correct behaviour or explain any missing evidence. False insufficient status. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.pins.original",
+      "arm": "answer_first",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.pins.changed/repeat-2",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "No is correct: result.is_ok guards release, so an Err skips it. Label 1 is the decisive function. Task fails only because status falsely says insufficient evidence. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.pins.changed",
+      "arm": "answer_first",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.pins.relabel/repeat-2",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Yes is correct for unconditional release, but cited label 1 only defines validate. Target finish is label 3. This is correct prose with unsupported citation selection. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.pins.relabel",
+      "arm": "answer_first",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.pins.missing/repeat-2",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Gives a definitive No to the release-on-error question while finish is withheld."
+      ],
+      "notes": "The insufficient-evidence status is correct, but bare No does not explain the missing definition and reads as an unsupported behavioural conclusion. This interpretation is explicitly recorded for human review. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.pins.missing",
+      "arm": "answer_first",
+      "split": "development",
+      "answerable": false,
+      "statusCorrect": true,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    }
+  ],
+  "contrasts": [
+    {
+      "family": "routing",
+      "repeat": 1,
+      "sourceChange": true,
+      "factualChange": true,
+      "labelPermutation": false,
+      "missingAbstention": false
+    },
+    {
+      "family": "routing",
+      "repeat": 2,
+      "sourceChange": true,
+      "factualChange": true,
+      "labelPermutation": false,
+      "missingAbstention": false
+    },
+    {
+      "family": "versions",
+      "repeat": 1,
+      "sourceChange": true,
+      "factualChange": true,
+      "labelPermutation": true,
+      "missingAbstention": false
+    },
+    {
+      "family": "versions",
+      "repeat": 2,
+      "sourceChange": true,
+      "factualChange": true,
+      "labelPermutation": true,
+      "missingAbstention": false
+    },
+    {
+      "family": "pins",
+      "repeat": 1,
+      "sourceChange": false,
+      "factualChange": false,
+      "labelPermutation": false,
+      "missingAbstention": false
+    },
+    {
+      "family": "pins",
+      "repeat": 2,
+      "sourceChange": false,
+      "factualChange": false,
+      "labelPermutation": false,
+      "missingAbstention": false
+    }
+  ],
+  "reproducible": [
+    {
+      "failure": "factual",
+      "cases": [
+        "evidence.pins.original",
+        "evidence.routing.relabel"
+      ],
+      "families": [
+        "pins",
+        "routing"
+      ]
+    },
+    {
+      "failure": "status",
+      "cases": [
+        "evidence.pins.changed",
+        "evidence.pins.original",
+        "evidence.routing.missing",
+        "evidence.routing.relabel",
+        "evidence.versions.missing"
+      ],
+      "families": [
+        "pins",
+        "routing",
+        "versions"
+      ]
+    },
+    {
+      "failure": "unsupported_claims",
+      "cases": [
+        "evidence.pins.missing",
+        "evidence.pins.original",
+        "evidence.routing.missing",
+        "evidence.routing.relabel",
+        "evidence.versions.missing"
+      ],
+      "families": [
+        "pins",
+        "routing",
+        "versions"
+      ]
+    },
+    {
+      "failure": "citation_support",
+      "cases": [
+        "evidence.pins.original",
+        "evidence.pins.relabel",
+        "evidence.routing.relabel"
+      ],
+      "families": [
+        "pins",
+        "routing"
+      ]
+    }
+  ],
+  "failures": [
+    {
+      "id": "evidence.routing.original/repeat-1",
+      "case": "evidence.routing.original",
+      "repeat": 1,
+      "factual": false,
+      "status": false,
+      "unsupported_claims": false,
+      "citation_support": false,
+      "reference_binding": false,
+      "execution": false
+    },
+    {
+      "id": "evidence.routing.changed/repeat-1",
+      "case": "evidence.routing.changed",
+      "repeat": 1,
+      "factual": false,
+      "status": false,
+      "unsupported_claims": false,
+      "citation_support": false,
+      "reference_binding": false,
+      "execution": false
+    },
+    {
+      "id": "evidence.routing.relabel/repeat-1",
+      "case": "evidence.routing.relabel",
+      "repeat": 1,
+      "factual": true,
+      "status": true,
+      "unsupported_claims": true,
+      "citation_support": true,
+      "reference_binding": false,
+      "execution": false
+    },
+    {
+      "id": "evidence.routing.missing/repeat-1",
+      "case": "evidence.routing.missing",
+      "repeat": 1,
+      "factual": false,
+      "status": true,
+      "unsupported_claims": true,
+      "citation_support": false,
+      "reference_binding": false,
+      "execution": false
+    },
+    {
+      "id": "evidence.versions.original/repeat-1",
+      "case": "evidence.versions.original",
+      "repeat": 1,
+      "factual": false,
+      "status": false,
+      "unsupported_claims": false,
+      "citation_support": false,
+      "reference_binding": false,
+      "execution": false
+    },
+    {
+      "id": "evidence.versions.changed/repeat-1",
+      "case": "evidence.versions.changed",
+      "repeat": 1,
+      "factual": false,
+      "status": false,
+      "unsupported_claims": false,
+      "citation_support": false,
+      "reference_binding": false,
+      "execution": false
+    },
+    {
+      "id": "evidence.versions.relabel/repeat-1",
+      "case": "evidence.versions.relabel",
+      "repeat": 1,
+      "factual": false,
+      "status": false,
+      "unsupported_claims": false,
+      "citation_support": false,
+      "reference_binding": false,
+      "execution": false
+    },
+    {
+      "id": "evidence.versions.missing/repeat-1",
+      "case": "evidence.versions.missing",
+      "repeat": 1,
+      "factual": false,
+      "status": true,
+      "unsupported_claims": true,
+      "citation_support": false,
+      "reference_binding": false,
+      "execution": false
+    },
+    {
+      "id": "evidence.pins.original/repeat-1",
+      "case": "evidence.pins.original",
+      "repeat": 1,
+      "factual": true,
+      "status": true,
+      "unsupported_claims": true,
+      "citation_support": true,
+      "reference_binding": false,
+      "execution": false
+    },
+    {
+      "id": "evidence.pins.changed/repeat-1",
+      "case": "evidence.pins.changed",
+      "repeat": 1,
+      "factual": false,
+      "status": true,
+      "unsupported_claims": false,
+      "citation_support": false,
+      "reference_binding": false,
+      "execution": false
+    },
+    {
+      "id": "evidence.pins.relabel/repeat-1",
+      "case": "evidence.pins.relabel",
+      "repeat": 1,
+      "factual": false,
+      "status": false,
+      "unsupported_claims": false,
+      "citation_support": true,
+      "reference_binding": false,
+      "execution": false
+    },
+    {
+      "id": "evidence.pins.missing/repeat-1",
+      "case": "evidence.pins.missing",
+      "repeat": 1,
+      "factual": false,
+      "status": false,
+      "unsupported_claims": true,
+      "citation_support": false,
+      "reference_binding": false,
+      "execution": false
+    },
+    {
+      "id": "evidence.routing.original/repeat-2",
+      "case": "evidence.routing.original",
+      "repeat": 2,
+      "factual": false,
+      "status": false,
+      "unsupported_claims": false,
+      "citation_support": false,
+      "reference_binding": false,
+      "execution": false
+    },
+    {
+      "id": "evidence.routing.changed/repeat-2",
+      "case": "evidence.routing.changed",
+      "repeat": 2,
+      "factual": false,
+      "status": false,
+      "unsupported_claims": false,
+      "citation_support": false,
+      "reference_binding": false,
+      "execution": false
+    },
+    {
+      "id": "evidence.routing.relabel/repeat-2",
+      "case": "evidence.routing.relabel",
+      "repeat": 2,
+      "factual": true,
+      "status": true,
+      "unsupported_claims": true,
+      "citation_support": true,
+      "reference_binding": false,
+      "execution": false
+    },
+    {
+      "id": "evidence.routing.missing/repeat-2",
+      "case": "evidence.routing.missing",
+      "repeat": 2,
+      "factual": false,
+      "status": true,
+      "unsupported_claims": true,
+      "citation_support": false,
+      "reference_binding": false,
+      "execution": false
+    },
+    {
+      "id": "evidence.versions.original/repeat-2",
+      "case": "evidence.versions.original",
+      "repeat": 2,
+      "factual": false,
+      "status": false,
+      "unsupported_claims": false,
+      "citation_support": false,
+      "reference_binding": false,
+      "execution": false
+    },
+    {
+      "id": "evidence.versions.changed/repeat-2",
+      "case": "evidence.versions.changed",
+      "repeat": 2,
+      "factual": false,
+      "status": false,
+      "unsupported_claims": false,
+      "citation_support": false,
+      "reference_binding": false,
+      "execution": false
+    },
+    {
+      "id": "evidence.versions.relabel/repeat-2",
+      "case": "evidence.versions.relabel",
+      "repeat": 2,
+      "factual": false,
+      "status": false,
+      "unsupported_claims": false,
+      "citation_support": false,
+      "reference_binding": false,
+      "execution": false
+    },
+    {
+      "id": "evidence.versions.missing/repeat-2",
+      "case": "evidence.versions.missing",
+      "repeat": 2,
+      "factual": false,
+      "status": true,
+      "unsupported_claims": true,
+      "citation_support": false,
+      "reference_binding": false,
+      "execution": false
+    },
+    {
+      "id": "evidence.pins.original/repeat-2",
+      "case": "evidence.pins.original",
+      "repeat": 2,
+      "factual": true,
+      "status": true,
+      "unsupported_claims": true,
+      "citation_support": true,
+      "reference_binding": false,
+      "execution": false
+    },
+    {
+      "id": "evidence.pins.changed/repeat-2",
+      "case": "evidence.pins.changed",
+      "repeat": 2,
+      "factual": false,
+      "status": true,
+      "unsupported_claims": false,
+      "citation_support": false,
+      "reference_binding": false,
+      "execution": false
+    },
+    {
+      "id": "evidence.pins.relabel/repeat-2",
+      "case": "evidence.pins.relabel",
+      "repeat": 2,
+      "factual": false,
+      "status": false,
+      "unsupported_claims": false,
+      "citation_support": true,
+      "reference_binding": false,
+      "execution": false
+    },
+    {
+      "id": "evidence.pins.missing/repeat-2",
+      "case": "evidence.pins.missing",
+      "repeat": 2,
+      "factual": false,
+      "status": false,
+      "unsupported_claims": true,
+      "citation_support": false,
+      "reference_binding": false,
+      "execution": false
+    }
+  ]
+}

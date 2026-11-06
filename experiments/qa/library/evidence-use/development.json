@@ -1,0 +1,712 @@
+{
+  "schema": 1,
+  "cases": [
+    {
+      "id": "evidence.routing.original",
+      "family": "routing",
+      "repository": "evidence-fixture",
+      "source": "a",
+      "split": "development",
+      "condition": "original",
+      "question": "Which Coordinator method handles Request::Apply, and which method does it call to check the token?",
+      "author": "Codex; controlled synthetic Rust fixture",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "Coordinator::dispatch receives Request::Apply.",
+          "evidence": [
+            {
+              "path": "routing.rs",
+              "needle": "Request::Apply(token)"
+            }
+          ]
+        },
+        {
+          "text": "It invokes Coordinator::validate on the token.",
+          "evidence": [
+            {
+              "path": "routing.rs",
+              "needle": "self.validate(token)"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "expected_support": [
+        "target"
+      ],
+      "ranges": [
+        {
+          "key": "target",
+          "path": "routing.rs",
+          "first": 10,
+          "last": 15
+        },
+        {
+          "key": "helper",
+          "path": "routing.rs",
+          "first": 17,
+          "last": 23
+        },
+        {
+          "key": "noise",
+          "path": "routing.rs",
+          "first": 25,
+          "last": 27
+        }
+      ],
+      "scope_note": "Interpret only the supplied source state; deliberately changed fixtures are not production fixes."
+    },
+    {
+      "id": "evidence.routing.changed",
+      "family": "routing",
+      "repository": "evidence-fixture",
+      "source": "b",
+      "split": "development",
+      "condition": "changed",
+      "question": "Which Coordinator method handles Request::Apply, and which method does it call to check the token?",
+      "author": "Codex; controlled synthetic Rust fixture",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "Coordinator::validate receives Request::Apply.",
+          "evidence": [
+            {
+              "path": "routing.rs",
+              "needle": "Request::Apply(token)"
+            }
+          ]
+        },
+        {
+          "text": "It invokes Coordinator::dispatch on the token.",
+          "evidence": [
+            {
+              "path": "routing.rs",
+              "needle": "self.dispatch(token)"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "expected_support": [
+        "target"
+      ],
+      "ranges": [
+        {
+          "key": "target",
+          "path": "routing.rs",
+          "first": 10,
+          "last": 15
+        },
+        {
+          "key": "helper",
+          "path": "routing.rs",
+          "first": 17,
+          "last": 23
+        },
+        {
+          "key": "noise",
+          "path": "routing.rs",
+          "first": 25,
+          "last": 27
+        }
+      ],
+      "scope_note": "Interpret only the supplied source state; deliberately changed fixtures are not production fixes."
+    },
+    {
+      "id": "evidence.routing.relabel",
+      "family": "routing",
+      "repository": "evidence-fixture",
+      "source": "a",
+      "split": "development",
+      "condition": "relabel",
+      "question": "Which Coordinator method handles Request::Apply, and which method does it call to check the token?",
+      "author": "Codex; controlled synthetic Rust fixture",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "Coordinator::dispatch receives Request::Apply.",
+          "evidence": [
+            {
+              "path": "routing.rs",
+              "needle": "Request::Apply(token)"
+            }
+          ]
+        },
+        {
+          "text": "It invokes Coordinator::validate on the token.",
+          "evidence": [
+            {
+              "path": "routing.rs",
+              "needle": "self.validate(token)"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "expected_support": [
+        "target"
+      ],
+      "ranges": [
+        {
+          "key": "noise",
+          "path": "routing.rs",
+          "first": 25,
+          "last": 27
+        },
+        {
+          "key": "helper",
+          "path": "routing.rs",
+          "first": 17,
+          "last": 23
+        },
+        {
+          "key": "target",
+          "path": "routing.rs",
+          "first": 10,
+          "last": 15
+        }
+      ],
+      "scope_note": "Interpret only the supplied source state; deliberately changed fixtures are not production fixes."
+    },
+    {
+      "id": "evidence.routing.missing",
+      "family": "routing",
+      "repository": "evidence-fixture",
+      "source": "a",
+      "split": "development",
+      "condition": "missing",
+      "question": "Which Coordinator method handles Request::Apply, and which method does it call to check the token?",
+      "author": "Codex; controlled synthetic Rust fixture",
+      "expected_status": "insufficient_evidence",
+      "required_facts": [],
+      "forbidden_claims": [],
+      "expected_support": [],
+      "ranges": [
+        {
+          "key": "helper",
+          "path": "routing.rs",
+          "first": 17,
+          "last": 23
+        },
+        {
+          "key": "noise",
+          "path": "routing.rs",
+          "first": 25,
+          "last": 27
+        }
+      ],
+      "scope_note": "The decisive definition is withheld; adjacent helpers do not establish the requested behaviour."
+    },
+    {
+      "id": "evidence.versions.original",
+      "family": "versions",
+      "repository": "evidence-fixture",
+      "source": "a",
+      "split": "development",
+      "condition": "original",
+      "question": "Which relation between requested and committed makes check_requested return an error?",
+      "author": "Codex; controlled synthetic Rust fixture",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "Rejection happens when requested is greater than committed; equality is accepted.",
+          "evidence": [
+            {
+              "path": "versions.rs",
+              "needle": "requested > committed"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "expected_support": [
+        "target"
+      ],
+      "ranges": [
+        {
+          "key": "target",
+          "path": "versions.rs",
+          "first": 3,
+          "last": 9
+        },
+        {
+          "key": "helper",
+          "path": "versions.rs",
+          "first": 11,
+          "last": 13
+        },
+        {
+          "key": "noise",
+          "path": "versions.rs",
+          "first": 15,
+          "last": 17
+        }
+      ],
+      "scope_note": "Interpret only the supplied source state; deliberately changed fixtures are not production fixes."
+    },
+    {
+      "id": "evidence.versions.changed",
+      "family": "versions",
+      "repository": "evidence-fixture",
+      "source": "b",
+      "split": "development",
+      "condition": "changed",
+      "question": "Which relation between requested and committed makes check_requested return an error?",
+      "author": "Codex; controlled synthetic Rust fixture",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "Rejection happens when requested is less than committed; equality is accepted.",
+          "evidence": [
+            {
+              "path": "versions.rs",
+              "needle": "requested < committed"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "expected_support": [
+        "target"
+      ],
+      "ranges": [
+        {
+          "key": "target",
+          "path": "versions.rs",
+          "first": 3,
+          "last": 9
+        },
+        {
+          "key": "helper",
+          "path": "versions.rs",
+          "first": 11,
+          "last": 13
+        },
+        {
+          "key": "noise",
+          "path": "versions.rs",
+          "first": 15,
+          "last": 17
+        }
+      ],
+      "scope_note": "Interpret only the supplied source state; deliberately changed fixtures are not production fixes."
+    },
+    {
+      "id": "evidence.versions.relabel",
+      "family": "versions",
+      "repository": "evidence-fixture",
+      "source": "a",
+      "split": "development",
+      "condition": "relabel",
+      "question": "Which relation between requested and committed makes check_requested return an error?",
+      "author": "Codex; controlled synthetic Rust fixture",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "Rejection happens when requested is greater than committed; equality is accepted.",
+          "evidence": [
+            {
+              "path": "versions.rs",
+              "needle": "requested > committed"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "expected_support": [
+        "target"
+      ],
+      "ranges": [
+        {
+          "key": "noise",
+          "path": "versions.rs",
+          "first": 15,
+          "last": 17
+        },
+        {
+          "key": "helper",
+          "path": "versions.rs",
+          "first": 11,
+          "last": 13
+        },
+        {
+          "key": "target",
+          "path": "versions.rs",
+          "first": 3,
+          "last": 9
+        }
+      ],
+      "scope_note": "Interpret only the supplied source state; deliberately changed fixtures are not production fixes."
+    },
+    {
+      "id": "evidence.versions.missing",
+      "family": "versions",
+      "repository": "evidence-fixture",
+      "source": "a",
+      "split": "development",
+      "condition": "missing",
+      "question": "Which relation between requested and committed makes check_requested return an error?",
+      "author": "Codex; controlled synthetic Rust fixture",
+      "expected_status": "insufficient_evidence",
+      "required_facts": [],
+      "forbidden_claims": [],
+      "expected_support": [],
+      "ranges": [
+        {
+          "key": "helper",
+          "path": "versions.rs",
+          "first": 11,
+          "last": 13
+        },
+        {
+          "key": "noise",
+          "path": "versions.rs",
+          "first": 15,
+          "last": 17
+        }
+      ],
+      "scope_note": "The decisive definition is withheld; adjacent helpers do not establish the requested behaviour."
+    },
+    {
+      "id": "evidence.delivery.original",
+      "family": "delivery",
+      "repository": "evidence-fixture",
+      "source": "a",
+      "split": "development",
+      "condition": "original",
+      "question": "If validation rejects the attempt, does run_once already deliver a physical effect?",
+      "author": "Codex; controlled synthetic Rust fixture",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "The physical effect is not delivered after rejected validation.",
+          "evidence": [
+            {
+              "path": "delivery.rs",
+              "needle": "deliver(delivered);"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "expected_support": [
+        "target"
+      ],
+      "ranges": [
+        {
+          "key": "target",
+          "path": "delivery.rs",
+          "first": 3,
+          "last": 7
+        },
+        {
+          "key": "helper",
+          "path": "delivery.rs",
+          "first": 9,
+          "last": 11
+        },
+        {
+          "key": "noise",
+          "path": "delivery.rs",
+          "first": 13,
+          "last": 15
+        }
+      ],
+      "scope_note": "Interpret only the supplied source state; deliberately changed fixtures are not production fixes."
+    },
+    {
+      "id": "evidence.delivery.changed",
+      "family": "delivery",
+      "repository": "evidence-fixture",
+      "source": "b",
+      "split": "development",
+      "condition": "changed",
+      "question": "If validation rejects the attempt, does run_once already deliver a physical effect?",
+      "author": "Codex; controlled synthetic Rust fixture",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "The physical effect is already delivered before rejected validation.",
+          "evidence": [
+            {
+              "path": "delivery.rs",
+              "needle": "deliver(delivered);"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "expected_support": [
+        "target"
+      ],
+      "ranges": [
+        {
+          "key": "target",
+          "path": "delivery.rs",
+          "first": 3,
+          "last": 7
+        },
+        {
+          "key": "helper",
+          "path": "delivery.rs",
+          "first": 9,
+          "last": 11
+        },
+        {
+          "key": "noise",
+          "path": "delivery.rs",
+          "first": 13,
+          "last": 15
+        }
+      ],
+      "scope_note": "Interpret only the supplied source state; deliberately changed fixtures are not production fixes."
+    },
+    {
+      "id": "evidence.delivery.relabel",
+      "family": "delivery",
+      "repository": "evidence-fixture",
+      "source": "a",
+      "split": "development",
+      "condition": "relabel",
+      "question": "If validation rejects the attempt, does run_once already deliver a physical effect?",
+      "author": "Codex; controlled synthetic Rust fixture",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "The physical effect is not delivered after rejected validation.",
+          "evidence": [
+            {
+              "path": "delivery.rs",
+              "needle": "deliver(delivered);"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "expected_support": [
+        "target"
+      ],
+      "ranges": [
+        {
+          "key": "noise",
+          "path": "delivery.rs",
+          "first": 13,
+          "last": 15
+        },
+        {
+          "key": "helper",
+          "path": "delivery.rs",
+          "first": 9,
+          "last": 11
+        },
+        {
+          "key": "target",
+          "path": "delivery.rs",
+          "first": 3,
+          "last": 7
+        }
+      ],
+      "scope_note": "Interpret only the supplied source state; deliberately changed fixtures are not production fixes."
+    },
+    {
+      "id": "evidence.delivery.missing",
+      "family": "delivery",
+      "repository": "evidence-fixture",
+      "source": "a",
+      "split": "development",
+      "condition": "missing",
+      "question": "If validation rejects the attempt, does run_once already deliver a physical effect?",
+      "author": "Codex; controlled synthetic Rust fixture",
+      "expected_status": "insufficient_evidence",
+      "required_facts": [],
+      "forbidden_claims": [],
+      "expected_support": [],
+      "ranges": [
+        {
+          "key": "helper",
+          "path": "delivery.rs",
+          "first": 9,
+          "last": 11
+        },
+        {
+          "key": "noise",
+          "path": "delivery.rs",
+          "first": 13,
+          "last": 15
+        }
+      ],
+      "scope_note": "The decisive definition is withheld; adjacent helpers do not establish the requested behaviour."
+    },
+    {
+      "id": "evidence.pins.original",
+      "family": "pins",
+      "repository": "evidence-fixture",
+      "source": "a",
+      "split": "development",
+      "condition": "original",
+      "question": "Does finish call release when validation returns an error?",
+      "author": "Codex; controlled synthetic Rust fixture",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "An error from validation still releases the pin.",
+          "evidence": [
+            {
+              "path": "pins.rs",
+              "needle": "release(live_pins);"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "expected_support": [
+        "target"
+      ],
+      "ranges": [
+        {
+          "key": "target",
+          "path": "pins.rs",
+          "first": 3,
+          "last": 7
+        },
+        {
+          "key": "helper",
+          "path": "pins.rs",
+          "first": 9,
+          "last": 11
+        },
+        {
+          "key": "noise",
+          "path": "pins.rs",
+          "first": 13,
+          "last": 15
+        }
+      ],
+      "scope_note": "Interpret only the supplied source state; deliberately changed fixtures are not production fixes."
+    },
+    {
+      "id": "evidence.pins.changed",
+      "family": "pins",
+      "repository": "evidence-fixture",
+      "source": "b",
+      "split": "development",
+      "condition": "changed",
+      "question": "Does finish call release when validation returns an error?",
+      "author": "Codex; controlled synthetic Rust fixture",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "An error from validation does not release the pin.",
+          "evidence": [
+            {
+              "path": "pins.rs",
+              "needle": "release(live_pins);"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "expected_support": [
+        "target"
+      ],
+      "ranges": [
+        {
+          "key": "target",
+          "path": "pins.rs",
+          "first": 3,
+          "last": 9
+        },
+        {
+          "key": "helper",
+          "path": "pins.rs",
+          "first": 11,
+          "last": 13
+        },
+        {
+          "key": "noise",
+          "path": "pins.rs",
+          "first": 15,
+          "last": 17
+        }
+      ],
+      "scope_note": "Interpret only the supplied source state; deliberately changed fixtures are not production fixes."
+    },
+    {
+      "id": "evidence.pins.relabel",
+      "family": "pins",
+      "repository": "evidence-fixture",
+      "source": "a",
+      "split": "development",
+      "condition": "relabel",
+      "question": "Does finish call release when validation returns an error?",
+      "author": "Codex; controlled synthetic Rust fixture",
+      "expected_status": "answered",
+      "required_facts": [
+        {
+          "text": "An error from validation still releases the pin.",
+          "evidence": [
+            {
+              "path": "pins.rs",
+              "needle": "release(live_pins);"
+            }
+          ]
+        }
+      ],
+      "forbidden_claims": [],
+      "expected_support": [
+        "target"
+      ],
+      "ranges": [
+        {
+          "key": "noise",
+          "path": "pins.rs",
+          "first": 13,
+          "last": 15
+        },
+        {
+          "key": "helper",
+          "path": "pins.rs",
+          "first": 9,
+          "last": 11
+        },
+        {
+          "key": "target",
+          "path": "pins.rs",
+          "first": 3,
+          "last": 7
+        }
+      ],
+      "scope_note": "Interpret only the supplied source state; deliberately changed fixtures are not production fixes."
+    },
+    {
+      "id": "evidence.pins.missing",
+      "family": "pins",
+      "repository": "evidence-fixture",
+      "source": "a",
+      "split": "development",
+      "condition": "missing",
+      "question": "Does finish call release when validation returns an error?",
+      "author": "Codex; controlled synthetic Rust fixture",
+      "expected_status": "insufficient_evidence",
+      "required_facts": [],
+      "forbidden_claims": [],
+      "expected_support": [],
+      "ranges": [
+        {
+          "key": "helper",
+          "path": "pins.rs",
+          "first": 9,
+          "last": 11
+        },
+        {
+          "key": "noise",
+          "path": "pins.rs",
+          "first": 13,
+          "last": 15
+        }
+      ],
+      "scope_note": "The decisive definition is withheld; adjacent helpers do not establish the requested behaviour."
+    }
+  ]
+}

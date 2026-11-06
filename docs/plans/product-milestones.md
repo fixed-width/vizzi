@@ -53,6 +53,12 @@ Both variants complete 1/12 guided tasks and 0/3 broad workflows; false insuffic
 statuses increase from 4/15 to 11/15 with the published edit. A custom edit needs a separate
 evidence-use failure hypothesis and development/fresh evaluation split. No planner/chat
 interface or production QA acceptance follows from these diagnostics.
+The [evidence-use study](../../experiments/qa/EVIDENCE_USE_RESULTS.md) now reproduces errors
+in the unchanged 0.8B model when source is permuted or a definition withheld. Its 32
+development responses and eight ungenerated real-source reservations are separate.
+An ambiguous delivery fixture is flagged; the clearer routing/version/pin cases identify
+a behavioural target, not a weight mechanism. Test output-format effects before editing
+tensors, and add count-matched controls before qualifying an edit on reserved questions.
 Retain new maintainer questions for subsequent fresh evaluation. None of these
 agent-graded diagnostics establishes product acceptance.
 

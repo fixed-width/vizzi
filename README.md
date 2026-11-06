@@ -33,6 +33,8 @@ smaller physical batches save little memory and increase latency. A separate
 [weight-space investigation](docs/explanation/model-weight-optimisation.md) considers
 targeted behavioural edits. A [paired test of the published 0.8B patch](experiments/qa/WEIGHT_EDIT_RESULTS.md)
 finds no complete-task improvement under the current CPU Q4 non-thinking conditions.
+The [evidence-use diagnostic](experiments/qa/EVIDENCE_USE_RESULTS.md) identifies repeatable
+errors on small source contrasts; real-code evaluation questions remain ungenerated.
 [Reproduce the latest comparison](experiments/qa/MODEL_COMPARISON.md) or inspect the
 [compact comparison](experiments/qa/COMPACT_RESULTS.md) and [original pilot](experiments/qa/RESULTS.md).
 

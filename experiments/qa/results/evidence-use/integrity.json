@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "developmentCases": 16,
+  "responses": 32,
+  "repeats": 2,
+  "byteIdenticalRepeats": 16,
+  "semanticGradesReusedAfterIdentityChecks": 16,
+  "reservedCases": 8,
+  "reservedGenerations": 0,
+  "onlyDevelopmentSourcesAdmitted": true,
+  "permutationRangeSetsUnchanged": true,
+  "nativeReferencesValid": 32,
+  "sourceOrderChecked": true,
+  "sourceModelRuntimeHashesVerified": true,
+  "historicalArchivesUnchanged": true,
+  "serverClosed": true
+}

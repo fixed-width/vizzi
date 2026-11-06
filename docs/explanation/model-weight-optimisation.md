@@ -66,6 +66,14 @@ unsupported claims and completeness as well as speed; fewer refusals alone is no
 success. The fifteen already-inspected questions remain diagnostics, not fresh held-outs.
 The published patch is evaluated; no custom weight edit has been discovered here.
 
+The [evidence-use diagnostic](../../experiments/qa/EVIDENCE_USE_RESULTS.md) now reproduces
+errors with the unchanged 0.8B control: it can follow an altered condition yet invent a
+call path after source permutation, and assert behaviour when its definition is missing.
+That establishes a narrow behaviour to investigate, not a located circuit. Output grammar
+and presentation need controlled checks before attributing the failure to particular
+weights. A wording ambiguity and presentation-count shortcut in the starter cases are
+documented so they cannot become hidden evaluation assumptions.
+
 ## Practical weight transformations
 
 The current 4B artifact is already Q4_K_M. The

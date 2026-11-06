@@ -30,6 +30,9 @@ distinguishes targeted behavioural edits from compression and runtime allocation
 The [published weight-edit comparison](WEIGHT_EDIT_RESULTS.md) reconstructs and audits a
 matched 0.8B pair. It finds no complete-task improvement in Q4 non-thinking QA; the
 [procedure](WEIGHT_EDIT.md) records artifact construction and evaluation separately.
+The [evidence-use development diagnostic](EVIDENCE_USE_RESULTS.md) now tests source changes,
+excerpt permutation and withheld definitions with the unchanged 0.8B control. It retains
+eight ungenerated real-source reservations and documents an ambiguous synthetic family.
 
 Build with one compiler task and run the normal correctness checks:
 
