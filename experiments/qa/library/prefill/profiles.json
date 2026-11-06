@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "request_timeout_ms": 600000,
+  "profiles": [
+    {
+      "id": "baseline",
+      "batch_tokens": 512,
+      "ubatch_tokens": 128
+    },
+    {
+      "id": "micro32",
+      "batch_tokens": 512,
+      "ubatch_tokens": 32
+    },
+    {
+      "id": "micro8",
+      "batch_tokens": 512,
+      "ubatch_tokens": 8
+    }
+  ],
+  "screen_cases": [
+    "decomp.commit-checks.full"
+  ],
+  "selection": "Fastest successful full response among profiles with observed process-tree PSS <= 4 GiB; no answer-based selection. If none fit, stop.",
+  "validation_cases": "All fifteen frozen decomposition questions on the chosen profile, unchanged source/model/prompts."
+}

@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import {batchArgs,profileLimits,selectedCases,selectResourceProfile} from './runtime-profile.mjs';
+import {server} from './model.mjs';
+assert.deepEqual(batchArgs({}),['--batch-size','512','--ubatch-size','128']);
+assert.deepEqual(batchArgs({batch_tokens:512,ubatch_tokens:32}),['--batch-size','512','--ubatch-size','32']);
+for(const limits of [{batch_tokens:0},{ubatch_tokens:0},{batch_tokens:32,ubatch_tokens:64},{ubatch_tokens:1.5},{batch_tokens:8193}])assert.throws(()=>batchArgs(limits));
+const base={threads:2,context_tokens:8192,request_timeout_ms:360000},config={schema:1,request_timeout_ms:600000,profiles:[{id:'control',batch_tokens:512,ubatch_tokens:128},{id:'micro32',batch_tokens:512,ubatch_tokens:32}]};
+assert.equal(profileLimits(base),base);
+assert.deepEqual(profileLimits(base,config,'micro32'),{...base,request_timeout_ms:600000,batch_tokens:512,ubatch_tokens:32});
+assert.throws(()=>profileLimits(base,config,'absent'));
+assert.throws(()=>profileLimits(base,{...config,profiles:[...config.profiles,config.profiles[0]]},'control'));
+const cases=[{id:'a'},{id:'b'}];assert.equal(selectedCases(cases),cases);assert.deepEqual(selectedCases(cases,'b'),[cases[1]]);assert.throws(()=>selectedCases(cases,'missing'));assert.throws(()=>selectedCases(cases,'a,a'));
+const screen=[{id:'control',success:true,peakPssKiB:5*1024**2,totalMs:100},{id:'micro32',success:true,peakPssKiB:4*1024**2,totalMs:300},{id:'micro8',success:true,peakPssKiB:3*1024**2,totalMs:400}];
+assert.equal(selectResourceProfile(screen).id,'micro32');assert.equal(selectResourceProfile(screen.map(r=>({...r,success:false}))),null);
+assert.equal(selectResourceProfile([{...screen[1],peakPssKiB:4*1024**2+1}]),null);
+await assert.rejects(server('/not-executed','/not-opened',{ubatch_tokens:0},'/not-created'),/invalid physical batch/);
+console.log('prefill profiles: unchanged defaults, valid physical/logical limits, exact case filters and resource-only selection');

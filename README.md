@@ -28,6 +28,10 @@ three exact maintainer workflow probes is completed correctly, even when complet
 is supplied. A 4B candidate improves guided lookups but misses the 4 GiB target and costs
 more latency; earlier receiver-method grading is corrected in an explicit source-audit
 erratum. This remains an isolated experiment, with no chat interface.
+The [physical batch follow-up](experiments/qa/PREFILL_RESULTS.md) still exceeds 4 GiB;
+smaller physical batches save little memory and increase latency. A separate
+[weight-space investigation](docs/explanation/model-weight-optimisation.md) considers
+targeted behavioural edits for the QA task.
 [Reproduce the latest comparison](experiments/qa/MODEL_COMPARISON.md) or inspect the
 [compact comparison](experiments/qa/COMPACT_RESULTS.md) and [original pilot](experiments/qa/RESULTS.md).
 

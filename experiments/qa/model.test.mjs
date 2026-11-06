@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
-import {prompt,schema,generate} from './model.mjs';
+import {prompt,schema,generate,server} from './model.mjs';
 import {createServer} from 'node:http';
+import {mkdtemp,writeFile,chmod,readFile,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
 const hidden='HIDDEN_GOLD_SENTINEL';
 const item={repository:'fixture',question:'Where is the entry?',required_facts:[{text:hidden}],forbidden_claims:[hidden]};
 const context={snapshot:'snapshot',evidence:[{label:1,path:'src/a.rs',start_line:1,end_line:1,text:'fn main() {}'}]};
@@ -34,3 +37,13 @@ try{
  assert.deepEqual(observed[3].messages,observed[2].messages,'field order must not alter prompt text');
  console.log('model streaming: first answer token is observed before complete delivery');
 }finally{await new Promise(resolve=>stub.close(resolve));}
+const directory=await mkdtemp(join(tmpdir(),'vizzi-qa-runtime-profile-'));let child;
+try{
+ const runtime=join(directory,'runtime.cjs'),log=join(directory,'runtime.log');
+ await writeFile(runtime,"#!/usr/bin/env node\nconst http=require('node:http');const args=process.argv.slice(2);console.log(JSON.stringify(args));const at=n=>args[args.indexOf(n)+1];http.createServer((q,r)=>{r.writeHead(200,{'Content-Type':'application/json'});r.end('{}');}).listen(Number(at('--port')),'127.0.0.1');\n");
+ await chmod(runtime,0o755);
+ child=await server(runtime,'unused-model.gguf',{threads:2,context_tokens:8192,batch_tokens:512,ubatch_tokens:32},log);
+ const actual=JSON.parse((await readFile(log,'utf8')).trim());assert.deepEqual(actual,child.args);
+ const at=n=>actual[actual.indexOf(n)+1];assert.equal(at('--batch-size'),'512');assert.equal(at('--ubatch-size'),'32');assert.equal(at('--threads'),'2');assert.equal(at('--threads-batch'),'2');assert.equal(at('--ctx-size'),'8192');assert.equal(at('--device'),'none');assert.equal(at('--n-gpu-layers'),'0');assert.ok(actual.includes('--no-op-offload') && actual.includes('--offline') && actual.includes('--no-mmproj'));
+ console.log('runtime profile: spawned CPU-only server receives the selected logical/physical batch limits');
+}finally{await child?.close();await rm(directory,{recursive:true});}

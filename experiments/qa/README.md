@@ -23,6 +23,10 @@ and narrow results separately and does not implement an automatic planner.
 The [fixed-source model comparison](MODEL_COMPARISON_RESULTS.md) measures a pinned 4B
 candidate against a reproduced live 2B control. Read the [dispatch source-audit erratum](DISPATCH_ERRATUM.md)
 before interpreting older receiver-method grades; original frozen artifacts are retained.
+The [physical batch resource screen](PREFILL_RESULTS.md) keeps 4B weights fixed and
+misses the 4 GiB target at all three sizes; follow its [procedure](PREFILL.md) to repeat it.
+The [weight-space explanation](../../docs/explanation/model-weight-optimisation.md)
+distinguishes targeted behavioural edits from compression and runtime allocation changes.
 
 Build with one compiler task and run the normal correctness checks:
 

@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "sha256": {
+    "baseline/answers.jsonl.gz": "494cc621d23ff5e5588a75755525030edfbf431b2be1d2bda2b75b3f7883d699",
+    "baseline/manifest.json": "b0fce2ded4653dfb6fb29165927c1273cc75f22134f4906c13c4da150d26c399",
+    "baseline/memory.json.gz": "6d643be168c4b5033705c790bf3601d6bfa207172fe3ecd422a7819fc0cf33ce",
+    "baseline/run.log.gz": "66c5607ef55e56c306c9e42cef227b0053a9150a53de995d84cc8e836570f0bd",
+    "baseline/runtime.json": "a002a90744f2c320dddb93fe26730f5eeb80bc5cb8081c4fc6af2f5f0fdc6be7",
+    "baseline/runtime.log.gz": "7c36136c74005c8760c576d22eb1632a928004869d9930b0d1436f046c81360d",
+    "micro32/answers.jsonl.gz": "5d4b5f070c64ccbd211720ffaefb84591a797aa66e3dc4e2aae8fc26437fdbd6",
+    "micro32/manifest.json": "e80e7ff365a2e9c47ce5c72cf2d3962a43fc07c2289eb459aba7f4e5602efdcf",
+    "micro32/memory.json.gz": "77609593933f36f0592a62ca3cea8dac7556a2183f3935ff74edeb459c08c2db",
+    "micro32/run.log.gz": "7a06a977ab65fc706509c23cf62839f4da31633e37733e382e20955f2017794e",
+    "micro32/runtime.json": "f5d396f2396b726534eb539b9ac3a9a95c69b89bdbdcac60d6d2229059a24b44",
+    "micro32/runtime.log.gz": "47575fce0aac4e7c70b9a92b4c9bc3186a541dc3e6712cad2427978545b4a8d5",
+    "micro8/answers.jsonl.gz": "0cd0feaf5781864718f450bb301576c5d79c26ea49080a3c8d5279aa4a855837",
+    "micro8/manifest.json": "02704f5d83a3e9388b318cc6dada8bd0ffcb6929ba357a503d7795e2a8f1b6b6",
+    "micro8/memory.json.gz": "d4fcde0c5aef0d5deaf459483fba641dd9eeadce8a506beeca5b1b1592d8a019",
+    "micro8/run.log.gz": "77203dbaf3e74588abf61c84425ecf05af90641b77e7b1884817ab3bb46f018f",
+    "micro8/runtime.json": "285d2bd1653e5ca63f9a5f35fe33a77dc22d8bee9311642c4ea193142906cf05",
+    "micro8/runtime.log.gz": "21c47b5195ab94fcb66ff2f48b210920e0f544b5ab1cdbdf647e2c7bd7633518",
+    "prepared.json.gz": "9721d8279a0cd58c468246d328a6503ab2f291cc0bb682f66b11c30a979103db",
+    "screen.json": "7cc0e13b6a4464da739a828cb97aba82b5e96fb51b00e4540b3cfc91e3782e5b",
+    "validation/clippy.log.gz": "b2ec2088a14067b3b11fa7f3148203f88baa8ca2cb5fc0f94a4246c671d45925",
+    "validation/node.log.gz": "d5a33d1e4eb9d14c5ea86f7a9896fd7add12dc5a9084fa3066b5f52b8471abb2",
+    "validation/red.log.gz": "67bf9cbf9b6103e876e3efe5f4dc94218c8c8d39339558b99416749cb13ce7c8",
+    "validation/workspace.log.gz": "50a4a02fd5cd4697bca67d39a7ff327e3fcece353c4c014355f9faf320e1e802",
+    "validation.json": "652f1ea0b454fab11de648b3b677eebd9acfe54904729b2c7d2c6430c777e367"
+  }
+}

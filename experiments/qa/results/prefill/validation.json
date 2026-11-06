@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "rust": "453 workspace tests including doctests, workspace formatting and all-target Clippy passed before inference. No Rust or dependency changes.",
+  "node": "13 serial Node test files passed, including profile selection and actual spawned CPU-only arguments. Focused profile test first failed with the missing implementation.",
+  "mutation": "No new native cohort: native code/binaries unchanged. Previous relevant provenance run: 52 caught, 3 unviable; not evidence of mutation coverage for JavaScript.",
+  "conditions": "Only one measured model at a time, two CPU/prefill threads, nice 10, no GPU. Correctness jobs completed before inference.",
+  "identity": "Frozen code/data/binary hashes, source archive, model and runtime hashes reverified. All source contexts/messages/response limits match the prior 4B commit question; only physical batch differs among these three runtime argument lists, apart from ephemeral ports.",
+  "priorArtifacts": "Every checksum in the prior model-comparison archive verified unchanged. Dispatch erratum preserved; current resource answers not semantically graded.",
+  "shutdown": "All three recorded model server PIDs absent after their runs; no viewer/editor launched.",
+  "limits": "Observe-only; no cap enforced. The observer requested_cap_bytes field is an inactive 12-GiB default, not this experiment's four-GiB selection target. One cold-prefix request per profile on a 64-GB host; no laptop qualification, repeated-trial inference or quality claim."
+}

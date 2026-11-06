@@ -43,8 +43,14 @@ raises supported narrow tasks from 3/12 to 5/12 and removes false refusals, but 
 still fail all three original workflows. The [fixed-source 2B/4B comparison](../../experiments/qa/MODEL_COMPARISON_RESULTS.md)
 now improves guided narrow tasks from 5/12 to 12/12, while the 4B model uses 4.76 GiB PSS
 and misses the declared 4 GiB target. Neither completes the original workflows under
-the rubric. A bounded prefill batch/microbatch memory experiment is the next resource
-check; do not add a planner or chat interface on these diagnostics alone.
+the rubric. The [physical batch screen](../../experiments/qa/PREFILL_RESULTS.md) now
+observes 4.658/4.651/4.645 GiB at sizes 128/32/8 with logical batch fixed at 512. No
+profile qualifies, so the cohort stops before full-suite validation. Further allocation
+work needs a separate condition. The maintainer's
+[weight-space programming proposal](../explanation/model-weight-optimisation.md)
+is a distinct quality hypothesis; the released 0.8B repair offers a concrete comparison
+before custom edits. Neither those edits nor a planner/chat interface follow from these
+diagnostics alone.
 Retain new maintainer questions for subsequent fresh evaluation. None of these
 agent-graded diagnostics establishes product acceptance.
 
