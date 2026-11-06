@@ -69,8 +69,11 @@ The published patch is evaluated; no custom weight edit has been discovered here
 The [evidence-use diagnostic](../../experiments/qa/EVIDENCE_USE_RESULTS.md) now reproduces
 errors with the unchanged 0.8B control: it can follow an altered condition yet invent a
 call path after source permutation, and assert behaviour when its definition is missing.
-That establishes a narrow behaviour to investigate, not a located circuit. Output grammar
-and presentation need controlled checks before attributing the failure to particular
+That establishes a narrow behaviour to investigate, not a located circuit. The
+[response-format ablation](../../experiments/qa/DECODING_RESULTS.md) now holds rendered
+prompts fixed: schema removal helps two cases and hurts two others, with no aggregate
+content gain and no usable JSON outputs. Some misreads persist in both conditions.
+Output-contract effects matter without explaining every failure or identifying particular
 weights. A wording ambiguity and presentation-count shortcut in the starter cases are
 documented so they cannot become hidden evaluation assumptions.
 

@@ -35,6 +35,8 @@ targeted behavioural edits. A [paired test of the published 0.8B patch](experime
 finds no complete-task improvement under the current CPU Q4 non-thinking conditions.
 The [evidence-use diagnostic](experiments/qa/EVIDENCE_USE_RESULTS.md) identifies repeatable
 errors on small source contrasts; real-code evaluation questions remain ungenerated.
+A [response-format comparison](experiments/qa/DECODING_RESULTS.md) changes which errors
+occur without improving aggregate content, so schema enforcement remains the default.
 [Reproduce the latest comparison](experiments/qa/MODEL_COMPARISON.md) or inspect the
 [compact comparison](experiments/qa/COMPACT_RESULTS.md) and [original pilot](experiments/qa/RESULTS.md).
 

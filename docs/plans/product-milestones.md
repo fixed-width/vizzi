@@ -59,6 +59,11 @@ development responses and eight ungenerated real-source reservations are separat
 An ambiguous delivery fixture is flagged; the clearer routing/version/pin cases identify
 a behavioural target, not a weight mechanism. Test output-format effects before editing
 tensors, and add count-matched controls before qualifying an edit on reserved questions.
+The [response-format comparison](../../experiments/qa/DECODING_RESULTS.md) now verifies
+equal effective prompts and changes only enforcement. Content remains 14/24 per condition,
+with two unique cases helped and two hurt; unconstrained outputs are all prose and fail
+the structured interface. Keep the default schema. Specific output-contract and surviving
+code-reading failures remain hypotheses, with no weight edit or reserved evaluation yet.
 Retain new maintainer questions for subsequent fresh evaluation. None of these
 agent-graded diagnostics establishes product acceptance.
 

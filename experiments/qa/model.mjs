@@ -42,8 +42,14 @@ export async function server(runtime,model,limits,logPath){
  }catch(e){child.kill('SIGKILL');await log.close();throw e;}
  return {pid:child.pid,args,url,startupMs:performance.now()-started,async close(){if(child.exitCode===null){const ended=once(child,'exit');child.kill('SIGTERM');const timer=setTimeout(()=>child.kill('SIGKILL'),5000);try{await ended;}finally{clearTimeout(timer);}}await log.close();}};
 }
-export async function generate(host,item,context,limits,options={}){
+export function generationRequest(item,context,limits,options={}){
+ const constraint=options.constraint??'schema';assert.ok(['schema','none'].includes(constraint),'invalid output constraint');
  const messages=prompt(item,context,options),body={messages,temperature:0,seed:42,max_tokens:limits.output_tokens,stream:true,stream_options:{include_usage:true},response_format:{type:'json_object',schema:schemaFor(options.protocol,options.citationLimit,options.fieldOrder)},chat_template_kwargs:{enable_thinking:false},cache_prompt:true};
+ if(constraint==='none')delete body.response_format;
+ return body;
+}
+export async function generate(host,item,context,limits,options={}){
+ const body=generationRequest(item,context,limits,options),messages=body.messages;
  const start=performance.now(),response=await fetch(host.url+'/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(limits.request_timeout_ms)});
  if(!response.ok)throw new Error(`${response.status}: ${await response.text()}`);
  let content='',reasoning='',buffer='',firstTokenMs=null,firstAnswerMs=null,usage=null,finish=null;const decoder=new TextDecoder();

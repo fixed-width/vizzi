@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "rust": "453 workspace tests/doctests, formatting and all-target Clippy passed. No Rust/dependency changes or new native mutation cohort.",
+  "node": "15 serial QA test files passed, including actual HTTP request omission, preserved non-JSON SSE output, balanced plan, paired scoring and raw-abstention tests. Focused request/module, rendered-prompt, task-consistency and empty-abstention tests fail first before fixes.",
+  "mutations": "Complete new request builder and decoding-study module: 234 caught, 13 documented equivalents, zero timeouts/errors/no-coverage. Raw score 94.74; exit 1 at threshold 100. Server/streaming and runner orchestration are outside mutation scope; HTTP and native integration are separate evidence.",
+  "preflight": "All twelve response-format pairs render identical prompts through the pinned runtime using the exact request bodies. All twenty-four generated pair prompt-token counts match. Only response_format differs between each pair.",
+  "measurement": "One owned CPU-only server, two threads, serial requests, nice 10, all correctness/mutation/build jobs finished beforehand. Both indexes and model server close. No viewer/editor or inspected project build invoked.",
+  "assessment": "24 live schema controls exactly reproduce prior context/messages/raw/native results. Eleven unparsed repeat outputs are reused after identity checks; thirteen changed unconstrained outputs manually reviewed. No JSON object extraction, fence removal or repair.",
+  "limitations": "Known synthetic development cases and author grading, no reserved generations or model weight edit. Prose factual content is distinct from a usable native-bound response. The omitted condition has no newly added format examples; not an optimised prompt comparison.",
+  "scope": "Observe-only process-tree sampling on a larger host. No enforced cap, laptop/editor emulation, per-arm peak or independent repeated-trial inference.",
+  "testAndConfigSha256": {
+    "experiments/qa/decoding.test.mjs": "2a6693d7cce3cd5a4180317f46c554ebe956b06e96cf7cb8d4a8ab16c4018a76",
+    "experiments/qa/model.test.mjs": "ac7be3f5f9732b53e50fcda3c3e2c25ec932df82b986e0b08b72fd08922ee728",
+    "experiments/qa/decoding-stryker.config.json": "d15a61fc970944ac197a43234c2026fdfd913cf99c40e504bb35a70327f7de94",
+    "package-lock.json": "e7ff76f17d7408c0b6dfd075c564ba31fec03cc838be612a008cf5bd343e291f"
+  }
+}

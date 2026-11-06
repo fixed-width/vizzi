@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "cases": 12,
+  "responses": 48,
+  "renderedRequestPairs": 12,
+  "equalRenderedPrompts": 12,
+  "pairedMessagesAndSource": 24,
+  "matchingPromptTokenCounts": 24,
+  "requestDifferenceOnlyResponseFormat": true,
+  "reservedGenerations": 0,
+  "deliveryExcludedBeforeInference": true,
+  "sourceModelRuntimeHashesVerified": true,
+  "historicalPayloadChecksumsUnchanged": true,
+  "ownedServerClosed": true
+}

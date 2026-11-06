@@ -1,0 +1,535 @@
+{
+  "schema": 1,
+  "grader": "Codex, source-aware question/oracle author; preliminary manual comparison, not independent acceptance",
+  "limitations": [
+    "Twelve previously observed synthetic development cases, two passes; reserved real-source cases unrun.",
+    "Raw content is assessed without JSON repair. Positive code facts/unsupported code claims are separate from status and citation format. Missing cases require an explicit raw-abstention judgment.",
+    "The unconstrained prompt still requests JSON but receives no new schema examples; this is not an optimised prose/JSON prompt comparison.",
+    "Correct predicate prose with a false insufficient-evidence ending is credited for code content and recorded as a separate calibration problem.",
+    "No held-out accuracy, weight localisation or production acceptance is established."
+  ],
+  "grades": [
+    {
+      "id": "evidence.routing.original/repeat-1/schema",
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct dispatch receiver and validate call, directly supported by target label 1. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.routing.original/repeat-1/unconstrained",
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Correct dispatch receiver and validate call with accurate file/line descriptions. No supplied integer-label citations or requested JSON. Repeat-2 wording is changed and manually reviewed; requested facts remain correct.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.routing.changed/repeat-1/unconstrained",
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Correct swapped roles: validate receives Apply and calls dispatch. Token==0 explanation matches the helper. File/line descriptions are accurate, but no integer labels or JSON are supplied.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.routing.changed/repeat-1/schema",
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correctly follows the swapped roles: validate receives Apply and calls dispatch. Labels 1/2 support the receiver and token check; ancillary zero-token description is true. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.routing.relabel/repeat-1/schema",
+      "facts": [
+        "contradicted",
+        "contradicted"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Names validate as the protocol receiver.",
+        "Invents a call to pending as token validation; pending merely returns zero."
+      ],
+      "notes": "Wrong roles/call after source order changes. Decisive dispatch definition is label 3; cited label 1 only defines pending. False insufficient-evidence status. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused.",
+      "roleConfusion": true
+    },
+    {
+      "id": "evidence.routing.relabel/repeat-1/unconstrained",
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Correct dispatch-to-validate flow after permutation, unlike the schema arm. The answer locates the decisive definition and token validator accurately by line range. Integer-label citations and requested JSON are absent.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.routing.missing/repeat-1/unconstrained",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Claims the visible validate(token) handles Request::Apply and calls pending despite no receiver definition and no such call."
+      ],
+      "notes": "Specific receiver/call assertions are not established. The visible helper only checks token==0. Its name and the constant pending function do not justify the invented flow.",
+      "roleConfusion": true,
+      "rawAbstention": false
+    },
+    {
+      "id": "evidence.routing.missing/repeat-1/schema",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Claims validate handles Apply and calls pending although the receiver definition is withheld."
+      ],
+      "notes": "Expected insufficient evidence. The visible token validator does not handle Request or call pending. Answered status and specific invented flow fail abstention. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused.",
+      "roleConfusion": true,
+      "rawAbstention": false
+    },
+    {
+      "id": "evidence.versions.original/repeat-1/schema",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct strict greater-than error condition; equality is excluded by this strict relation. Ancillary propagation/describe statements match sources. Label 1 supports the requested predicate. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.versions.original/repeat-1/unconstrained",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct strict > rejection. Inline source [1] directly supports the requested condition. The extra source-3 format! rationale is not proof of comparison behaviour, but does not alter the stated predicate. Citation reasoning is distinct from the correct code fact.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.versions.changed/repeat-1/unconstrained",
+      "facts": [
+        "contradicted"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Says Err occurs when requested < committed is false, then says requested >= committed succeeds, then concludes not-less-than triggers error."
+      ],
+      "notes": "The opening strict-less-than sentence is correct, but the full answer contradicts it and the supplied branch. Grade the entire output, not only the opening sentence. Raw ending falsely claims insufficient evidence.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.versions.changed/repeat-1/schema",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correctly changes to requested < committed and explicitly accepts equality. Target label 1 supports the new rule. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.versions.relabel/repeat-1/schema",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct greater-than rule and target label 3 after permutation. Err(\"rejected\") is accepted as an error value description rather than a claim about a named Rust type. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.versions.relabel/repeat-1/unconstrained",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "The actual predicate/else behaviour is described correctly and supported by source [3]. Its ending falsely claims the relationship is insufficiently established despite explaining it. For the predeclared content metric, correct code facts are credited separately from this raw answerability/calibration error.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.versions.missing/repeat-1/unconstrained",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Invents a less-than validation condition and a greater-or-equal rejection inside commit_request, which only delegates to unseen check_requested."
+      ],
+      "notes": "No guard definition is supplied. The asserted relation is unsupported and internally inconsistent; there is no explicit raw abstention.",
+      "roleConfusion": false,
+      "rawAbstention": false
+    },
+    {
+      "id": "evidence.versions.missing/repeat-1/schema",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Asserts greater-than and then less-than-or-equal rejection rules without the check_requested definition."
+      ],
+      "notes": "The helper delegates to an unseen check; neither relation can be established. The answer is also internally inconsistent and falsely reports answered. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused.",
+      "roleConfusion": false,
+      "rawAbstention": false
+    },
+    {
+      "id": "evidence.pins.original/repeat-1/schema",
+      "facts": [
+        "contradicted"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Answers No despite the unconditional release call after validate."
+      ],
+      "notes": "The target calls release even if result is Err. A bare No does not establish the correct behaviour or explain any missing evidence. False insufficient status. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.pins.original/repeat-1/unconstrained",
+      "facts": [
+        "contradicted"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Claims finish calls release only when valid is true; the supplied finish releases unconditionally after capturing the validation result."
+      ],
+      "notes": "False conditional and false claim that the evidence cannot establish the Err behaviour. This failure persists without the schema.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.pins.changed/repeat-1/unconstrained",
+      "facts": [
+        "missing"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Claims finish does not check the validation result before invoking release, despite its explicit result.is_ok guard."
+      ],
+      "notes": "It mentions successful validation but never gives the requested No for an error and contradicts the guard when denying that the return value is checked. Raw insufficient-evidence conclusion is false.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.pins.changed/repeat-1/schema",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "No is correct: result.is_ok guards release, so an Err skips it. Label 1 is the decisive function. Task fails only because status falsely says insufficient evidence. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.pins.relabel/repeat-1/schema",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Yes is correct for unconditional release, but cited label 1 only defines validate. Target finish is label 3. This is correct prose with unsupported citation selection. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.pins.relabel/repeat-1/unconstrained",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Correct explicit unconditional release, including after validation error. Describing finish as operating through release is accepted as delegation rather than an invented direct decrement expression. Raw ending falsely says insufficient evidence. No integer-label citation is supplied.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.pins.missing/repeat-1/unconstrained",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Correctly explains that release and validate definitions do not reveal whether missing finish invokes release on error; explicit insufficient-evidence conclusion. This improves on the schema arm bare No.",
+      "roleConfusion": false,
+      "rawAbstention": true
+    },
+    {
+      "id": "evidence.pins.missing/repeat-1/schema",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Gives a definitive No to the release-on-error question while finish is withheld."
+      ],
+      "notes": "The insufficient-evidence status is correct, but bare No does not explain the missing definition and reads as an unsupported behavioural conclusion. This interpretation is explicitly recorded for human review. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused.",
+      "roleConfusion": false,
+      "rawAbstention": false
+    },
+    {
+      "id": "evidence.routing.original/repeat-2/unconstrained",
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Correct dispatch receiver and validate call with accurate file/line descriptions. No supplied integer-label citations or requested JSON. Repeat-2 wording is changed and manually reviewed; requested facts remain correct.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.routing.original/repeat-2/schema",
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct dispatch receiver and validate call, directly supported by target label 1. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.routing.changed/repeat-2/schema",
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correctly follows the swapped roles: validate receives Apply and calls dispatch. Labels 1/2 support the receiver and token check; ancillary zero-token description is true. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.routing.changed/repeat-2/unconstrained",
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Correct swapped roles: validate receives Apply and calls dispatch. Token==0 explanation matches the helper. File/line descriptions are accurate, but no integer labels or JSON are supplied. Repeat 2 is byte-identical after context/message/native-result checks; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.routing.relabel/repeat-2/unconstrained",
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Correct dispatch-to-validate flow after permutation, unlike the schema arm. The answer locates the decisive definition and token validator accurately by line range. Integer-label citations and requested JSON are absent. Repeat 2 is byte-identical after context/message/native-result checks; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.routing.relabel/repeat-2/schema",
+      "facts": [
+        "contradicted",
+        "contradicted"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Names validate as the protocol receiver.",
+        "Invents a call to pending as token validation; pending merely returns zero."
+      ],
+      "notes": "Wrong roles/call after source order changes. Decisive dispatch definition is label 3; cited label 1 only defines pending. False insufficient-evidence status. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused.",
+      "roleConfusion": true
+    },
+    {
+      "id": "evidence.routing.missing/repeat-2/schema",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Claims validate handles Apply and calls pending although the receiver definition is withheld."
+      ],
+      "notes": "Expected insufficient evidence. The visible token validator does not handle Request or call pending. Answered status and specific invented flow fail abstention. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused.",
+      "roleConfusion": true,
+      "rawAbstention": false
+    },
+    {
+      "id": "evidence.routing.missing/repeat-2/unconstrained",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Claims the visible validate(token) handles Request::Apply and calls pending despite no receiver definition and no such call."
+      ],
+      "notes": "Specific receiver/call assertions are not established. The visible helper only checks token==0. Its name and the constant pending function do not justify the invented flow. Repeat 2 is byte-identical after context/message/native-result checks; grade reused.",
+      "roleConfusion": true,
+      "rawAbstention": false
+    },
+    {
+      "id": "evidence.versions.original/repeat-2/unconstrained",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct strict > rejection. Inline source [1] directly supports the requested condition. The extra source-3 format! rationale is not proof of comparison behaviour, but does not alter the stated predicate. Citation reasoning is distinct from the correct code fact. Repeat 2 is byte-identical after context/message/native-result checks; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.versions.original/repeat-2/schema",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct strict greater-than error condition; equality is excluded by this strict relation. Ancillary propagation/describe statements match sources. Label 1 supports the requested predicate. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.versions.changed/repeat-2/schema",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correctly changes to requested < committed and explicitly accepts equality. Target label 1 supports the new rule. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.versions.changed/repeat-2/unconstrained",
+      "facts": [
+        "contradicted"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Says Err occurs when requested < committed is false, then says requested >= committed succeeds, then concludes not-less-than triggers error."
+      ],
+      "notes": "The opening strict-less-than sentence is correct, but the full answer contradicts it and the supplied branch. Grade the entire output, not only the opening sentence. Raw ending falsely claims insufficient evidence. Repeat 2 is byte-identical after context/message/native-result checks; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.versions.relabel/repeat-2/unconstrained",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "The actual predicate/else behaviour is described correctly and supported by source [3]. Its ending falsely claims the relationship is insufficiently established despite explaining it. For the predeclared content metric, correct code facts are credited separately from this raw answerability/calibration error. Repeat 2 is byte-identical after context/message/native-result checks; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.versions.relabel/repeat-2/schema",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct greater-than rule and target label 3 after permutation. Err(\"rejected\") is accepted as an error value description rather than a claim about a named Rust type. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.versions.missing/repeat-2/schema",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Asserts greater-than and then less-than-or-equal rejection rules without the check_requested definition."
+      ],
+      "notes": "The helper delegates to an unseen check; neither relation can be established. The answer is also internally inconsistent and falsely reports answered. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused.",
+      "roleConfusion": false,
+      "rawAbstention": false
+    },
+    {
+      "id": "evidence.versions.missing/repeat-2/unconstrained",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Invents a less-than validation condition and a greater-or-equal rejection inside commit_request, which only delegates to unseen check_requested."
+      ],
+      "notes": "No guard definition is supplied. The asserted relation is unsupported and internally inconsistent; there is no explicit raw abstention. Repeat 2 is byte-identical after context/message/native-result checks; grade reused.",
+      "roleConfusion": false,
+      "rawAbstention": false
+    },
+    {
+      "id": "evidence.pins.original/repeat-2/unconstrained",
+      "facts": [
+        "contradicted"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Claims finish calls release only when valid is true; the supplied finish releases unconditionally after capturing the validation result."
+      ],
+      "notes": "False conditional and false claim that the evidence cannot establish the Err behaviour. This failure persists without the schema. Repeat 2 is byte-identical after context/message/native-result checks; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.pins.original/repeat-2/schema",
+      "facts": [
+        "contradicted"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Answers No despite the unconditional release call after validate."
+      ],
+      "notes": "The target calls release even if result is Err. A bare No does not establish the correct behaviour or explain any missing evidence. False insufficient status. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.pins.changed/repeat-2/schema",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "No is correct: result.is_ok guards release, so an Err skips it. Label 1 is the decisive function. Task fails only because status falsely says insufficient evidence. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.pins.changed/repeat-2/unconstrained",
+      "facts": [
+        "missing"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Claims finish does not check the validation result before invoking release, despite its explicit result.is_ok guard."
+      ],
+      "notes": "It mentions successful validation but never gives the requested No for an error and contradicts the guard when denying that the return value is checked. Raw insufficient-evidence conclusion is false. Repeat 2 is byte-identical after context/message/native-result checks; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.pins.relabel/repeat-2/unconstrained",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Correct explicit unconditional release, including after validation error. Describing finish as operating through release is accepted as delegation rather than an invented direct decrement expression. Raw ending falsely says insufficient evidence. No integer-label citation is supplied. Repeat 2 is byte-identical after context/message/native-result checks; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.pins.relabel/repeat-2/schema",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Yes is correct for unconditional release, but cited label 1 only defines validate. Target finish is label 3. This is correct prose with unsupported citation selection. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused.",
+      "roleConfusion": false
+    },
+    {
+      "id": "evidence.pins.missing/repeat-2/schema",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Gives a definitive No to the release-on-error question while finish is withheld."
+      ],
+      "notes": "The insufficient-evidence status is correct, but bare No does not explain the missing definition and reads as an unsupported behavioural conclusion. This interpretation is explicitly recorded for human review. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused.",
+      "roleConfusion": false,
+      "rawAbstention": false
+    },
+    {
+      "id": "evidence.pins.missing/repeat-2/unconstrained",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Correctly explains that release and validate definitions do not reveal whether missing finish invokes release on error; explicit insufficient-evidence conclusion. This improves on the schema arm bare No. Repeat 2 is byte-identical after context/message/native-result checks; grade reused.",
+      "roleConfusion": false,
+      "rawAbstention": true
+    }
+  ]
+}

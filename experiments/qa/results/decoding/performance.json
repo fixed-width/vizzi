@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "arms": [
+    {
+      "arm": "schema",
+      "responses": 24,
+      "medianMs": 4392.585778000001,
+      "p95Ms": 7247.41337200001,
+      "medianFirstOutputMs": 904.2131740000041,
+      "medianOutputTokens": 60.5,
+      "runtimeErrors": 0,
+      "parseErrors": 0,
+      "truncated": 0
+    },
+    {
+      "arm": "unconstrained",
+      "responses": 24,
+      "medianMs": 8012.3300915,
+      "p95Ms": 12713.030425999983,
+      "medianFirstOutputMs": 801.0970879999913,
+      "medianOutputTokens": 146,
+      "runtimeErrors": 0,
+      "parseErrors": 24,
+      "truncated": 0
+    }
+  ],
+  "cohort": {
+    "observedPeakPssGiB": 1.1298227310180664,
+    "peakPssKiB": 1184705,
+    "wallMs": 314165.98832199996,
+    "startupMs": 846.110362,
+    "capVerified": false,
+    "intervalMs": 250
+  },
+  "limitations": [
+    "One interleaved server and one whole-cohort peak, not per-arm memory.",
+    "Balanced first-arm order, prefix caching and two greedy passes; not independent samples or latency qualification.",
+    "First output includes JSON preamble in the schema arm; it is not necessarily the first user-visible answer word."
+  ]
+}

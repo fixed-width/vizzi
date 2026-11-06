@@ -1,0 +1,26 @@
+{
+  "$schema": "../../node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "mutate": ["experiments/qa/model.mjs:45-50", "experiments/qa/decoding-study.mjs"],
+  "files": [
+    "package.json",
+    "experiments/qa/decoding-study.mjs",
+    "experiments/qa/decoding.test.mjs",
+    "experiments/qa/evidence-study.mjs",
+    "experiments/qa/model.mjs",
+    "experiments/qa/runtime-profile.mjs",
+    "experiments/qa/compact-assess.mjs",
+    "experiments/qa/compact-support.mjs",
+    "experiments/qa/support.mjs",
+    "experiments/qa/library/evidence-use/*.json",
+    "experiments/qa/library/decoding/*.json"
+  ],
+  "testRunner": "command",
+  "commandRunner": {"command": "node experiments/qa/decoding.test.mjs"},
+  "coverageAnalysis": "off",
+  "concurrency": 1,
+  "timeoutMS": 5000,
+  "reporters": ["clear-text", "json"],
+  "clearTextReporter": {"reportMutants": false, "logTests": false},
+  "jsonReporter": {"fileName": "/tmp/vizzi-qa-decoding-mutations.json"},
+  "thresholds": {"break": 100}
+}

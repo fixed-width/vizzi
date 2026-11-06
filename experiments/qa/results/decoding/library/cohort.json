@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "kind": "response_format_ablation",
+  "repeats": 2,
+  "caseIds": [
+    "evidence.routing.original",
+    "evidence.routing.changed",
+    "evidence.routing.relabel",
+    "evidence.routing.missing",
+    "evidence.versions.original",
+    "evidence.versions.changed",
+    "evidence.versions.relabel",
+    "evidence.versions.missing",
+    "evidence.pins.original",
+    "evidence.pins.changed",
+    "evidence.pins.relabel",
+    "evidence.pins.missing"
+  ],
+  "arms": [
+    {"id": "schema", "constraint": "schema"},
+    {"id": "unconstrained", "constraint": "none"}
+  ],
+  "selection": "Previously identified clearer development families; delivery wording ambiguity excluded before inference. No reserved generation.",
+  "prompt": "Identical existing JSON-requesting messages; only response_format is omitted in the unconstrained arm.",
+  "preflight": "Rendered prompts must match before any generation; preserve all raw output without repairs."
+}

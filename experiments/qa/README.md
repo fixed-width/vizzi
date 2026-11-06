@@ -33,6 +33,9 @@ matched 0.8B pair. It finds no complete-task improvement in Q4 non-thinking QA; 
 The [evidence-use development diagnostic](EVIDENCE_USE_RESULTS.md) now tests source changes,
 excerpt permutation and withheld definitions with the unchanged 0.8B control. It retains
 eight ungenerated real-source reservations and documents an ambiguous synthetic family.
+The [response-format ablation](DECODING_RESULTS.md) keeps effective prompts fixed and
+finds mixed content changes without aggregate improvement when schema enforcement is
+removed. All unconstrained outputs are prose; the existing default remains enabled.
 
 Build with one compiler task and run the normal correctness checks:
 

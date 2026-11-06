@@ -13,8 +13,12 @@ const observed=[];
 const stub=createServer((request,response)=>{
  let body='';request.on('data',b=>body+=b);
  request.on('end',()=>{
-  const data=JSON.parse(body);observed.push(data);const answerFirst=data.response_format.schema.required[0]==='answer';
+  const data=JSON.parse(body);observed.push(data);const answerFirst=data.response_format?.schema.required[0]==='answer';
   response.setHeader('content-type','text/event-stream');response.flushHeaders();
+  if(!data.response_format){
+   response.write('data: '+JSON.stringify({choices:[{delta:{content:'The definition '}}]})+'\n\n');
+   setTimeout(()=>{response.write('data: '+JSON.stringify({choices:[{delta:{content:'is missing.'},finish_reason:'stop'}],usage:{prompt_tokens:10,completion_tokens:4}})+'\n\n');response.end('data: [DONE]\n\n');},200);return;
+  }
   response.write('data: '+JSON.stringify({choices:[{delta:{content:answerFirst?'{"answer":"Not established",':'{"status":"insufficient_evidence",'}}]})+'\n\n');
   setTimeout(()=>{response.write('data: '+JSON.stringify({choices:[{delta:{content:answerFirst?'"status":"insufficient_evidence","citations":[]}':'"answer":"Not established","citations":[]}'},finish_reason:'stop'}],usage:{prompt_tokens:10,completion_tokens:10}})+'\n\n');response.end('data: [DONE]\n\n');},200);
  });
@@ -29,9 +33,13 @@ try{
  assert.equal(longer.answer.status,'insufficient_evidence');
  const reordered=await generate({url:`http://127.0.0.1:${stub.address().port}`},item,context,{request_timeout_ms:3000,output_tokens:1024},{protocol:'ids',metadata:true,wordLimit:300,citationLimit:8,fieldOrder:'answer_first'});
  assert.deepEqual(Object.keys(reordered.answer),['answer','status','citations']);
- for(const [i,data]of observed.entries()){assert.equal(data.temperature,0);assert.equal(data.seed,42);assert.deepEqual(Object.keys(data.response_format.schema.properties),i===3?['answer','status','citations']:['status','answer','citations']);assert.ok(!JSON.stringify(data.messages).includes(hidden));}
- assert.deepEqual(observed.map(d=>d.max_tokens),[384,384,1024,1024]);
- assert.deepEqual(observed.map(d=>d.response_format.schema.properties.citations.maxItems),[4,4,8,8]);
+ const raw=await generate({url:`http://127.0.0.1:${stub.address().port}`},item,context,{request_timeout_ms:3000,output_tokens:1024},{protocol:'ids',metadata:true,wordLimit:300,citationLimit:8,fieldOrder:'answer_first',constraint:'none'});
+ assert.equal(raw.raw,'The definition is missing.');assert.equal(raw.answer,undefined);assert.ok(raw.formatError);assert.equal(raw.finish,'stop');
+ const {response_format,...expected}=observed[3];assert.deepEqual(observed[4],expected,'actual unconstrained HTTP request only omits response_format');
+ await assert.rejects(generate({url:`http://127.0.0.1:${stub.address().port}`},item,context,{request_timeout_ms:3000,output_tokens:1024},{constraint:'invalid'}),/invalid output constraint/);assert.equal(observed.length,5);
+ for(const [i,data]of observed.entries()){assert.equal(data.temperature,0);assert.equal(data.seed,42);if(i<4)assert.deepEqual(Object.keys(data.response_format.schema.properties),i===3?['answer','status','citations']:['status','answer','citations']);assert.ok(!JSON.stringify(data.messages).includes(hidden));}
+ assert.deepEqual(observed.map(d=>d.max_tokens),[384,384,1024,1024,1024]);
+ assert.deepEqual(observed.slice(0,4).map(d=>d.response_format.schema.properties.citations.maxItems),[4,4,8,8]);
  assert.equal(observed[2].messages[0].content,observed[1].messages[0].content.replace('100 words','300 words'));
  assert.deepEqual(observed[2].messages[1],observed[1].messages[1]);
  assert.deepEqual(observed[3].messages,observed[2].messages,'field order must not alter prompt text');
