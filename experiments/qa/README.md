@@ -39,6 +39,11 @@ removed. All unconstrained outputs are prose; the existing default remains enabl
 The [generic-object comparison](JSON_OBJECT_RESULTS.md) restores JSON syntax but reduces
 raw content correctness from 14/24 to 8/24 and yields no host-conforming responses.
 This closes simple enforcement relaxation; the full-schema default remains unchanged.
+The [extra-row mutation erratum](MUTATION_ERRATUM.md) corrects two earlier equivalence
+classifications without changing experiment answers or scores.
+The [conditional token probe](TOKEN_PROBE_RESULTS.md) then tests the persistent pin error:
+the source contrast moves Yes/No margins in the expected direction but does not flip the
+unconditional original, and source permutation has a larger effect. No edit is selected.
 
 Build with one compiler task and run the normal correctness checks:
 

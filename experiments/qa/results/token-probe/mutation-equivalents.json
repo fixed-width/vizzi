@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "sourceSha256": "be2070d8ffaa67a7385b89e7ac66e5393098fa3bd9f5371bfe72564f2a8c3483",
+  "scope": "Whole token-probe-support.mjs, including plan/messages/request/probability parser/effects; runner transport outside mutation scope.",
+  "counts": {
+    "caught": 262,
+    "equivalentSurvivors": 2,
+    "timeouts": 0,
+    "errors": 0,
+    "noCoverage": 0
+  },
+  "rawScore": 99.24,
+  "rawToolExit": 1,
+  "exclusions": [
+    {
+      "id": "199",
+      "location": {
+        "end": {
+          "column": 95,
+          "line": 33
+        },
+        "start": {
+          "column": 85,
+          "line": 33
+        }
+      },
+      "mutator": "ConditionalExpression",
+      "replacement": "true",
+      "reason": "After the earlier both-observed branch fails, a finite No value already implies Yes is censored; this left-hand null check is redundant for parser-produced finite/null choices."
+    },
+    {
+      "id": "261",
+      "location": {
+        "end": {
+          "column": 61,
+          "line": 44
+        },
+        "start": {
+          "column": 48,
+          "line": 44
+        }
+      },
+      "mutator": "CallExpression",
+      "replacement": ";",
+      "reason": "A missing planned row still fails at r.case access; only rejection diagnostics change."
+    }
+  ]
+}

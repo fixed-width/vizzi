@@ -81,6 +81,12 @@ JSON but lowers content correctness to 8/24 versus 14/24 for the full schema, wi
 host-conforming responses. Relaxing enforcement is not a useful substitute here. Remaining
 format-independent code/evidence errors are a separate model-side investigation target;
 the comparisons still do not identify a tensor edit.
+The [pin-release token probe](../../experiments/qa/TOKEN_PROBE_RESULTS.md) now finds that
+the source contrast shifts selected Yes/No log-probability margins in the expected
+direction, while No still wins for the unconditional original. Layout shifts are larger
+in this example, and explicit choice instructions do not recover the expected preference.
+These conditional lexical readouts expose sensitivity, not a causal parameter mechanism.
+A matched BF16/Q4 control is useful before attributing the error to editable weight features.
 
 ## Practical weight transformations
 

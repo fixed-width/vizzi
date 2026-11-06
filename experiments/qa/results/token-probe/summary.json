@@ -1,0 +1,374 @@
+{
+  "schema": 1,
+  "observations": 32,
+  "uniqueConditions": 16,
+  "exactRepeatedMeasurements": 16,
+  "censoredChoiceEntries": 8,
+  "table": [
+    {
+      "case": "evidence.pins.original",
+      "system": "production",
+      "prefix": "json",
+      "expected": "Yes",
+      "marginYesNo": {
+        "value": -0.1785184144973755,
+        "lower": -0.1785184144973755,
+        "upper": -0.1785184144973755
+      },
+      "globalTopToken": "No",
+      "globalTopId": 2665,
+      "observedChoiceMass": 0.5258744052365635,
+      "censoredChoices": []
+    },
+    {
+      "case": "evidence.pins.original",
+      "system": "production",
+      "prefix": "prose",
+      "expected": "Yes",
+      "marginYesNo": {
+        "value": -0.580053448677063,
+        "lower": -0.580053448677063,
+        "upper": -0.580053448677063
+      },
+      "globalTopToken": " No",
+      "globalTopId": 2233,
+      "observedChoiceMass": 0.5619757281557498,
+      "censoredChoices": [
+        "Unknown"
+      ]
+    },
+    {
+      "case": "evidence.pins.original",
+      "system": "diagnostic",
+      "prefix": "json",
+      "expected": "Yes",
+      "marginYesNo": {
+        "value": -1.2825469970703125,
+        "lower": -1.2825469970703125,
+        "upper": -1.2825469970703125
+      },
+      "globalTopToken": "No",
+      "globalTopId": 2665,
+      "observedChoiceMass": 0.9106993359027313,
+      "censoredChoices": []
+    },
+    {
+      "case": "evidence.pins.original",
+      "system": "diagnostic",
+      "prefix": "prose",
+      "expected": "Yes",
+      "marginYesNo": {
+        "value": -0.6542129814624786,
+        "lower": -0.6542129814624786,
+        "upper": -0.6542129814624786
+      },
+      "globalTopToken": " No",
+      "globalTopId": 2233,
+      "observedChoiceMass": 0.94284426204794,
+      "censoredChoices": []
+    },
+    {
+      "case": "evidence.pins.changed",
+      "system": "production",
+      "prefix": "json",
+      "expected": "No",
+      "marginYesNo": {
+        "value": -0.5258215665817261,
+        "lower": -0.5258215665817261,
+        "upper": -0.5258215665817261
+      },
+      "globalTopToken": "No",
+      "globalTopId": 2665,
+      "observedChoiceMass": 0.44703823613594806,
+      "censoredChoices": []
+    },
+    {
+      "case": "evidence.pins.changed",
+      "system": "production",
+      "prefix": "prose",
+      "expected": "No",
+      "marginYesNo": {
+        "value": -0.8648375868797302,
+        "lower": -0.8648375868797302,
+        "upper": -0.8648375868797302
+      },
+      "globalTopToken": " No",
+      "globalTopId": 2233,
+      "observedChoiceMass": 0.5677231085733898,
+      "censoredChoices": [
+        "Unknown"
+      ]
+    },
+    {
+      "case": "evidence.pins.changed",
+      "system": "diagnostic",
+      "prefix": "json",
+      "expected": "No",
+      "marginYesNo": {
+        "value": -1.4215775728225708,
+        "lower": -1.4215775728225708,
+        "upper": -1.4215775728225708
+      },
+      "globalTopToken": "No",
+      "globalTopId": 2665,
+      "observedChoiceMass": 0.8781574635234278,
+      "censoredChoices": []
+    },
+    {
+      "case": "evidence.pins.changed",
+      "system": "diagnostic",
+      "prefix": "prose",
+      "expected": "No",
+      "marginYesNo": {
+        "value": -0.7530669867992401,
+        "lower": -0.7530669867992401,
+        "upper": -0.7530669867992401
+      },
+      "globalTopToken": " No",
+      "globalTopId": 2233,
+      "observedChoiceMass": 0.948273248769977,
+      "censoredChoices": []
+    },
+    {
+      "case": "evidence.pins.relabel",
+      "system": "production",
+      "prefix": "json",
+      "expected": "Yes",
+      "marginYesNo": {
+        "value": 0.7180252075195312,
+        "lower": 0.7180252075195312,
+        "upper": 0.7180252075195312
+      },
+      "globalTopToken": "Yes",
+      "globalTopId": 9175,
+      "observedChoiceMass": 0.5019362181093693,
+      "censoredChoices": []
+    },
+    {
+      "case": "evidence.pins.relabel",
+      "system": "production",
+      "prefix": "prose",
+      "expected": "Yes",
+      "marginYesNo": {
+        "value": 0.36614990234375,
+        "lower": 0.36614990234375,
+        "upper": 0.36614990234375
+      },
+      "globalTopToken": " Yes",
+      "globalTopId": 7179,
+      "observedChoiceMass": 0.46823268191176676,
+      "censoredChoices": [
+        "Unknown"
+      ]
+    },
+    {
+      "case": "evidence.pins.relabel",
+      "system": "diagnostic",
+      "prefix": "json",
+      "expected": "Yes",
+      "marginYesNo": {
+        "value": -0.4682197570800781,
+        "lower": -0.4682197570800781,
+        "upper": -0.4682197570800781
+      },
+      "globalTopToken": "No",
+      "globalTopId": 2665,
+      "observedChoiceMass": 0.9145347722332609,
+      "censoredChoices": []
+    },
+    {
+      "case": "evidence.pins.relabel",
+      "system": "diagnostic",
+      "prefix": "prose",
+      "expected": "Yes",
+      "marginYesNo": {
+        "value": 0.09820938110351562,
+        "lower": 0.09820938110351562,
+        "upper": 0.09820938110351562
+      },
+      "globalTopToken": " Yes",
+      "globalTopId": 7179,
+      "observedChoiceMass": 0.9479496181224357,
+      "censoredChoices": []
+    },
+    {
+      "case": "evidence.pins.missing",
+      "system": "production",
+      "prefix": "json",
+      "expected": "Unknown",
+      "marginYesNo": {
+        "value": 0.10889434814453125,
+        "lower": 0.10889434814453125,
+        "upper": 0.10889434814453125
+      },
+      "globalTopToken": "Yes",
+      "globalTopId": 9175,
+      "observedChoiceMass": 0.497261436424807,
+      "censoredChoices": []
+    },
+    {
+      "case": "evidence.pins.missing",
+      "system": "production",
+      "prefix": "prose",
+      "expected": "Unknown",
+      "marginYesNo": {
+        "value": -0.3679466247558594,
+        "lower": -0.3679466247558594,
+        "upper": -0.3679466247558594
+      },
+      "globalTopToken": " No",
+      "globalTopId": 2233,
+      "observedChoiceMass": 0.4986772470782231,
+      "censoredChoices": [
+        "Unknown"
+      ]
+    },
+    {
+      "case": "evidence.pins.missing",
+      "system": "diagnostic",
+      "prefix": "json",
+      "expected": "Unknown",
+      "marginYesNo": {
+        "value": -1.1690731346607208,
+        "lower": -1.1690731346607208,
+        "upper": -1.1690731346607208
+      },
+      "globalTopToken": "No",
+      "globalTopId": 2665,
+      "observedChoiceMass": 0.8675137052461335,
+      "censoredChoices": []
+    },
+    {
+      "case": "evidence.pins.missing",
+      "system": "diagnostic",
+      "prefix": "prose",
+      "expected": "Unknown",
+      "marginYesNo": {
+        "value": 0.1421089768409729,
+        "lower": 0.1421089768409729,
+        "upper": 0.1421089768409729
+      },
+      "globalTopToken": " Yes",
+      "globalTopId": 7179,
+      "observedChoiceMass": 0.9343692792334506,
+      "censoredChoices": []
+    }
+  ],
+  "effectsFirstPass": [
+    {
+      "system": "production",
+      "prefix": "json",
+      "repeat": 1,
+      "originalMargin": {
+        "value": -0.1785184144973755,
+        "lower": -0.1785184144973755,
+        "upper": -0.1785184144973755
+      },
+      "changedMargin": {
+        "value": -0.5258215665817261,
+        "lower": -0.5258215665817261,
+        "upper": -0.5258215665817261
+      },
+      "sourceShift": {
+        "value": 0.3473031520843506,
+        "lower": 0.3473031520843506,
+        "upper": 0.3473031520843506
+      },
+      "permutationShift": {
+        "value": -0.8965436220169067,
+        "lower": -0.8965436220169067,
+        "upper": -0.8965436220169067
+      },
+      "missingWinner": "Yes"
+    },
+    {
+      "system": "production",
+      "prefix": "prose",
+      "repeat": 1,
+      "originalMargin": {
+        "value": -0.580053448677063,
+        "lower": -0.580053448677063,
+        "upper": -0.580053448677063
+      },
+      "changedMargin": {
+        "value": -0.8648375868797302,
+        "lower": -0.8648375868797302,
+        "upper": -0.8648375868797302
+      },
+      "sourceShift": {
+        "value": 0.28478413820266724,
+        "lower": 0.28478413820266724,
+        "upper": 0.28478413820266724
+      },
+      "permutationShift": {
+        "value": -0.946203351020813,
+        "lower": -0.946203351020813,
+        "upper": -0.946203351020813
+      },
+      "missingWinner": null
+    },
+    {
+      "system": "diagnostic",
+      "prefix": "json",
+      "repeat": 1,
+      "originalMargin": {
+        "value": -1.2825469970703125,
+        "lower": -1.2825469970703125,
+        "upper": -1.2825469970703125
+      },
+      "changedMargin": {
+        "value": -1.4215775728225708,
+        "lower": -1.4215775728225708,
+        "upper": -1.4215775728225708
+      },
+      "sourceShift": {
+        "value": 0.1390305757522583,
+        "lower": 0.1390305757522583,
+        "upper": 0.1390305757522583
+      },
+      "permutationShift": {
+        "value": -0.8143272399902344,
+        "lower": -0.8143272399902344,
+        "upper": -0.8143272399902344
+      },
+      "missingWinner": "No"
+    },
+    {
+      "system": "diagnostic",
+      "prefix": "prose",
+      "repeat": 1,
+      "originalMargin": {
+        "value": -0.6542129814624786,
+        "lower": -0.6542129814624786,
+        "upper": -0.6542129814624786
+      },
+      "changedMargin": {
+        "value": -0.7530669867992401,
+        "lower": -0.7530669867992401,
+        "upper": -0.7530669867992401
+      },
+      "sourceShift": {
+        "value": 0.09885400533676147,
+        "lower": 0.09885400533676147,
+        "upper": 0.09885400533676147
+      },
+      "permutationShift": {
+        "value": -0.7524223625659943,
+        "lower": -0.7524223625659943,
+        "upper": -0.7524223625659943
+      },
+      "missingWinner": "Yes"
+    }
+  ],
+  "sourceShiftPositiveAllReadouts": true,
+  "permutationMagnitudeExceedsSourceShiftAllReadouts": true,
+  "wholeCohort": {
+    "peakPssKiB": 1062098,
+    "observedPeakPssGiB": 1.0128955841064453,
+    "wallMs": 77791.011648,
+    "startupMs": 947.5036149999999,
+    "medianObservationMs": 2412.079050000004,
+    "samplingIntervalMs": 250
+  },
+  "cacheReuse": "All timings.cache_n=0 and prompt_n=input token count. tokens_cached stores the retained prompt total in this runtime; it does not count reused prefill tokens."
+}

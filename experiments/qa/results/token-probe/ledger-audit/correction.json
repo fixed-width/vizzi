@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "scope": "Supersedes equivalence labels only; historical source/raw counts/checksums and all QA results unchanged.",
+  "historical": [
+    {
+      "archive": "decoding",
+      "report": "experiments/qa/results/decoding/validation/mutations.json.gz",
+      "sourceSha256": "aae1d464caf5e02ddc297355c1830ba7e6b724e9e9abc64020ef870c5a8633c8",
+      "mutantId": "123",
+      "location": {
+        "end": {
+          "column": 78,
+          "line": 20
+        },
+        "start": {
+          "column": 40,
+          "line": 20
+        }
+      },
+      "originalExpression": "assert.equal(rows.length,plan.length);",
+      "mutation": ";",
+      "expectedRows": 4,
+      "providedRows": 5,
+      "extraId": "unplanned",
+      "originalRejects": true,
+      "mutantAccepts": true,
+      "impact": "Prior equivalent classification was wrong; the count guard prevents silently accepting an extra unique graded row. Existing measured ledgers have exact planned counts, so model responses and reported QA scores are unchanged."
+    },
+    {
+      "archive": "json-object",
+      "report": "experiments/qa/results/json-object/validation/mutations.json.gz",
+      "sourceSha256": "6617a945f7f358182127e9836ba2d36a1a50dab7649f47fdeb5e6df0c4d43392",
+      "mutantId": "155",
+      "location": {
+        "end": {
+          "column": 78,
+          "line": 29
+        },
+        "start": {
+          "column": 40,
+          "line": 29
+        }
+      },
+      "originalExpression": "assert.equal(rows.length,plan.length);",
+      "mutation": ";",
+      "expectedRows": 4,
+      "providedRows": 5,
+      "extraId": "unplanned",
+      "originalRejects": true,
+      "mutantAccepts": true,
+      "impact": "Prior equivalent classification was wrong; the count guard prevents silently accepting an extra unique graded row. Existing measured ledgers have exact planned counts, so model responses and reported QA scores are unchanged."
+    }
+  ],
+  "currentPairedRun": {
+    "caught": 261,
+    "equivalentSurvivors": 14,
+    "timeouts": 0,
+    "errors": 0,
+    "rawScore": 94.91,
+    "rawExit": 1
+  },
+  "supportModuleSha256": {
+    "experiments/qa/evidence-study.mjs": "939d670308d01543f1c238d80731652b3f92df62bb98c31e95a2a03e5dd317a4",
+    "experiments/qa/compact-assess.mjs": "6c7f8f31d7b960b5991e4a724b74702e85f05366c9c181350fa5ff74234f76fe",
+    "experiments/qa/compact-support.mjs": "fca8329cc1f3fe2c67778b5338f000b896fcc6dd354df855b4662483d4d82a48",
+    "experiments/qa/support.mjs": "273417232b72a1a2522d3b5d46d67895079f83870c3328dc375a2b1bfb4ee1d8"
+  }
+}

@@ -107,7 +107,9 @@ sixteen serial Node test files pass. The new generic test fails before implement
 the HTTP stub verifies the exact schema-property omission and earlier defaults.
 
 Focused mutation testing covers the complete request builder and paired-study module:
-**260 caught, fifteen documented equivalents, zero timeouts/errors/no-coverage**. Raw
+**260 caught, fifteen survivors, zero timeouts/errors/no-coverage**. The
+[subsequent exclusion correction](MUTATION_ERRATUM.md) identifies fourteen equivalents and
+one behavioural coverage gap; original records remain unchanged. Raw
 score is 94.55, with exit 1 at threshold 100. [Each equivalent](results/json-object/mutation-equivalents.json)
 has its source hash, ID, location, replacement and narrow reason; survivors are not
 counted as caught. Streaming/server/runner orchestration has separate integration evidence

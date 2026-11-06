@@ -69,6 +69,7 @@ for(const field of ['messages','contextSha256','renderedPrompt','request']){
  assert.throws(()=>compareDecoding(bad,library,spec,grading));
 }
 assert.throws(()=>compareDecoding(rows.slice(1),library,spec,{...grading,grades:grading.grades.slice(1)}));
+assert.throws(()=>compareDecoding([...rows,{...rows[0],id:'unplanned'}],library,spec,{...grading,grades:[...grading.grades,{...grading.grades[0],id:'unplanned'}]}),'an extra graded row still lies outside the frozen plan');
 const noRender=structuredClone(rows);for(const r of noRender)delete r.renderedPrompt;assert.throws(()=>compareDecoding(noRender,library,spec,grading));
 const emptyRender=structuredClone(rows);for(const r of emptyRender)r.renderedPrompt='';assert.throws(()=>compareDecoding(emptyRender,library,spec,grading));
 const nonStringRender=structuredClone(rows),render=['same'];for(const r of nonStringRender)r.renderedPrompt=render;assert.throws(()=>compareDecoding(nonStringRender,library,spec,grading));

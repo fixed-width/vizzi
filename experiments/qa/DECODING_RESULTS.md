@@ -113,7 +113,9 @@ request change and unmodified non-JSON retention. Request/module, rendered-input
 task-consistency and empty-abstention regressions are observed failing before fixes.
 
 Mutation scope is the complete new request builder and decoding-study module:
-**234 caught, thirteen documented equivalents, zero timeouts/errors/no-coverage**.
+**234 caught, thirteen survivors, zero timeouts/errors/no-coverage**. The
+[subsequent exclusion correction](MUTATION_ERRATUM.md) identifies twelve equivalents and
+one behavioural coverage gap among those survivors; original records remain unchanged.
 [Each survivor](results/decoding/mutation-equivalents.json) is bound to source hash,
 location, replacement and a narrow reason: redundant rejection/pairing guards, parity-
 preserving order changes, irrelevant invalid-input fallback keys or diagnostics. Raw score

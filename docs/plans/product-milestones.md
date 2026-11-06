@@ -69,6 +69,11 @@ objects but lowers raw content to 8/24 and produces zero host-conforming respons
 Keep the full schema and close simple enforcement relaxation. Remaining model-side
 code/evidence failures, count-matched controls and an eventual frozen candidate remain
 separate work; reserved real-source questions are still unrun.
+The [pin-release token probe](../../experiments/qa/TOKEN_PROBE_RESULTS.md) now observes
+small expected-direction source shifts but a persistent No preference and larger layout
+effects. It does not locate a weight edit. A cached BF16/Q4 control is the next bounded
+model-side check; real-source reservations remain unrun. An explicit mutation-audit
+erratum corrects two historical exclusion labels without changing measured QA results.
 Retain new maintainer questions for subsequent fresh evaluation. None of these
 agent-graded diagnostics establishes product acceptance.
 

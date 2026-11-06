@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "cases": 4,
+  "systems": 2,
+  "prefixes": 2,
+  "repeats": 2,
+  "observations": 32,
+  "sourceArchiveChecksumValid": true,
+  "sourceAndUserMessagePreserved": true,
+  "allSixSpellingsSingleDistinctTokens": true,
+  "exactSpellingRoundTrips": true,
+  "oneSampledPositionAnd512PreSamplingEntriesPerObservation": true,
+  "allEvaluatedTokenCountsMatchExplicitArrays": true,
+  "allMeasuredPrefillCacheReuseZero": true,
+  "weightsUnchanged": true,
+  "reservedGenerations": 0,
+  "ownedServerClosed": true,
+  "historicalPayloadChecksumsUnchanged": true
+}

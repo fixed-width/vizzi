@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "native": "Current production Rust/Cargo inputs match d15a56d. Its passing 453 workspace tests/doctests baseline is retained, not rerun; original log/hash and native tree recorded. Fresh formatting and all-target Clippy pass.",
+  "node": "17 serial QA test files pass after new probe and extra-row regressions; focused test fails without implementation. Exact probability, censoring/bounds, neutral request construction, source/prefix/order and ledger tests pass.",
+  "probeMutations": "Whole token-probe-support module: 262 caught, 2 documented equivalents, zero timeouts/errors/no-coverage. Raw 99.24, exit 1 at threshold 100. Runner transport outside mutation scope with 32 real endpoint observations.",
+  "auditCorrection": "Historical archived sources/mutations demonstrate that two prior equivalent count-guard labels were wrong. An extra-row regression catches the current paired count guard; new full paired mutation run is 261 caught/14 equivalents. No old model scores change; frozen evidence remains unchanged.",
+  "runtime": "Candidate tokenization/detokenization and all condition prompts prepared before any probabilities. Explicit token arrays, one predicted token, 512 pre-sampling logprobs, cache_prompt=false; all actual cache_n=0, post_sampling_probs=false, backend sampling=false.",
+  "limits": "Conditional lexical token readouts, not complete answers, semantic word mass, calibrated uncertainty or causal activation evidence. Instruction/prefix interventions and whole captured source metadata remain confounds for weight localisation.",
+  "measurement": "CPU-only, two inference/prefill threads, one model server, nice 10, serial cold-prefill requests after correctness/mutation work. No source builds, viewer/editor, new dependency, training or weight edit; server closes.",
+  "testAndConfigSha256": {
+    "experiments/qa/token-probe.test.mjs": "d15051bafe21904148b5d49fd112772854d4e87f55977e8360f7dddd0c435de0",
+    "experiments/qa/decoding.test.mjs": "870f57ac75c16a09328af594a1088bd0d745f30134c8d9d53b53bd9805588150",
+    "experiments/qa/token-probe-stryker.config.json": "5761af28b1684f5bef30a65731152e0a3fd55c7fc4fba500b54ae40729fbaaa4",
+    "experiments/qa/decoding-stryker.config.json": "ed0201ecfa74b60722e316685a802a80625fe01869a3cacf27ef83849180f7bc",
+    "package-lock.json": "e7ff76f17d7408c0b6dfd075c564ba31fec03cc838be612a008cf5bd343e291f"
+  }
+}
