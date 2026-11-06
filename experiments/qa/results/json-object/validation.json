@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "rust": "453 workspace tests/doctests, formatting and all-target Clippy pass; production Rust/dependencies unchanged, so no new native mutation cohort.",
+  "node": "16 serial QA test files pass. New generic request/plan/shape tests fail before implementation. Actual HTTP stub confirms only the schema property is omitted; old default and unconstrained regressions remain passing.",
+  "mutations": "Complete request builder and paired-study module: 260 caught, 15 documented equivalents, zero timeouts/errors/no-coverage. Raw score 94.55, raw exit 1 at threshold 100. Streaming/server/runner orchestration are outside mutation scope with separate HTTP/native integration evidence.",
+  "preflight": "All twelve full-schema/generic pairs render byte-identical prompts through the pinned runtime, and all twenty-four generated pair prompt-token counts match. Only response_format.schema differs.",
+  "measurement": "One owned CPU-only model server, two threads, nice 10 and serial requests after all correctness/mutation work. Both indexes/server close. No inspected tooling, viewer, editor, conversion, training or weight edit.",
+  "assessment": "24 live schema controls exactly reproduce prior request/rendered prompt/source/messages/raw/native results. All 12 generic repeat outputs are byte-identical and reused after checks. Twelve new unique generic objects manually reviewed without renaming keys or coercing labels/statuses.",
+  "limits": "Known small synthetic development cases and source-aware author grading. Valid generic objects do not establish host conformance or real-code acceptance. No reserved generation; no per-arm memory, enforced cap or laptop/editor emulation.",
+  "testAndConfigSha256": {
+    "experiments/qa/json-object.test.mjs": "a2a599b11dec848442e5e9b1a01e45eb0003719befb190db768df8269be7f1f1",
+    "experiments/qa/decoding.test.mjs": "aec2a8e2ae434c8f5353e598b631fcee163208ab7958b1a6543767e597b90edd",
+    "experiments/qa/model.test.mjs": "488dd77ea4208c657973ad0aa57dd6d56ef9576d6b9cb74ffadefc67b330d7c9",
+    "experiments/qa/decoding-stryker.config.json": "ed0201ecfa74b60722e316685a802a80625fe01869a3cacf27ef83849180f7bc",
+    "package-lock.json": "e7ff76f17d7408c0b6dfd075c564ba31fec03cc838be612a008cf5bd343e291f"
+  }
+}

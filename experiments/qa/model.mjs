@@ -43,9 +43,10 @@ export async function server(runtime,model,limits,logPath){
  return {pid:child.pid,args,url,startupMs:performance.now()-started,async close(){if(child.exitCode===null){const ended=once(child,'exit');child.kill('SIGTERM');const timer=setTimeout(()=>child.kill('SIGKILL'),5000);try{await ended;}finally{clearTimeout(timer);}}await log.close();}};
 }
 export function generationRequest(item,context,limits,options={}){
- const constraint=options.constraint??'schema';assert.ok(['schema','none'].includes(constraint),'invalid output constraint');
+ const constraint=options.constraint??'schema';assert.ok(['schema','none','json_object'].includes(constraint),'invalid output constraint');
  const messages=prompt(item,context,options),body={messages,temperature:0,seed:42,max_tokens:limits.output_tokens,stream:true,stream_options:{include_usage:true},response_format:{type:'json_object',schema:schemaFor(options.protocol,options.citationLimit,options.fieldOrder)},chat_template_kwargs:{enable_thinking:false},cache_prompt:true};
  if(constraint==='none')delete body.response_format;
+ if(constraint==='json_object')body.response_format={type:'json_object'};
  return body;
 }
 export async function generate(host,item,context,limits,options={}){

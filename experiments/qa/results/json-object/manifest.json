@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "createdAt": "2026-11-06T20:20:38.486Z",
+  "preparedSha256": "c88e31e8be881179369c150343deafd7b113a7d649709ead83a812273c056e5c",
+  "model": {
+    "id": "qwen3.5-0.8b-base-local-q4",
+    "repository": "Qwen/Qwen3.5-0.8B",
+    "revision": "2fc06364715b967f1860aea9cf38778875588b17",
+    "filename": "model-q4.gguf",
+    "bytes": 541903872,
+    "sha256": "94d3009ee9cfca48d7d852bf0fe6c14c6f4f2506e818ca63f8c873fa46320a0a",
+    "directory": "base",
+    "artifact_kind": "Locally built GGUF; repository/revision identify source, not a downloadable GGUF",
+    "gguf_architecture": "qwen35",
+    "gguf_parameter_count": 772845888,
+    "chat_template_sha256": "273d8e0e683b885071fb17e08d71e5f2a5ddfb5309756181681de4f5a1822d80"
+  },
+  "runtimeSha256": "eaf9c1c664cc0ae1f4dea4b171bb91aac8409fcfea0574c9b6bcc93792ce2400",
+  "limits": {
+    "threads": 2,
+    "context_tokens": 8192,
+    "output_tokens": 1024,
+    "evidence_bytes": 8000,
+    "evidence_items": 6,
+    "request_timeout_ms": 360000,
+    "sampled_memory_target_bytes": 4294967296,
+    "batch_tokens": 512,
+    "ubatch_tokens": 128
+  },
+  "condition": "unaltered base; no prompt/weight tune",
+  "decodingSha256": "5d1e1b9718a3a68847550f13b6a197be97e7edc9bcfa4d6bca2013141a4b9a1b",
+  "repeats": 2,
+  "caseIds": [
+    "evidence.routing.original",
+    "evidence.routing.changed",
+    "evidence.routing.relabel",
+    "evidence.routing.missing",
+    "evidence.versions.original",
+    "evidence.versions.changed",
+    "evidence.versions.relabel",
+    "evidence.versions.missing",
+    "evidence.pins.original",
+    "evidence.pins.changed",
+    "evidence.pins.relabel",
+    "evidence.pins.missing"
+  ],
+  "reservedGenerations": 0,
+  "environment": {
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13700H",
+    "physicalMemoryBytes": 67080241152
+  },
+  "completed": 48,
+  "incomplete": false
+}

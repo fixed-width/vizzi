@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {generationRequest} from './model.mjs';
-import {decodingPlan,responseShape,compareDecoding} from './decoding-study.mjs';
+import {decodingPlan,responseShape,compareDecoding,assertDecodingRequests} from './decoding-study.mjs';
 import {json} from './support.mjs';
 
 const library=await json('experiments/qa/library/evidence-use/development.json'),spec=await json('experiments/qa/library/decoding/cohort.json');
@@ -10,6 +10,7 @@ const item={repository:'fixture',question:'Where is the check?',required_facts:[
 const control=generationRequest(item,context,limits,options),unconstrained=generationRequest(item,context,limits,{...options,constraint:'none'});
 assert.deepEqual(generationRequest(item,context,limits,{...options,constraint:'schema'}),control);
 const {response_format,...rest}=control;assert.deepEqual(unconstrained,rest);assert.ok(!('response_format' in unconstrained));assert.ok(response_format.schema);
+assert.throws(()=>assertDecodingRequests({...control,response_format:{type:'json_object'}},unconstrained,'response_format_ablation'),'a generic object cannot masquerade as the schema control');
 assert.equal(response_format.type,'json_object');assert.deepEqual(response_format.schema.required,['answer','status','citations']);assert.equal(response_format.schema.properties.answer.maxLength,2000);assert.equal(response_format.schema.properties.citations.maxItems,8);
 assert.ok(!JSON.stringify(control.messages).includes('HIDDEN_GOLD'));assert.equal(control.max_tokens,1024);assert.equal(control.temperature,0);assert.equal(control.seed,42);assert.equal(control.cache_prompt,true);assert.deepEqual(control.chat_template_kwargs,{enable_thinking:false});
 assert.equal(control.stream,true);assert.deepEqual(control.stream_options,{include_usage:true});

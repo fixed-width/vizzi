@@ -9,7 +9,7 @@ import {checkedRange,checkAudit} from './packs-support.mjs';
 import {chooseModel} from './model-config.mjs';
 import {server,generate,schemaFor,generationRequest} from './model.mjs';
 import {validateEvidenceStudy,developmentRuns,modelQuestion} from './evidence-study.mjs';
-import {decodingPlan,responseShape} from './decoding-study.mjs';
+import {decodingPlan,responseShape,assertDecodingRequests} from './decoding-study.mjs';
 
 const [command,...args]=process.argv.slice(2),allowed=new Set(['--output','--prepared','--runtime','--models-root','--pytorch','--vizzi','--decoding']);
 assert.ok(['prepare','run'].includes(command));
@@ -64,7 +64,8 @@ if(command==='prepare'){
  await save(join(output,'inputs.json'),inputs);await save(join(output,'reserved.json'),{generations:0,inputs:reservedInputs});await save(join(output,'audit.json'),audit);
  const rust=(await readdir('crates/vizzi-qa/src')).filter(p=>p.endsWith('.rs')).map(p=>'crates/vizzi-qa/src/'+p);
  const sourceFiles=Object.entries(config.sources).flatMap(([name,s])=>Object.keys(s.files).map(path=>join(sources[name].root,path)));
- const files=await captureHashes([...rust,'Cargo.lock','crates/vizzi-qa/Cargo.toml',configPath,developmentPath,reservedPath,config.models,'docs/qa/EVIDENCE_USE.md',...(decodingPath?[decodingPath,'docs/qa/DECODING.md']:[]),...['evidence.mjs','evidence-study.mjs','decoding-study.mjs','model.mjs','model-config.mjs','runtime-profile.mjs','support.mjs','compact-support.mjs','compact-assess.mjs','packs-support.mjs'].map(p=>'experiments/qa/'+p),'target/release/vizzi-qa','target/release/vizzi-envelope',...sourceFiles,...['inputs.json','reserved.json','audit.json'].map(p=>join(output,p))]);
+ const studyDoc=decoding?.kind==='json_object_ablation'?'docs/qa/JSON_OBJECT.md':'docs/qa/DECODING.md';
+ const files=await captureHashes([...rust,'Cargo.lock','crates/vizzi-qa/Cargo.toml',configPath,developmentPath,reservedPath,config.models,'docs/qa/EVIDENCE_USE.md',...(decodingPath?[decodingPath,studyDoc]:[]),...['evidence.mjs','evidence-study.mjs','decoding-study.mjs','model.mjs','model-config.mjs','runtime-profile.mjs','support.mjs','compact-support.mjs','compact-assess.mjs','packs-support.mjs'].map(p=>'experiments/qa/'+p),'target/release/vizzi-qa','target/release/vizzi-envelope',...sourceFiles,...['inputs.json','reserved.json','audit.json'].map(p=>join(output,p))]);
  await save(join(output,'prepared.json'),{schema:1,createdAt:new Date().toISOString(),sources,model,limits,files,caseIds,decodingSha256:decodingPath?await digest(decodingPath):null,reservedCases:reserved.cases.length,expectedResponses:plan.length,reservedGenerations:0,limitations:['Agent-authored synthetic development fixtures; real-source reserved questions have no model outputs.','Preparation audits gold/source; inference uses development questions/source only.','Greedy repeats and prefix caching are diagnostic replays, not independent samples.']});
  console.log(`Audited ${inputs.length} development and ${reservedInputs.length} reserved contexts; zero generations.`);
 }else{
@@ -86,7 +87,7 @@ if(command==='prepare'){
      const response=await fetch(host.url+'/apply-template',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(request),signal:AbortSignal.timeout(limits.request_timeout_ms)});assert.ok(response.ok,`prompt rendering failed: ${response.status}`);
      const value=await response.json();assert.ok(typeof value.prompt==='string' && value.prompt.length);rendered.set(id+'/'+arm.id,{request,prompt:value.prompt});prompts.push(value.prompt);requests.push(request);
     }
-    assert.equal(prompts[0],prompts[1],'response_format changes rendered prompt');const {response_format,...without}=requests[0];assert.ok(response_format);assert.deepEqual(without,requests[1]);
+    assert.equal(prompts[0],prompts[1],'response_format changes rendered prompt');assertDecodingRequests(requests[0],requests[1],decoding.kind);
    }
    await save(join(output,'rendered.json'),Object.fromEntries(rendered));
   }

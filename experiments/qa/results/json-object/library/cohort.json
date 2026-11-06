@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "kind": "json_object_ablation",
+  "repeats": 2,
+  "caseIds": [
+    "evidence.routing.original",
+    "evidence.routing.changed",
+    "evidence.routing.relabel",
+    "evidence.routing.missing",
+    "evidence.versions.original",
+    "evidence.versions.changed",
+    "evidence.versions.relabel",
+    "evidence.versions.missing",
+    "evidence.pins.original",
+    "evidence.pins.changed",
+    "evidence.pins.relabel",
+    "evidence.pins.missing"
+  ],
+  "arms": [
+    {
+      "id": "schema",
+      "constraint": "schema"
+    },
+    {
+      "id": "json_object",
+      "constraint": "json_object"
+    }
+  ],
+  "selection": "Same twelve development cases; no reserved generations or delivery ambiguity.",
+  "prompt": "Identical existing messages; only response_format.schema is omitted in generic-object mode.",
+  "preflight": "Require identical rendered prompts before any generation and preserve all objects without normalization."
+}

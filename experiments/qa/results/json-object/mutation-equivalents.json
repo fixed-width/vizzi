@@ -1,0 +1,275 @@
+{
+  "schema": 1,
+  "sourceSha256": {
+    "experiments/qa/decoding-study.mjs": "6617a945f7f358182127e9836ba2d36a1a50dab7649f47fdeb5e6df0c4d43392",
+    "experiments/qa/model.mjs": "0247754a2c14e88a223485a9ef1aa9426944f8bb8af2414aa263090e014e54e1"
+  },
+  "scope": "Entire request builder and paired-study module; streaming/server/runner orchestration outside mutation scope with separate integration checks.",
+  "counts": {
+    "caught": 260,
+    "equivalentSurvivors": 15,
+    "timeouts": 0,
+    "errors": 0,
+    "noCoverage": 0
+  },
+  "rawScore": 94.55,
+  "rawToolExit": 1,
+  "interpretation": "Equivalents concern admission/request/scoring outcomes for JSON inputs, not exact exception text/type. Raw 100% threshold remains unmet and survivors are not counted as caught.",
+  "exclusions": [
+    {
+      "file": "experiments/qa/decoding-study.mjs",
+      "id": "6",
+      "location": {
+        "end": {
+          "column": 142,
+          "line": 6
+        },
+        "start": {
+          "column": 113,
+          "line": 6
+        }
+      },
+      "mutator": "CallExpression",
+      "replacement": ";",
+      "reason": "Downstream developmentRuns also rejects repeat counts other than two; only earlier diagnostics change."
+    },
+    {
+      "file": "experiments/qa/decoding-study.mjs",
+      "id": "34",
+      "location": {
+        "end": {
+          "column": 124,
+          "line": 10
+        },
+        "start": {
+          "column": 90,
+          "line": 10
+        }
+      },
+      "mutator": "ConditionalExpression",
+      "replacement": "true",
+      "reason": "Unknown items still fail on access and reserved splits are rejected by developmentRuns; no invalid case is admitted."
+    },
+    {
+      "file": "experiments/qa/decoding-study.mjs",
+      "id": "36",
+      "location": {
+        "end": {
+          "column": 124,
+          "line": 10
+        },
+        "start": {
+          "column": 90,
+          "line": 10
+        }
+      },
+      "mutator": "LogicalOperator",
+      "replacement": "item || item.split === 'development'",
+      "reason": "Reserved splits remain rejected downstream and absent items fail on access; rejection outcome is unchanged."
+    },
+    {
+      "file": "experiments/qa/decoding-study.mjs",
+      "id": "37",
+      "location": {
+        "end": {
+          "column": 124,
+          "line": 10
+        },
+        "start": {
+          "column": 98,
+          "line": 10
+        }
+      },
+      "mutator": "ConditionalExpression",
+      "replacement": "true",
+      "reason": "The downstream development-only admission independently rejects a reserved split."
+    },
+    {
+      "file": "experiments/qa/decoding-study.mjs",
+      "id": "40",
+      "location": {
+        "end": {
+          "column": 157,
+          "line": 10
+        },
+        "start": {
+          "column": 125,
+          "line": 10
+        }
+      },
+      "mutator": "StringLiteral",
+      "replacement": "\"\"",
+      "reason": "Changes exception diagnostic text only, not admission, request generation or scoring."
+    },
+    {
+      "file": "experiments/qa/decoding-study.mjs",
+      "id": "48",
+      "location": {
+        "end": {
+          "column": 98,
+          "line": 12
+        },
+        "start": {
+          "column": 82,
+          "line": 12
+        }
+      },
+      "mutator": "ArithmeticOperator",
+      "replacement": "index + p.repeat + 1",
+      "reason": "Adding two preserves the integer parity and hence request order."
+    },
+    {
+      "file": "experiments/qa/decoding-study.mjs",
+      "id": "49",
+      "location": {
+        "end": {
+          "column": 96,
+          "line": 12
+        },
+        "start": {
+          "column": 82,
+          "line": 12
+        }
+      },
+      "mutator": "ArithmeticOperator",
+      "replacement": "index - p.repeat",
+      "reason": "The changed inner sum differs by twice the repeat; modulo-two truthiness and order are unchanged."
+    },
+    {
+      "file": "experiments/qa/decoding-study.mjs",
+      "id": "61",
+      "location": {
+        "end": {
+          "column": 44,
+          "line": 16
+        },
+        "start": {
+          "column": 15,
+          "line": 16
+        }
+      },
+      "mutator": "OptionalChaining",
+      "replacement": "control.response_format.type",
+      "reason": "Absent control.response_format is still rejected by direct property access; only error type differs."
+    },
+    {
+      "file": "experiments/qa/decoding-study.mjs",
+      "id": "69",
+      "location": {
+        "end": {
+          "column": 70,
+          "line": 18
+        },
+        "start": {
+          "column": 52,
+          "line": 18
+        }
+      },
+      "mutator": "CallExpression",
+      "replacement": ";",
+      "reason": "The same control schema was already required before this branch; deleting the second assertion changes no accepted JSON request."
+    },
+    {
+      "file": "experiments/qa/decoding-study.mjs",
+      "id": "76",
+      "location": {
+        "end": {
+          "column": 78,
+          "line": 20
+        },
+        "start": {
+          "column": 51,
+          "line": 20
+        }
+      },
+      "mutator": "CallExpression",
+      "replacement": ";",
+      "reason": "Control response_format type/schema checks already require this object to exist."
+    },
+    {
+      "file": "experiments/qa/decoding-study.mjs",
+      "id": "90",
+      "location": {
+        "end": {
+          "column": 117,
+          "line": 23
+        },
+        "start": {
+          "column": 115,
+          "line": 23
+        }
+      },
+      "mutator": "ArrayDeclaration",
+      "replacement": "[\"Stryker was here\"]",
+      "reason": "For a nonobject, either fallback key list fails the required three-key and order checks."
+    },
+    {
+      "file": "experiments/qa/decoding-study.mjs",
+      "id": "155",
+      "location": {
+        "end": {
+          "column": 78,
+          "line": 29
+        },
+        "start": {
+          "column": 40,
+          "line": 29
+        }
+      },
+      "mutator": "CallExpression",
+      "replacement": ";",
+      "reason": "Other ledger, grade and planned-ID checks still reject an incomplete/extra ledger before returning a comparison."
+    },
+    {
+      "file": "experiments/qa/decoding-study.mjs",
+      "id": "169",
+      "location": {
+        "end": {
+          "column": 65,
+          "line": 32
+        },
+        "start": {
+          "column": 50,
+          "line": 32
+        }
+      },
+      "mutator": "CallExpression",
+      "replacement": ";",
+      "reason": "An absent planned row still fails at row.case access; only rejection diagnostics change."
+    },
+    {
+      "file": "experiments/qa/decoding-study.mjs",
+      "id": "185",
+      "location": {
+        "end": {
+          "column": 127,
+          "line": 36
+        },
+        "start": {
+          "column": 87,
+          "line": 36
+        }
+      },
+      "mutator": "CallExpression",
+      "replacement": ";",
+      "reason": "Message equality follows from normalized request equality and each row matching its request messages."
+    },
+    {
+      "file": "experiments/qa/model.mjs",
+      "id": "268",
+      "location": {
+        "end": {
+          "column": 138,
+          "line": 46
+        },
+        "start": {
+          "column": 111,
+          "line": 46
+        }
+      },
+      "mutator": "StringLiteral",
+      "replacement": "\"\"",
+      "reason": "Changes exception diagnostic text only, not admission, request generation or scoring."
+    }
+  ]
+}

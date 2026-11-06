@@ -36,6 +36,9 @@ eight ungenerated real-source reservations and documents an ambiguous synthetic 
 The [response-format ablation](DECODING_RESULTS.md) keeps effective prompts fixed and
 finds mixed content changes without aggregate improvement when schema enforcement is
 removed. All unconstrained outputs are prose; the existing default remains enabled.
+The [generic-object comparison](JSON_OBJECT_RESULTS.md) restores JSON syntax but reduces
+raw content correctness from 14/24 to 8/24 and yields no host-conforming responses.
+This closes simple enforcement relaxation; the full-schema default remains unchanged.
 
 Build with one compiler task and run the normal correctness checks:
 

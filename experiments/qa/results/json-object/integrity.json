@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "cases": 12,
+  "responses": 48,
+  "genericRootObjects": 24,
+  "renderedRequestPairs": 12,
+  "equalRenderedPrompts": 12,
+  "equalGeneratedPromptTokenCounts": 24,
+  "requestDifferenceOnlySchemaProperty": true,
+  "reservedGenerations": 0,
+  "deliveryExcludedBeforeInference": true,
+  "modelWeightsUnchanged": true,
+  "frozenInputsVerified": true,
+  "historicalPayloadChecksumsUnchanged": true,
+  "ownedServerClosed": true
+}

@@ -64,6 +64,11 @@ equal effective prompts and changes only enforcement. Content remains 14/24 per 
 with two unique cases helped and two hurt; unconstrained outputs are all prose and fail
 the structured interface. Keep the default schema. Specific output-contract and surviving
 code-reading failures remain hypotheses, with no weight edit or reserved evaluation yet.
+The [generic-JSON follow-up](../../experiments/qa/JSON_OBJECT_RESULTS.md) now parses all
+objects but lowers raw content to 8/24 and produces zero host-conforming responses.
+Keep the full schema and close simple enforcement relaxation. Remaining model-side
+code/evidence failures, count-matched controls and an eventual frozen candidate remain
+separate work; reserved real-source questions are still unrun.
 Retain new maintainer questions for subsequent fresh evaluation. None of these
 agent-graded diagnostics establishes product acceptance.
 

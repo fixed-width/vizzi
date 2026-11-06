@@ -76,6 +76,11 @@ content gain and no usable JSON outputs. Some misreads persist in both condition
 Output-contract effects matter without explaining every failure or identifying particular
 weights. A wording ambiguity and presentation-count shortcut in the starter cases are
 documented so they cannot become hidden evaluation assumptions.
+The [generic-object follow-up](../../experiments/qa/JSON_OBJECT_RESULTS.md) restores valid
+JSON but lowers content correctness to 8/24 versus 14/24 for the full schema, with no
+host-conforming responses. Relaxing enforcement is not a useful substitute here. Remaining
+format-independent code/evidence errors are a separate model-side investigation target;
+the comparisons still do not identify a tensor edit.
 
 ## Practical weight transformations
 

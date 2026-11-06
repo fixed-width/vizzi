@@ -1,0 +1,1112 @@
+{
+  "schema": 1,
+  "grader": "Codex, source-aware case/oracle author; preliminary manual comparison, not independent acceptance",
+  "limitations": [
+    "Twelve already-observed synthetic development cases, two greedy passes; real-source reservations unrun.",
+    "No key/value/status/label coercion or JSON repair. Human citation support is not native reference validation.",
+    "Raw positive content requires the requested error/call relation, not just quoting an operator while denying the answer can be determined. Raw negative content requires explicit abstention.",
+    "False source-availability statements remain recorded separately from the required code facts and machine-readable status failures."
+  ],
+  "decisions": [
+    {
+      "id": "evidence.routing.original/repeat-1/schema",
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct dispatch receiver and validate call, directly supported by target label 1. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused. This live schema control again reproduces the prior decoding run exactly; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.routing.original",
+      "arm": "schema",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 2,
+      "taskSuccess": true
+    },
+    {
+      "id": "evidence.routing.original/repeat-1/json_object",
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct dispatch receiver and validate call. Quoted source_labels 1/2 identify supporting excerpts to the human grader, but are not converted into native integer citations. Status/citations fields required by the host are absent.",
+      "roleConfusion": false,
+      "case": "evidence.routing.original",
+      "arm": "json_object",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 2,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.routing.changed/repeat-1/json_object",
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct swapped validate receiver and dispatch validator, including the true zero-token check. Source labels are human-identifiable strings, not a valid host response; no repair is performed.",
+      "roleConfusion": false,
+      "case": "evidence.routing.changed",
+      "arm": "json_object",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 2,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.routing.changed/repeat-1/schema",
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correctly follows the swapped roles: validate receives Apply and calls dispatch. Labels 1/2 support the receiver and token check; ancillary zero-token description is true. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused. This live schema control again reproduces the prior decoding run exactly; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.routing.changed",
+      "arm": "schema",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 2,
+      "taskSuccess": true
+    },
+    {
+      "id": "evidence.routing.relabel/repeat-1/schema",
+      "facts": [
+        "contradicted",
+        "contradicted"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Names validate as the protocol receiver.",
+        "Invents a call to pending as token validation; pending merely returns zero."
+      ],
+      "notes": "Wrong roles/call after source order changes. Decisive dispatch definition is label 3; cited label 1 only defines pending. False insufficient-evidence status. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused. This live schema control again reproduces the prior decoding run exactly; grade reused.",
+      "roleConfusion": true,
+      "case": "evidence.routing.relabel",
+      "arm": "schema",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.routing.relabel/repeat-1/json_object",
+      "facts": [
+        "contradicted",
+        "contradicted"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Calls validate the Apply receiver and invents its pending call."
+      ],
+      "notes": "Same incorrect body as schema control. Labels 1/2 cover pending/validate, not the actual dispatch receiver at label 3.",
+      "roleConfusion": true,
+      "case": "evidence.routing.relabel",
+      "arm": "json_object",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.routing.missing/repeat-1/json_object",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Claims validate handles Apply and calls pending without the receiver definition; the visible validator has no such call."
+      ],
+      "notes": "Specific invented flow rather than explicit uncertainty. Two visible helpers do not establish the missing receiver.",
+      "roleConfusion": true,
+      "rawAbstention": false,
+      "case": "evidence.routing.missing",
+      "arm": "json_object",
+      "split": "development",
+      "answerable": false,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.routing.missing/repeat-1/schema",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Claims validate handles Apply and calls pending although the receiver definition is withheld."
+      ],
+      "notes": "Expected insufficient evidence. The visible token validator does not handle Request or call pending. Answered status and specific invented flow fail abstention. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused. This live schema control again reproduces the prior decoding run exactly; grade reused.",
+      "roleConfusion": true,
+      "rawAbstention": false,
+      "case": "evidence.routing.missing",
+      "arm": "schema",
+      "split": "development",
+      "answerable": false,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.versions.original/repeat-1/schema",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct strict greater-than error condition; equality is excluded by this strict relation. Ancillary propagation/describe statements match sources. Label 1 supports the requested predicate. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused. This live schema control again reproduces the prior decoding run exactly; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.versions.original",
+      "arm": "schema",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": true
+    },
+    {
+      "id": "evidence.versions.original/repeat-1/json_object",
+      "facts": [
+        "missing"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Claims requested is assumed to be a valid positive integer, although the u64 parameter also admits zero and no positivity check is shown."
+      ],
+      "notes": "It quotes if requested > committed but denies that any specific error relation is defined and answers None. Merely quoting a visible operator while denying the requested relation is not credited as the requested code fact. Full if/Err/else body is supplied.",
+      "roleConfusion": false,
+      "case": "evidence.versions.original",
+      "arm": "json_object",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.versions.changed/repeat-1/json_object",
+      "facts": [
+        "missing"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Quotes requested < committed but does not identify it as the error condition, falsely demanding extra context and saying the supplied commit_request/describe context is unavailable. The answer is None. Treat this as a missing requested fact and false availability/calibration claim, not a correct predicate answer.",
+      "roleConfusion": false,
+      "case": "evidence.versions.changed",
+      "arm": "json_object",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.versions.changed/repeat-1/schema",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correctly changes to requested < committed and explicitly accepts equality. Target label 1 supports the new rule. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused. This live schema control again reproduces the prior decoding run exactly; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.versions.changed",
+      "arm": "schema",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": true
+    },
+    {
+      "id": "evidence.versions.relabel/repeat-1/schema",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct greater-than rule and target label 3 after permutation. Err(\"rejected\") is accepted as an error value description rather than a claim about a named Rust type. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused. This live schema control again reproduces the prior decoding run exactly; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.versions.relabel",
+      "arm": "schema",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": true
+    },
+    {
+      "id": "evidence.versions.relabel/repeat-1/json_object",
+      "facts": [
+        "missing"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Falsely says the check_requested implementation is absent despite its whole body at label 3. It offers the condition only as a hypothetical example of missing information; no requested error relation is established by its answer.",
+      "roleConfusion": false,
+      "case": "evidence.versions.relabel",
+      "arm": "json_object",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.versions.missing/repeat-1/json_object",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Correctly explains that the two delegating/formatting helpers do not supply check_requested and its error condition is unknown. Explicit raw abstention, despite invalid status spelling and host shape.",
+      "roleConfusion": false,
+      "rawAbstention": true,
+      "case": "evidence.versions.missing",
+      "arm": "json_object",
+      "split": "development",
+      "answerable": false,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.versions.missing/repeat-1/schema",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Asserts greater-than and then less-than-or-equal rejection rules without the check_requested definition."
+      ],
+      "notes": "The helper delegates to an unseen check; neither relation can be established. The answer is also internally inconsistent and falsely reports answered. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused. This live schema control again reproduces the prior decoding run exactly; grade reused.",
+      "roleConfusion": false,
+      "rawAbstention": false,
+      "case": "evidence.versions.missing",
+      "arm": "schema",
+      "split": "development",
+      "answerable": false,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.pins.original/repeat-1/schema",
+      "facts": [
+        "contradicted"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Answers No despite the unconditional release call after validate."
+      ],
+      "notes": "The target calls release even if result is Err. A bare No does not establish the correct behaviour or explain any missing evidence. False insufficient status. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused. This live schema control again reproduces the prior decoding run exactly; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.pins.original",
+      "arm": "schema",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.pins.original/repeat-1/json_object",
+      "facts": [
+        "missing"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Does not give Yes for the unconditional release call. Falsely says validate is absent (it is supplied) and requires execution context, although finish visibly captures the result, releases, then returns it. Missing requested fact and false evidence-availability conclusion.",
+      "roleConfusion": false,
+      "case": "evidence.pins.original",
+      "arm": "json_object",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.pins.changed/repeat-1/json_object",
+      "facts": [
+        "missing"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Says the necessary logic checking the validation return is missing, despite result.is_ok guarding release."
+      ],
+      "notes": "No correct No for Err is established; answer again demands an allegedly absent validate definition that is actually supplied. This does not improve on the full schema.",
+      "roleConfusion": false,
+      "case": "evidence.pins.changed",
+      "arm": "json_object",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.pins.changed/repeat-1/schema",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "No is correct: result.is_ok guards release, so an Err skips it. Label 1 is the decisive function. Task fails only because status falsely says insufficient evidence. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused. This live schema control again reproduces the prior decoding run exactly; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.pins.changed",
+      "arm": "schema",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.pins.relabel/repeat-1/schema",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Yes is correct for unconditional release, but cited label 1 only defines validate. Target finish is label 3. This is correct prose with unsupported citation selection. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused. This live schema control again reproduces the prior decoding run exactly; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.pins.relabel",
+      "arm": "schema",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.pins.relabel/repeat-1/json_object",
+      "facts": [
+        "missing"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Acknowledges that finish calls release after validate, but denies that the complete supplied finish determines error behaviour and never supplies the requested unconditional-on-Err conclusion. Label 3 contains the decisive body. False uncertainty is retained as a calibration issue.",
+      "roleConfusion": false,
+      "case": "evidence.pins.relabel",
+      "arm": "json_object",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.pins.missing/repeat-1/json_object",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Correctly explains that release and validate alone cannot establish whether missing finish invokes release on error. Explicit raw abstention; the answer None is not coerced into a host string/status/citation object.",
+      "roleConfusion": false,
+      "rawAbstention": true,
+      "case": "evidence.pins.missing",
+      "arm": "json_object",
+      "split": "development",
+      "answerable": false,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.pins.missing/repeat-1/schema",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Gives a definitive No to the release-on-error question while finish is withheld."
+      ],
+      "notes": "The insufficient-evidence status is correct, but bare No does not explain the missing definition and reads as an unsupported behavioural conclusion. This interpretation is explicitly recorded for human review. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused. This live schema control again reproduces the prior decoding run exactly; grade reused.",
+      "roleConfusion": false,
+      "rawAbstention": false,
+      "case": "evidence.pins.missing",
+      "arm": "schema",
+      "split": "development",
+      "answerable": false,
+      "statusCorrect": true,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.routing.original/repeat-2/json_object",
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct dispatch receiver and validate call. Quoted source_labels 1/2 identify supporting excerpts to the human grader, but are not converted into native integer citations. Status/citations fields required by the host are absent. Repeat 2 is byte-identical after source/message/native-result checks; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.routing.original",
+      "arm": "json_object",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 2,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.routing.original/repeat-2/schema",
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct dispatch receiver and validate call, directly supported by target label 1. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused. This live schema control again reproduces the prior decoding run exactly; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.routing.original",
+      "arm": "schema",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 2,
+      "taskSuccess": true
+    },
+    {
+      "id": "evidence.routing.changed/repeat-2/schema",
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correctly follows the swapped roles: validate receives Apply and calls dispatch. Labels 1/2 support the receiver and token check; ancillary zero-token description is true. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused. This live schema control again reproduces the prior decoding run exactly; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.routing.changed",
+      "arm": "schema",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 2,
+      "taskSuccess": true
+    },
+    {
+      "id": "evidence.routing.changed/repeat-2/json_object",
+      "facts": [
+        "supported",
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct swapped validate receiver and dispatch validator, including the true zero-token check. Source labels are human-identifiable strings, not a valid host response; no repair is performed. Repeat 2 is byte-identical after source/message/native-result checks; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.routing.changed",
+      "arm": "json_object",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 2,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.routing.relabel/repeat-2/json_object",
+      "facts": [
+        "contradicted",
+        "contradicted"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Calls validate the Apply receiver and invents its pending call."
+      ],
+      "notes": "Same incorrect body as schema control. Labels 1/2 cover pending/validate, not the actual dispatch receiver at label 3. Repeat 2 is byte-identical after source/message/native-result checks; grade reused.",
+      "roleConfusion": true,
+      "case": "evidence.routing.relabel",
+      "arm": "json_object",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.routing.relabel/repeat-2/schema",
+      "facts": [
+        "contradicted",
+        "contradicted"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Names validate as the protocol receiver.",
+        "Invents a call to pending as token validation; pending merely returns zero."
+      ],
+      "notes": "Wrong roles/call after source order changes. Decisive dispatch definition is label 3; cited label 1 only defines pending. False insufficient-evidence status. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused. This live schema control again reproduces the prior decoding run exactly; grade reused.",
+      "roleConfusion": true,
+      "case": "evidence.routing.relabel",
+      "arm": "schema",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.routing.missing/repeat-2/schema",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Claims validate handles Apply and calls pending although the receiver definition is withheld."
+      ],
+      "notes": "Expected insufficient evidence. The visible token validator does not handle Request or call pending. Answered status and specific invented flow fail abstention. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused. This live schema control again reproduces the prior decoding run exactly; grade reused.",
+      "roleConfusion": true,
+      "rawAbstention": false,
+      "case": "evidence.routing.missing",
+      "arm": "schema",
+      "split": "development",
+      "answerable": false,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.routing.missing/repeat-2/json_object",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Claims validate handles Apply and calls pending without the receiver definition; the visible validator has no such call."
+      ],
+      "notes": "Specific invented flow rather than explicit uncertainty. Two visible helpers do not establish the missing receiver. Repeat 2 is byte-identical after source/message/native-result checks; grade reused.",
+      "roleConfusion": true,
+      "rawAbstention": false,
+      "case": "evidence.routing.missing",
+      "arm": "json_object",
+      "split": "development",
+      "answerable": false,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.versions.original/repeat-2/json_object",
+      "facts": [
+        "missing"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Claims requested is assumed to be a valid positive integer, although the u64 parameter also admits zero and no positivity check is shown."
+      ],
+      "notes": "It quotes if requested > committed but denies that any specific error relation is defined and answers None. Merely quoting a visible operator while denying the requested relation is not credited as the requested code fact. Full if/Err/else body is supplied. Repeat 2 is byte-identical after source/message/native-result checks; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.versions.original",
+      "arm": "json_object",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.versions.original/repeat-2/schema",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct strict greater-than error condition; equality is excluded by this strict relation. Ancillary propagation/describe statements match sources. Label 1 supports the requested predicate. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused. This live schema control again reproduces the prior decoding run exactly; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.versions.original",
+      "arm": "schema",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": true
+    },
+    {
+      "id": "evidence.versions.changed/repeat-2/schema",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correctly changes to requested < committed and explicitly accepts equality. Target label 1 supports the new rule. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused. This live schema control again reproduces the prior decoding run exactly; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.versions.changed",
+      "arm": "schema",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": true
+    },
+    {
+      "id": "evidence.versions.changed/repeat-2/json_object",
+      "facts": [
+        "missing"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Quotes requested < committed but does not identify it as the error condition, falsely demanding extra context and saying the supplied commit_request/describe context is unavailable. The answer is None. Treat this as a missing requested fact and false availability/calibration claim, not a correct predicate answer. Repeat 2 is byte-identical after source/message/native-result checks; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.versions.changed",
+      "arm": "json_object",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.versions.relabel/repeat-2/json_object",
+      "facts": [
+        "missing"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Falsely says the check_requested implementation is absent despite its whole body at label 3. It offers the condition only as a hypothetical example of missing information; no requested error relation is established by its answer. Repeat 2 is byte-identical after source/message/native-result checks; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.versions.relabel",
+      "arm": "json_object",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.versions.relabel/repeat-2/schema",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "Correct greater-than rule and target label 3 after permutation. Err(\"rejected\") is accepted as an error value description rather than a claim about a named Rust type. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused. This live schema control again reproduces the prior decoding run exactly; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.versions.relabel",
+      "arm": "schema",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": true
+    },
+    {
+      "id": "evidence.versions.missing/repeat-2/schema",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Asserts greater-than and then less-than-or-equal rejection rules without the check_requested definition."
+      ],
+      "notes": "The helper delegates to an unseen check; neither relation can be established. The answer is also internally inconsistent and falsely reports answered. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused. This live schema control again reproduces the prior decoding run exactly; grade reused.",
+      "roleConfusion": false,
+      "rawAbstention": false,
+      "case": "evidence.versions.missing",
+      "arm": "schema",
+      "split": "development",
+      "answerable": false,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.versions.missing/repeat-2/json_object",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Correctly explains that the two delegating/formatting helpers do not supply check_requested and its error condition is unknown. Explicit raw abstention, despite invalid status spelling and host shape. Repeat 2 is byte-identical after source/message/native-result checks; grade reused.",
+      "roleConfusion": false,
+      "rawAbstention": true,
+      "case": "evidence.versions.missing",
+      "arm": "json_object",
+      "split": "development",
+      "answerable": false,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.pins.original/repeat-2/json_object",
+      "facts": [
+        "missing"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Does not give Yes for the unconditional release call. Falsely says validate is absent (it is supplied) and requires execution context, although finish visibly captures the result, releases, then returns it. Missing requested fact and false evidence-availability conclusion. Repeat 2 is byte-identical after source/message/native-result checks; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.pins.original",
+      "arm": "json_object",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.pins.original/repeat-2/schema",
+      "facts": [
+        "contradicted"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Answers No despite the unconditional release call after validate."
+      ],
+      "notes": "The target calls release even if result is Err. A bare No does not establish the correct behaviour or explain any missing evidence. False insufficient status. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused. This live schema control again reproduces the prior decoding run exactly; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.pins.original",
+      "arm": "schema",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.pins.changed/repeat-2/schema",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": true,
+      "unsupportedClaims": [],
+      "notes": "No is correct: result.is_ok guards release, so an Err skips it. Label 1 is the decisive function. Task fails only because status falsely says insufficient evidence. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused. This live schema control again reproduces the prior decoding run exactly; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.pins.changed",
+      "arm": "schema",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.pins.changed/repeat-2/json_object",
+      "facts": [
+        "missing"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Says the necessary logic checking the validation return is missing, despite result.is_ok guarding release."
+      ],
+      "notes": "No correct No for Err is established; answer again demands an allegedly absent validate definition that is actually supplied. This does not improve on the full schema. Repeat 2 is byte-identical after source/message/native-result checks; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.pins.changed",
+      "arm": "json_object",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.pins.relabel/repeat-2/json_object",
+      "facts": [
+        "missing"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Acknowledges that finish calls release after validate, but denies that the complete supplied finish determines error behaviour and never supplies the requested unconditional-on-Err conclusion. Label 3 contains the decisive body. False uncertainty is retained as a calibration issue. Repeat 2 is byte-identical after source/message/native-result checks; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.pins.relabel",
+      "arm": "json_object",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.pins.relabel/repeat-2/schema",
+      "facts": [
+        "supported"
+      ],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Yes is correct for unconditional release, but cited label 1 only defines validate. Target finish is label 3. This is correct prose with unsupported citation selection. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused. This live schema control again reproduces the prior decoding run exactly; grade reused.",
+      "roleConfusion": false,
+      "case": "evidence.pins.relabel",
+      "arm": "schema",
+      "split": "development",
+      "answerable": true,
+      "statusCorrect": true,
+      "supportedFacts": 1,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.pins.missing/repeat-2/schema",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [
+        "Gives a definitive No to the release-on-error question while finish is withheld."
+      ],
+      "notes": "The insufficient-evidence status is correct, but bare No does not explain the missing definition and reads as an unsupported behavioural conclusion. This interpretation is explicitly recorded for human review. Repeat 2 is byte-identical after context/messages/native-reference/finish checks; grade reused. Live schema control reproduces the earlier output/context/messages/native result exactly; grade reused. This live schema control again reproduces the prior decoding run exactly; grade reused.",
+      "roleConfusion": false,
+      "rawAbstention": false,
+      "case": "evidence.pins.missing",
+      "arm": "schema",
+      "split": "development",
+      "answerable": false,
+      "statusCorrect": true,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    },
+    {
+      "id": "evidence.pins.missing/repeat-2/json_object",
+      "facts": [],
+      "citationsSupport": false,
+      "unsupportedClaims": [],
+      "notes": "Correctly explains that release and validate alone cannot establish whether missing finish invokes release on error. Explicit raw abstention; the answer None is not coerced into a host string/status/citation object. Repeat 2 is byte-identical after source/message/native-result checks; grade reused.",
+      "roleConfusion": false,
+      "rawAbstention": true,
+      "case": "evidence.pins.missing",
+      "arm": "json_object",
+      "split": "development",
+      "answerable": false,
+      "statusCorrect": false,
+      "supportedFacts": 0,
+      "taskSuccess": false
+    }
+  ],
+  "pairs": [
+    {
+      "case": "evidence.routing.original",
+      "repeat": 1,
+      "schemaTask": true,
+      "json_objectTask": false,
+      "schemaContent": true,
+      "json_objectContent": true,
+      "matchingPromptTokens": true
+    },
+    {
+      "case": "evidence.routing.changed",
+      "repeat": 1,
+      "schemaTask": true,
+      "json_objectTask": false,
+      "schemaContent": true,
+      "json_objectContent": true,
+      "matchingPromptTokens": true
+    },
+    {
+      "case": "evidence.routing.relabel",
+      "repeat": 1,
+      "schemaTask": false,
+      "json_objectTask": false,
+      "schemaContent": false,
+      "json_objectContent": false,
+      "matchingPromptTokens": true
+    },
+    {
+      "case": "evidence.routing.missing",
+      "repeat": 1,
+      "schemaTask": false,
+      "json_objectTask": false,
+      "schemaContent": false,
+      "json_objectContent": false,
+      "matchingPromptTokens": true
+    },
+    {
+      "case": "evidence.versions.original",
+      "repeat": 1,
+      "schemaTask": true,
+      "json_objectTask": false,
+      "schemaContent": true,
+      "json_objectContent": false,
+      "matchingPromptTokens": true
+    },
+    {
+      "case": "evidence.versions.changed",
+      "repeat": 1,
+      "schemaTask": true,
+      "json_objectTask": false,
+      "schemaContent": true,
+      "json_objectContent": false,
+      "matchingPromptTokens": true
+    },
+    {
+      "case": "evidence.versions.relabel",
+      "repeat": 1,
+      "schemaTask": true,
+      "json_objectTask": false,
+      "schemaContent": true,
+      "json_objectContent": false,
+      "matchingPromptTokens": true
+    },
+    {
+      "case": "evidence.versions.missing",
+      "repeat": 1,
+      "schemaTask": false,
+      "json_objectTask": false,
+      "schemaContent": false,
+      "json_objectContent": true,
+      "matchingPromptTokens": true
+    },
+    {
+      "case": "evidence.pins.original",
+      "repeat": 1,
+      "schemaTask": false,
+      "json_objectTask": false,
+      "schemaContent": false,
+      "json_objectContent": false,
+      "matchingPromptTokens": true
+    },
+    {
+      "case": "evidence.pins.changed",
+      "repeat": 1,
+      "schemaTask": false,
+      "json_objectTask": false,
+      "schemaContent": true,
+      "json_objectContent": false,
+      "matchingPromptTokens": true
+    },
+    {
+      "case": "evidence.pins.relabel",
+      "repeat": 1,
+      "schemaTask": false,
+      "json_objectTask": false,
+      "schemaContent": true,
+      "json_objectContent": false,
+      "matchingPromptTokens": true
+    },
+    {
+      "case": "evidence.pins.missing",
+      "repeat": 1,
+      "schemaTask": false,
+      "json_objectTask": false,
+      "schemaContent": false,
+      "json_objectContent": true,
+      "matchingPromptTokens": true
+    },
+    {
+      "case": "evidence.routing.original",
+      "repeat": 2,
+      "schemaTask": true,
+      "json_objectTask": false,
+      "schemaContent": true,
+      "json_objectContent": true,
+      "matchingPromptTokens": true
+    },
+    {
+      "case": "evidence.routing.changed",
+      "repeat": 2,
+      "schemaTask": true,
+      "json_objectTask": false,
+      "schemaContent": true,
+      "json_objectContent": true,
+      "matchingPromptTokens": true
+    },
+    {
+      "case": "evidence.routing.relabel",
+      "repeat": 2,
+      "schemaTask": false,
+      "json_objectTask": false,
+      "schemaContent": false,
+      "json_objectContent": false,
+      "matchingPromptTokens": true
+    },
+    {
+      "case": "evidence.routing.missing",
+      "repeat": 2,
+      "schemaTask": false,
+      "json_objectTask": false,
+      "schemaContent": false,
+      "json_objectContent": false,
+      "matchingPromptTokens": true
+    },
+    {
+      "case": "evidence.versions.original",
+      "repeat": 2,
+      "schemaTask": true,
+      "json_objectTask": false,
+      "schemaContent": true,
+      "json_objectContent": false,
+      "matchingPromptTokens": true
+    },
+    {
+      "case": "evidence.versions.changed",
+      "repeat": 2,
+      "schemaTask": true,
+      "json_objectTask": false,
+      "schemaContent": true,
+      "json_objectContent": false,
+      "matchingPromptTokens": true
+    },
+    {
+      "case": "evidence.versions.relabel",
+      "repeat": 2,
+      "schemaTask": true,
+      "json_objectTask": false,
+      "schemaContent": true,
+      "json_objectContent": false,
+      "matchingPromptTokens": true
+    },
+    {
+      "case": "evidence.versions.missing",
+      "repeat": 2,
+      "schemaTask": false,
+      "json_objectTask": false,
+      "schemaContent": false,
+      "json_objectContent": true,
+      "matchingPromptTokens": true
+    },
+    {
+      "case": "evidence.pins.original",
+      "repeat": 2,
+      "schemaTask": false,
+      "json_objectTask": false,
+      "schemaContent": false,
+      "json_objectContent": false,
+      "matchingPromptTokens": true
+    },
+    {
+      "case": "evidence.pins.changed",
+      "repeat": 2,
+      "schemaTask": false,
+      "json_objectTask": false,
+      "schemaContent": true,
+      "json_objectContent": false,
+      "matchingPromptTokens": true
+    },
+    {
+      "case": "evidence.pins.relabel",
+      "repeat": 2,
+      "schemaTask": false,
+      "json_objectTask": false,
+      "schemaContent": true,
+      "json_objectContent": false,
+      "matchingPromptTokens": true
+    },
+    {
+      "case": "evidence.pins.missing",
+      "repeat": 2,
+      "schemaTask": false,
+      "json_objectTask": false,
+      "schemaContent": false,
+      "json_objectContent": true,
+      "matchingPromptTokens": true
+    }
+  ],
+  "formats": [
+    {
+      "arm": "schema",
+      "responses": 24,
+      "jsonParsed": 24,
+      "schemaValid": 24,
+      "orderCompliant": 24,
+      "nativeReferencesValid": 24,
+      "contentCorrect": 14,
+      "taskSuccess": 10
+    },
+    {
+      "arm": "json_object",
+      "responses": 24,
+      "jsonParsed": 24,
+      "schemaValid": 0,
+      "orderCompliant": 0,
+      "nativeReferencesValid": 0,
+      "contentCorrect": 8,
+      "taskSuccess": 0
+    }
+  ],
+  "paired": {
+    "taskHelped": 0,
+    "taskHurt": 10,
+    "contentHelped": 4,
+    "contentHurt": 10
+  }
+}
