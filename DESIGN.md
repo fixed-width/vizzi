@@ -20,11 +20,15 @@ The [companion workflow](docs/companion/PRODUCT.md) is the next delivery slice. 
 what it contributes alongside an editor, rather than accepting source-browsing feature
 parity as progress towards the product goal.
 
-Natural-language questions are being evaluated as another way into the same captured
-evidence. The [CPU question experiment](docs/qa/PRODUCT.md) separates external repository
-memory, model inference and evaluation; it does not require repository-specific model
-training or establish a production answer feature. Its question library covers reusable
-and codebase-specific probes, with source-bound answers and explicit uncertainty.
+Natural-language questions should help discover and focus the same captured evidence.
+The optional model interprets search intent and helps narrow or rank results; the source
+engine owns locations, identities, analysis coverage and established relationships.
+Search remains useful without inference. Model suggestions must preserve inspectable
+evidence and expose unresolved relationships. Repository-specific training is not required.
+The [question-driven ranking experiment](docs/qa/SEARCH.md) evaluates this role separately
+from the earlier [CPU answer experiments](docs/qa/PRODUCT.md). The question library covers
+reusable and codebase-specific tasks; relevance and navigation usefulness are separate
+from complete-answer correctness.
 
 
 ## Architecture

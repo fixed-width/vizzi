@@ -1,0 +1,14 @@
+{
+  "$schema": "../../node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "mutate": ["experiments/qa/search-support.mjs"],
+  "files": ["package.json", "experiments/qa/search-support.mjs", "experiments/qa/search.test.mjs"],
+  "testRunner": "command",
+  "commandRunner": {"command": "node experiments/qa/search.test.mjs"},
+  "coverageAnalysis": "off",
+  "concurrency": 1,
+  "timeoutMS": 5000,
+  "reporters": ["clear-text", "json"],
+  "clearTextReporter": {"reportMutants": false, "logTests": false},
+  "jsonReporter": {"fileName": "/tmp/vizzi-search-node-mutations.json"},
+  "thresholds": {"break": 100}
+}

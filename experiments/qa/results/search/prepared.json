@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "createdAt": "2026-11-07T00:34:55.365Z",
+  "files": {
+    "/home/mpd/git-sources/vizzi/experiments/qa/library/search/cohort.json": "34aaab60c655f5193b56d00a8873968c2018718b451811455029723471d6062a",
+    "/home/mpd/git-sources/vizzi/experiments/qa/library/weight-edit/models.json": "7ccb9bd934b2406093baf3cc205bb08c6f5419c63eeab9ee4c975afaad47d748",
+    "/home/mpd/git-sources/vizzi/experiments/qa/library/maintainer-2026-11-05/cases.json": "39b5454f9cef1e61471097eda4b3d8bec21387c6cd3665abf4cc46bc128d4ba7",
+    "/home/mpd/git-sources/vizzi/experiments/qa/results/source-packs/prepared.json": "8064bed87d0fc6263dbdc1af01ed501bde85175cb044bf0a904c38b9c56167df",
+    "/tmp/vizzi-qa-packs-prepared/lpc-rs.tar": "03b3b09405358aaa67457b306a86497f44e2bc3597a63ba720fd28cdaf7a56a0",
+    "/home/mpd/git-sources/vizzi/docs/qa/SEARCH.md": "59d1f7bcadf8817fe5d9b8012acff2489f84d51aa2d725e0cfc3ade4a3606dff",
+    "/home/mpd/git-sources/vizzi/experiments/qa/search.mjs": "71b02c909e379e59096ac2e49a8a30a40b469b5a369c3864faf8bfcb750eb191",
+    "/home/mpd/git-sources/vizzi/experiments/qa/search-support.mjs": "4c070cde0c8a5c22c58376b7b6bf963d9bb652855c742374fc920fa83966b696",
+    "/home/mpd/git-sources/vizzi/experiments/qa/model.mjs": "0247754a2c14e88a223485a9ef1aa9426944f8bb8af2414aa263090e014e54e1",
+    "/home/mpd/git-sources/vizzi/experiments/qa/model-config.mjs": "757e4c594fe48cc71133db640ac2e3bdc1f0f777be4644920c747dcb08f24373",
+    "/home/mpd/git-sources/vizzi/experiments/qa/runtime-profile.mjs": "b66963fbb69f7905ef09b67275fa88e343ab0235458356b2780b26a7c08ed6af",
+    "/home/mpd/git-sources/vizzi/experiments/qa/support.mjs": "273417232b72a1a2522d3b5d46d67895079f83870c3328dc375a2b1bfb4ee1d8",
+    "/home/mpd/git-sources/vizzi/experiments/qa/compact-support.mjs": "fca8329cc1f3fe2c67778b5338f000b896fcc6dd354df855b4662483d4d82a48",
+    "/home/mpd/git-sources/vizzi/crates/vizzi-qa/Cargo.toml": "d11423a61a17e1dd0f9acf74216982556435ac16cfb8e779916946672517d88d",
+    "/home/mpd/git-sources/vizzi/Cargo.lock": "38c796e08d9779134fe4635de351b3018b27ff2d68feb72230c7e99fcb155f98",
+    "/home/mpd/git-sources/vizzi/crates/vizzi-qa/src/compact.rs": "ce6d769b80375c01206579e0bf6b820651e1f6b93da3f30359ab73e08336b008",
+    "/home/mpd/git-sources/vizzi/crates/vizzi-qa/src/curated.rs": "2fe97d597f92cceb73700bd63514663a21679cbbaca29cd8d339052aba51a62c",
+    "/home/mpd/git-sources/vizzi/crates/vizzi-qa/src/lib.rs": "27c3ed4f0c300517b89aa649476c082c85638454bef32cfd9ee1fad05b3ab925",
+    "/home/mpd/git-sources/vizzi/crates/vizzi-qa/src/main.rs": "dd7063ac3fb5af892aa6770d12a446a6a6881113eba82e832d4c4fd9e2eaf383",
+    "/home/mpd/git-sources/vizzi/crates/vizzi-qa/src/metadata.rs": "41076b17d033398eacc596e30703db5c4b3a95156cc68a8e1d82144d768b3caf",
+    "/home/mpd/git-sources/vizzi/crates/vizzi-qa/src/native.rs": "8562161d6843b01f145365ad0e70699cce8bdc3cafd68da2bc7af6afde657b38",
+    "/home/mpd/git-sources/vizzi/crates/vizzi-qa/src/ranking.rs": "7ad170ecaea24cb80064936ac83d42bfa505075f9abbfd8d43d3f14c2642e04c",
+    "/home/mpd/git-sources/vizzi/target/release/vizzi-qa": "03f4297149e5757ad5b424d0dd15d0ba7bd681bb99bf7c6b0f557b8a412e80ba",
+    "/home/mpd/git-sources/vizzi/target/release/vizzi-envelope": "4348433c09b341418ca0f8b87df36fedf1a872d00b0d9eb3ebf93b622548b537",
+    "/tmp/vizzi-search-prepared/inputs.json": "a59fd319364b9744f5c4b9f99ee77b937f7ba3578cc960903c153a5bf27fa9fe"
+  },
+  "sourceRoot": "/tmp/vizzi-search-prepared/source",
+  "sourceRevision": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+  "archiveSha256": "03b3b09405358aaa67457b306a86497f44e2bc3597a63ba720fd28cdaf7a56a0",
+  "previousIndexSnapshot": "32e85124e908b80f91952c6b91e4c8737ffec2c6118b70f8f50738f980444241",
+  "expectedSnapshot": "2d40aee6ae91d4d40652590a5d88d512c4c94edc8345e6074a7fb918c7c6b54e",
+  "capture": {
+    "capture": {
+      "candidates": 1032,
+      "omitted": 101,
+      "selected": 931
+    },
+    "index_ms": 10968.068709000001,
+    "ready": true,
+    "schema": 1,
+    "snapshot": "2d40aee6ae91d4d40652590a5d88d512c4c94edc8345e6074a7fb918c7c6b54e",
+    "stats": {
+      "bytes": 10754851,
+      "changed": 931,
+      "chunks": 22808,
+      "files": 931,
+      "removed": 0,
+      "reused": 0
+    }
+  },
+  "model": {
+    "id": "qwen3.5-0.8b-base-local-q4",
+    "repository": "Qwen/Qwen3.5-0.8B",
+    "revision": "2fc06364715b967f1860aea9cf38778875588b17",
+    "filename": "model-q4.gguf",
+    "bytes": 541903872,
+    "sha256": "94d3009ee9cfca48d7d852bf0fe6c14c6f4f2506e818ca63f8c873fa46320a0a",
+    "directory": "base",
+    "artifact_kind": "Locally built GGUF; repository/revision identify source, not a downloadable GGUF",
+    "gguf_architecture": "qwen35",
+    "gguf_parameter_count": 772845888,
+    "chat_template_sha256": "273d8e0e683b885071fb17e08d71e5f2a5ddfb5309756181681de4f5a1822d80"
+  },
+  "limits": {
+    "threads": 2,
+    "context_tokens": 8192,
+    "batch_tokens": 512,
+    "ubatch_tokens": 128,
+    "request_timeout_ms": 30000
+  },
+  "expectedObservations": 6,
+  "reservedGenerations": 0
+}

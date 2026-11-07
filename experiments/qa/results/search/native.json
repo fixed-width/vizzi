@@ -1,0 +1,22 @@
+{
+  "pid": 273814,
+  "ready": {
+    "capture": {
+      "candidates": 1032,
+      "omitted": 101,
+      "selected": 931
+    },
+    "index_ms": 12311.233201000001,
+    "ready": true,
+    "schema": 1,
+    "snapshot": "2d40aee6ae91d4d40652590a5d88d512c4c94edc8345e6074a7fb918c7c6b54e",
+    "stats": {
+      "bytes": 10754851,
+      "changed": 931,
+      "chunks": 22808,
+      "files": 931,
+      "removed": 0,
+      "reused": 0
+    }
+  }
+}

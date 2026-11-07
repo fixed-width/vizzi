@@ -1,5 +1,14 @@
 # Run the CPU repository-question pilot
 
+The current development direction is [question-driven source ranking](SEARCH.md): an
+optional small model helps order inspectable search results. The earlier answer studies
+below remain historical evidence; they do not define the model's product role. Read
+[the search explanation](../../docs/explanation/question-driven-search.md) for that distinction.
+The [first ranking results](SEARCH_RESULTS.md) show stable source binding but inconsistent
+relevance and an 8.73-second median cost. The [source-card trial](results/search/trial.md)
+keeps the baseline and both proposed orders inspectable. Candidate coverage is the next
+engineering priority; this model is not selected for integration.
+
 This how-to is for contributors reproducing the experiment in
 [PRODUCT](../../docs/qa/PRODUCT.md) and [TECH](../../docs/qa/TECH.md). The experiment is
 isolated from the viewer and opens no editor/browser. Candidates answer locally;

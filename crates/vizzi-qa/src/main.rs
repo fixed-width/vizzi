@@ -52,6 +52,10 @@ enum Request {
         id: String,
         answer: IdAnswer,
     },
+    Reorder {
+        id: String,
+        order: Vec<usize>,
+    },
     Refresh,
 }
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -146,6 +150,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     let references = corpus.validate_ids(context, &answer)?;
                     Ok(
                         json!({"id":id,"provenance_valid":true,"references":references,"semantic_correctness":"not_checked"}),
+                    )
+                }
+                Request::Reorder { id, order } => {
+                    let context = &contexts
+                        .iter()
+                        .rev()
+                        .find(|(key, _)| key == &id)
+                        .ok_or("Context expired or unknown")?
+                        .1;
+                    let evidence = corpus.reorder(context, &order)?;
+                    Ok(
+                        json!({"id":id,"context":{"snapshot":context.snapshot(),"evidence":evidence},"relevance":"not_checked"}),
                     )
                 }
                 Request::Refresh => {

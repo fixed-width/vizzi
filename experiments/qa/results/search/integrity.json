@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "allFreezeHashesStillMatch": true,
+  "sourceArchiveUnchanged": true,
+  "sourceRevision": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+  "indexVersionChangeRecorded": true,
+  "currentIndexSnapshot": "2d40aee6ae91d4d40652590a5d88d512c4c94edc8345e6074a7fb918c7c6b54e",
+  "gradesFrozenBeforeModelStartup": true,
+  "modelAndRuntimeUnchanged": true,
+  "rawResponsesMatchParsedResults": true,
+  "allSixOrdersCompleteAndSourceBound": true,
+  "allCacheReuseZero": true,
+  "reversedPresentationsOnlyReorderSameCards": true,
+  "ownedProcessesStopped": true,
+  "reservedGenerations": 0,
+  "historicalChecksumsVerified": [
+    {
+      "archive": "bf16-probe",
+      "files": 41
+    },
+    {
+      "archive": "compact",
+      "files": 15
+    },
+    {
+      "archive": "decoding",
+      "files": 36
+    },
+    {
+      "archive": "decomposition",
+      "files": 12
+    },
+    {
+      "archive": "dispatch-erratum",
+      "files": 7
+    },
+    {
+      "archive": "evidence-use",
+      "files": 36
+    },
+    {
+      "archive": "json-object",
+      "files": 29
+    },
+    {
+      "archive": "maintainer",
+      "files": 9
+    },
+    {
+      "archive": "model-comparison",
+      "files": 19
+    },
+    {
+      "archive": "pilot",
+      "files": 4
+    },
+    {
+      "archive": "prefill",
+      "files": 25
+    },
+    {
+      "archive": "source-packs",
+      "files": 12
+    },
+    {
+      "archive": "token-probe",
+      "files": 37
+    },
+    {
+      "archive": "weight-edit",
+      "files": 39
+    }
+  ]
+}

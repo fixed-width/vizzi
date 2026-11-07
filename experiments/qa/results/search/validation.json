@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "native": "Fresh full workspace tests/doctests: 456 pass. Formatting and all-target Clippy pass; optimized native host/observer build pass. No browser/UI changes.",
+  "node": "All 19 serial QA test files pass. TDD logs retain missing-method/module and protocol/ledger/card/key regression failures before implementation/fixes.",
+  "mutations": "Portable module: 3 caught, 1 unviable, 0 missed/timeouts. Whole Node helper: 191 caught, 2 reviewed equivalents, 0 timeouts/errors/no-coverage; raw 98.96, exit 1 at threshold 100. Initial survivors led to stronger bounds, multi-question, ledger and fallback tests plus canonical grade-key validation. Native/HTTP transport outside mutation scopes.",
+  "inference": "Six serial requests after all build/correctness/mutation work; CPU only, two inference/prefill threads, nice 10. One native index and one model server. Both stopped.",
+  "scope": "Known maintainer questions and source-aware agent relevance grades. Reranking only, no generated answer. One cached 0.8B model/prompt, no tuning or retries after inference; all eight reserved cases unrun. Not independent usefulness acceptance or whole-repository qualification."
+}

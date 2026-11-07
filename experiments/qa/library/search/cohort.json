@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "questions": "experiments/qa/library/maintainer-2026-11-05/cases.json",
+  "case_ids": ["maintainer.lpc-rs.transaction-creation", "maintainer.lpc-rs.add-efun", "maintainer.lpc-rs.commit-checks"],
+  "sourceRecord": "experiments/qa/results/source-packs/prepared.json",
+  "models": "experiments/qa/library/weight-edit/models.json",
+  "model": "qwen3.5-0.8b-base-local-q4",
+  "runtimeSha256": "eaf9c1c664cc0ae1f4dea4b171bb91aac8409fcfea0574c9b6bcc93792ce2400",
+  "selector": "compact",
+  "limit": 8,
+  "budget": 4000,
+  "limits": {"threads": 2, "context_tokens": 8192, "batch_tokens": 512, "ubatch_tokens": 128, "request_timeout_ms": 30000},
+  "reservedGenerations": 0,
+  "split": "development"
+}

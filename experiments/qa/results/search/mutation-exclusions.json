@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "node": {
+    "scope": "Whole search-support.mjs; CLI/HTTP transport outside mutation scope.",
+    "caught": 191,
+    "equivalentSurvivors": 2,
+    "timeouts": 0,
+    "errors": 0,
+    "noCoverage": 0,
+    "rawScore": 98.96,
+    "rawToolExit": 1,
+    "sourceSha256": "4c070cde0c8a5c22c58376b7b6bf963d9bb652855c742374fc920fa83966b696",
+    "exclusions": [
+      {
+        "file": "experiments/qa/search-support.mjs",
+        "id": "8",
+        "location": {
+          "end": {
+            "column": 43,
+            "line": 4
+          },
+          "start": {
+            "column": 12,
+            "line": 4
+          }
+        },
+        "mutator": "ConditionalExpression",
+        "replacement": "true",
+        "reason": "For JSON question values, non-strings are still rejected by the following trim/Buffer operation. This removes only the early type diagnostic; executable objects are outside the JSON input contract."
+      },
+      {
+        "file": "experiments/qa/search-support.mjs",
+        "id": "184",
+        "location": {
+          "end": {
+            "column": 18,
+            "line": 56
+          },
+          "start": {
+            "column": 3,
+            "line": 56
+          }
+        },
+        "mutator": "CallExpression",
+        "replacement": ";",
+        "reason": "A missing planned row is still rejected by the following row.case access; only rejection diagnostics change."
+      }
+    ]
+  },
+  "rust": {
+    "scope": "Whole crates/vizzi-qa/src/ranking.rs; native JSON-line handler outside mutation scope.",
+    "caught": 3,
+    "unviable": 1,
+    "missed": 0,
+    "timeouts": 0,
+    "sourceSha256": "7ad170ecaea24cb80064936ac83d42bfa505075f9abbfd8d43d3f14c2642e04c",
+    "unviableReason": "Generated success stub requires Evidence: Default, which is not implemented. Compilation failure is separate from mutations caught by tests."
+  }
+}

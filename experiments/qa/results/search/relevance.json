@@ -1,0 +1,100 @@
+{
+  "schema": 1,
+  "auditedAt": "2026-11-07T00:36:22.902Z",
+  "authorship": "Source-aware agent, before any ranking inference; known development questions, not independent maintainer acceptance.",
+  "gradeDefinition": {
+    "0": "unhelpful match",
+    "1": "useful supporting context/example",
+    "2": "direct implementation or extension starting point"
+  },
+  "cases": {
+    "maintainer.lpc-rs.transaction-creation": {
+      "grades": {
+        "1": 1,
+        "2": 1,
+        "3": 2,
+        "4": 0,
+        "5": 0,
+        "6": 1,
+        "7": 0,
+        "8": 0
+      },
+      "reasons": {
+        "1": "A transaction_tests.rs Pending helper visibly constructs a Transaction from start_txn; useful example, not the normal task entry.",
+        "2": "TxnHandle::new wraps an already-created Transaction; supporting ownership context, not the transaction constructor.",
+        "3": "The visible impl Transaction and new(snapshot) initialize snapshot, Changeset and effects: a direct implementation starting point.",
+        "4": "Counters for commits and new world versions do not locate transaction creation.",
+        "5": "Class copy-on-write updates an existing transaction and does not locate its creation.",
+        "6": "Architecture guidance points to interpreter/stm/retry.rs for attempts; a supporting navigation clue, with no constructor/caller shown.",
+        "7": "Process fields mention transaction-visible layout and object creation time, not transaction creation.",
+        "8": "Scheduling/lifetime prose contains no creation entry location or constructor."
+      },
+      "missing_expected_sources": [
+        "Task::open_attempt, the normal owning-task transaction creation caller, is absent."
+      ],
+      "notes": [
+        "The test-helper path in label 1 is labelled code by the current role hint. Grade uses its visible construction and test path, not that hint as authority."
+      ]
+    },
+    "maintainer.lpc-rs.add-efun": {
+      "grades": {
+        "1": 1,
+        "2": 1,
+        "3": 0,
+        "4": 1,
+        "5": 1,
+        "6": 1,
+        "7": 1,
+        "8": 0
+      },
+      "reasons": {
+        "1": "A native efun handler signature/body is a useful implementation example; no registration/extension mechanism is shown.",
+        "2": "The same handler has documentation and its EfunContext signature; useful but partly duplicates label 1.",
+        "3": "Constructs a runtime EfunContext; it does not implement/register a new efun or show handler boilerplate.",
+        "4": "Another native handler example shows EfunContext and runtime error handling, without registration.",
+        "5": "A native handler example; its add_rule command behavior must not be confused with registering an efun.",
+        "6": "Another native handler example; add_action is not itself the efun registration mechanism.",
+        "7": "A design note states that efuns append to the registry to preserve indices; supporting guidance but no registry location or row.",
+        "8": "A synonym behavior comparison does not explain extending the native efun set."
+      },
+      "missing_expected_sources": [
+        "The efuns! registration table/macro and module declaration are absent.",
+        "Test and documentation extension locations are absent."
+      ],
+      "notes": [
+        "No grade-2 direct extension mechanism is in this pool; handler examples remain grade 1.",
+        "The two parse_add_synonym excerpts partly duplicate one another."
+      ]
+    },
+    "maintainer.lpc-rs.commit-checks": {
+      "grades": {
+        "1": 1,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 2,
+        "8": 1
+      },
+      "reasons": {
+        "1": "The guide names snapshot, staging, committer submission, rejection/retry and receipt delivery; useful orientation but no source checks or locations.",
+        "2": "get_char registration semantics are downstream behavior and do not locate the general commit/check path.",
+        "3": "A collector explainer describes GcRefused checks for garbage collection, a different operation from transaction commit validation.",
+        "4": "Historical build/test validation prose does not locate runtime commit checks.",
+        "5": "Exports of the visualization UI do not implement transaction commits.",
+        "6": "An environment iterator retains a transaction handle but does not submit or validate commits.",
+        "7": "Production Publication::commit_phase visibly submits Transaction::take_changeset via commit_changeset: a direct source entry for a native socket commit path.",
+        "8": "A Fixture::commit helper demonstrates commit_changeset submission; useful test example, not the production validation path."
+      },
+      "missing_expected_sources": [
+        "The normal Task submission/delivery path is absent.",
+        "Committer::dispatch and the validator with the requested rejection checks are absent."
+      ],
+      "notes": [
+        "The sole direct source result is a specialized native socket submission path, not a complete general commit trace.",
+        "Label 8 has a test path despite its code role hint."
+      ]
+    }
+  }
+}

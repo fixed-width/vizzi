@@ -3,6 +3,7 @@ mod compact;
 mod curated;
 mod metadata;
 pub mod native;
+mod ranking;
 pub use curated::SourceRange;
 pub use metadata::{SourceRole, SourceScope};
 use serde::{Deserialize, Serialize};

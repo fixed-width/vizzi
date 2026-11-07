@@ -1,0 +1,252 @@
+{
+  "schema": 1,
+  "knownQuestions": 3,
+  "candidates": [
+    {
+      "case": "maintainer.lpc-rs.transaction-creation",
+      "returned": 8,
+      "literalBytes": 3008,
+      "missingExpectedSources": [
+        "Task::open_attempt, the normal owning-task transaction creation caller, is absent."
+      ]
+    },
+    {
+      "case": "maintainer.lpc-rs.add-efun",
+      "returned": 8,
+      "literalBytes": 3425,
+      "missingExpectedSources": [
+        "The efuns! registration table/macro and module declaration are absent.",
+        "Test and documentation extension locations are absent."
+      ]
+    },
+    {
+      "case": "maintainer.lpc-rs.commit-checks",
+      "returned": 8,
+      "literalBytes": 3023,
+      "missingExpectedSources": [
+        "The normal Task submission/delivery path is absent.",
+        "Committer::dispatch and the validator with the requested rejection checks are absent."
+      ]
+    }
+  ],
+  "modelRequests": 6,
+  "validCompleteOrders": 6,
+  "sourceBindingValid": 6,
+  "baselineFallbacks": 0,
+  "reservedGenerations": 0,
+  "medianAdditionalRankingMs": 8734.240893499998,
+  "maxAdditionalRankingMs": 10119.199013000001,
+  "rankingMs": [
+    {
+      "id": "maintainer.lpc-rs.transaction-creation/forward",
+      "ms": 8964.214859999998
+    },
+    {
+      "id": "maintainer.lpc-rs.add-efun/forward",
+      "ms": 10117.824185999998
+    },
+    {
+      "id": "maintainer.lpc-rs.commit-checks/forward",
+      "ms": 8323.918758
+    },
+    {
+      "id": "maintainer.lpc-rs.commit-checks/reverse",
+      "ms": 8499.230521999998
+    },
+    {
+      "id": "maintainer.lpc-rs.add-efun/reverse",
+      "ms": 10116.004701999998
+    },
+    {
+      "id": "maintainer.lpc-rs.transaction-creation/reverse",
+      "ms": 8401.294096999998
+    }
+  ],
+  "nativeIndexMs": 12311.233201000001,
+  "modelStartupMs": 1045.4348279999995,
+  "retrievalMs": [
+    {
+      "case": "maintainer.lpc-rs.transaction-creation",
+      "ms": 555.082813
+    },
+    {
+      "case": "maintainer.lpc-rs.add-efun",
+      "ms": 717.030686
+    },
+    {
+      "case": "maintainer.lpc-rs.commit-checks",
+      "ms": 511.745903
+    }
+  ],
+  "peakPssKiB": 1209430,
+  "peakPssGiB": 1.153402328491211,
+  "wholeObservedMs": 70390.241387,
+  "samplingErrors": 0,
+  "within4GiBObservedTarget": true,
+  "within5SecondMedianTarget": false,
+  "quality": [
+    {
+      "id": "maintainer.lpc-rs.transaction-creation/forward",
+      "top3": [
+        3,
+        1,
+        5
+      ],
+      "baseline": {
+        "topGrades": [
+          1,
+          1,
+          2
+        ],
+        "ndcgAt3": 0.7579237460681981,
+        "firstDirectRank": 3
+      },
+      "suggested": {
+        "topGrades": [
+          2,
+          1,
+          0
+        ],
+        "ndcgAt3": 0.878961873034099,
+        "firstDirectRank": 1
+      }
+    },
+    {
+      "id": "maintainer.lpc-rs.add-efun/forward",
+      "top3": [
+        1,
+        2,
+        3
+      ],
+      "baseline": {
+        "topGrades": [
+          1,
+          1,
+          0
+        ],
+        "ndcgAt3": 0.7653606369886217,
+        "firstDirectRank": null
+      },
+      "suggested": {
+        "topGrades": [
+          1,
+          1,
+          0
+        ],
+        "ndcgAt3": 0.7653606369886217,
+        "firstDirectRank": null
+      }
+    },
+    {
+      "id": "maintainer.lpc-rs.commit-checks/forward",
+      "top3": [
+        3,
+        4,
+        5
+      ],
+      "baseline": {
+        "topGrades": [
+          1,
+          0,
+          0
+        ],
+        "ndcgAt3": 0.24207625393180188,
+        "firstDirectRank": 7
+      },
+      "suggested": {
+        "topGrades": [
+          0,
+          0,
+          0
+        ],
+        "ndcgAt3": 0,
+        "firstDirectRank": 5
+      }
+    },
+    {
+      "id": "maintainer.lpc-rs.commit-checks/reverse",
+      "top3": [
+        1,
+        2,
+        3
+      ],
+      "baseline": {
+        "topGrades": [
+          1,
+          0,
+          0
+        ],
+        "ndcgAt3": 0.24207625393180188,
+        "firstDirectRank": 7
+      },
+      "suggested": {
+        "topGrades": [
+          1,
+          0,
+          0
+        ],
+        "ndcgAt3": 0.24207625393180188,
+        "firstDirectRank": 7
+      }
+    },
+    {
+      "id": "maintainer.lpc-rs.add-efun/reverse",
+      "top3": [
+        7,
+        6,
+        1
+      ],
+      "baseline": {
+        "topGrades": [
+          1,
+          1,
+          0
+        ],
+        "ndcgAt3": 0.7653606369886217,
+        "firstDirectRank": null
+      },
+      "suggested": {
+        "topGrades": [
+          1,
+          1,
+          1
+        ],
+        "ndcgAt3": 1,
+        "firstDirectRank": null
+      }
+    },
+    {
+      "id": "maintainer.lpc-rs.transaction-creation/reverse",
+      "top3": [
+        7,
+        6,
+        1
+      ],
+      "baseline": {
+        "topGrades": [
+          1,
+          1,
+          2
+        ],
+        "ndcgAt3": 0.7579237460681981,
+        "firstDirectRank": 3
+      },
+      "suggested": {
+        "topGrades": [
+          0,
+          1,
+          1
+        ],
+        "ndcgAt3": 0.27377123820459426,
+        "firstDirectRank": 4
+      }
+    }
+  ],
+  "improvedPresentations": 2,
+  "worsenedPresentations": 2,
+  "unchangedPresentations": 2,
+  "identicalOrdersAcrossPresentation": 0,
+  "rankerQualifiedForIntegration": false,
+  "medianModelRequestMs": 8731.722690999999,
+  "maxModelRequestMs": 10117.824185999998
+}
