@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "allFrozenHashesStillMatch": true,
+  "ownedNativeStopped": true,
+  "sourceSha256": {
+    "crates/vizzi-qa/src/discovery.rs": "e3b6b6838321c9270b8c4a0a02246407c35eeb5dab06feffc8b40bbb9dea205c",
+    "crates/vizzi-qa/src/lib.rs": "63b10a7fc65544df10a492384b82fbfef918e2280bf9c4cb48507b8084be3bdd",
+    "crates/vizzi-qa/tests/ownership.rs": "7fcd0262e1088f7211c0a50e5a4cbe9dbb38ebadb4197e3e6eb12b4a12b4a98f",
+    "experiments/qa/coverage.mjs": "ae3060e953ea95a16bc30860c0edd59aed540fe3f74522ae184fb252c44f45a8",
+    "experiments/qa/coverage-support.mjs": "1afffd50036869c34489efbfe55b8fc4d7ee3242462944dbe88b1b6789780c18",
+    "experiments/qa/library/search-ownership/cohort.json": "a6d44b7925d9d4d8c8a530fa5a499dd2bd8cbee5b1ef203e55421dda67efebc8"
+  },
+  "workspaceTestsAndDoctests": 486,
+  "serialQaTests": 20,
+  "formattingAndClippyPassed": true,
+  "coreAndBrowserSourcesUnchanged": true,
+  "previousBrowserBaselineRetained": true,
+  "modelRequests": 0,
+  "reservedGenerations": 0
+}

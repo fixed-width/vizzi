@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "native": "Fresh full workspace tests/doctests: 486 pass. All-target Clippy, formatting and optimized native host/observer build pass. Twelve ownership regressions supplement existing discovery/protocol tests.",
+  "node": "All 20 serial QA test files pass. Cohort runner verifies unchanged questions/targets and freezes both cohort files. Ninety measured native responses pass source binding and assessment checks.",
+  "mutations": "Whole search module: 88 caught, 4 reviewed result/rejection equivalents, 3 unviable, 1 timeout. Supplemental excerpt storage: only 1 unviable generated variant, no viable direct field mutant. Prior Node-helper mutation evidence retained with identical source hash. Single low-priority mutant/compiler job throughout mutation runs.",
+  "browser": "Core/browser/vizzi host source unchanged from 7219417. Prior complete headless browser pass retained, not rerun; current change is the experimental native QA crate/runner.",
+  "measurement": "No model. All build/correctness/mutation work finishes before serial optimized queries at nice 10. One native index, owned process stopped. Observer sampling is not an enforced memory cap.",
+  "limits": "Known development queries and preferred source locators; no independent task acceptance or held-out generalisation. Captured ownership is lexical, not resolved semantic type/call ownership. Earlier archives preserved and all eight reserved cases unrun."
+}

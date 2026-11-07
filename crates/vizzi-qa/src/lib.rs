@@ -63,6 +63,8 @@ struct Window {
 /// A bounded source excerpt with a prompt-local label and complete source identity.
 #[derive(Debug, Serialize)]
 pub struct Evidence {
+    #[serde(skip)]
+    range: Range<usize>,
     /// One-based prompt-local citation label.
     pub label: usize,
     /// Content/path/range-derived identity.
@@ -242,6 +244,7 @@ fn excerpt(file: &IndexedFile, range: &Range<usize>, label: usize) -> Evidence {
             .filter(|b| *b == b'\n')
             .count();
     Evidence {
+        range: range.clone(),
         label,
         id: hash.finalize().to_hex().to_string(),
         path: file.path.clone(),

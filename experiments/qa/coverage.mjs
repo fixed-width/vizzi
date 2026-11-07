@@ -7,11 +7,12 @@ import {corpus,json,digest} from './support.mjs';
 import {captureHashes,verifyHashes} from './compact-support.mjs';
 import {coveragePlan,locateTarget,assessCoverage} from './coverage-support.mjs';
 
-const [command,...args]=process.argv.slice(2),allowed=new Set(['--output','--prepared','--source-archive']);
+const [command,...args]=process.argv.slice(2),allowed=new Set(['--output','--prepared','--source-archive','--cohort']);
 assert.ok(['prepare','run'].includes(command));for(let i=0;i<args.length;i+=2)assert.ok(allowed.has(args[i])&&args[i+1]&&!args[i+1].startsWith('--'));
 const option=name=>{const i=args.indexOf(name);assert.ok(i>=0,`missing ${name}`);return resolve(args[i+1]);};
-const output=option('--output'),specPath='experiments/qa/library/search-coverage/cohort.json',spec=await json(specPath),save=(path,value)=>writeFile(path,JSON.stringify(value,null,2)+'\n',{flag:'wx'});
+const output=option('--output'),specPath=args.includes('--cohort')?option('--cohort'):'experiments/qa/library/search-coverage/cohort.json',spec=await json(specPath),save=(path,value)=>writeFile(path,JSON.stringify(value,null,2)+'\n',{flag:'wx'});
 assert.equal(spec.schema,1);assert.equal(spec.split,'known_development');assert.equal(spec.reservedGenerations,0);assert.equal(spec.repeats,3);assert.deepEqual(spec.selectors,['compact','search']);
+if(spec.previousCohort)assert.deepEqual(spec.cases,(await json(spec.previousCohort)).cases,'comparison targets/questions changed');
 const plan=coveragePlan(spec.cases);
 if(command==='prepare'){
  const source=await json(spec.sourceRecord),archive=args.includes('--source-archive')?option('--source-archive'):source.sourceRoot+'.tar',root=join(output,'source');
@@ -29,7 +30,7 @@ if(command==='prepare'){
  try{
   assert.equal(index.ready.stats.files,source.initial.stats.files);assert.equal(index.ready.stats.bytes,source.initial.stats.bytes);
   const rust=[];for(const crate of ['vizzi-core','vizzi-qa'])for(const file of await readdir('crates/'+crate+'/src'))if(file.endsWith('.rs'))rust.push(join('crates',crate,'src',file));
-  const files=await captureHashes([specPath,spec.sourceRecord,spec.protocol,archive,...rust,'Cargo.toml','Cargo.lock','experiments/qa/coverage.mjs','experiments/qa/coverage-support.mjs','experiments/qa/support.mjs','experiments/qa/compact-support.mjs','target/release/vizzi-qa','target/release/vizzi-envelope',join(output,'source-audit.json')]);
+  const files=await captureHashes([specPath,spec.sourceRecord,spec.protocol,...(spec.previousCohort?[spec.previousCohort]:[]),archive,...rust,'Cargo.toml','Cargo.lock','experiments/qa/coverage.mjs','experiments/qa/coverage-support.mjs','experiments/qa/support.mjs','experiments/qa/compact-support.mjs','target/release/vizzi-qa','target/release/vizzi-envelope',join(output,'source-audit.json')]);
   await save(join(output,'prepared.json'),{schema:1,createdAt:new Date().toISOString(),files,sourceRoot:root,sourceRevision:source.sourceRevision,sourceArchiveSha256:source.archiveSha256,previousIndexSnapshot:source.initial.snapshot,previousRankingIndexSnapshot:(await json('experiments/qa/results/search/prepared.json')).expectedSnapshot,expectedSnapshot:index.ready.snapshot,capture:index.ready,expectedObservations:plan.length,reservedGenerations:0});
   console.log(`Froze ${spec.cases.length} known questions, ${audit.length} audited source targets and ${plan.length} paired observations; no queries run.`);
  }finally{await index.close();}

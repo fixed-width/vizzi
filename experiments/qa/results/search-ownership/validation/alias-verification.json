@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "change": "Clippy type alias for the existing priority tuple only",
+  "allMutationTestedFunctionBodiesByteIdentical": true,
+  "mutantInventoryIdentical": 96,
+  "functions": {
+    "plan": "638455b9d6257cdfe7fb26a83d129c803e549f35ba5960ee35741fdfccaa43eb",
+    "matches": "f5c6bb778f22b61694c090edd5b708c6d2a6726b2c7b2561155b93af97001789",
+    "bits": "0ea17bf3556af7df4844963182fe1814faae4d86810838ade5511772329e59fa",
+    "text_bits": "8a82f02e3e376b02e36a323870d0fb43de20564d9643985029f413572875f42d",
+    "ownership": "2d01f3c5a0fc3dde4638d728b8f468910c3b0e07bf286d0b93441c23b139336b",
+    "tier": "3d250a7ff9427640895281cfbe74cbfabc7c0a4af5265e2701519b6aed41593a",
+    "diversify": "88cfbb2b893059f44344d2542dd456c4b36b118a94ddca27e72a2ac21cdafc07",
+    "Corpus::retrieve_search": "cc4be1550f39bd8a373410ac7d3ec23c797fbd4c8baa9c8816cb2c0ecbb3b8b4"
+  }
+}

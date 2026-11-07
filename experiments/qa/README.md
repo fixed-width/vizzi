@@ -12,6 +12,9 @@ The [candidate-coverage follow-up](SEARCH_COVERAGE_RESULTS.md) adds raw macro de
 and a separate deterministic search selector. It finds four of seven preferred locators
 at low query cost but loses the transaction constructor; it stays experimental. The
 [source-card comparison](results/search-coverage/trial.md) keeps that counterexample visible.
+The [ownership revision](SEARCH_OWNERSHIP_RESULTS.md) restores the constructor's exact
+baseline identity at rank 1 and moves the validator first, but loses the receiver and
+still misses the Task entry. Coverage remains 4/7, so the selector stays experimental.
 
 This how-to is for contributors reproducing the experiment in
 [PRODUCT](../../docs/qa/PRODUCT.md) and [TECH](../../docs/qa/TECH.md). The experiment is

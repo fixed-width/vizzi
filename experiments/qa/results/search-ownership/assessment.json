@@ -1,0 +1,2036 @@
+[
+  {
+    "id": "maintainer.lpc-rs.transaction-creation/search/repeat-1",
+    "case": "maintainer.lpc-rs.transaction-creation",
+    "question": "where are new transactions created?",
+    "selector": "search",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "constructor",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      },
+      {
+        "id": "owning-entry",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 542.6378990000001,
+    "roundTripMs": 543.570584000001
+  },
+  {
+    "id": "maintainer.lpc-rs.transaction-creation/compact/repeat-1",
+    "case": "maintainer.lpc-rs.transaction-creation",
+    "question": "where are new transactions created?",
+    "selector": "compact",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "constructor",
+        "literalRank": 3,
+        "scopeRank": null,
+        "foundRank": 3
+      },
+      {
+        "id": "owning-entry",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 499.030435,
+    "roundTripMs": 499.405385
+  },
+  {
+    "id": "maintainer.lpc-rs.add-efun/compact/repeat-1",
+    "case": "maintainer.lpc-rs.add-efun",
+    "question": "how do i add a new efun?",
+    "selector": "compact",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "registration-definition",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "registration-table",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 547.030078,
+    "roundTripMs": 547.4410909999988
+  },
+  {
+    "id": "maintainer.lpc-rs.add-efun/search/repeat-1",
+    "case": "maintainer.lpc-rs.add-efun",
+    "question": "how do i add a new efun?",
+    "selector": "search",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "registration-definition",
+        "literalRank": 1,
+        "scopeRank": 1,
+        "foundRank": 1
+      },
+      {
+        "id": "registration-table",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 609.368301,
+    "roundTripMs": 609.8927669999994
+  },
+  {
+    "id": "maintainer.lpc-rs.commit-checks/search/repeat-1",
+    "case": "maintainer.lpc-rs.commit-checks",
+    "question": "show me the codepath that transaction commits take, with all the checks they go through",
+    "selector": "search",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "receiver",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "validator",
+        "literalRank": 1,
+        "scopeRank": 1,
+        "foundRank": 1
+      },
+      {
+        "id": "future-version-check",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      }
+    ],
+    "elapsedMs": 475.271461,
+    "roundTripMs": 475.5621030000002
+  },
+  {
+    "id": "maintainer.lpc-rs.commit-checks/compact/repeat-1",
+    "case": "maintainer.lpc-rs.commit-checks",
+    "question": "show me the codepath that transaction commits take, with all the checks they go through",
+    "selector": "compact",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "receiver",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "validator",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "future-version-check",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 404.044992,
+    "roundTripMs": 404.6540180000011
+  },
+  {
+    "id": "v2.lpc-rs.purpose/compact/repeat-1",
+    "case": "v2.lpc-rs.purpose",
+    "question": "What is lpc-rs, and what kind of applications is it intended to run?",
+    "selector": "compact",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      },
+      {
+        "id": "fact-2",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      }
+    ],
+    "elapsedMs": 698.625842,
+    "roundTripMs": 699.186162
+  },
+  {
+    "id": "v2.lpc-rs.purpose/search/repeat-1",
+    "case": "v2.lpc-rs.purpose",
+    "question": "What is lpc-rs, and what kind of applications is it intended to run?",
+    "selector": "search",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      },
+      {
+        "id": "fact-2",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      }
+    ],
+    "elapsedMs": 736.8377109999999,
+    "roundTripMs": 737.2770250000012
+  },
+  {
+    "id": "v2.lpc-rs.language/search/repeat-1",
+    "case": "v2.lpc-rs.language",
+    "question": "What implementation language and language edition does the project declare?",
+    "selector": "search",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "fact-2",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      }
+    ],
+    "elapsedMs": 97.483874,
+    "roundTripMs": 97.93363700000191
+  },
+  {
+    "id": "v2.lpc-rs.language/compact/repeat-1",
+    "case": "v2.lpc-rs.language",
+    "question": "What implementation language and language edition does the project declare?",
+    "selector": "compact",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "fact-2",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      }
+    ],
+    "elapsedMs": 98.96161000000001,
+    "roundTripMs": 99.44937199999913
+  },
+  {
+    "id": "v2.lpc-rs.entry/compact/repeat-1",
+    "case": "v2.lpc-rs.entry",
+    "question": "Where does the gamedriver executable start, and how does it boot the runtime?",
+    "selector": "compact",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      },
+      {
+        "id": "fact-2",
+        "literalRank": 2,
+        "scopeRank": null,
+        "foundRank": 2
+      }
+    ],
+    "elapsedMs": 224.001139,
+    "roundTripMs": 224.49174499999936
+  },
+  {
+    "id": "v2.lpc-rs.entry/search/repeat-1",
+    "case": "v2.lpc-rs.entry",
+    "question": "Where does the gamedriver executable start, and how does it boot the runtime?",
+    "selector": "search",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      },
+      {
+        "id": "fact-2",
+        "literalRank": 2,
+        "scopeRank": null,
+        "foundRank": 2
+      }
+    ],
+    "elapsedMs": 237.278538,
+    "roundTripMs": 237.64833400000134
+  },
+  {
+    "id": "v2.lpc-rs.configuration/search/repeat-1",
+    "case": "v2.lpc-rs.configuration",
+    "question": "How can I select the gamedriver environment file, and which environment setting has precedence for its mudlib root?",
+    "selector": "search",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 444.38945,
+    "roundTripMs": 444.8453420000005
+  },
+  {
+    "id": "v2.lpc-rs.configuration/compact/repeat-1",
+    "case": "v2.lpc-rs.configuration",
+    "question": "How can I select the gamedriver environment file, and which environment setting has precedence for its mudlib root?",
+    "selector": "compact",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 530.709521,
+    "roundTripMs": 531.2924700000003
+  },
+  {
+    "id": "v2.lpc-rs.validation/compact/repeat-1",
+    "case": "v2.lpc-rs.validation",
+    "question": "Which commands does the project document for workspace builds, tests, linting and formatting?",
+    "selector": "compact",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 597.229412,
+    "roundTripMs": 597.5330270000013
+  },
+  {
+    "id": "v2.lpc-rs.validation/search/repeat-1",
+    "case": "v2.lpc-rs.validation",
+    "question": "Which commands does the project document for workspace builds, tests, linting and formatting?",
+    "selector": "search",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 607.745172,
+    "roundTripMs": 608.1437069999993
+  },
+  {
+    "id": "v2.lpc-rs.safety/search/repeat-1",
+    "case": "v2.lpc-rs.safety",
+    "question": "Does the main lpc-rs library permit unsafe Rust?",
+    "selector": "search",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 866.053552,
+    "roundTripMs": 866.4401839999991
+  },
+  {
+    "id": "v2.lpc-rs.safety/compact/repeat-1",
+    "case": "v2.lpc-rs.safety",
+    "question": "Does the main lpc-rs library permit unsafe Rust?",
+    "selector": "compact",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 795.316024,
+    "roundTripMs": 795.7024190000011
+  },
+  {
+    "id": "v2.lpc-rs.reader/compact/repeat-1",
+    "case": "v2.lpc-rs.reader",
+    "question": "Which abstraction supplies compiler source bytes, and what is the default implementation?",
+    "selector": "compact",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 5,
+        "scopeRank": null,
+        "foundRank": 5
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 530.327996,
+    "roundTripMs": 530.7814070000022
+  },
+  {
+    "id": "v2.lpc-rs.reader/search/repeat-1",
+    "case": "v2.lpc-rs.reader",
+    "question": "Which abstraction supplies compiler source bytes, and what is the default implementation?",
+    "selector": "search",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 5,
+        "scopeRank": null,
+        "foundRank": 5
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 531.2358750000001,
+    "roundTripMs": 531.4594059999981
+  },
+  {
+    "id": "v2.lpc-rs.fallback/search/repeat-1",
+    "case": "v2.lpc-rs.fallback",
+    "question": "When does the compiler retry a source path with the c extension, and what prevents an endless retry?",
+    "selector": "search",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 738.662006,
+    "roundTripMs": 738.9682589999975
+  },
+  {
+    "id": "v2.lpc-rs.fallback/compact/repeat-1",
+    "case": "v2.lpc-rs.fallback",
+    "question": "When does the compiler retry a source path with the c extension, and what prevents an endless retry?",
+    "selector": "compact",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 641.598953,
+    "roundTripMs": 641.9251689999983
+  },
+  {
+    "id": "v2.lpc-rs.host-vs-game/compact/repeat-1",
+    "case": "v2.lpc-rs.host-vs-game",
+    "question": "Can the host-facing compiler accept a source path outside the mudlib, and how does in-game compilation enforce its boundary?",
+    "selector": "compact",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 3,
+        "scopeRank": null,
+        "foundRank": 3
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 615.792025,
+    "roundTripMs": 616.1243859999995
+  },
+  {
+    "id": "v2.lpc-rs.host-vs-game/search/repeat-1",
+    "case": "v2.lpc-rs.host-vs-game",
+    "question": "Can the host-facing compiler accept a source path outside the mudlib, and how does in-game compilation enforce its boundary?",
+    "selector": "search",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 3,
+        "scopeRank": null,
+        "foundRank": 3
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 552.8345879999999,
+    "roundTripMs": 553.1159099999968
+  },
+  {
+    "id": "v2.lpc-rs.source-identity/search/repeat-1",
+    "case": "v2.lpc-rs.source-identity",
+    "question": "Why does CompilerSource keep both a resolved host location and a separate diagnostic name?",
+    "selector": "search",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      },
+      {
+        "id": "fact-2",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      }
+    ],
+    "elapsedMs": 575.2142190000001,
+    "roundTripMs": 575.7317350000012
+  },
+  {
+    "id": "v2.lpc-rs.source-identity/compact/repeat-1",
+    "case": "v2.lpc-rs.source-identity",
+    "question": "Why does CompilerSource keep both a resolved host location and a separate diagnostic name?",
+    "selector": "compact",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      },
+      {
+        "id": "fact-2",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      }
+    ],
+    "elapsedMs": 562.4963240000001,
+    "roundTripMs": 562.7540999999983
+  },
+  {
+    "id": "v2.lpc-rs.fallback-test/compact/repeat-1",
+    "case": "v2.lpc-rs.fallback-test",
+    "question": "Which regression test covers stopping source retries and preserving other I/O errors?",
+    "selector": "compact",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      }
+    ],
+    "elapsedMs": 649.8088250000001,
+    "roundTripMs": 650.0511890000016
+  },
+  {
+    "id": "v2.lpc-rs.fallback-test/search/repeat-1",
+    "case": "v2.lpc-rs.fallback-test",
+    "question": "Which regression test covers stopping source retries and preserving other I/O errors?",
+    "selector": "search",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      }
+    ],
+    "elapsedMs": 657.705701,
+    "roundTripMs": 657.9236399999972
+  },
+  {
+    "id": "v2.lpc-rs.probe/search/repeat-1",
+    "case": "v2.lpc-rs.probe",
+    "question": "Does checking whether a path is a file or directory require reading its source bytes?",
+    "selector": "search",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 4,
+        "scopeRank": null,
+        "foundRank": 4
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 527.329884,
+    "roundTripMs": 527.8829420000002
+  },
+  {
+    "id": "v2.lpc-rs.probe/compact/repeat-1",
+    "case": "v2.lpc-rs.probe",
+    "question": "Does checking whether a path is a file or directory require reading its source bytes?",
+    "selector": "compact",
+    "repeat": 1,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 4,
+        "scopeRank": null,
+        "foundRank": 4
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 518.909397,
+    "roundTripMs": 519.1436740000026
+  },
+  {
+    "id": "v2.lpc-rs.probe/compact/repeat-2",
+    "case": "v2.lpc-rs.probe",
+    "question": "Does checking whether a path is a file or directory require reading its source bytes?",
+    "selector": "compact",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 4,
+        "scopeRank": null,
+        "foundRank": 4
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 523.487089,
+    "roundTripMs": 523.6921679999978
+  },
+  {
+    "id": "v2.lpc-rs.probe/search/repeat-2",
+    "case": "v2.lpc-rs.probe",
+    "question": "Does checking whether a path is a file or directory require reading its source bytes?",
+    "selector": "search",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 4,
+        "scopeRank": null,
+        "foundRank": 4
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 511.525368,
+    "roundTripMs": 511.805046999998
+  },
+  {
+    "id": "v2.lpc-rs.fallback-test/search/repeat-2",
+    "case": "v2.lpc-rs.fallback-test",
+    "question": "Which regression test covers stopping source retries and preserving other I/O errors?",
+    "selector": "search",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      }
+    ],
+    "elapsedMs": 652.918937,
+    "roundTripMs": 653.1595719999968
+  },
+  {
+    "id": "v2.lpc-rs.fallback-test/compact/repeat-2",
+    "case": "v2.lpc-rs.fallback-test",
+    "question": "Which regression test covers stopping source retries and preserving other I/O errors?",
+    "selector": "compact",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      }
+    ],
+    "elapsedMs": 666.969795,
+    "roundTripMs": 667.4212079999998
+  },
+  {
+    "id": "v2.lpc-rs.source-identity/compact/repeat-2",
+    "case": "v2.lpc-rs.source-identity",
+    "question": "Why does CompilerSource keep both a resolved host location and a separate diagnostic name?",
+    "selector": "compact",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      },
+      {
+        "id": "fact-2",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      }
+    ],
+    "elapsedMs": 564.706343,
+    "roundTripMs": 565.0283950000012
+  },
+  {
+    "id": "v2.lpc-rs.source-identity/search/repeat-2",
+    "case": "v2.lpc-rs.source-identity",
+    "question": "Why does CompilerSource keep both a resolved host location and a separate diagnostic name?",
+    "selector": "search",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      },
+      {
+        "id": "fact-2",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      }
+    ],
+    "elapsedMs": 577.284164,
+    "roundTripMs": 577.5349669999996
+  },
+  {
+    "id": "v2.lpc-rs.host-vs-game/search/repeat-2",
+    "case": "v2.lpc-rs.host-vs-game",
+    "question": "Can the host-facing compiler accept a source path outside the mudlib, and how does in-game compilation enforce its boundary?",
+    "selector": "search",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 3,
+        "scopeRank": null,
+        "foundRank": 3
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 656.719128,
+    "roundTripMs": 657.0017310000003
+  },
+  {
+    "id": "v2.lpc-rs.host-vs-game/compact/repeat-2",
+    "case": "v2.lpc-rs.host-vs-game",
+    "question": "Can the host-facing compiler accept a source path outside the mudlib, and how does in-game compilation enforce its boundary?",
+    "selector": "compact",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 3,
+        "scopeRank": null,
+        "foundRank": 3
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 567.7117000000001,
+    "roundTripMs": 567.9712550000004
+  },
+  {
+    "id": "v2.lpc-rs.fallback/compact/repeat-2",
+    "case": "v2.lpc-rs.fallback",
+    "question": "When does the compiler retry a source path with the c extension, and what prevents an endless retry?",
+    "selector": "compact",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 590.022739,
+    "roundTripMs": 590.3812289999987
+  },
+  {
+    "id": "v2.lpc-rs.fallback/search/repeat-2",
+    "case": "v2.lpc-rs.fallback",
+    "question": "When does the compiler retry a source path with the c extension, and what prevents an endless retry?",
+    "selector": "search",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 619.3978639999999,
+    "roundTripMs": 619.6580140000005
+  },
+  {
+    "id": "v2.lpc-rs.reader/search/repeat-2",
+    "case": "v2.lpc-rs.reader",
+    "question": "Which abstraction supplies compiler source bytes, and what is the default implementation?",
+    "selector": "search",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 5,
+        "scopeRank": null,
+        "foundRank": 5
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 512.331874,
+    "roundTripMs": 512.557166999999
+  },
+  {
+    "id": "v2.lpc-rs.reader/compact/repeat-2",
+    "case": "v2.lpc-rs.reader",
+    "question": "Which abstraction supplies compiler source bytes, and what is the default implementation?",
+    "selector": "compact",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 5,
+        "scopeRank": null,
+        "foundRank": 5
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 464.43899999999996,
+    "roundTripMs": 464.78436100000545
+  },
+  {
+    "id": "v2.lpc-rs.safety/compact/repeat-2",
+    "case": "v2.lpc-rs.safety",
+    "question": "Does the main lpc-rs library permit unsafe Rust?",
+    "selector": "compact",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 697.996436,
+    "roundTripMs": 698.4658999999956
+  },
+  {
+    "id": "v2.lpc-rs.safety/search/repeat-2",
+    "case": "v2.lpc-rs.safety",
+    "question": "Does the main lpc-rs library permit unsafe Rust?",
+    "selector": "search",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 717.4424849999999,
+    "roundTripMs": 717.8686059999964
+  },
+  {
+    "id": "v2.lpc-rs.validation/search/repeat-2",
+    "case": "v2.lpc-rs.validation",
+    "question": "Which commands does the project document for workspace builds, tests, linting and formatting?",
+    "selector": "search",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 557.39098,
+    "roundTripMs": 557.8631210000021
+  },
+  {
+    "id": "v2.lpc-rs.validation/compact/repeat-2",
+    "case": "v2.lpc-rs.validation",
+    "question": "Which commands does the project document for workspace builds, tests, linting and formatting?",
+    "selector": "compact",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 606.69021,
+    "roundTripMs": 607.1421440000049
+  },
+  {
+    "id": "v2.lpc-rs.configuration/compact/repeat-2",
+    "case": "v2.lpc-rs.configuration",
+    "question": "How can I select the gamedriver environment file, and which environment setting has precedence for its mudlib root?",
+    "selector": "compact",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 487.812552,
+    "roundTripMs": 488.18151500000386
+  },
+  {
+    "id": "v2.lpc-rs.configuration/search/repeat-2",
+    "case": "v2.lpc-rs.configuration",
+    "question": "How can I select the gamedriver environment file, and which environment setting has precedence for its mudlib root?",
+    "selector": "search",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 507.41197500000004,
+    "roundTripMs": 507.9189289999995
+  },
+  {
+    "id": "v2.lpc-rs.entry/search/repeat-2",
+    "case": "v2.lpc-rs.entry",
+    "question": "Where does the gamedriver executable start, and how does it boot the runtime?",
+    "selector": "search",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      },
+      {
+        "id": "fact-2",
+        "literalRank": 2,
+        "scopeRank": null,
+        "foundRank": 2
+      }
+    ],
+    "elapsedMs": 238.098911,
+    "roundTripMs": 238.5017269999953
+  },
+  {
+    "id": "v2.lpc-rs.entry/compact/repeat-2",
+    "case": "v2.lpc-rs.entry",
+    "question": "Where does the gamedriver executable start, and how does it boot the runtime?",
+    "selector": "compact",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      },
+      {
+        "id": "fact-2",
+        "literalRank": 2,
+        "scopeRank": null,
+        "foundRank": 2
+      }
+    ],
+    "elapsedMs": 284.252772,
+    "roundTripMs": 284.6303509999998
+  },
+  {
+    "id": "v2.lpc-rs.language/compact/repeat-2",
+    "case": "v2.lpc-rs.language",
+    "question": "What implementation language and language edition does the project declare?",
+    "selector": "compact",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "fact-2",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      }
+    ],
+    "elapsedMs": 135.27688500000002,
+    "roundTripMs": 135.53576500000054
+  },
+  {
+    "id": "v2.lpc-rs.language/search/repeat-2",
+    "case": "v2.lpc-rs.language",
+    "question": "What implementation language and language edition does the project declare?",
+    "selector": "search",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "fact-2",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      }
+    ],
+    "elapsedMs": 138.08852,
+    "roundTripMs": 138.41237199999887
+  },
+  {
+    "id": "v2.lpc-rs.purpose/search/repeat-2",
+    "case": "v2.lpc-rs.purpose",
+    "question": "What is lpc-rs, and what kind of applications is it intended to run?",
+    "selector": "search",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      },
+      {
+        "id": "fact-2",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      }
+    ],
+    "elapsedMs": 735.623459,
+    "roundTripMs": 735.8743479999976
+  },
+  {
+    "id": "v2.lpc-rs.purpose/compact/repeat-2",
+    "case": "v2.lpc-rs.purpose",
+    "question": "What is lpc-rs, and what kind of applications is it intended to run?",
+    "selector": "compact",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      },
+      {
+        "id": "fact-2",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      }
+    ],
+    "elapsedMs": 814.570318,
+    "roundTripMs": 814.7686759999997
+  },
+  {
+    "id": "maintainer.lpc-rs.commit-checks/compact/repeat-2",
+    "case": "maintainer.lpc-rs.commit-checks",
+    "question": "show me the codepath that transaction commits take, with all the checks they go through",
+    "selector": "compact",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "receiver",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "validator",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "future-version-check",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 499.217001,
+    "roundTripMs": 499.48468299999513
+  },
+  {
+    "id": "maintainer.lpc-rs.commit-checks/search/repeat-2",
+    "case": "maintainer.lpc-rs.commit-checks",
+    "question": "show me the codepath that transaction commits take, with all the checks they go through",
+    "selector": "search",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "receiver",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "validator",
+        "literalRank": 1,
+        "scopeRank": 1,
+        "foundRank": 1
+      },
+      {
+        "id": "future-version-check",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      }
+    ],
+    "elapsedMs": 505.62902099999997,
+    "roundTripMs": 505.99275399999897
+  },
+  {
+    "id": "maintainer.lpc-rs.add-efun/search/repeat-2",
+    "case": "maintainer.lpc-rs.add-efun",
+    "question": "how do i add a new efun?",
+    "selector": "search",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "registration-definition",
+        "literalRank": 1,
+        "scopeRank": 1,
+        "foundRank": 1
+      },
+      {
+        "id": "registration-table",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 609.635,
+    "roundTripMs": 609.9463179999948
+  },
+  {
+    "id": "maintainer.lpc-rs.add-efun/compact/repeat-2",
+    "case": "maintainer.lpc-rs.add-efun",
+    "question": "how do i add a new efun?",
+    "selector": "compact",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "registration-definition",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "registration-table",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 574.971781,
+    "roundTripMs": 575.2168509999974
+  },
+  {
+    "id": "maintainer.lpc-rs.transaction-creation/compact/repeat-2",
+    "case": "maintainer.lpc-rs.transaction-creation",
+    "question": "where are new transactions created?",
+    "selector": "compact",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "constructor",
+        "literalRank": 3,
+        "scopeRank": null,
+        "foundRank": 3
+      },
+      {
+        "id": "owning-entry",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 556.472117,
+    "roundTripMs": 556.8652389999988
+  },
+  {
+    "id": "maintainer.lpc-rs.transaction-creation/search/repeat-2",
+    "case": "maintainer.lpc-rs.transaction-creation",
+    "question": "where are new transactions created?",
+    "selector": "search",
+    "repeat": 2,
+    "targets": [
+      {
+        "id": "constructor",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      },
+      {
+        "id": "owning-entry",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 554.542964,
+    "roundTripMs": 554.9207650000026
+  },
+  {
+    "id": "maintainer.lpc-rs.add-efun/search/repeat-3",
+    "case": "maintainer.lpc-rs.add-efun",
+    "question": "how do i add a new efun?",
+    "selector": "search",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "registration-definition",
+        "literalRank": 1,
+        "scopeRank": 1,
+        "foundRank": 1
+      },
+      {
+        "id": "registration-table",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 658.6891740000001,
+    "roundTripMs": 658.965280999997
+  },
+  {
+    "id": "maintainer.lpc-rs.add-efun/compact/repeat-3",
+    "case": "maintainer.lpc-rs.add-efun",
+    "question": "how do i add a new efun?",
+    "selector": "compact",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "registration-definition",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "registration-table",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 560.474622,
+    "roundTripMs": 560.8662160000022
+  },
+  {
+    "id": "maintainer.lpc-rs.commit-checks/compact/repeat-3",
+    "case": "maintainer.lpc-rs.commit-checks",
+    "question": "show me the codepath that transaction commits take, with all the checks they go through",
+    "selector": "compact",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "receiver",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "validator",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "future-version-check",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 405.534722,
+    "roundTripMs": 405.83500600000116
+  },
+  {
+    "id": "maintainer.lpc-rs.commit-checks/search/repeat-3",
+    "case": "maintainer.lpc-rs.commit-checks",
+    "question": "show me the codepath that transaction commits take, with all the checks they go through",
+    "selector": "search",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "receiver",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "validator",
+        "literalRank": 1,
+        "scopeRank": 1,
+        "foundRank": 1
+      },
+      {
+        "id": "future-version-check",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      }
+    ],
+    "elapsedMs": 443.098155,
+    "roundTripMs": 443.63823599999887
+  },
+  {
+    "id": "v2.lpc-rs.purpose/search/repeat-3",
+    "case": "v2.lpc-rs.purpose",
+    "question": "What is lpc-rs, and what kind of applications is it intended to run?",
+    "selector": "search",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      },
+      {
+        "id": "fact-2",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      }
+    ],
+    "elapsedMs": 707.7491219999999,
+    "roundTripMs": 708.1983760000003
+  },
+  {
+    "id": "v2.lpc-rs.purpose/compact/repeat-3",
+    "case": "v2.lpc-rs.purpose",
+    "question": "What is lpc-rs, and what kind of applications is it intended to run?",
+    "selector": "compact",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      },
+      {
+        "id": "fact-2",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      }
+    ],
+    "elapsedMs": 873.854817,
+    "roundTripMs": 874.1938149999987
+  },
+  {
+    "id": "v2.lpc-rs.language/compact/repeat-3",
+    "case": "v2.lpc-rs.language",
+    "question": "What implementation language and language edition does the project declare?",
+    "selector": "compact",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "fact-2",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      }
+    ],
+    "elapsedMs": 124.638481,
+    "roundTripMs": 125.10442399999738
+  },
+  {
+    "id": "v2.lpc-rs.language/search/repeat-3",
+    "case": "v2.lpc-rs.language",
+    "question": "What implementation language and language edition does the project declare?",
+    "selector": "search",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "fact-2",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      }
+    ],
+    "elapsedMs": 134.882858,
+    "roundTripMs": 135.21114500000112
+  },
+  {
+    "id": "v2.lpc-rs.entry/search/repeat-3",
+    "case": "v2.lpc-rs.entry",
+    "question": "Where does the gamedriver executable start, and how does it boot the runtime?",
+    "selector": "search",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      },
+      {
+        "id": "fact-2",
+        "literalRank": 2,
+        "scopeRank": null,
+        "foundRank": 2
+      }
+    ],
+    "elapsedMs": 269.065059,
+    "roundTripMs": 269.4532230000041
+  },
+  {
+    "id": "v2.lpc-rs.entry/compact/repeat-3",
+    "case": "v2.lpc-rs.entry",
+    "question": "Where does the gamedriver executable start, and how does it boot the runtime?",
+    "selector": "compact",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      },
+      {
+        "id": "fact-2",
+        "literalRank": 2,
+        "scopeRank": null,
+        "foundRank": 2
+      }
+    ],
+    "elapsedMs": 253.244831,
+    "roundTripMs": 253.63677199999802
+  },
+  {
+    "id": "v2.lpc-rs.configuration/compact/repeat-3",
+    "case": "v2.lpc-rs.configuration",
+    "question": "How can I select the gamedriver environment file, and which environment setting has precedence for its mudlib root?",
+    "selector": "compact",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 486.92175799999995,
+    "roundTripMs": 487.1601609999998
+  },
+  {
+    "id": "v2.lpc-rs.configuration/search/repeat-3",
+    "case": "v2.lpc-rs.configuration",
+    "question": "How can I select the gamedriver environment file, and which environment setting has precedence for its mudlib root?",
+    "selector": "search",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 467.73246,
+    "roundTripMs": 468.15701300000364
+  },
+  {
+    "id": "v2.lpc-rs.validation/search/repeat-3",
+    "case": "v2.lpc-rs.validation",
+    "question": "Which commands does the project document for workspace builds, tests, linting and formatting?",
+    "selector": "search",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 575.89874,
+    "roundTripMs": 576.2137380000058
+  },
+  {
+    "id": "v2.lpc-rs.validation/compact/repeat-3",
+    "case": "v2.lpc-rs.validation",
+    "question": "Which commands does the project document for workspace builds, tests, linting and formatting?",
+    "selector": "compact",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 614.3313449999999,
+    "roundTripMs": 614.8373559999964
+  },
+  {
+    "id": "v2.lpc-rs.safety/compact/repeat-3",
+    "case": "v2.lpc-rs.safety",
+    "question": "Does the main lpc-rs library permit unsafe Rust?",
+    "selector": "compact",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 896.010174,
+    "roundTripMs": 896.5467680000002
+  },
+  {
+    "id": "v2.lpc-rs.safety/search/repeat-3",
+    "case": "v2.lpc-rs.safety",
+    "question": "Does the main lpc-rs library permit unsafe Rust?",
+    "selector": "search",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 797.59987,
+    "roundTripMs": 797.8638389999978
+  },
+  {
+    "id": "v2.lpc-rs.reader/search/repeat-3",
+    "case": "v2.lpc-rs.reader",
+    "question": "Which abstraction supplies compiler source bytes, and what is the default implementation?",
+    "selector": "search",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 5,
+        "scopeRank": null,
+        "foundRank": 5
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 505.924156,
+    "roundTripMs": 506.32150700000057
+  },
+  {
+    "id": "v2.lpc-rs.reader/compact/repeat-3",
+    "case": "v2.lpc-rs.reader",
+    "question": "Which abstraction supplies compiler source bytes, and what is the default implementation?",
+    "selector": "compact",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 5,
+        "scopeRank": null,
+        "foundRank": 5
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 571.5745810000001,
+    "roundTripMs": 571.8751980000015
+  },
+  {
+    "id": "v2.lpc-rs.fallback/compact/repeat-3",
+    "case": "v2.lpc-rs.fallback",
+    "question": "When does the compiler retry a source path with the c extension, and what prevents an endless retry?",
+    "selector": "compact",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 741.438575,
+    "roundTripMs": 741.6717129999961
+  },
+  {
+    "id": "v2.lpc-rs.fallback/search/repeat-3",
+    "case": "v2.lpc-rs.fallback",
+    "question": "When does the compiler retry a source path with the c extension, and what prevents an endless retry?",
+    "selector": "search",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 643.509939,
+    "roundTripMs": 643.7989860000016
+  },
+  {
+    "id": "v2.lpc-rs.host-vs-game/search/repeat-3",
+    "case": "v2.lpc-rs.host-vs-game",
+    "question": "Can the host-facing compiler accept a source path outside the mudlib, and how does in-game compilation enforce its boundary?",
+    "selector": "search",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 3,
+        "scopeRank": null,
+        "foundRank": 3
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 531.420991,
+    "roundTripMs": 531.6983469999977
+  },
+  {
+    "id": "v2.lpc-rs.host-vs-game/compact/repeat-3",
+    "case": "v2.lpc-rs.host-vs-game",
+    "question": "Can the host-facing compiler accept a source path outside the mudlib, and how does in-game compilation enforce its boundary?",
+    "selector": "compact",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 3,
+        "scopeRank": null,
+        "foundRank": 3
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 638.110945,
+    "roundTripMs": 638.4087570000047
+  },
+  {
+    "id": "v2.lpc-rs.source-identity/compact/repeat-3",
+    "case": "v2.lpc-rs.source-identity",
+    "question": "Why does CompilerSource keep both a resolved host location and a separate diagnostic name?",
+    "selector": "compact",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      },
+      {
+        "id": "fact-2",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      }
+    ],
+    "elapsedMs": 685.79831,
+    "roundTripMs": 686.1696480000028
+  },
+  {
+    "id": "v2.lpc-rs.source-identity/search/repeat-3",
+    "case": "v2.lpc-rs.source-identity",
+    "question": "Why does CompilerSource keep both a resolved host location and a separate diagnostic name?",
+    "selector": "search",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      },
+      {
+        "id": "fact-2",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      }
+    ],
+    "elapsedMs": 669.692986,
+    "roundTripMs": 670.1280760000009
+  },
+  {
+    "id": "v2.lpc-rs.fallback-test/search/repeat-3",
+    "case": "v2.lpc-rs.fallback-test",
+    "question": "Which regression test covers stopping source retries and preserving other I/O errors?",
+    "selector": "search",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      }
+    ],
+    "elapsedMs": 679.832858,
+    "roundTripMs": 680.0564900000027
+  },
+  {
+    "id": "v2.lpc-rs.fallback-test/compact/repeat-3",
+    "case": "v2.lpc-rs.fallback-test",
+    "question": "Which regression test covers stopping source retries and preserving other I/O errors?",
+    "selector": "compact",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      }
+    ],
+    "elapsedMs": 723.639184,
+    "roundTripMs": 723.9571290000022
+  },
+  {
+    "id": "v2.lpc-rs.probe/compact/repeat-3",
+    "case": "v2.lpc-rs.probe",
+    "question": "Does checking whether a path is a file or directory require reading its source bytes?",
+    "selector": "compact",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 4,
+        "scopeRank": null,
+        "foundRank": 4
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 526.453544,
+    "roundTripMs": 526.7915279999943
+  },
+  {
+    "id": "v2.lpc-rs.probe/search/repeat-3",
+    "case": "v2.lpc-rs.probe",
+    "question": "Does checking whether a path is a file or directory require reading its source bytes?",
+    "selector": "search",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "fact-1",
+        "literalRank": 4,
+        "scopeRank": null,
+        "foundRank": 4
+      },
+      {
+        "id": "fact-2",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 541.971092,
+    "roundTripMs": 542.4995340000023
+  },
+  {
+    "id": "maintainer.lpc-rs.transaction-creation/search/repeat-3",
+    "case": "maintainer.lpc-rs.transaction-creation",
+    "question": "where are new transactions created?",
+    "selector": "search",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "constructor",
+        "literalRank": 1,
+        "scopeRank": null,
+        "foundRank": 1
+      },
+      {
+        "id": "owning-entry",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 467.80229099999997,
+    "roundTripMs": 468.28259799999796
+  },
+  {
+    "id": "maintainer.lpc-rs.transaction-creation/compact/repeat-3",
+    "case": "maintainer.lpc-rs.transaction-creation",
+    "question": "where are new transactions created?",
+    "selector": "compact",
+    "repeat": 3,
+    "targets": [
+      {
+        "id": "constructor",
+        "literalRank": 3,
+        "scopeRank": null,
+        "foundRank": 3
+      },
+      {
+        "id": "owning-entry",
+        "literalRank": null,
+        "scopeRank": null,
+        "foundRank": null
+      }
+    ],
+    "elapsedMs": 424.792758,
+    "roundTripMs": 425.2177689999953
+  }
+]

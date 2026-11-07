@@ -46,3 +46,7 @@ other creation sites. This illustrates why aggregate locator gains are insuffici
 source ownership, useful baseline hits and the developer's actual navigation task must
 survive expansion. No model runs in that comparison, so its trade-off belongs to search
 selection rather than model reasoning.
+The [ownership revision](../../experiments/qa/SEARCH_OWNERSHIP_RESULTS.md) restores the
+constructor and prioritises the validator, but ordinary members then displace an external
+receiver and the Task caller is still absent. Captured containment should help locate
+definitions without being mistaken for evidence of the usage/entry role a question asks for.

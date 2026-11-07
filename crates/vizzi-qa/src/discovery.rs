@@ -1,5 +1,5 @@
 //! Bounded topic-gated source pools for complementary discovery intents.
-use crate::{Context, Corpus, Error, SourceRole, compact, excerpt, require};
+use crate::{Context, Corpus, Error, SourceRole, SourceScope, compact, excerpt, require};
 use std::{cmp::Reverse, collections::BTreeSet, ops::Range};
 
 struct Plan {
@@ -64,6 +64,16 @@ fn text_bits(text: &str, keys: &BTreeSet<String>, prefix: bool) -> u64 {
         .iter()
         .fold(0, |mask, term| mask | bits(term, keys, prefix))
 }
+fn ownership(scope: Option<&SourceScope>, topics: &BTreeSet<String>) -> u64 {
+    scope.map_or(0, |scope| {
+        std::iter::once(&scope.name)
+            .chain(scope.parents.iter())
+            .filter(|name| name.chars().all(|c| c.is_alphanumeric() || c == '_'))
+            .fold(0, |mask, name| {
+                mask | bits(&compact::stem(&name.to_lowercase()), topics, false)
+            })
+    })
+}
 fn tier(path: &str, role: SourceRole) -> u8 {
     let name = path.rsplit('/').next().unwrap_or(path).to_ascii_lowercase();
     if name == "tests.rs" || name.ends_with("_tests.rs") {
@@ -76,10 +86,33 @@ fn tier(path: &str, role: SourceRole) -> u8 {
         SourceRole::Historical => 3,
     }
 }
-struct Candidate {
+type Priority = (
+    u8,
+    Reverse<u32>,
+    Reverse<u32>,
+    Reverse<u32>,
+    Reverse<u32>,
+    Reverse<u32>,
+);
+struct Candidate<'a> {
     index: usize,
     scope: usize,
-    priority: (u8, Reverse<u32>, Reverse<u32>, Reverse<u32>, Reverse<u32>),
+    family: Option<(&'a str, &'a str)>,
+    priority: Priority,
+}
+fn diversify<'a>(pool: Vec<Candidate<'a>>) -> Vec<Candidate<'a>> {
+    let mut seen = BTreeSet::new();
+    let mut first = vec![];
+    let mut repeated = vec![];
+    for candidate in pool {
+        if candidate.family.is_none_or(|name| seen.insert(name)) {
+            first.push(candidate);
+        } else {
+            repeated.push(candidate);
+        }
+    }
+    first.extend(repeated);
+    first
 }
 impl Corpus {
     /// Retrieves complementary topic-bound source locations for creation, extension and flow.
@@ -124,14 +157,15 @@ impl Corpus {
                 }
             }
         }
-        let mut pools: [Vec<Candidate>; 2] = [vec![], vec![]];
+        let mut pools: [Vec<Candidate<'_>>; 2] = [vec![], vec![]];
         for (index, window) in self.windows.iter().enumerate() {
-            let topic = masks[index][0];
+            let file = &window.file;
+            let scope = file.metadata.scope(window.range.start);
+            let owned = ownership(scope.map(|s| &s.label), &plan.topics);
+            let topic = masks[index][0] | owned;
             if topic == 0 {
                 continue;
             }
-            let file = &window.file;
-            let scope = file.metadata.scope(window.range.start);
             let scope_text = scope
                 .map(|s| {
                     format!(
@@ -152,8 +186,10 @@ impl Corpus {
                 pool.push(Candidate {
                     index,
                     scope: scope.map_or(window.range.start, |s| s.range.start),
+                    family: scope.map(|s| (s.label.kind.as_str(), s.label.name.as_str())),
                     priority: (
                         tier(&file.path, file.metadata.role_for(&window.range)),
+                        Reverse(owned.count_ones()),
                         Reverse(named),
                         Reverse(body.count_ones()),
                         Reverse(topic.count_ones()),
@@ -169,11 +205,46 @@ impl Corpus {
             .facets
             .each_ref()
             .map(|facet| plan.topics.union(facet).cloned().collect::<BTreeSet<_>>());
-        let mut pools = pools.map(Vec::into_iter);
+        let mut pools = pools.map(|pool| diversify(pool).into_iter());
         let mut evidence = vec![];
         let mut seen = BTreeSet::new();
-        let mut ranges: Vec<(&str, Range<usize>)> = vec![];
+        let mut ranges: Vec<(String, Range<usize>)> = vec![];
         let mut used = 0;
+        let mut represented = 0;
+        let baseline = self.retrieve_compact(question, limit, budget)?;
+        for mut source in baseline.evidence {
+            let owned = ownership(source.scope.as_ref(), &plan.topics);
+            let location = source
+                .scope
+                .as_ref()
+                .map(|s| format!("{} {} {}", s.kind, s.name, s.parents.join(" ")))
+                .unwrap_or_default();
+            if tier(&source.path, source.role) != 0
+                || owned & !represented == 0
+                || !plan.facets.iter().any(|facet| {
+                    text_bits(&format!("{} {location}", source.text), facet, false) != 0
+                })
+            {
+                continue;
+            }
+            let file = self
+                .files
+                .get(&source.path)
+                .ok_or_else(|| Error("Baseline source is unavailable".into()))?;
+            let key = file
+                .metadata
+                .scope(source.range.start)
+                .map_or(source.range.start, |s| s.range.start);
+            seen.insert((file.path.as_str(), key));
+            ranges.push((source.path.clone(), source.range.clone()));
+            used += source.range.len();
+            represented |= owned;
+            source.label = evidence.len() + 1;
+            evidence.push(source);
+            if evidence.len() == limit {
+                break;
+            }
+        }
         let allowance = (budget / limit).clamp(128, 1000).min(budget);
         while evidence.len() < limit {
             let mut added = false;
@@ -216,7 +287,7 @@ impl Corpus {
                         continue;
                     }
                     if ranges.iter().any(|(path, other)| {
-                        *path == file.path
+                        path == &file.path
                             && other
                                 .end
                                 .min(range.end)
@@ -229,7 +300,7 @@ impl Corpus {
                     used += range.len();
                     evidence.push(excerpt(file, &range, evidence.len() + 1));
                     seen.insert((file.path.as_str(), candidate.scope));
-                    ranges.push((&file.path, range));
+                    ranges.push((file.path.clone(), range));
                     added = true;
                     break;
                 }

@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "preparedSha256": "9549b6f4ceada6f3bcfafba06218aa568bca3b19694dc54df0784c93ed2ba6bd",
+  "sourceRevision": "1a4f5b65dd2a269298748df2dfd68092a169a8d9",
+  "snapshot": "47505ef338c17fb78304f6f6cd8cbc19de4d36d3968b0c723f09a33f5d027538",
+  "observations": 90,
+  "modelRequests": 0,
+  "reservedGenerations": 0,
+  "complete": true
+}

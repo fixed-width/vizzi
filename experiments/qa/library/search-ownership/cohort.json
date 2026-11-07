@@ -1,0 +1,407 @@
+{
+  "schema": 1,
+  "split": "known_development",
+  "authorship": "Same known questions and frozen locators as candidate coverage; ownership/baseline revision, not new held-outs.",
+  "sourceRecord": "experiments/qa/results/source-packs/prepared.json",
+  "protocol": "docs/qa/SEARCH_OWNERSHIP.md",
+  "selectors": [
+    "compact",
+    "search"
+  ],
+  "repeats": 3,
+  "limit": 8,
+  "budget": 4000,
+  "reservedGenerations": 0,
+  "cases": [
+    {
+      "id": "maintainer.lpc-rs.transaction-creation",
+      "question": "where are new transactions created?",
+      "group": "maintainer",
+      "targets": [
+        {
+          "id": "constructor",
+          "alternatives": [
+            {
+              "path": "src/interpreter/stm/mod.rs",
+              "needle": "pub(crate) fn new(snapshot: Snapshot) -> Self {",
+              "scope": {
+                "name": "new",
+                "kind": "function",
+                "parent": "Transaction"
+              }
+            }
+          ]
+        },
+        {
+          "id": "owning-entry",
+          "alternatives": [
+            {
+              "path": "src/interpreter/task/mod.rs",
+              "needle": "async fn open_attempt(",
+              "scope": {
+                "name": "open_attempt",
+                "kind": "function"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "maintainer.lpc-rs.add-efun",
+      "question": "how do i add a new efun?",
+      "group": "maintainer",
+      "targets": [
+        {
+          "id": "registration-definition",
+          "alternatives": [
+            {
+              "path": "src/interpreter/efun/mod.rs",
+              "needle": "macro_rules! efuns {",
+              "scope": {
+                "name": "efuns",
+                "kind": "macro"
+              }
+            }
+          ]
+        },
+        {
+          "id": "registration-table",
+          "alternatives": [
+            {
+              "path": "src/interpreter/efun/mod.rs",
+              "needle": "efuns! {"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "maintainer.lpc-rs.commit-checks",
+      "question": "show me the codepath that transaction commits take, with all the checks they go through",
+      "group": "maintainer",
+      "targets": [
+        {
+          "id": "receiver",
+          "alternatives": [
+            {
+              "path": "src/interpreter/stm/committer.rs",
+              "needle": "fn dispatch(&mut self, msg: CommitProtocol",
+              "scope": {
+                "name": "dispatch",
+                "kind": "function",
+                "parent": "Committer"
+              }
+            }
+          ]
+        },
+        {
+          "id": "validator",
+          "alternatives": [
+            {
+              "path": "src/interpreter/stm/committer.rs",
+              "needle": "pub(crate) fn commit(&mut self, mut changeset: Changeset)",
+              "scope": {
+                "name": "commit",
+                "kind": "function",
+                "parent": "Committer"
+              }
+            }
+          ]
+        },
+        {
+          "id": "future-version-check",
+          "alternatives": [
+            {
+              "path": "src/interpreter/stm/committer.rs",
+              "needle": "Conflict::FutureVersion {"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2.lpc-rs.purpose",
+      "question": "What is lpc-rs, and what kind of applications is it intended to run?",
+      "group": "regression",
+      "targets": [
+        {
+          "id": "fact-1",
+          "alternatives": [
+            {
+              "path": "README.md",
+              "needle": "An LPC compiler, virtual machine and gamedriver for multi-user dungeons (MUDs)."
+            }
+          ]
+        },
+        {
+          "id": "fact-2",
+          "alternatives": [
+            {
+              "path": "README.md",
+              "needle": "LPC is a language for building persistent, multiplayer text worlds."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2.lpc-rs.language",
+      "question": "What implementation language and language edition does the project declare?",
+      "group": "regression",
+      "targets": [
+        {
+          "id": "fact-1",
+          "alternatives": [
+            {
+              "path": "README.md",
+              "needle": "You need a current stable Rust toolchain"
+            }
+          ]
+        },
+        {
+          "id": "fact-2",
+          "alternatives": [
+            {
+              "path": "Cargo.toml",
+              "needle": "edition = \"2024\""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2.lpc-rs.entry",
+      "question": "Where does the gamedriver executable start, and how does it boot the runtime?",
+      "group": "regression",
+      "targets": [
+        {
+          "id": "fact-1",
+          "alternatives": [
+            {
+              "path": "lpc-rs-driver/src/main.rs",
+              "needle": "lpc_rs::runtime::run(run());"
+            }
+          ]
+        },
+        {
+          "id": "fact-2",
+          "alternatives": [
+            {
+              "path": "lpc-rs-driver/src/main.rs",
+              "needle": "let mut vm = Vm::new(config);"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2.lpc-rs.configuration",
+      "question": "How can I select the gamedriver environment file, and which environment setting has precedence for its mudlib root?",
+      "group": "regression",
+      "targets": [
+        {
+          "id": "fact-1",
+          "alternatives": [
+            {
+              "path": "README.md",
+              "needle": "cargo run -p lpc-rs-driver -- --env .env"
+            }
+          ]
+        },
+        {
+          "id": "fact-2",
+          "alternatives": [
+            {
+              "path": "lpc-rs-utils/src/config.rs",
+              "needle": ".get(\"LPC_LIB_DIR\")"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2.lpc-rs.validation",
+      "question": "Which commands does the project document for workspace builds, tests, linting and formatting?",
+      "group": "regression",
+      "targets": [
+        {
+          "id": "fact-1",
+          "alternatives": [
+            {
+              "path": "README.md",
+              "needle": "cargo build --workspace\ncargo test --workspace"
+            }
+          ]
+        },
+        {
+          "id": "fact-2",
+          "alternatives": [
+            {
+              "path": "README.md",
+              "needle": "cargo clippy --workspace --all-targets -- -D warnings"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2.lpc-rs.safety",
+      "question": "Does the main lpc-rs library permit unsafe Rust?",
+      "group": "regression",
+      "targets": [
+        {
+          "id": "fact-1",
+          "alternatives": [
+            {
+              "path": "src/lib.rs",
+              "needle": "#![forbid(unsafe_code)]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2.lpc-rs.reader",
+      "question": "Which abstraction supplies compiler source bytes, and what is the default implementation?",
+      "group": "regression",
+      "targets": [
+        {
+          "id": "fact-1",
+          "alternatives": [
+            {
+              "path": "src/compiler/mod.rs",
+              "needle": "let reader = self.source_reader.as_deref().unwrap_or(&DiskSourceReader);"
+            }
+          ]
+        },
+        {
+          "id": "fact-2",
+          "alternatives": [
+            {
+              "path": "src/compiler/source_reader.rs",
+              "needle": "tokio::fs::read(path).await"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2.lpc-rs.fallback",
+      "question": "When does the compiler retry a source path with the c extension, and what prevents an endless retry?",
+      "group": "regression",
+      "targets": [
+        {
+          "id": "fact-1",
+          "alternatives": [
+            {
+              "path": "src/compiler/mod.rs",
+              "needle": "if error.kind() == ErrorKind::NotFound"
+            }
+          ]
+        },
+        {
+          "id": "fact-2",
+          "alternatives": [
+            {
+              "path": "src/compiler/mod.rs",
+              "needle": "absolute.extension().and_then(OsStr::to_str) != Some(\"c\")"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2.lpc-rs.host-vs-game",
+      "question": "Can the host-facing compiler accept a source path outside the mudlib, and how does in-game compilation enforce its boundary?",
+      "group": "regression",
+      "targets": [
+        {
+          "id": "fact-1",
+          "alternatives": [
+            {
+              "path": "src/compiler/source.rs",
+              "needle": "Establish an input's identity without restricting host-facing compiler inputs."
+            }
+          ]
+        },
+        {
+          "id": "fact-2",
+          "alternatives": [
+            {
+              "path": "src/compiler/mod.rs",
+              "needle": "self.config.validate_in_game_path(path, span)?;"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2.lpc-rs.source-identity",
+      "question": "Why does CompilerSource keep both a resolved host location and a separate diagnostic name?",
+      "group": "regression",
+      "targets": [
+        {
+          "id": "fact-1",
+          "alternatives": [
+            {
+              "path": "src/compiler/source.rs",
+              "needle": "The host location and canonical diagnostic location"
+            }
+          ]
+        },
+        {
+          "id": "fact-2",
+          "alternatives": [
+            {
+              "path": "src/compiler/source.rs",
+              "needle": "The safe input spelling used in file errors"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2.lpc-rs.fallback-test",
+      "question": "Which regression test covers stopping source retries and preserving other I/O errors?",
+      "group": "regression",
+      "targets": [
+        {
+          "id": "fact-1",
+          "alternatives": [
+            {
+              "path": "src/compiler/mod.rs",
+              "needle": "async fn file_reads_stop_after_extension_fallback_and_preserve_other_io_errors()"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "v2.lpc-rs.probe",
+      "question": "Does checking whether a path is a file or directory require reading its source bytes?",
+      "group": "regression",
+      "targets": [
+        {
+          "id": "fact-1",
+          "alternatives": [
+            {
+              "path": "src/compiler/source_reader.rs",
+              "needle": "Probe a path without reading its contents"
+            }
+          ]
+        },
+        {
+          "id": "fact-2",
+          "alternatives": [
+            {
+              "path": "src/compiler/source_reader.rs",
+              "needle": "let metadata = tokio::fs::metadata(path).await?;"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "previousCohort": "experiments/qa/library/search-coverage/cohort.json"
+}

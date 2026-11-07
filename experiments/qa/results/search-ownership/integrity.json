@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "sourceArchivePinned": true,
+  "allFrozenHashesStillMatch": true,
+  "allReturnedPoolsNativeBound": true,
+  "rawResponsesMatchAssessment": true,
+  "allThirtyRepeatedPoolsIdentical": true,
+  "sourceIndexVersionChangeRecorded": true,
+  "ownedNativeStopped": true,
+  "modelRequests": 0,
+  "reservedGenerations": 0,
+  "historicalChecksumsVerified": [
+    {
+      "archive": "bf16-probe",
+      "files": 41
+    },
+    {
+      "archive": "compact",
+      "files": 15
+    },
+    {
+      "archive": "decoding",
+      "files": 36
+    },
+    {
+      "archive": "decomposition",
+      "files": 12
+    },
+    {
+      "archive": "dispatch-erratum",
+      "files": 7
+    },
+    {
+      "archive": "evidence-use",
+      "files": 36
+    },
+    {
+      "archive": "json-object",
+      "files": 29
+    },
+    {
+      "archive": "maintainer",
+      "files": 9
+    },
+    {
+      "archive": "model-comparison",
+      "files": 19
+    },
+    {
+      "archive": "pilot",
+      "files": 4
+    },
+    {
+      "archive": "prefill",
+      "files": 25
+    },
+    {
+      "archive": "search",
+      "files": 42
+    },
+    {
+      "archive": "search-coverage",
+      "files": 79
+    },
+    {
+      "archive": "source-packs",
+      "files": 12
+    },
+    {
+      "archive": "token-probe",
+      "files": 37
+    },
+    {
+      "archive": "weight-edit",
+      "files": 39
+    }
+  ]
+}
