@@ -38,3 +38,11 @@ about source selection and model limits. Their complete-answer rubric is a diffe
 task from reducing the number of unhelpful source results a developer must inspect.
 Search should be judged by useful starting points, evidence coverage, task progress,
 latency and resource cost, with independent maintainer review still needed.
+
+The [candidate-coverage comparison](../../experiments/qa/SEARCH_COVERAGE_RESULTS.md) adds
+raw macro declarations and deterministic topic/operation pools. It retrieves the efun
+macro and commit validator but loses the known transaction constructor while returning
+other creation sites. This illustrates why aggregate locator gains are insufficient:
+source ownership, useful baseline hits and the developer's actual navigation task must
+survive expansion. No model runs in that comparison, so its trade-off belongs to search
+selection rather than model reasoning.

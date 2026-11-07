@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "allPreparedHashesStillMatch": true,
+  "ownedNativeStopped": true,
+  "testAndConfigSha256": {
+    "crates/vizzi-core/src/rust.rs": "8e7ff6b330dc6d34289eeb306edcfd2b2809ca27aeb4ba89e3c57c3a761c32b8",
+    "crates/vizzi-qa/tests/discovery.rs": "3e583119ff84dd681c4df4ed0b693c57cd215ec6d29ddece47251f84a7c78cad",
+    "crates/vizzi-qa/tests/compact.rs": "6a4a46011d32867863c96c3f49967268b0db94480879177750b36409145556a0",
+    "crates/vizzi-qa/tests/protocol_options.rs": "f75235cd7b91b2b26ea6820c11767bba5c830dddde25fbb286e7d250286283eb",
+    "experiments/browser/discovery.test.mjs": "6661c8bd80e940abe566187266d1816bb53ca09a12a3554a3e4c6cdae85df71d",
+    "experiments/qa/coverage.test.mjs": "ee94860351080c716d56e62615c16f23fa2f923e7cb52acfcde2074bac9c229d",
+    "experiments/qa/coverage-stryker.config.json": "f5d98c11dee4c793dfef489df10d30df821e469e9ed1076fd934bab182a0101e"
+  },
+  "workspaceTestsAndDoctests": 474,
+  "serialQaTestFiles": 20,
+  "completeBrowserSuitePassed": true,
+  "formattingPassed": true,
+  "clippyPassed": true,
+  "modelRequests": 0,
+  "reservedGenerations": 0
+}

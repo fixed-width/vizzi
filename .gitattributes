@@ -1,2 +1,3 @@
 # Generated source cards preserve whitespace inside literal excerpts.
 experiments/qa/results/search/trial.md whitespace=-blank-at-eol
+experiments/qa/results/search-coverage/trial.md whitespace=-blank-at-eol

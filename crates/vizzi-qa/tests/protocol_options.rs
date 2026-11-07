@@ -16,6 +16,11 @@ fn protocol_exposes_bounded_selection_and_native_id_resolution() {
         ),
     )
     .unwrap();
+    std::fs::write(
+        root.path().join("message.rs"),
+        "struct Message; impl Message { fn new() -> Self { Self } }\n",
+    )
+    .unwrap();
     let mut child = Command::new(env!("CARGO_BIN_EXE_vizzi-qa"))
         .arg(root.path())
         .stdin(Stdio::piped())
@@ -50,6 +55,15 @@ fn protocol_exposes_bounded_selection_and_native_id_resolution() {
     assert!(evidence[0]["text"].as_str().unwrap().len() <= 160);
     let validation = request(
         json!({"op":"validate_ids","id":"small","answer":{"status":"answered","answer":"Packet transport","citations":[1]}}),
+    );
+    let searched = request(
+        json!({"op":"retrieve","id":"searched","question":"where are messages created?","selector":"search","limit":1,"budget":160}),
+    );
+    assert!(searched.get("error").is_none(), "{searched}");
+    assert_eq!(searched["context"]["evidence"][0]["path"], "message.rs");
+    assert_eq!(
+        request(json!({"op":"reorder","id":"searched","order":[1]}))["context"],
+        searched["context"]
     );
     assert_eq!(validation["provenance_valid"], true);
     assert_eq!(validation["references"][0]["path"], "README.md");

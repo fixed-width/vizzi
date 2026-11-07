@@ -8,6 +8,10 @@ The [first ranking results](SEARCH_RESULTS.md) show stable source binding but in
 relevance and an 8.73-second median cost. The [source-card trial](results/search/trial.md)
 keeps the baseline and both proposed orders inspectable. Candidate coverage is the next
 engineering priority; this model is not selected for integration.
+The [candidate-coverage follow-up](SEARCH_COVERAGE_RESULTS.md) adds raw macro definitions
+and a separate deterministic search selector. It finds four of seven preferred locators
+at low query cost but loses the transaction constructor; it stays experimental. The
+[source-card comparison](results/search-coverage/trial.md) keeps that counterexample visible.
 
 This how-to is for contributors reproducing the experiment in
 [PRODUCT](../../docs/qa/PRODUCT.md) and [TECH](../../docs/qa/TECH.md). The experiment is

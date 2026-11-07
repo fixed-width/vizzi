@@ -14,6 +14,7 @@ enum Selector {
     #[default]
     Legacy,
     Compact,
+    Search,
 }
 fn default_limit() -> usize {
     6
@@ -103,6 +104,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     let context = match selector {
                         Selector::Legacy => corpus.retrieve(&question, limit, budget)?,
                         Selector::Compact => corpus.retrieve_compact(&question, limit, budget)?,
+                        Selector::Search => corpus.retrieve_search(&question, limit, budget)?,
                     };
                     let response = json!({"id":id,"context":context});
                     contexts.push_back((id, context));

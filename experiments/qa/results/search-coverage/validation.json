@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "native": "Fresh workspace tests/doctests: 474 pass; formatting, all-target Clippy and optimized native host/observer build pass.",
+  "browser": "Full headless browser suite passes, including a macro-declaration display/no-expansion regression observed failing on the older build. Recording-only editor stubs; owned test processes close.",
+  "node": "All 20 serial QA test files pass. TDD logs retain missing implementation, malformed-cohort and earlier native/browser failures.",
+  "mutations": "Primary combined full-scope result: 86 caught, 2 reviewed equivalents, 9 unviable and 1 timeout. Initial 98-mutant run followed by baseline-checked survivor retests with strengthened tests; production source unchanged. Supplemental diff: 5 caught, 2 unviable. Node: 211 caught, 9 reviewed equivalents, 0 timeouts/errors/no-coverage; raw 95.91, exit 1 at threshold 100. Single low-priority worker/compiler task throughout each mutation run.",
+  "performance": "All correctness/mutation/build/browser work finishes before measured queries. Optimized native host, serial queries, nice 10, one index and no model; observer enforces no memory cap. Owned host closes.",
+  "limits": "Known questions and source-aware locator oracles, not independent human task success. Alternative real creation sites are visible without satisfying frozen preferred locators. No macro expansion/call resolution, model inference or reserved-case queries."
+}

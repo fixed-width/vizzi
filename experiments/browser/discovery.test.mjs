@@ -4,7 +4,7 @@ import {join} from 'node:path';
 import {buildHost, browser, startHost, workspace, paint} from './support.mjs';
 if (!process.argv.includes('--no-build')) buildHost();
 const input = await workspace({files: {
-  'engine/input.rs': 'pub trait SourceReader {\n    fn read_file(&self);\n}\n',
+  'engine/input.rs': 'pub trait SourceReader {\n    fn read_file(&self);\n}\nmacro_rules! source_readers { ($name:ident) => { fn hidden_reader() {} }; }\n',
   'engine/compile.rs': 'pub fn compile() {}\n',
   'tools/run.py': 'class Runner: pass\n',
 }});
@@ -34,6 +34,8 @@ try {
   await page.locator('#source-preview').waitFor({state:'visible'});
   await page.waitForFunction(() => document.querySelector('#preview-source').textContent.includes('SourceReader'));
   assert.match(await page.locator('#preview-source').textContent(), /SourceReader/);
+  assert.equal(await page.locator('#preview-names').getByRole('button', {name:'macro source_readers',exact:true}).count(),1);
+  assert.equal(await page.locator('#preview-names').getByRole('button', {name:'function hidden_reader',exact:true}).count(),0);
   await page.locator('#preview-names').getByRole('button', {name: 'trait SourceReader', exact: true}).click();
   await page.getByRole('button', {name:'Keep this location', exact:true}).click();
   await page.waitForFunction(() => document.querySelector('#show-saved').textContent.includes('1'));

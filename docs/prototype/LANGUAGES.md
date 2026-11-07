@@ -25,7 +25,7 @@ document model also permits multiple analyses.
 
 | Language | Selected inputs | Extracted declarations | Limits |
 | --- | --- | --- | --- |
-| Rust | `.rs` | Functions, types, modules, constants, statics, implementations | Raw source; no macro expansion or compiler resolution |
+| Rust | `.rs` | Functions, types, modules, constants, statics, implementations, macro definitions | Raw source; no macro expansion, generated declarations or compiler resolution |
 | Python | `.py` | Classes and functions, including methods, nested and async functions | No import/type resolution, assignments, or call relationships; declaration spans omit decorators |
 | C | `.c` or explicit assignment inside enabled family scopes | Function/type definitions and every typedef alias | No preprocessing, include/type resolution, or compiler configuration |
 | C++ | C++ suffix hints or explicit assignment inside enabled family scopes | C forms plus named classes/namespaces, using aliases, methods/operators with bodies | No template instantiation or overload resolution |

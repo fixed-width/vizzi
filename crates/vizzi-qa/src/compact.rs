@@ -3,7 +3,7 @@ use crate::{Context, Corpus, Error, IndexedFile, SourceRole, excerpt, floor, req
 use std::{collections::BTreeSet, ops::Range};
 
 #[derive(Clone, Copy, PartialEq, Eq)]
-enum Intent {
+pub(super) enum Intent {
     Overview,
     Policy,
     Manifest,
@@ -12,7 +12,7 @@ enum Intent {
     Tests,
     Behavior,
 }
-fn stem(word: &str) -> String {
+pub(super) fn stem(word: &str) -> String {
     match word {
         "configuration" | "configured" | "configure" => return "config".into(),
         "environment" => return "env".into(),
@@ -38,7 +38,7 @@ fn stem(word: &str) -> String {
     }
     s
 }
-fn words(text: &str) -> BTreeSet<String> {
+pub(super) fn words(text: &str) -> BTreeSet<String> {
     terms(text).keys().map(|w| stem(w)).collect()
 }
 fn hits(a: &BTreeSet<String>, b: &BTreeSet<String>) -> usize {
@@ -104,7 +104,7 @@ fn package_words(corpus: &Corpus, path: &str) -> BTreeSet<String> {
         parent = parent.rsplit_once('/').map(|(p, _)| p).unwrap_or("");
     }
 }
-fn scope_range(file: &IndexedFile, window: &Range<usize>) -> Range<usize> {
+pub(super) fn scope_range(file: &IndexedFile, window: &Range<usize>) -> Range<usize> {
     if let Some(scope) = file.metadata.scope(window.start) {
         if scope.range.len() <= 4096 {
             return scope.range.clone();
@@ -113,7 +113,7 @@ fn scope_range(file: &IndexedFile, window: &Range<usize>) -> Range<usize> {
     }
     window.clone()
 }
-fn select_range(
+pub(super) fn select_range(
     file: &IndexedFile,
     allowed: Range<usize>,
     query: &BTreeSet<String>,
@@ -184,6 +184,20 @@ fn role_weight(role: SourceRole, intent: Intent) -> f64 {
         SourceRole::Code => 1.0,
     }
 }
+pub(super) fn query_intent(corpus: &Corpus, question: &str, query: &BTreeSet<String>) -> Intent {
+    let lower = question.to_lowercase();
+    let named = corpus
+        .files
+        .values()
+        .flat_map(|f| f.metadata.scopes.iter())
+        .any(|s| {
+            s.label.name.len() >= 4
+                && (s.label.name.contains('_')
+                    || s.label.name.chars().skip(1).any(char::is_uppercase))
+                && lower.contains(&s.label.name.to_lowercase())
+        });
+    intent(query, named)
+}
 impl Corpus {
     /// Selects role-aware, query-centred literal evidence under a compact byte allowance.
     pub fn retrieve_compact(
@@ -201,18 +215,7 @@ impl Corpus {
             "Invalid QA context allowance",
         )?;
         let mut query = words(question);
-        let lower = question.to_lowercase();
-        let named = self
-            .files
-            .values()
-            .flat_map(|f| f.metadata.scopes.iter())
-            .any(|s| {
-                s.label.name.len() >= 4
-                    && (s.label.name.contains('_')
-                        || s.label.name.chars().skip(1).any(char::is_uppercase))
-                    && lower.contains(&s.label.name.to_lowercase())
-            });
-        let plan = intent(&query, named);
+        let plan = query_intent(self, question, &query);
         if plan == Intent::Policy && query.contains("check") {
             query.extend(["test".into(), "format".into(), "valid".into()]);
         }

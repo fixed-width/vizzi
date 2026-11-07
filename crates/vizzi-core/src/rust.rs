@@ -97,6 +97,7 @@ fn declaration(node: tree_sitter::Node<'_>, text: &str) -> Option<(&'static str,
         "static_item" => "static",
         "union_item" => "union",
         "impl_item" => "implementation",
+        "macro_definition" => "macro",
         _ => return None,
     };
     let name = if node.kind() == "impl_item" {
@@ -116,6 +117,32 @@ fn declaration(node: tree_sitter::Node<'_>, text: &str) -> Option<(&'static str,
 mod tests {
     use super::*;
     use crate::model::{Coverage, WorkspaceId};
+    #[test]
+    fn macro_definitions_retain_raw_scope_without_expanding_tokens_or_invocations() {
+        let definition = "macro_rules! codecs { () => { fn generated() {} }; }";
+        let text = format!("mod registry {{ {definition} codecs!(); fn install() {{}} }}");
+        let result = RustAnalyzer::new()
+            .unwrap()
+            .analyze(text.as_bytes())
+            .unwrap();
+        assert_eq!(result.coverage, Coverage::Syntax);
+        assert_eq!(
+            result
+                .facts
+                .iter()
+                .map(|f| (f.kind.as_str(), f.name.as_str()))
+                .collect::<Vec<_>>(),
+            [
+                ("module", "registry"),
+                ("macro", "codecs"),
+                ("function", "install")
+            ]
+        );
+        let found = &result.facts[1];
+        assert_eq!(&text[found.span.clone()], definition);
+        assert_eq!(found.parent, Some(0));
+        assert!(found.key.contains("registry"));
+    }
     #[test]
     fn extracts_qualified_declarations_and_marks_duplicates_ambiguous() {
         let text = b"mod one { fn same() {} } mod two { fn same() {} } fn repeated() {} fn repeated() {} struct Example; impl Example { fn method(&self) {} }";

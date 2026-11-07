@@ -1,0 +1,147 @@
+[
+  {
+    "case": "maintainer.lpc-rs.transaction-creation",
+    "target": "constructor",
+    "sourceMarkerPresent": true
+  },
+  {
+    "case": "maintainer.lpc-rs.transaction-creation",
+    "target": "owning-entry",
+    "sourceMarkerPresent": true
+  },
+  {
+    "case": "maintainer.lpc-rs.add-efun",
+    "target": "registration-definition",
+    "sourceMarkerPresent": true
+  },
+  {
+    "case": "maintainer.lpc-rs.add-efun",
+    "target": "registration-table",
+    "sourceMarkerPresent": true
+  },
+  {
+    "case": "maintainer.lpc-rs.commit-checks",
+    "target": "receiver",
+    "sourceMarkerPresent": true
+  },
+  {
+    "case": "maintainer.lpc-rs.commit-checks",
+    "target": "validator",
+    "sourceMarkerPresent": true
+  },
+  {
+    "case": "maintainer.lpc-rs.commit-checks",
+    "target": "future-version-check",
+    "sourceMarkerPresent": true
+  },
+  {
+    "case": "v2.lpc-rs.purpose",
+    "target": "fact-1",
+    "sourceMarkerPresent": true
+  },
+  {
+    "case": "v2.lpc-rs.purpose",
+    "target": "fact-2",
+    "sourceMarkerPresent": true
+  },
+  {
+    "case": "v2.lpc-rs.language",
+    "target": "fact-1",
+    "sourceMarkerPresent": true
+  },
+  {
+    "case": "v2.lpc-rs.language",
+    "target": "fact-2",
+    "sourceMarkerPresent": true
+  },
+  {
+    "case": "v2.lpc-rs.entry",
+    "target": "fact-1",
+    "sourceMarkerPresent": true
+  },
+  {
+    "case": "v2.lpc-rs.entry",
+    "target": "fact-2",
+    "sourceMarkerPresent": true
+  },
+  {
+    "case": "v2.lpc-rs.configuration",
+    "target": "fact-1",
+    "sourceMarkerPresent": true
+  },
+  {
+    "case": "v2.lpc-rs.configuration",
+    "target": "fact-2",
+    "sourceMarkerPresent": true
+  },
+  {
+    "case": "v2.lpc-rs.validation",
+    "target": "fact-1",
+    "sourceMarkerPresent": true
+  },
+  {
+    "case": "v2.lpc-rs.validation",
+    "target": "fact-2",
+    "sourceMarkerPresent": true
+  },
+  {
+    "case": "v2.lpc-rs.safety",
+    "target": "fact-1",
+    "sourceMarkerPresent": true
+  },
+  {
+    "case": "v2.lpc-rs.reader",
+    "target": "fact-1",
+    "sourceMarkerPresent": true
+  },
+  {
+    "case": "v2.lpc-rs.reader",
+    "target": "fact-2",
+    "sourceMarkerPresent": true
+  },
+  {
+    "case": "v2.lpc-rs.fallback",
+    "target": "fact-1",
+    "sourceMarkerPresent": true
+  },
+  {
+    "case": "v2.lpc-rs.fallback",
+    "target": "fact-2",
+    "sourceMarkerPresent": true
+  },
+  {
+    "case": "v2.lpc-rs.host-vs-game",
+    "target": "fact-1",
+    "sourceMarkerPresent": true
+  },
+  {
+    "case": "v2.lpc-rs.host-vs-game",
+    "target": "fact-2",
+    "sourceMarkerPresent": true
+  },
+  {
+    "case": "v2.lpc-rs.source-identity",
+    "target": "fact-1",
+    "sourceMarkerPresent": true
+  },
+  {
+    "case": "v2.lpc-rs.source-identity",
+    "target": "fact-2",
+    "sourceMarkerPresent": true
+  },
+  {
+    "case": "v2.lpc-rs.fallback-test",
+    "target": "fact-1",
+    "sourceMarkerPresent": true
+  },
+  {
+    "case": "v2.lpc-rs.probe",
+    "target": "fact-1",
+    "sourceMarkerPresent": true
+  },
+  {
+    "case": "v2.lpc-rs.probe",
+    "target": "fact-2",
+    "sourceMarkerPresent": true
+  }
+]

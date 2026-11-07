@@ -1,6 +1,7 @@
 //! Experimental CPU repository QA: retrieval and source binding, separate from inference.
 mod compact;
 mod curated;
+mod discovery;
 mod metadata;
 pub mod native;
 mod ranking;
@@ -342,6 +343,7 @@ impl Corpus {
         hash.update(include_bytes!("compact.rs"));
         hash.update(include_bytes!("metadata.rs"));
         hash.update(include_bytes!("curated.rs"));
+        hash.update(include_bytes!("discovery.rs"));
         for name in self.languages.names() {
             if let Some(language) = self.languages.select(name) {
                 hash.update(language.context().id.as_str().as_bytes());

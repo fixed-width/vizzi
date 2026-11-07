@@ -110,6 +110,33 @@ fn a_named_component_question_does_not_become_a_project_overview_query() {
         .unwrap();
     assert_eq!(context.evidence()[0].path, "src/bucket.rs");
 }
+
+#[test]
+fn purpose_queries_distinguish_named_types_functions_and_the_project_itself() {
+    let c = corpus(vec![
+        file("README.md", "This project is a transport service."),
+        file(
+            "src/bucket.rs",
+            "/// project purpose project purpose\npub struct TokenBucket;\npub fn retry_read() {}\n",
+        ),
+    ]);
+    for question in [
+        "What is the purpose of TokenBucket?",
+        "What is the purpose of retry_read?",
+    ] {
+        assert_eq!(
+            c.retrieve_compact(question, 3, 2500).unwrap().evidence()[0].path,
+            "src/bucket.rs"
+        );
+    }
+    assert_eq!(
+        c.retrieve_compact("What is this project's purpose?", 3, 2500)
+            .unwrap()
+            .evidence()[0]
+            .path,
+        "README.md"
+    );
+}
 #[test]
 fn package_description_connects_an_executable_role_to_its_main_source() {
     let c = corpus(vec![
