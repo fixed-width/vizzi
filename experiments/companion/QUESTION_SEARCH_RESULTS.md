@@ -11,6 +11,10 @@ independent navigation usefulness remain unevaluated; the eight earlier reserved
 real-source cases remain unrun. This slice establishes a working trial, not acceptance
 of complete answers or whole-repository scale.
 
+The subsequent [fresh Tract Plugin Pack trial](TRACT_PLUGIN_PACK_FRESH_RESULTS.md)
+records the first maintainer-authored pair on another repository and its relevance and
+retention failures. Fresh-question status statements above describe this earlier checkpoint.
+
 ## Delivered behaviour and architecture
 
 One question input replaces literal name/file search in the trial. Up to eight finite

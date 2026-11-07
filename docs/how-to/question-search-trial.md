@@ -97,3 +97,8 @@ literal excerpts and runs a source-aware, two-file save/handoff replay using a r
 editor. Its results do not measure fresh-question relevance. Keep it separate from the
 maintainer trial above. Linux process-tree memory can be observed by wrapping the command
 with `vizzi-envelope --observe-only /tmp/vizzi-question-memory.json --`.
+
+For a completed first-acquisition example, see the [Tract Plugin Pack trial](../../experiments/companion/TRACT_PLUGIN_PACK_FRESH_RESULTS.md).
+Its two cases are now observed evaluation cases; reuse them as regressions rather than
+calling a later repeat fresh. The report separates returned clues, source-audited answers
+and browser replay from independent maintainer task completion.

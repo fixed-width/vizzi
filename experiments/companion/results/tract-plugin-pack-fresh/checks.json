@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "frozenQuestionsSha256": "67d620faf8ed9d618ab346613f5b583a05782038220373c46581a5b4f043041d",
+  "frozenSourceFilesReverified": 445,
+  "firstResponseFilesReverified": 5,
+  "releaseBinaryUnchanged": true,
+  "productionCodeChanged": false,
+  "executed": [
+    "Four first query/selector observations in the frozen order",
+    "Four headless browser replays with exact response/group validation, source inspection, two distinct investigations and recording-only handoffs",
+    "node --check for both experiment drivers",
+    "node experiments/qa/coverage.test.mjs passed",
+    "Documentation links and git diff --check passed"
+  ],
+  "notRerun": [
+    "Rust workspace tests/Clippy and broad browser/mutation baseline are unchanged historical evidence from adefa08, not new trial runs"
+  ],
+  "modelsLoaded": 0,
+  "queryRewrites": 0,
+  "reservedPriorCasesRun": 0,
+  "sourceOriginalHeadAfterTrial": "951cf85413029423e036c641638b845edafe75cf",
+  "sourceOriginalStatusAfterTrial": ""
+}

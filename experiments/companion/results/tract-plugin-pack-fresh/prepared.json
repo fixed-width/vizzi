@@ -1,0 +1,1809 @@
+{
+  "schema": 1,
+  "cohort": "experiments/companion/library/tract-plugin-pack.json",
+  "cohortSha256": "67d620faf8ed9d618ab346613f5b583a05782038220373c46581a5b4f043041d",
+  "sourceRevision": "951cf85413029423e036c641638b845edafe75cf",
+  "sourceRoot": "/tmp/vizzi-tract-fresh-070btu43/tract-plugin-pack",
+  "archive": "/tmp/vizzi-tract-fresh-070btu43/source.tar",
+  "archiveSha256": "f1e325485da0a39a35d10a03adb3f9058717234459f98290c9d8e811501b4aa6",
+  "regularFiles": 445,
+  "bytes": 23969897,
+  "extensions": {
+    ".toml": 26,
+    ".yml": 3,
+    "(none)": 2,
+    ".md": 123,
+    ".lock": 1,
+    ".rs": 231,
+    ".pdf": 14,
+    ".png": 27,
+    ".ttf": 14,
+    ".txt": 1,
+    ".css": 1,
+    ".json": 1,
+    ".wt": 1
+  },
+  "submodulesNotExported": [],
+  "files": {
+    ".cargo/config.toml": {
+      "bytes": 51,
+      "sha256": "58240f7afb302af6a859a152d614e84a1519e422145b9e5d51cbd7d13eb5cc9a"
+    },
+    ".cargo/mutants-tract-effects.toml": {
+      "bytes": 9938,
+      "sha256": "a5611de4adc78c1dccce1c2309e42aef007a7bbf14b40eacccb2df5839c5e0aa"
+    },
+    ".cargo/mutants.toml": {
+      "bytes": 2184,
+      "sha256": "225087c029f4d3e6ead293e468863b3f94c069751475395e9ef00ff870fb380f"
+    },
+    ".config/nextest.toml": {
+      "bytes": 660,
+      "sha256": "e530f3ce5e453021833bb16946fc71cdcfea8e2e40e2e5ef7b4428c5dc32f3af"
+    },
+    ".github/workflows/build.yml": {
+      "bytes": 1239,
+      "sha256": "5bb5a5bed7307544533311df2445226c5eaee82b484576cec322026fd240c17f"
+    },
+    ".github/workflows/ci.yml": {
+      "bytes": 1021,
+      "sha256": "f7c06a1eb0d59f5626de15851b0289adc3ba74f5da19404cff55c732caf201f5"
+    },
+    ".github/workflows/mutation-testing.yml": {
+      "bytes": 3036,
+      "sha256": "ed8a028a242b746d2c87a217d65bfb2771cb53b08c11c2f23f6bb7eac9fe6c39"
+    },
+    ".gitignore": {
+      "bytes": 259,
+      "sha256": "aaa14cea99462e406eeecc65d2ba835693f8704629c9c1d83ea0a784f88a40ed"
+    },
+    "AGENTS.md": {
+      "bytes": 25460,
+      "sha256": "dbac439817702a6519f022ec1199f776e572b7c336689f941cb2571355ee3890"
+    },
+    "Cargo.lock": {
+      "bytes": 82588,
+      "sha256": "4a0940714372e9729f4cca56eed0b3e203671e09d11c0fee9d82c085da12cd54"
+    },
+    "Cargo.toml": {
+      "bytes": 867,
+      "sha256": "ee675656876b9d3cc7548c90a7b0ea2765d8cceeead5d8e6554717f02710501b"
+    },
+    "LICENSE": {
+      "bytes": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    "README.md": {
+      "bytes": 21306,
+      "sha256": "9c7676978b74f977c8f48119475bc4f995d14fb1ffda4fa33e64fe2930344d52"
+    },
+    "bench-suite/Cargo.toml": {
+      "bytes": 347,
+      "sha256": "9cd47f3fccd2c29adba2451663f6cf6af3541396144c4c0ef7b6b2f912478d02"
+    },
+    "bench-suite/benches/render.rs": {
+      "bytes": 3466,
+      "sha256": "af20da689b5bf5370f4f336fd15a872ed5713009594c2f7ea3c66b8bc6328d62"
+    },
+    "bench-suite/src/lib.rs": {
+      "bytes": 1,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    "docs/README.md": {
+      "bytes": 4258,
+      "sha256": "f8da1b6584fb041075c431a7f87cbf9bbd70a152d5acb4e42f3cb9cfeba10598"
+    },
+    "docs/development/mutation-testing.md": {
+      "bytes": 3216,
+      "sha256": "478b5ac5d1e4c38890b7b74ebcc5ee7a5b315a576952cf1f7d3636a03d43969f"
+    },
+    "docs/gain-brain/gain-brain-manual.md": {
+      "bytes": 6224,
+      "sha256": "33394f3fba128cc5268e40bf5e0577ec37f93e1e2205a835183a7c8f982798e5"
+    },
+    "docs/gain-brain/gain-brain-manual.pdf": {
+      "bytes": 74123,
+      "sha256": "d296ad15d12106b40049c77c7ba9dc55708e35840c465ece4ba2e06716803fdd"
+    },
+    "docs/gain-brain/screenshot.png": {
+      "bytes": 15854,
+      "sha256": "19b5548345f53384578b16f0120ac96edb16a50014d3246af1ced5825da18bd9"
+    },
+    "docs/gs-meter/gs-meter-manual.md": {
+      "bytes": 8097,
+      "sha256": "cf1d2f3dd200d9cec70e54f68c150f787dffc66bdc66ad9d66f0193a410dda08"
+    },
+    "docs/gs-meter/gs-meter-manual.pdf": {
+      "bytes": 161108,
+      "sha256": "e5fead9c352cef29d99526eab80dd6d2f6b10b0d6f5f30a023083a81a61e870b"
+    },
+    "docs/gs-meter/screenshot-db.png": {
+      "bytes": 54826,
+      "sha256": "e7c3fa832a5b96d65104140280ef1bf26d2c85b6c6d79199577f3747c5e432ec"
+    },
+    "docs/gs-meter/screenshot-lufs.png": {
+      "bytes": 54742,
+      "sha256": "432ecc8e3015741916d0d9273bdb25b53ba866aeb83627508ae9f10a7a12b99b"
+    },
+    "docs/hd26/hd26-manual.md": {
+      "bytes": 11818,
+      "sha256": "137e4d28937e82e11c7f53faa504fb7caed0c6a5fcf3684ccf470c4068838a35"
+    },
+    "docs/hd26/hd26-manual.pdf": {
+      "bytes": 145509,
+      "sha256": "a81368e20b18c76f9fa9331ae331c135bfb1df463a49d79e037ac8d4a1b06d80"
+    },
+    "docs/hd26/screenshot.png": {
+      "bytes": 81259,
+      "sha256": "0c50ff92351616e2c645f72ff18db183b4cf3f86a78c2c6a9894d58fb5bb4f5e"
+    },
+    "docs/imagine/imagine-manual.md": {
+      "bytes": 24613,
+      "sha256": "6441cc49242ec14fa5d2dde811bf8e2eb7d07899ac7109c05018fd1b866a7680"
+    },
+    "docs/imagine/imagine-manual.pdf": {
+      "bytes": 213977,
+      "sha256": "a9ccb8b1b7678508d50d9dfcaa03baae621fada3244106440c9ea9d66cf0397b"
+    },
+    "docs/imagine/screenshot.png": {
+      "bytes": 128638,
+      "sha256": "73f6d8f3dfc94306093cf681cc361899fd4d2eeb9a7cdd6760a24f0b3bd2a57e"
+    },
+    "docs/miff/miff-manual.md": {
+      "bytes": 11195,
+      "sha256": "459dbe75e2b4559d32f8a3c83822d86916190fd833392dcee8cef19fee615660"
+    },
+    "docs/miff/miff-manual.pdf": {
+      "bytes": 182125,
+      "sha256": "ddd35ca057345c95f42c49ad7fd042c3def141b508241297f4c40c42ec1feea1"
+    },
+    "docs/miff/screenshot.png": {
+      "bytes": 102385,
+      "sha256": "11cd6ede641da268b79632d5def055a45e7f06893e0cd831d4d7d4f39216bf5e"
+    },
+    "docs/minitosis/minitosis-manual.md": {
+      "bytes": 5290,
+      "sha256": "76bdb62a0c681012c8eec987c05313539c0db31f2d903ddef9be31b91b416700"
+    },
+    "docs/minitosis/minitosis-manual.pdf": {
+      "bytes": 97657,
+      "sha256": "5899f01c7ff5570c8ba21cbf977faf9d63015bc152a6d2148937ac99be78e68f"
+    },
+    "docs/minitosis/screenshot.png": {
+      "bytes": 56084,
+      "sha256": "2a970ed00aecce94895c90d4b8095e64a5c90eb065beed97ab9b5cd6d77b7a82"
+    },
+    "docs/multosis/SCREENSHOTS.md": {
+      "bytes": 5705,
+      "sha256": "9c93285a09dd88d6875cab545b007970360c20e3008c9ecfb260e7323f72fa3d"
+    },
+    "docs/multosis/effect-editor-spectral.png": {
+      "bytes": 35034,
+      "sha256": "d43d4f7a9b3d61c51126c125b3ca3a92c314d5d6e199d88b42a2c4b1d7738ca1"
+    },
+    "docs/multosis/effect-editor.png": {
+      "bytes": 34912,
+      "sha256": "fab21f75ed2012ad7c5d5e10f06ae5e4b675ba31852eecd77802b67b1aa3c419"
+    },
+    "docs/multosis/grid.png": {
+      "bytes": 103931,
+      "sha256": "892882af85223a1d3feadc060e8fe04ef8e3578087319dd4be4abacf2a11c1e3"
+    },
+    "docs/multosis/mseg-assign.png": {
+      "bytes": 14504,
+      "sha256": "54527aac1086081be13860e0c6baee7bdc37e343746d5e48dec498bece65af05"
+    },
+    "docs/multosis/mseg-bipolar.png": {
+      "bytes": 13378,
+      "sha256": "2865d77e5e6db918fbfd478383461b23ab9714e4b046a45c921785875b92a433"
+    },
+    "docs/multosis/mseg-strip.png": {
+      "bytes": 17840,
+      "sha256": "96af6f310fe24b8b43caf8adbcc6825eca046f87875c2413fd6e276b06a7a269"
+    },
+    "docs/multosis/mseg-transform-menu.png": {
+      "bytes": 13450,
+      "sha256": "da6ea0a0f74462c385f73c0a14d2454ce953102439ed79eb414efc05c52642f1"
+    },
+    "docs/multosis/mseg.png": {
+      "bytes": 66561,
+      "sha256": "f965ba4caa4b3c2492bd09d7cb4f54093f01fe6fb34d8fe007b54abbaecf7828"
+    },
+    "docs/multosis/multosis-manual.md": {
+      "bytes": 46578,
+      "sha256": "a04245f49afaf2f03033aea13dca6527f29c888c1dc14b6a65294e2951ab3644"
+    },
+    "docs/multosis/multosis-manual.pdf": {
+      "bytes": 659503,
+      "sha256": "8002f640377ab233212397bebf315cd3423e08579d94f136309908db48a87459"
+    },
+    "docs/multosis/pdc-stripe.png": {
+      "bytes": 4996,
+      "sha256": "6375ada94245b353d3f22db45fd9c7e7d20247ed4093885b807594490a3a4ece"
+    },
+    "docs/multosis/screenshot.png": {
+      "bytes": 251643,
+      "sha256": "8680cfbf2b492c7523e08ea79c76cf84ab1db34d7bc8af6e3c064519740c0289"
+    },
+    "docs/multosis/solo-mute.png": {
+      "bytes": 10846,
+      "sha256": "153dfeb6c410dbc6915aeb2e1981d71a1d272163670bc2e1d6237cc9f51b8321"
+    },
+    "docs/multosis/toolbar.png": {
+      "bytes": 33605,
+      "sha256": "1c92b36574442181206dab96ec04134d9bb85b38d116641f4c9d5b5aa178cca8"
+    },
+    "docs/multosis/track-row.png": {
+      "bytes": 15342,
+      "sha256": "5f2831714e0d1f02b4eb586e91bd62aa4958736e014784df0d4b262173d12601"
+    },
+    "docs/nap/nap-manual.md": {
+      "bytes": 19823,
+      "sha256": "465994298df09bf2d4168d398da3f204fc59c193b07f0e25bdb7837923d3af8c"
+    },
+    "docs/nap/nap-manual.pdf": {
+      "bytes": 177220,
+      "sha256": "df68759d9e11bcc751eebf8cdc1a569836daa27dfa52c3dbcc9f4474642108ee"
+    },
+    "docs/nap/screenshot.png": {
+      "bytes": 102064,
+      "sha256": "46f86016449212a6013864914be6d1584c41b9a15f6996ec431df024900fbfb1"
+    },
+    "docs/pope-scope/pope-scope-manual.md": {
+      "bytes": 15911,
+      "sha256": "2779c0fd7c34e8d879ebd015985ec65d5fe515d52df5d6d6f2dae8f58190b734"
+    },
+    "docs/pope-scope/pope-scope-manual.pdf": {
+      "bytes": 241417,
+      "sha256": "659adeaff6f70d236895d675cb93a688d501caf9c00213cc5d1558c4fb7e02fa"
+    },
+    "docs/pope-scope/screenshot.png": {
+      "bytes": 173263,
+      "sha256": "9b57d6e88177d08825591dd7359e48a1fe57e17b6eaf33622c1a9736f36dd7ab"
+    },
+    "docs/research/2026-05-new-audio-dsp-papers.md": {
+      "bytes": 10180,
+      "sha256": "2448991708150e2a8de3d7afd7b6a473a7c3ae66a816979ab76294ee848cf0e6"
+    },
+    "docs/satch/satch-manual.md": {
+      "bytes": 7662,
+      "sha256": "5d74f0935c5bfa5652f4c7ff259c853373de20c784d546b0c478784f3fce07ab"
+    },
+    "docs/satch/satch-manual.pdf": {
+      "bytes": 80225,
+      "sha256": "ea85c234855397847f2cc37bb00a50109662933bd463668e0a05d76f20fbdaab"
+    },
+    "docs/satch/screenshot.png": {
+      "bytes": 28973,
+      "sha256": "7007947d4b548662d8da92c59f54d826fc19af79e034db97d597e52e62ebb929"
+    },
+    "docs/six-pack/screenshot.png": {
+      "bytes": 100548,
+      "sha256": "6e33a5968c72424c702472abf6784b63fd97bf3362acbb0479e78304776ded96"
+    },
+    "docs/six-pack/six-pack-manual.md": {
+      "bytes": 16569,
+      "sha256": "ad41f8f9187de21234963e2569936081b540bbb8796e029057950fa1098130aa"
+    },
+    "docs/six-pack/six-pack-manual.pdf": {
+      "bytes": 175610,
+      "sha256": "0e70f4a12b78ba6ac4188f00394b5b4af0dc1885d90b85dd18cc281765a810b2"
+    },
+    "docs/superpowers/plans/2026-03-19-param-dial.md": {
+      "bytes": 18804,
+      "sha256": "4ccbb80ab6ccb9f3c7fba8499535bb43d0907af5e0e72c58f70775fe8389eb00"
+    },
+    "docs/superpowers/plans/2026-03-19-stft-magnitude-filtering.md": {
+      "bytes": 28763,
+      "sha256": "8ea832fb5cbcac59e39addb1554ce3ec0e13f5335f13cb4208b34d3058189aad"
+    },
+    "docs/superpowers/plans/2026-03-20-egui-port.md": {
+      "bytes": 13226,
+      "sha256": "a2bad36290d970abe78f62cf5a8e8c6511e89994b47000e735d4dbce2d58b5ec"
+    },
+    "docs/superpowers/plans/2026-03-20-oversampling.md": {
+      "bytes": 19624,
+      "sha256": "83e1b1d7e1a5bd877532444aaf6c2368e87dc67ad11ea079b1ba4a795b357256"
+    },
+    "docs/superpowers/plans/2026-03-21-workspace-restructure.md": {
+      "bytes": 7646,
+      "sha256": "ec83f67fbcfd15207dcaffd4afaf8a9f730fc9ac061883ff438cf4db904ba45f"
+    },
+    "docs/superpowers/plans/2026-03-22-gain-brain.md": {
+      "bytes": 27738,
+      "sha256": "e6c2a40311cbab423ad9dc3582776e79a7aa7737ac0af03875631a6092a304f3"
+    },
+    "docs/superpowers/plans/2026-03-22-lufs-gain-matching.md": {
+      "bytes": 11248,
+      "sha256": "de97075e95d7d116166e9e1ea230951d1fb085947246c0aaf83d1ff41a55e5c7"
+    },
+    "docs/superpowers/plans/2026-03-22-tiny-skia-widgets.md": {
+      "bytes": 15000,
+      "sha256": "72c3e689aad43a7b196eab4258fe9d2c638cb2436e035f950b1d9d1217c3cc87"
+    },
+    "docs/superpowers/plans/2026-03-23-satch.md": {
+      "bytes": 13405,
+      "sha256": "8ce7e1036646bb46f14980c13d982175b7c5c330e834b461cb861c69576fed23"
+    },
+    "docs/superpowers/plans/2026-03-23-tinylimit.md": {
+      "bytes": 14852,
+      "sha256": "e8d02c59f688b9d497266e763c58f3f1573e622807973f68119973731050544d"
+    },
+    "docs/superpowers/plans/2026-03-29-gainbrain-cumulative-delta-protocol.md": {
+      "bytes": 24798,
+      "sha256": "8ad7191644cc85a378cae28ba11bd447b0e00512411823ef96a7348edcd0aa7f"
+    },
+    "docs/superpowers/plans/2026-03-29-pope-scope.md": {
+      "bytes": 77070,
+      "sha256": "510108e48618991ae5fd68b4798399c1e85eb9b35372ea53623bc2bf676c04e8"
+    },
+    "docs/superpowers/plans/2026-04-01-warp-zone.md": {
+      "bytes": 64192,
+      "sha256": "73d74b356474564766fb7f56123ee6e69f4eb85cbc8902e76112c98c0f0281a6"
+    },
+    "docs/superpowers/plans/2026-04-19-tiny-skia-text-entry.md": {
+      "bytes": 45684,
+      "sha256": "2393fabbedcb337a3dfa8223e25d747352064b750d12803b6189d98c98c92e03"
+    },
+    "docs/superpowers/plans/2026-04-19-wavetable-filter-tiny-skia-port.md": {
+      "bytes": 73742,
+      "sha256": "da06fc7c04c0aae840eb2de5aaef5895b9808c4271b8364a3000d0b7f1c9b292"
+    },
+    "docs/superpowers/plans/2026-04-26-six-pack.md": {
+      "bytes": 109674,
+      "sha256": "9a44f0d019d3c829d4a2b0f716e439d714706e4ed50a511976a73d78849fb7e5"
+    },
+    "docs/superpowers/plans/2026-05-05-imagine.md": {
+      "bytes": 195208,
+      "sha256": "72222e509d2fdf5c995298d8a0a4fa7d945a388b7711fcf818d558670d584b25"
+    },
+    "docs/superpowers/plans/2026-05-15-dropdown-widget.md": {
+      "bytes": 58016,
+      "sha256": "0c4aba12a1a3600a4bd96f1ad6c9060ad6a66c43d951a715909c80a39d01aa25"
+    },
+    "docs/superpowers/plans/2026-05-16-miff.md": {
+      "bytes": 78756,
+      "sha256": "348c745865ea43f13853d7aa32f642599fcc3a8a6cef1e0927547f6b055f9506"
+    },
+    "docs/superpowers/plans/2026-05-16-mseg-editor-core.md": {
+      "bytes": 45587,
+      "sha256": "9f2f106c265ffd35c32f3a7f62441339e0f67cc3a362367f6aaa28e366bf890b"
+    },
+    "docs/superpowers/plans/2026-05-16-mseg-editor.md": {
+      "bytes": 57474,
+      "sha256": "2603014dab326b820741a20a5b154280a153267521a9e47a1cae32a40d866fb3"
+    },
+    "docs/superpowers/plans/2026-05-16-tract-dsp-extraction.md": {
+      "bytes": 41470,
+      "sha256": "1b4d1e629167c985503c483d3f83a3c10da4f9036e4960cb203597cbafe5b307"
+    },
+    "docs/superpowers/plans/2026-05-16-tract-dsp-window-boxcar.md": {
+      "bytes": 41073,
+      "sha256": "4d27ad4a5db259f3b3c7e13168618d7b836caf98eb5ca360b8cbdbd8c288647a"
+    },
+    "docs/superpowers/plans/2026-05-17-multosis-phase-1a.md": {
+      "bytes": 65097,
+      "sha256": "db5dbd44c3c9cc67ec83637977141c56885bdb66584c509f550daad3e9e3e0f8"
+    },
+    "docs/superpowers/plans/2026-05-17-multosis-phase-1b-i.md": {
+      "bytes": 40151,
+      "sha256": "7ebc0fbc68d84b8ece5f93eeb1c3a3627f9d73a4d6e2375eca5baa46aeea1f51"
+    },
+    "docs/superpowers/plans/2026-05-17-multosis-phase-1b-ii-a.md": {
+      "bytes": 30688,
+      "sha256": "1a32b8d16b34a1af4c09d42776f493aac8afa1a7cea84d0341efd5142698b26e"
+    },
+    "docs/superpowers/plans/2026-05-17-multosis-phase-1b-ii-b-1.md": {
+      "bytes": 18862,
+      "sha256": "216165f2fe4317907422150ca284b9d9c531d081ea507293b294733ba3e0d2c6"
+    },
+    "docs/superpowers/plans/2026-05-17-multosis-phase-1b-ii-b-2.md": {
+      "bytes": 29152,
+      "sha256": "8dfc9c16cb120b44de483c95962fe5b69e8009bb759772f19ccaf75dbbdce577"
+    },
+    "docs/superpowers/plans/2026-05-17-tract-dsp-fir-stft.md": {
+      "bytes": 43092,
+      "sha256": "f6a1df2b7b5bc8594c19713a7bc06be0dce54378c9de13c98d04e5d1ca0931c1"
+    },
+    "docs/superpowers/plans/2026-05-17-tract-dsp-stft-analyzer.md": {
+      "bytes": 49127,
+      "sha256": "0b9468acd029b35aca6cc414145c01ebce2e8309ac92743ef266b383bc98bb56"
+    },
+    "docs/superpowers/plans/2026-05-18-multosis-connection-indicators.md": {
+      "bytes": 15127,
+      "sha256": "c754f9334798c8c7dac9a4c34142e55f282f87b398a7e2cda95ea9b5b60c116d"
+    },
+    "docs/superpowers/plans/2026-05-18-multosis-grid-interaction.md": {
+      "bytes": 36488,
+      "sha256": "e9516d00be3d283653c9260d52f55748ad37ccaeef0242e74234c6ef85c482a8"
+    },
+    "docs/superpowers/plans/2026-05-18-multosis-grid-layout.md": {
+      "bytes": 23193,
+      "sha256": "d3c2ed093661420f3914c6ea1c683197e37ddbfa395dbfbcdf3c6b7cc4da0fc6"
+    },
+    "docs/superpowers/plans/2026-05-18-multosis-phase-1b-ii-b-3.md": {
+      "bytes": 28597,
+      "sha256": "61a2ab3956d8c0020748f2e6da6b9fa8f0939087286974daa240b73e9a8941b5"
+    },
+    "docs/superpowers/plans/2026-05-18-multosis-phase-1b-ii-b-4.md": {
+      "bytes": 24786,
+      "sha256": "76da74b789b09a3bd7d914aef6b0140e949e67ff620576030fa682ec4e177178"
+    },
+    "docs/superpowers/plans/2026-05-18-multosis-phase-2a.md": {
+      "bytes": 39393,
+      "sha256": "2e05180de7fb48b1b0495f4d96aee7f062c38e945cb054d2e53c3ab69e6a52ac"
+    },
+    "docs/superpowers/plans/2026-05-18-multosis-region-corner-resize.md": {
+      "bytes": 17843,
+      "sha256": "8e7ae76c8a79ce4e2d2c31beca7cc4bd3ccea771d4a0442e3543d9f4339e50a7"
+    },
+    "docs/superpowers/plans/2026-05-18-multosis-ui-performance.md": {
+      "bytes": 21944,
+      "sha256": "94e5f3e5d32dbbc2de1d97c7bdffd7042033b1314db332e9b974d180e02ff0f8"
+    },
+    "docs/superpowers/plans/2026-05-19-multosis-bundle-a.md": {
+      "bytes": 36612,
+      "sha256": "e89db01876940ca2465068519a795053f84a6c2cad43145604433fcf43dd9985"
+    },
+    "docs/superpowers/plans/2026-05-19-multosis-phase-2b.md": {
+      "bytes": 31138,
+      "sha256": "89174d5312cdd084dafffe65ab1bd127244a18dfff22019d728e03b21a3ff729"
+    },
+    "docs/superpowers/plans/2026-05-19-multosis-phase-2c.md": {
+      "bytes": 72179,
+      "sha256": "0ece2fede741314f923a266bc5d5da6ef3c3a7fa3917ba0b41727f2a92c61d25"
+    },
+    "docs/superpowers/plans/2026-05-19-multosis-phase-3.md": {
+      "bytes": 46638,
+      "sha256": "aad520f001cff8f53c76b36f29e06ac742aed2499102c99442394855396edc75"
+    },
+    "docs/superpowers/plans/2026-05-20-multosis-grid-simplification.md": {
+      "bytes": 41173,
+      "sha256": "0d0e6758f2ea1379f7e6a9f2bbe0a41756d42c92201063786116c4dee0a9c0c9"
+    },
+    "docs/superpowers/plans/2026-05-21-mseg-multi-select.md": {
+      "bytes": 44181,
+      "sha256": "134fe38e97ae8d0f1a81dc0aad396906a3fd4f2cd386d7667cfbd2ce785e1d0d"
+    },
+    "docs/superpowers/plans/2026-05-21-multosis-cell-step-trigger.md": {
+      "bytes": 17362,
+      "sha256": "ace692e31c80fbffd0edd2812e46b8fa879a368be0442ad1634731e005b8dc86"
+    },
+    "docs/superpowers/plans/2026-05-21-multosis-editor-polish.md": {
+      "bytes": 19901,
+      "sha256": "5886971bf92675f6cc367a82647fe7c6ceddb61062348b155ed5cc23b4429540"
+    },
+    "docs/superpowers/plans/2026-05-21-multosis-per-track-mix.md": {
+      "bytes": 26657,
+      "sha256": "4150fc66496decd02b81851b0e71035ffa3a96e243be5e5172dca349efe03b4f"
+    },
+    "docs/superpowers/plans/2026-05-21-multosis-sample-accurate-cell-light.md": {
+      "bytes": 36542,
+      "sha256": "4144da13a55e1bb5a80027f7ec9192036a91e912efd3c491008062a5100ee671"
+    },
+    "docs/superpowers/plans/2026-05-22-multosis-undo-redo.md": {
+      "bytes": 26587,
+      "sha256": "084e3dcd8a1ffb556c218a770760bf4cbe0aded07485f6058dccc8acf028438d"
+    },
+    "docs/superpowers/plans/2026-05-23-mseg-editor-improvements.md": {
+      "bytes": 62665,
+      "sha256": "33348a6a6fa785c269ab68706b1c62cc7c3f779629a9bc947591212a86c5237a"
+    },
+    "docs/superpowers/plans/2026-05-24-multosis-spectral-effects-family.md": {
+      "bytes": 97040,
+      "sha256": "724bbe22942ce830992637154b12414265fefc23816dc066e6ef9057864e5dd1"
+    },
+    "docs/superpowers/plans/2026-05-29-nap-fft-mode.md": {
+      "bytes": 30547,
+      "sha256": "b9bccd0e817a796f8b87fd11161fbd886dd659ec93ae02e29cc0569715c28584"
+    },
+    "docs/superpowers/plans/2026-05-29-nap-velvet-reverb.md": {
+      "bytes": 66005,
+      "sha256": "ea19b72887b347af14ee41c0d3bdbab4d26280a4fd24d16465882fdca356dc1f"
+    },
+    "docs/superpowers/plans/2026-05-30-hd26.md": {
+      "bytes": 82342,
+      "sha256": "bd163b8db8b9fe335a494d9378fea708599aa2d73ffc39122dfbeb30cf18d748"
+    },
+    "docs/superpowers/plans/2026-10-16-minitosis.md": {
+      "bytes": 4576,
+      "sha256": "5b2681b67b4f7971c9d8ef615c37221c12fb134bf9d76512cb8e0957d1cf5df6"
+    },
+    "docs/superpowers/specs/2026-03-19-param-dial-design.md": {
+      "bytes": 5532,
+      "sha256": "3330b7e694919c72a9be940e0b0c9d3df0eb58fe47fdac8b3f153fe42529237f"
+    },
+    "docs/superpowers/specs/2026-03-20-oversampling-design.md": {
+      "bytes": 5947,
+      "sha256": "0a9e11470d5e3ab950b4cb79b351d4fb4600413dde98cba4a0cb57300486482f"
+    },
+    "docs/superpowers/specs/2026-03-21-workspace-restructure-design.md": {
+      "bytes": 5795,
+      "sha256": "82c452d9eafd1d5ab8b0584795221a1f825771654693dc114b9bfdf509c31a5c"
+    },
+    "docs/superpowers/specs/2026-03-22-gain-brain-design.md": {
+      "bytes": 10758,
+      "sha256": "8f2f69f43785161c09929f45514b003d8b8dcd6c07ca584077289d08e235e682"
+    },
+    "docs/superpowers/specs/2026-03-22-tiny-skia-widgets-design.md": {
+      "bytes": 5443,
+      "sha256": "bd2c210b1dbc56e1cd82ab7c1320a40786246b579f8562750e0baea09c4bd3d0"
+    },
+    "docs/superpowers/specs/2026-03-23-satch-design.md": {
+      "bytes": 10139,
+      "sha256": "1f3242791b347724c511c330257fa5a9090bd679c53364921272b735bb5d062f"
+    },
+    "docs/superpowers/specs/2026-03-23-tinylimit-design.md": {
+      "bytes": 12962,
+      "sha256": "0d89111cc383990949997f6f40633ee02d92fb7055b0b5bccaf761081f34dd10"
+    },
+    "docs/superpowers/specs/2026-03-29-gainbrain-sync-protocol-design.md": {
+      "bytes": 8807,
+      "sha256": "e4cb9d09255453db16b1f258098b5ae276cc0bb17c3a095a4542ba7fa39bebac"
+    },
+    "docs/superpowers/specs/2026-03-29-pope-scope-design.md": {
+      "bytes": 14636,
+      "sha256": "5baac8bb4c989bec5bce74168923f6654e4c74701db32fd14b6e1418e63e5199"
+    },
+    "docs/superpowers/specs/2026-04-01-warp-zone-design.md": {
+      "bytes": 7874,
+      "sha256": "a7b1d311b33efcafdbe8b76b6d6fb2e4d79aaef31da4dec58928e29cf6bb541c"
+    },
+    "docs/superpowers/specs/2026-04-19-tiny-skia-text-entry-design.md": {
+      "bytes": 11007,
+      "sha256": "2c40ada2b0682c5d484e7aaf91ede606dfdb28790d0bca7f313e90e11833604d"
+    },
+    "docs/superpowers/specs/2026-04-19-wavetable-filter-tiny-skia-port.md": {
+      "bytes": 12181,
+      "sha256": "13438cb9988ff99bf9571626f2991b69ebaf4dc6613225651c2368935323d658"
+    },
+    "docs/superpowers/specs/2026-04-26-six-pack-design.md": {
+      "bytes": 36513,
+      "sha256": "d8d26e68e33c6dc43ad861cc72c4961c7c9d19125c5fd52233b80aafe1779509"
+    },
+    "docs/superpowers/specs/2026-05-03-grid-selector-widget-design.md": {
+      "bytes": 14953,
+      "sha256": "243125a1b68c8e1f3921f2c892503350bd6f49f2a1370a41a3fd148bb1d148e2"
+    },
+    "docs/superpowers/specs/2026-05-05-imagine-design.md": {
+      "bytes": 37902,
+      "sha256": "952a07b4dddb2e3cf52fe8da517fff937e52896371a6c0bdc67c3b3a6019d3c0"
+    },
+    "docs/superpowers/specs/2026-05-15-dropdown-widget-design.md": {
+      "bytes": 11450,
+      "sha256": "2808fa132845be7f49dd987c7bdd5030ddfed12d5902261388d93db1668db886"
+    },
+    "docs/superpowers/specs/2026-05-16-miff-design.md": {
+      "bytes": 15576,
+      "sha256": "e9e8d9246d7cb84718cbfd3a9c0aac78db9a597286303ab76d353fe8f5134cf7"
+    },
+    "docs/superpowers/specs/2026-05-16-mseg-editor-widget-design.md": {
+      "bytes": 19689,
+      "sha256": "2240faf7e238cd6e4fa071cc101f8777bea2d511e31b65fdbbd3e4633f28f3ed"
+    },
+    "docs/superpowers/specs/2026-05-16-tract-dsp-fir-stft-design.md": {
+      "bytes": 9126,
+      "sha256": "668d9ea62633d946bb81cf1ffb4a74caffda9e2e38938a4e6b03b982d373d5db"
+    },
+    "docs/superpowers/specs/2026-05-16-tract-dsp-window-boxcar-design.md": {
+      "bytes": 8458,
+      "sha256": "060f86dbd1644af8e24aaaac306966e9533352267b2f7419a8be1ad491749139"
+    },
+    "docs/superpowers/specs/2026-05-17-multosis-phase-1-design.md": {
+      "bytes": 15591,
+      "sha256": "17be6c506388b8eec61c96f4de522b527e52a008a17ad72399e81d618b0a866c"
+    },
+    "docs/superpowers/specs/2026-05-17-tract-dsp-stft-analyzer-design.md": {
+      "bytes": 9070,
+      "sha256": "96f636a25d5c52a296d17640cbff3739de2f5349e0bbd9d1ffd7e8c1c702ccbc"
+    },
+    "docs/superpowers/specs/2026-05-18-multosis-connection-indicators-design.md": {
+      "bytes": 7181,
+      "sha256": "1b77925cae080a1135caa8a1f73f116d74e91b4ad50466b20aa2b389914f9e8f"
+    },
+    "docs/superpowers/specs/2026-05-18-multosis-grid-interaction-design.md": {
+      "bytes": 8563,
+      "sha256": "a207c4ecc3a88e39db416649870b40e1b2e0e16b5401ea1dd63bd4684d4d1c79"
+    },
+    "docs/superpowers/specs/2026-05-18-multosis-grid-layout-design.md": {
+      "bytes": 8567,
+      "sha256": "6a4c33bb7c96ce33535ff64b07d6eed9ce5a0d7e4da7ce75f2834793eb3cdceb"
+    },
+    "docs/superpowers/specs/2026-05-18-multosis-phase-2a-design.md": {
+      "bytes": 10244,
+      "sha256": "3b3f9a9811ead9c591ecf2396d61e4eb75669b797cfb1f86487d8fd8661a3ec0"
+    },
+    "docs/superpowers/specs/2026-05-18-multosis-region-corner-resize-design.md": {
+      "bytes": 5996,
+      "sha256": "5b42557f4e731746bef05c0098aa601da189cd0e4f331f6f1c76dd7d5b8c652b"
+    },
+    "docs/superpowers/specs/2026-05-18-multosis-ui-performance-design.md": {
+      "bytes": 7683,
+      "sha256": "abdd8e0cbd53c5a3bc230c3a1ebb4b33a284333aeb1e116a95baf55e142819c7"
+    },
+    "docs/superpowers/specs/2026-05-19-multosis-bundle-a-design.md": {
+      "bytes": 13312,
+      "sha256": "e69df3246063eeaec92233e3af7ddfd13384c32b07bb2fb2ef6857dfee658c0f"
+    },
+    "docs/superpowers/specs/2026-05-19-multosis-phase-2b-design.md": {
+      "bytes": 9227,
+      "sha256": "096d83e315a15680cdcb1c8ebb1a205b45ecfc96fb01a2262a98bb2c0dc5a485"
+    },
+    "docs/superpowers/specs/2026-05-19-multosis-phase-2c-design.md": {
+      "bytes": 15248,
+      "sha256": "3120f1400da4271d69e3999841242db80bbe0d3ac5552c94e1c5e78db86a6e1e"
+    },
+    "docs/superpowers/specs/2026-05-19-multosis-phase-3-design.md": {
+      "bytes": 12606,
+      "sha256": "fb1c455ba63a3b2705004d27571d97f9ee1ac1fa4efb0b94fe3e86bf3ab8302f"
+    },
+    "docs/superpowers/specs/2026-05-20-multosis-grid-simplification-design.md": {
+      "bytes": 10479,
+      "sha256": "01fb72d08f1cab66c5b1cbbbd13cccfffbb8af5722eaaa600ec657866980bbd8"
+    },
+    "docs/superpowers/specs/2026-05-21-mseg-multi-select-design.md": {
+      "bytes": 9748,
+      "sha256": "b087aec9f77ac44185b22eed6e76a1f5aaa3875579ac6f53ace25231e827892d"
+    },
+    "docs/superpowers/specs/2026-05-21-multosis-cell-step-trigger-design.md": {
+      "bytes": 5748,
+      "sha256": "deac423145c4e85106df5c5046f619de167ae02d3936c1052b3b8932e73d48e8"
+    },
+    "docs/superpowers/specs/2026-05-21-multosis-editor-polish-design.md": {
+      "bytes": 5720,
+      "sha256": "a2efc2cfb6c340bb1501a6527ae9e8fea9842a8422cbf1d2fac6de72a51b0b43"
+    },
+    "docs/superpowers/specs/2026-05-21-multosis-per-track-mix-design.md": {
+      "bytes": 6552,
+      "sha256": "bd52273b9446c1fff823d0e867420e5bfd187a8908241e9ffdbc5e3a15267919"
+    },
+    "docs/superpowers/specs/2026-05-21-multosis-sample-accurate-cell-light-design.md": {
+      "bytes": 9422,
+      "sha256": "d7d60d660778d818c09eb007c72b4e3884fe0ed755db5f3d3ea25f33f547ab5f"
+    },
+    "docs/superpowers/specs/2026-05-22-multosis-speed-dropdown-design.md": {
+      "bytes": 4571,
+      "sha256": "267a3501c632ad4f012cbc806c498bdcf942c2ae1ed2da2f96dda195630f3ee7"
+    },
+    "docs/superpowers/specs/2026-05-22-multosis-undo-redo-design.md": {
+      "bytes": 7906,
+      "sha256": "a2be7a4618e513909a514596bd7fc5cd3784fea6093fae02e79772a31ef1ebea"
+    },
+    "docs/superpowers/specs/2026-05-23-mseg-editor-improvements-design.md": {
+      "bytes": 16652,
+      "sha256": "651bc625391f359041213de13bddce7b9884aa1b58d9fc93b9d0aeb5db462b1a"
+    },
+    "docs/superpowers/specs/2026-05-24-multosis-spectral-effects-family-design.md": {
+      "bytes": 15570,
+      "sha256": "9e6241cdf867c0537fa71fa90c833f19e761d4277f0d8509f6c720ceca76c3f0"
+    },
+    "docs/superpowers/specs/2026-05-29-nap-fft-mode-design.md": {
+      "bytes": 8702,
+      "sha256": "e6f2176254c0f6cedc6b03020b172d07e9c70dc67483a9ffe2e3c24abc95352e"
+    },
+    "docs/superpowers/specs/2026-05-29-nap-velvet-reverb-design.md": {
+      "bytes": 15343,
+      "sha256": "b1661c1bcf40d75e9937cfb1a07e1ac89c8df2e04082a487d7d279e7923bad54"
+    },
+    "docs/superpowers/specs/2026-05-30-hd26-design.md": {
+      "bytes": 14806,
+      "sha256": "985ec8d1b6ad2b0c67ab52f5af1c065c43ea1511f36d90025f171d74921f1861"
+    },
+    "docs/superpowers/specs/2026-10-16-minitosis-design.md": {
+      "bytes": 4306,
+      "sha256": "7c67dd003985873d8ca7b636a86b86e49355bd71753204555c3ecc0b8e6f2677"
+    },
+    "docs/superpowers/specs/2026-10-16-mseg-mix-modulation-design.md": {
+      "bytes": 1931,
+      "sha256": "7a42c32d8565db2dac40e338da211d8756a7e9ed6f0653dbebc95366435b1942"
+    },
+    "docs/tinylimit/screenshot.png": {
+      "bytes": 53676,
+      "sha256": "89b764dc99047cd8b1995a62e4fafce8bf26895f4ca36137fd74a845165f89f6"
+    },
+    "docs/tinylimit/tinylimit-manual.md": {
+      "bytes": 9253,
+      "sha256": "fc514bb50b5ccb0bfb7e47d511933a2ba151aff377799c7454f656ee7d944250"
+    },
+    "docs/tinylimit/tinylimit-manual.pdf": {
+      "bytes": 107950,
+      "sha256": "0bfeadceffee9f4e8c8a8ea69e208faa300f72b018f104e959f2e5e44f3f0daa"
+    },
+    "docs/warp-zone/screenshot.png": {
+      "bytes": 105458,
+      "sha256": "981a9e7a4f717860b0e01e86442e31dfd180871fd7d90ab70c0c8e89ba93949c"
+    },
+    "docs/warp-zone/warp-zone-manual.md": {
+      "bytes": 7748,
+      "sha256": "3ab8ec23c509faf5bbf91252473f0a2ecbf9884c4fd0e85de8df8dd4ff396428"
+    },
+    "docs/warp-zone/warp-zone-manual.pdf": {
+      "bytes": 156828,
+      "sha256": "c0d0c85e6bdc71ca8beaf8ec1fef10ec06d9b5940a5f28f893ff03500f8cf294"
+    },
+    "docs/wavetable-filter/screenshot.png": {
+      "bytes": 214163,
+      "sha256": "1b34bb98e7d258321b4a0b96da64fab6c18f1d36da3a221a90a4f7a8ce004502"
+    },
+    "docs/wavetable-filter/wavetable-filter-manual.md": {
+      "bytes": 6810,
+      "sha256": "29e0ff11fc7a8b93f69e014259849936f87651e2e5d9894ad8fa9acadf416e3c"
+    },
+    "docs/wavetable-filter/wavetable-filter-manual.pdf": {
+      "bytes": 250936,
+      "sha256": "6be5a7bca99f6e8dfec9d62f433e5d02b4b188d50cf34868f291e629f9101d58"
+    },
+    "gain-brain/Cargo.toml": {
+      "bytes": 936,
+      "sha256": "168a83b19eead0543a9943d518fc3124e4bf3c8b41a5e85e19484c195883d32b"
+    },
+    "gain-brain/src/editor.rs": {
+      "bytes": 30825,
+      "sha256": "14dfeb8b3edd33fac898304881a2fcd2e8cdb9f369d30ceb184f201ecf789600"
+    },
+    "gain-brain/src/fonts/DejaVuSans.ttf": {
+      "bytes": 759720,
+      "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280"
+    },
+    "gain-brain/src/groups.rs": {
+      "bytes": 8066,
+      "sha256": "81601db0940233c2df3c726a2926fd663ffc840535b73a4639cb37f8a50859a8"
+    },
+    "gain-brain/src/lib.rs": {
+      "bytes": 59014,
+      "sha256": "2900e453af3e285f82495c1844309276ab1284ade9ff7762cb784e04861a9c2f"
+    },
+    "gain-brain/src/main.rs": {
+      "bytes": 95,
+      "sha256": "c9450b2f2b0e0d4e5f83f2bd1db1235d21fb292864720a30a30ec02f91f4c256"
+    },
+    "gs-meter/Cargo.toml": {
+      "bytes": 1083,
+      "sha256": "770ef62fcf675ba3c874b54b00acd780917f321d222baf4248710a2c26d9ff2f"
+    },
+    "gs-meter/build.rs": {
+      "bytes": 486,
+      "sha256": "d77f4de35c31f629ac80895bbe0bd01094295d386d0eee551fd4c6b4999dba5c"
+    },
+    "gs-meter/src/editor.rs": {
+      "bytes": 35695,
+      "sha256": "d69d063eb69af402e0f59ef2dd7bea2267ef8937d6f84520007f2357ebcd8141"
+    },
+    "gs-meter/src/fonts/DejaVuSans.ttf": {
+      "bytes": 759720,
+      "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280"
+    },
+    "gs-meter/src/lib.rs": {
+      "bytes": 14228,
+      "sha256": "9977b6faafe91742c72db047e3c157be98bd3658664e11fbbd0a2e32ca16e12b"
+    },
+    "gs-meter/src/lufs.rs": {
+      "bytes": 33792,
+      "sha256": "5c9ce0dc6c2f535602d32792ab4029a4005d6cae237607e9360fb6a96fbf07b1"
+    },
+    "gs-meter/src/main.rs": {
+      "bytes": 91,
+      "sha256": "43b33038211e2dc3da3fcce35ee08c6d86211dd8bbcb5452b63fb9c23f9848ee"
+    },
+    "gs-meter/src/meter.rs": {
+      "bytes": 30390,
+      "sha256": "1e23bfb30d015c7a36dd6d9cc080b3bff6f3c5901b23401eb2d0f23447330990"
+    },
+    "hd26/Cargo.toml": {
+      "bytes": 1038,
+      "sha256": "187e819cbf6cffce0561d77dae3296da486950ad1c89fb0abf1383d0d0540c5d"
+    },
+    "hd26/benches/dsp.rs": {
+      "bytes": 3286,
+      "sha256": "d84512bc7bec1a4b91685caf78196951bfcd8f9dca2e6a91ff6c9cabb2de7e75"
+    },
+    "hd26/examples/profile.rs": {
+      "bytes": 2790,
+      "sha256": "e882dce8bfd2a2503cbc3257640bf1e82fc0a1ecaff7c2556c4533c351cfc71e"
+    },
+    "hd26/src/delay.rs": {
+      "bytes": 4814,
+      "sha256": "fae33b1cecc93afedc6585efb3af53b64c425494a05f23df3e3c347f6a642af0"
+    },
+    "hd26/src/dimension.rs": {
+      "bytes": 9074,
+      "sha256": "035bdfd9c790890ac10fe049924a91b04c0d216b223077420386268249ce7be2"
+    },
+    "hd26/src/editor.rs": {
+      "bytes": 23660,
+      "sha256": "59e59e7dbc7310428c7709b78c445bd293779daed9a55a7232f4e10f03d7455b"
+    },
+    "hd26/src/fonts/DejaVuSans.ttf": {
+      "bytes": 759720,
+      "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280"
+    },
+    "hd26/src/hyper.rs": {
+      "bytes": 9498,
+      "sha256": "0eb86963ad27fddef212eae9a0a1001ad913635ed7c530aefe13969fefe09afb"
+    },
+    "hd26/src/lfo.rs": {
+      "bytes": 4975,
+      "sha256": "4a9cacf9bcfd2c38f56de280e543d80c10b2109ca87dfdada52c167d247fe793"
+    },
+    "hd26/src/lib.rs": {
+      "bytes": 12580,
+      "sha256": "3e697e4c305d7112b4cf963a4ac9a47db8d260498704ff6db9e5512f1e30d723"
+    },
+    "hd26/src/main.rs": {
+      "bytes": 84,
+      "sha256": "c62d15a291f3983fa18e4157f5fda3f2c3d03764f722c143ee106d083ad8f5a2"
+    },
+    "hd26/src/transient.rs": {
+      "bytes": 6841,
+      "sha256": "4fe2fcac86c5a9d8def3c64b61a19809f5e85237fda390e612ffbdd06daaee9f"
+    },
+    "imagine/Cargo.toml": {
+      "bytes": 1053,
+      "sha256": "561dcd76e1484dc2dbc65bea8b3f07fbd37574e4d214f7ab4ace63854621e381"
+    },
+    "imagine/examples/imagine_profile.rs": {
+      "bytes": 13775,
+      "sha256": "8db708171788fbdfa4c3f6b6297f541cf92cb98f0f62432e3d71793c010952e2"
+    },
+    "imagine/src/bands.rs": {
+      "bytes": 12968,
+      "sha256": "350f2218916a72ab06349e6cf62253fe4cf0af71cd662a7b4c11f3fd1db2d9be"
+    },
+    "imagine/src/crossover.rs": {
+      "bytes": 30593,
+      "sha256": "0b11c38223f767e13ebe21ae6a30ae73e5e01316f59e415c2fec701167b429b6"
+    },
+    "imagine/src/decorrelator.rs": {
+      "bytes": 8437,
+      "sha256": "62a9c8b04cbd22ed26a55c11e4413d836778eeb25c24ec58ed86706dee163a60"
+    },
+    "imagine/src/editor/band_strip.rs": {
+      "bytes": 19526,
+      "sha256": "1de2122dcefa9ae06e1a9e9d7070ca61bbeaf7f2fce9aecf9a5513df0481eb3e"
+    },
+    "imagine/src/editor/global_strip.rs": {
+      "bytes": 8140,
+      "sha256": "985576accd3186e6323b9cdfc3f4102a9d0689816f8e4d57b4d1bb8b40ebfa5d"
+    },
+    "imagine/src/editor/spectrum_view.rs": {
+      "bytes": 8994,
+      "sha256": "f9d30bd5fb6c6ef7f66f418911f538f14be524428db51bb910f52c92551f41e2"
+    },
+    "imagine/src/editor/vectorscope_view.rs": {
+      "bytes": 45734,
+      "sha256": "6ac67d2972994277eef1da38e4417901e50a6409b7102590563c1dc02e55be7f"
+    },
+    "imagine/src/editor.rs": {
+      "bytes": 42623,
+      "sha256": "12f02455bbc5b52e6842dee367ab05351a33908bcd9bbe3bb44e1a6054d56a8f"
+    },
+    "imagine/src/fonts/DejaVuSans.ttf": {
+      "bytes": 759720,
+      "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280"
+    },
+    "imagine/src/lib.rs": {
+      "bytes": 39731,
+      "sha256": "5b5c9a06807da3b433538ab11dc09438376433d422880a0a8c57c0b7f531ff77"
+    },
+    "imagine/src/main.rs": {
+      "bytes": 103,
+      "sha256": "0a7a960005c2423b889ff729339d1570773c72ec4bb831ae0847eef72251e234"
+    },
+    "imagine/src/midside.rs": {
+      "bytes": 3392,
+      "sha256": "c26660fdbb0de95cc9c849ba6da51abe319a0cee47a520dbfd632061ab860e3a"
+    },
+    "imagine/src/polar_rays.rs": {
+      "bytes": 3968,
+      "sha256": "e6a7174d860891a636167b0b881676f915c637fcf8c97108ad3802a020ef0384"
+    },
+    "imagine/src/spectrum.rs": {
+      "bytes": 20944,
+      "sha256": "c1e18ea966a635aab7d2c1395651d5da3b9007b92c896b86e447ef19746aacef"
+    },
+    "imagine/src/theme.rs": {
+      "bytes": 3906,
+      "sha256": "61ec54bc6131cc1ec7800b8db554387fa22206c13ab5e9c03486342dbd701c41"
+    },
+    "imagine/src/vectorscope.rs": {
+      "bytes": 2187,
+      "sha256": "cd4297b77252ce4cd9b216264f7919d9dff980bca52c9e4c046c10b33400f7cc"
+    },
+    "miff/Cargo.toml": {
+      "bytes": 1008,
+      "sha256": "ab89e37bc187c4c10a0cb1493b768825d7295757af940f209d5dd4373518e311"
+    },
+    "miff/build.rs": {
+      "bytes": 486,
+      "sha256": "d77f4de35c31f629ac80895bbe0bd01094295d386d0eee551fd4c6b4999dba5c"
+    },
+    "miff/examples/miff_profile.rs": {
+      "bytes": 8164,
+      "sha256": "fb6555dd7216eb59b40218772adba338e0c1e347356f48164b6c9a386669e913"
+    },
+    "miff/src/convolution.rs": {
+      "bytes": 6740,
+      "sha256": "9d42606701008b9375b70e78d46c8fb4935966eb3c7456f6f2e9d860b1796cca"
+    },
+    "miff/src/editor/response_view.rs": {
+      "bytes": 15354,
+      "sha256": "3eb4c67465d7c6e5ab761c1a25e17383564f5e13f36883d6f9e864f1717a18de"
+    },
+    "miff/src/editor.rs": {
+      "bytes": 51771,
+      "sha256": "6a8eb44802ddff9d04dfd677699a51a0c5a5e20ef470abb988d5f9ba6b9f71ca"
+    },
+    "miff/src/fonts/DejaVuSans.ttf": {
+      "bytes": 759720,
+      "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280"
+    },
+    "miff/src/kernel.rs": {
+      "bytes": 11822,
+      "sha256": "839a863ceef5739a3f22e3828f86857402412774c6789cc6e671497359392aa0"
+    },
+    "miff/src/lib.rs": {
+      "bytes": 17797,
+      "sha256": "5c7ecd95e593edd156990e33f1f2e5f25b6027bbd698e28a41ed00637e41f0cf"
+    },
+    "miff/src/main.rs": {
+      "bytes": 99,
+      "sha256": "0df28c2abc99741e29e0b486551a7c1a4376c2ec09c1e9842781e0c628f502fd"
+    },
+    "minitosis/Cargo.toml": {
+      "bytes": 1234,
+      "sha256": "c02cbed29144dba09578d9b36ea938a3e6df100b1987a5b44cda00b166da73e1"
+    },
+    "minitosis/src/editor.rs": {
+      "bytes": 27254,
+      "sha256": "e10a9792c226e1446a9bec7070fcd1379174a2e11394483ff0a51c9bbf1206b2"
+    },
+    "minitosis/src/engine.rs": {
+      "bytes": 9694,
+      "sha256": "fe48eef3f464b28fe667cf20827edea13f97f2b626e5fbe7e298a284e1c81e75"
+    },
+    "minitosis/src/handoff.rs": {
+      "bytes": 3696,
+      "sha256": "94f0a71ecf2e4c167f9bc3ddef5c90786cde78a1dabfe38cf901ee59b62a8c82"
+    },
+    "minitosis/src/lib.rs": {
+      "bytes": 10046,
+      "sha256": "629967a245cf5ab9967e640aab45d0cb39da0c93946c60dc11c6221443f1a187"
+    },
+    "minitosis/src/main.rs": {
+      "bytes": 94,
+      "sha256": "f09affe5cf862b20f9788dda34369d065731b66acf14b1f1c93a173a7efdc2e4"
+    },
+    "minitosis/src/params.rs": {
+      "bytes": 10653,
+      "sha256": "abe30028963b27d062f4d3130a2449bca40f00f34040a2a5db834c6b271c194d"
+    },
+    "minitosis/src/state.rs": {
+      "bytes": 5024,
+      "sha256": "7b5d98162a27aff919f8b223f27563e55e405398e590c0c65829723dc26c8df6"
+    },
+    "minitosis/src/tests.rs": {
+      "bytes": 14200,
+      "sha256": "f7d3674b7d33f4e15644dd913fecb88282c403f8dc0833b83a67065816a6aa50"
+    },
+    "minitosis/test-data/automation-ids.txt": {
+      "bytes": 2206,
+      "sha256": "742926adc08a6eff73a95465d3c9400634f0b60223dd731e8218600f4eb056fb"
+    },
+    "multosis/BACKLOG.md": {
+      "bytes": 3376,
+      "sha256": "1f2a08c4fb12706fea0e4d6bc40e40c7d2eaa4d4a7eb5460ed7b9f9d58461f7a"
+    },
+    "multosis/Cargo.toml": {
+      "bytes": 1239,
+      "sha256": "10ff0fd58c77cf753a94dc3779756421a0a23a5f7c638e9f6f6eccef10ec4b43"
+    },
+    "multosis/benches/dsp.rs": {
+      "bytes": 9768,
+      "sha256": "10252e31bf24c5f8f544ab7c948a25de948eac0ee26fcebaa8ea537a7748ead6"
+    },
+    "multosis/benches/effects.rs": {
+      "bytes": 2211,
+      "sha256": "cff42dc4b4222b0195898d5855346db5943660604327616c6c1bc4586ef25bc0"
+    },
+    "multosis/examples/diode_profile.rs": {
+      "bytes": 2413,
+      "sha256": "508e0375c18a20f8bd4d9fa1367c1f1974ac6652dce74cab5830d38182a149f8"
+    },
+    "multosis/examples/ladder_profile.rs": {
+      "bytes": 2618,
+      "sha256": "2ba11685e93233b7e2453348ad8436ecac6f707ff68cd167f07834695bccce7d"
+    },
+    "multosis/examples/reverb_profile.rs": {
+      "bytes": 2992,
+      "sha256": "c0dfcfd78f704183724102e3ff7e2fb459552983303787fc3fce12e375063f78"
+    },
+    "multosis/examples/spectral_stretch_profile.rs": {
+      "bytes": 3183,
+      "sha256": "5067d584f1a4f58d89fd968bbdc3c172a0d4e2bc2ca130f519b30b0e824405b4"
+    },
+    "multosis/src/clock.rs": {
+      "bytes": 9586,
+      "sha256": "56715d5a7962ade1916faf4e9189b7ea3809c3a15fa0078a2b49e2f43e0af89d"
+    },
+    "multosis/src/editor/effect_editor.rs": {
+      "bytes": 3599,
+      "sha256": "d343f9bb867e6468f9c8b78cfe093e7306ee2284fe86037198585d7df139047b"
+    },
+    "multosis/src/editor/grid_view.rs": {
+      "bytes": 41348,
+      "sha256": "eec34e0bd67157056f8cc2d8423106315dc93674880bbdd531122f3c7c5f4ace"
+    },
+    "multosis/src/editor/toolbar.rs": {
+      "bytes": 16844,
+      "sha256": "c7fa1ce6257deceb6be5b5a6c6fd25d50f8650f40442da5f4a2990e78d0e0d37"
+    },
+    "multosis/src/editor/track_list.rs": {
+      "bytes": 19883,
+      "sha256": "4fd2686b19ddf5458d4da37bf658934df1b188749997396427722d61c7c76206"
+    },
+    "multosis/src/editor.rs": {
+      "bytes": 52582,
+      "sha256": "4c5da576fdeb5273b44333f121eb50bfe5f9e5fc2946d6afd4547816251b1648"
+    },
+    "multosis/src/engine.rs": {
+      "bytes": 63172,
+      "sha256": "4d8d5e0a705a11a533ee55f94be36bab8cf913bb28bccf4b76419a6c348af2e7"
+    },
+    "multosis/src/fonts/DejaVuSans.ttf": {
+      "bytes": 759720,
+      "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280"
+    },
+    "multosis/src/grid.rs": {
+      "bytes": 9067,
+      "sha256": "46ce2a9c9afa68d20a5c033c9561f291661d87421750a207218e9df4499a2243"
+    },
+    "multosis/src/handoff.rs": {
+      "bytes": 1726,
+      "sha256": "05a32a706aac393080eb7b0a0a5ef8658f31ae3d127463d724319852a5f81070"
+    },
+    "multosis/src/lib.rs": {
+      "bytes": 15904,
+      "sha256": "52013fb40456f0fee6f18a183b8cbaf054a87d616f1041cdd1c69f95cfd9fc00"
+    },
+    "multosis/src/main.rs": {
+      "bytes": 92,
+      "sha256": "2ddb2f781661605c09aa9ff1f539244d2113cfebb9c0f9d9e39c624297a17680"
+    },
+    "multosis/src/modulation.rs": {
+      "bytes": 42989,
+      "sha256": "2d1ef936603c9e94ffdf803182d0320975c2354efd2fd579eae488e8ae521a06"
+    },
+    "multosis/src/playhead_display.rs": {
+      "bytes": 1421,
+      "sha256": "93945976bd9599a71a8240c35f26612802e41488d6734ec71d3959a405544954"
+    },
+    "multosis/src/propagation.rs": {
+      "bytes": 4818,
+      "sha256": "046ec9bd8de92a557d208eae7cb216aafdc8cdbd38cf46cb581fdb41e469874d"
+    },
+    "multosis/src/randomize.rs": {
+      "bytes": 1789,
+      "sha256": "e650b4d55565593485c8a1de7667f3ddbc3564911459c3baa4c839c2255a53b6"
+    },
+    "multosis/src/region.rs": {
+      "bytes": 3638,
+      "sha256": "d0fb5596c693033549a27fe4bbb045182239d9f855ac57346f8f63fe00ee72ce"
+    },
+    "multosis/src/seq_status.rs": {
+      "bytes": 1214,
+      "sha256": "0f2f2074de8e40c065db98372e5a9954411e9438be319a8d56571a9021887917"
+    },
+    "multosis/src/undo.rs": {
+      "bytes": 4396,
+      "sha256": "2db8221413616ba1d119580a3ee4a984799b9d1560adb4642ede0cac7e9a1107"
+    },
+    "nap/Cargo.toml": {
+      "bytes": 1201,
+      "sha256": "333de1a317accaa1ed54aa3aac5a481410a1ef6bd23d6e3ad75b16c36ce6ebe4"
+    },
+    "nap/benches/dsp.rs": {
+      "bytes": 2482,
+      "sha256": "fc98802488547c35ed8098dbbbb707eb89c63d0b5d572f158d663157e8b92b4b"
+    },
+    "nap/examples/nap_profile.rs": {
+      "bytes": 5697,
+      "sha256": "4b94be0d0e363d776f13ce84cab936807f62b8d2ac928579588cfb6ca9e27416"
+    },
+    "nap/src/coloration.rs": {
+      "bytes": 3568,
+      "sha256": "437cb8aa3e22184104ed5b19d5a2175d2c4157b0c5c5bf119d2cb65892f811b6"
+    },
+    "nap/src/editor/tail_view.rs": {
+      "bytes": 2947,
+      "sha256": "1cc6b92d9cae7a81b7dc40dabd53fb3ce3bd175c64621522601e121f11f436ee"
+    },
+    "nap/src/editor.rs": {
+      "bytes": 55628,
+      "sha256": "ba2d3d3bb621dd54b0cc546b5f262da001f49f21f160dfa731b6724949929900"
+    },
+    "nap/src/engine.rs": {
+      "bytes": 22438,
+      "sha256": "bfb046bc7cdfb007db7fb2f0deb4618cb71fe526d1ab9a941c9207378c3f364e"
+    },
+    "nap/src/fonts/DejaVuSans.ttf": {
+      "bytes": 759720,
+      "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280"
+    },
+    "nap/src/handoff.rs": {
+      "bytes": 8411,
+      "sha256": "d9870e07b442e5b6c86639b510ae575fae0bac98ab897189af91bdc23718964e"
+    },
+    "nap/src/ir.rs": {
+      "bytes": 7825,
+      "sha256": "a0fd4e7826b19316e745871eb607d3f00e1f13099dd67a3678f28c51fbe99226"
+    },
+    "nap/src/lib.rs": {
+      "bytes": 28457,
+      "sha256": "506bd492d06256123b7aefe96ed7b2ce770436102a1d764b8ca21d962da1247f"
+    },
+    "nap/src/main.rs": {
+      "bytes": 81,
+      "sha256": "03f26355be4bb00ff6876fdb6f67807ef2d323f27c5f25ca38cf112e924b5248"
+    },
+    "nap/src/rng.rs": {
+      "bytes": 1589,
+      "sha256": "79868deb22c8e6b97a02954561c107058eb2e624366aa7e1545b0d4e97f84352"
+    },
+    "nap/src/sequence.rs": {
+      "bytes": 14883,
+      "sha256": "4788a6746538ebb4806368b8fc461d758208973996fbbdda4fc196130b8f92e6"
+    },
+    "nap/src/theme.rs": {
+      "bytes": 1093,
+      "sha256": "5f1369bfa077a212bf343f4143cb6d983d3d5d1adbe2fa1f485ff311ef65c767"
+    },
+    "nih-plug-widgets/Cargo.toml": {
+      "bytes": 302,
+      "sha256": "cf2e1a34aefd06e088240123436f50e8d9eff7dea4f7159f0b71e629e08deac0"
+    },
+    "nih-plug-widgets/src/lib.rs": {
+      "bytes": 388,
+      "sha256": "99871d678824d4b7026e558cd6b252a0c40e56bdfbfcc89a55f0dd4011ca1833"
+    },
+    "nih-plug-widgets/src/param_dial.rs": {
+      "bytes": 11865,
+      "sha256": "a0c761192f579a7e858213968b52f224da0fc555953a6f7165d34a454605f800"
+    },
+    "nih-plug-widgets/src/style.css": {
+      "bytes": 1769,
+      "sha256": "2bdc307944893383c99a4ce2e6f5fdb306f23b91b25a34895550caca4edeb6d1"
+    },
+    "pope-scope/Cargo.toml": {
+      "bytes": 1110,
+      "sha256": "be62d1bdb97b38d057c05b8da6bc3691a7196995d56383c1225fee18a0a7f9c4"
+    },
+    "pope-scope/benches/dsp.rs": {
+      "bytes": 828,
+      "sha256": "5e5add667361bd8693edef19b037d9f0541ced9b9e25d1df464d0c039a5a9ead"
+    },
+    "pope-scope/src/controls.rs": {
+      "bytes": 8954,
+      "sha256": "d7c37fb10d887de7375ea26637debf72ca5de94c0ba65259ecfbf67887332681"
+    },
+    "pope-scope/src/editor.rs": {
+      "bytes": 72923,
+      "sha256": "aa4b82256c44822b0a64788435d0e4490e346bd0390c6c6d3ba0f7048574a556"
+    },
+    "pope-scope/src/fonts/DejaVuSans.ttf": {
+      "bytes": 759720,
+      "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280"
+    },
+    "pope-scope/src/lib.rs": {
+      "bytes": 16625,
+      "sha256": "f47f500dc0e66f918654a66a44b37f54e2fc7f012cd33f347c0b59f3bfed0a0d"
+    },
+    "pope-scope/src/main.rs": {
+      "bytes": 95,
+      "sha256": "245b3d1083b942961c6890ba0df71617e50b6b8572c73df132b022d0f6722b99"
+    },
+    "pope-scope/src/renderer.rs": {
+      "bytes": 40539,
+      "sha256": "bbe41d50d02a44c28019a74d0f33f382238c80be1abf25c6fda02a4ddf09b05d"
+    },
+    "pope-scope/src/ring_buffer.rs": {
+      "bytes": 16155,
+      "sha256": "6fcd6ed6d881967abbdb797174123887469107b0e6539a8c622b8178baa6e2ab"
+    },
+    "pope-scope/src/snapshot.rs": {
+      "bytes": 51412,
+      "sha256": "4b5c687153d5ccecd4233e9f00ecdf508832af8ce0c86a4fa82d03a37e7f7cad"
+    },
+    "pope-scope/src/store.rs": {
+      "bytes": 10181,
+      "sha256": "4b505adeb04e55ce576fd22494955241dc10456601690a76169d0a75ff222b54"
+    },
+    "pope-scope/src/theme.rs": {
+      "bytes": 5811,
+      "sha256": "53fd1a485bd29e53bc0440ce45d45ba3d8f4c212498cef9178209df71aac0cc3"
+    },
+    "pope-scope/src/time_mapping.rs": {
+      "bytes": 16673,
+      "sha256": "369dd4ea8fd5d89651a3e16cd86ae786f50ee67e9639a41dd95733a04aaa06d7"
+    },
+    "rust-toolchain.toml": {
+      "bytes": 31,
+      "sha256": "e5cc0545f232bde807bd9394c2433322d1cd2cf42b060ceab2ac7329bc9cdaa2"
+    },
+    "satch/Cargo.toml": {
+      "bytes": 1044,
+      "sha256": "2669fdd9bd5685835187f154c347b6cc943863eea01db80ae1d0d821694063ca"
+    },
+    "satch/src/editor.rs": {
+      "bytes": 20841,
+      "sha256": "315d6c891da7076d761aa7e035d814b84713bf3a073c2739a4c69727f5f31b7e"
+    },
+    "satch/src/fonts/DejaVuSans.ttf": {
+      "bytes": 759720,
+      "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280"
+    },
+    "satch/src/lib.rs": {
+      "bytes": 15067,
+      "sha256": "cf082c8b56f1f4740850227a03f308e994ab273419e25c882fe05191d9efe62e"
+    },
+    "satch/src/main.rs": {
+      "bytes": 85,
+      "sha256": "fc5530e54c4e3ea7a893e2d61aa2e4eb4bb54fb33be3e54deb98aed5f763e1e1"
+    },
+    "satch/src/spectral.rs": {
+      "bytes": 438,
+      "sha256": "4ee76b20588be547028c5d1e70f5ed2c7d52740211d1ba52a5bf84cd48f0afaa"
+    },
+    "six-pack/Cargo.toml": {
+      "bytes": 1013,
+      "sha256": "8e82ecef0092a053efc801a2c5fd218d55b04f46407d9a7539ffb265df0669e3"
+    },
+    "six-pack/examples/six_pack_profile.rs": {
+      "bytes": 6598,
+      "sha256": "83b4c661b7fd857c40b0127eaa20209d8b04f8fb9035e336bc111e998e368bec"
+    },
+    "six-pack/src/bands.rs": {
+      "bytes": 8541,
+      "sha256": "3c45e272ed7596b682bf523b066ab65331abb8bb997fbf9a6088df400b398be9"
+    },
+    "six-pack/src/editor/band_labels.rs": {
+      "bytes": 8166,
+      "sha256": "c3912ec7368e4ee8de71afa076d2ec002ff03e879819e0e6a4d720128b626384"
+    },
+    "six-pack/src/editor/bottom_strip.rs": {
+      "bytes": 7139,
+      "sha256": "225336edd20563a1fad604ebeb798898d0584f85e9e7396f8e62b492e7133c27"
+    },
+    "six-pack/src/editor/curve_view.rs": {
+      "bytes": 21062,
+      "sha256": "c24cd37dfe39a88cbab3c49d1b6482477b6799ac127d67bd9819595a9bda7422"
+    },
+    "six-pack/src/editor.rs": {
+      "bytes": 34751,
+      "sha256": "ca84447b5e69c457e894ffd51950f96ed8b00291b301d53e1b15bb066c5cf5be"
+    },
+    "six-pack/src/fonts/DejaVuSans.ttf": {
+      "bytes": 759720,
+      "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280"
+    },
+    "six-pack/src/lib.rs": {
+      "bytes": 31349,
+      "sha256": "f0c8df1b580bafa3b6cd9e869826e4efb448a43f7c8af8159b3b114a0074a1d3"
+    },
+    "six-pack/src/main.rs": {
+      "bytes": 104,
+      "sha256": "e9808ef859727223bbff9321c522f344ef4238ebd7b086823a9bd0ee4a636218"
+    },
+    "six-pack/src/oversampling.rs": {
+      "bytes": 18489,
+      "sha256": "3d52fd782c1c9d6bd1cf984634c8768ce9245305e92d82f40294d9c2258ecf5b"
+    },
+    "six-pack/src/saturation.rs": {
+      "bytes": 10200,
+      "sha256": "122961415f3c2f8406f9b77fa7ebdf6be23a5b4e70941384a5018b14cbbf91b2"
+    },
+    "six-pack/src/spectrum.rs": {
+      "bytes": 5003,
+      "sha256": "b4f3e5d2d34fc1cac6e87aa402e0484b9a613aa74baede08b9a7b5dbfd0cc888"
+    },
+    "six-pack/src/svf.rs": {
+      "bytes": 9409,
+      "sha256": "52c8685e00b6f97f99632279c2cab52b0115407367de53d6815ca947053b07d2"
+    },
+    "tiny-skia-widgets/Cargo.toml": {
+      "bytes": 665,
+      "sha256": "191e5799195a50a9b9d8e9ffd560e4157f5877e38b1468419114c8f0f31e0b08"
+    },
+    "tiny-skia-widgets/src/axis.rs": {
+      "bytes": 3225,
+      "sha256": "966b7c861c6a19c27e972af92671ad19ceff1607465d96db8c9afbf85acea4d7"
+    },
+    "tiny-skia-widgets/src/controls.rs": {
+      "bytes": 23187,
+      "sha256": "2e49b2fbc04bdf07bb919261e52d70b31796aa989e61fc2aafc425d532e24a56"
+    },
+    "tiny-skia-widgets/src/drag.rs": {
+      "bytes": 8503,
+      "sha256": "e5979e3b37b52a1b00a6f15f72de471c415f014e273e1cd8053377c5501c6d2c"
+    },
+    "tiny-skia-widgets/src/dropdown.rs": {
+      "bytes": 65381,
+      "sha256": "72c940c6cf8f687a2928d9a9b621f180efdc95a5e59e91cc4666585be12ef804"
+    },
+    "tiny-skia-widgets/src/editor_base.rs": {
+      "bytes": 12682,
+      "sha256": "c1e47c769d04316be91e6a2e0f179e1cdb267302e5a076e87b988a9e151c013d"
+    },
+    "tiny-skia-widgets/src/grid_selector.rs": {
+      "bytes": 22051,
+      "sha256": "80793bac71c52532610b4f43cf803750ac50a588201c37f05d2c156923848229"
+    },
+    "tiny-skia-widgets/src/lib.rs": {
+      "bytes": 878,
+      "sha256": "ab2a21f7a9aae990c1937a91938249e31a606e652bd2434d1ff3f6c23cad961a"
+    },
+    "tiny-skia-widgets/src/mseg/editor.rs": {
+      "bytes": 90196,
+      "sha256": "315bc38d451791c0caeb2fd3dd534199216076fe6b6f3e1724b5f41cce7816e9"
+    },
+    "tiny-skia-widgets/src/mseg/mod.rs": {
+      "bytes": 32578,
+      "sha256": "e776d8943c4088316c1981ae1a0b3b70aecaa15bdfa8f116d1714b8bf79f5941"
+    },
+    "tiny-skia-widgets/src/mseg/randomize.rs": {
+      "bytes": 17010,
+      "sha256": "15907cb98712b135eee44aba55b7be5fbd4d82ce47f6a3bbc5be262fdc96af2f"
+    },
+    "tiny-skia-widgets/src/mseg/render.rs": {
+      "bytes": 38705,
+      "sha256": "417067fd71f38d13a2906e82bd6ff34d562292e761710d6f17f9f637fe7d6801"
+    },
+    "tiny-skia-widgets/src/param_dial.rs": {
+      "bytes": 28910,
+      "sha256": "727b936d408b9e2ae2f73167bbd51555332a32602649abb51c53cfb4afe84630"
+    },
+    "tiny-skia-widgets/src/primitives.rs": {
+      "bytes": 12603,
+      "sha256": "e159a07b191243071856c5d189ff5ae320a3c67c3c485208111f56e97b197a8b"
+    },
+    "tiny-skia-widgets/src/test_font.rs": {
+      "bytes": 7507,
+      "sha256": "e74bd162467ba14118a252a5335218b9ae3056d707f795901360128c5a53efce"
+    },
+    "tiny-skia-widgets/src/text.rs": {
+      "bytes": 11482,
+      "sha256": "49e62842acd9cdf78861de7a2e67211e98d11913beb292fa49a0c9ed9d33bf0b"
+    },
+    "tiny-skia-widgets/src/text_edit.rs": {
+      "bytes": 10348,
+      "sha256": "22ece32c8e8cf633252cc7c66ff42f1db8a5fe7f57c1014a6d54817d2a92d6f5"
+    },
+    "tiny-skia-widgets/test_data/DejaVuSans.ttf": {
+      "bytes": 759720,
+      "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280"
+    },
+    "tinylimit/Cargo.toml": {
+      "bytes": 991,
+      "sha256": "ce73993572d493118f7704107a3d60276276bbebeb27f107c0634cb60cd11335"
+    },
+    "tinylimit/examples/tinylimit_profile.rs": {
+      "bytes": 7993,
+      "sha256": "1bdf11398d169e3c0b577f6448b1c5974968c00cd1d470b9a07784427e43e5e0"
+    },
+    "tinylimit/src/editor.rs": {
+      "bytes": 39520,
+      "sha256": "242a3d29dbb516a9ffdc1e9980141d91b81427270fecf6f3ffb8be1f91080c00"
+    },
+    "tinylimit/src/fonts/DejaVuSans.ttf": {
+      "bytes": 759720,
+      "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280"
+    },
+    "tinylimit/src/lib.rs": {
+      "bytes": 18220,
+      "sha256": "83d1aba16f7539e97aaa74b73b6671582b008409bcdb93d964b700e149b5b977"
+    },
+    "tinylimit/src/limiter.rs": {
+      "bytes": 27264,
+      "sha256": "218339c24783c47e3d1076dec151c475cbb01a550e8b7d5c437724472865a084"
+    },
+    "tinylimit/src/main.rs": {
+      "bytes": 94,
+      "sha256": "d3e9d3016f9a4289634a1c8fabf4886b8ef7c8c5998de0fe073036a8181922e3"
+    },
+    "tract-dsp/Cargo.toml": {
+      "bytes": 1653,
+      "sha256": "929c5cc0510df9141888bc288c8c1d38f99a921f21f51c47a9dead7c712f25c8"
+    },
+    "tract-dsp/benches/dsp.rs": {
+      "bytes": 18567,
+      "sha256": "75f5002f8f0f4f506a9ff65767a8b0232db479a07e562aee0bb8c12606cd86a3"
+    },
+    "tract-dsp/examples/tract_dsp_profile.rs": {
+      "bytes": 8548,
+      "sha256": "11a90bafc15c74ff7654a5beebe22208742940102466ae5c39cbb175d06735c9"
+    },
+    "tract-dsp/src/boxcar.rs": {
+      "bytes": 5385,
+      "sha256": "828f5188e52bce520d586373572a347f707f8287f55a367e61bd8a0fa475e3ba"
+    },
+    "tract-dsp/src/db.rs": {
+      "bytes": 2350,
+      "sha256": "a4da7f86b0f1b851c7e1aae92d44ee15c84dc4a7d2877acbdd6d8d7b7e475db4"
+    },
+    "tract-dsp/src/fast_math.rs": {
+      "bytes": 6343,
+      "sha256": "ce764e0e573322794f2d0c4fcbc7e8915797a0f0f72b8c08cfce5f3232f693dc"
+    },
+    "tract-dsp/src/fir.rs": {
+      "bytes": 7124,
+      "sha256": "3cbc10da2bf06f5ad7ac8dfbf4e7e184c223db25acda74613fd8f54784d55fa1"
+    },
+    "tract-dsp/src/hilbert.rs": {
+      "bytes": 13914,
+      "sha256": "dc0365f53a7808916af22ec0c302f1076dae52e2973720209328fcfa1885ffde"
+    },
+    "tract-dsp/src/lib.rs": {
+      "bytes": 1018,
+      "sha256": "fdf28863fb2a85caf2a4a7e899d8aed98957241c107954afb75ba232cdf4c647"
+    },
+    "tract-dsp/src/partitioned_conv.rs": {
+      "bytes": 12355,
+      "sha256": "89e28d092ecbb40a0dd4cd0d576079e3700e6c87288bfcdb39b34c07d9775609"
+    },
+    "tract-dsp/src/spectral_clipper.rs": {
+      "bytes": 56242,
+      "sha256": "7c1a7dfd6e86f5dadb65a3959ce13f9da7ca54f3ad79afde232bfabab3178da0"
+    },
+    "tract-dsp/src/spectral_engine.rs": {
+      "bytes": 16681,
+      "sha256": "e38171e3a2ea69bd63f0405f3a061211f9c7cc623387cd1c28bdc40b5580d336"
+    },
+    "tract-dsp/src/spectral_shifter.rs": {
+      "bytes": 32144,
+      "sha256": "74cb654fca807dd77c6045a4d87e5588abbc4ff3e40cf52680e0ac74adaea6d2"
+    },
+    "tract-dsp/src/spsc.rs": {
+      "bytes": 9834,
+      "sha256": "3c318f9b75f765c1113451342ccac424b7b44eb86bfa71cdcfe3ec0afc7e910f"
+    },
+    "tract-dsp/src/stft.rs": {
+      "bytes": 8203,
+      "sha256": "7ce7d6ee4e32f20ff3f9bb328a7db9f682e64737b92df6892d9c17474499f0f8"
+    },
+    "tract-dsp/src/stft_analysis.rs": {
+      "bytes": 9468,
+      "sha256": "32b886953aab8a2ff9ea37d40629f17c352655916a9a1c1766896d3ea031b48e"
+    },
+    "tract-dsp/src/true_peak.rs": {
+      "bytes": 13737,
+      "sha256": "3863fc58f106a387ef4799f7d62acd97351e99d773163a2afe196f0ed27ce2e2"
+    },
+    "tract-dsp/src/window.rs": {
+      "bytes": 2281,
+      "sha256": "bb16ea81be94f88dade91404f31af69a0d90d4663d3ac3554a235f41999f23a3"
+    },
+    "tract-effects/Cargo.toml": {
+      "bytes": 603,
+      "sha256": "97f150fbaf44d5e6998bc8c75152c7e2036c7252d6235554d482d6955a3a3953"
+    },
+    "tract-effects/src/compressor.rs": {
+      "bytes": 9719,
+      "sha256": "729870fdbd4d68c7d0a9449c0e3391adf9871af44c8c61e498e6b47cffdfef4f"
+    },
+    "tract-effects/src/editor/interaction_tests.rs": {
+      "bytes": 24653,
+      "sha256": "6c402edc91b64800ca14518c9fa1ed3e7926cdf98d7850e26df210476ee0e6f0"
+    },
+    "tract-effects/src/editor/mod.rs": {
+      "bytes": 188640,
+      "sha256": "25712a45815fbcd64ee5d19fdec8b5439b61e0dd6f40151fdeb4b04fd3794410"
+    },
+    "tract-effects/src/editor/view.rs": {
+      "bytes": 105345,
+      "sha256": "98846d7de9c381f3336ed590d6317470292e3ab3c927eb514a9f72d832b97665"
+    },
+    "tract-effects/src/effects/auto_pan.rs": {
+      "bytes": 13439,
+      "sha256": "2a8ec8c60c738717e2812876cf56817ef3ec0530f32d835d85e598f5cefadf84"
+    },
+    "tract-effects/src/effects/bitcrush.rs": {
+      "bytes": 7659,
+      "sha256": "a129ab614b2185259ab4129f5d1fc308faec7cafa3235430feb6cf13b37b5bfe"
+    },
+    "tract-effects/src/effects/chorus.rs": {
+      "bytes": 29834,
+      "sha256": "fa0b5f6406eff1b8eca9fb41366a73aa4d94647c86cc050de1d565431cbcc284"
+    },
+    "tract-effects/src/effects/comb.rs": {
+      "bytes": 26119,
+      "sha256": "a5344c1a1e70d959f96d722f605533b56fb816f2856ecb31fbb09c06ab2b72d7"
+    },
+    "tract-effects/src/effects/compressor.rs": {
+      "bytes": 9840,
+      "sha256": "9608a7d01c5601b5b45659abf41d0a05f43fcfcaad9c868943a51521abf158b0"
+    },
+    "tract-effects/src/effects/delay.rs": {
+      "bytes": 30029,
+      "sha256": "5c2b22ce8a78c0674413362b9a6e4449dbecf9242ebae046f149f78d68a18134"
+    },
+    "tract-effects/src/effects/diode.rs": {
+      "bytes": 26335,
+      "sha256": "a5a746c0bc915dd0c39bda5231fdfa2f25b176c3dec4cc1371973c5f4a4ef14a"
+    },
+    "tract-effects/src/effects/distortion.rs": {
+      "bytes": 25615,
+      "sha256": "fcbcf5acb8bc5cb3e3eda6f557ef804c9509182a9d7341f8771d014f9c3325dc"
+    },
+    "tract-effects/src/effects/downsample.rs": {
+      "bytes": 28441,
+      "sha256": "e7644bcdebd6945d53895b243f85d568dfcd395ccd7011130371157c259e4533"
+    },
+    "tract-effects/src/effects/flanger.rs": {
+      "bytes": 29148,
+      "sha256": "d9cdecd14eaba3216e80ea7ab6e6a6d04a8a6c31773fc065834b55900e282138"
+    },
+    "tract-effects/src/effects/fm.rs": {
+      "bytes": 47174,
+      "sha256": "dcf19878e9ae044782a504ad7561f2496a6070de11e909d05edd189450d7b44d"
+    },
+    "tract-effects/src/effects/frequency_shift.rs": {
+      "bytes": 45075,
+      "sha256": "29e402b771ab171d452955c19a31b6c62e1983f6bb6c2cb931e5c19893b0cd73"
+    },
+    "tract-effects/src/effects/gate.rs": {
+      "bytes": 15518,
+      "sha256": "c4b945b0263d7c5a296938fabb2f1a41ff4cdc1c9283d3b7d8c5c71d9ac7b9df"
+    },
+    "tract-effects/src/effects/haas.rs": {
+      "bytes": 11273,
+      "sha256": "5f791a2346832828f950c385c74b94beb0c86bc8389a068c3542ac638b7495be"
+    },
+    "tract-effects/src/effects/ladder.rs": {
+      "bytes": 23947,
+      "sha256": "36072b06f6cc9001584cb2d98aabc37c393ae6a507453f6134194f83b5fd5327"
+    },
+    "tract-effects/src/effects/limiter.rs": {
+      "bytes": 13079,
+      "sha256": "b0453b746fdaa69e82c257fca7a55b78f28fb94e54a83ed053582ce899184f4b"
+    },
+    "tract-effects/src/effects/mod.rs": {
+      "bytes": 134199,
+      "sha256": "0b6eaaa72ff50ee62eadda27b44ad901c9642cd847acc5071ad3025cc9068984"
+    },
+    "tract-effects/src/effects/none.rs": {
+      "bytes": 850,
+      "sha256": "904eb6a374d5f320f89e18d1293636d827c5430103d709e6cc27a34ff1ba7947"
+    },
+    "tract-effects/src/effects/phaser.rs": {
+      "bytes": 21220,
+      "sha256": "c19516fe9df78cbb64abff289de903decb69d13183fe164c0385e32994271aa7"
+    },
+    "tract-effects/src/effects/phaser_filter.rs": {
+      "bytes": 23724,
+      "sha256": "3cd56387eaa32e662a4ab7f59e62bca793fc872e17c286d9d5098d40519a478b"
+    },
+    "tract-effects/src/effects/pitch_shift.rs": {
+      "bytes": 33680,
+      "sha256": "6a7d1a576c6c31ed44cca4a4acf2674fa30927023000f9daf369d056e0270e91"
+    },
+    "tract-effects/src/effects/plate.rs": {
+      "bytes": 49043,
+      "sha256": "4a0132fbbf596e97f3bf2cd2a7fc5a7ba902de5cdb94531a00457b7a246e3352"
+    },
+    "tract-effects/src/effects/repeat.rs": {
+      "bytes": 33536,
+      "sha256": "8c1226b359633a6f9fbf9d14e2e0c4c7068880685709afe6071d9089c06c6c8d"
+    },
+    "tract-effects/src/effects/reverb.rs": {
+      "bytes": 46183,
+      "sha256": "5fb280f0ee11543d36e38e8884e8d37cd73fe31e8c7da17b33bed051f09a16da"
+    },
+    "tract-effects/src/effects/ring.rs": {
+      "bytes": 23740,
+      "sha256": "44774bdabac7a5a11e91f3a4fa4371d6011d3bd30e43251d87144caaf9dac300"
+    },
+    "tract-effects/src/effects/sallen_key.rs": {
+      "bytes": 28136,
+      "sha256": "851ebb79cd6e2aee83359672ceaaea12bef858ec735e9a62b37cacfd9a53b837"
+    },
+    "tract-effects/src/effects/satch.rs": {
+      "bytes": 21227,
+      "sha256": "7e6df2ce7cb0c59a25d495311134e79edc453cac24323349fde4f0e17be2aab5"
+    },
+    "tract-effects/src/effects/spectral_bandpass.rs": {
+      "bytes": 15773,
+      "sha256": "3ea575ea8c548b9a4767d5906ecf303e2a8fc5b289dc212cfd5d53b9b0c512bc"
+    },
+    "tract-effects/src/effects/spectral_cascade.rs": {
+      "bytes": 28662,
+      "sha256": "2551fca84fbf4f5fa571ad02d4c59248b94b7c22df276b61faca3b7fedea2704"
+    },
+    "tract-effects/src/effects/spectral_compress.rs": {
+      "bytes": 23282,
+      "sha256": "757219ca5658d26f0f241afe1ef0d28b7ecba5cb4f47035b72d557e63f722ba5"
+    },
+    "tract-effects/src/effects/spectral_corrupt.rs": {
+      "bytes": 26800,
+      "sha256": "9f57676927119dc5d282039902a80526506a12a375f293b122f6e3534f466c59"
+    },
+    "tract-effects/src/effects/spectral_lofi.rs": {
+      "bytes": 25428,
+      "sha256": "86f247adce7d231db4e42df9fa2b6d23ab7db7dd2d5c5a697723fa11667f910f"
+    },
+    "tract-effects/src/effects/spectral_mirror.rs": {
+      "bytes": 16392,
+      "sha256": "6579e7c86053429d9a86c4dcb765a3748f0b6b85ca0e53b21525e699e6eda447"
+    },
+    "tract-effects/src/effects/spectral_reverb.rs": {
+      "bytes": 25625,
+      "sha256": "9ceceb3825a7416a10c49365b0cc0ddbb4e555e6d92a8d9b4905920fc11df1cd"
+    },
+    "tract-effects/src/effects/spectral_rotate.rs": {
+      "bytes": 15993,
+      "sha256": "4cbfc0cb707f2a23a45c12c0cbba3f9fbf2165ab430469f0617b868efccf630e"
+    },
+    "tract-effects/src/effects/spectral_scatter.rs": {
+      "bytes": 28928,
+      "sha256": "b55606d4bb4f04e105625519c3a506faeb5f1573f6b660934d063c6e4002a60e"
+    },
+    "tract-effects/src/effects/spectral_shift.rs": {
+      "bytes": 22627,
+      "sha256": "18150b696750b007657d052dee1b8ac95bc33b785a863e6d5efbf906c9a2cb8c"
+    },
+    "tract-effects/src/effects/spectral_smear.rs": {
+      "bytes": 27277,
+      "sha256": "c8213f813e5ea310f9924580c9d1b7613ea05d605240c679b25599ebea9c962d"
+    },
+    "tract-effects/src/effects/spectral_spread.rs": {
+      "bytes": 19590,
+      "sha256": "2639a30cc520307bed704cbd10bd5145b96438947c4065df8c3784cf1ba304f2"
+    },
+    "tract-effects/src/effects/spectral_stretch.rs": {
+      "bytes": 47853,
+      "sha256": "af79b35f8eeadca5c9b7a293141f0502f597a4f443aadba5895ed290bb96a517"
+    },
+    "tract-effects/src/effects/spectral_twist.rs": {
+      "bytes": 21139,
+      "sha256": "23b5db81f2bc68156489bd16f7165e068a73360682c11bbb3905ebfc350737df"
+    },
+    "tract-effects/src/effects/stereo_widener.rs": {
+      "bytes": 5234,
+      "sha256": "e61f21dd7fc549d15026e9e2e32d74490aa507833a06d5cb302e355a1546e026"
+    },
+    "tract-effects/src/effects/stretch.rs": {
+      "bytes": 37358,
+      "sha256": "4b1705c9cd9b9d44d6ffd935cba39d500791ef7faff56b44dff27f5ddc224251"
+    },
+    "tract-effects/src/effects/svf.rs": {
+      "bytes": 24997,
+      "sha256": "32d115701502a517e9112cc32ad76217e4754e2d40f83115f395365e4c892330"
+    },
+    "tract-effects/src/effects/transient_shaper.rs": {
+      "bytes": 12430,
+      "sha256": "1aafb3e5f8fb6f9acd46ddbe7a363b184038df1b3388825acaac8ac46e20fe4d"
+    },
+    "tract-effects/src/effects/tremolo.rs": {
+      "bytes": 14267,
+      "sha256": "3276a551506a0a0a13e37664e80ae62c4d8a711b80f7e8405084c994798eb27a"
+    },
+    "tract-effects/src/effects/varispeed.rs": {
+      "bytes": 36558,
+      "sha256": "72f43c4b78239324b166a31c9977364ca8eafaff5cc0aa60de1377c7ec63a769"
+    },
+    "tract-effects/src/effects/vibrato.rs": {
+      "bytes": 18283,
+      "sha256": "513ec37e5b5e085e096236de247c66cb19cf765ea57d9809a6af7009f8d6b144"
+    },
+    "tract-effects/src/effects/vocoder.rs": {
+      "bytes": 39001,
+      "sha256": "db2ff1314c97949cdd5f4e8149d71872e86d71d6c25640d4b950c6245a16d6cd"
+    },
+    "tract-effects/src/effects/warp_zone.rs": {
+      "bytes": 22246,
+      "sha256": "e4dbf6887e23dd548ac23decd441418b18d141206ed67e996ce397404802a5cd"
+    },
+    "tract-effects/src/effects/wavefolder.rs": {
+      "bytes": 24356,
+      "sha256": "cf20c6d94a9d45ad89a9a3afad9fa178934956b707d4436c24567368850f1492"
+    },
+    "tract-effects/src/lib.rs": {
+      "bytes": 2658,
+      "sha256": "7e8b4f81ec7185e67c01a6953b3e3897b2b4ff09e6e58bd4e3aa234312e8dab2"
+    },
+    "tract-effects/src/modulation.rs": {
+      "bytes": 46936,
+      "sha256": "b283ffdcbd67785f36996d1a2290e0696da875cd08a054f60dc5fecfe3fb13b1"
+    },
+    "tract-effects/src/randomize.rs": {
+      "bytes": 17774,
+      "sha256": "95fb37227ca098f619646aba002c28b9748ec1233c33950d693300edb99dc8d1"
+    },
+    "tract-effects/src/undo.rs": {
+      "bytes": 6026,
+      "sha256": "4a59d9645b70399e1cf03ca43fc7e9a61bfd5d046e18fe209819c3892f91a03a"
+    },
+    "tract-effects/test-data/multosis-state.json": {
+      "bytes": 6100,
+      "sha256": "d3f495e8d8e29b40f7e0f59d566f3de93d44da7f610a8b377b13f43e9cd7a5ec"
+    },
+    "warp-zone/Cargo.toml": {
+      "bytes": 1171,
+      "sha256": "b122557695b79b8a33189c8adaac8dc2341083a74058d40dfbdd3f62003904ee"
+    },
+    "warp-zone/benches/dsp.rs": {
+      "bytes": 1269,
+      "sha256": "1b488c1f0693114ed4dc31e8c637d6816af0c6a683b7db6696895c8797a82c60"
+    },
+    "warp-zone/src/editor.rs": {
+      "bytes": 29036,
+      "sha256": "ec3020db3503140dd07a7968b0cdf7504ee2f451683c146fdf52df99ffda5861"
+    },
+    "warp-zone/src/fonts/DejaVuSans.ttf": {
+      "bytes": 759720,
+      "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280"
+    },
+    "warp-zone/src/lib.rs": {
+      "bytes": 20225,
+      "sha256": "de554972ca24ee439a7dcfab69bfc5d3c9351fe13834487fda7f8c0d962d9008"
+    },
+    "warp-zone/src/main.rs": {
+      "bytes": 92,
+      "sha256": "7cce82d4615c7b42dc9ebeb964e48df5f3b0167721c3fec3ec4a0da4489f03e9"
+    },
+    "wavetable-filter/Cargo.toml": {
+      "bytes": 1222,
+      "sha256": "b8d41b14ce3da0bd9711ff22516e18ea8355072b147bcf07bf5c8faad7a04bd9"
+    },
+    "wavetable-filter/benches/dsp.rs": {
+      "bytes": 1048,
+      "sha256": "c7debb0b685e54354210673eb10a5aaafeaae9ae7abd7a36a1d426e113094f9b"
+    },
+    "wavetable-filter/build.rs": {
+      "bytes": 486,
+      "sha256": "d77f4de35c31f629ac80895bbe0bd01094295d386d0eee551fd4c6b4999dba5c"
+    },
+    "wavetable-filter/src/editor/filter_response_view.rs": {
+      "bytes": 13289,
+      "sha256": "c45790604d7b548941ed247c772aa04b4d9e86f410369a14189e7cd1b2042820"
+    },
+    "wavetable-filter/src/editor/wavetable_view.rs": {
+      "bytes": 15866,
+      "sha256": "418391d2945fa9fec961d0fb2cc7e61a6e305db053db2de59404d9e36850fb51"
+    },
+    "wavetable-filter/src/editor.rs": {
+      "bytes": 27460,
+      "sha256": "18ba7b11c47e89eddf034ccb0c09887b48640e5a181489b56454b8636b41f983"
+    },
+    "wavetable-filter/src/fonts/DejaVuSans.ttf": {
+      "bytes": 759720,
+      "sha256": "ae7b7855e115a5966d8b1b3f80f254ccc117ec86f9965e202ee2940453837280"
+    },
+    "wavetable-filter/src/lib.rs": {
+      "bytes": 106918,
+      "sha256": "4e4097560952855615e8054d4db6c9c7c0c7ce99730841c001925b1aa90b663f"
+    },
+    "wavetable-filter/src/main.rs": {
+      "bytes": 133,
+      "sha256": "e1384771978a7612ace5b8abae7598140c4f288709cafd6fd19f9cb9958ef254"
+    },
+    "wavetable-filter/src/wavetable.rs": {
+      "bytes": 13241,
+      "sha256": "6989e09f7ce39e4c4ad42732b8913d51be71d9fc516c0103a07ff99ad6f9984f"
+    },
+    "wavetable-filter/tests/fixtures/phaseless-bass.wt": {
+      "bytes": 1048588,
+      "sha256": "841dd80f112cdfef9e31d10025056027e2700d990c138b6cbd9a7b3d2ed6bb49"
+    },
+    "xtask/Cargo.toml": {
+      "bytes": 300,
+      "sha256": "2f769e207be8b42880a7681027811340e961f8f184dda14fcf327ad940424004"
+    },
+    "xtask/src/bundle.rs": {
+      "bytes": 10734,
+      "sha256": "8dd5875418958e3a0e5d7628ef8242da4ed804e963bc66a7a0af8da13e888bbb"
+    },
+    "xtask/src/main.rs": {
+      "bytes": 5486,
+      "sha256": "edf457013db3af662d9d9bc434b498485e720a7627b13356cb0054b90cd10648"
+    }
+  }
+}

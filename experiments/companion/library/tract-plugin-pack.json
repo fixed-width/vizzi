@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "id": "companion.tract-plugin-pack.fresh-2026-11-07",
+  "split": "fresh_maintainer_trial",
+  "createdAt": "2026-11-07T23:31:37.999226+00:00",
+  "authorship": "Verbatim questions supplied by the maintainer after the native question-search trial implementation. No tract-plugin-pack source content or retrieval outputs were inspected by this evaluator before this freeze.",
+  "source": {
+    "repository": "tract-plugin-pack",
+    "localPath": "/home/mpd/git-sources/tract-plugin-pack",
+    "revision": "951cf85413029423e036c641638b845edafe75cf",
+    "worktreeStatusAtFreeze": "clean"
+  },
+  "implementation": {
+    "commit": "adefa081438a1497126e8224c62bfb6b468a2938",
+    "worktreeStatusBeforeFreeze": "clean",
+    "binarySha256": "605b0dc0aea9b9743b0f8b9c77d4051eef93451fcb4fff736aaa1756cd14b8ed",
+    "model": null
+  },
+  "allowance": {
+    "results": 8,
+    "excerptBytes": 4000,
+    "workers": 1
+  },
+  "policy": {
+    "tuning": "No query rewriting, query expansion, model/ranking changes or source-aware selection before both first-result pairs are captured. Keep these cases out of search tuning.",
+    "evaluation": "Capture original/focused outputs before manual source audit. Later source-aware relevance audit and automated workflow replay do not establish independent maintainer task completion.",
+    "source": "Use an immutable local export of the frozen revision; do not build or execute the inspected project.",
+    "editor": "Recording-only adapter in automated checks; do not launch the real desktop editor.",
+    "reservedPriorRealSourceCases": "Leave the eight earlier reserved cases unrun."
+  },
+  "cases": [
+    {
+      "id": "tract.gui-widget-inventory",
+      "question": "Show me the different gui widgets that are used by the plugin pack.",
+      "category": "cross-cutting inventory",
+      "selectorOrder": [
+        "focused",
+        "original"
+      ]
+    },
+    {
+      "id": "tract.minitosis-signal-path",
+      "question": "help me trace the signal path from input to output for minitosis",
+      "category": "codebase-specific signal flow",
+      "selectorOrder": [
+        "original",
+        "focused"
+      ]
+    }
+  ]
+}

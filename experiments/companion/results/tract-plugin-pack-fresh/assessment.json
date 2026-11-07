@@ -1,0 +1,206 @@
+{
+  "schema": 1,
+  "metric": "Exact declaration/operation anchors, distinguished from useful orientation and usage clues. Counts do not assert full semantic task completion.",
+  "rows": [
+    {
+      "case": "tract.gui-widget-inventory",
+      "selector": "focused",
+      "found": 0,
+      "total": 8,
+      "targets": [
+        {
+          "id": "buttons",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        },
+        {
+          "id": "sliders",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        },
+        {
+          "id": "stepped-selectors",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        },
+        {
+          "id": "rotary-dials",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        },
+        {
+          "id": "dropdowns",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        },
+        {
+          "id": "text-entry",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        },
+        {
+          "id": "mseg-editors",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        },
+        {
+          "id": "shared-effect-editor",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        }
+      ]
+    },
+    {
+      "case": "tract.gui-widget-inventory",
+      "selector": "original",
+      "found": 0,
+      "total": 8,
+      "targets": [
+        {
+          "id": "buttons",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        },
+        {
+          "id": "sliders",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        },
+        {
+          "id": "stepped-selectors",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        },
+        {
+          "id": "rotary-dials",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        },
+        {
+          "id": "dropdowns",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        },
+        {
+          "id": "text-entry",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        },
+        {
+          "id": "mseg-editors",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        },
+        {
+          "id": "shared-effect-editor",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        }
+      ]
+    },
+    {
+      "case": "tract.minitosis-signal-path",
+      "selector": "original",
+      "found": 0,
+      "total": 6,
+      "targets": [
+        {
+          "id": "host-audio-entry",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        },
+        {
+          "id": "render-orchestration",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        },
+        {
+          "id": "sample-wet-dry-bypass",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        },
+        {
+          "id": "latency-aligned-dry",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        },
+        {
+          "id": "effect-dispatch",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        },
+        {
+          "id": "post-blend-output-gain",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        }
+      ]
+    },
+    {
+      "case": "tract.minitosis-signal-path",
+      "selector": "focused",
+      "found": 0,
+      "total": 6,
+      "targets": [
+        {
+          "id": "host-audio-entry",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        },
+        {
+          "id": "render-orchestration",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        },
+        {
+          "id": "sample-wet-dry-bypass",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        },
+        {
+          "id": "latency-aligned-dry",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        },
+        {
+          "id": "effect-dispatch",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        },
+        {
+          "id": "post-blend-output-gain",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        }
+      ]
+    }
+  ]
+}

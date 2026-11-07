@@ -1,0 +1,145 @@
+{
+  "case": "tract.gui-widget-inventory",
+  "selector": "original",
+  "recordedAt": "2026-11-07T23:33:22.705Z",
+  "data": {
+    "snapshot": "3914e03cdea7d45b897f070e71863a26ff013450219a7b115d3e9f08fb8bbbc7",
+    "question": "Show me the different gui widgets that are used by the plugin pack.",
+    "selector": "original",
+    "available_files": 231,
+    "searched_files": 231,
+    "omitted_files": 0,
+    "results": [
+      {
+        "id": "8726d9e3377ef82e4cc90c2737fd2dc428b99e5a0817c42c49607745240d1f8f",
+        "title": "Plugin for SixPack::process",
+        "path": "six-pack/src/lib.rs",
+        "file": "1b2db071885f77e9b649c709bb3fdf85d604c63bc924156b28c0d1497d58daaf",
+        "version": "70e75206af2ab97f80589f50230a3132d0219ad65b2a5994c4f4b252a0151672",
+        "line": 567,
+        "end_line": 580,
+        "excerpt": "        let len_os = os_l.len();\n\n        // Per-band post-saturation sum-of-squares for the GUI activity glow.\n        // Stored at block end; not used by the audio path itself.\n        let mut band_sumsq = [0.0f32; 6];\n\n        // Per-oversampled-sample DSP loop.\n        for i in 0..len_os {\n            let dry_l = os_l[i];\n            let dry_r = os_r[i];\n\n            let mut wet_l = 0.0f32;\n            let mut wet_r = 0.0f32;\n            let mut boost_l = 0.0f32;\n",
+        "suggested_role": null,
+        "scope": {
+          "name": "process",
+          "kind": "function",
+          "parents": [
+            "Plugin for SixPack"
+          ]
+        }
+      },
+      {
+        "id": "25f1482d3e6310798f46107cb896d1377210dde9f01acefdb9b028ab476e6d2e",
+        "title": "SixPackWindow",
+        "path": "six-pack/src/editor.rs",
+        "file": "148be9a477ad65cb5a6a8ee742545301698aa01aea9e355e87e9af0095e36a30",
+        "version": "07d99990f9c918cdf76bb853ac51e3f31f88bb1139f9c4a06f7a82028effe9a9",
+        "line": 128,
+        "end_line": 137,
+        "excerpt": "    /// post-saturation RMS each block; GUI reads it lock-free.\n    pub(crate) band_activity_bins: Arc<[AtomicU32; 6]>,\n    /// EMA-smoothed display values, GUI-thread-only. Used to glow each\n    /// band dot proportionally to its current saturation activity.\n    pub(crate) display_band_activity: [f32; 6],\n\n    text_renderer: widgets::TextRenderer,\n    drag: widgets::DragState<HitAction>,\n    text_edit: widgets::TextEditState<HitAction>,\n\n",
+        "suggested_role": null,
+        "scope": {
+          "name": "SixPackWindow",
+          "kind": "struct",
+          "parents": []
+        }
+      },
+      {
+        "id": "b356052e7fe84089bc6dcd4ac80e671992cebafb752d7b886a3b8a9ae19520df",
+        "title": "lib.rs",
+        "path": "tract-dsp/src/lib.rs",
+        "file": "09ede65fe9c707006231ad2290bb3c78d64c1c9a36fe0981f5cc42b8cf055297",
+        "version": "ef3694859d32ded5725c5edf985b550a81019bd1ae13efb57b36431fc5b20349",
+        "line": 1,
+        "end_line": 10,
+        "excerpt": "//! `tract-dsp` — shared, GUI-free DSP primitives for the tract-plugin-pack\n//! workspace.\n//!\n//! This crate contains pure signal-processing code only. It has no\n//! `nih-plug`, `tiny-skia`, `softbuffer`, or editor dependency. By default it\n//! uses `fearless_simd` for stable-compatible SIMD. The optional\n//! `stft` feature adds `realfft`/`rustfft` and enables the `stft` module; the\n//! optional `stft-analysis` feature adds `rustfft` and enables the\n//! `stft_analysis` module.\n//!\n",
+        "suggested_role": null,
+        "scope": null
+      },
+      {
+        "id": "e5b3ef4b363912504dde612babd38bb2f01c15682780172cdd89227c0669e5a6",
+        "title": "GainBrain",
+        "path": "gain-brain/src/lib.rs",
+        "file": "8bfe7d70e680a46b098f7bd86e40e11e5ccf4a2429afaccc7f7d9590d19fbaad",
+        "version": "1101c66e5d27389bbdc84c058d4affc5ab1b923b4e0b5d246914d72102ae932e",
+        "line": 110,
+        "end_line": 115,
+        "excerpt": "    /// Shared holder for the GuiContext, populated when the editor is first\n    /// spawned. Used by `task_executor` (on the main thread) to update the\n    /// host-visible gain parameter when group sync changes the effective gain.\n    /// Stays populated even after the editor window is closed since the\n    /// GuiContext Arc remains valid for the plugin's lifetime.\n    pub gui_context: Arc<std::sync::Mutex<Option<Arc<dyn GuiContext>>>>,\n",
+        "suggested_role": null,
+        "scope": {
+          "name": "GainBrain",
+          "kind": "struct",
+          "parents": []
+        }
+      },
+      {
+        "id": "eeb64bd97c55549ef3cd34817b43c5abbe41189d7bded335f857e02ff89112fe",
+        "title": "MultosisParams",
+        "path": "multosis/src/lib.rs",
+        "file": "34c44694242601a8fbf900093154a3b63cdbd8a5789b4ed39dfe17b97521b4d7",
+        "version": "3ce092375fa2bc930d40212ee648c3f027ae332a393d35caef23fbf891b91628",
+        "line": 34,
+        "end_line": 45,
+        "excerpt": "    #[persist = \"editor-state\"]\n    pub editor_state: std::sync::Arc<tiny_skia_widgets::EditorState>,\n\n    /// The routing grid — persisted plugin state, edited by the GUI (Milestone\n    /// 1b-ii). `Arc<Mutex<Grid>>` is nih-plug's `PersistentField` shape.\n    #[persist = \"grid\"]\n    pub grid: Arc<Mutex<Grid>>,\n\n    /// Per-track effect configuration — persisted plugin state.\n    #[persist = \"track-effects\"]\n    pub track_effects: Arc<Mutex<[crate::effects::TrackEffect; 16]>>,\n\n",
+        "suggested_role": null,
+        "scope": {
+          "name": "MultosisParams",
+          "kind": "struct",
+          "parents": []
+        }
+      },
+      {
+        "id": "aa5e28601432af6b4e2783aa4da8481c5c4b38f371c7b38e45f201c9b8715128",
+        "title": "ClapPlugin for SixPack",
+        "path": "six-pack/src/lib.rs",
+        "file": "1b2db071885f77e9b649c709bb3fdf85d604c63bc924156b28c0d1497d58daaf",
+        "version": "70e75206af2ab97f80589f50230a3132d0219ad65b2a5994c4f4b252a0151672",
+        "line": 647,
+        "end_line": 657,
+        "excerpt": "impl ClapPlugin for SixPack {\n    const CLAP_ID: &'static str = \"com.mpd.six-pack\";\n    const CLAP_DESCRIPTION: Option<&'static str> = Some(\"6-band parallel multiband saturator\");\n    const CLAP_MANUAL_URL: Option<&'static str> = None;\n    const CLAP_SUPPORT_URL: Option<&'static str> = None;\n    const CLAP_FEATURES: &'static [ClapFeature] = &[\n        ClapFeature::AudioEffect,\n        ClapFeature::Stereo,\n        ClapFeature::Distortion,\n    ];\n}",
+        "suggested_role": null,
+        "scope": {
+          "name": "ClapPlugin for SixPack",
+          "kind": "implementation",
+          "parents": []
+        }
+      },
+      {
+        "id": "47a56312dcf4d734ecbc852d8eff264ed2a53eb024503b3e04a9109ee80eafe7",
+        "title": "EditorHandle::new",
+        "path": "tiny-skia-widgets/src/editor_base.rs",
+        "file": "fabc85771df66fae6482e2d6dd0fd8937d476ac6376a0d7f4deac3819c7637ca",
+        "version": "610010cf21439ae04889f5b5273ff1b1948098cf9ea1f176d2ff8e5c3ec0f551",
+        "line": 84,
+        "end_line": 98,
+        "excerpt": "    }\n}\n\n/// # Safety\n///\n/// The WindowHandle is created by baseview from the host-provided parent window\n/// and is only used on the GUI thread. The `Send` bound is required by nih-plug's\n/// `Editor::spawn` return type. This is safe as long as the handle is not accessed\n/// from multiple threads simultaneously, which nih-plug guarantees.\nunsafe impl Send for EditorHandle {}\n\nimpl Drop for EditorHandle {\n    fn drop(&mut self) {\n        self.state.set_open(false);\n        self.window.close();\n",
+        "suggested_role": null,
+        "scope": {
+          "name": "new",
+          "kind": "function",
+          "parents": [
+            "EditorHandle"
+          ]
+        }
+      },
+      {
+        "id": "c617269bbb840d5f972d07c84356da8d179db557eab4d35101e689e3214496a1",
+        "title": "Plugin for SixPack",
+        "path": "six-pack/src/lib.rs",
+        "file": "1b2db071885f77e9b649c709bb3fdf85d604c63bc924156b28c0d1497d58daaf",
+        "version": "70e75206af2ab97f80589f50230a3132d0219ad65b2a5994c4f4b252a0151672",
+        "line": 421,
+        "end_line": 433,
+        "excerpt": "impl Plugin for SixPack {\n    const NAME: &'static str = \"Six Pack\";\n    const VENDOR: &'static str = \"mpd\";\n    const URL: &'static str = \"\";\n    const EMAIL: &'static str = \"\";\n    const VERSION: &'static str = \"0.1.0\";\n    const AUDIO_IO_LAYOUTS: &'static [AudioIOLayout] = &[AudioIOLayout {\n        main_input_channels: NonZeroU32::new(2),\n        main_output_channels: NonZeroU32::new(2),\n        ..AudioIOLayout::const_default()\n    }];\n    const SAMPLE_ACCURATE_AUTOMATION: bool = true;\n\n",
+        "suggested_role": null,
+        "scope": {
+          "name": "Plugin for SixPack",
+          "kind": "implementation",
+          "parents": []
+        }
+      }
+    ]
+  },
+  "elapsedMs": 232.29779400000007,
+  "responseBytes": 7390
+}

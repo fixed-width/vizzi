@@ -1,0 +1,168 @@
+{
+  "schema": 1,
+  "sourceRevision": "951cf85413029423e036c641638b845edafe75cf",
+  "cohortSha256": "67d620faf8ed9d618ab346613f5b583a05782038220373c46581a5b4f043041d",
+  "authorship": "Source-informed automated replay after first results. Selected usage/orientation clues only; no independent navigation timing, complete answer, or real editor launch.",
+  "observations": [
+    {
+      "case": "tract.gui-widget-inventory",
+      "selector": "focused",
+      "renderedIds": [
+        "9044be559cf0033844226ea56eb5f342dc1d8b04a01e1e039ac9d9395ff523a8",
+        "ccf7a99d79a76c8ad0dcf6a869e4b5eef6f96b9993a0484e6283ee9e499d6992",
+        "4b61aff602af5182855383b6d08a2cc75e2f5750dab18da28db1858ca058b1d2",
+        "e2de59380b6162f00d3a783d1ca7777906753bec7e26ab7c580cc992d4ef203b",
+        "8cc6ce0e1a262929cb9828f20709e938b5e495ab0fdd0752a9bbea0e71dd5411",
+        "eb38185fd723cc51dd268685d2d6f4fb0ac283a2ce6119f6619a23d8254d43be",
+        "093103218e108a84f1a737806d4d4f1a8f720e22e06a9a44bc6ee88c0406c6ef",
+        "b8db7f35cc845d6ea581a81c3fbc42453dbf3f11466792a65bb89777bc41d62b"
+      ],
+      "inspectedFirst": {
+        "id": "9044be559cf0033844226ea56eb5f342dc1d8b04a01e1e039ac9d9395ff523a8",
+        "path": "gs-meter/src/editor.rs",
+        "line": 280,
+        "title": "draw::slider_row"
+      },
+      "kept": {
+        "id": "9044be559cf0033844226ea56eb5f342dc1d8b04a01e1e039ac9d9395ff523a8",
+        "path": "gs-meter/src/editor.rs",
+        "line": 280,
+        "title": "draw::slider_row"
+      }
+    },
+    {
+      "case": "tract.gui-widget-inventory",
+      "selector": "original",
+      "renderedIds": [
+        "8726d9e3377ef82e4cc90c2737fd2dc428b99e5a0817c42c49607745240d1f8f",
+        "25f1482d3e6310798f46107cb896d1377210dde9f01acefdb9b028ab476e6d2e",
+        "b356052e7fe84089bc6dcd4ac80e671992cebafb752d7b886a3b8a9ae19520df",
+        "e5b3ef4b363912504dde612babd38bb2f01c15682780172cdd89227c0669e5a6",
+        "eeb64bd97c55549ef3cd34817b43c5abbe41189d7bded335f857e02ff89112fe",
+        "aa5e28601432af6b4e2783aa4da8481c5c4b38f371c7b38e45f201c9b8715128",
+        "47a56312dcf4d734ecbc852d8eff264ed2a53eb024503b3e04a9109ee80eafe7",
+        "c617269bbb840d5f972d07c84356da8d179db557eab4d35101e689e3214496a1"
+      ],
+      "inspectedFirst": {
+        "id": "8726d9e3377ef82e4cc90c2737fd2dc428b99e5a0817c42c49607745240d1f8f",
+        "path": "six-pack/src/lib.rs",
+        "line": 567,
+        "title": "Plugin for SixPack::process"
+      },
+      "kept": null
+    },
+    {
+      "case": "tract.minitosis-signal-path",
+      "selector": "original",
+      "renderedIds": [
+        "48d786c799157d1e2bb649c5d373b38e88e4f06a93b14e8971e1f46063b5b278",
+        "cae3babd0aee7a69da6f14e068fa4028c876af3bf17943c50bf9afc7237c13df",
+        "afd224b9c7a4cc9577f8c264f07c44ccf9ec7a1efbe354b4c95ea19a57fcce66",
+        "2eabaab19124f4cea8d3fb9d0fc171c73e85a2264d8ca7614f4992e8874fa263",
+        "08ff084e87a2e5ea33f95a520dd2549ed3fbea7698b3dada641fce5e0dab4cf1",
+        "5f40789cbc1ec62962030c58a1251d980d9f042c9aab90793df01bd94a596daa",
+        "8d7cba83145c96449024e63bab26d8cad24480af528afad46e9f4c042c5f3d40",
+        "da2de1269ea441e62b18c8159b1e403a35a6927fbf4ab0d4139a6ccd385aadee"
+      ],
+      "inspectedFirst": {
+        "id": "48d786c799157d1e2bb649c5d373b38e88e4f06a93b14e8971e1f46063b5b278",
+        "path": "six-pack/src/lib.rs",
+        "line": 168,
+        "title": "SixPack"
+      },
+      "kept": {
+        "id": "cae3babd0aee7a69da6f14e068fa4028c876af3bf17943c50bf9afc7237c13df",
+        "path": "minitosis/src/lib.rs",
+        "line": 184,
+        "title": "Plugin for Minitosis"
+      }
+    },
+    {
+      "case": "tract.minitosis-signal-path",
+      "selector": "focused",
+      "renderedIds": [
+        "b47adf268faa8e07da097a2ef5a8915eb742d19c2e63eb576d712eff3a40e41d",
+        "ab5a68b4a64d9b0dd0d300318cfe3a6e1e4a1aa7ebc95b9867295c9b632bb35d",
+        "c684e3cd39ba09125fb4adbab1f77d5911d0b949f3916fa5bd58f433ccc68499",
+        "d7ca7343042d7671f17891bffe13bd82d9684be12b96233925fdafb1e21c79b2",
+        "5a22d06a9b62e741f6ca15781411e58eb4c7880682a7e72e7f420376b469ca7b",
+        "07859f4c92cac9bf2dcb7700904168bfbebf7ed5840df03b71ff4b5397df98ef",
+        "9ae3f7e762f67dac8f65166801b0e4489356277215c2356b14b75c49d4a21219",
+        "115ad8e58ee268fdb87b0b4c410bc12afc921ee473e557d5f8675814d8017563"
+      ],
+      "inspectedFirst": {
+        "id": "b47adf268faa8e07da097a2ef5a8915eb742d19c2e63eb576d712eff3a40e41d",
+        "path": "minitosis/src/editor.rs",
+        "line": 427,
+        "title": "MinitosisWindow::commit_output_text"
+      },
+      "kept": null
+    }
+  ],
+  "saved": [
+    {
+      "case": "tract.gui-widget-inventory",
+      "board": {
+        "schema": 1,
+        "workspace": "8b134a001796c6d05ff710cd1c027a0d59a902a79b24c1db58f62b1760869ae6",
+        "revision": 2,
+        "next_id": 2,
+        "question": "Show me the different gui widgets that are used by the plugin pack.",
+        "evidence": [
+          {
+            "id": 1,
+            "title": "draw::slider_row",
+            "note": "",
+            "source": {
+              "workspace": "8b134a001796c6d05ff710cd1c027a0d59a902a79b24c1db58f62b1760869ae6",
+              "snapshot": "3914e03cdea7d45b897f070e71863a26ff013450219a7b115d3e9f08fb8bbbc7",
+              "file": "34d5115dddccaeaa38538d1132d56bfa25d054fb1dd0cc682b5edcad7a12ee9b",
+              "version": "b08eadd4970b69f6cd8f38a2c7ad401a1531916583716718234d2860be1a302b",
+              "content": "75b9dbe88327d42b5a408d4428aaea7b34d983f9c50782f955fb41ee08a25e44",
+              "path": "gs-meter/src/editor.rs",
+              "line": 280,
+              "end_line": 285,
+              "excerpt": "        macro_rules! slider_row {\n            ($label:expr, $param:expr, $param_id:expr, $value_text:expr) => {\n                tr.draw_text(\n                    &mut self.surface.pixmap,\n                    pad,\n                    y + font_size,\n",
+              "truncated": true
+            }
+          }
+        ],
+        "connections": []
+      },
+      "recordingOnlyHandoff": "--reuse-window\n--goto\n/tmp/vizzi-tract-fresh-070btu43/tract-plugin-pack/gs-meter/src/editor.rs:280:1\n",
+      "pageErrors": []
+    },
+    {
+      "case": "tract.minitosis-signal-path",
+      "board": {
+        "schema": 1,
+        "workspace": "8b134a001796c6d05ff710cd1c027a0d59a902a79b24c1db58f62b1760869ae6",
+        "revision": 2,
+        "next_id": 2,
+        "question": "help me trace the signal path from input to output for minitosis",
+        "evidence": [
+          {
+            "id": 1,
+            "title": "Plugin for Minitosis",
+            "note": "",
+            "source": {
+              "workspace": "8b134a001796c6d05ff710cd1c027a0d59a902a79b24c1db58f62b1760869ae6",
+              "snapshot": "3914e03cdea7d45b897f070e71863a26ff013450219a7b115d3e9f08fb8bbbc7",
+              "file": "ceffc8506069856cd6e524dab6e0c738310d5237cc0b97a0e7f53d99b01ff93b",
+              "version": "b192dbc9d0dc699b975b5bdef31b201a09620b6dc39524b11f2bd8f7e6b27711",
+              "content": "0f1d6c1e98c02c869041ea7bf67ef441b23f05949af24d3be84f6d0001dbbbb3",
+              "path": "minitosis/src/lib.rs",
+              "line": 184,
+              "end_line": 189,
+              "excerpt": "impl Plugin for Minitosis {\n    const NAME: &'static str = \"Minitosis\";\n    const VENDOR: &'static str = \"mpd\";\n    const URL: &'static str = \"\";\n    const EMAIL: &'static str = \"\";\n    const VERSION: &'static str = env!(\"CARGO_PKG_VERSION\");\n",
+              "truncated": true
+            }
+          }
+        ],
+        "connections": []
+      },
+      "recordingOnlyHandoff": "--reuse-window\n--goto\n/tmp/vizzi-tract-fresh-070btu43/tract-plugin-pack/minitosis/src/lib.rs:184:1\n",
+      "pageErrors": []
+    }
+  ]
+}

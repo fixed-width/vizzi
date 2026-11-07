@@ -13,7 +13,9 @@ Rust/Python are selected by default; explicit scopes enable raw C/C++ analysis.
 An opt-in [question-search trial](docs/how-to/question-search-trial.md) at
 `/investigate?trial=search` finds and groups source starting points without a model.
 Inspect results, keep useful evidence and hand it to VS Code through the same workflow.
-Fresh-question usefulness remains to be evaluated; the default overview is unchanged.
+The first [fresh Tract Plugin Pack trial](experiments/companion/TRACT_PLUGIN_PACK_FRESH_RESULTS.md)
+exposed intent/ranking and evidence-retention gaps. Independent maintainer navigation
+usefulness remains to be evaluated; the default overview is unchanged.
 
 The production renderer, compiler-backed language integrations and storage engine
 remain open decisions. Both guided learning and local-change review tasks now pass

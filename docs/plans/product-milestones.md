@@ -5,6 +5,9 @@ The opt-in [question-search trial](../companion/SEARCH_PRODUCT.md) now tests a q
 entry into that workflow, using the existing source preview, retained evidence and verified
 editor handoff. The [trial guide](../how-to/question-search-trial.md) keeps fresh questions
 separate from known-question replay; independent usefulness remains to be evaluated.
+The first [fresh Tract Plugin Pack pair](../../experiments/companion/TRACT_PLUGIN_PACK_FRESH_RESULTS.md)
+now exposes wrong intent routing and insufficient retained spans. Keep search opt-in; use
+separate development cases before expanding the keyword pools or claiming generalization.
 The prototype below establishes safe browsing/comparison and performance foundations; it
 does not establish added value alongside an editor. Further IDE-surface feature work is
 paused as a delivery priority. Complete the companion slice and evaluate its contribution

@@ -1,0 +1,270 @@
+{
+  "schema": 1,
+  "authorship": "Agent-authored source reference after first paired results were captured. Source-informed relevance audit, not blind gold, maintainer completion, or an exhaustive semantic call graph.",
+  "sourceRevision": "951cf85413029423e036c641638b845edafe75cf",
+  "definitionMetric": "Exact declaration/operation anchors, distinguished from useful orientation and usage clues. Counts do not assert full semantic task completion.",
+  "cases": [
+    {
+      "id": "tract.gui-widget-inventory",
+      "targets": [
+        {
+          "id": "buttons",
+          "alternatives": [
+            {
+              "path": "tiny-skia-widgets/src/controls.rs",
+              "needle": "pub fn draw_button(",
+              "line": 16
+            },
+            {
+              "path": "tiny-skia-widgets/src/controls.rs",
+              "needle": "pub fn draw_outline_button(",
+              "line": 210
+            }
+          ]
+        },
+        {
+          "id": "sliders",
+          "alternatives": [
+            {
+              "path": "tiny-skia-widgets/src/controls.rs",
+              "needle": "pub fn draw_slider(",
+              "line": 58
+            },
+            {
+              "path": "tiny-skia-widgets/src/controls.rs",
+              "needle": "pub fn draw_outline_slider(",
+              "line": 304
+            }
+          ]
+        },
+        {
+          "id": "stepped-selectors",
+          "alternatives": [
+            {
+              "path": "tiny-skia-widgets/src/controls.rs",
+              "needle": "pub fn draw_stepped_selector(",
+              "line": 142
+            },
+            {
+              "path": "tiny-skia-widgets/src/controls.rs",
+              "needle": "pub fn draw_outline_stepped_selector(",
+              "line": 249
+            }
+          ]
+        },
+        {
+          "id": "rotary-dials",
+          "alternatives": [
+            {
+              "path": "tiny-skia-widgets/src/param_dial.rs",
+              "needle": "pub fn draw_dial(",
+              "line": 136
+            },
+            {
+              "path": "tiny-skia-widgets/src/param_dial.rs",
+              "needle": "pub fn draw_dial_ex(",
+              "line": 200
+            }
+          ]
+        },
+        {
+          "id": "dropdowns",
+          "alternatives": [
+            {
+              "path": "tiny-skia-widgets/src/dropdown.rs",
+              "needle": "pub fn draw_dropdown_trigger(",
+              "line": 400
+            },
+            {
+              "path": "tiny-skia-widgets/src/dropdown.rs",
+              "needle": "pub fn draw_dropdown_popup<",
+              "line": 450
+            }
+          ]
+        },
+        {
+          "id": "text-entry",
+          "alternatives": [
+            {
+              "path": "tiny-skia-widgets/src/text_edit.rs",
+              "needle": "pub struct TextEditState<",
+              "line": 12
+            }
+          ]
+        },
+        {
+          "id": "mseg-editors",
+          "alternatives": [
+            {
+              "path": "tiny-skia-widgets/src/mseg/editor.rs",
+              "needle": "pub struct MsegEditState {",
+              "line": 96
+            },
+            {
+              "path": "tiny-skia-widgets/src/mseg/render.rs",
+              "needle": "pub fn draw_mseg(",
+              "line": 109
+            }
+          ]
+        },
+        {
+          "id": "shared-effect-editor",
+          "alternatives": [
+            {
+              "path": "tract-effects/src/editor/mod.rs",
+              "needle": "pub struct EffectEditor {",
+              "line": 69
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "path": "Cargo.toml",
+          "needle": "exclude = [\"nih-plug\", \"nih-plug-widgets\"]",
+          "line": 7
+        },
+        {
+          "path": "gs-meter/src/editor.rs",
+          "needle": "                widgets::draw_slider(",
+          "line": 292
+        }
+      ],
+      "limits": [
+        "These eight families cover shared controls and the shared composite effect editor. Plugin-specific meters, grids and plots also need orientation; this is not an exhaustive widget-instance inventory.",
+        "Grid selector is exported but no production call sites were found outside its own crate in this revision. The old nih-plug-widgets crate is excluded from the workspace."
+      ]
+    },
+    {
+      "id": "tract.minitosis-signal-path",
+      "targets": [
+        {
+          "id": "host-audio-entry",
+          "alternatives": [
+            {
+              "path": "minitosis/src/lib.rs",
+              "needle": "    fn process(\n",
+              "line": 255
+            }
+          ]
+        },
+        {
+          "id": "render-orchestration",
+          "alternatives": [
+            {
+              "path": "minitosis/src/lib.rs",
+              "needle": "    fn render(\n",
+              "line": 110
+            }
+          ]
+        },
+        {
+          "id": "sample-wet-dry-bypass",
+          "alternatives": [
+            {
+              "path": "minitosis/src/engine.rs",
+              "needle": "    pub fn process_sample(&mut self, input: [f32; 2], mix: f32, bypass: bool)",
+              "line": 89
+            }
+          ]
+        },
+        {
+          "id": "latency-aligned-dry",
+          "alternatives": [
+            {
+              "path": "minitosis/src/engine.rs",
+              "needle": "    fn next(&mut self, input: [f32; 2], latency: usize)",
+              "line": 31
+            }
+          ]
+        },
+        {
+          "id": "effect-dispatch",
+          "alternatives": [
+            {
+              "path": "tract-effects/src/effects/mod.rs",
+              "needle": "impl Effect for EffectInstance {",
+              "line": 1237
+            }
+          ]
+        },
+        {
+          "id": "post-blend-output-gain",
+          "alternatives": [
+            {
+              "path": "minitosis/src/lib.rs",
+              "needle": "            let gain = self.params.output.smoothed.next();",
+              "line": 172
+            }
+          ]
+        }
+      ],
+      "context": [
+        {
+          "id": "block-and-modulation-setup",
+          "alternatives": [
+            {
+              "path": "minitosis/src/engine.rs",
+              "needle": "    pub fn begin_block(&mut self, track: &TrackEffect,",
+              "line": 70
+            }
+          ]
+        },
+        {
+          "id": "modulation-trigger",
+          "alternatives": [
+            {
+              "path": "tract-effects/src/modulation.rs",
+              "needle": "    pub fn begin_block(\n",
+              "line": 528
+            }
+          ]
+        },
+        {
+          "id": "mseg-effective-parameters",
+          "alternatives": [
+            {
+              "path": "tract-effects/src/modulation.rs",
+              "needle": "    pub fn advance_segment(\n",
+              "line": 560
+            }
+          ]
+        },
+        {
+          "id": "mix-ramp",
+          "alternatives": [
+            {
+              "path": "tract-effects/src/modulation.rs",
+              "needle": "    pub fn next_mix(&mut self, base: f32)",
+              "line": 623
+            }
+          ]
+        },
+        {
+          "id": "background-preparation",
+          "alternatives": [
+            {
+              "path": "minitosis/src/lib.rs",
+              "needle": "pub fn prepare_processor(",
+              "line": 49
+            }
+          ]
+        },
+        {
+          "id": "processor-handoff",
+          "alternatives": [
+            {
+              "path": "minitosis/src/handoff.rs",
+              "needle": "    pub fn try_install(",
+              "line": 31
+            }
+          ]
+        }
+      ],
+      "limits": [
+        "EffectInstance chooses an effect at runtime; fully tracing every effect implementation is outside this finite reference.",
+        "nih-plug host/format/device plumbing is an external dependency and not in this source export."
+      ]
+    }
+  ]
+}

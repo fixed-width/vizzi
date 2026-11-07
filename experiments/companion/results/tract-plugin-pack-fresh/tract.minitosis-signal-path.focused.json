@@ -1,0 +1,161 @@
+{
+  "case": "tract.minitosis-signal-path",
+  "selector": "focused",
+  "recordedAt": "2026-11-07T23:33:23.202Z",
+  "data": {
+    "snapshot": "3914e03cdea7d45b897f070e71863a26ff013450219a7b115d3e9f08fb8bbbc7",
+    "question": "help me trace the signal path from input to output for minitosis",
+    "selector": "focused",
+    "available_files": 231,
+    "searched_files": 231,
+    "omitted_files": 0,
+    "results": [
+      {
+        "id": "b47adf268faa8e07da097a2ef5a8915eb742d19c2e63eb576d712eff3a40e41d",
+        "title": "MinitosisWindow::commit_output_text",
+        "path": "minitosis/src/editor.rs",
+        "file": "3e15bad38be6c1febd842cc68666ae73fcafa938802e4c114bce1c2ec11e7cec",
+        "version": "1947456f203ed537a0a942e05f200422c0d726e45ad3fa006bdb93aa8e5ebb1f",
+        "line": 427,
+        "end_line": 437,
+        "excerpt": "fn commit_output_text(&mut self) {\n        if let Some(((), text)) = self.output_text.commit()\n            && let Some(norm) = self\n                .params\n                .output\n                .string_to_normalized_value(&text)\n                .filter(|v| v.is_finite())\n        {\n            let setter = ParamSetter::new(self.gui_context.as_ref());\n            setter.begin_set_parameter(&self.params.output);\n            setter.set_parameter_normalized(&self.params.output, norm);\n",
+        "suggested_role": "entry",
+        "scope": {
+          "name": "commit_output_text",
+          "kind": "function",
+          "parents": [
+            "MinitosisWindow"
+          ]
+        }
+      },
+      {
+        "id": "5a22d06a9b62e741f6ca15781411e58eb4c7880682a7e72e7f420376b469ca7b",
+        "title": "ClickTracker<A>::check_and_update",
+        "path": "tract-effects/src/editor/mod.rs",
+        "file": "45e173283a3607109523c3953d481fa0a8e58e3a2bafa1a4d569eb4c6c9de8b7",
+        "version": "b81b57c51e8269d58051ab20987daafd2f220298348c0a85ae1000baf34574f3",
+        "line": 1384,
+        "end_line": 1386,
+        "excerpt": "pub fn check_and_update(&mut self, action: A) -> bool {\n        self.check_and_update_at(action, std::time::Instant::now())\n    }",
+        "suggested_role": "validation",
+        "scope": {
+          "name": "check_and_update",
+          "kind": "function",
+          "parents": [
+            "ClickTracker<A>"
+          ]
+        }
+      },
+      {
+        "id": "ab5a68b4a64d9b0dd0d300318cfe3a6e1e4a1aa7ebc95b9867295c9b632bb35d",
+        "title": "Session<'a>::commit_dial_text_edit",
+        "path": "tract-effects/src/editor/mod.rs",
+        "file": "45e173283a3607109523c3953d481fa0a8e58e3a2bafa1a4d569eb4c6c9de8b7",
+        "version": "b81b57c51e8269d58051ab20987daafd2f220298348c0a85ae1000baf34574f3",
+        "line": 1072,
+        "end_line": 1084,
+        "excerpt": "fn commit_dial_text_edit(&mut self, i: usize, text: &str) {\n        let Some(spec) = self.param_spec(i) else {\n            return;\n        };\n        let Some(v) = effects::parse_value(text, spec.format) else {\n            return;\n        };\n        let clamped = v.clamp(spec.min, spec.max);\n\n        self.effect.params[i] = clamped;\n\n        self.response.changed = true;\n    }",
+        "suggested_role": "entry",
+        "scope": {
+          "name": "commit_dial_text_edit",
+          "kind": "function",
+          "parents": [
+            "Session<'a>"
+          ]
+        }
+      },
+      {
+        "id": "07859f4c92cac9bf2dcb7700904168bfbebf7ed5840df03b71ff4b5397df98ef",
+        "title": "ClickTracker<A>::check_and_update_at",
+        "path": "tract-effects/src/editor/mod.rs",
+        "file": "45e173283a3607109523c3953d481fa0a8e58e3a2bafa1a4d569eb4c6c9de8b7",
+        "version": "b81b57c51e8269d58051ab20987daafd2f220298348c0a85ae1000baf34574f3",
+        "line": 1388,
+        "end_line": 1394,
+        "excerpt": "fn check_and_update_at(&mut self, action: A, now: std::time::Instant) -> bool {\n        let is_double = self.last_action == Some(action)\n            && now.duration_since(self.last_time).as_millis() < DOUBLE_CLICK_MS;\n        self.last_time = now;\n        self.last_action = Some(action);\n        is_double\n    }",
+        "suggested_role": "validation",
+        "scope": {
+          "name": "check_and_update_at",
+          "kind": "function",
+          "parents": [
+            "ClickTracker<A>"
+          ]
+        }
+      },
+      {
+        "id": "c684e3cd39ba09125fb4adbab1f77d5911d0b949f3916fa5bd58f433ccc68499",
+        "title": "Session<'a>::commit_mix_text_edit",
+        "path": "tract-effects/src/editor/mod.rs",
+        "file": "45e173283a3607109523c3953d481fa0a8e58e3a2bafa1a4d569eb4c6c9de8b7",
+        "version": "b81b57c51e8269d58051ab20987daafd2f220298348c0a85ae1000baf34574f3",
+        "line": 1086,
+        "end_line": 1097,
+        "excerpt": "fn commit_mix_text_edit(&mut self, text: &str) {\n        let cleaned = text.trim();\n        if let Ok(pct) = cleaned.parse::<f32>()\n            && pct.is_finite()\n        {\n            let value = (pct / 100.0).clamp(0.0, 1.0);\n\n            self.effect.mix = value;\n\n            self.response.changed = true;\n        }\n    }",
+        "suggested_role": "entry",
+        "scope": {
+          "name": "commit_mix_text_edit",
+          "kind": "function",
+          "parents": [
+            "Session<'a>"
+          ]
+        }
+      },
+      {
+        "id": "9ae3f7e762f67dac8f65166801b0e4489356277215c2356b14b75c49d4a21219",
+        "title": "Session<'a>::mseg_double_click_check",
+        "path": "tract-effects/src/editor/mod.rs",
+        "file": "45e173283a3607109523c3953d481fa0a8e58e3a2bafa1a4d569eb4c6c9de8b7",
+        "version": "b81b57c51e8269d58051ab20987daafd2f220298348c0a85ae1000baf34574f3",
+        "line": 997,
+        "end_line": 999,
+        "excerpt": "fn mseg_double_click_check(&mut self, x: f32, y: f32) -> bool {\n        self.mseg_double_click_check_at(x, y, std::time::Instant::now())\n    }",
+        "suggested_role": "validation",
+        "scope": {
+          "name": "mseg_double_click_check",
+          "kind": "function",
+          "parents": [
+            "Session<'a>"
+          ]
+        }
+      },
+      {
+        "id": "d7ca7343042d7671f17891bffe13bd82d9684be12b96233925fdafb1e21c79b2",
+        "title": "MultosisWindow::swap_tracks",
+        "path": "multosis/src/editor.rs",
+        "file": "4c7a606cdcc3c27b16f6e7420ad9b836b44b92fe09e68daf904cccf6f2b6824a",
+        "version": "60c098d06c17bfd602c00a8247a398509b1e7efcba4550b034ac5cd42b45db7d",
+        "line": 533,
+        "end_line": 540,
+        "excerpt": "        ) {\n            track_list::swap_rows_pure(&mut grid, &mut effects, &mut modu, from, to);\n            // Re-publish the freshly swapped grid through the GUI→audio\n            // handoff so the audio thread sees the new cell layout before\n            // the next process block (matches every other grid edit).\n            self.grid_handoff.publish(*grid);\n        }\n        // Encode (from, to) for the audio thread's swap consumer.\n",
+        "suggested_role": "entry",
+        "scope": {
+          "name": "swap_tracks",
+          "kind": "function",
+          "parents": [
+            "MultosisWindow"
+          ]
+        }
+      },
+      {
+        "id": "115ad8e58ee268fdb87b0b4c410bc12afc921ee473e557d5f8675814d8017563",
+        "title": "Session<'a>::mseg_double_click_check_at",
+        "path": "tract-effects/src/editor/mod.rs",
+        "file": "45e173283a3607109523c3953d481fa0a8e58e3a2bafa1a4d569eb4c6c9de8b7",
+        "version": "b81b57c51e8269d58051ab20987daafd2f220298348c0a85ae1000baf34574f3",
+        "line": 1001,
+        "end_line": 1009,
+        "excerpt": "fn mseg_double_click_check_at(&mut self, x: f32, y: f32, now: std::time::Instant) -> bool {\n        let elapsed_ms = now\n            .duration_since(self.state.mseg_last_click_time)\n            .as_millis();\n        let (px, py) = self.state.mseg_last_click_pos;\n        let dist_sq = (x - px) * (x - px) + (y - py) * (y - py);\n        let is_double = elapsed_ms < 400 && dist_sq < 64.0;\n        self.state.mseg_last_click_time = now;\n        self.state.mseg_last_click_pos = (x, y);\n",
+        "suggested_role": "validation",
+        "scope": {
+          "name": "mseg_double_click_check_at",
+          "kind": "function",
+          "parents": [
+            "Session<'a>"
+          ]
+        }
+      }
+    ]
+  },
+  "elapsedMs": 266.31332399999974,
+  "responseBytes": 6706
+}

@@ -1,0 +1,138 @@
+{
+  "case": "tract.gui-widget-inventory",
+  "selector": "focused",
+  "recordedAt": "2026-11-07T23:33:22.462Z",
+  "data": {
+    "snapshot": "3914e03cdea7d45b897f070e71863a26ff013450219a7b115d3e9f08fb8bbbc7",
+    "question": "Show me the different gui widgets that are used by the plugin pack.",
+    "selector": "focused",
+    "available_files": 231,
+    "searched_files": 231,
+    "omitted_files": 0,
+    "results": [
+      {
+        "id": "9044be559cf0033844226ea56eb5f342dc1d8b04a01e1e039ac9d9395ff523a8",
+        "title": "draw::slider_row",
+        "path": "gs-meter/src/editor.rs",
+        "file": "34d5115dddccaeaa38538d1132d56bfa25d054fb1dd0cc682b5edcad7a12ee9b",
+        "version": "b08eadd4970b69f6cd8f38a2c7ad401a1531916583716718234d2860be1a302b",
+        "line": 280,
+        "end_line": 292,
+        "excerpt": "macro_rules! slider_row {\n            ($label:expr, $param:expr, $param_id:expr, $value_text:expr) => {\n                tr.draw_text(\n                    &mut self.surface.pixmap,\n                    pad,\n                    y + font_size,\n                    $label,\n                    font_size,\n                    widgets::color_muted(),\n                );\n                let sx = pad + label_w;\n                let sy = y + 4.0 * s;\n                widgets::draw_slider(\n",
+        "suggested_role": "registration",
+        "scope": {
+          "name": "slider_row",
+          "kind": "macro",
+          "parents": [
+            "GsMeterWindow",
+            "draw"
+          ]
+        }
+      },
+      {
+        "id": "8cc6ce0e1a262929cb9828f20709e938b5e495ab0fdd0752a9bbea0e71dd5411",
+        "title": "HitAction",
+        "path": "gain-brain/src/editor.rs",
+        "file": "733e703290549c4fc98326dfec14cf160e469310dc0d34cb64a8290590aad74a",
+        "version": "1ccc6b8dc6f016909f42ae70287607b9f729f37d5b73c42f3a9bef41f86700a4",
+        "line": 29,
+        "end_line": 46,
+        "excerpt": "}\n\n#[derive(Clone, Copy, PartialEq, Debug)]\nenum ParamId {\n    Gain,\n    LinkMode,\n}\n\nstruct GainBrainWindow {\n    gui_context: Arc<dyn GuiContext>,\n    surface: widgets::SoftbufferSurface,\n    physical_width: u32,\n    physical_height: u32,\n    scale_factor: f32,\n    /// Packed (w << 32 | h) pending host-initiated resize, read on next frame.\n    pending_resize: Arc<std::sync::atomic::AtomicU64>,\n\n    params: Arc<GainBrainParams>,\n",
+        "suggested_role": "example",
+        "scope": {
+          "name": "HitAction",
+          "kind": "enum",
+          "parents": []
+        }
+      },
+      {
+        "id": "ccf7a99d79a76c8ad0dcf6a869e4b5eef6f96b9993a0484e6283ee9e499d6992",
+        "title": "Imagine",
+        "path": "imagine/src/lib.rs",
+        "file": "8ea1e685f14f382c1b47e23a2ef224c650ff8275c1f7c1017a7af507850a9f90",
+        "version": "04e00039d129c48a0c0f51d01c6895f8f353a54000cb290c8a18487636c6792d",
+        "line": 384,
+        "end_line": 396,
+        "excerpt": "    polar_producer: Arc<PolarRayProducer>,\n\n    /// FFT analyzer. Reset in `initialize` to update sample-rate-dependent log\n    /// bin tables.\n    spectrum: Option<Analyzer>,\n\n    sample_rate: f32,\n\n    /// Frozen at `initialize()` since Quality is non-automatable.\n    active_quality: Quality,\n\n    /// Last crossover frequencies passed to `redesign`. Used to gate per-block\n    /// redesigns: if smoothed values haven't moved, we skip the windowed-sinc\n",
+        "suggested_role": "registration",
+        "scope": {
+          "name": "Imagine",
+          "kind": "struct",
+          "parents": []
+        }
+      },
+      {
+        "id": "eb38185fd723cc51dd268685d2d6f4fb0ac283a2ce6119f6619a23d8254d43be",
+        "title": "GainSource",
+        "path": "gs-meter/src/editor.rs",
+        "file": "34d5115dddccaeaa38538d1132d56bfa25d054fb1dd0cc682b5edcad7a12ee9b",
+        "version": "b08eadd4970b69f6cd8f38a2c7ad401a1531916583716718234d2860be1a302b",
+        "line": 65,
+        "end_line": 78,
+        "excerpt": "    LufsShortTermMax,\n    LufsMomentary,\n    LufsMomentaryMax,\n    LufsTruePeak,\n}\n\nstruct GsMeterWindow {\n    gui_context: Arc<dyn GuiContext>,\n    surface: widgets::SoftbufferSurface,\n    physical_width: u32,\n    physical_height: u32,\n    scale_factor: f32,\n    /// Packed (w << 32 | h) pending host-initiated resize, read on next frame.\n    p",
+        "suggested_role": "example",
+        "scope": {
+          "name": "GainSource",
+          "kind": "enum",
+          "parents": []
+        }
+      },
+      {
+        "id": "4b61aff602af5182855383b6d08a2cc75e2f5750dab18da28db1858ca058b1d2",
+        "title": "lib.rs",
+        "path": "gain-brain/src/lib.rs",
+        "file": "8bfe7d70e680a46b098f7bd86e40e11e5ccf4a2429afaccc7f7d9590d19fbaad",
+        "version": "1101c66e5d27389bbdc84c058d4affc5ab1b923b4e0b5d246914d72102ae932e",
+        "line": 9,
+        "end_line": 21,
+        "excerpt": "/// format!() heap allocations and stderr writes on the audio thread.\nmacro_rules! debug_log {\n    ($($arg:tt)*) => {\n        #[cfg(debug_assertions)]\n        nih_log!($($arg)*);\n    };\n}\n\n// ── Background task for host-param sync ──────────────────────────────────────\n\n/// Tasks dispatched from the audio thread to the main/GUI thread via\n/// `ProcessContext::execute_gui()`.\n#[derive(Clone, Copy)]\n",
+        "suggested_role": "registration",
+        "scope": null
+      },
+      {
+        "id": "093103218e108a84f1a737806d4d4f1a8f720e22e06a9a44bc6ee88c0406c6ef",
+        "title": "editor.rs",
+        "path": "imagine/src/editor.rs",
+        "file": "4866750a6d979fd1e0d5ddf826b546e1f055dc90c89f6895f9c04d877a636ce7",
+        "version": "791b12157e31d6abb4eca2fee5aa7223eb2db204a933012f6aab83367380f82b",
+        "line": 98,
+        "end_line": 103,
+        "excerpt": "\nstruct ImagineWindow {\n    gui_context: Arc<dyn GuiContext>,\n    surface: widgets::SoftbufferSurface,\n    physical_width: u32,\n    ph",
+        "suggested_role": "example",
+        "scope": null
+      },
+      {
+        "id": "e2de59380b6162f00d3a783d1ca7777906753bec7e26ab7c580cc992d4ef203b",
+        "title": "baseview::WindowHandler for Hd26Window::on_event",
+        "path": "hd26/src/editor.rs",
+        "file": "ec19b818de148a8f1f5e93d1876fd5647f509d929ad6c5d10608a7089f8b0f6a",
+        "version": "d86fd24ef0a1d7186ecb0b8f514491ed21a55037062a7225bd6c65d23c2731c8",
+        "line": 505,
+        "end_line": 512,
+        "excerpt": "                    let shift = modifiers.contains(keyboard_types::Modifiers::SHIFT);\n                    let current = dispatch!(self, id, p => p.modulated_normalized_value());\n                    if let Some(norm) = self.drag.update_drag(shift, current) {\n                        let setter = ParamSetter::new(self.gui_context.as_ref());\n                        self.set_norm(&setter, id, norm);\n                    }\n                }\n            }\n",
+        "suggested_role": "registration",
+        "scope": {
+          "name": "on_event",
+          "kind": "function",
+          "parents": [
+            "baseview::WindowHandler for Hd26Window"
+          ]
+        }
+      },
+      {
+        "id": "b8db7f35cc845d6ea581a81c3fbc42453dbf3f11466792a65bb89777bc41d62b",
+        "title": "editor.rs",
+        "path": "pope-scope/src/editor.rs",
+        "file": "72a0c9d1bb01fc0865114d57c7d4a5ffc39236bbe7886ba6dcb27d2b2ddddaa6",
+        "version": "455bc62053fb31385942db73a16eda26cca9a9031f20bd53509502e212fed155",
+        "line": 137,
+        "end_line": 152,
+        "excerpt": "\nstruct PopeScopeWindow {\n    gui_context: Arc<dyn GuiContext>,\n    surface: widgets::SoftbufferSurface,\n    physical_width: u32,\n    physical_height: u32,\n    scale_factor: f32,\n    /// Packed (w << 32 | h) pending host-initiated resize, read on next frame.\n    pending_resize: Arc<std::sync::atomic::AtomicU64>,\n\n    params: Arc<PopeScopeParams>,\n    sample_rate: f32,\n    text_renderer: widgets::TextRenderer,\n\n    /// Cached snapshots for freeze mode.\n    cached_snapshots: Vec<WaveSnapshot>,\n",
+        "suggested_role": "example",
+        "scope": null
+      }
+    ]
+  },
+  "elapsedMs": 849.4254450000001,
+  "responseBytes": 6809
+}

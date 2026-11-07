@@ -1,0 +1,143 @@
+{
+  "case": "tract.minitosis-signal-path",
+  "selector": "original",
+  "recordedAt": "2026-11-07T23:33:22.935Z",
+  "data": {
+    "snapshot": "3914e03cdea7d45b897f070e71863a26ff013450219a7b115d3e9f08fb8bbbc7",
+    "question": "help me trace the signal path from input to output for minitosis",
+    "selector": "original",
+    "available_files": 231,
+    "searched_files": 231,
+    "omitted_files": 0,
+    "results": [
+      {
+        "id": "48d786c799157d1e2bb649c5d373b38e88e4f06a93b14e8971e1f46063b5b278",
+        "title": "SixPack",
+        "path": "six-pack/src/lib.rs",
+        "file": "1b2db071885f77e9b649c709bb3fdf85d604c63bc924156b28c0d1497d58daaf",
+        "version": "70e75206af2ab97f80589f50230a3132d0219ad65b2a5994c4f4b252a0151672",
+        "line": 168,
+        "end_line": 177,
+        "excerpt": "    sample_rate: f32,\n    os: StereoOversampler,\n    max_block: usize,\n    pub spectrum: SpectrumAnalyzer,\n    /// Spectrum of the wet path — what Six Pack is *adding* to the dry\n    /// signal, sampled at native rate from inside the OS loop. Drives the\n    /// \"harmonics added\" overlay so users can see the plugin's contribution\n    /// even at low drive where the output spectrum looks indistinguishable\n    /// from the input.\n    pub spectrum_wet: SpectrumAnalyzer,\n",
+        "suggested_role": null,
+        "scope": {
+          "name": "SixPack",
+          "kind": "struct",
+          "parents": []
+        }
+      },
+      {
+        "id": "cae3babd0aee7a69da6f14e068fa4028c876af3bf17943c50bf9afc7237c13df",
+        "title": "Plugin for Minitosis",
+        "path": "minitosis/src/lib.rs",
+        "file": "ceffc8506069856cd6e524dab6e0c738310d5237cc0b97a0e7f53d99b01ff93b",
+        "version": "b192dbc9d0dc699b975b5bdef31b201a09620b6dc39524b11f2bd8f7e6b27711",
+        "line": 184,
+        "end_line": 194,
+        "excerpt": "impl Plugin for Minitosis {\n    const NAME: &'static str = \"Minitosis\";\n    const VENDOR: &'static str = \"mpd\";\n    const URL: &'static str = \"\";\n    const EMAIL: &'static str = \"\";\n    const VERSION: &'static str = env!(\"CARGO_PKG_VERSION\");\n    const AUDIO_IO_LAYOUTS: &'static [AudioIOLayout] = &[AudioIOLayout {\n        main_input_channels: std::num::NonZeroU32::new(2),\n        main_output_channels: std::num::NonZeroU32::new(2),\n        ..AudioIOLayout::const_default()\n    }];\n",
+        "suggested_role": null,
+        "scope": {
+          "name": "Plugin for Minitosis",
+          "kind": "implementation",
+          "parents": []
+        }
+      },
+      {
+        "id": "afd224b9c7a4cc9577f8c264f07c44ccf9ec7a1efbe354b4c95ea19a57fcce66",
+        "title": "AnalyticSignal",
+        "path": "tract-dsp/src/hilbert.rs",
+        "file": "488cf6cf9765f0cba5157104f107cf562c38cbcaf4d023ef4beeb841d7bfa729",
+        "version": "537b813d7bfb908afe04aa36bd83a6b51e9d4c448984762d1cb3a3dfd805b9f0",
+        "line": 110,
+        "end_line": 116,
+        "excerpt": "pub struct AnalyticSignal {\n    hilbert: HilbertFir,\n    /// Ring-buffer delay matched to the Hilbert FIR's group delay; the\n    /// `real` output is the input read out from this delay.\n    delay: Vec<f32>,\n    delay_idx: usize,\n}",
+        "suggested_role": null,
+        "scope": {
+          "name": "AnalyticSignal",
+          "kind": "struct",
+          "parents": []
+        }
+      },
+      {
+        "id": "2eabaab19124f4cea8d3fb9d0fc171c73e85a2264d8ca7614f4992e8874fa263",
+        "title": "delay.rs",
+        "path": "tract-effects/src/effects/delay.rs",
+        "file": "60cde3ded0e442a48dcf4159cac41b0f31d913f72da83880f709c3863499ae4c",
+        "version": "fd64d4adc1c42596eaac70099752468ed84b912141e767b54a5f4150d4c8831b",
+        "line": 8,
+        "end_line": 16,
+        "excerpt": "/// the subdivision is converted to samples using the host's current BPM\n/// (cached via `set_bpm`).\n///\n/// **Feedback** scales the delay-line output back into its input\n/// (chorus-style feedback, capped at 0.95 to prevent runaway).\n///\n/// **Duck** envelope-follows the input level and attenuates the delayed\n/// output proportionally — at full Duck, loud input fully silences the\n/// delay, leaving the dry signal clear; the delay swells in as the\n",
+        "suggested_role": null,
+        "scope": null
+      },
+      {
+        "id": "08ff084e87a2e5ea33f95a520dd2549ed3fbea7698b3dada641fce5e0dab4cf1",
+        "title": "Drop for MinitosisWindow",
+        "path": "minitosis/src/editor.rs",
+        "file": "3e15bad38be6c1febd842cc68666ae73fcafa938802e4c114bce1c2ec11e7cec",
+        "version": "1947456f203ed537a0a942e05f200422c0d726e45ad3fa006bdb93aa8e5ebb1f",
+        "line": 648,
+        "end_line": 653,
+        "excerpt": "impl Drop for MinitosisWindow {\n    fn drop(&mut self) {\n        self.end_effect_gestures();\n        self.end_output_drag();\n    }\n}",
+        "suggested_role": null,
+        "scope": {
+          "name": "Drop for MinitosisWindow",
+          "kind": "implementation",
+          "parents": []
+        }
+      },
+      {
+        "id": "5f40789cbc1ec62962030c58a1251d980d9f042c9aab90793df01bd94a596daa",
+        "title": "baseview::WindowHandler for MinitosisWindow",
+        "path": "minitosis/src/editor.rs",
+        "file": "3e15bad38be6c1febd842cc68666ae73fcafa938802e4c114bce1c2ec11e7cec",
+        "version": "1947456f203ed537a0a942e05f200422c0d726e45ad3fa006bdb93aa8e5ebb1f",
+        "line": 484,
+        "end_line": 494,
+        "excerpt": "impl baseview::WindowHandler for MinitosisWindow {\n    fn on_frame(&mut self, window: &mut baseview::Window) {\n        widgets::consume_pending_resize(&self.pending_resize, (self.width, self.height), window);\n        self.sync_selection();\n        let output_edit = self\n            .output_text\n            .active_for(&())\n            .map(|text| (text, self.output_text.caret_visible()));\n        draw_frame(\n            &mut self.surface.pixmap,\n            &mut self.renderer,\n",
+        "suggested_role": null,
+        "scope": {
+          "name": "baseview::WindowHandler for MinitosisWindow",
+          "kind": "implementation",
+          "parents": []
+        }
+      },
+      {
+        "id": "8d7cba83145c96449024e63bab26d8cad24480af528afad46e9f4c042c5f3d40",
+        "title": "Effect for FmEffect::process_sample",
+        "path": "tract-effects/src/effects/fm.rs",
+        "file": "dc86dd19e562625db36fc259a0d6d21a68d0d9ebd8b1535603817a40270d116f",
+        "version": "7efb790872a0eafac1713336a5330e208ffcf474155ac98e5d63aa9fa46bd0d9",
+        "line": 200,
+        "end_line": 207,
+        "excerpt": "            // self-modulation), enriching the timbre.\n            //\n            // No input gate needed — the analytic signal of silence is\n            // silence, so a silent input naturally yields a silent output.\n            let mod_sine = (self.mod_phase * two_pi).sin();\n            self.mod_phase = (self.mod_phase + phase_inc).rem_euclid(1.0);\n            let theta_mod = if self.topology < 0.5 {\n                // PM: instantaneous rotation = depth · modulator.\n",
+        "suggested_role": null,
+        "scope": {
+          "name": "process_sample",
+          "kind": "function",
+          "parents": [
+            "Effect for FmEffect"
+          ]
+        }
+      },
+      {
+        "id": "da2de1269ea441e62b18c8159b1e403a35a6927fbf4ab0d4139a6ccd385aadee",
+        "title": "draw",
+        "path": "six-pack/src/editor/bottom_strip.rs",
+        "file": "56670995dc841039e6603c3974415968c9a4eb54b3c9c77e993338ce68eb4e95",
+        "version": "87f0b579009ca074d75672c9dbc355a3b4b151c2712bc56fd7b55ecf74facfab",
+        "line": 52,
+        "end_line": 59,
+        "excerpt": "        (GlobalDialId::Mix, \"\", 0.0, String::new(), None),\n    ];\n    // When I/O Link is on, the audio path uses `output_gain = 1 / input_gain`\n    // (i.e. `output_dB = -input_dB`) directly and ignores the Output param's\n    // stored value. Mirror the Output dial's display to match: same magnitude,\n    // opposite sign in dB, which by symmetry of the gain skew is exactly\n    // `1 − input_normalized` on the dial.\n    let io_linked = win.params.io_link.value();\n",
+        "suggested_role": null,
+        "scope": {
+          "name": "draw",
+          "kind": "function",
+          "parents": []
+        }
+      }
+    ]
+  },
+  "elapsedMs": 229.64284700000007,
+  "responseBytes": 6881
+}

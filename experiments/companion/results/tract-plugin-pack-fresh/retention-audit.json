@@ -1,0 +1,34 @@
+[
+  {
+    "case": "tract.gui-widget-inventory",
+    "searchSelector": "focused",
+    "searchRange": [
+      280,
+      292
+    ],
+    "savedRange": [
+      280,
+      285
+    ],
+    "sameSnapshotFileVersion": true,
+    "savedContainsSliderCall": false,
+    "searchContainsSliderCall": true,
+    "note": "This checks finite captured content and navigation usefulness separately. A saved location is not necessarily the entire displayed search excerpt."
+  },
+  {
+    "case": "tract.minitosis-signal-path",
+    "searchSelector": "original",
+    "searchRange": [
+      184,
+      194
+    ],
+    "savedRange": [
+      184,
+      189
+    ],
+    "sameSnapshotFileVersion": true,
+    "savedContainsSliderCall": false,
+    "searchContainsSliderCall": false,
+    "note": "This checks finite captured content and navigation usefulness separately. A saved location is not necessarily the entire displayed search excerpt."
+  }
+]

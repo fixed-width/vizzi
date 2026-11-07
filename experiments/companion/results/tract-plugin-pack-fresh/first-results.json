@@ -1,0 +1,638 @@
+{
+  "schema": 1,
+  "recordedAt": "2026-11-07T23:33:23.202Z",
+  "cohort": "experiments/companion/library/tract-plugin-pack.json",
+  "cohortSha256": "67d620faf8ed9d618ab346613f5b583a05782038220373c46581a5b4f043041d",
+  "binarySha256": "605b0dc0aea9b9743b0f8b9c77d4051eef93451fcb4fff736aaa1756cd14b8ed",
+  "sourceRevision": "951cf85413029423e036c641638b845edafe75cf",
+  "sourceRoot": "/tmp/vizzi-tract-fresh-070btu43/tract-plugin-pack",
+  "status": {
+    "readiness": "ready",
+    "recovery": {
+      "running": false,
+      "completed": 0,
+      "discarded": 0,
+      "verification": null,
+      "overlay": null,
+      "error": null
+    },
+    "schema": 1,
+    "name": "tract-plugin-pack",
+    "generation": 1,
+    "snapshot": "3914e03cdea7d45b897f070e71863a26ff013450219a7b115d3e9f08fb8bbbc7",
+    "pending": false,
+    "measurements": {
+      "deferred": 0,
+      "files": 231,
+      "analyzed": 231,
+      "source_only": 0,
+      "bytes": 4401436,
+      "read_files": 231,
+      "shared_sources": 0,
+      "retained": 0,
+      "reconciled": true,
+      "parsed": 229,
+      "tree_reuses": 0,
+      "reused": 0,
+      "cache_hits": 2,
+      "cache_warnings": 0,
+      "capture_ms": 12.254698,
+      "total_ms": 991.263628
+    },
+    "error": null,
+    "observation": "native directory watches + periodic reconciliation"
+  },
+  "activationMs": 1028.533723,
+  "observations": [
+    {
+      "case": "tract.gui-widget-inventory",
+      "selector": "focused",
+      "recordedAt": "2026-11-07T23:33:22.462Z",
+      "data": {
+        "snapshot": "3914e03cdea7d45b897f070e71863a26ff013450219a7b115d3e9f08fb8bbbc7",
+        "question": "Show me the different gui widgets that are used by the plugin pack.",
+        "selector": "focused",
+        "available_files": 231,
+        "searched_files": 231,
+        "omitted_files": 0,
+        "results": [
+          {
+            "id": "9044be559cf0033844226ea56eb5f342dc1d8b04a01e1e039ac9d9395ff523a8",
+            "title": "draw::slider_row",
+            "path": "gs-meter/src/editor.rs",
+            "file": "34d5115dddccaeaa38538d1132d56bfa25d054fb1dd0cc682b5edcad7a12ee9b",
+            "version": "b08eadd4970b69f6cd8f38a2c7ad401a1531916583716718234d2860be1a302b",
+            "line": 280,
+            "end_line": 292,
+            "excerpt": "macro_rules! slider_row {\n            ($label:expr, $param:expr, $param_id:expr, $value_text:expr) => {\n                tr.draw_text(\n                    &mut self.surface.pixmap,\n                    pad,\n                    y + font_size,\n                    $label,\n                    font_size,\n                    widgets::color_muted(),\n                );\n                let sx = pad + label_w;\n                let sy = y + 4.0 * s;\n                widgets::draw_slider(\n",
+            "suggested_role": "registration",
+            "scope": {
+              "name": "slider_row",
+              "kind": "macro",
+              "parents": [
+                "GsMeterWindow",
+                "draw"
+              ]
+            }
+          },
+          {
+            "id": "8cc6ce0e1a262929cb9828f20709e938b5e495ab0fdd0752a9bbea0e71dd5411",
+            "title": "HitAction",
+            "path": "gain-brain/src/editor.rs",
+            "file": "733e703290549c4fc98326dfec14cf160e469310dc0d34cb64a8290590aad74a",
+            "version": "1ccc6b8dc6f016909f42ae70287607b9f729f37d5b73c42f3a9bef41f86700a4",
+            "line": 29,
+            "end_line": 46,
+            "excerpt": "}\n\n#[derive(Clone, Copy, PartialEq, Debug)]\nenum ParamId {\n    Gain,\n    LinkMode,\n}\n\nstruct GainBrainWindow {\n    gui_context: Arc<dyn GuiContext>,\n    surface: widgets::SoftbufferSurface,\n    physical_width: u32,\n    physical_height: u32,\n    scale_factor: f32,\n    /// Packed (w << 32 | h) pending host-initiated resize, read on next frame.\n    pending_resize: Arc<std::sync::atomic::AtomicU64>,\n\n    params: Arc<GainBrainParams>,\n",
+            "suggested_role": "example",
+            "scope": {
+              "name": "HitAction",
+              "kind": "enum",
+              "parents": []
+            }
+          },
+          {
+            "id": "ccf7a99d79a76c8ad0dcf6a869e4b5eef6f96b9993a0484e6283ee9e499d6992",
+            "title": "Imagine",
+            "path": "imagine/src/lib.rs",
+            "file": "8ea1e685f14f382c1b47e23a2ef224c650ff8275c1f7c1017a7af507850a9f90",
+            "version": "04e00039d129c48a0c0f51d01c6895f8f353a54000cb290c8a18487636c6792d",
+            "line": 384,
+            "end_line": 396,
+            "excerpt": "    polar_producer: Arc<PolarRayProducer>,\n\n    /// FFT analyzer. Reset in `initialize` to update sample-rate-dependent log\n    /// bin tables.\n    spectrum: Option<Analyzer>,\n\n    sample_rate: f32,\n\n    /// Frozen at `initialize()` since Quality is non-automatable.\n    active_quality: Quality,\n\n    /// Last crossover frequencies passed to `redesign`. Used to gate per-block\n    /// redesigns: if smoothed values haven't moved, we skip the windowed-sinc\n",
+            "suggested_role": "registration",
+            "scope": {
+              "name": "Imagine",
+              "kind": "struct",
+              "parents": []
+            }
+          },
+          {
+            "id": "eb38185fd723cc51dd268685d2d6f4fb0ac283a2ce6119f6619a23d8254d43be",
+            "title": "GainSource",
+            "path": "gs-meter/src/editor.rs",
+            "file": "34d5115dddccaeaa38538d1132d56bfa25d054fb1dd0cc682b5edcad7a12ee9b",
+            "version": "b08eadd4970b69f6cd8f38a2c7ad401a1531916583716718234d2860be1a302b",
+            "line": 65,
+            "end_line": 78,
+            "excerpt": "    LufsShortTermMax,\n    LufsMomentary,\n    LufsMomentaryMax,\n    LufsTruePeak,\n}\n\nstruct GsMeterWindow {\n    gui_context: Arc<dyn GuiContext>,\n    surface: widgets::SoftbufferSurface,\n    physical_width: u32,\n    physical_height: u32,\n    scale_factor: f32,\n    /// Packed (w << 32 | h) pending host-initiated resize, read on next frame.\n    p",
+            "suggested_role": "example",
+            "scope": {
+              "name": "GainSource",
+              "kind": "enum",
+              "parents": []
+            }
+          },
+          {
+            "id": "4b61aff602af5182855383b6d08a2cc75e2f5750dab18da28db1858ca058b1d2",
+            "title": "lib.rs",
+            "path": "gain-brain/src/lib.rs",
+            "file": "8bfe7d70e680a46b098f7bd86e40e11e5ccf4a2429afaccc7f7d9590d19fbaad",
+            "version": "1101c66e5d27389bbdc84c058d4affc5ab1b923b4e0b5d246914d72102ae932e",
+            "line": 9,
+            "end_line": 21,
+            "excerpt": "/// format!() heap allocations and stderr writes on the audio thread.\nmacro_rules! debug_log {\n    ($($arg:tt)*) => {\n        #[cfg(debug_assertions)]\n        nih_log!($($arg)*);\n    };\n}\n\n// ── Background task for host-param sync ──────────────────────────────────────\n\n/// Tasks dispatched from the audio thread to the main/GUI thread via\n/// `ProcessContext::execute_gui()`.\n#[derive(Clone, Copy)]\n",
+            "suggested_role": "registration",
+            "scope": null
+          },
+          {
+            "id": "093103218e108a84f1a737806d4d4f1a8f720e22e06a9a44bc6ee88c0406c6ef",
+            "title": "editor.rs",
+            "path": "imagine/src/editor.rs",
+            "file": "4866750a6d979fd1e0d5ddf826b546e1f055dc90c89f6895f9c04d877a636ce7",
+            "version": "791b12157e31d6abb4eca2fee5aa7223eb2db204a933012f6aab83367380f82b",
+            "line": 98,
+            "end_line": 103,
+            "excerpt": "\nstruct ImagineWindow {\n    gui_context: Arc<dyn GuiContext>,\n    surface: widgets::SoftbufferSurface,\n    physical_width: u32,\n    ph",
+            "suggested_role": "example",
+            "scope": null
+          },
+          {
+            "id": "e2de59380b6162f00d3a783d1ca7777906753bec7e26ab7c580cc992d4ef203b",
+            "title": "baseview::WindowHandler for Hd26Window::on_event",
+            "path": "hd26/src/editor.rs",
+            "file": "ec19b818de148a8f1f5e93d1876fd5647f509d929ad6c5d10608a7089f8b0f6a",
+            "version": "d86fd24ef0a1d7186ecb0b8f514491ed21a55037062a7225bd6c65d23c2731c8",
+            "line": 505,
+            "end_line": 512,
+            "excerpt": "                    let shift = modifiers.contains(keyboard_types::Modifiers::SHIFT);\n                    let current = dispatch!(self, id, p => p.modulated_normalized_value());\n                    if let Some(norm) = self.drag.update_drag(shift, current) {\n                        let setter = ParamSetter::new(self.gui_context.as_ref());\n                        self.set_norm(&setter, id, norm);\n                    }\n                }\n            }\n",
+            "suggested_role": "registration",
+            "scope": {
+              "name": "on_event",
+              "kind": "function",
+              "parents": [
+                "baseview::WindowHandler for Hd26Window"
+              ]
+            }
+          },
+          {
+            "id": "b8db7f35cc845d6ea581a81c3fbc42453dbf3f11466792a65bb89777bc41d62b",
+            "title": "editor.rs",
+            "path": "pope-scope/src/editor.rs",
+            "file": "72a0c9d1bb01fc0865114d57c7d4a5ffc39236bbe7886ba6dcb27d2b2ddddaa6",
+            "version": "455bc62053fb31385942db73a16eda26cca9a9031f20bd53509502e212fed155",
+            "line": 137,
+            "end_line": 152,
+            "excerpt": "\nstruct PopeScopeWindow {\n    gui_context: Arc<dyn GuiContext>,\n    surface: widgets::SoftbufferSurface,\n    physical_width: u32,\n    physical_height: u32,\n    scale_factor: f32,\n    /// Packed (w << 32 | h) pending host-initiated resize, read on next frame.\n    pending_resize: Arc<std::sync::atomic::AtomicU64>,\n\n    params: Arc<PopeScopeParams>,\n    sample_rate: f32,\n    text_renderer: widgets::TextRenderer,\n\n    /// Cached snapshots for freeze mode.\n    cached_snapshots: Vec<WaveSnapshot>,\n",
+            "suggested_role": "example",
+            "scope": null
+          }
+        ]
+      },
+      "elapsedMs": 849.4254450000001,
+      "responseBytes": 6809
+    },
+    {
+      "case": "tract.gui-widget-inventory",
+      "selector": "original",
+      "recordedAt": "2026-11-07T23:33:22.705Z",
+      "data": {
+        "snapshot": "3914e03cdea7d45b897f070e71863a26ff013450219a7b115d3e9f08fb8bbbc7",
+        "question": "Show me the different gui widgets that are used by the plugin pack.",
+        "selector": "original",
+        "available_files": 231,
+        "searched_files": 231,
+        "omitted_files": 0,
+        "results": [
+          {
+            "id": "8726d9e3377ef82e4cc90c2737fd2dc428b99e5a0817c42c49607745240d1f8f",
+            "title": "Plugin for SixPack::process",
+            "path": "six-pack/src/lib.rs",
+            "file": "1b2db071885f77e9b649c709bb3fdf85d604c63bc924156b28c0d1497d58daaf",
+            "version": "70e75206af2ab97f80589f50230a3132d0219ad65b2a5994c4f4b252a0151672",
+            "line": 567,
+            "end_line": 580,
+            "excerpt": "        let len_os = os_l.len();\n\n        // Per-band post-saturation sum-of-squares for the GUI activity glow.\n        // Stored at block end; not used by the audio path itself.\n        let mut band_sumsq = [0.0f32; 6];\n\n        // Per-oversampled-sample DSP loop.\n        for i in 0..len_os {\n            let dry_l = os_l[i];\n            let dry_r = os_r[i];\n\n            let mut wet_l = 0.0f32;\n            let mut wet_r = 0.0f32;\n            let mut boost_l = 0.0f32;\n",
+            "suggested_role": null,
+            "scope": {
+              "name": "process",
+              "kind": "function",
+              "parents": [
+                "Plugin for SixPack"
+              ]
+            }
+          },
+          {
+            "id": "25f1482d3e6310798f46107cb896d1377210dde9f01acefdb9b028ab476e6d2e",
+            "title": "SixPackWindow",
+            "path": "six-pack/src/editor.rs",
+            "file": "148be9a477ad65cb5a6a8ee742545301698aa01aea9e355e87e9af0095e36a30",
+            "version": "07d99990f9c918cdf76bb853ac51e3f31f88bb1139f9c4a06f7a82028effe9a9",
+            "line": 128,
+            "end_line": 137,
+            "excerpt": "    /// post-saturation RMS each block; GUI reads it lock-free.\n    pub(crate) band_activity_bins: Arc<[AtomicU32; 6]>,\n    /// EMA-smoothed display values, GUI-thread-only. Used to glow each\n    /// band dot proportionally to its current saturation activity.\n    pub(crate) display_band_activity: [f32; 6],\n\n    text_renderer: widgets::TextRenderer,\n    drag: widgets::DragState<HitAction>,\n    text_edit: widgets::TextEditState<HitAction>,\n\n",
+            "suggested_role": null,
+            "scope": {
+              "name": "SixPackWindow",
+              "kind": "struct",
+              "parents": []
+            }
+          },
+          {
+            "id": "b356052e7fe84089bc6dcd4ac80e671992cebafb752d7b886a3b8a9ae19520df",
+            "title": "lib.rs",
+            "path": "tract-dsp/src/lib.rs",
+            "file": "09ede65fe9c707006231ad2290bb3c78d64c1c9a36fe0981f5cc42b8cf055297",
+            "version": "ef3694859d32ded5725c5edf985b550a81019bd1ae13efb57b36431fc5b20349",
+            "line": 1,
+            "end_line": 10,
+            "excerpt": "//! `tract-dsp` — shared, GUI-free DSP primitives for the tract-plugin-pack\n//! workspace.\n//!\n//! This crate contains pure signal-processing code only. It has no\n//! `nih-plug`, `tiny-skia`, `softbuffer`, or editor dependency. By default it\n//! uses `fearless_simd` for stable-compatible SIMD. The optional\n//! `stft` feature adds `realfft`/`rustfft` and enables the `stft` module; the\n//! optional `stft-analysis` feature adds `rustfft` and enables the\n//! `stft_analysis` module.\n//!\n",
+            "suggested_role": null,
+            "scope": null
+          },
+          {
+            "id": "e5b3ef4b363912504dde612babd38bb2f01c15682780172cdd89227c0669e5a6",
+            "title": "GainBrain",
+            "path": "gain-brain/src/lib.rs",
+            "file": "8bfe7d70e680a46b098f7bd86e40e11e5ccf4a2429afaccc7f7d9590d19fbaad",
+            "version": "1101c66e5d27389bbdc84c058d4affc5ab1b923b4e0b5d246914d72102ae932e",
+            "line": 110,
+            "end_line": 115,
+            "excerpt": "    /// Shared holder for the GuiContext, populated when the editor is first\n    /// spawned. Used by `task_executor` (on the main thread) to update the\n    /// host-visible gain parameter when group sync changes the effective gain.\n    /// Stays populated even after the editor window is closed since the\n    /// GuiContext Arc remains valid for the plugin's lifetime.\n    pub gui_context: Arc<std::sync::Mutex<Option<Arc<dyn GuiContext>>>>,\n",
+            "suggested_role": null,
+            "scope": {
+              "name": "GainBrain",
+              "kind": "struct",
+              "parents": []
+            }
+          },
+          {
+            "id": "eeb64bd97c55549ef3cd34817b43c5abbe41189d7bded335f857e02ff89112fe",
+            "title": "MultosisParams",
+            "path": "multosis/src/lib.rs",
+            "file": "34c44694242601a8fbf900093154a3b63cdbd8a5789b4ed39dfe17b97521b4d7",
+            "version": "3ce092375fa2bc930d40212ee648c3f027ae332a393d35caef23fbf891b91628",
+            "line": 34,
+            "end_line": 45,
+            "excerpt": "    #[persist = \"editor-state\"]\n    pub editor_state: std::sync::Arc<tiny_skia_widgets::EditorState>,\n\n    /// The routing grid — persisted plugin state, edited by the GUI (Milestone\n    /// 1b-ii). `Arc<Mutex<Grid>>` is nih-plug's `PersistentField` shape.\n    #[persist = \"grid\"]\n    pub grid: Arc<Mutex<Grid>>,\n\n    /// Per-track effect configuration — persisted plugin state.\n    #[persist = \"track-effects\"]\n    pub track_effects: Arc<Mutex<[crate::effects::TrackEffect; 16]>>,\n\n",
+            "suggested_role": null,
+            "scope": {
+              "name": "MultosisParams",
+              "kind": "struct",
+              "parents": []
+            }
+          },
+          {
+            "id": "aa5e28601432af6b4e2783aa4da8481c5c4b38f371c7b38e45f201c9b8715128",
+            "title": "ClapPlugin for SixPack",
+            "path": "six-pack/src/lib.rs",
+            "file": "1b2db071885f77e9b649c709bb3fdf85d604c63bc924156b28c0d1497d58daaf",
+            "version": "70e75206af2ab97f80589f50230a3132d0219ad65b2a5994c4f4b252a0151672",
+            "line": 647,
+            "end_line": 657,
+            "excerpt": "impl ClapPlugin for SixPack {\n    const CLAP_ID: &'static str = \"com.mpd.six-pack\";\n    const CLAP_DESCRIPTION: Option<&'static str> = Some(\"6-band parallel multiband saturator\");\n    const CLAP_MANUAL_URL: Option<&'static str> = None;\n    const CLAP_SUPPORT_URL: Option<&'static str> = None;\n    const CLAP_FEATURES: &'static [ClapFeature] = &[\n        ClapFeature::AudioEffect,\n        ClapFeature::Stereo,\n        ClapFeature::Distortion,\n    ];\n}",
+            "suggested_role": null,
+            "scope": {
+              "name": "ClapPlugin for SixPack",
+              "kind": "implementation",
+              "parents": []
+            }
+          },
+          {
+            "id": "47a56312dcf4d734ecbc852d8eff264ed2a53eb024503b3e04a9109ee80eafe7",
+            "title": "EditorHandle::new",
+            "path": "tiny-skia-widgets/src/editor_base.rs",
+            "file": "fabc85771df66fae6482e2d6dd0fd8937d476ac6376a0d7f4deac3819c7637ca",
+            "version": "610010cf21439ae04889f5b5273ff1b1948098cf9ea1f176d2ff8e5c3ec0f551",
+            "line": 84,
+            "end_line": 98,
+            "excerpt": "    }\n}\n\n/// # Safety\n///\n/// The WindowHandle is created by baseview from the host-provided parent window\n/// and is only used on the GUI thread. The `Send` bound is required by nih-plug's\n/// `Editor::spawn` return type. This is safe as long as the handle is not accessed\n/// from multiple threads simultaneously, which nih-plug guarantees.\nunsafe impl Send for EditorHandle {}\n\nimpl Drop for EditorHandle {\n    fn drop(&mut self) {\n        self.state.set_open(false);\n        self.window.close();\n",
+            "suggested_role": null,
+            "scope": {
+              "name": "new",
+              "kind": "function",
+              "parents": [
+                "EditorHandle"
+              ]
+            }
+          },
+          {
+            "id": "c617269bbb840d5f972d07c84356da8d179db557eab4d35101e689e3214496a1",
+            "title": "Plugin for SixPack",
+            "path": "six-pack/src/lib.rs",
+            "file": "1b2db071885f77e9b649c709bb3fdf85d604c63bc924156b28c0d1497d58daaf",
+            "version": "70e75206af2ab97f80589f50230a3132d0219ad65b2a5994c4f4b252a0151672",
+            "line": 421,
+            "end_line": 433,
+            "excerpt": "impl Plugin for SixPack {\n    const NAME: &'static str = \"Six Pack\";\n    const VENDOR: &'static str = \"mpd\";\n    const URL: &'static str = \"\";\n    const EMAIL: &'static str = \"\";\n    const VERSION: &'static str = \"0.1.0\";\n    const AUDIO_IO_LAYOUTS: &'static [AudioIOLayout] = &[AudioIOLayout {\n        main_input_channels: NonZeroU32::new(2),\n        main_output_channels: NonZeroU32::new(2),\n        ..AudioIOLayout::const_default()\n    }];\n    const SAMPLE_ACCURATE_AUTOMATION: bool = true;\n\n",
+            "suggested_role": null,
+            "scope": {
+              "name": "Plugin for SixPack",
+              "kind": "implementation",
+              "parents": []
+            }
+          }
+        ]
+      },
+      "elapsedMs": 232.29779400000007,
+      "responseBytes": 7390
+    },
+    {
+      "case": "tract.minitosis-signal-path",
+      "selector": "original",
+      "recordedAt": "2026-11-07T23:33:22.935Z",
+      "data": {
+        "snapshot": "3914e03cdea7d45b897f070e71863a26ff013450219a7b115d3e9f08fb8bbbc7",
+        "question": "help me trace the signal path from input to output for minitosis",
+        "selector": "original",
+        "available_files": 231,
+        "searched_files": 231,
+        "omitted_files": 0,
+        "results": [
+          {
+            "id": "48d786c799157d1e2bb649c5d373b38e88e4f06a93b14e8971e1f46063b5b278",
+            "title": "SixPack",
+            "path": "six-pack/src/lib.rs",
+            "file": "1b2db071885f77e9b649c709bb3fdf85d604c63bc924156b28c0d1497d58daaf",
+            "version": "70e75206af2ab97f80589f50230a3132d0219ad65b2a5994c4f4b252a0151672",
+            "line": 168,
+            "end_line": 177,
+            "excerpt": "    sample_rate: f32,\n    os: StereoOversampler,\n    max_block: usize,\n    pub spectrum: SpectrumAnalyzer,\n    /// Spectrum of the wet path — what Six Pack is *adding* to the dry\n    /// signal, sampled at native rate from inside the OS loop. Drives the\n    /// \"harmonics added\" overlay so users can see the plugin's contribution\n    /// even at low drive where the output spectrum looks indistinguishable\n    /// from the input.\n    pub spectrum_wet: SpectrumAnalyzer,\n",
+            "suggested_role": null,
+            "scope": {
+              "name": "SixPack",
+              "kind": "struct",
+              "parents": []
+            }
+          },
+          {
+            "id": "cae3babd0aee7a69da6f14e068fa4028c876af3bf17943c50bf9afc7237c13df",
+            "title": "Plugin for Minitosis",
+            "path": "minitosis/src/lib.rs",
+            "file": "ceffc8506069856cd6e524dab6e0c738310d5237cc0b97a0e7f53d99b01ff93b",
+            "version": "b192dbc9d0dc699b975b5bdef31b201a09620b6dc39524b11f2bd8f7e6b27711",
+            "line": 184,
+            "end_line": 194,
+            "excerpt": "impl Plugin for Minitosis {\n    const NAME: &'static str = \"Minitosis\";\n    const VENDOR: &'static str = \"mpd\";\n    const URL: &'static str = \"\";\n    const EMAIL: &'static str = \"\";\n    const VERSION: &'static str = env!(\"CARGO_PKG_VERSION\");\n    const AUDIO_IO_LAYOUTS: &'static [AudioIOLayout] = &[AudioIOLayout {\n        main_input_channels: std::num::NonZeroU32::new(2),\n        main_output_channels: std::num::NonZeroU32::new(2),\n        ..AudioIOLayout::const_default()\n    }];\n",
+            "suggested_role": null,
+            "scope": {
+              "name": "Plugin for Minitosis",
+              "kind": "implementation",
+              "parents": []
+            }
+          },
+          {
+            "id": "afd224b9c7a4cc9577f8c264f07c44ccf9ec7a1efbe354b4c95ea19a57fcce66",
+            "title": "AnalyticSignal",
+            "path": "tract-dsp/src/hilbert.rs",
+            "file": "488cf6cf9765f0cba5157104f107cf562c38cbcaf4d023ef4beeb841d7bfa729",
+            "version": "537b813d7bfb908afe04aa36bd83a6b51e9d4c448984762d1cb3a3dfd805b9f0",
+            "line": 110,
+            "end_line": 116,
+            "excerpt": "pub struct AnalyticSignal {\n    hilbert: HilbertFir,\n    /// Ring-buffer delay matched to the Hilbert FIR's group delay; the\n    /// `real` output is the input read out from this delay.\n    delay: Vec<f32>,\n    delay_idx: usize,\n}",
+            "suggested_role": null,
+            "scope": {
+              "name": "AnalyticSignal",
+              "kind": "struct",
+              "parents": []
+            }
+          },
+          {
+            "id": "2eabaab19124f4cea8d3fb9d0fc171c73e85a2264d8ca7614f4992e8874fa263",
+            "title": "delay.rs",
+            "path": "tract-effects/src/effects/delay.rs",
+            "file": "60cde3ded0e442a48dcf4159cac41b0f31d913f72da83880f709c3863499ae4c",
+            "version": "fd64d4adc1c42596eaac70099752468ed84b912141e767b54a5f4150d4c8831b",
+            "line": 8,
+            "end_line": 16,
+            "excerpt": "/// the subdivision is converted to samples using the host's current BPM\n/// (cached via `set_bpm`).\n///\n/// **Feedback** scales the delay-line output back into its input\n/// (chorus-style feedback, capped at 0.95 to prevent runaway).\n///\n/// **Duck** envelope-follows the input level and attenuates the delayed\n/// output proportionally — at full Duck, loud input fully silences the\n/// delay, leaving the dry signal clear; the delay swells in as the\n",
+            "suggested_role": null,
+            "scope": null
+          },
+          {
+            "id": "08ff084e87a2e5ea33f95a520dd2549ed3fbea7698b3dada641fce5e0dab4cf1",
+            "title": "Drop for MinitosisWindow",
+            "path": "minitosis/src/editor.rs",
+            "file": "3e15bad38be6c1febd842cc68666ae73fcafa938802e4c114bce1c2ec11e7cec",
+            "version": "1947456f203ed537a0a942e05f200422c0d726e45ad3fa006bdb93aa8e5ebb1f",
+            "line": 648,
+            "end_line": 653,
+            "excerpt": "impl Drop for MinitosisWindow {\n    fn drop(&mut self) {\n        self.end_effect_gestures();\n        self.end_output_drag();\n    }\n}",
+            "suggested_role": null,
+            "scope": {
+              "name": "Drop for MinitosisWindow",
+              "kind": "implementation",
+              "parents": []
+            }
+          },
+          {
+            "id": "5f40789cbc1ec62962030c58a1251d980d9f042c9aab90793df01bd94a596daa",
+            "title": "baseview::WindowHandler for MinitosisWindow",
+            "path": "minitosis/src/editor.rs",
+            "file": "3e15bad38be6c1febd842cc68666ae73fcafa938802e4c114bce1c2ec11e7cec",
+            "version": "1947456f203ed537a0a942e05f200422c0d726e45ad3fa006bdb93aa8e5ebb1f",
+            "line": 484,
+            "end_line": 494,
+            "excerpt": "impl baseview::WindowHandler for MinitosisWindow {\n    fn on_frame(&mut self, window: &mut baseview::Window) {\n        widgets::consume_pending_resize(&self.pending_resize, (self.width, self.height), window);\n        self.sync_selection();\n        let output_edit = self\n            .output_text\n            .active_for(&())\n            .map(|text| (text, self.output_text.caret_visible()));\n        draw_frame(\n            &mut self.surface.pixmap,\n            &mut self.renderer,\n",
+            "suggested_role": null,
+            "scope": {
+              "name": "baseview::WindowHandler for MinitosisWindow",
+              "kind": "implementation",
+              "parents": []
+            }
+          },
+          {
+            "id": "8d7cba83145c96449024e63bab26d8cad24480af528afad46e9f4c042c5f3d40",
+            "title": "Effect for FmEffect::process_sample",
+            "path": "tract-effects/src/effects/fm.rs",
+            "file": "dc86dd19e562625db36fc259a0d6d21a68d0d9ebd8b1535603817a40270d116f",
+            "version": "7efb790872a0eafac1713336a5330e208ffcf474155ac98e5d63aa9fa46bd0d9",
+            "line": 200,
+            "end_line": 207,
+            "excerpt": "            // self-modulation), enriching the timbre.\n            //\n            // No input gate needed — the analytic signal of silence is\n            // silence, so a silent input naturally yields a silent output.\n            let mod_sine = (self.mod_phase * two_pi).sin();\n            self.mod_phase = (self.mod_phase + phase_inc).rem_euclid(1.0);\n            let theta_mod = if self.topology < 0.5 {\n                // PM: instantaneous rotation = depth · modulator.\n",
+            "suggested_role": null,
+            "scope": {
+              "name": "process_sample",
+              "kind": "function",
+              "parents": [
+                "Effect for FmEffect"
+              ]
+            }
+          },
+          {
+            "id": "da2de1269ea441e62b18c8159b1e403a35a6927fbf4ab0d4139a6ccd385aadee",
+            "title": "draw",
+            "path": "six-pack/src/editor/bottom_strip.rs",
+            "file": "56670995dc841039e6603c3974415968c9a4eb54b3c9c77e993338ce68eb4e95",
+            "version": "87f0b579009ca074d75672c9dbc355a3b4b151c2712bc56fd7b55ecf74facfab",
+            "line": 52,
+            "end_line": 59,
+            "excerpt": "        (GlobalDialId::Mix, \"\", 0.0, String::new(), None),\n    ];\n    // When I/O Link is on, the audio path uses `output_gain = 1 / input_gain`\n    // (i.e. `output_dB = -input_dB`) directly and ignores the Output param's\n    // stored value. Mirror the Output dial's display to match: same magnitude,\n    // opposite sign in dB, which by symmetry of the gain skew is exactly\n    // `1 − input_normalized` on the dial.\n    let io_linked = win.params.io_link.value();\n",
+            "suggested_role": null,
+            "scope": {
+              "name": "draw",
+              "kind": "function",
+              "parents": []
+            }
+          }
+        ]
+      },
+      "elapsedMs": 229.64284700000007,
+      "responseBytes": 6881
+    },
+    {
+      "case": "tract.minitosis-signal-path",
+      "selector": "focused",
+      "recordedAt": "2026-11-07T23:33:23.202Z",
+      "data": {
+        "snapshot": "3914e03cdea7d45b897f070e71863a26ff013450219a7b115d3e9f08fb8bbbc7",
+        "question": "help me trace the signal path from input to output for minitosis",
+        "selector": "focused",
+        "available_files": 231,
+        "searched_files": 231,
+        "omitted_files": 0,
+        "results": [
+          {
+            "id": "b47adf268faa8e07da097a2ef5a8915eb742d19c2e63eb576d712eff3a40e41d",
+            "title": "MinitosisWindow::commit_output_text",
+            "path": "minitosis/src/editor.rs",
+            "file": "3e15bad38be6c1febd842cc68666ae73fcafa938802e4c114bce1c2ec11e7cec",
+            "version": "1947456f203ed537a0a942e05f200422c0d726e45ad3fa006bdb93aa8e5ebb1f",
+            "line": 427,
+            "end_line": 437,
+            "excerpt": "fn commit_output_text(&mut self) {\n        if let Some(((), text)) = self.output_text.commit()\n            && let Some(norm) = self\n                .params\n                .output\n                .string_to_normalized_value(&text)\n                .filter(|v| v.is_finite())\n        {\n            let setter = ParamSetter::new(self.gui_context.as_ref());\n            setter.begin_set_parameter(&self.params.output);\n            setter.set_parameter_normalized(&self.params.output, norm);\n",
+            "suggested_role": "entry",
+            "scope": {
+              "name": "commit_output_text",
+              "kind": "function",
+              "parents": [
+                "MinitosisWindow"
+              ]
+            }
+          },
+          {
+            "id": "5a22d06a9b62e741f6ca15781411e58eb4c7880682a7e72e7f420376b469ca7b",
+            "title": "ClickTracker<A>::check_and_update",
+            "path": "tract-effects/src/editor/mod.rs",
+            "file": "45e173283a3607109523c3953d481fa0a8e58e3a2bafa1a4d569eb4c6c9de8b7",
+            "version": "b81b57c51e8269d58051ab20987daafd2f220298348c0a85ae1000baf34574f3",
+            "line": 1384,
+            "end_line": 1386,
+            "excerpt": "pub fn check_and_update(&mut self, action: A) -> bool {\n        self.check_and_update_at(action, std::time::Instant::now())\n    }",
+            "suggested_role": "validation",
+            "scope": {
+              "name": "check_and_update",
+              "kind": "function",
+              "parents": [
+                "ClickTracker<A>"
+              ]
+            }
+          },
+          {
+            "id": "ab5a68b4a64d9b0dd0d300318cfe3a6e1e4a1aa7ebc95b9867295c9b632bb35d",
+            "title": "Session<'a>::commit_dial_text_edit",
+            "path": "tract-effects/src/editor/mod.rs",
+            "file": "45e173283a3607109523c3953d481fa0a8e58e3a2bafa1a4d569eb4c6c9de8b7",
+            "version": "b81b57c51e8269d58051ab20987daafd2f220298348c0a85ae1000baf34574f3",
+            "line": 1072,
+            "end_line": 1084,
+            "excerpt": "fn commit_dial_text_edit(&mut self, i: usize, text: &str) {\n        let Some(spec) = self.param_spec(i) else {\n            return;\n        };\n        let Some(v) = effects::parse_value(text, spec.format) else {\n            return;\n        };\n        let clamped = v.clamp(spec.min, spec.max);\n\n        self.effect.params[i] = clamped;\n\n        self.response.changed = true;\n    }",
+            "suggested_role": "entry",
+            "scope": {
+              "name": "commit_dial_text_edit",
+              "kind": "function",
+              "parents": [
+                "Session<'a>"
+              ]
+            }
+          },
+          {
+            "id": "07859f4c92cac9bf2dcb7700904168bfbebf7ed5840df03b71ff4b5397df98ef",
+            "title": "ClickTracker<A>::check_and_update_at",
+            "path": "tract-effects/src/editor/mod.rs",
+            "file": "45e173283a3607109523c3953d481fa0a8e58e3a2bafa1a4d569eb4c6c9de8b7",
+            "version": "b81b57c51e8269d58051ab20987daafd2f220298348c0a85ae1000baf34574f3",
+            "line": 1388,
+            "end_line": 1394,
+            "excerpt": "fn check_and_update_at(&mut self, action: A, now: std::time::Instant) -> bool {\n        let is_double = self.last_action == Some(action)\n            && now.duration_since(self.last_time).as_millis() < DOUBLE_CLICK_MS;\n        self.last_time = now;\n        self.last_action = Some(action);\n        is_double\n    }",
+            "suggested_role": "validation",
+            "scope": {
+              "name": "check_and_update_at",
+              "kind": "function",
+              "parents": [
+                "ClickTracker<A>"
+              ]
+            }
+          },
+          {
+            "id": "c684e3cd39ba09125fb4adbab1f77d5911d0b949f3916fa5bd58f433ccc68499",
+            "title": "Session<'a>::commit_mix_text_edit",
+            "path": "tract-effects/src/editor/mod.rs",
+            "file": "45e173283a3607109523c3953d481fa0a8e58e3a2bafa1a4d569eb4c6c9de8b7",
+            "version": "b81b57c51e8269d58051ab20987daafd2f220298348c0a85ae1000baf34574f3",
+            "line": 1086,
+            "end_line": 1097,
+            "excerpt": "fn commit_mix_text_edit(&mut self, text: &str) {\n        let cleaned = text.trim();\n        if let Ok(pct) = cleaned.parse::<f32>()\n            && pct.is_finite()\n        {\n            let value = (pct / 100.0).clamp(0.0, 1.0);\n\n            self.effect.mix = value;\n\n            self.response.changed = true;\n        }\n    }",
+            "suggested_role": "entry",
+            "scope": {
+              "name": "commit_mix_text_edit",
+              "kind": "function",
+              "parents": [
+                "Session<'a>"
+              ]
+            }
+          },
+          {
+            "id": "9ae3f7e762f67dac8f65166801b0e4489356277215c2356b14b75c49d4a21219",
+            "title": "Session<'a>::mseg_double_click_check",
+            "path": "tract-effects/src/editor/mod.rs",
+            "file": "45e173283a3607109523c3953d481fa0a8e58e3a2bafa1a4d569eb4c6c9de8b7",
+            "version": "b81b57c51e8269d58051ab20987daafd2f220298348c0a85ae1000baf34574f3",
+            "line": 997,
+            "end_line": 999,
+            "excerpt": "fn mseg_double_click_check(&mut self, x: f32, y: f32) -> bool {\n        self.mseg_double_click_check_at(x, y, std::time::Instant::now())\n    }",
+            "suggested_role": "validation",
+            "scope": {
+              "name": "mseg_double_click_check",
+              "kind": "function",
+              "parents": [
+                "Session<'a>"
+              ]
+            }
+          },
+          {
+            "id": "d7ca7343042d7671f17891bffe13bd82d9684be12b96233925fdafb1e21c79b2",
+            "title": "MultosisWindow::swap_tracks",
+            "path": "multosis/src/editor.rs",
+            "file": "4c7a606cdcc3c27b16f6e7420ad9b836b44b92fe09e68daf904cccf6f2b6824a",
+            "version": "60c098d06c17bfd602c00a8247a398509b1e7efcba4550b034ac5cd42b45db7d",
+            "line": 533,
+            "end_line": 540,
+            "excerpt": "        ) {\n            track_list::swap_rows_pure(&mut grid, &mut effects, &mut modu, from, to);\n            // Re-publish the freshly swapped grid through the GUI→audio\n            // handoff so the audio thread sees the new cell layout before\n            // the next process block (matches every other grid edit).\n            self.grid_handoff.publish(*grid);\n        }\n        // Encode (from, to) for the audio thread's swap consumer.\n",
+            "suggested_role": "entry",
+            "scope": {
+              "name": "swap_tracks",
+              "kind": "function",
+              "parents": [
+                "MultosisWindow"
+              ]
+            }
+          },
+          {
+            "id": "115ad8e58ee268fdb87b0b4c410bc12afc921ee473e557d5f8675814d8017563",
+            "title": "Session<'a>::mseg_double_click_check_at",
+            "path": "tract-effects/src/editor/mod.rs",
+            "file": "45e173283a3607109523c3953d481fa0a8e58e3a2bafa1a4d569eb4c6c9de8b7",
+            "version": "b81b57c51e8269d58051ab20987daafd2f220298348c0a85ae1000baf34574f3",
+            "line": 1001,
+            "end_line": 1009,
+            "excerpt": "fn mseg_double_click_check_at(&mut self, x: f32, y: f32, now: std::time::Instant) -> bool {\n        let elapsed_ms = now\n            .duration_since(self.state.mseg_last_click_time)\n            .as_millis();\n        let (px, py) = self.state.mseg_last_click_pos;\n        let dist_sq = (x - px) * (x - px) + (y - py) * (y - py);\n        let is_double = elapsed_ms < 400 && dist_sq < 64.0;\n        self.state.mseg_last_click_time = now;\n        self.state.mseg_last_click_pos = (x, y);\n",
+            "suggested_role": "validation",
+            "scope": {
+              "name": "mseg_double_click_check_at",
+              "kind": "function",
+              "parents": [
+                "Session<'a>"
+              ]
+            }
+          }
+        ]
+      },
+      "elapsedMs": 266.31332399999974,
+      "responseBytes": 6706
+    }
+  ],
+  "model": null,
+  "workers": 1,
+  "protocol": "Single untouched query per selector in the frozen counterbalanced order, before source/relevance audit. No inference, query rewriting, tuning or editor launch. Single observations are not latency distributions."
+}
