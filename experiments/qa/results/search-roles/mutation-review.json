@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "scope": "Whole final discovery.rs; focused unmodified baseline, 101 variants. Earlier preparatory run is separate because the callable-name filter changed production code.",
+  "counts": {
+    "caught": 93,
+    "equivalentSurvivors": 4,
+    "unviable": 3,
+    "timeouts": 1
+  },
+  "reviews": [
+    {
+      "name": "crates/vizzi-qa/src/discovery.rs:19:5: replace plan -> Option<Plan> with Some(Default::default())",
+      "status": "Unviable",
+      "reason": "Generated default replacement does not satisfy return-type/Default requirements; compiler output is preserved separately.",
+      "compilerErrors": [
+        "error[E0277]: the trait bound `Plan: Default` is not satisfied"
+      ],
+      "log": "validation/reviewed/crates__vizzi-qa__src__discovery.rs-19-5.log.gz",
+      "diff": "validation/reviewed/crates__vizzi-qa__src__discovery.rs-19-5.diff.gz"
+    },
+    {
+      "name": "crates/vizzi-qa/src/discovery.rs:80:42: replace | with ^ in bits",
+      "status": "MissedMutant",
+      "reason": "Each bounded key has a distinct bit position in this fold, so OR and XOR return identical masks.",
+      "compilerErrors": [],
+      "log": "validation/reviewed/crates__vizzi-qa__src__discovery.rs-80-42.log.gz",
+      "diff": "validation/reviewed/crates__vizzi-qa__src__discovery.rs-80-42.diff.gz"
+    },
+    {
+      "name": "crates/vizzi-qa/src/discovery.rs:124:5: replace diversify -> Vec<Candidate<'a>> with vec![Default::default()]",
+      "status": "Unviable",
+      "reason": "Generated default replacement does not satisfy return-type/Default requirements; compiler output is preserved separately.",
+      "compilerErrors": [
+        "error[E0277]: the trait bound `Candidate<'_>: Default` is not satisfied"
+      ],
+      "log": "validation/reviewed/crates__vizzi-qa__src__discovery.rs-124-5.log.gz",
+      "diff": "validation/reviewed/crates__vizzi-qa__src__discovery.rs-124-5.diff.gz"
+    },
+    {
+      "name": "crates/vizzi-qa/src/discovery.rs:148:9: replace Corpus::retrieve_search -> Result<Context, Error> with Ok(Default::default())",
+      "status": "Unviable",
+      "reason": "Generated default replacement does not satisfy return-type/Default requirements; compiler output is preserved separately.",
+      "compilerErrors": [
+        "error[E0277]: the trait bound `Context: Default` is not satisfied"
+      ],
+      "log": "validation/reviewed/crates__vizzi-qa__src__discovery.rs-148-9.log.gz",
+      "diff": "validation/reviewed/crates__vizzi-qa__src__discovery.rs-148-9.diff.gz"
+    },
+    {
+      "name": "crates/vizzi-qa/src/discovery.rs:149:41: replace && with || in Corpus::retrieve_search",
+      "status": "MissedMutant",
+      "reason": "Compact retrieval revalidates the same question/count/byte bounds on both recognised and delegated paths before those bounds drive preview allocation. Rejection is unchanged; early diagnostics/work differ. Invalid-input performance is outside mutation checks.",
+      "compilerErrors": [],
+      "log": "validation/reviewed/crates__vizzi-qa__src__discovery.rs-149-41.log.gz",
+      "diff": "validation/reviewed/crates__vizzi-qa__src__discovery.rs-149-41.diff.gz"
+    },
+    {
+      "name": "crates/vizzi-qa/src/discovery.rs:153:38: replace && with || in Corpus::retrieve_search",
+      "status": "MissedMutant",
+      "reason": "Compact retrieval revalidates the same question/count/byte bounds on both recognised and delegated paths before those bounds drive preview allocation. Rejection is unchanged; early diagnostics/work differ. Invalid-input performance is outside mutation checks.",
+      "compilerErrors": [],
+      "log": "validation/reviewed/crates__vizzi-qa__src__discovery.rs-153-38.log.gz",
+      "diff": "validation/reviewed/crates__vizzi-qa__src__discovery.rs-153-38.diff.gz"
+    },
+    {
+      "name": "crates/vizzi-qa/src/discovery.rs:171:46: replace == with != in Corpus::retrieve_search",
+      "status": "MissedMutant",
+      "reason": "Disjoint operation vocabularies prevent all masks being nonzero. Processing all-zero flags only ORs zeros into accumulators. Results are identical; the removed optimization is not performance-tested by correctness mutation checks.",
+      "compilerErrors": [],
+      "log": "validation/reviewed/crates__vizzi-qa__src__discovery.rs-171-46.log.gz",
+      "diff": "validation/reviewed/crates__vizzi-qa__src__discovery.rs-171-46.diff.gz"
+    },
+    {
+      "name": "crates/vizzi-qa/src/discovery.rs:346:16: delete ! in Corpus::retrieve_search",
+      "status": "Timeout",
+      "reason": "Deleting the exhausted-pool negation makes a missing recognised topic fail to terminate. This is a generated-program timeout, not a mutation caught by test failure. Unmodified empty-topic and measured-cohort checks pass.",
+      "compilerErrors": [],
+      "log": "validation/reviewed/crates__vizzi-qa__src__discovery.rs-346-16.log.gz",
+      "diff": "validation/reviewed/crates__vizzi-qa__src__discovery.rs-346-16.diff.gz"
+    }
+  ],
+  "preparation": "A stronger ancestor fixture failed the attempted survivor-run baseline. That run tested zero mutants; direct name credit was then restricted to callable declarations, focused tests passed and the entire final module was tested anew.",
+  "sourceSha256": "50b37988b9b56a70c5ef4723d4f5bed59d3ca3bcc521b5af823be20c585fb139",
+  "node": {
+    "rerun": false,
+    "sourceUnchanged": true,
+    "retainedCaught": 211,
+    "retainedEquivalentSurvivors": 9,
+    "evidence": "experiments/qa/results/search-coverage/mutation-review.json"
+  },
+  "limits": "Timeout and compile failures remain separate from caught mutations. Result/rejection equivalents do not qualify optimization or invalid-input performance. Mutation evidence is not proof."
+}

@@ -2,31 +2,50 @@
 use crate::{Context, Corpus, Error, SourceRole, SourceScope, compact, excerpt, require};
 use std::{cmp::Reverse, collections::BTreeSet, ops::Range};
 
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Role {
+    Definition,
+    Entry,
+    Registration,
+    Example,
+    Validation,
+}
 struct Plan {
     topics: BTreeSet<String>,
     facets: [BTreeSet<String>; 2],
+    roles: [Role; 2],
 }
 fn plan(query: &BTreeSet<String>) -> Option<Plan> {
-    let facets = if !query.is_disjoint(&compact::words("add extend register registration plugin")) {
-        [
-            "register registry registration table prototype dispatch macro arity signature",
-            "implement implementation example handler context result",
-        ]
-    } else if !query.is_disjoint(&compact::words(
-        "new create created creation construct constructor instantiate",
-    )) {
-        [
-            "new create created creation constructor construct instantiate init initial",
-            "start begin open attempt allocate spawn make",
-        ]
-    } else if !query.is_disjoint(&compact::words("codepath trace")) {
-        [
-            "commit submit send dispatch deliver publish",
-            "validate validation check conflict reject rejection ensure guard",
-        ]
-    } else {
-        return None;
-    };
+    let (facets, roles) =
+        if !query.is_disjoint(&compact::words("add extend register registration plugin")) {
+            (
+                [
+                    "register registry registration table prototype dispatch macro arity signature",
+                    "implement implementation example handler context result",
+                ],
+                [Role::Registration, Role::Example],
+            )
+        } else if !query.is_disjoint(&compact::words(
+            "new create created creation construct constructor instantiate",
+        )) {
+            (
+                [
+                    "new create created creation constructor construct instantiate init initial",
+                    "start begin open attempt allocate spawn make",
+                ],
+                [Role::Definition, Role::Entry],
+            )
+        } else if !query.is_disjoint(&compact::words("codepath trace")) {
+            (
+                [
+                    "commit submit send dispatch deliver publish",
+                    "validate validation check conflict reject rejection ensure guard",
+                ],
+                [Role::Entry, Role::Validation],
+            )
+        } else {
+            return None;
+        };
     let ignored = compact::words(
         "show me code codepath path take takes all check checks they go through please find locate location located happen happens source implementation function method functions methods new create created creation construct constructor instantiate add extend extension register registration plugin start",
     );
@@ -42,6 +61,7 @@ fn plan(query: &BTreeSet<String>) -> Option<Plan> {
     Some(Plan {
         topics,
         facets: facets.map(compact::words),
+        roles,
     })
 }
 fn matches(topic: &str, term: &str) -> bool {
@@ -179,18 +199,33 @@ impl Corpus {
             let scope_topic = text_bits(&scope_text, &plan.topics, true).count_ones();
             for (facet, pool) in pools.iter_mut().enumerate() {
                 let body = masks[index][facet + 1];
-                let named = text_bits(&scope_text, &plan.facets[facet], false).count_ones();
-                if body == 0 && named == 0 {
+                let contextual = text_bits(&scope_text, &plan.facets[facet], false).count_ones();
+                if body == 0 && contextual == 0 {
                     continue;
                 }
+                let role = plan.roles[facet];
+                let named = scope
+                    .filter(|s| matches!(s.label.kind.as_str(), "function" | "method"))
+                    .map_or(0, |s| {
+                        text_bits(&s.label.name, &plan.facets[facet], false).count_ones()
+                    })
+                    + u32::from(
+                        role == Role::Registration
+                            && scope.is_some_and(|s| s.label.kind == "macro"),
+                    );
+                let definition_owned = if matches!(role, Role::Definition | Role::Registration) {
+                    owned.count_ones()
+                } else {
+                    0
+                };
                 pool.push(Candidate {
                     index,
                     scope: scope.map_or(window.range.start, |s| s.range.start),
                     family: scope.map(|s| (s.label.kind.as_str(), s.label.name.as_str())),
                     priority: (
                         tier(&file.path, file.metadata.role_for(&window.range)),
-                        Reverse(owned.count_ones()),
                         Reverse(named),
+                        Reverse(definition_owned),
                         Reverse(body.count_ones()),
                         Reverse(topic.count_ones()),
                         Reverse(scope_topic),

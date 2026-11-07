@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "allFrozenHashesStillMatch": true,
+  "ownedNativeStopped": true,
+  "sourceSha256": {
+    "crates/vizzi-qa/src/discovery.rs": "50b37988b9b56a70c5ef4723d4f5bed59d3ca3bcc521b5af823be20c585fb139",
+    "crates/vizzi-qa/tests/search_roles.rs": "f297bfdd52e1ccd570483f047ba92a7300803cf1be9a191b78cfca3ff0690911",
+    "experiments/qa/library/search-roles/cohort.json": "c4714f3b7101e1b5d1c2be3b54d4f174a5702eaebe0dea37a1a69e0b65ad24b0",
+    "experiments/qa/coverage-support.mjs": "1afffd50036869c34489efbfe55b8fc4d7ee3242462944dbe88b1b6789780c18"
+  },
+  "workspaceTestsAndDoctests": 490,
+  "serialQaTestFiles": 20,
+  "formattingAndClippyPassed": true,
+  "coreAndBrowserSourcesUnchanged": true,
+  "previousBrowserBaselineRetained": true,
+  "modelRequests": 0,
+  "reservedGenerations": 0
+}

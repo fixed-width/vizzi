@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "native": "490 fresh workspace tests/doctests pass; all-target Clippy, formatting and optimized host/observer build pass. Source-role/ownership/discovery/native protocol fixtures pass.",
+  "node": "20 serial QA test files pass; unchanged coverage-helper mutation baseline retained with identical source hash. Ninety native responses and result bindings pass real-source checks.",
+  "browser": "Core/browser/vizzi host unchanged from 7521c76, verified by source diff. Previous complete headless browser baseline retained, not rerun.",
+  "mutations": "Whole final module: 93 caught, 4 reviewed result/rejection equivalents, 3 unviable and 1 timeout. Earlier preparatory run and aborted unmodified baseline are preserved separately. One mutant/compiler/jobserver task, nice 10, serial tests.",
+  "measurement": "All correctness, mutation and build jobs finish before optimized serial queries. One native index, no model, nice 10. Owned process stops. PSS observation is not an enforced memory cap or laptop qualification.",
+  "limits": "Known development questions and source-aware frozen locators. No code execution, macro expansion, semantic call resolution, model inference or reserved-case queries; independent usefulness and fresh-question acceptance remain open."
+}

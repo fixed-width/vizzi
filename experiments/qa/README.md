@@ -15,6 +15,10 @@ at low query cost but loses the transaction constructor; it stays experimental. 
 The [ownership revision](SEARCH_OWNERSHIP_RESULTS.md) restores the constructor's exact
 baseline identity at rank 1 and moves the validator first, but loses the receiver and
 still misses the Task entry. Coverage remains 4/7, so the selector stays experimental.
+The [role-specific revision](SEARCH_ROLES_RESULTS.md) separates direct operation names
+from ownership and weak ancestor context. It recovers 6/7 preferred locators, including
+the Task entry and receiver, without losing broader controls. The table invocation still
+misses; [source cards](results/search-roles/trial.md) are ready for a usefulness walkthrough.
 
 This how-to is for contributors reproducing the experiment in
 [PRODUCT](../../docs/qa/PRODUCT.md) and [TECH](../../docs/qa/TECH.md). The experiment is

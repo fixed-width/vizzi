@@ -50,3 +50,8 @@ The [ownership revision](../../experiments/qa/SEARCH_OWNERSHIP_RESULTS.md) resto
 constructor and prioritises the validator, but ordinary members then displace an external
 receiver and the Task caller is still absent. Captured containment should help locate
 definitions without being mistaken for evidence of the usage/entry role a question asks for.
+The [role-specific follow-up](../../experiments/qa/SEARCH_ROLES_RESULTS.md) makes that
+distinction explicit: direct callable operation names precede ownership, and entry/validation
+pools do not inherit the definition ownership boost. It recovers the constructor, Task
+entry, macro, receiver and validator on the frozen development questions. The table
+invocation and broader gaps remain, so human task usefulness is still a separate test.
