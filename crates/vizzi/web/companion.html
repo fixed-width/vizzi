@@ -15,6 +15,7 @@
     <span id="source-state" role="status">Mapping source…</span>
     <details class="workspace-menu"><summary>More</summary><div>
       <a href="/review">Review changes</a><a href="/explore">Detailed source browser</a>
+      <a href="/investigate?trial=search">Try question search</a>
       <button id="add-source" type="button">Add a known source location</button>
       <button id="export" type="button">Export investigation</button>
       <label class="theme-control">Theme<select id="theme" aria-label="Theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
@@ -22,6 +23,15 @@
   </header>
   <p id="investigation-notice" role="status" hidden></p><p id="investigation-error" role="alert" hidden></p>
   <main class="companion-main">
+    <section id="question-search-panel" aria-label="Question source search" hidden>
+      <div class="discovery-heading"><h1 id="search-repository-title">Find a starting point in the code</h1><p>Ask a question, then inspect and keep useful source locations.</p></div>
+      <form id="source-question-form"><label for="source-question">Ask about this codebase<input id="source-question" type="search" maxlength="2048" autocomplete="off" placeholder="For example: where are new transactions created?"></label><div class="search-actions"><button type="submit">Search sources</button><button id="search-keep-question" type="button" disabled>Keep question</button></div></form>
+      <details id="search-comparison"><summary>Trial comparison</summary><label><input id="search-original" type="checkbox">Original matching</label><p>Compare the original matching order for the same captured source.</p></details>
+      <p id="search-scope">Searches captured indexed source.</p><p id="search-summary" role="status">Enter a question to find source starting points.</p>
+      <p id="search-stale" hidden>Source changed. Search again before keeping these results.</p>
+      <div id="search-results" aria-label="Suggested source groups" aria-busy="false"></div><p id="search-empty" hidden>No matches in the searched source. Try a symbol or rephrase the question.</p>
+      <button id="search-retry-index" type="button" hidden>Retry source indexing</button><p><a href="/">Browse repository areas instead</a></p>
+    </section>
     <section id="discovery-panel" aria-label="Repository overview">
       <div class="discovery-heading"><h1 id="repository-title">Explore this repository</h1><p id="discovery-summary">Preparing the source overview…</p></div>
       <label class="discovery-search" for="discover-search">Find a name or file<input id="discover-search" type="search" autocomplete="off" maxlength="256" placeholder="For example: reader, compile, test"></label>

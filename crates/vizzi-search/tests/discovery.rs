@@ -1,5 +1,5 @@
 //! Natural-language operation words do not replace the topic being searched for.
-use vizzi_qa::{Context, Corpus, SourceFile};
+use vizzi_search::{Context, Corpus, SourceFile};
 
 fn file(path: &str, text: &str) -> SourceFile {
     SourceFile {

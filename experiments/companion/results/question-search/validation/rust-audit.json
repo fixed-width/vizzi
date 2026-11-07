@@ -1,0 +1,3037 @@
+{
+  "generatedUnion": 86,
+  "latestDispositions": {
+    "CaughtMutant": 78,
+    "MissedMutant": 2,
+    "Unviable": 6
+  },
+  "reviewedEquivalents": [
+    {
+      "name": "crates/vizzi/src/companion.rs:335:21: delete field outline_count from struct WindowQuery expression in Companion::pin",
+      "reason": "Pinning reads Window.lines and discards Window.outline; deleting outline_count only changes unused metadata/effort."
+    },
+    {
+      "name": "crates/vizzi-search/src/lib.rs:346:26: replace > with >= in Corpus::replace_inputs",
+      "reason": "All range starts are strictly inside valid UTF-8 text: stride starts are below len; captured facts have nonempty validated spans, and built-in text analyzers emit nonempty spans. With a 1,800-byte window, end is always greater than start. Replacing > with >= cannot add an empty range through supported inputs."
+    }
+  ],
+  "excludedFromExecution": [],
+  "preparatoryRun": "Interrupted after 55 of 86 variants, following boundary-test gaps. Its caught/unviable variants are preserved by cargo-mutants iteration. Later completed runs cover the remaining variants.",
+  "limitations": [
+    "Six unviable mutations are build failures, not test catches.",
+    "This audit covers the new native/captured adapters and affected corpus methods; relocated ranking modules retain earlier evidence and are not newly qualified in full.",
+    "DOM/HTTP adapters are covered by integration tests but are not independently mutation-tested in full."
+  ],
+  "variants": [
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/companion.rs:299:9: replace Companion::pin_current -> Result<u32, CompanionError> with Ok(0)",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/companion.rs",
+        "function": {
+          "function_name": "Companion::pin_current",
+          "return_type": "-> Result<u32, CompanionError>",
+          "span": {
+            "start": {
+              "line": 297,
+              "column": 5
+            },
+            "end": {
+              "line": 305,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 299,
+            "column": 9
+          },
+          "end": {
+            "line": 304,
+            "column": 26
+          }
+        },
+        "replacement": "Ok(0)",
+        "genre": "FnValue"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/companion.rs:299:9: replace Companion::pin_current -> Result<u32, CompanionError> with Ok(1)",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/companion.rs",
+        "function": {
+          "function_name": "Companion::pin_current",
+          "return_type": "-> Result<u32, CompanionError>",
+          "span": {
+            "start": {
+              "line": 297,
+              "column": 5
+            },
+            "end": {
+              "line": 305,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 299,
+            "column": 9
+          },
+          "end": {
+            "line": 304,
+            "column": 26
+          }
+        },
+        "replacement": "Ok(1)",
+        "genre": "FnValue"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/companion.rs:299:43: replace != with == in Companion::pin_current",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/companion.rs",
+        "function": {
+          "function_name": "Companion::pin_current",
+          "return_type": "-> Result<u32, CompanionError>",
+          "span": {
+            "start": {
+              "line": 297,
+              "column": 5
+            },
+            "end": {
+              "line": 305,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 299,
+            "column": 43
+          },
+          "end": {
+            "line": 299,
+            "column": 45
+          }
+        },
+        "replacement": "==",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/companion.rs:333:21: delete field line_start from struct WindowQuery expression in Companion::pin",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/companion.rs",
+        "function": {
+          "function_name": "Companion::pin",
+          "return_type": "-> Result<u32, CompanionError>",
+          "span": {
+            "start": {
+              "line": 306,
+              "column": 5
+            },
+            "end": {
+              "line": 377,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 333,
+            "column": 21
+          },
+          "end": {
+            "line": 333,
+            "column": 52
+          }
+        },
+        "replacement": "",
+        "genre": "StructField"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/companion.rs:334:21: delete field line_count from struct WindowQuery expression in Companion::pin",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/companion.rs",
+        "function": {
+          "function_name": "Companion::pin",
+          "return_type": "-> Result<u32, CompanionError>",
+          "span": {
+            "start": {
+              "line": 306,
+              "column": 5
+            },
+            "end": {
+              "line": 377,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 334,
+            "column": 21
+          },
+          "end": {
+            "line": 334,
+            "column": 41
+          }
+        },
+        "replacement": "",
+        "genre": "StructField"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "MissedMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/companion.rs:335:21: delete field outline_count from struct WindowQuery expression in Companion::pin",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/companion.rs",
+        "function": {
+          "function_name": "Companion::pin",
+          "return_type": "-> Result<u32, CompanionError>",
+          "span": {
+            "start": {
+              "line": 306,
+              "column": 5
+            },
+            "end": {
+              "line": 377,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 335,
+            "column": 21
+          },
+          "end": {
+            "line": 335,
+            "column": 44
+          }
+        },
+        "replacement": "",
+        "genre": "StructField"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "Unviable",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:97:9: replace QuestionSearch::search -> Result<SearchResults, CompanionError> with Ok(Default::default())",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 97,
+            "column": 9
+          },
+          "end": {
+            "line": 217,
+            "column": 11
+          }
+        },
+        "replacement": "Ok(Default::default())",
+        "genre": "FnValue"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:97:47: replace || with && in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 97,
+            "column": 47
+          },
+          "end": {
+            "line": 97,
+            "column": 49
+          }
+        },
+        "replacement": "&&",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:97:73: replace > with == in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 97,
+            "column": 73
+          },
+          "end": {
+            "line": 97,
+            "column": 74
+          }
+        },
+        "replacement": "==",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:97:73: replace > with < in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 97,
+            "column": 73
+          },
+          "end": {
+            "line": 97,
+            "column": 74
+          }
+        },
+        "replacement": "<",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:97:73: replace > with >= in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 97,
+            "column": 73
+          },
+          "end": {
+            "line": 97,
+            "column": 74
+          }
+        },
+        "replacement": ">=",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:105:35: replace != with == in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 105,
+            "column": 35
+          },
+          "end": {
+            "line": 105,
+            "column": 37
+          }
+        },
+        "replacement": "==",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:130:27: replace != with == in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 130,
+            "column": 27
+          },
+          "end": {
+            "line": 130,
+            "column": 29
+          }
+        },
+        "replacement": "==",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:138:21: replace || with && in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 138,
+            "column": 21
+          },
+          "end": {
+            "line": 138,
+            "column": 23
+          }
+        },
+        "replacement": "&&",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:137:21: replace || with && in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 137,
+            "column": 21
+          },
+          "end": {
+            "line": 137,
+            "column": 23
+          }
+        },
+        "replacement": "&&",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:136:21: replace || with && in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 136,
+            "column": 21
+          },
+          "end": {
+            "line": 136,
+            "column": 23
+          }
+        },
+        "replacement": "&&",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:135:35: replace != with == in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 135,
+            "column": 35
+          },
+          "end": {
+            "line": 135,
+            "column": 37
+          }
+        },
+        "replacement": "==",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:136:36: replace > with == in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 136,
+            "column": 36
+          },
+          "end": {
+            "line": 136,
+            "column": 37
+          }
+        },
+        "replacement": "==",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:136:36: replace > with < in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 136,
+            "column": 36
+          },
+          "end": {
+            "line": 136,
+            "column": 37
+          }
+        },
+        "replacement": "<",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:136:36: replace > with >= in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 136,
+            "column": 36
+          },
+          "end": {
+            "line": 136,
+            "column": 37
+          }
+        },
+        "replacement": ">=",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:136:47: replace * with + in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 136,
+            "column": 47
+          },
+          "end": {
+            "line": 136,
+            "column": 48
+          }
+        },
+        "replacement": "+",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:136:47: replace * with / in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 136,
+            "column": 47
+          },
+          "end": {
+            "line": 136,
+            "column": 48
+          }
+        },
+        "replacement": "/",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:136:40: replace * with + in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 136,
+            "column": 40
+          },
+          "end": {
+            "line": 136,
+            "column": 41
+          }
+        },
+        "replacement": "+",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:136:40: replace * with / in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 136,
+            "column": 40
+          },
+          "end": {
+            "line": 136,
+            "column": 41
+          }
+        },
+        "replacement": "/",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:137:40: replace == with != in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 137,
+            "column": 40
+          },
+          "end": {
+            "line": 137,
+            "column": 42
+          }
+        },
+        "replacement": "!=",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:138:44: replace > with == in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 138,
+            "column": 44
+          },
+          "end": {
+            "line": 138,
+            "column": 45
+          }
+        },
+        "replacement": "==",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:138:44: replace > with < in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 138,
+            "column": 44
+          },
+          "end": {
+            "line": 138,
+            "column": 45
+          }
+        },
+        "replacement": "<",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:138:44: replace > with >= in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 138,
+            "column": 44
+          },
+          "end": {
+            "line": 138,
+            "column": 45
+          }
+        },
+        "replacement": ">=",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:138:30: replace + with - in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 138,
+            "column": 30
+          },
+          "end": {
+            "line": 138,
+            "column": 31
+          }
+        },
+        "replacement": "-",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:138:30: replace + with * in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 138,
+            "column": 30
+          },
+          "end": {
+            "line": 138,
+            "column": 31
+          }
+        },
+        "replacement": "*",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:138:56: replace * with + in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 138,
+            "column": 56
+          },
+          "end": {
+            "line": 138,
+            "column": 57
+          }
+        },
+        "replacement": "+",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:138:56: replace * with / in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 138,
+            "column": 56
+          },
+          "end": {
+            "line": 138,
+            "column": 57
+          }
+        },
+        "replacement": "/",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:138:49: replace * with + in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 138,
+            "column": 49
+          },
+          "end": {
+            "line": 138,
+            "column": 50
+          }
+        },
+        "replacement": "+",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:138:49: replace * with / in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 138,
+            "column": 49
+          },
+          "end": {
+            "line": 138,
+            "column": 50
+          }
+        },
+        "replacement": "/",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:142:23: replace += with -= in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 142,
+            "column": 23
+          },
+          "end": {
+            "line": 142,
+            "column": 25
+          }
+        },
+        "replacement": "-=",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:142:23: replace += with *= in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 142,
+            "column": 23
+          },
+          "end": {
+            "line": 142,
+            "column": 25
+          }
+        },
+        "replacement": "*=",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:203:48: replace != with == in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 203,
+            "column": 48
+          },
+          "end": {
+            "line": 203,
+            "column": 50
+          }
+        },
+        "replacement": "==",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:215:44: replace - with + in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 215,
+            "column": 44
+          },
+          "end": {
+            "line": 215,
+            "column": 45
+          }
+        },
+        "replacement": "+",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/question_search.rs:215:44: replace - with / in QuestionSearch::search",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/question_search.rs",
+        "function": {
+          "function_name": "QuestionSearch::search",
+          "return_type": "-> Result<SearchResults, CompanionError>",
+          "span": {
+            "start": {
+              "line": 95,
+              "column": 5
+            },
+            "end": {
+              "line": 218,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 215,
+            "column": 44
+          },
+          "end": {
+            "line": 215,
+            "column": 45
+          }
+        },
+        "replacement": "/",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:102:9: replace Context::search_roles -> &[SearchRole] with Vec::leak(Vec::new())",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Context::search_roles",
+          "return_type": "-> &[SearchRole]",
+          "span": {
+            "start": {
+              "line": 100,
+              "column": 5
+            },
+            "end": {
+              "line": 103,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 102,
+            "column": 9
+          },
+          "end": {
+            "line": 102,
+            "column": 20
+          }
+        },
+        "replacement": "Vec::leak(Vec::new())",
+        "genre": "FnValue"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "Unviable",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:102:9: replace Context::search_roles -> &[SearchRole] with Vec::leak(vec![Default::default()])",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Context::search_roles",
+          "return_type": "-> &[SearchRole]",
+          "span": {
+            "start": {
+              "line": 100,
+              "column": 5
+            },
+            "end": {
+              "line": 103,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 102,
+            "column": 9
+          },
+          "end": {
+            "line": 102,
+            "column": 20
+          }
+        },
+        "replacement": "Vec::leak(vec![Default::default()])",
+        "genre": "FnValue"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "Unviable",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:289:9: replace Corpus::replace_inputs -> Result<Update, Error> with Ok(Default::default())",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 289,
+            "column": 9
+          },
+          "end": {
+            "line": 422,
+            "column": 18
+          }
+        },
+        "replacement": "Ok(Default::default())",
+        "genre": "FnValue"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:289:30: replace <= with > in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 289,
+            "column": 30
+          },
+          "end": {
+            "line": 289,
+            "column": 32
+          }
+        },
+        "replacement": ">",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:297:36: replace && with || in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 297,
+            "column": 36
+          },
+          "end": {
+            "line": 297,
+            "column": 38
+          }
+        },
+        "replacement": "||",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:297:28: replace <= with > in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 297,
+            "column": 28
+          },
+          "end": {
+            "line": 297,
+            "column": 30
+          }
+        },
+        "replacement": ">",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:297:53: replace <= with > in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 297,
+            "column": 53
+          },
+          "end": {
+            "line": 297,
+            "column": 55
+          }
+        },
+        "replacement": ">",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:300:21: delete ! in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 300,
+            "column": 21
+          },
+          "end": {
+            "line": 300,
+            "column": 22
+          }
+        },
+        "replacement": "",
+        "genre": "UnaryOperator"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:301:19: replace += with -= in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 301,
+            "column": 19
+          },
+          "end": {
+            "line": 301,
+            "column": 21
+          }
+        },
+        "replacement": "-=",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:301:19: replace += with *= in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 301,
+            "column": 19
+          },
+          "end": {
+            "line": 301,
+            "column": 21
+          }
+        },
+        "replacement": "*=",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:302:27: replace <= with > in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 302,
+            "column": 27
+          },
+          "end": {
+            "line": 302,
+            "column": 29
+          }
+        },
+        "replacement": ">",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:306:50: replace && with || in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 306,
+            "column": 50
+          },
+          "end": {
+            "line": 306,
+            "column": 52
+          }
+        },
+        "replacement": "||",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:306:39: replace == with != in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 306,
+            "column": 39
+          },
+          "end": {
+            "line": 306,
+            "column": 41
+          }
+        },
+        "replacement": "!=",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:309:24: replace += with -= in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 309,
+            "column": 24
+          },
+          "end": {
+            "line": 309,
+            "column": 26
+          }
+        },
+        "replacement": "-=",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:309:24: replace += with *= in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 309,
+            "column": 24
+          },
+          "end": {
+            "line": 309,
+            "column": 26
+          }
+        },
+        "replacement": "*=",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "preparatory",
+      "summary": "Unviable",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:327:17: replace && with || in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 327,
+            "column": 17
+          },
+          "end": {
+            "line": 327,
+            "column": 19
+          }
+        },
+        "replacement": "||",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:346:26: replace > with == in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 346,
+            "column": 26
+          },
+          "end": {
+            "line": 346,
+            "column": 27
+          }
+        },
+        "replacement": "==",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:346:26: replace > with < in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 346,
+            "column": 26
+          },
+          "end": {
+            "line": 346,
+            "column": 27
+          }
+        },
+        "replacement": "<",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "expanded",
+      "summary": "MissedMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:346:26: replace > with >= in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 346,
+            "column": 26
+          },
+          "end": {
+            "line": 346,
+            "column": 27
+          }
+        },
+        "replacement": ">=",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:360:21: replace += with -= in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 360,
+            "column": 21
+          },
+          "end": {
+            "line": 360,
+            "column": 23
+          }
+        },
+        "replacement": "-=",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:360:21: replace += with *= in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 360,
+            "column": 21
+          },
+          "end": {
+            "line": 360,
+            "column": 23
+          }
+        },
+        "replacement": "*=",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:365:25: delete ! in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 365,
+            "column": 25
+          },
+          "end": {
+            "line": 365,
+            "column": 26
+          }
+        },
+        "replacement": "",
+        "genre": "UnaryOperator"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:389:39: replace < with == in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 389,
+            "column": 39
+          },
+          "end": {
+            "line": 389,
+            "column": 40
+          }
+        },
+        "replacement": "==",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:389:39: replace < with > in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 389,
+            "column": 39
+          },
+          "end": {
+            "line": 389,
+            "column": 40
+          }
+        },
+        "replacement": ">",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "expanded",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:389:39: replace < with <= in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 389,
+            "column": 39
+          },
+          "end": {
+            "line": 389,
+            "column": 40
+          }
+        },
+        "replacement": "<=",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:392:54: replace += with -= in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 392,
+            "column": 54
+          },
+          "end": {
+            "line": 392,
+            "column": 56
+          }
+        },
+        "replacement": "-=",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "expanded",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:392:54: replace += with *= in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 392,
+            "column": 54
+          },
+          "end": {
+            "line": 392,
+            "column": 56
+          }
+        },
+        "replacement": "*=",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "expanded",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:392:59: replace * with + in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 392,
+            "column": 59
+          },
+          "end": {
+            "line": 392,
+            "column": 60
+          }
+        },
+        "replacement": "+",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "expanded",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:392:59: replace * with / in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 392,
+            "column": 59
+          },
+          "end": {
+            "line": 392,
+            "column": 60
+          }
+        },
+        "replacement": "/",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:395:30: replace += with -= in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 395,
+            "column": 30
+          },
+          "end": {
+            "line": 395,
+            "column": 32
+          }
+        },
+        "replacement": "-=",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "expanded",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:395:30: replace += with *= in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 395,
+            "column": 30
+          },
+          "end": {
+            "line": 395,
+            "column": 32
+          }
+        },
+        "replacement": "*=",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "expanded",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:417:45: replace / with % in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 417,
+            "column": 45
+          },
+          "end": {
+            "line": 417,
+            "column": 46
+          }
+        },
+        "replacement": "%",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "expanded",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/lib.rs:417:45: replace / with * in Corpus::replace_inputs",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/lib.rs",
+        "function": {
+          "function_name": "Corpus::replace_inputs",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 5
+            },
+            "end": {
+              "line": 423,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 417,
+            "column": 45
+          },
+          "end": {
+            "line": 417,
+            "column": 46
+          }
+        },
+        "replacement": "*",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/inputs.rs:11:9: replace Input::path -> &str with \"\"",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/inputs.rs",
+        "function": {
+          "function_name": "Input::path",
+          "return_type": "-> &str",
+          "span": {
+            "start": {
+              "line": 10,
+              "column": 5
+            },
+            "end": {
+              "line": 15,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 11,
+            "column": 9
+          },
+          "end": {
+            "line": 14,
+            "column": 10
+          }
+        },
+        "replacement": "\"\"",
+        "genre": "FnValue"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/inputs.rs:11:9: replace Input::path -> &str with \"xyzzy\"",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/inputs.rs",
+        "function": {
+          "function_name": "Input::path",
+          "return_type": "-> &str",
+          "span": {
+            "start": {
+              "line": 10,
+              "column": 5
+            },
+            "end": {
+              "line": 15,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 11,
+            "column": 9
+          },
+          "end": {
+            "line": 14,
+            "column": 10
+          }
+        },
+        "replacement": "\"xyzzy\"",
+        "genre": "FnValue"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/inputs.rs:17:9: replace Input::bytes -> usize with 0",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/inputs.rs",
+        "function": {
+          "function_name": "Input::bytes",
+          "return_type": "-> usize",
+          "span": {
+            "start": {
+              "line": 16,
+              "column": 5
+            },
+            "end": {
+              "line": 21,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 17,
+            "column": 9
+          },
+          "end": {
+            "line": 20,
+            "column": 10
+          }
+        },
+        "replacement": "0",
+        "genre": "FnValue"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/inputs.rs:17:9: replace Input::bytes -> usize with 1",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/inputs.rs",
+        "function": {
+          "function_name": "Input::bytes",
+          "return_type": "-> usize",
+          "span": {
+            "start": {
+              "line": 16,
+              "column": 5
+            },
+            "end": {
+              "line": 21,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 17,
+            "column": 9
+          },
+          "end": {
+            "line": 20,
+            "column": 10
+          }
+        },
+        "replacement": "1",
+        "genre": "FnValue"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/inputs.rs:23:9: replace Input::binding -> String with String::new()",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/inputs.rs",
+        "function": {
+          "function_name": "Input::binding",
+          "return_type": "-> String",
+          "span": {
+            "start": {
+              "line": 22,
+              "column": 5
+            },
+            "end": {
+              "line": 27,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 23,
+            "column": 9
+          },
+          "end": {
+            "line": 26,
+            "column": 10
+          }
+        },
+        "replacement": "String::new()",
+        "genre": "FnValue"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/inputs.rs:23:9: replace Input::binding -> String with \"xyzzy\".into()",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/inputs.rs",
+        "function": {
+          "function_name": "Input::binding",
+          "return_type": "-> String",
+          "span": {
+            "start": {
+              "line": 22,
+              "column": 5
+            },
+            "end": {
+              "line": 27,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 23,
+            "column": 9
+          },
+          "end": {
+            "line": 26,
+            "column": 10
+          }
+        },
+        "replacement": "\"xyzzy\".into()",
+        "genre": "FnValue"
+      }
+    },
+    {
+      "phase": "expanded",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/inputs.rs:29:9: replace Input::reusable -> bool with true",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/inputs.rs",
+        "function": {
+          "function_name": "Input::reusable",
+          "return_type": "-> bool",
+          "span": {
+            "start": {
+              "line": 28,
+              "column": 5
+            },
+            "end": {
+              "line": 33,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 29,
+            "column": 9
+          },
+          "end": {
+            "line": 32,
+            "column": 10
+          }
+        },
+        "replacement": "true",
+        "genre": "FnValue"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/inputs.rs:29:9: replace Input::reusable -> bool with false",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/inputs.rs",
+        "function": {
+          "function_name": "Input::reusable",
+          "return_type": "-> bool",
+          "span": {
+            "start": {
+              "line": 28,
+              "column": 5
+            },
+            "end": {
+              "line": 33,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 29,
+            "column": 9
+          },
+          "end": {
+            "line": 32,
+            "column": 10
+          }
+        },
+        "replacement": "false",
+        "genre": "FnValue"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/inputs.rs:30:62: replace == with != in Input::reusable",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/inputs.rs",
+        "function": {
+          "function_name": "Input::reusable",
+          "return_type": "-> bool",
+          "span": {
+            "start": {
+              "line": 28,
+              "column": 5
+            },
+            "end": {
+              "line": 33,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 30,
+            "column": 62
+          },
+          "end": {
+            "line": 30,
+            "column": 64
+          }
+        },
+        "replacement": "!=",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/inputs.rs:35:9: replace Input::text -> Result<String, Error> with Ok(String::new())",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/inputs.rs",
+        "function": {
+          "function_name": "Input::text",
+          "return_type": "-> Result<String, Error>",
+          "span": {
+            "start": {
+              "line": 34,
+              "column": 5
+            },
+            "end": {
+              "line": 44,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 35,
+            "column": 9
+          },
+          "end": {
+            "line": 43,
+            "column": 10
+          }
+        },
+        "replacement": "Ok(String::new())",
+        "genre": "FnValue"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/inputs.rs:35:9: replace Input::text -> Result<String, Error> with Ok(\"xyzzy\".into())",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/inputs.rs",
+        "function": {
+          "function_name": "Input::text",
+          "return_type": "-> Result<String, Error>",
+          "span": {
+            "start": {
+              "line": 34,
+              "column": 5
+            },
+            "end": {
+              "line": 44,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 35,
+            "column": 9
+          },
+          "end": {
+            "line": 43,
+            "column": 10
+          }
+        },
+        "replacement": "Ok(\"xyzzy\".into())",
+        "genre": "FnValue"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi-search/src/inputs.rs:46:9: replace Input::analysis -> Option<&Analysis> with None",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/inputs.rs",
+        "function": {
+          "function_name": "Input::analysis",
+          "return_type": "-> Option<&Analysis>",
+          "span": {
+            "start": {
+              "line": 45,
+              "column": 5
+            },
+            "end": {
+              "line": 53,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 46,
+            "column": 9
+          },
+          "end": {
+            "line": 52,
+            "column": 10
+          }
+        },
+        "replacement": "None",
+        "genre": "FnValue"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "Unviable",
+      "mutation": {
+        "name": "crates/vizzi-search/src/inputs.rs:46:9: replace Input::analysis -> Option<&Analysis> with Some(Box::leak(Box::new(Default::default())))",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/inputs.rs",
+        "function": {
+          "function_name": "Input::analysis",
+          "return_type": "-> Option<&Analysis>",
+          "span": {
+            "start": {
+              "line": 45,
+              "column": 5
+            },
+            "end": {
+              "line": 53,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 46,
+            "column": 9
+          },
+          "end": {
+            "line": 52,
+            "column": 10
+          }
+        },
+        "replacement": "Some(Box::leak(Box::new(Default::default())))",
+        "genre": "FnValue"
+      }
+    },
+    {
+      "phase": "boundary",
+      "summary": "Unviable",
+      "mutation": {
+        "name": "crates/vizzi-search/src/inputs.rs:60:9: replace Corpus::replace_documents -> Result<Update, Error> with Ok(Default::default())",
+        "package": "vizzi-search",
+        "file": "crates/vizzi-search/src/inputs.rs",
+        "function": {
+          "function_name": "Corpus::replace_documents",
+          "return_type": "-> Result<Update, Error>",
+          "span": {
+            "start": {
+              "line": 56,
+              "column": 5
+            },
+            "end": {
+              "line": 61,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 60,
+            "column": 9
+          },
+          "end": {
+            "line": 60,
+            "column": 86
+          }
+        },
+        "replacement": "Ok(Default::default())",
+        "genre": "FnValue"
+      }
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 //! Behavioral checks for the experimental retrieval and citation boundary.
-use vizzi_qa::{Answer, Citation, Corpus, SourceFile, Status};
+use vizzi_search::{Answer, Citation, Corpus, SourceFile, Status};
 fn file(path: &str, text: &str) -> SourceFile {
     SourceFile {
         path: path.into(),
@@ -501,4 +501,84 @@ fn invalid_oracle_and_answer_bounds_fail_explicitly() {
         })
         .collect();
     assert!(corpus.validate(&context, &answer).is_err());
+}
+
+#[test]
+fn namespace_matches_and_substantial_body_mentions_both_influence_lexical_order() {
+    let mut c = Corpus::new().unwrap();
+    c.replace(vec![
+        file("needle/needle.txt", "noise"),
+        file("other.txt", "needle needle needle"),
+    ])
+    .unwrap();
+    assert_eq!(
+        c.retrieve("needle", 1, 4000).unwrap().evidence()[0].path,
+        "needle/needle.txt"
+    );
+    c.replace(vec![
+        file("needle.txt", "noise noise"),
+        file("other.txt", "needle needle needle"),
+    ])
+    .unwrap();
+    assert_eq!(
+        c.retrieve("needle", 1, 4000).unwrap().evidence()[0].path,
+        "other.txt"
+    );
+}
+
+#[test]
+fn a_moderate_paragraph_with_several_mentions_can_outrank_one_isolated_mention() {
+    let mut c = Corpus::new().unwrap();
+    c.replace(vec![
+        file(
+            "long.txt",
+            &format!("{}{}", "needle ".repeat(4), "plain ".repeat(24)),
+        ),
+        file("brief.txt", "needle plain plain"),
+    ])
+    .unwrap();
+    assert_eq!(
+        c.retrieve("needle", 1, 4000).unwrap().evidence()[0].path,
+        "long.txt"
+    );
+    c.replace(vec![
+        file(
+            "long.txt",
+            &format!("{}{}", "needle ".repeat(2), "plain ".repeat(20)),
+        ),
+        file("brief.txt", "needle plain plain plain"),
+    ])
+    .unwrap();
+    assert_eq!(
+        c.retrieve("needle", 1, 4000).unwrap().evidence()[0].path,
+        "brief.txt"
+    );
+}
+
+#[test]
+fn standalone_same_path_same_size_edits_invalidate_results_and_held_context() {
+    let mut c = Corpus::new().unwrap();
+    c.replace(vec![file("src/item.rs", "fn first() {}\n")])
+        .unwrap();
+    let held = c.retrieve_compact("first", 1, 1000).unwrap();
+    let before = c.snapshot().to_owned();
+    let changed = c
+        .replace(vec![file("src/item.rs", "fn other() {}\n")])
+        .unwrap();
+    assert_eq!(changed.changed, 1);
+    assert_eq!(changed.reused, 0);
+    assert_ne!(c.snapshot(), before);
+    assert!(
+        c.retrieve_compact("first", 1, 1000)
+            .unwrap()
+            .evidence()
+            .is_empty()
+    );
+    assert!(
+        c.retrieve_compact("other", 1, 1000).unwrap().evidence()[0]
+            .text
+            .contains("other")
+    );
+    assert!(held.evidence()[0].text.contains("first"));
+    assert!(c.reorder(&held, &[1]).is_err());
 }

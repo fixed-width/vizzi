@@ -8,6 +8,7 @@ publish = false
 workspace = true
 
 [dependencies]
+vizzi-search = { path = "../vizzi-search" }
 vizzi = { path = "../vizzi" }
 vizzi-core = { path = "../vizzi-core" }
 blake3.workspace = true

@@ -29,7 +29,7 @@ if(command==='prepare'){
  const index=await corpus(root);
  try{
   assert.equal(index.ready.stats.files,source.initial.stats.files);assert.equal(index.ready.stats.bytes,source.initial.stats.bytes);
-  const rust=[];for(const crate of ['vizzi-core','vizzi-qa'])for(const file of await readdir('crates/'+crate+'/src'))if(file.endsWith('.rs'))rust.push(join('crates',crate,'src',file));
+  const rust=[];for(const crate of ['vizzi-core','vizzi-qa','vizzi-search']){rust.push(join('crates',crate,'Cargo.toml'));for(const file of await readdir('crates/'+crate+'/src'))if(file.endsWith('.rs'))rust.push(join('crates',crate,'src',file));}
   const files=await captureHashes([specPath,spec.sourceRecord,spec.protocol,...(spec.previousCohort?[spec.previousCohort]:[]),archive,...rust,'Cargo.toml','Cargo.lock','experiments/qa/coverage.mjs','experiments/qa/coverage-support.mjs','experiments/qa/support.mjs','experiments/qa/compact-support.mjs','target/release/vizzi-qa','target/release/vizzi-envelope',join(output,'source-audit.json')]);
   await save(join(output,'prepared.json'),{schema:1,createdAt:new Date().toISOString(),files,sourceRoot:root,sourceRevision:source.sourceRevision,sourceArchiveSha256:source.archiveSha256,previousIndexSnapshot:source.initial.snapshot,previousRankingIndexSnapshot:(await json('experiments/qa/results/search/prepared.json')).expectedSnapshot,expectedSnapshot:index.ready.snapshot,capture:index.ready,expectedObservations:plan.length,reservedGenerations:0});
   console.log(`Froze ${spec.cases.length} known questions, ${audit.length} audited source targets and ${plan.length} paired observations; no queries run.`);

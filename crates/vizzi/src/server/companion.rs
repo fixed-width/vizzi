@@ -31,10 +31,26 @@ impl IntoResponse for Error {
         (status, Json(serde_json::json!({"message":message}))).into_response()
     }
 }
-pub(super) fn router(app: Arc<Companion>) -> Router {
+pub(super) fn router(
+    app: Arc<Companion>,
+    search: Arc<crate::question_search::QuestionSearch>,
+) -> Router {
     Router::new()
         .route("/api/investigation", get(view).post(edit))
         .route("/api/discovery", get(discover))
+        .route(
+            "/api/search",
+            get(|| async {
+                Json(serde_json::json!({"trial":true,"question_bytes":2048,"result_limit":8}))
+            })
+            .post(
+                move |Json(request): Json<crate::question_search::SearchRequest>| {
+                    let search = search.clone();
+                    async move { work(move || search.search(&request)).await }
+                },
+            ),
+        )
+        .route("/api/search/evidence", post(pin_current))
         .route("/api/investigation/lookup", get(lookup))
         .route("/api/investigation/evidence", post(pin))
         .route("/api/investigation/evidence/{id}/open", post(open))
@@ -104,6 +120,16 @@ async fn pin(
 ) -> Result<Json<serde_json::Value>, Error> {
     work(move || {
         let id = app.pin(request)?;
+        Ok(serde_json::json!({"id":id,"view":app.view()}))
+    })
+    .await
+}
+async fn pin_current(
+    State(app): State<Arc<Companion>>,
+    Json(request): Json<PinEvidence>,
+) -> Result<Json<serde_json::Value>, Error> {
+    work(move || {
+        let id = app.pin_current(request)?;
         Ok(serde_json::json!({"id":id,"view":app.view()}))
     })
     .await

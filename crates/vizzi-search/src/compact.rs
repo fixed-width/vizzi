@@ -307,6 +307,7 @@ impl Corpus {
         }
         Ok(Context {
             snapshot: self.snapshot.clone(),
+            roles: vec![],
             evidence,
         })
     }

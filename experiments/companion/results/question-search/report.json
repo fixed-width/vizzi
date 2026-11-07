@@ -1,0 +1,1218 @@
+{
+  "schema": 1,
+  "createdAt": "2026-11-07T07:32:32.199Z",
+  "sourceRoot": "/tmp/vizzi-search-roles-prepared/source",
+  "sourceSnapshot": "a400367c7ef7fb7bf02b9dccc32674bdce31f6458a915dfba79a898b13bf5587",
+  "environment": {
+    "os": "linux",
+    "arch": "x64",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13700H"
+  },
+  "workers": 1,
+  "model": null,
+  "binarySha256": "605b0dc0aea9b9743b0f8b9c77d4051eef93451fcb4fff736aaa1756cd14b8ed",
+  "activationMs": 2260.371845,
+  "coldQueryMs": 1500.7208289999999,
+  "scope": {
+    "availableFiles": 552,
+    "searchedFiles": 552,
+    "omittedFiles": 0
+  },
+  "observations": [
+    {
+      "id": "maintainer.lpc-rs.transaction-creation",
+      "question": "where are new transactions created?",
+      "selector": "focused",
+      "samplesMs": [
+        448.8085550000005,
+        456.60315900000023,
+        572.8679539999994,
+        441.70990900000015,
+        472.79530299999897,
+        470.6562619999986,
+        425.44029299999966,
+        425.2696580000011,
+        453.23196800000005,
+        464.2935499999985,
+        490.9217690000005,
+        480.83589200000097,
+        506.44300099999964,
+        490.45651,
+        459.08266000000003,
+        531.6747460000006,
+        558.2227170000006,
+        520.0356660000016,
+        482.07054700000117,
+        442.0452719999994,
+        476.6150999999991,
+        513.8790149999986,
+        548.1816829999989,
+        449.20484099999885,
+        569.5449950000002,
+        546.9932069999995,
+        451.100864,
+        462.2841049999988,
+        469.46759999999995,
+        473.1370969999989
+      ],
+      "medianMs": 473.1370969999989,
+      "p95Ms": 569.5449950000002,
+      "maxMs": 572.8679539999994,
+      "maxResponseBytes": 6912,
+      "snapshot": "a400367c7ef7fb7bf02b9dccc32674bdce31f6458a915dfba79a898b13bf5587",
+      "available_files": 552,
+      "searched_files": 552,
+      "omitted_files": 0,
+      "results": [
+        {
+          "id": "bb050c0f0581cb1ef1404db52740e978e9efeb89686268baf12b6ed0a664688c",
+          "title": "Transaction",
+          "path": "src/interpreter/stm/mod.rs",
+          "file": "beb06fc7b4893bafad88aef00c61ddc96df2fe6d81b0b6a2260eb3652081092c",
+          "version": "417054f21fac8ab230ab24ebd9324f95d8882c287184abea641ff6942905653f",
+          "line": 127,
+          "end_line": 139,
+          "excerpt": "impl Transaction {\n    pub(crate) fn new(snapshot: Snapshot) -> Self {\n        let version = snapshot.version();\n        Self {\n            snapshot,\n            changeset: Changeset::new(version),\n            effects: Vec::new(),\n            pending_call_outs: Vec::new(),\n            cancelled_call_outs: HashSet::new(),\n            joinable: true,\n            interrupted: None,\n            compilation: diagnostics::CompilationTiming::default(),\n            presence_revision: 0,\n",
+          "suggested_role": "definition",
+          "scope": {
+            "name": "Transaction",
+            "kind": "implementation",
+            "parents": []
+          }
+        },
+        {
+          "id": "ffc84a86e1e89ac9079f3f617b8c97865e0f0188b68f595db0e6913ba01df32b",
+          "title": "Transaction::with_class_cow",
+          "path": "src/interpreter/stm/mod.rs",
+          "file": "beb06fc7b4893bafad88aef00c61ddc96df2fe6d81b0b6a2260eb3652081092c",
+          "version": "417054f21fac8ab230ab24ebd9324f95d8882c287184abea641ff6942905653f",
+          "line": 385,
+          "end_line": 395,
+          "excerpt": "            return Ok(f(Arc::make_mut(own)));\n        }\n        let current = self\n            .read_class(var_id)\n            .ok_or_else(|| LpcError::runtime(\"class is not in this transaction's world\"))?;\n        let mut clone = (*current).clone();\n        let result = f(&mut clone);\n        self.changeset\n            .write(var_id, WorldValue::Class(Arc::new(clone)));\n        Ok(result)\n    }",
+          "suggested_role": "definition",
+          "scope": {
+            "name": "with_class_cow",
+            "kind": "function",
+            "parents": [
+              "Transaction"
+            ]
+          }
+        },
+        {
+          "id": "7f56e277ddbdc7f37d658eb5c358b81099c4a9e704442c2d1845a6081f6197f0",
+          "title": "AttemptBody for Publication::begin_attempt",
+          "path": "src/interpreter/sockets/transport.rs",
+          "file": "7aff3d7ec7e6b420c778f7895a13383206c716dd0a99209a281b472bc083b8da",
+          "version": "5e06f0797db79a944f75a1aa18ef89c2ba73e7ae953eb21628549d8d6421cfa6",
+          "line": 940,
+          "end_line": 951,
+          "excerpt": "async fn begin_attempt(\n        &mut self,\n        tx: &flume::Sender<CommitProtocol>,\n    ) -> Result<Option<LiveSnapshot>> {\n        let live = start_txn(tx).await?;\n        let txn = TxnHandle::new(Transaction::new(live.inner.clone()));\n        let access = SocketAccess {\n            sockets: &self.gs.sockets,\n            txn: txn.clone(),\n        };\n        self.outcome = match &self.update {\n            Update::InputCapacity(handle) => Outcome::Capacity(access.input_capacity(*handle)?),\n",
+          "suggested_role": "entry",
+          "scope": {
+            "name": "begin_attempt",
+            "kind": "function",
+            "parents": [
+              "AttemptBody for Publication"
+            ]
+          }
+        },
+        {
+          "id": "1c460b52c1abed0608483fe76832e6993f04c108c93090832397aebe1e40e63f",
+          "title": "Transaction::with_mapping_cow",
+          "path": "src/interpreter/stm/mod.rs",
+          "file": "beb06fc7b4893bafad88aef00c61ddc96df2fe6d81b0b6a2260eb3652081092c",
+          "version": "417054f21fac8ab230ab24ebd9324f95d8882c287184abea641ff6942905653f",
+          "line": 520,
+          "end_line": 530,
+          "excerpt": "        }\n        let current = self\n            .read_value(var_id)\n            .and_then(WorldValue::into_mapping)\n            .unwrap_or_else(|| Arc::new(LpcMapping::default()));\n        let mut clone = (*current).clone();\n        f(&mut clone)?;\n        self.changeset\n            .write(var_id, WorldValue::Mapping(Arc::new(clone)));\n        Ok(())\n    }",
+          "suggested_role": "definition",
+          "scope": {
+            "name": "with_mapping_cow",
+            "kind": "function",
+            "parents": [
+              "Transaction"
+            ]
+          }
+        },
+        {
+          "id": "cacac291f7c12e67c4e638545bc2ec9fbc42f13d57d140a418d4feb9a7af3ad6",
+          "title": "Task<STACKSIZE>::open_attempt",
+          "path": "src/interpreter/task/mod.rs",
+          "file": "b1e9a6cdcd6befd5a9ac0fb3de6ba7e8574ae83cddbaeeaa17e58795039be09f",
+          "version": "ad459306c024a2f544a5d3a0f66df2f5d8ff331d2c772374fe14087f20acbc34",
+          "line": 381,
+          "end_line": 398,
+          "excerpt": "async fn open_attempt(\n        &mut self,\n        tx: &flume::Sender<CommitProtocol>,\n    ) -> Result<Option<LiveSnapshot>> {\n        let live = if self.joins_parent {\n            None\n        } else {\n            Some(start_txn(tx).await?)\n        };\n\n        if let Some(live) = &live {\n            self.context.txn = TxnHandle::new(Transaction::new(live.inner.clone()));\n            self.context.clear_commands();\n        }\n\n        let seed = self\n            .seed\n            .clone()\n",
+          "suggested_role": "entry",
+          "scope": {
+            "name": "open_attempt",
+            "kind": "function",
+            "parents": [
+              "Task<STACKSIZE>"
+            ]
+          }
+        },
+        {
+          "id": "e34734d31790ea51acce56d0eb6430f061e835fea9b9bf42a0d3aa98f79804cd",
+          "title": "Transaction::pending_entry_view",
+          "path": "src/interpreter/stm/mod.rs",
+          "file": "beb06fc7b4893bafad88aef00c61ddc96df2fe6d81b0b6a2260eb3652081092c",
+          "version": "417054f21fac8ab230ab24ebd9324f95d8882c287184abea641ff6942905653f",
+          "line": 560,
+          "end_line": 562,
+          "excerpt": "pub(crate) fn pending_entry_view(&self, server: &std::path::Path) -> PendingEntryView {\n        PendingEntryView::new(&self.effects, server)\n    }",
+          "suggested_role": "definition",
+          "scope": {
+            "name": "pending_entry_view",
+            "kind": "function",
+            "parents": [
+              "Transaction"
+            ]
+          }
+        },
+        {
+          "id": "c4be8e38c72f5ca24c21566b65b70312213eb8b16d7a67e0ca64e73b398d9b2e",
+          "title": "attempt_timeout",
+          "path": "src/interpreter/stm/retry.rs",
+          "file": "ad2b60424795949c63c0658841b777b63668c1a8a7e66bae7206161afed8c23c",
+          "version": "a19b91984a52b8fd7840c6ef4212fbd179bd387a4523a48984009f112b7f2537",
+          "line": 465,
+          "end_line": 474,
+          "excerpt": "fn attempt_timeout(body: &impl AttemptBody, attempts: u64, conflicts: u64) -> LpcError {\n    let error = body.timeout_error().with_note(format!(\n        \"Transaction aborted after {attempts} attempt(s) and {conflicts} conflict(s); uncommitted changes and output were discarded.\"\n    ));\n    if conflicts > 0 {\n        error.with_note(\"Concurrent changes forced retries. Check shared state accessed by this operation and reduce the work done in one transaction.\")\n    } else {\n        error\n    }\n}",
+          "suggested_role": "entry",
+          "scope": {
+            "name": "attempt_timeout",
+            "kind": "function",
+            "parents": []
+          }
+        },
+        {
+          "id": "541b333f94477efdeaebd19ca294123a011df7161053d2fc654b8ba55750eecf",
+          "title": "Transaction::pending_directory_view",
+          "path": "src/interpreter/stm/mod.rs",
+          "file": "beb06fc7b4893bafad88aef00c61ddc96df2fe6d81b0b6a2260eb3652081092c",
+          "version": "417054f21fac8ab230ab24ebd9324f95d8882c287184abea641ff6942905653f",
+          "line": 565,
+          "end_line": 567,
+          "excerpt": "pub(crate) fn pending_directory_view(&self, server: &std::path::Path) -> PendingDirectoryView {\n        PendingDirectoryView::new(&self.effects, server)\n    }",
+          "suggested_role": "definition",
+          "scope": {
+            "name": "pending_directory_view",
+            "kind": "function",
+            "parents": [
+              "Transaction"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "maintainer.lpc-rs.add-efun",
+      "question": "how do i add a new efun?",
+      "selector": "focused",
+      "samplesMs": [
+        631.0639909999991,
+        702.8506019999986,
+        640.9011449999998,
+        655.8198819999998,
+        721.7628550000009,
+        716.2491550000013,
+        706.8179820000005,
+        701.4180850000012,
+        701.3448160000007,
+        715.6169300000001,
+        712.7600420000017,
+        705.1664349999992,
+        680.1518980000001,
+        689.5414470000032,
+        706.9512090000062,
+        710.102515999999,
+        704.2781289999984,
+        676.142949000001,
+        699.6919009999983,
+        726.0367970000007,
+        729.6619360000041,
+        690.3443160000024,
+        709.207405000001,
+        689.1220610000018,
+        706.1929939999973,
+        700.6930150000044,
+        698.9712050000016,
+        630.3568620000005,
+        590.856614999997,
+        623.2732439999963
+      ],
+      "medianMs": 701.4180850000012,
+      "p95Ms": 726.0367970000007,
+      "maxMs": 729.6619360000041,
+      "maxResponseBytes": 6572,
+      "snapshot": "a400367c7ef7fb7bf02b9dccc32674bdce31f6458a915dfba79a898b13bf5587",
+      "available_files": 552,
+      "searched_files": 552,
+      "omitted_files": 0,
+      "results": [
+        {
+          "id": "fab655e65488ba5d81cbac20c0c51d605b037b72c42271ad6a02f60e47447649",
+          "title": "efuns",
+          "path": "src/interpreter/efun/mod.rs",
+          "file": "e425f0394c640c1ebabe0d96e51aed56b4bb54716e697e0ba91270e5ce787bbb",
+          "version": "6f032ee8f9dc5f60eda21c6b7b05a7b07646f0a0d8cd18cfc9f2d6b10f1039d2",
+          "line": 324,
+          "end_line": 331,
+          "excerpt": "        /// indexes into this map; a reorder invalidates compiled code.\n        pub static EFUN_PROTOTYPES: LazyLock<IndexMap<&'static str, FunctionPrototype>> = LazyLock::new(|| {\n            let mut m = IndexMap::new();\n            $( m.insert(efun_name(stringify!($name)), efuns!(@prototype $name { $($row)* })); )+\n            m\n        });\n    };\n}",
+          "suggested_role": "registration",
+          "scope": {
+            "name": "efuns",
+            "kind": "macro",
+            "parents": []
+          }
+        },
+        {
+          "id": "c593c71d0ff587575236ca93e637d253faa6967642a44b6fc1dfeb710b22b083",
+          "title": "Efun::prototype",
+          "path": "src/interpreter/efun/mod.rs",
+          "file": "e425f0394c640c1ebabe0d96e51aed56b4bb54716e697e0ba91270e5ce787bbb",
+          "version": "6f032ee8f9dc5f60eda21c6b7b05a7b07646f0a0d8cd18cfc9f2d6b10f1039d2",
+          "line": 1427,
+          "end_line": 1429,
+          "excerpt": "pub fn prototype(self) -> &'static FunctionPrototype {\n        &EFUN_PROTOTYPES[self as usize]\n    }",
+          "suggested_role": "registration",
+          "scope": {
+            "name": "prototype",
+            "kind": "function",
+            "parents": [
+              "Efun"
+            ]
+          }
+        },
+        {
+          "id": "3d82b962b53d319fd7127bfeb81ae328e81ca742cccbb961379418982c7c4b7c",
+          "title": "ContextHolder for EfunOverrideWalker::into_context",
+          "path": "src/compiler/codegen/efun_override_walker.rs",
+          "file": "01c4c29e3006f8652cfc8e80e2bd939afbe4dd725752610cb15a5918cf91e474",
+          "version": "1465594ed11ee93356ecf21a57b339f7208d49d29c4e8168ffce2c70f8173259",
+          "line": 22,
+          "end_line": 24,
+          "excerpt": "fn into_context(self) -> CompilationContext {\n        self.context\n    }",
+          "suggested_role": "example",
+          "scope": {
+            "name": "into_context",
+            "kind": "function",
+            "parents": [
+              "ContextHolder for EfunOverrideWalker"
+            ]
+          }
+        },
+        {
+          "id": "6ec1371d106b79245c53c422145d11c6104a8049985e7f5867385f97c94179ed",
+          "title": "function_signature",
+          "path": "src/interpreter/efun/function_signature.rs",
+          "file": "2caf4a6c9a8c26d2e54e614cccd33084f4ef7405368fe90e2f4aed472174766b",
+          "version": "0cedd59c1c5510b957169daa3eacebfd141e0ff764f926848810613ada15f131",
+          "line": 10,
+          "end_line": 18,
+          "excerpt": "pub fn function_signature<const N: usize>(context: &mut EfunContext<'_, N>) -> Result<()> {\n    let Some(name) = context.arg(0).as_str() else {\n        return Err(context.runtime_error(\"function_signature: name must be a string\"));\n    };\n    if context.arg(1) != &context.txn().nil() && !matches!(context.arg(1), LpcRef::Object(_)) {\n        return Err(context.runtime_error(\"function_signature: target must be an object\"));\n    }\n    let Some(function) = context\n        .arg(1)\n",
+          "suggested_role": "registration",
+          "scope": {
+            "name": "function_signature",
+            "kind": "function",
+            "parents": []
+          }
+        },
+        {
+          "id": "e5290d41d1d61c10fa5f22d39356aa397925f4b271ae9fb818b18deb4cb2109e",
+          "title": "EfunContext<'task, N>::return_efun_result",
+          "path": "src/interpreter/efun/efun_context.rs",
+          "file": "686301a0a40d6dffce7abba8798e1c9cfabd81872d5f7343b4eb7d1b959b2f6a",
+          "version": "dec296018ec88d3d5343e6283a2075007c0f86307591ba7661cee752dbf15b70",
+          "line": 336,
+          "end_line": 346,
+          "excerpt": "pub fn return_efun_result(&mut self, result: LpcRef) {\n        let frame = self.stack.last_mut().expect(NO_CALLING_FRAME);\n        let slot = &mut frame.registers[0];\n        match result {\n            LpcRef::Int(value) => match slot {\n                LpcRef::Int(x) => x.0 = value.0,\n                _ => *slot = LpcRef::Int(value),\n            },\n            other => *slot = other,\n        }\n    }",
+          "suggested_role": "example",
+          "scope": {
+            "name": "return_efun_result",
+            "kind": "function",
+            "parents": [
+              "EfunContext<'task, N>"
+            ]
+          }
+        },
+        {
+          "id": "fec45aef3261c26b4c8db1fd6c72bc48bf52bf5e62aa7b85f670ea7fcd408222",
+          "title": "load_prototype",
+          "path": "src/interpreter/efun/clone_object.rs",
+          "file": "a3d4ff40597cdfe44a6551de0f02ce9674d755d584555bc48b79130355d4719a",
+          "version": "cd1c58e8fef6035037ff00fb24e72c9c6e71d7aa1686bb717d64c0d72ca2ca2e",
+          "line": 10,
+          "end_line": 21,
+          "excerpt": "async fn load_prototype<const N: usize>(\n    context: &mut EfunContext<'_, N>,\n    path: &str,\n) -> Result<Arc<Process>> {\n    let full_path = context.in_game_path(path);\n\n    if full_path.is_clone() {\n        return Err(context.runtime_error(format!(\"Cannot clone a clone: {}\", full_path)));\n    }\n\n    context.load_object(path).await\n}",
+          "suggested_role": "registration",
+          "scope": {
+            "name": "load_prototype",
+            "kind": "function",
+            "parents": []
+          }
+        },
+        {
+          "id": "071a86d689a52ed2b6cde9948117f5c977c6649297355b339b921adabec62144",
+          "title": "compile_process_in_context",
+          "path": "src/util/process_builder.rs",
+          "file": "3c62ee73ce05c9847cde881c120ce09c37203794ec60d035cf9dd4ce3ded5113",
+          "version": "3b541c57dd077cca432a2535fb251bb901343748f8a29fe6ad7e7ec3ddb15c7e",
+          "line": 115,
+          "end_line": 128,
+          "excerpt": "pub(crate) async fn compile_process_in_context(\n    ctx: &crate::interpreter::task_context::TaskContext,\n    path: &LpcPath,\n    code: Option<&str>,\n    gate: Arc<dyn CompileGate>,\n    source_reader: Arc<dyn SourceReader>,\n) -> Result<(Arc<Process>, Vec<LpcError>)> {\n    let simul = ctx.simul_efuns().map(|process| process.program(ctx.txn()));\n    compile_to_process(\n        ctx.object_space(),\n        Some(gate),\n        Some(source_reader),\n        simul,\n        |compiler| async move {\n",
+          "suggested_role": "example",
+          "scope": {
+            "name": "compile_process_in_context",
+            "kind": "function",
+            "parents": []
+          }
+        },
+        {
+          "id": "11bf49c28e5738a556eb7fb8a30336007b3a235e092274fb2fc830f9c27ee9c3",
+          "title": "Renderer<'a>::render_table",
+          "path": "src/interpreter/efun/render_markdown/render.rs",
+          "file": "817b7f8215bb5b840a82a93d2f0d3b842fb0881524fc18ad67c82bd1799b89b1",
+          "version": "5f73fdda0782bd50bb53ef7f0143fac0bc92695b94e3f2b7feb42a4ae856a522",
+          "line": 338,
+          "end_line": 347,
+          "excerpt": "fn render_table(&mut self, table: Table) -> Result<()> {\n        let columns = table.alignments.len();\n        if columns == 0 || table.rows.is_empty() {\n            return Ok(());\n        }\n        let mut widths = vec![1; columns];\n        let mut plain_rows = Vec::with_capacity(table.rows.len());\n        for row in &table.rows {\n            let mut plain_row = Vec::with_capacity(row.len());\n            for (column, cell) in row.iter().enumerate() {\n",
+          "suggested_role": "registration",
+          "scope": {
+            "name": "render_table",
+            "kind": "function",
+            "parents": [
+              "Renderer<'a>"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "maintainer.lpc-rs.commit-checks",
+      "question": "show me the codepath that transaction commits take, with all the checks they go through",
+      "selector": "focused",
+      "samplesMs": [
+        376.66038699999626,
+        393.0466050000032,
+        366.5053990000015,
+        398.9271399999998,
+        377.24853200000507,
+        377.8914470000018,
+        358.74565399999847,
+        372.3584570000021,
+        369.6889200000005,
+        324.9036149999956,
+        370.35910200000217,
+        363.67345000000205,
+        392.9812419999944,
+        400.1842340000003,
+        407.74145000000135,
+        397.44146600000386,
+        344.45060500000545,
+        376.0550359999979,
+        360.3901689999984,
+        317.4127559999979,
+        366.55185700000584,
+        324.626268,
+        397.9477960000004,
+        393.1246209999954,
+        314.3183329999956,
+        320.27899700000125,
+        326.06616299999587,
+        322.3326339999985,
+        319.2185460000037,
+        320.8071859999982
+      ],
+      "medianMs": 369.6889200000005,
+      "p95Ms": 400.1842340000003,
+      "maxMs": 407.74145000000135,
+      "maxResponseBytes": 6941,
+      "snapshot": "a400367c7ef7fb7bf02b9dccc32674bdce31f6458a915dfba79a898b13bf5587",
+      "available_files": 552,
+      "searched_files": 552,
+      "omitted_files": 0,
+      "results": [
+        {
+          "id": "18b08d3e6f53a177cc21bc5f331b2a9d4378ec12b52ea1e677afe8420f3a8a3b",
+          "title": "Committer::dispatch",
+          "path": "src/interpreter/stm/committer.rs",
+          "file": "6a1d27eec2da7cbbc3a7ccb3c16e55654714d12b2f323d88dfbd4df021ab74ca",
+          "version": "e86d4e7efb15b77f4bb8be660db4bef125ede56ee1ef2532c18c670b5814905b",
+          "line": 279,
+          "end_line": 288,
+          "excerpt": "fn dispatch(&mut self, msg: CommitProtocol, tx: &flume::Sender<CommitProtocol>) -> bool {\n        match msg {\n            CommitProtocol::BootstrapObject(change) => {\n                let mut changeset = Changeset::new(self.snapshot.version());\n                changeset.object_changes.push(change);\n                self.publish(changeset, false);\n                if self.live_versions.is_empty() {\n                    self.evict_old_versions();\n                }\n            }\n",
+          "suggested_role": "entry",
+          "scope": {
+            "name": "dispatch",
+            "kind": "function",
+            "parents": [
+              "Committer"
+            ]
+          }
+        },
+        {
+          "id": "791f0d433e961db59714173d984d2abb3ea655ca118fff33ffaaaf329a9e90db",
+          "title": "CommitterStats::conflict",
+          "path": "src/interpreter/stm/committer.rs",
+          "file": "6a1d27eec2da7cbbc3a7ccb3c16e55654714d12b2f323d88dfbd4df021ab74ca",
+          "version": "e86d4e7efb15b77f4bb8be660db4bef125ede56ee1ef2532c18c670b5814905b",
+          "line": 77,
+          "end_line": 79,
+          "excerpt": "fn conflict(&mut self) {\n        self.conflicts += 1;\n    }",
+          "suggested_role": "validation",
+          "scope": {
+            "name": "conflict",
+            "kind": "function",
+            "parents": [
+              "CommitterStats"
+            ]
+          }
+        },
+        {
+          "id": "3a9c9539fb52c108bb7802cf0e50c61c383fea970acbe9d633e6d06bd48691dd",
+          "title": "AttemptBody for Invocation<'_>::commit_phase",
+          "path": "src/interpreter/sockets/callbacks.rs",
+          "file": "463f638ee25124117724b2f0518872dd237ddc5913274ee3b2bd9cd2bf4bfe3b",
+          "version": "b10554b6736e05a3cf57e387cfd40d373841ac120fa79e7b352b322f204718b0",
+          "line": 272,
+          "end_line": 284,
+          "excerpt": "async fn commit_phase(\n        &mut self,\n        tx: &flume::Sender<CommitProtocol>,\n        _live: LiveSnapshot,\n    ) -> Result<(std::result::Result<(), Conflict>, Vec<Effect>)> {\n        let txn = self.txn.as_ref().expect(\"attempt opened\");\n        let changes = txn.with(|t| {\n            if self.failure.is_some() {\n                t.validation_changeset()\n            } else {\n                t.clone_changeset()\n            }\n        });\n",
+          "suggested_role": "entry",
+          "scope": {
+            "name": "commit_phase",
+            "kind": "function",
+            "parents": [
+              "AttemptBody for Invocation<'_>"
+            ]
+          }
+        },
+        {
+          "id": "39e7038e73d7d2e68b8ea0e9ecfd56f7c1450cffa5f85608c597cbc0bedfd123",
+          "title": "Registration::valid",
+          "path": "src/interpreter/snooping/mod.rs",
+          "file": "eb8b0a223990a09a483f4ff1661f4ee8611d93a7d37c72b87f9ba31eef1b36e2",
+          "version": "ed86aef779c1af3ab8ff08cc035623bfa3ad4f2373a5e47a236eb79bfd79082d",
+          "line": 183,
+          "end_line": 195,
+          "excerpt": "pub(crate) fn valid(&self, txn: &mut Transaction) -> bool {\n        let (Some(observer), Some(target), Some(connection)) = (\n            self.observer.upgrade(),\n            self.target.upgrade(),\n            self.connection.upgrade(),\n        ) else {\n            return false;\n        };\n        observer.is_live_in(txn)\n            && target.is_live_in(txn)\n            && !connection.is_dead()\n            && txn\n                .read_connection(target.connection.id)\n",
+          "suggested_role": "validation",
+          "scope": {
+            "name": "valid",
+            "kind": "function",
+            "parents": [
+              "Registration"
+            ]
+          }
+        },
+        {
+          "id": "72833856b6a122392a6bfed49da165eacb5c493c8eb5cc5f512ec8cdfea057f1",
+          "title": "Committer::commit_watch",
+          "path": "src/interpreter/stm/committer.rs",
+          "file": "6a1d27eec2da7cbbc3a7ccb3c16e55654714d12b2f323d88dfbd4df021ab74ca",
+          "version": "e86d4e7efb15b77f4bb8be660db4bef125ede56ee1ef2532c18c670b5814905b",
+          "line": 242,
+          "end_line": 244,
+          "excerpt": "pub(crate) fn commit_watch(&self) -> watch::Receiver<Version> {\n        self.commit_watch.subscribe()\n    }",
+          "suggested_role": "entry",
+          "scope": {
+            "name": "commit_watch",
+            "kind": "function",
+            "parents": [
+              "Committer"
+            ]
+          }
+        },
+        {
+          "id": "dbbbe5c1037c09feb3f835f3b3cb870c7a728756fccce5859b1f2845d426951c",
+          "title": "Committer::commit",
+          "path": "src/interpreter/stm/committer.rs",
+          "file": "6a1d27eec2da7cbbc3a7ccb3c16e55654714d12b2f323d88dfbd4df021ab74ca",
+          "version": "e86d4e7efb15b77f4bb8be660db4bef125ede56ee1ef2532c18c670b5814905b",
+          "line": 611,
+          "end_line": 619,
+          "excerpt": "pub(crate) fn commit(&mut self, mut changeset: Changeset) -> Result<(), Conflict> {\n        let current_version = self.snapshot.version();\n        let changeset_version = changeset.base_version();\n\n        // Should not occur in practice - it implies versions are being created in more than one place.\n        if current_version < changeset_version {\n            self.stats.conflict();\n            return Err(Conflict::FutureVersion {\n                base: changeset_version,\n",
+          "suggested_role": "validation",
+          "scope": {
+            "name": "commit",
+            "kind": "function",
+            "parents": [
+              "Committer"
+            ]
+          }
+        },
+        {
+          "id": "846b0b054df39d9c7a6d4a96f9289c4fefa97918bb9236189631e41db2c35504",
+          "title": "Transaction::publish_system",
+          "path": "src/interpreter/stm/mod.rs",
+          "file": "beb06fc7b4893bafad88aef00c61ddc96df2fe6d81b0b6a2260eb3652081092c",
+          "version": "417054f21fac8ab230ab24ebd9324f95d8882c287184abea641ff6942905653f",
+          "line": 216,
+          "end_line": 229,
+          "excerpt": "pub(crate) fn publish_system(\n        &mut self,\n        space: &Arc<ObjectSpace>,\n        process: &Arc<Process>,\n        insert: bool,\n    ) {\n        self.track_read(space.system_revision.id);\n        self.write(space.system_revision.id, LpcRef::from(0));\n        self.changeset\n            .system_publications\n            .push(changeset::SystemPublication {\n                space: space.clone(),\n                key: space.process_key(process),\n                process: process.clone(),\n",
+          "suggested_role": "entry",
+          "scope": {
+            "name": "publish_system",
+            "kind": "function",
+            "parents": [
+              "Transaction"
+            ]
+          }
+        },
+        {
+          "id": "26ca70349364cbf3a03d2f23834ded84bd829c8de6b62860aedc25c9f18c89b2",
+          "title": "fmt::Display for CommitOrigin::fmt",
+          "path": "src/interpreter/stm/diagnostics.rs",
+          "file": "94ee33522303b1375d14a03f8c647a6fc6e4b446aec52da929394e914f5c3760",
+          "version": "aa7810cde59cb378fb503700e4afe3111c3a1e647a16c1339262fb71f46e9689",
+          "line": 28,
+          "end_line": 46,
+          "excerpt": "        write!(f, \"{}::{}\", self.object, self.entry)\n    }\n}\n\n/// The first validation failure encountered, rather than every conflicting cell.\n#[derive(Debug, Clone, PartialEq, Eq)]\npub(crate) enum Conflict {\n    ReadInvalidated {\n        cell: VarId,\n        base: Version,\n        current: Version,\n        written_at: Version,\n        writer: Option<Arc<CommitOrigin>>,\n    },\n    MergeMismatch {\n        cell: VarId,\n        base: Version,\n        current: Version,\n    },\n",
+          "suggested_role": "validation",
+          "scope": {
+            "name": "fmt",
+            "kind": "function",
+            "parents": [
+              "fmt::Display for CommitOrigin"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "maintainer.lpc-rs.transaction-creation",
+      "question": "where are new transactions created?",
+      "selector": "original",
+      "samplesMs": [
+        435.86077300000034,
+        425.6305710000015,
+        428.6455449999994,
+        423.283755000004,
+        426.4089260000037,
+        425.50281100000575,
+        420.91590500000166,
+        416.63931800000137,
+        432.3124839999946,
+        425.27999600000476,
+        423.8164669999969,
+        424.98368299999856,
+        425.65140099999553,
+        430.08824399999867,
+        431.7327080000032,
+        424.7990920000011,
+        422.96375499998976,
+        425.69086199998856,
+        434.6831510000047,
+        432.8678660000005,
+        426.23179900000105,
+        445.8969300000026,
+        435.07811400000355,
+        431.01467499999853,
+        455.23743999999715,
+        513.222597999993,
+        538.1121180000046,
+        535.1586249999964,
+        531.025290000005,
+        532.2562279999984
+      ],
+      "medianMs": 430.08824399999867,
+      "p95Ms": 535.1586249999964,
+      "maxMs": 538.1121180000046,
+      "maxResponseBytes": 6843,
+      "snapshot": "a400367c7ef7fb7bf02b9dccc32674bdce31f6458a915dfba79a898b13bf5587",
+      "available_files": 552,
+      "searched_files": 552,
+      "omitted_files": 0,
+      "results": [
+        {
+          "id": "69f281afb9871fe6af043c5a0a29cbe115eb2ef89fce1021b19ede1a3adc7390",
+          "title": "Pending::new",
+          "path": "src/command/presence/transaction_tests.rs",
+          "file": "c73a968deb43830d10c858a9ff8375156d7f636737199876ff9ca181f6688ec0",
+          "version": "c2524cd3da6654b7cc1eb1455742e79083c65a3244f5044637e545f3c38a0d2c",
+          "line": 20,
+          "end_line": 25,
+          "excerpt": "async fn new(vm: &Vm) -> Self {\n        let live = start_txn(&vm.global_state.committer_tx).await.unwrap();\n        let mut template = TaskTemplate::from(vm.global_state.clone());\n        template.txn = TxnHandle::new(Transaction::new(live.inner.clone()));\n        Self { live, template }\n    }",
+          "suggested_role": null,
+          "scope": {
+            "name": "new",
+            "kind": "function",
+            "parents": [
+              "Pending"
+            ]
+          }
+        },
+        {
+          "id": "a601867aee27f6f3e452241db884bbfac03fa5ea430fda0121e77aefe206ee79",
+          "title": "TxnHandle::new",
+          "path": "src/interpreter/stm/mod.rs",
+          "file": "beb06fc7b4893bafad88aef00c61ddc96df2fe6d81b0b6a2260eb3652081092c",
+          "version": "417054f21fac8ab230ab24ebd9324f95d8882c287184abea641ff6942905653f",
+          "line": 718,
+          "end_line": 721,
+          "excerpt": "pub(crate) fn new(txn: Transaction) -> Self {\n        let mode = txn.snapshot.null_mode;\n        Self(Arc::new(spin::Mutex::new(txn)), None, mode)\n    }",
+          "suggested_role": null,
+          "scope": {
+            "name": "new",
+            "kind": "function",
+            "parents": [
+              "TxnHandle"
+            ]
+          }
+        },
+        {
+          "id": "bb050c0f0581cb1ef1404db52740e978e9efeb89686268baf12b6ed0a664688c",
+          "title": "Transaction",
+          "path": "src/interpreter/stm/mod.rs",
+          "file": "beb06fc7b4893bafad88aef00c61ddc96df2fe6d81b0b6a2260eb3652081092c",
+          "version": "417054f21fac8ab230ab24ebd9324f95d8882c287184abea641ff6942905653f",
+          "line": 127,
+          "end_line": 139,
+          "excerpt": "impl Transaction {\n    pub(crate) fn new(snapshot: Snapshot) -> Self {\n        let version = snapshot.version();\n        Self {\n            snapshot,\n            changeset: Changeset::new(version),\n            effects: Vec::new(),\n            pending_call_outs: Vec::new(),\n            cancelled_call_outs: HashSet::new(),\n            joinable: true,\n            interrupted: None,\n            compilation: diagnostics::CompilationTiming::default(),\n            presence_revision: 0,\n",
+          "suggested_role": null,
+          "scope": {
+            "name": "Transaction",
+            "kind": "implementation",
+            "parents": []
+          }
+        },
+        {
+          "id": "ffc84a86e1e89ac9079f3f617b8c97865e0f0188b68f595db0e6913ba01df32b",
+          "title": "Transaction::with_class_cow",
+          "path": "src/interpreter/stm/mod.rs",
+          "file": "beb06fc7b4893bafad88aef00c61ddc96df2fe6d81b0b6a2260eb3652081092c",
+          "version": "417054f21fac8ab230ab24ebd9324f95d8882c287184abea641ff6942905653f",
+          "line": 385,
+          "end_line": 395,
+          "excerpt": "            return Ok(f(Arc::make_mut(own)));\n        }\n        let current = self\n            .read_class(var_id)\n            .ok_or_else(|| LpcError::runtime(\"class is not in this transaction's world\"))?;\n        let mut clone = (*current).clone();\n        let result = f(&mut clone);\n        self.changeset\n            .write(var_id, WorldValue::Class(Arc::new(clone)));\n        Ok(result)\n    }",
+          "suggested_role": null,
+          "scope": {
+            "name": "with_class_cow",
+            "kind": "function",
+            "parents": [
+              "Transaction"
+            ]
+          }
+        },
+        {
+          "id": "da4609a0b2df0ceec74a56685a3b2c6823bfa87a8b56027204bc67e939313e6a",
+          "title": "Process",
+          "path": "src/interpreter/process/mod.rs",
+          "file": "0a9dac862ecdb8d48a6e474cd14526c20380d311a546f16261ad6aae196154de",
+          "version": "c4a5a29601fa92e5a97026ddbf8caa14fe8acb2ac290a710dba53a73fd16a3d5",
+          "line": 68,
+          "end_line": 82,
+          "excerpt": "pub struct Process {\n    initial_image: Arc<ProgramImage>,\n\n    /// The transaction-visible program and global-cell layout after an upgrade.\n    pub(crate) image_cell: SVar<ProgramImage>,\n\n    /// The second this process was constructed: what `object_time` answers.\n    pub created: i64,\n\n    /// Present only for nonresident programs defining the idle cleanup apply.\n    pub(crate) cleanup: Option<Box<cleanup::Cleanup>>,\n\n    /// How this process is named.\n    name: ObjectName,\n\n",
+          "suggested_role": null,
+          "scope": {
+            "name": "Process",
+            "kind": "struct",
+            "parents": []
+          }
+        },
+        {
+          "id": "be4b5ebde2938d46af562239a14a691c39be66817db8eec0646acb71ce73669f",
+          "title": "UPDATED",
+          "path": "src/interpreter/vm/object_recompile/tests.rs",
+          "file": "46c122e03a00e86eeab32cdb9c7e6d4aae49a1506872319f854162e7610a1c8d",
+          "version": "944ca91ae55f0a9828b72fd86eee62ffa6bcee583645e4f058c5f58a6832a9ae",
+          "line": 30,
+          "end_line": 42,
+          "excerpt": "const UPDATED: &str = r#\"\n    int added = 7;\n    string changed = \"new\";\n    int creates = 999;\n    int health = 900;\n    void create() { creates += 1000; }\n    void set(int value) { health = value; }\n    int value() { return health * 10; }\n    int created() { return creates; }\n    int defaults() { return added == 7 && changed == \"new\"; }\n    function composed() { return compose(&abs(), &abs()); }\n    function closure() { return (: health :); }\n\"#;",
+          "suggested_role": null,
+          "scope": {
+            "name": "UPDATED",
+            "kind": "constant",
+            "parents": []
+          }
+        },
+        {
+          "id": "7ca7114a3cc506438a105965a153cca116495aceb5acf801bf38606a7623a28d",
+          "title": "Committer::publish",
+          "path": "src/interpreter/stm/committer.rs",
+          "file": "6a1d27eec2da7cbbc3a7ccb3c16e55654714d12b2f323d88dfbd4df021ab74ca",
+          "version": "e86d4e7efb15b77f4bb8be660db4bef125ede56ee1ef2532c18c670b5814905b",
+          "line": 671,
+          "end_line": 682,
+          "excerpt": "fn publish(&mut self, mut changeset: Changeset, transaction: bool) {\n        let mut written_vars = changeset.touched_vars();\n        if !changeset.object_changes.is_empty() {\n            written_vars.insert(self.snapshot.object_membership);\n        }\n        if written_vars.is_empty() {\n            // Conflict-free read-only changeset: no new version, no history.\n            self.stats.read_only_commit();\n            return;\n        }\n\n        let new_version = Version::new();\n",
+          "suggested_role": null,
+          "scope": {
+            "name": "publish",
+            "kind": "function",
+            "parents": [
+              "Committer"
+            ]
+          }
+        },
+        {
+          "id": "ac73a85a7be02d8303681c8253106c1c39212b59bf90657da144eeb0d0cf5774",
+          "title": "regex_cache.rs",
+          "path": "src/interpreter/vm/regex_cache.rs",
+          "file": "001433d797b06b5c434213d99a2a0135803c70dc9103abf08bb37feb5f0f2344",
+          "version": "25181c3091bd422feb734518ef5debd6601843b8610ff2eee9d31833bd2f175a",
+          "line": 1,
+          "end_line": 14,
+          "excerpt": "//! Bounded compiled regexes shared by a VM, independent of LPC values and transactions.\n\nuse std::sync::Arc;\n\nuse regex::{Regex, RegexBuilder};\n\nuse crate::{compile_time_config::REGEX_CACHE_CAPACITY, util::memo::Memo};\n\n/// Compilation options only; matching offsets and output flags do not belong in the key.\n#[derive(Clone, Copy, Debug, Default, Eq, Hash, PartialEq)]\npub(crate) struct RegexOptions {\n    pub case_insensitive: bool,\n    pub multi_line: bool,\n    pub dot_matches_new_line: bool,\n",
+          "suggested_role": null,
+          "scope": null
+        }
+      ]
+    },
+    {
+      "id": "maintainer.lpc-rs.add-efun",
+      "question": "how do i add a new efun?",
+      "selector": "original",
+      "samplesMs": [
+        621.9931380000053,
+        667.3867210000026,
+        648.7028359999968,
+        632.389062000002,
+        563.6825450000033,
+        647.6606960000063,
+        645.8678990000044,
+        613.688559999995,
+        644.4501369999925,
+        555.0490580000042,
+        541.4351580000075,
+        581.7395059999981,
+        529.7698910000036,
+        532.5080079999898,
+        655.91734,
+        566.0510179999983,
+        503.66109999999753,
+        612.701608000003,
+        599.0930620000145,
+        522.8195560000022,
+        572.630588,
+        588.4750330000097,
+        550.022032000008,
+        556.1941609999922,
+        607.4545369999978,
+        559.2905640000099,
+        571.6579970000021,
+        502.93215300000156,
+        569.7128960000118,
+        526.6753270000045
+      ],
+      "medianMs": 572.630588,
+      "p95Ms": 655.91734,
+      "maxMs": 667.3867210000026,
+      "maxResponseBytes": 6841,
+      "snapshot": "a400367c7ef7fb7bf02b9dccc32674bdce31f6458a915dfba79a898b13bf5587",
+      "available_files": 552,
+      "searched_files": 552,
+      "omitted_files": 0,
+      "results": [
+        {
+          "id": "82dcda06c36c72c66ba0fa052b806065d1f798fb23e780cdcc762555957dad90",
+          "title": "parse_add_synonym",
+          "path": "src/interpreter/efun/parse_add_synonym.rs",
+          "file": "7ced5fcd2f42133ec433e01e61797da06aaef7417d8ecb04e2f96d03e3edb707",
+          "version": "ebeea9451ad7c4c20b723aac9cdedf53d3e27f5f0836ffea86cf81129f54a86c",
+          "line": 14,
+          "end_line": 24,
+          "excerpt": "pub fn parse_add_synonym<const N: usize>(context: &mut EfunContext<'_, N>) -> Result<()> {\n    let (LpcRef::String(new_verb), LpcRef::String(old_verb)) =\n        (context.arg(0).clone(), context.arg(1).clone())\n    else {\n        return Err(context.runtime_error(\"parse_add_synonym: the verbs must be strings\"));\n    };\n    let rule_filter = context\n        .try_arg(2)\n        .filter(|r| !r.is_null_in(context.txn()))\n        .map(|r| match r {\n            LpcRef::String(s) => Ok(s.to_str()),\n",
+          "suggested_role": null,
+          "scope": {
+            "name": "parse_add_synonym",
+            "kind": "function",
+            "parents": []
+          }
+        },
+        {
+          "id": "f5dccf1fa1154d545ff62258d49ec55b419c696f3cf87bc3a087010ae943613d",
+          "title": "parse_add_synonym.rs",
+          "path": "src/interpreter/efun/parse_add_synonym.rs",
+          "file": "7ced5fcd2f42133ec433e01e61797da06aaef7417d8ecb04e2f96d03e3edb707",
+          "version": "ebeea9451ad7c4c20b723aac9cdedf53d3e27f5f0836ffea86cf81129f54a86c",
+          "line": 7,
+          "end_line": 14,
+          "excerpt": "    interpreter::{efun::efun_context::EfunContext, lpc_ref::LpcRef},\n};\n\n/// `parse_add_synonym(new_verb, old_verb, rule)`: copies every rule\n/// `this_object()` registered under `old_verb` (or only the one whose text\n/// is `rule`) as a fresh rule for `new_verb` sharing its handlers; `old_verb`\n/// is the typed verb, so a synonym of a synonym works.\npub fn parse_add_synonym<const N: usize>(context: &mut EfunContext<'_, N>) -> Result<()> {\n",
+          "suggested_role": null,
+          "scope": null
+        },
+        {
+          "id": "d5c302f8ecdf86630379b8a681123f724ecbcd9978c44c3a1ac0bf7f98188e6b",
+          "title": "EfunContext<'task, N>::new",
+          "path": "src/interpreter/efun/efun_context.rs",
+          "file": "686301a0a40d6dffce7abba8798e1c9cfabd81872d5f7343b4eb7d1b959b2f6a",
+          "version": "dec296018ec88d3d5343e6283a2075007c0f86307591ba7661cee752dbf15b70",
+          "line": 80,
+          "end_line": 86,
+          "excerpt": "pub fn new(\n        stack: &'task mut CallStack<N>,\n        task_context: &'task TaskContext,\n        efun: Efun,\n    ) -> Self {\n        Self::build(stack, task_context, efun, SmallVec::new(), None, None)\n    }",
+          "suggested_role": null,
+          "scope": {
+            "name": "new",
+            "kind": "function",
+            "parents": [
+              "EfunContext<'task, N>"
+            ]
+          }
+        },
+        {
+          "id": "6fdc0ce78a1bc9b1f993892052adf642622268ad4cecd644dc48cdc69a4ed1e9",
+          "title": "parse_add_rule",
+          "path": "src/interpreter/efun/parse_add_rule.rs",
+          "file": "9119bf85741c960313d9f7147c3f4e6f3db982ed88d28b3f3559e005dbe9d030",
+          "version": "d21d7226e1e28abbff436174a313522611e01bd7b51c23a27b4ca914b0d8e88c",
+          "line": 14,
+          "end_line": 23,
+          "excerpt": "pub fn parse_add_rule<const N: usize>(context: &mut EfunContext<'_, N>) -> Result<()> {\n    let this = context.process().clone();\n    if this.parser_ready.get().is_none() {\n        return Err(context.runtime_error(\"parse_add_rule: parse_init() has not been called\"));\n    }\n    let (LpcRef::String(verb), LpcRef::String(rule)) =\n        (context.arg(0).clone(), context.arg(1).clone())\n    else {\n        return Err(context.runtime_error(\"parse_add_rule: the verb and rule must be strings\"));\n    };\n",
+          "suggested_role": null,
+          "scope": {
+            "name": "parse_add_rule",
+            "kind": "function",
+            "parents": []
+          }
+        },
+        {
+          "id": "732a424b2400f6c7c93c40af33a72ba47a15bee79aca91ab263843eeb097a86d",
+          "title": "add_rule",
+          "path": "src/interpreter/efun/add_rule.rs",
+          "file": "245a756633bc3ceb4bd0377e49347b4ae77a1e3cd98b91c00b472ad48baf746f",
+          "version": "4a2eff1ae65cef9e506137029b8d390fb54e309e3bd4b6d9757ccae84974cc7c",
+          "line": 13,
+          "end_line": 21,
+          "excerpt": "pub fn add_rule<const N: usize>(context: &mut EfunContext<'_, N>) -> Result<()> {\n    let Some(player) = context.this_player().load_full() else {\n        return Err(context.runtime_error(\"add_rule: no this_player() to attach to\"));\n    };\n    if !player.commands_enabled(context.txn()) {\n        return Err(context.runtime_error(\"add_rule: this_player() is not a living object\"));\n    }\n\n    let LpcRef::String(pattern) = context.arg(0).clone() else {\n",
+          "suggested_role": null,
+          "scope": {
+            "name": "add_rule",
+            "kind": "function",
+            "parents": []
+          }
+        },
+        {
+          "id": "9c7c8b1ccb327f2a5c60df68ecb2b8c837051828b2eb17806cf79bb9268fe3b7",
+          "title": "add_action",
+          "path": "src/interpreter/efun/add_action.rs",
+          "file": "31d1c19086c11e94991dcad4fa088dafe13bab0efddf3001a620831d27d8deae",
+          "version": "f7607c5de3adb3649040421e892b056a8efd892fa48f404abc23f3ce74fe84ad",
+          "line": 20,
+          "end_line": 29,
+          "excerpt": "pub fn add_action<const N: usize>(context: &mut EfunContext<'_, N>) -> Result<()> {\n    let Some(player) = context.this_player().load_full() else {\n        return Err(context.runtime_error(\"add_action: no this_player() to attach to\"));\n    };\n    if !player.commands_enabled(context.txn()) {\n        return Err(context.runtime_error(\"add_action: this_player() is not a living object\"));\n    }\n\n    let handler = handler_from(context, context.arg(0).clone(), \"add_action\")?;\n\n",
+          "suggested_role": null,
+          "scope": {
+            "name": "add_action",
+            "kind": "function",
+            "parents": []
+          }
+        },
+        {
+          "id": "fab655e65488ba5d81cbac20c0c51d605b037b72c42271ad6a02f60e47447649",
+          "title": "efuns",
+          "path": "src/interpreter/efun/mod.rs",
+          "file": "e425f0394c640c1ebabe0d96e51aed56b4bb54716e697e0ba91270e5ce787bbb",
+          "version": "6f032ee8f9dc5f60eda21c6b7b05a7b07646f0a0d8cd18cfc9f2d6b10f1039d2",
+          "line": 324,
+          "end_line": 331,
+          "excerpt": "        /// indexes into this map; a reorder invalidates compiled code.\n        pub static EFUN_PROTOTYPES: LazyLock<IndexMap<&'static str, FunctionPrototype>> = LazyLock::new(|| {\n            let mut m = IndexMap::new();\n            $( m.insert(efun_name(stringify!($name)), efuns!(@prototype $name { $($row)* })); )+\n            m\n        });\n    };\n}",
+          "suggested_role": null,
+          "scope": {
+            "name": "efuns",
+            "kind": "macro",
+            "parents": []
+          }
+        },
+        {
+          "id": "1a4ca5f8bcd04d6418145713e8398060a1b14942b4b9f06691dd92190b2a931c",
+          "title": "EFUN_FUNCTIONS",
+          "path": "src/interpreter/efun/mod.rs",
+          "file": "e425f0394c640c1ebabe0d96e51aed56b4bb54716e697e0ba91270e5ce787bbb",
+          "version": "6f032ee8f9dc5f60eda21c6b7b05a7b07646f0a0d8cd18cfc9f2d6b10f1039d2",
+          "line": 1392,
+          "end_line": 1401,
+          "excerpt": "pub static EFUN_FUNCTIONS: LazyLock<IndexMap<&'static str, Arc<ProgramFunction>>> =\n    LazyLock::new(|| {\n        EFUN_PROTOTYPES\n            .iter()\n            .map(|(k, v)| {\n                let f = ProgramFunction::new(v.clone(), 0);\n                (*k, Arc::new(f))\n            })\n            .collect()\n    });",
+          "suggested_role": null,
+          "scope": {
+            "name": "EFUN_FUNCTIONS",
+            "kind": "static",
+            "parents": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "maintainer.lpc-rs.commit-checks",
+      "question": "show me the codepath that transaction commits take, with all the checks they go through",
+      "selector": "original",
+      "samplesMs": [
+        315.9824290000106,
+        345.6719230000017,
+        274.0042570000078,
+        333.20493800000986,
+        341.5996080000041,
+        314.7858469999919,
+        314.5941080000048,
+        292.29212800000096,
+        275.88253099999565,
+        302.6264620000002,
+        296.47555800000555,
+        292.24834599999303,
+        296.1296239999938,
+        296.61750900000334,
+        288.0089650000009,
+        346.64418000000296,
+        294.83075700000336,
+        316.2509949999949,
+        345.67601700000523,
+        287.1800899999944,
+        308.845438999997,
+        325.76073399999586,
+        301.2313839999988,
+        294.0966199999966,
+        292.9167289999896,
+        285.36420999999973,
+        282.74315500000375,
+        293.52393499999016,
+        286.5359699999972,
+        291.6646619999956
+      ],
+      "medianMs": 296.47555800000555,
+      "p95Ms": 345.67601700000523,
+      "maxMs": 346.64418000000296,
+      "maxResponseBytes": 6515,
+      "snapshot": "a400367c7ef7fb7bf02b9dccc32674bdce31f6458a915dfba79a898b13bf5587",
+      "available_files": 552,
+      "searched_files": 552,
+      "omitted_files": 0,
+      "results": [
+        {
+          "id": "5b19bf9a8b5cb194ae6bef7ce5add8e5f7fe61a637fd454b5058e270395070a7",
+          "title": "AllEnvironment",
+          "path": "src/interpreter/process/util.rs",
+          "file": "1027183f32a035d54c366c932031f02f5159578803cebdc673837af12d2b5ad3",
+          "version": "f39d122b2b0e5ed51b4827e8a9f886c6b266db237ef070be233bdfc35df8b283",
+          "line": 9,
+          "end_line": 19,
+          "excerpt": "pub struct AllEnvironment {\n    /// The current environment. Calling `next` will return the environment of this `Process`.\n    current: Option<Arc<Process>>,\n\n    /// Already returned, by filename; the second line behind `move_to`'s\n    /// refusal.\n    seen: HashSet<Arc<Process>>,\n\n    /// The transaction whose view this chain is followed through.\n    txn: TxnHandle,\n}",
+          "suggested_role": null,
+          "scope": {
+            "name": "AllEnvironment",
+            "kind": "struct",
+            "parents": []
+          }
+        },
+        {
+          "id": "e35d72bc25b6c64dfedd71a39a7db85cc237873a6cafee03b6954c406c4a92ce",
+          "title": "AttemptBody for Publication::commit_phase",
+          "path": "src/interpreter/sockets/transport.rs",
+          "file": "7aff3d7ec7e6b420c778f7895a13383206c716dd0a99209a281b472bc083b8da",
+          "version": "5e06f0797db79a944f75a1aa18ef89c2ba73e7ae953eb21628549d8d6421cfa6",
+          "line": 1007,
+          "end_line": 1020,
+          "excerpt": "async fn commit_phase(\n        &mut self,\n        tx: &flume::Sender<CommitProtocol>,\n        _live: LiveSnapshot,\n    ) -> Result<(std::result::Result<(), Conflict>, Vec<Effect>)> {\n        let txn = self\n            .txn\n            .take()\n            .ok_or_else(|| error(\"missing native socket attempt\"))?;\n        Ok((\n            commit_changeset(tx, txn.with(Transaction::take_changeset)).await?,\n            Vec::new(),\n        ))\n    }",
+          "suggested_role": null,
+          "scope": {
+            "name": "commit_phase",
+            "kind": "function",
+            "parents": [
+              "AttemptBody for Publication"
+            ]
+          }
+        },
+        {
+          "id": "b2407297a330c49a84c4d85fe3a00101f0f495bb865157e838f42868f3afc934",
+          "title": "Fixture::commit",
+          "path": "src/interpreter/sockets/transport/tests.rs",
+          "file": "bf242028f51c9841c4dff571c2d172b4a56b50de151ced353b86d2ac96bb1214",
+          "version": "f72c33317f80cb17884e8cdcd88d5bfce5108d9a0cd5752d0ee5734f84faa084",
+          "line": 49,
+          "end_line": 55,
+          "excerpt": "async fn commit(&self, txn: &TxnHandle, mut live: LiveSnapshot) {\n        live.disarm();\n        commit_changeset(&self.gs.committer_tx, txn.with(Transaction::take_changeset))\n            .await\n            .unwrap()\n            .unwrap();\n    }",
+          "suggested_role": null,
+          "scope": {
+            "name": "commit",
+            "kind": "function",
+            "parents": [
+              "Fixture"
+            ]
+          }
+        },
+        {
+          "id": "17c6cafebbc135051e43ac4460877950619989614d868d685b60dea73345a9e4",
+          "title": "AttemptBody for Task<STACKSIZE>::commit_phase",
+          "path": "src/interpreter/task/mod.rs",
+          "file": "b1e9a6cdcd6befd5a9ac0fb3de6ba7e8574ae83cddbaeeaa17e58795039be09f",
+          "version": "ad459306c024a2f544a5d3a0f66df2f5d8ff331d2c772374fe14087f20acbc34",
+          "line": 1067,
+          "end_line": 1076,
+          "excerpt": "        Vec<Effect>,\n    )> {\n        // Clone the changeset, not take it: the result's payload is read\n        // through this handle after the commit, against the pre-commit\n        // snapshot plus this changeset.\n        let changeset = self.context.txn.with(|t| t.clone_changeset());\n        let commit = commit_changeset(tx, changeset).await?;\n        let effects = self.context.txn.with(|t| t.take_effects());\n        Ok((commit, effects))\n    }",
+          "suggested_role": null,
+          "scope": {
+            "name": "commit_phase",
+            "kind": "function",
+            "parents": [
+              "AttemptBody for Task<STACKSIZE>"
+            ]
+          }
+        },
+        {
+          "id": "ac86e906f818eb5553a34bcb126264f7cdbc8ab86dc97d659ccd257514d3a894",
+          "title": "AttemptBody for Race<'_>::commit_phase",
+          "path": "src/interpreter/sockets/callbacks/tests.rs",
+          "file": "0dfea3758cf18222a8fbb356c11af2ad94ad4fa8ccfe8a1d4a6ea0aa1756fc46",
+          "version": "85f6396acb3964d2fa2397418f42823055350823e272ea47198542864a0e036f",
+          "line": 365,
+          "end_line": 374,
+          "excerpt": "                }\n                .close(&owner, handle)?,\n            }\n            other.disarm();\n            commit_changeset(tx, txn.with(Transaction::take_changeset))\n                .await?\n                .unwrap();\n        }\n        self.body.commit_phase(tx, live).await\n    }",
+          "suggested_role": null,
+          "scope": {
+            "name": "commit_phase",
+            "kind": "function",
+            "parents": [
+              "AttemptBody for Race<'_>"
+            ]
+          }
+        },
+        {
+          "id": "5c5a6c13d3dc8afc3214f9980da087ef2c841bbbfd64629eabd69d51bdd902ae",
+          "title": "Fixture::commit",
+          "path": "src/interpreter/sockets/tests.rs",
+          "file": "426bdfbc68e2f96cf6239c35362aaadeb371000840204d7f12178dc154d73e9b",
+          "version": "aacd2e80c3d5428e01186ea4825336f3eca047c0d4b72862803ed67b413d55cd",
+          "line": 51,
+          "end_line": 55,
+          "excerpt": "pub(super) fn commit(&mut self, txn: &TxnHandle) {\n        self.committer\n            .commit(txn.with(Transaction::take_changeset))\n            .unwrap();\n    }",
+          "suggested_role": null,
+          "scope": {
+            "name": "commit",
+            "kind": "function",
+            "parents": [
+              "Fixture"
+            ]
+          }
+        },
+        {
+          "id": "31bb0fce6010d23d796568879c3149aedd0209acca9cc14c89b9bad875e82714",
+          "title": "Fixture::commit",
+          "path": "src/interpreter/sockets/callbacks/tests.rs",
+          "file": "0dfea3758cf18222a8fbb356c11af2ad94ad4fa8ccfe8a1d4a6ea0aa1756fc46",
+          "version": "85f6396acb3964d2fa2397418f42823055350823e272ea47198542864a0e036f",
+          "line": 94,
+          "end_line": 103,
+          "excerpt": "async fn commit(&self, txn: &TxnHandle, mut live: LiveSnapshot) {\n        live.disarm();\n        commit_changeset(\n            &self.gs().committer_tx,\n            txn.with(Transaction::take_changeset),\n        )\n        .await\n        .unwrap()\n        .unwrap();\n    }",
+          "suggested_role": null,
+          "scope": {
+            "name": "commit",
+            "kind": "function",
+            "parents": [
+              "Fixture"
+            ]
+          }
+        },
+        {
+          "id": "3ae2f815e07f07bd1842fecfe7eae9ce92cd924df1acde0a6b40ff6304f33a78",
+          "title": "CompileThrough for SemanticCheckWalker",
+          "path": "src/test_support/mod.rs",
+          "file": "8a2d5c247aae137d6f2d081ce23601d6d68f48b1b0ee8d80bbf8dcca37038929",
+          "version": "7d6a22191e8346d76fec86289da8b44aaa23b1c5c8ba49c48a38f7dc94b52321",
+          "line": 440,
+          "end_line": 450,
+          "excerpt": "impl CompileThrough for SemanticCheckWalker {\n    async fn compile_through_parsed(\n        program: &mut ProgramNode,\n        context: CompilationContext,\n    ) -> Result<Self> {\n        let context = ScopeWalker::compile_through_parsed(program, context)\n            .await?\n            .into_context();\n        apply(program, context, false).await\n    }\n}",
+          "suggested_role": null,
+          "scope": {
+            "name": "CompileThrough for SemanticCheckWalker",
+            "kind": "implementation",
+            "parents": []
+          }
+        }
+      ]
+    }
+  ],
+  "workflow": {
+    "question": "where are new transactions created?",
+    "authorship": "Known source-aware functional replay, not a fresh maintainer task",
+    "board": {
+      "schema": 1,
+      "workspace": "92f7b59f1f904e0466ab6584d12041f205072766cf71ece326ddbbee8b93d9ee",
+      "revision": 3,
+      "next_id": 3,
+      "question": "where are new transactions created?",
+      "evidence": [
+        {
+          "id": 1,
+          "title": "Transaction",
+          "note": "",
+          "source": {
+            "workspace": "92f7b59f1f904e0466ab6584d12041f205072766cf71ece326ddbbee8b93d9ee",
+            "snapshot": "a400367c7ef7fb7bf02b9dccc32674bdce31f6458a915dfba79a898b13bf5587",
+            "file": "beb06fc7b4893bafad88aef00c61ddc96df2fe6d81b0b6a2260eb3652081092c",
+            "version": "417054f21fac8ab230ab24ebd9324f95d8882c287184abea641ff6942905653f",
+            "content": "55049f746a8d12470351d5747b46da19669ec0bec0ad09019bc9eeb78f4ad664",
+            "path": "src/interpreter/stm/mod.rs",
+            "line": 127,
+            "end_line": 132,
+            "excerpt": "impl Transaction {\n    pub(crate) fn new(snapshot: Snapshot) -> Self {\n        let version = snapshot.version();\n        Self {\n            snapshot,\n            changeset: Changeset::new(version),\n",
+            "truncated": true
+          }
+        },
+        {
+          "id": 2,
+          "title": "AttemptBody for Publication::begin_attempt",
+          "note": "",
+          "source": {
+            "workspace": "92f7b59f1f904e0466ab6584d12041f205072766cf71ece326ddbbee8b93d9ee",
+            "snapshot": "a400367c7ef7fb7bf02b9dccc32674bdce31f6458a915dfba79a898b13bf5587",
+            "file": "7aff3d7ec7e6b420c778f7895a13383206c716dd0a99209a281b472bc083b8da",
+            "version": "5e06f0797db79a944f75a1aa18ef89c2ba73e7ae953eb21628549d8d6421cfa6",
+            "content": "f6572ef19d18e699b78f420525e31006e9e661f37a6465c51486fe811cb3a15a",
+            "path": "src/interpreter/sockets/transport.rs",
+            "line": 940,
+            "end_line": 945,
+            "excerpt": "    async fn begin_attempt(\n        &mut self,\n        tx: &flume::Sender<CommitProtocol>,\n    ) -> Result<Option<LiveSnapshot>> {\n        let live = start_txn(tx).await?;\n        let txn = TxnHandle::new(Transaction::new(live.inner.clone()));\n",
+            "truncated": true
+          }
+        }
+      ],
+      "connections": []
+    },
+    "recordingOnlyHandoff": "--reuse-window\n--goto\n/tmp/vizzi-search-roles-prepared/source/src/interpreter/stm/mod.rs:127:1\n"
+  },
+  "browser": {
+    "version": "156.0.8078.4",
+    "samplesMs": [
+      347.5,
+      481.2000000476837,
+      614.5,
+      364.40000009536743,
+      465.2999999523163,
+      597.5,
+      363.7999999523163,
+      498.2000000476837,
+      632.9000000953674,
+      381,
+      479.7999999523163,
+      595.0999999046326,
+      346.09999990463257,
+      465.7999999523163,
+      679.7000000476837,
+      382.10000014305115,
+      514.3999998569489,
+      731.1000001430511,
+      397.2000000476837,
+      580.7999999523163,
+      715.5999999046326,
+      413.69999980926514,
+      580.7999999523163,
+      681.2000000476837,
+      415.5,
+      548.2000000476837,
+      598.1000001430511,
+      348.40000009536743,
+      464.69999980926514,
+      598.8999998569489
+    ],
+    "medianMs": 498.2000000476837,
+    "p95Ms": 715.5999999046326,
+    "maxMs": 731.1000001430511,
+    "errors": []
+  },
+  "limitations": [
+    "Known development questions only; no fresh-question relevance or maintainer acceptance claim.",
+    "One optimized native host, one indexing worker, no model, no competing test/mutation cohort.",
+    "Thirty warm localhost/full-body observations after five warmups per question/selector; JSON parsing follows request timing.",
+    "Browser submission through two animation frames includes DOM/network/frame scheduling, rather than physical input or hardware frame-time capture.",
+    "Pinned lpc-rs source scope only; cache preparation is separated from warm retrieval. No large-repository qualification."
+  ]
+}

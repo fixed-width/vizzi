@@ -1,5 +1,5 @@
 //! Explicit source packs select captured bytes rather than expanded anchor windows.
-use vizzi_qa::{Corpus, IdAnswer, SourceFile, SourceRange, Status};
+use vizzi_search::{Corpus, IdAnswer, SourceFile, SourceRange, Status};
 
 fn source(path: &str, text: &str) -> SourceFile {
     SourceFile {

@@ -1,0 +1,125 @@
+{
+  "authorship": "Known development targets only; post-run descriptive audit using the unchanged coverage helper, not a fresh relevance evaluation.",
+  "rows": [
+    {
+      "case": "maintainer.lpc-rs.transaction-creation",
+      "selector": "focused",
+      "targets": [
+        {
+          "id": "constructor",
+          "literalRank": 1,
+          "scopeRank": null,
+          "foundRank": 1
+        },
+        {
+          "id": "owning-entry",
+          "literalRank": 5,
+          "scopeRank": 5,
+          "foundRank": 5
+        }
+      ]
+    },
+    {
+      "case": "maintainer.lpc-rs.add-efun",
+      "selector": "focused",
+      "targets": [
+        {
+          "id": "registration-definition",
+          "literalRank": null,
+          "scopeRank": 1,
+          "foundRank": 1
+        },
+        {
+          "id": "registration-table",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        }
+      ]
+    },
+    {
+      "case": "maintainer.lpc-rs.commit-checks",
+      "selector": "focused",
+      "targets": [
+        {
+          "id": "receiver",
+          "literalRank": 1,
+          "scopeRank": 1,
+          "foundRank": 1
+        },
+        {
+          "id": "validator",
+          "literalRank": 6,
+          "scopeRank": 6,
+          "foundRank": 6
+        },
+        {
+          "id": "future-version-check",
+          "literalRank": 6,
+          "scopeRank": null,
+          "foundRank": 6
+        }
+      ]
+    },
+    {
+      "case": "maintainer.lpc-rs.transaction-creation",
+      "selector": "original",
+      "targets": [
+        {
+          "id": "constructor",
+          "literalRank": 3,
+          "scopeRank": null,
+          "foundRank": 3
+        },
+        {
+          "id": "owning-entry",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        }
+      ]
+    },
+    {
+      "case": "maintainer.lpc-rs.add-efun",
+      "selector": "original",
+      "targets": [
+        {
+          "id": "registration-definition",
+          "literalRank": null,
+          "scopeRank": 7,
+          "foundRank": 7
+        },
+        {
+          "id": "registration-table",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        }
+      ]
+    },
+    {
+      "case": "maintainer.lpc-rs.commit-checks",
+      "selector": "original",
+      "targets": [
+        {
+          "id": "receiver",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        },
+        {
+          "id": "validator",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        },
+        {
+          "id": "future-version-check",
+          "literalRank": null,
+          "scopeRank": null,
+          "foundRank": null
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+# Execute every generated variant. Classify the observed deletion of outline_count
+# in Companion::pin separately: pinning discards Window.outline and retains only
+# Window.lines. Deleting line_start or line_count changes saved evidence and must fail.
+# cargo-mutants 27.1.0 still generated this field deletion with an exact exclude_re;
+# keep it visible as a reviewed equivalent rather than reporting it as test-caught.
+exclude_re = []

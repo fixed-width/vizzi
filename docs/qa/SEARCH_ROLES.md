@@ -46,3 +46,9 @@ is an enforced cap or hardware qualification. Stop the owned process.
 
 Retain this cohort's gains and failures without changing policy after results. Any later
 UI integration or source-role correction remains separate work.
+
+The subsequent [native question-search trial](../companion/SEARCH_TECH.md) extracts portable
+search into `vizzi-search`; `vizzi-qa` retains acquisition/stdio and compatibility exports.
+Historical runs remain tied to their recorded source hashes.
+Current development tests live under `crates/vizzi-search/tests`; new freezes include the
+shared crate's implementation and manifest as well as the QA adapter.

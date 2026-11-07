@@ -11,6 +11,7 @@ pub mod engine;
 pub mod host;
 mod invalidation;
 mod maintenance;
+pub mod question_search;
 pub mod review;
 pub mod review_application;
 pub mod review_source;

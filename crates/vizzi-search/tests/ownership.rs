@@ -1,5 +1,5 @@
 //! Captured owners carry information absent from constructor bodies and filenames.
-use vizzi_qa::{Context, Corpus, SourceFile};
+use vizzi_search::{Context, Corpus, SourceFile};
 fn file(path: &str, text: &str) -> SourceFile {
     SourceFile {
         path: path.into(),

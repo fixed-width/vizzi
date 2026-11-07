@@ -294,6 +294,15 @@ impl Companion {
             lines: doc.captured().line_count(),
         })
     }
+    /// Keeps a search location only while its observation is current.
+    pub fn pin_current(&self, request: PinEvidence) -> Result<u32, CompanionError> {
+        if self.snapshot()?.id().as_str() != request.snapshot {
+            return Err(CompanionError::Conflict(
+                "Source changed; search again before keeping this location".into(),
+            ));
+        }
+        self.pin(request)
+    }
     /// Captures a finite literal excerpt at the requested exact observation/version.
     pub fn pin(&self, request: PinEvidence) -> Result<u32, CompanionError> {
         let snapshot = self

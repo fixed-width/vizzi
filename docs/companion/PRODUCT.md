@@ -1,5 +1,8 @@
 # An investigation alongside the editor
 
+The opt-in [question-search trial](SEARCH_PRODUCT.md) adds a question-first path into
+the same previews, saved evidence and editor handoff. The overview below remains the default.
+
 This contract implements the maintainer's product-alignment decision after `0968fe4`.
 The primary experience helps an unfamiliar reader discover how source is organised,
 then retain useful context. It uses the

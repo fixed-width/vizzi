@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/vizzi-perf", "crates/vizzi-core", "crates/vizzi", "crates/vizzi-qa"]
+members = ["crates/vizzi-perf", "crates/vizzi-core", "crates/vizzi", "crates/vizzi-qa", "crates/vizzi-search"]
 resolver = "3"
 
 [workspace.package]

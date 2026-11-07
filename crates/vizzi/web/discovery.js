@@ -1,7 +1,7 @@
 import {renderStyledText} from '/presentation.js';
 
 // Source discovery owns temporary selection; saved interpretation stays in the companion.
-export function installDiscovery({transport, keep, openEditor, showError}) {
+export function installDiscovery({transport, keep, openEditor, showError, browseEnabled=true}) {
   const el = id => document.getElementById(id);
   const node = (tag, text) => {const n = document.createElement(tag);n.textContent = text;return n;};
   let path = '', offset = 0, data, status, board, preview, lastSnapshot;
@@ -14,7 +14,7 @@ export function installDiscovery({transport, keep, openEditor, showError}) {
   function syncSaved() {
     const saved = savedLocation();
     el('keep-discovered').textContent = saved ? 'Kept' : 'Keep this location';
-    el('keep-discovered').disabled = saving || !preview?.available || Boolean(saved);
+    el('keep-discovered').disabled = !board || saving || !preview?.available || Boolean(saved);
     el('preview-editor').hidden = !saved;
   }
   function breadcrumbs() {
@@ -97,7 +97,7 @@ export function installDiscovery({transport, keep, openEditor, showError}) {
   el('close-preview').onclick = () => {++previewRequest;previewController?.abort();preview = undefined;el('source-preview').hidden = true;};
   el('preview-more-names').onclick = () => {if (preview) void inspect(preview, nextNames);};
   el('keep-discovered').onclick = async () => {
-    if (!preview?.available || saving || savedLocation()) return;
+    if (!board || !preview?.available || saving || savedLocation()) return;
     const selected = preview;saving = true;syncSaved();
     try {await keep({snapshot: selected.snapshot, ...selected.location, title: selected.label});}
     catch (e) {showError(e);}finally {saving = false;syncSaved();}
@@ -105,9 +105,10 @@ export function installDiscovery({transport, keep, openEditor, showError}) {
   el('preview-editor').onclick = () => {const saved = savedLocation();if (saved) void openEditor(saved.id);};
   breadcrumbs();
   return {
+    inspect,
     receiveStatus(next) {
       status = next;el('repository-title').textContent = next.name || 'Explore this repository';
-      if (next.snapshot && lastSnapshot !== next.snapshot) {lastSnapshot = next.snapshot;void load();}
+      if (browseEnabled && next.snapshot && lastSnapshot !== next.snapshot) {lastSnapshot = next.snapshot;void load();}
       if (next.error && !next.snapshot) el('discovery-summary').textContent = 'Source indexing failed. Retry to build the overview.';
     },
     saved(view) {board = view.board;syncSaved();},

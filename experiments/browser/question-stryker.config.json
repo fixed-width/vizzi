@@ -1,0 +1,33 @@
+{
+  "$schema": "../../node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "mutate": [
+    "crates/vizzi/web/question-state.js"
+  ],
+  "testRunner": "command",
+  "commandRunner": {
+    "command": "node crates/vizzi/web/question-state.test.js"
+  },
+  "coverageAnalysis": "off",
+  "concurrency": 1,
+  "timeoutMS": 5000,
+  "reporters": [
+    "clear-text",
+    "json"
+  ],
+  "clearTextReporter": {
+    "reportMutants": false,
+    "logTests": false
+  },
+  "jsonReporter": {
+    "fileName": "/tmp/vizzi-question-node-mutations.json"
+  },
+  "thresholds": {
+    "break": 100
+  },
+  "ignorePatterns": [
+    "**",
+    "!package.json",
+    "!crates/vizzi/web/question-state.js",
+    "!crates/vizzi/web/question-state.test.js"
+  ]
+}

@@ -1,5 +1,5 @@
 //! Operation roles separate external entry evidence from ordinary owned members.
-use vizzi_qa::{Corpus, SourceFile};
+use vizzi_search::{Corpus, SourceFile};
 fn file(path: &str, text: &str) -> SourceFile {
     SourceFile {
         path: path.into(),
@@ -135,4 +135,55 @@ fn macro_registration_remains_a_structural_definition_signal() {
         .retrieve_search("how do I add a new codec?", 2, 1000)
         .unwrap();
     assert!(result.evidence()[0].text.contains("macro_rules! codecs"));
+}
+
+#[test]
+fn suggested_roles_align_with_search_evidence_without_changing_qa_serialization() {
+    let c = corpus(vec![
+        file(
+            "src/item.rs",
+            "struct Parcel; impl Parcel { fn new() -> Self { Self } }\n",
+        ),
+        file(
+            "src/open.rs",
+            "fn open_attempt(parcel: Parcel) { parcel.begin(); }\n",
+        ),
+    ]);
+    let focused = c
+        .retrieve_search("where are new parcels created?", 8, 4000)
+        .unwrap();
+    assert!(!focused.evidence().is_empty());
+    assert_eq!(focused.search_roles().len(), focused.evidence().len());
+    assert!(
+        focused
+            .search_roles()
+            .contains(&vizzi_search::SearchRole::Definition)
+    );
+    assert!(
+        focused
+            .search_roles()
+            .contains(&vizzi_search::SearchRole::Entry)
+    );
+    for (hit, role) in focused.evidence().iter().zip(focused.search_roles()) {
+        assert_eq!(
+            *role,
+            if hit.path == "src/item.rs" {
+                vizzi_search::SearchRole::Definition
+            } else {
+                vizzi_search::SearchRole::Entry
+            }
+        );
+    }
+    assert!(
+        serde_json::to_value(&focused)
+            .unwrap()
+            .get("roles")
+            .is_none()
+    );
+    for result in [
+        c.retrieve_compact("Parcel", 8, 4000).unwrap(),
+        c.retrieve_search("Parcel", 8, 4000).unwrap(),
+    ] {
+        assert!(result.search_roles().is_empty());
+    }
 }

@@ -1,0 +1,29 @@
+{
+  "workspaceTestsAndDoctests": {
+    "passed": 507,
+    "failed": 0,
+    "command": "CARGO_BUILD_JOBS=1 RUST_TEST_THREADS=1 nice -n 10 cargo test --offline --workspace"
+  },
+  "format": "cargo fmt --all --check passed",
+  "clippy": "CARGO_BUILD_JOBS=1 nice -n 10 cargo clippy --offline --workspace --all-targets -- -D warnings passed",
+  "browser": "CARGO_BUILD_JOBS=1 RUST_TEST_THREADS=1 nice -n 10 npm test passed (headless, recording-only editor fixtures)",
+  "qaNodeTestFiles": {
+    "passed": 20,
+    "localhostAdapter": "Fake HTTP model-adapter test required sandbox escalation; no real model/inference was used."
+  },
+  "rustMutations": "rust-audit.json",
+  "browserQueryStateMutations": {
+    "generated": 249,
+    "caught": 249,
+    "timeouts": 0,
+    "errors": 0,
+    "survived": 0,
+    "workers": 1
+  },
+  "freshMaintainerTrial": "Pending repository/questions; original three reference repositories are not required.",
+  "reservedRealSourceCases": {
+    "run": 0,
+    "reserved": 8
+  },
+  "finalScopedBrowserRegression": "After the full suite, final review reproduced saving being enabled before initial investigation state loaded, both on search cards and in the shared source drawer. Save controls/handlers now require that state. Trial, default discovery and saved-investigation browser checks passed after the final DOM-only fixes."
+}

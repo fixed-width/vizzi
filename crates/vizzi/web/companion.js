@@ -2,14 +2,18 @@ import {installAppearance} from '/appearance.js';
 import {createMessage,textRow} from '/messages.js';
 import {followChanges} from '/updates.js';
 import {installDiscovery} from '/discovery.js';
+import {installQuestionSearch} from '/question-search.js';
 const element=id=>document.getElementById(id),node=(tag,text)=>{const n=document.createElement(tag);n.textContent=text;return n;};
 installAppearance(element('theme'));
 const error=createMessage(element('investigation-error'),{label:'Dismiss investigation error'}),notice=createMessage(element('investigation-notice'),{label:'Dismiss investigation notice'}),sourceLabel=textRow(element('source-state'));
 let view,sourceStatus,selected,request=0,busy=false,questionDirty=false,noteDirty=false,wantIndex=false,updates;
-const discovery=installDiscovery({transport,openEditor,showError,keep:location=>mutate('/api/investigation/evidence',{revision:view.board.revision,snapshot:location.snapshot,file:location.file,version:location.version,line:location.line,title:location.title})});
+const trialSearch=new URLSearchParams(location.search).get('trial')==='search';
+const keepLocation=location=>mutate(trialSearch?'/api/search/evidence':'/api/investigation/evidence',{revision:view.board.revision,snapshot:location.snapshot,file:location.file,version:location.version,line:location.line,title:location.title});
+const discovery=installDiscovery({transport,openEditor,showError,keep:keepLocation,browseEnabled:!trialSearch});
+const questionSearch=installQuestionSearch({enabled:trialSearch,transport,inspect:discovery.inspect,keep:keepLocation,openEditor,showError,startIndex,saveQuestion:text=>mutate('/api/investigation',{action:'question',revision:view.board.revision,text})});
 function showMode(saved){
  if(noteDirty && !saved){notice.show('Save the current note before changing views.');return;}
- element('saved-workspace').hidden=!saved;element('discovery-panel').hidden=saved;
+ element('saved-workspace').hidden=!saved;element('discovery-panel').hidden=saved||trialSearch;element('question-search-panel').hidden=saved||!trialSearch;
  element('show-saved').setAttribute('aria-pressed',String(saved));element('show-discovery').setAttribute('aria-pressed',String(!saved));
  discovery.closePreview();if(!saved)element('evidence-detail').hidden=true;
  history.replaceState(null,'',saved?'#saved':location.pathname+location.search);
@@ -21,7 +25,7 @@ function setBusy(value){busy=value;for(const b of document.querySelectorAll('but
 function showError(e){error.show(e.message ?? String(e));}
 async function load(){const token=++request;try{const next=await transport('/api/investigation');if(token===request)apply(next);}catch(e){showError(e);}}
 async function mutate(uri,body,report=showError){if(busy)return null;setBusy(true);++request;error.show(null);try{const result=await transport(uri,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});apply(result.view ?? result);return result;}catch(e){report(e);if(e.status===409)await load();return null;}finally{setBusy(false);}}
-function apply(next){if(!next?.board || next.board.schema!==1 || !Array.isArray(next.board.evidence) || next.board.evidence.length>32 || !Array.isArray(next.board.connections) || next.board.connections.length>64)throw new Error('Invalid bounded investigation');if(view && next.board.revision<view.board.revision)return;const changed=!view || view.board.revision!==next.board.revision;view=next;if(changed){render();}else renderFreshness();discovery.saved(view);}
+function apply(next){if(!next?.board || next.board.schema!==1 || !Array.isArray(next.board.evidence) || next.board.evidence.length>32 || !Array.isArray(next.board.connections) || next.board.connections.length>64)throw new Error('Invalid bounded investigation');if(view && next.board.revision<view.board.revision)return;const changed=!view || view.board.revision!==next.board.revision;view=next;if(changed){render();}else renderFreshness();discovery.saved(view);questionSearch.saved(view);}
 function render(){
  const board=view.board;element('investigation-title').textContent=board.question || 'Your saved context';if(!questionDirty)element('question').value=board.question;
  element('save-mode').textContent=view.persistent?'Saved locally.':'Session investigation · export to keep a copy after the host stops.';
@@ -62,6 +66,6 @@ element('close-detail').addEventListener('click',()=>{if(noteDirty){notice.show(
 element('add-source').addEventListener('click',addSource);element('empty-add-source').addEventListener('click',()=>showMode(false));element('index-source').addEventListener('click',startIndex);element('cancel-source').addEventListener('click',()=>element('source-dialog').close());
 element('export').addEventListener('click',()=>{if(!view)return;const url=URL.createObjectURL(new Blob([JSON.stringify(view.board,null,2)+'\n'],{type:'application/json'}));const link=node('a','');link.href=url;link.download='investigation.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),0);});
 new ResizeObserver(()=>requestAnimationFrame(drawConnections)).observe(element('evidence-map'));
-updates=followChanges({session:()=>({receive(change){const old=sourceStatus?.snapshot;sourceStatus=change.status;updateSourceControls();discovery.receiveStatus(sourceStatus);if(old!==sourceStatus.snapshot && view)void load();return true;},close(e){if(e)sourceLabel.show('Source updates disconnected; saved investigation is kept');}})});
+updates=followChanges({session:()=>({receive(change){const old=sourceStatus?.snapshot;sourceStatus=change.status;updateSourceControls();discovery.receiveStatus(sourceStatus);questionSearch.receiveStatus(sourceStatus);if(old!==sourceStatus.snapshot && view)void load();return true;},close(e){if(e)sourceLabel.show('Source updates disconnected; saved investigation is kept');}})});
 showMode(location.hash==='#saved');
 void load();void startIndex();

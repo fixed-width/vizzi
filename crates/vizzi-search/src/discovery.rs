@@ -2,12 +2,19 @@
 use crate::{Context, Corpus, Error, SourceRole, SourceScope, compact, excerpt, require};
 use std::{cmp::Reverse, collections::BTreeSet, ops::Range};
 
-#[derive(Clone, Copy, PartialEq, Eq)]
-enum Role {
+/// Suggested pool origin, not a resolved semantic role or relevance guarantee.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Role {
+    /// Declaration or constructor starting point.
     Definition,
+    /// Potential entry or use location.
     Entry,
+    /// Potential registration or extension mechanism.
     Registration,
+    /// Supporting implementation example.
     Example,
+    /// Potential check or rejection location.
     Validation,
 }
 struct Plan {
@@ -242,6 +249,7 @@ impl Corpus {
             .map(|facet| plan.topics.union(facet).cloned().collect::<BTreeSet<_>>());
         let mut pools = pools.map(|pool| diversify(pool).into_iter());
         let mut evidence = vec![];
+        let mut roles = vec![];
         let mut seen = BTreeSet::new();
         let mut ranges: Vec<(String, Range<usize>)> = vec![];
         let mut used = 0;
@@ -254,11 +262,10 @@ impl Corpus {
                 .as_ref()
                 .map(|s| format!("{} {} {}", s.kind, s.name, s.parents.join(" ")))
                 .unwrap_or_default();
-            if tier(&source.path, source.role) != 0
-                || owned & !represented == 0
-                || !plan.facets.iter().any(|facet| {
-                    text_bits(&format!("{} {location}", source.text), facet, false) != 0
-                })
+            let facet = plan.facets.iter().position(|facet| {
+                text_bits(&format!("{} {location}", source.text), facet, false) != 0
+            });
+            if tier(&source.path, source.role) != 0 || owned & !represented == 0 || facet.is_none()
             {
                 continue;
             }
@@ -275,6 +282,9 @@ impl Corpus {
             used += source.range.len();
             represented |= owned;
             source.label = evidence.len() + 1;
+            if let Some(facet) = facet {
+                roles.push(plan.roles[facet]);
+            }
             evidence.push(source);
             if evidence.len() == limit {
                 break;
@@ -334,6 +344,7 @@ impl Corpus {
                     }
                     used += range.len();
                     evidence.push(excerpt(file, &range, evidence.len() + 1));
+                    roles.push(plan.roles[facet]);
                     seen.insert((file.path.as_str(), candidate.scope));
                     ranges.push((file.path.clone(), range));
                     added = true;
@@ -350,6 +361,7 @@ impl Corpus {
         Ok(Context {
             snapshot: self.snapshot.clone(),
             evidence,
+            roles,
         })
     }
 }

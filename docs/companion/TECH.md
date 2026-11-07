@@ -1,5 +1,8 @@
 # Companion architecture and first slice
 
+The [question-search adapter](SEARCH_TECH.md) reuses this workflow through the shared
+`vizzi-search` crate. It is an opt-in trial, separate from default metadata-only discovery.
+
 Read [the behaviour contract](PRODUCT.md) first. Source access/analysis, investigations,
 visual projection and host integration retain separate interfaces.
 

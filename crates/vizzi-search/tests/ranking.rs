@@ -1,5 +1,5 @@
 //! Reordering preserves held evidence and cannot turn model labels into source facts.
-use vizzi_qa::{Corpus, SourceFile};
+use vizzi_search::{Corpus, SourceFile};
 
 fn corpus() -> Corpus {
     let mut corpus = Corpus::new().unwrap();

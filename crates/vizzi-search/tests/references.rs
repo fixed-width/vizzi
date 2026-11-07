@@ -1,5 +1,5 @@
 //! Evidence IDs bind model answers to native-held source, without trusting model locations.
-use vizzi_qa::{Corpus, IdAnswer, SourceFile, Status};
+use vizzi_search::{Corpus, IdAnswer, SourceFile, Status};
 
 #[test]
 fn id_answers_resolve_only_supplied_labels_to_canonical_source_locations() {

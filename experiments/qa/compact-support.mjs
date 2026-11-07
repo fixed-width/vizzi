@@ -41,8 +41,8 @@ export async function verifyHashes(files){
 }
 export async function freezeInputs(preparedPath){
  const prepared=await verifyPrepared(preparedPath);
- const rust=(await readdir('crates/vizzi-qa/src')).filter(p=>p.endsWith('.rs')).map(p=>join('crates/vizzi-qa/src',p));
- const paths=[...rust,'crates/vizzi-qa/Cargo.toml','Cargo.lock','experiments/qa/support.mjs','experiments/qa/model.mjs','experiments/qa/compact-support.mjs','experiments/qa/compact.mjs',casesPath,cohortPath,templatesPath,modelPath,preparedPath,'target/release/vizzi-qa','target/release/vizzi-envelope'];
+ const rust=[];for(const crate of ['vizzi-qa','vizzi-search'])for(const file of await readdir('crates/'+crate+'/src'))if(file.endsWith('.rs'))rust.push(join('crates',crate,'src',file));
+ const paths=[...rust,'crates/vizzi-qa/Cargo.toml','crates/vizzi-search/Cargo.toml','Cargo.toml','Cargo.lock','experiments/qa/support.mjs','experiments/qa/model.mjs','experiments/qa/compact-support.mjs','experiments/qa/compact.mjs',casesPath,cohortPath,templatesPath,modelPath,preparedPath,'target/release/vizzi-qa','target/release/vizzi-envelope'];
  return {schema:1,createdAt:new Date().toISOString(),preparedPath:resolve(preparedPath),files:await captureHashes(paths),sourceRevisions:Object.fromEntries(Object.entries(prepared.sources).map(([name,s])=>[name,s.revision])),development:'Only the 32 previously observed formulations were available for retrieval tuning. Fresh gold anchors were audited, but their candidate retrieval/model outputs were not inspected before this freeze.',authorship:'Fresh cases are agent-authored and source-aware, not independent maintainer questions.'};
 }
 export async function indexesFor(prepared){

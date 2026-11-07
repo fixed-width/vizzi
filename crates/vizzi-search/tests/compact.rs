@@ -1,5 +1,5 @@
 //! Source roles, lexical scope and compact evidence through the corpus interface.
-use vizzi_qa::{Corpus, SourceFile, SourceRole};
+use vizzi_search::{Corpus, SourceFile, SourceRole};
 fn file(path: &str, text: &str) -> SourceFile {
     SourceFile {
         path: path.into(),
