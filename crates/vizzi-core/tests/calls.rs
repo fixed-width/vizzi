@@ -222,6 +222,7 @@ fn call_capture_checks_empty_oversized_and_exact_literal_bounds_independently() 
             .analyze(text.as_bytes())
             .unwrap();
         analysis.calls.as_mut().unwrap().sites = vec![CallSite {
+            target: None,
             owner: None,
             name: None,
             spelling: text.clone(),
@@ -238,6 +239,7 @@ fn call_capture_checks_empty_oversized_and_exact_literal_bounds_independently() 
     }
     let mut empty = RustAnalyzer::new().unwrap().analyze(b"x").unwrap();
     empty.calls.as_mut().unwrap().sites = vec![CallSite {
+        target: None,
         owner: None,
         name: None,
         spelling: "".into(),
@@ -280,6 +282,7 @@ fn call_capture_accepts_4096_sites_and_refuses_one_more() {
     );
     let last = text.rfind("send").unwrap();
     analysis.calls.as_mut().unwrap().sites.push(CallSite {
+        target: None,
         owner: Some(0),
         name: Some("send".into()),
         spelling: "send".into(),

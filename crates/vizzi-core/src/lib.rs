@@ -16,6 +16,7 @@ pub mod publication;
 pub mod python;
 pub mod query;
 pub mod rust;
+mod rust_calls;
 pub mod structure;
 mod syntax;
 mod syntax_state;

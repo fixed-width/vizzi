@@ -9,10 +9,11 @@ reference, with no separate design mock.
 - `/workspace` opens the canvas. **Add fragment** reveals a source-name chooser. A known
   Minitosis example can open its entry function for a guided visual demonstration, clearly
   distinguished from automatic task interpretation or a fresh search evaluation.
-- Selecting a written call opens its candidate destination beside the caller. Earlier views
-  retain position, dimensions and reading state. Multiple candidates are a deliberate
-  choice; missing/dynamic targets remain unresolved. Links identify their source call site
-  and candidate status rather than claiming semantic resolution/runtime execution.
+- Selecting a written call opens its destination beside the caller. Earlier views
+  retain position, dimensions and reading state. A language-supported unique destination opens directly;
+  unresolved multiple candidates require a choice. Source-local Rust `self` bindings are
+  distinct from name candidates, as described in [call destination selection](../explanation/call-destinations.md).
+  Links identify their call site and evidence rather than claiming runtime execution.
 - Following another step retains the chain. A branch opens into free space without globally
   rearranging existing views. Recursion/revisiting an open fragment reveals that existing
   view and link instead of recursively creating an unbounded graph.
@@ -37,4 +38,5 @@ reference, with no separate design mock.
 The first acceptance question is whether the maintainer can walk and branch through a real
 call trail while retaining previous-step context. Groups, alternative representations and
 revision/diff views are supported by the design direction but are not required in this small
-prototype. No new model, parser, call-resolution mechanism or GPU backend is introduced.
+prototype. No new model, parser or GPU backend is introduced. Source-local Rust bindings extend the
+existing captured call metadata without requiring a repository build.

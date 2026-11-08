@@ -292,7 +292,12 @@ impl Document {
                 }
             }
             if let Some(calls) = &analysis.calls {
-                calls.validate(text, &analysis.facts, &analysis.coverage)?;
+                calls.validate(
+                    text,
+                    &analysis.facts,
+                    &analysis.coverage,
+                    &analysis.context.language,
+                )?;
             }
             if source.encoding() == SourceEncoding::Unsupported
                 && !matches!(

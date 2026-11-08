@@ -39,9 +39,10 @@ export class Workspace {
  follow(parentId,site,target){
   this.fresh();const parent=this.view(parentId),s=parent.symbol.source;
   require(site&&site.owner===parent.symbol.id&&within(site.source,s)&&typeof site.spelling==='string'&&bytes(site.spelling)>0&&bytes(site.spelling)<=256&&Array.isArray(site.candidates)&&site.candidates.some(c=>sameSymbol(target,c)),'Call witness differs from the visible caller');
+  require(site.binding==null||(site.binding==='rust_self_receiver'&&site.candidates.length===1&&site.candidate_count===1),'Invalid source-local binding');
   const existing=this.views.find(v=>v.symbol.id===target.id),key=linkKey(parentId,existing?.id??'v'+this.next,site.source,site.spelling);
   require(this.links.length<96||this.links.some(l=>l.id===key),'Workspace link allowance reached');const to=this.add(target,parent.area,parent);
-  if(!this.links.some(l=>l.id===key))this.links.push({id:key,from:parentId,to,kind:'candidate',spelling:site.spelling,source:clone(site.source)});
+  if(!this.links.some(l=>l.id===key))this.links.push({id:key,from:parentId,to,kind:site.binding==='rust_self_receiver'?'self':'candidate',spelling:site.spelling,source:clone(site.source)});
   return to;
  }
  move(id,x,y){require(finite(x,-1e5,1e5)&&finite(y,-1e5,1e5),'Invalid fragment position');const v=this.view(id);v.x=x;v.y=y;}
@@ -62,7 +63,7 @@ export class Workspace {
   require(typeof raw==='string'&&bytes(raw)<=524288,'Invalid visual workspace size');let data;try{data=JSON.parse(raw);}catch{throw new Error('Invalid visual workspace JSON');}
   require(data&&data.schema===1&&opaque(data.snapshot)&&integer(data.next,1,1e6)&&Array.isArray(data.views)&&data.views.length<=LIMIT&&Array.isArray(data.links)&&data.links.length<=96&&camera(data.camera),'Invalid visual workspace document');
   const ids=new Set(),symbols=new Set();for(const v of data.views){require(v&&typeof v.id==='string'&&/^v[1-9][0-9]{0,5}$/.test(v.id)&&!ids.has(v.id)&&v.kind==='source'&&symbol(v.symbol)&&!symbols.has(v.symbol.id)&&typeof v.area==='string'&&bytes(v.area)<=4096&&geometry(v)&&typeof v.collapsed==='boolean'&&reading(v.reading,v.symbol.source),'Invalid restored fragment');ids.add(v.id);symbols.add(v.symbol.id);require(Number(v.id.slice(1))<data.next,'Invalid next view identity');}
-  require(data.selected===null||ids.has(data.selected),'Invalid selected fragment');const linkIds=new Set();for(const l of data.links)require(l&&typeof l.id==='string'&&!linkIds.has(l.id)&&ids.has(l.from)&&ids.has(l.to)&&l.kind==='candidate'&&typeof l.spelling==='string'&&bytes(l.spelling)>0&&bytes(l.spelling)<=256&&within(l.source,data.views.find(v=>v.id===l.from).symbol.source)&&l.id===linkKey(l.from,l.to,l.source,l.spelling)&&(linkIds.add(l.id),true),'Invalid restored link');
+  require(data.selected===null||ids.has(data.selected),'Invalid selected fragment');const linkIds=new Set();for(const l of data.links)require(l&&typeof l.id==='string'&&!linkIds.has(l.id)&&ids.has(l.from)&&ids.has(l.to)&&(l.kind==='candidate'||l.kind==='self')&&typeof l.spelling==='string'&&bytes(l.spelling)>0&&bytes(l.spelling)<=256&&within(l.source,data.views.find(v=>v.id===l.from).symbol.source)&&l.id===linkKey(l.from,l.to,l.source,l.spelling)&&(linkIds.add(l.id),true),'Invalid restored link');
   const model=new Workspace(data.snapshot);model.views=data.views;model.links=data.links;model.camera=data.camera;model.next=data.next;model.selected=data.selected;model.markSnapshot(currentSnapshot);return model;
  }
 }

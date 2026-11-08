@@ -107,3 +107,10 @@ const exponentId=structuredClone(alone);exponentId.views[0].id='v1e2';exponentId
 assert.throws(()=>new Workspace(snapshot+'\n'));
 const boxedId=structuredClone(alone);boxedId.views[0].id=['v1'];assert.throws(()=>restore(boxedId));
 assert.throws(()=>new Workspace(new String(snapshot)));
+
+const bound=new Workspace(snapshot),boundRoot=bound.openRoot(a,'src'),boundSite={...call(a,b),binding:'rust_self_receiver'};const boundChild=bound.follow(boundRoot,boundSite,b);assert.equal(bound.links[0].kind,'self');assert.equal(Workspace.restore(bound.serialize(),snapshot).links[0].kind,'self');assert.equal(boundChild,bound.views[1].id);
+assert.throws(()=>bound.follow(boundRoot,{...boundSite,candidates:[b,c],candidate_count:2},b));
+assert.throws(()=>bound.follow(boundRoot,{...boundSite,binding:'unknown'},b));
+assert.throws(()=>bound.follow(boundRoot,{...boundSite,candidates:[b,c],candidate_count:1},b));
+assert.throws(()=>bound.follow(boundRoot,{...boundSite,candidate_count:2},b));
+assert.equal(model.links[0].kind,'candidate','a name candidate must not be promoted to a source-local binding');

@@ -14,6 +14,12 @@ maintainer feedback on concurrent context and spatial organisation before anothe
 benchmark, model experiment or infrastructure expansion. Reuse the source engine, captured
 provenance/calls, bounded queries and editor handoff. Keep candidate links and reader associations distinct from semantic relationships.
 
+The first call-selection follow-up now opens supported Rust `self` destinations directly,
+with [separate binding/candidate evidence](../explanation/call-destinations.md). The
+[Minitosis check](../../experiments/visual/SELF_CALL_RESULTS.md) removes the unrelated render
+choices while retaining the caller. Broader receiver/type analysis remains a separate
+capability; maintain the chooser where current analysis cannot establish a destination.
+
 The prepared Minitosis search-led leave/return session was stopped after the direction
 correction on 2026-11-08. Preserve its notes and treat the maintainer's feedback as product
 direction, without inventing task completion/time scores. Earlier checkpoints below are

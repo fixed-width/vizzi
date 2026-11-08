@@ -9,12 +9,18 @@ use crate::{
 use std::{collections::BTreeMap, ops::ControlFlow};
 use tree_sitter::StreamingIterator;
 
-struct Checkpoints<'a> {
+pub(crate) struct Checkpoints<'a> {
     cancelled: &'a dyn Fn() -> bool,
     ticks: u8,
 }
-impl Checkpoints<'_> {
-    fn poll(&mut self) -> bool {
+impl<'a> Checkpoints<'a> {
+    pub(crate) fn new(cancelled: &'a dyn Fn() -> bool) -> Self {
+        Self {
+            cancelled,
+            ticks: 0,
+        }
+    }
+    pub(crate) fn poll(&mut self) -> bool {
         self.ticks = self.ticks.wrapping_add(1);
         self.ticks == 0 && (self.cancelled)()
     }
@@ -318,6 +324,17 @@ impl SyntaxAnalyzer {
                         return Ok(None);
                     }
                     drop(cursor);
+                    if self.context.language == "rust"
+                        && !crate::rust_calls::bind(
+                            tree.root_node(),
+                            text,
+                            &mut analysis,
+                            &scope_facts,
+                            cancelled,
+                        )
+                    {
+                        return Ok(None);
+                    }
                     analysis.coloring = self.color(&tree, bytes, cancelled);
                     if analysis.coloring.is_none() || cancelled() {
                         return Ok(None);

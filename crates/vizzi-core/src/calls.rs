@@ -1,4 +1,4 @@
-//! Bounded literal call evidence, without import, type or runtime resolution.
+//! Bounded call evidence and source-local bindings; no general import/type/runtime resolution.
 use serde::{Deserialize, Serialize};
 use std::{collections::BTreeMap, ops::Range};
 use tree_sitter::Node;
@@ -7,9 +7,27 @@ use tree_sitter::Node;
 pub const CALL_LIMIT: usize = 4096;
 /// Maximum literal callee spelling retained for one site.
 pub const SPELLING_BYTES: usize = 256;
+/// Language-specific evidence for choosing a source destination.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum TargetBasis {
+    /// Same shorthand Rust `self` receiver and one inherent method in its lexical scope.
+    RustSelfReceiver,
+}
+/// A language-supported destination in the same captured analysis.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CallTarget {
+    /// Destination declaration ordinal, independent of display names.
+    pub declaration: usize,
+    /// Evidence supporting this destination.
+    pub basis: TargetBasis,
+}
 /// A raw invocation expression, owned by its nearest emitted enclosing declaration.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CallSite {
+    /// Optional language-supported destination; absent for legacy or ambiguous evidence.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub target: Option<CallTarget>,
     /// Enclosing declaration ordinal; syntactic containment, not runtime ownership.
     pub owner: Option<usize>,
     /// Terminal callee name when recognizable; dynamic expressions remain unnamed.
@@ -94,6 +112,7 @@ pub(crate) fn collect(
         parent = current.parent();
     }
     output.sites.push(CallSite {
+        target: None,
         owner,
         name: name(callee, text),
         spelling: spelling.into(),
@@ -107,6 +126,7 @@ impl CallFacts {
         text: Option<&str>,
         facts: &[crate::model::Fact],
         coverage: &crate::model::Coverage,
+        language: &str,
     ) -> Result<(), crate::model::ModelError> {
         use crate::model::{Coverage, ModelError};
         if !matches!(coverage, Coverage::Syntax | Coverage::Partial)
@@ -117,6 +137,16 @@ impl CallFacts {
             ));
         }
         for call in &self.sites {
+            if let Some(target) = &call.target
+                && (language != "rust"
+                    || *coverage != Coverage::Syntax
+                    || call.owner.is_none()
+                    || facts.get(target.declaration).is_none_or(|fact| {
+                        fact.kind != "function" || call.name.as_deref() != Some(fact.name.as_str())
+                    }))
+            {
+                return Err(ModelError("invalid source-local call destination".into()));
+            }
             if call.span.start >= call.span.end
                 || call.spelling.len() > SPELLING_BYTES
                 || !text.is_some_and(|s| s.get(call.span.clone()) == Some(call.spelling.as_str()))

@@ -1,0 +1,156 @@
+{
+  "kind": "optimized native cold one-shot indexing; synthetic wide Rust impl",
+  "workers": 1,
+  "samples": [
+    {
+      "mode": "before",
+      "methods": 512,
+      "bytes": 19395,
+      "repeat": 0,
+      "elapsedMs": 44.528729005833156,
+      "snapshot": "c4876f190d9a20e7bf1c3664f1fd40aa1636deab59c64a67478461bcff69acdf"
+    },
+    {
+      "mode": "after",
+      "methods": 512,
+      "bytes": 19395,
+      "repeat": 0,
+      "elapsedMs": 35.19092999340501,
+      "snapshot": "b835c1d2191d96d60d1477b7f565358d1a70c9cfbe3a894f7ae57c6440ac103a"
+    },
+    {
+      "mode": "before",
+      "methods": 512,
+      "bytes": 19395,
+      "repeat": 1,
+      "elapsedMs": 39.28295300283935,
+      "snapshot": "c4876f190d9a20e7bf1c3664f1fd40aa1636deab59c64a67478461bcff69acdf"
+    },
+    {
+      "mode": "after",
+      "methods": 512,
+      "bytes": 19395,
+      "repeat": 1,
+      "elapsedMs": 42.70027500751894,
+      "snapshot": "b835c1d2191d96d60d1477b7f565358d1a70c9cfbe3a894f7ae57c6440ac103a"
+    },
+    {
+      "mode": "before",
+      "methods": 512,
+      "bytes": 19395,
+      "repeat": 2,
+      "elapsedMs": 50.3265480074333,
+      "snapshot": "c4876f190d9a20e7bf1c3664f1fd40aa1636deab59c64a67478461bcff69acdf"
+    },
+    {
+      "mode": "after",
+      "methods": 512,
+      "bytes": 19395,
+      "repeat": 2,
+      "elapsedMs": 45.21946898603346,
+      "snapshot": "b835c1d2191d96d60d1477b7f565358d1a70c9cfbe3a894f7ae57c6440ac103a"
+    },
+    {
+      "mode": "before",
+      "methods": 2048,
+      "bytes": 78811,
+      "repeat": 0,
+      "elapsedMs": 89.05455000058282,
+      "snapshot": "bce01e76a70283b420ccd60ab9fe7a272c072512e0bbda8a3c513932aa87d0c9"
+    },
+    {
+      "mode": "after",
+      "methods": 2048,
+      "bytes": 78811,
+      "repeat": 0,
+      "elapsedMs": 70.0566519954009,
+      "snapshot": "77e5dc153e328f7cbc68296993457187372b85111abc9d300aab8f30c3d2171e"
+    },
+    {
+      "mode": "before",
+      "methods": 2048,
+      "bytes": 78811,
+      "repeat": 1,
+      "elapsedMs": 83.8886609999463,
+      "snapshot": "bce01e76a70283b420ccd60ab9fe7a272c072512e0bbda8a3c513932aa87d0c9"
+    },
+    {
+      "mode": "after",
+      "methods": 2048,
+      "bytes": 78811,
+      "repeat": 1,
+      "elapsedMs": 97.95092199055944,
+      "snapshot": "77e5dc153e328f7cbc68296993457187372b85111abc9d300aab8f30c3d2171e"
+    },
+    {
+      "mode": "before",
+      "methods": 2048,
+      "bytes": 78811,
+      "repeat": 2,
+      "elapsedMs": 96.87708399724215,
+      "snapshot": "bce01e76a70283b420ccd60ab9fe7a272c072512e0bbda8a3c513932aa87d0c9"
+    },
+    {
+      "mode": "after",
+      "methods": 2048,
+      "bytes": 78811,
+      "repeat": 2,
+      "elapsedMs": 79.99434298835695,
+      "snapshot": "77e5dc153e328f7cbc68296993457187372b85111abc9d300aab8f30c3d2171e"
+    },
+    {
+      "mode": "before",
+      "methods": 8192,
+      "bytes": 318427,
+      "repeat": 0,
+      "elapsedMs": 251.15557499520946,
+      "snapshot": "9d4cf54102c070db0bca71dd4665352293cc232faa97f34464ed140bbf656371"
+    },
+    {
+      "mode": "after",
+      "methods": 8192,
+      "bytes": 318427,
+      "repeat": 0,
+      "elapsedMs": 248.58482500712853,
+      "snapshot": "72704e0045010d25603c52636518522755545e301eda0290142a41a91cc9e176"
+    },
+    {
+      "mode": "before",
+      "methods": 8192,
+      "bytes": 318427,
+      "repeat": 1,
+      "elapsedMs": 304.28699000913184,
+      "snapshot": "9d4cf54102c070db0bca71dd4665352293cc232faa97f34464ed140bbf656371"
+    },
+    {
+      "mode": "after",
+      "methods": 8192,
+      "bytes": 318427,
+      "repeat": 1,
+      "elapsedMs": 358.0056350037921,
+      "snapshot": "72704e0045010d25603c52636518522755545e301eda0290142a41a91cc9e176"
+    },
+    {
+      "mode": "before",
+      "methods": 8192,
+      "bytes": 318427,
+      "repeat": 2,
+      "elapsedMs": 261.11973699880764,
+      "snapshot": "9d4cf54102c070db0bca71dd4665352293cc232faa97f34464ed140bbf656371"
+    },
+    {
+      "mode": "after",
+      "methods": 8192,
+      "bytes": 318427,
+      "repeat": 2,
+      "elapsedMs": 275.61274700565264,
+      "snapshot": "72704e0045010d25603c52636518522755545e301eda0290142a41a91cc9e176"
+    }
+  ],
+  "binarySha256": {
+    "before": "a44f2ec26a0d7a4b6097c35003a01e69774e6c392c8f862a8f37fcab6639a1bc",
+    "after": "6c06d36b5d132a6fd5976dfe02104fca7e5a65ca189d03de2bc5fe8580e5dfee"
+  },
+  "limitations": "Three sequential samples per size and binary; includes process start, capture, cache write, parsing/coloring/binding. Not isolated binder time or representative whole-repository qualification.",
+  "inputPattern": "One render method plus N calling step methods; methods counts the calling methods."
+}

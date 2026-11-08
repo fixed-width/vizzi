@@ -5,8 +5,11 @@ Read [the behaviour contract](PRODUCT.md) and [domain terms](../../CONTEXT.md).
 The existing Rust engine remains authoritative for snapshots, captured source, call evidence
 and native bindings. Reuse `/api/structure` for declarations/written-call candidates and
 `/api/window` for bounded, styled source sections. Reuse current-only pin/verified editor
-operations when explicitly requested. The new native work is asset routing only; no new
-source acquisition or analysis layer is needed.
+operations when explicitly requested. Language-specific destination evidence stays in the Rust
+analyzer and captured call metadata; the browser never chooses a type based on names or paths.
+The first [source-local binding](../explanation/call-destinations.md) covers direct Rust `self`
+receivers across inherent/trait impl blocks in one lexical scope/file. The projection returns
+a sole target and its evidence kind, or the existing bounded candidates.
 
 A browser presentation module owns a versioned visual-workspace document: view identities,
 source bindings, rectangles/collapse state, reading sections/scrolls, camera and visual links.
@@ -38,7 +41,7 @@ working set to be materialised. A bounded-node/line limit is not a frame-time qu
 Use TDD through the presentation-model interface and headless browser. Exercise stable
 caller/branch geometry, reading state, candidate witnesses, revisits/cycles, camera/fit,
 move/resize/collapse, close, malformed persistence, stale snapshots and bounded growth.
-Perform mutation checks on the presentation model with one worker/nice 10; no new Rust
-behaviour beyond routing is introduced. Run existing workspace tests/doctests, formatting,
+Perform mutation checks on the presentation model and native binding rules with one
+worker/compiler task at nice 10. Persist source-local and candidate link kinds separately. Run existing workspace tests/doctests, formatting,
 Clippy and the affected/full browser suite. Capture the real Minitosis interaction for
 review after correctness checks. Do not fabricate semantic links or usability results.

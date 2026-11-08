@@ -24,7 +24,7 @@ function links(){
  for(const l of model.links){const a=model.view(l.from),b=model.view(l.to),x=a.x+a.w,y=a.y+28,tx=b.x,ty=b.y+28;let d;
   if(a.id===b.id)d=`M ${x} ${y} C ${x+90} ${y-100} ${a.x-90} ${y-100} ${a.x} ${y}`;
   else{const bend=Math.max(45,Math.abs(tx-x)/2);d=`M ${x} ${y} C ${x+bend} ${y} ${tx-bend} ${ty} ${tx} ${ty}`;}
-  const path=svg('path',{d,'marker-end':'url(#candidate-arrow)'}),title=svg('title');title.textContent=`${l.spelling}, line ${l.source.line}: selected candidate, not a resolved call`;path.append(title);root.append(path);const label=svg('text',{x:x+9,y:y-9});label.textContent='candidate';root.append(label);
+  const path=svg('path',{d,'marker-end':'url(#candidate-arrow)'}),title=svg('title');path.classList.toggle('self-call',l.kind==='self');title.textContent=`${l.spelling}, line ${l.source.line}: ${l.kind==='self'?'Rust source-local self receiver':'selected name candidate'}`;path.append(title);root.append(path);const label=svg('text',{x:x+9,y:y-9});label.textContent=l.kind==='self'?'self call':'candidate';root.append(label);
  }
 }
 function geometry(){
@@ -61,12 +61,12 @@ async function loadSource(id,start){
 async function loadCalls(id,offset){
  const r=mounted.get(id);if(!r||model.stale)return;const v=model.view(id);try{const data=await post('/api/structure',{snapshot:model.snapshot,query:{kind:'calls',symbol:v.symbol.id,area:v.area||v.symbol.source.path,offset}},r.controller.signal);if(mounted.get(id)!==r||model.stale)return;if(data.snapshot!==model.snapshot||!Array.isArray(data.items)||data.items.length>8)throw new Error('Call response differs');r.sites=offset===0?data.items:[...r.sites,...data.items];r.nextCalls=data.next;r.matching=data.matching;r.callsReady=true;renderCalls(id);}catch(e){if(e.name!=='AbortError'){r.callsReady=true;r.popup.replaceChildren(node('p',e.message));}}
 }
-function renderCalls(id){const r=mounted.get(id);if(!r)return;r.popup.replaceChildren(node('p',`${r.sites.length} of ${r.matching} written calls; candidates are not resolved destinations.`));for(const site of r.sites)r.popup.append(button(`${site.name??'Dynamic call'} · line ${site.source.line}`,null,()=>chooseCall(id,site)));if(r.nextCalls!==null&&r.nextCalls!==undefined&&r.sites.length<64)r.popup.append(button('More written calls',null,()=>void loadCalls(id,r.nextCalls)));if(!r.matching)r.popup.append(node('p','No attributed calls recorded. This does not prove no runtime calls.'));}
+function renderCalls(id){const r=mounted.get(id);if(!r)return;r.popup.replaceChildren(node('p',`${r.sites.length} of ${r.matching} written calls.`));for(const site of r.sites)r.popup.append(button(`${site.name??'Dynamic call'} · line ${site.source.line}`,null,()=>chooseCall(id,site)));if(r.nextCalls!==null&&r.nextCalls!==undefined&&r.sites.length<64)r.popup.append(button('More written calls',null,()=>void loadCalls(id,r.nextCalls)));if(!r.matching)r.popup.append(node('p','No attributed calls recorded. This does not prove no runtime calls.'));}
 function toggleCalls(id){const r=mounted.get(id);if(!r||model.stale)return;hideDestinations();for(const[other,x]of mounted)if(other!==id)x.popup.hidden=true;r.popup.hidden=!r.popup.hidden;if(!r.callsReady)r.popup.replaceChildren(node('p','Loading written calls…'));else renderCalls(id);}
 function hideDestinations(){el('destination-stack').hidden=true;}
 function chooseCall(id,site){
  if(model.stale)return;const r=mounted.get(id);r.popup.hidden=true;for(const n of r.code.querySelectorAll('.is-call'))n.classList.remove('is-call');const line=r.code.querySelector(`[data-line="${site.source.line}"]`);line?.classList.add('is-call');
- const candidates=site.candidates;if(candidates.length===1){follow(id,site,candidates[0]);return;}
+ const candidates=site.candidates;if(candidates.length===1&&site.candidate_count===1){follow(id,site,candidates[0]);return;}
  const stack=el('destination-stack'),v=model.view(id);stack.replaceChildren(node('h2',site.spelling),node('p',candidates.length?`Choose among ${site.candidate_count} terminal-name matches. The first ${candidates.length} are shown; type/import resolution is unavailable.`:'No indexed destination. Dynamic or external calls remain unresolved.'));stack.append(button('Close choices',null,hideDestinations));
  for(const candidate of candidates){const b=button([...candidate.parents,candidate.name].join('::'),null,()=>follow(id,site,candidate));b.dataset.candidate=candidate.id;b.dataset.path=candidate.source.path;b.append(node('small',`${candidate.source.path}:${candidate.source.line}`));stack.append(b);}Object.assign(stack.style,{left:v.x+v.w+24+'px',top:v.y+'px'});stack.hidden=false;
 }

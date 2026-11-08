@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "kind": "source-informed visual functional replay",
+  "sourceRevision": "951cf85413029423e036c641638b845edafe75cf",
+  "binarySha256": "6c06d36b5d132a6fd5976dfe02104fca7e5a65ca189d03de2bc5fe8580e5dfee",
+  "steps": [
+    {
+      "from": "process",
+      "to": "render",
+      "candidatesShown": 0,
+      "callerRetained": true
+    },
+    {
+      "from": "render",
+      "to": "process_sample",
+      "candidatesShown": 8,
+      "callerRetained": true
+    },
+    {
+      "from": "render",
+      "to": "begin_block",
+      "candidatesShown": 2,
+      "callerRetained": true
+    },
+    {
+      "from": "process_sample",
+      "to": "next",
+      "candidatesShown": 8,
+      "callerRetained": true
+    }
+  ],
+  "views": 5,
+  "candidateLinks": 3,
+  "selfLinks": 1,
+  "reloadRestored": true,
+  "pageErrors": [],
+  "frameIntervalsMs": [],
+  "limitations": "Single headless browser, known source and explicit candidate choices; not human comprehension, task time, semantic resolution, hardware GPU or large-working-set qualification."
+}

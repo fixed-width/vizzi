@@ -1,5 +1,6 @@
-//! Finite inventories and literal call candidates over captured metadata; no source IO.
+//! Finite inventories and call destinations over captured metadata; no source IO.
 use crate::{
+    calls::TargetBasis,
     comparison::ReviewPath,
     model::{Coverage, Document, Snapshot},
 };
@@ -96,6 +97,9 @@ pub struct Entry {
 /// One written invocation and finite candidate destinations.
 #[derive(Clone, Debug, Serialize)]
 pub struct Invocation {
+    /// Language evidence selecting the sole destination, otherwise name-based candidates.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub binding: Option<TargetBasis>,
     /// Exact callee spelling.
     pub spelling: String,
     /// Terminal callee name when recognizable.
@@ -104,7 +108,7 @@ pub struct Invocation {
     pub source: Source,
     /// Nearest emitted enclosing declaration, if admitted.
     pub owner: Option<String>,
-    /// Candidate declarations, never resolved destinations.
+    /// Sole source-local destination when binding is present, otherwise name candidates.
     pub candidates: Vec<Symbol>,
     /// All matching candidate declarations before the response allowance.
     pub candidate_count: usize,
@@ -112,6 +116,7 @@ pub struct Invocation {
     pub outside_area: bool,
 }
 struct Site {
+    target: Option<(String, TargetBasis)>,
     spelling: String,
     name: Option<String>,
     source: Source,
@@ -287,6 +292,11 @@ impl Structure {
                     index.uses.entry(name.clone()).or_default().push(n);
                 }
                 index.sites.push(Site {
+                    target: call.target.as_ref().and_then(|target| {
+                        mapping
+                            .get(&target.declaration)
+                            .map(|id| (id.clone(), target.basis))
+                    }),
                     spelling: call.spelling.clone(),
                     name: call.name.clone(),
                     source: source(doc, analysis.context.id.as_str(), &call.span),
@@ -367,6 +377,20 @@ impl Structure {
             .ok_or_else(|| Error("Symbol is absent from this observation".into()))
     }
     fn invocation(&self, site: &Site, area: &str) -> Invocation {
+        if let Some((id, basis)) = &site.target
+            && let Ok(target) = self.symbol(id)
+        {
+            return Invocation {
+                binding: Some(*basis),
+                spelling: site.spelling.clone(),
+                name: site.name.clone(),
+                source: site.source.clone(),
+                owner: site.owner.clone(),
+                candidates: vec![target.clone()],
+                candidate_count: 1,
+                outside_area: !within(&site.source.path, area),
+            };
+        }
         let mut candidates = site
             .name
             .as_ref()
@@ -391,6 +415,7 @@ impl Structure {
         });
         let candidate_count = candidates.len();
         Invocation {
+            binding: None,
             spelling: site.spelling.clone(),
             name: site.name.clone(),
             source: site.source.clone(),

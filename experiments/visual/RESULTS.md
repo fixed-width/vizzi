@@ -12,6 +12,9 @@ structured metadata, styled windows, current-only keep and verified editor inter
 This is the first source-view slice; grouping and other representation/revision kinds
 remain future work. Production rendering and independent usefulness remain unqualified.
 
+The [call-selection follow-up](SELF_CALL_RESULTS.md) adds source-local Rust receiver bindings;
+the measurements below describe the original candidate-only prototype.
+
 ## Real-source replay
 
 The [recording](results/result.json) uses the unchanged Tract Plugin Pack revision
