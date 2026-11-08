@@ -222,6 +222,7 @@ fn call_capture_checks_empty_oversized_and_exact_literal_bounds_independently() 
             .analyze(text.as_bytes())
             .unwrap();
         analysis.calls.as_mut().unwrap().sites = vec![CallSite {
+            name_span: None,
             target: None,
             owner: None,
             name: None,
@@ -239,6 +240,7 @@ fn call_capture_checks_empty_oversized_and_exact_literal_bounds_independently() 
     }
     let mut empty = RustAnalyzer::new().unwrap().analyze(b"x").unwrap();
     empty.calls.as_mut().unwrap().sites = vec![CallSite {
+        name_span: None,
         target: None,
         owner: None,
         name: None,
@@ -282,6 +284,7 @@ fn call_capture_accepts_4096_sites_and_refuses_one_more() {
     );
     let last = text.rfind("send").unwrap();
     analysis.calls.as_mut().unwrap().sites.push(CallSite {
+        name_span: None,
         target: None,
         owner: Some(0),
         name: Some("send".into()),
@@ -333,6 +336,7 @@ fn name_limits_and_owner_boundaries_are_checked_without_correlated_invalid_field
     let span = base.calls.as_ref().unwrap().sites[0].span.clone();
     for mode in 0..3 {
         let mut analysis = base.clone();
+        analysis.facts[0].name_span = None;
         analysis.facts[0].span = match mode {
             0 => span.clone(),
             1 => span.start + 1..span.end,
@@ -366,4 +370,22 @@ fn bundled_call_grammars_require_a_function_field_even_for_recovery_nodes() {
             .unwrap();
         assert_eq!(node["fields"]["function"]["required"], true);
     }
+}
+
+#[test]
+fn captured_identifier_spans_point_to_the_method_not_its_receiver_or_type_arguments() {
+    let text =
+        "struct A; impl A { fn run(&self) { self.writer.process_sample::<process_sample>(); } }";
+    let analysis = RustAnalyzer::new()
+        .unwrap()
+        .analyze(text.as_bytes())
+        .unwrap();
+    let site = &analysis.calls.unwrap().sites[0];
+    let value = serde_json::to_value(site).unwrap();
+    let start = value["name_span"]["start"]
+        .as_u64()
+        .expect("captured identifier start") as usize;
+    let end = value["name_span"]["end"].as_u64().unwrap() as usize;
+    assert_eq!(&text[start..end], "process_sample");
+    assert_eq!(start, text.find("process_sample").unwrap());
 }

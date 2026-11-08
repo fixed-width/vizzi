@@ -47,3 +47,15 @@ input/output tracing question.
 
 The [prototype contract](../visual/PRODUCT.md) records limits and the
 [working-set explanation](../explanation/visual-working-sets.md) describes the design rationale.
+
+To enable project-aware Rust navigation, install the matching server with
+`rustup component add rust-analyzer`, then add `--rust-analyzer rust-analyzer` to the host
+command. The selected root must be a Cargo project/workspace. Dependency metadata is read
+offline; if dependency sources are missing, fetch the locked metadata explicitly with
+`cargo metadata --locked --manifest-path /path/to/repository/Cargo.toml`. Neither lookup
+nor that metadata operation builds the repository.
+
+With the provider enabled, `GsMeter::process` → `self.lufs_meter.process_sample` opens
+`LufsMeter::process_sample` in `gs-meter/src/lufs.rs` directly. The first lookup starts
+the private language-server workspace; subsequent lookups reuse it. Basic browsing stays
+available when the server or project analysis is unavailable.

@@ -13,7 +13,8 @@ reference, with no separate design mock.
   retain position, dimensions and reading state. A language-supported unique destination opens directly;
   unresolved multiple candidates require a choice. Source-local Rust `self` bindings are
   distinct from name candidates, as described in [call destination selection](../explanation/call-destinations.md).
-  Links identify their call site and evidence rather than claiming runtime execution.
+  The [type-aware follow-up](SEMANTIC_PRODUCT.md) resolves ordinary receivers through a
+  configured language provider. Links identify their call site and evidence rather than claiming runtime execution.
 - Following another step retains the chain. A branch opens into free space without globally
   rearranging existing views. Recursion/revisiting an open fragment reveals that existing
   view and link instead of recursively creating an unbounded graph.

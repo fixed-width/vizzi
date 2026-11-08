@@ -28,6 +28,7 @@
     "**",
     "!package.json",
     "!crates/vizzi/web/visual-model.js",
-    "!crates/vizzi/web/visual-model.test.js"
+    "!crates/vizzi/web/visual-model.test.js",
+    "!crates/vizzi/web/fixtures/visual-v1.json"
   ]
 }

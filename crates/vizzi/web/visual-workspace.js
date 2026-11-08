@@ -5,11 +5,12 @@ import {createMessage} from '/messages.js';
 import {followChanges} from '/updates.js';
 const el=id=>document.getElementById(id),node=(tag,text='')=>{const n=document.createElement(tag);n.textContent=text;return n;},svg=(tag,attrs={})=>{const n=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const[k,v]of Object.entries(attrs))n.setAttribute(k,String(v));return n;};
 const error=createMessage(el('visual-error'),{label:'Dismiss workspace error'}),notice=createMessage(el('visual-notice'),{label:'Dismiss workspace notice'});
+let definitionProvider=false;const definitionCapabilities=transport('/api/structure').then(c=>{definitionProvider=c.definition_provider===true;}).catch(()=>{});
 let model,currentSnapshot,storageKey,board,busy=false,saveTimer,paletteTicket=0,jobs=Promise.resolve(),demoOpened=false;
 const mounted=new Map();
 installAppearance(el('theme'));
 const fail=e=>error.show(e?.message??String(e));
-async function transport(path,options){const response=await fetch(path,options);if(!response.ok){let text=await response.text();try{text=JSON.parse(text).message??text;}catch{}throw new Error(text);}return response.json();}
+async function transport(path,options){const response=await fetch(path,options);if(!response.ok){let text=await response.text();try{text=JSON.parse(text).message??text;}catch{}const error=new Error(text);error.status=response.status;throw error;}return response.json();}
 const post=(path,body,signal)=>transport(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal});
 function save(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{if(!model||!storageKey)return;try{localStorage.setItem(storageKey,model.serialize());}catch{notice.show('This browser could not save the visual layout.');}},120);}
 function size(){const r=el('workspace-canvas').getBoundingClientRect();return{w:r.width,h:r.height};}
@@ -24,7 +25,7 @@ function links(){
  for(const l of model.links){const a=model.view(l.from),b=model.view(l.to),x=a.x+a.w,y=a.y+28,tx=b.x,ty=b.y+28;let d;
   if(a.id===b.id)d=`M ${x} ${y} C ${x+90} ${y-100} ${a.x-90} ${y-100} ${a.x} ${y}`;
   else{const bend=Math.max(45,Math.abs(tx-x)/2);d=`M ${x} ${y} C ${x+bend} ${y} ${tx-bend} ${ty} ${tx} ${ty}`;}
-  const path=svg('path',{d,'marker-end':'url(#candidate-arrow)'}),title=svg('title');path.classList.toggle('self-call',l.kind==='self');title.textContent=`${l.spelling}, line ${l.source.line}: ${l.kind==='self'?'Rust source-local self receiver':'selected name candidate'}`;path.append(title);root.append(path);const label=svg('text',{x:x+9,y:y-9});label.textContent=l.kind==='self'?'self call':'candidate';root.append(label);
+  const path=svg('path',{d,'marker-end':'url(#candidate-arrow)'}),title=svg('title');path.classList.toggle('self-call',l.kind==='self');path.classList.toggle('definition-call',l.kind==='definition');title.textContent=`${l.spelling}, line ${l.source.line}: ${l.kind==='self'?'Rust source-local self receiver':l.kind==='definition'?'Language-server definition for captured source':'selected name candidate'}`;path.append(title);root.append(path);const label=svg('text',{x:x+9,y:y-9});label.textContent=l.kind==='self'?'self call':l.kind==='definition'?'definition':'candidate';root.append(label);
  }
 }
 function geometry(){
@@ -64,10 +65,24 @@ async function loadCalls(id,offset){
 function renderCalls(id){const r=mounted.get(id);if(!r)return;r.popup.replaceChildren(node('p',`${r.sites.length} of ${r.matching} written calls.`));for(const site of r.sites)r.popup.append(button(`${site.name??'Dynamic call'} · line ${site.source.line}`,null,()=>chooseCall(id,site)));if(r.nextCalls!==null&&r.nextCalls!==undefined&&r.sites.length<64)r.popup.append(button('More written calls',null,()=>void loadCalls(id,r.nextCalls)));if(!r.matching)r.popup.append(node('p','No attributed calls recorded. This does not prove no runtime calls.'));}
 function toggleCalls(id){const r=mounted.get(id);if(!r||model.stale)return;hideDestinations();for(const[other,x]of mounted)if(other!==id)x.popup.hidden=true;r.popup.hidden=!r.popup.hidden;if(!r.callsReady)r.popup.replaceChildren(node('p','Loading written calls…'));else renderCalls(id);}
 function hideDestinations(){el('destination-stack').hidden=true;}
-function chooseCall(id,site){
+async function chooseCall(id,site){
+ const record=mounted.get(id);if(!record||model.stale)return;const ticket=record.navigation=(record.navigation??0)+1,expected=model.snapshot;let attempted=false,note='',semantic=false;
+ await definitionCapabilities;
+ if(definitionProvider&&!site.binding&&site.id){
+  attempted=true;record.popup.hidden=true;const pending=setTimeout(()=>{if(mounted.get(id)===record&&record.navigation===ticket)record.state.textContent='Finding definition…';},150);
+  try{const response=await post('/api/call-definition',{snapshot:expected,call:site.id},record.controller.signal);
+   if(mounted.get(id)!==record||record.navigation!==ticket||model.snapshot!==expected||model.stale)return;
+   if(response.snapshot!==expected||response.invocation?.id!==site.id)throw new Error('Definition response differs from the selected call');
+   note=response.detail??'';
+   if(['unique','ambiguous','outside'].includes(response.state)){site=response.invocation;semantic=site.binding==='language_server_definition';}
+  }catch(e){if(e.name==='AbortError')return;if(e.status===409){fail(e);return;}note=e.message;}
+  finally{clearTimeout(pending);if(mounted.get(id)===record&&record.navigation===ticket)record.state.textContent='Captured source';}
+ }
+ if(mounted.get(id)!==record||record.navigation!==ticket||model.snapshot!==expected)return;
+
  if(model.stale)return;const r=mounted.get(id);r.popup.hidden=true;for(const n of r.code.querySelectorAll('.is-call'))n.classList.remove('is-call');const line=r.code.querySelector(`[data-line="${site.source.line}"]`);line?.classList.add('is-call');
- const candidates=site.candidates;if(candidates.length===1&&site.candidate_count===1){follow(id,site,candidates[0]);return;}
- const stack=el('destination-stack'),v=model.view(id);stack.replaceChildren(node('h2',site.spelling),node('p',candidates.length?`Choose among ${site.candidate_count} terminal-name matches. The first ${candidates.length} are shown; type/import resolution is unavailable.`:'No indexed destination. Dynamic or external calls remain unresolved.'));stack.append(button('Close choices',null,hideDestinations));
+ const candidates=site.candidates;if(candidates.length===1&&site.candidate_count===1&&(!attempted||semantic)){follow(id,site,candidates[0]);return;}
+ const stack=el('destination-stack'),v=model.view(id);stack.replaceChildren(node('h2',site.spelling),node('p',candidates.length?`Choose among ${site.candidate_count} ${semantic?'definition locations':'terminal-name matches'}. ${candidates.length} captured destinations are shown.${note?' '+note:''}`:note||'No indexed destination. Dynamic or external calls remain unresolved.'));stack.append(button('Close choices',null,hideDestinations));
  for(const candidate of candidates){const b=button([...candidate.parents,candidate.name].join('::'),null,()=>follow(id,site,candidate));b.dataset.candidate=candidate.id;b.dataset.path=candidate.source.path;b.append(node('small',`${candidate.source.path}:${candidate.source.line}`));stack.append(b);}Object.assign(stack.style,{left:v.x+v.w+24+'px',top:v.y+'px'});stack.hidden=false;
 }
 function follow(parent,site,target){try{const id=model.follow(parent,site,target);hideDestinations();mount(id);focus([parent,id]);save();}catch(e){fail(e);}}

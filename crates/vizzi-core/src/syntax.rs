@@ -27,6 +27,7 @@ impl<'a> Checkpoints<'a> {
 }
 
 pub(crate) struct Declaration {
+    pub name_span: Option<std::ops::Range<usize>>,
     pub kind: &'static str,
     pub name: String,
     pub span: std::ops::Range<usize>,
@@ -34,6 +35,9 @@ pub(crate) struct Declaration {
 impl Declaration {
     pub(crate) fn at(node: tree_sitter::Node<'_>, kind: &'static str, name: String) -> Self {
         Self {
+            name_span: node
+                .child_by_field_name("name")
+                .map(|name| name.byte_range()),
             kind,
             name,
             span: node.byte_range(),
@@ -278,6 +282,9 @@ impl SyntaxAnalyzer {
                         scope_facts.insert(node.id(), analysis.facts.len());
                     }
                     analysis.facts.push(Fact {
+                        name_span: declaration.name_span.filter(|range| {
+                            text.get(range.clone()) == Some(declaration.name.as_str())
+                        }),
                         parent: parent_fact,
                         key,
                         kind: declaration.kind.into(),

@@ -40,5 +40,9 @@ pub mod foreground_maintenance;
 #[cfg(feature = "qualification")]
 pub mod idle_probe;
 
+pub mod definitions;
+mod lsp;
+/// Optional Rust definition adapter over captured source.
+pub mod rust_definitions;
 /// Current-observation structural exploration adapter.
 pub mod structural;

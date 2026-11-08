@@ -14,6 +14,7 @@ fn document(name: Option<&str>) -> Arc<Document> {
     let (analyses, classification) = if let Some(name) = name {
         let mut analysis = RustAnalyzer::new().unwrap().analyze(text).unwrap();
         analysis.facts[0].name = name.into();
+        analysis.facts[0].name_span = None;
         let classification = Classification::Assigned {
             language: analysis.context.language.clone(),
             provenance,
@@ -180,6 +181,7 @@ fn the_window_allowance_accepts_65536_and_rejects_one_more_atomically() {
     analysis.coloring = None;
     analysis.facts = (0..4096)
         .map(|n| Fact {
+            name_span: None,
             parent: None,
             key: format!("token:{n}"),
             name: "x".into(),

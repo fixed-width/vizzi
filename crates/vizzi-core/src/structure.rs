@@ -97,6 +97,11 @@ pub struct Entry {
 /// One written invocation and finite candidate destinations.
 #[derive(Clone, Debug, Serialize)]
 pub struct Invocation {
+    /// Provider/configuration/source identity for language-server evidence.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub semantic_context: Option<String>,
+    /// Exact invocation identity for this observation and captured callee range.
+    pub id: String,
     /// Language evidence selecting the sole destination, otherwise name-based candidates.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub binding: Option<TargetBasis>,
@@ -116,6 +121,9 @@ pub struct Invocation {
     pub outside_area: bool,
 }
 struct Site {
+    id: String,
+    identifier: Option<std::ops::Range<usize>>,
+    language: String,
     target: Option<(String, TargetBasis)>,
     spelling: String,
     name: Option<String>,
@@ -133,6 +141,19 @@ pub struct Structure {
     sites: Vec<Site>,
     owners: BTreeMap<String, Vec<usize>>,
     uses: BTreeMap<String, Vec<usize>>,
+    spans: Vec<Option<std::ops::Range<usize>>>,
+    files: BTreeMap<String, Vec<usize>>,
+    call_ids: BTreeMap<String, usize>,
+}
+/// Captured call witness used by a host definition provider.
+#[derive(Clone, Debug)]
+pub struct CallLookup {
+    /// Native invocation, including owner and version-bound source.
+    pub invocation: Invocation,
+    /// Terminal identifier byte range, absent in legacy/dynamic calls.
+    pub identifier: Option<std::ops::Range<usize>>,
+    /// Analyzer language, independent of extension.
+    pub language: String,
 }
 /// Invalid scope, allowance or expired symbol identity.
 #[derive(Debug, thiserror::Error)]
@@ -193,6 +214,9 @@ impl Structure {
             sites: vec![],
             owners: BTreeMap::new(),
             uses: BTreeMap::new(),
+            spans: vec![],
+            files: BTreeMap::new(),
+            call_ids: BTreeMap::new(),
         };
         for doc in snapshot.documents() {
             if index.coverage.indexed_files == FILES || doc.path().len() > 4096 {
@@ -263,6 +287,8 @@ impl Structure {
                 parents.reverse();
                 let n = index.symbols.len();
                 index.ids.insert(id.clone(), n);
+                index.spans.push(fact.name_span.clone());
+                index.files.entry(doc.path().into()).or_default().push(n);
                 index.names.entry(fact.name.clone()).or_default().push(n);
                 mapping.insert(ordinal, id.clone());
                 index.symbols.push(Symbol {
@@ -292,6 +318,22 @@ impl Structure {
                     index.uses.entry(name.clone()).or_default().push(n);
                 }
                 index.sites.push(Site {
+                    id: blake3::hash(
+                        format!(
+                            "{}:{}:{}:{}:{}:{}",
+                            index.snapshot,
+                            doc.id().as_str(),
+                            doc.version().as_str(),
+                            analysis.context.id.as_str(),
+                            call.span.start,
+                            call.span.end
+                        )
+                        .as_bytes(),
+                    )
+                    .to_hex()
+                    .to_string(),
+                    identifier: call.name_span.clone(),
+                    language: analysis.context.language.clone(),
                     target: call.target.as_ref().and_then(|target| {
                         mapping
                             .get(&target.declaration)
@@ -304,6 +346,12 @@ impl Structure {
                 });
             }
         }
+        index.call_ids = index
+            .sites
+            .iter()
+            .enumerate()
+            .map(|(n, site)| (site.id.clone(), n))
+            .collect();
         index
     }
     fn page<I: IntoIterator, T>(
@@ -381,6 +429,8 @@ impl Structure {
             && let Ok(target) = self.symbol(id)
         {
             return Invocation {
+                semantic_context: None,
+                id: site.id.clone(),
                 binding: Some(*basis),
                 spelling: site.spelling.clone(),
                 name: site.name.clone(),
@@ -415,6 +465,8 @@ impl Structure {
         });
         let candidate_count = candidates.len();
         Invocation {
+            semantic_context: None,
+            id: site.id.clone(),
             binding: None,
             spelling: site.spelling.clone(),
             name: site.name.clone(),
@@ -424,6 +476,34 @@ impl Structure {
             candidate_count,
             outside_area: !within(&site.source.path, area),
         }
+    }
+    /// Retrieves a call by native identity without loading source or accepting a browser position.
+    pub fn call(&self, id: &str) -> Option<CallLookup> {
+        let site = &self.sites[*self.call_ids.get(id)?];
+        Some(CallLookup {
+            invocation: self.invocation(site, ""),
+            identifier: site.identifier.clone(),
+            language: site.language.clone(),
+        })
+    }
+    /// Maps a definition position to its narrowest admitted declaration; ties remain ambiguous.
+    pub fn definition(&self, path: &str, byte: usize) -> Option<Symbol> {
+        let mut matches = self
+            .files
+            .get(path)?
+            .iter()
+            .filter_map(|n| {
+                let span = self.spans[*n].as_ref()?;
+                span.contains(&byte)
+                    .then_some((span.len(), &self.symbols[*n]))
+            })
+            .collect::<Vec<_>>();
+        matches.sort_by_key(|(len, _)| *len);
+        let first = matches.first()?;
+        if matches.get(1).is_some_and(|other| other.0 == first.0) {
+            return None;
+        }
+        Some(first.1.clone())
     }
     fn anchored(&self, id: &str, area: &str) -> Result<&Symbol, Error> {
         validate(area, "")?;

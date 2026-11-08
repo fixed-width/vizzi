@@ -1,0 +1,230 @@
+{
+  "schema": 1,
+  "snapshot": "9e4574d9eae89c5cb8c668e65426156f1623c73ae420599de2e70db76f70dfe7",
+  "next": 6,
+  "selected": "v2",
+  "views": [
+    {
+      "id": "v1",
+      "kind": "source",
+      "symbol": {
+        "id": "cabb7929a66782dec16f9dbcf930e9504c2f924362325a27dc7863e3bf9d7efc",
+        "kind": "function",
+        "name": "process",
+        "parents": [
+          "Plugin for Minitosis"
+        ],
+        "source": {
+          "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+          "end_line": 273,
+          "file": "0b953368e58dd6222a4fd4351f1f4df4d1f2af27b214a9146ef6473da924f9c5",
+          "line": 255,
+          "path": "minitosis/src/lib.rs",
+          "version": "93aa3ffecc2cb51fc57e5de494ca69f65bb65e8938b8de1bcee05979a57fb438"
+        }
+      },
+      "area": "minitosis/src",
+      "x": 64,
+      "y": 64,
+      "w": 440,
+      "h": 400,
+      "collapsed": false,
+      "reading": {
+        "section": 255,
+        "top": 0,
+        "left": 0
+      }
+    },
+    {
+      "id": "v2",
+      "kind": "source",
+      "symbol": {
+        "id": "244e25a52dc9ddcdf5b9efca73f5f7246e78901b9b12c8b67ea06809aae4a05c",
+        "kind": "function",
+        "name": "render",
+        "parents": [
+          "Minitosis"
+        ],
+        "source": {
+          "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+          "end_line": 181,
+          "file": "0b953368e58dd6222a4fd4351f1f4df4d1f2af27b214a9146ef6473da924f9c5",
+          "line": 110,
+          "path": "minitosis/src/lib.rs",
+          "version": "93aa3ffecc2cb51fc57e5de494ca69f65bb65e8938b8de1bcee05979a57fb438"
+        }
+      },
+      "area": "minitosis/src",
+      "x": 576,
+      "y": 64,
+      "w": 440,
+      "h": 400,
+      "collapsed": false,
+      "reading": {
+        "section": 110,
+        "top": 850,
+        "left": 0
+      }
+    },
+    {
+      "id": "v3",
+      "kind": "source",
+      "symbol": {
+        "id": "996c951e0b917f5e62f105303387784d03219366b22e61657f0c7739fb4187f1",
+        "kind": "function",
+        "name": "process_sample",
+        "parents": [
+          "Processor"
+        ],
+        "source": {
+          "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+          "end_line": 104,
+          "file": "a0c63ad80adcd73c9be9ad5cbf35e730e7fcfe90dd1d44b65a40fdf2df773d12",
+          "line": 89,
+          "path": "minitosis/src/engine.rs",
+          "version": "b98c1bac501d5c49dac9eff1d461621a46e91b89fa70ae5a9737870c9092f486"
+        }
+      },
+      "area": "minitosis/src",
+      "x": 1088,
+      "y": 64,
+      "w": 440,
+      "h": 400,
+      "collapsed": false,
+      "reading": {
+        "section": 89,
+        "top": 0,
+        "left": 0
+      }
+    },
+    {
+      "id": "v4",
+      "kind": "source",
+      "symbol": {
+        "id": "8d77cebb915dee49c3f639064d181cfe41d8b3ad62575a00162f94085c8d26cf",
+        "kind": "function",
+        "name": "begin_block",
+        "parents": [
+          "Processor"
+        ],
+        "source": {
+          "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+          "end_line": 87,
+          "file": "a0c63ad80adcd73c9be9ad5cbf35e730e7fcfe90dd1d44b65a40fdf2df773d12",
+          "line": 70,
+          "path": "minitosis/src/engine.rs",
+          "version": "b98c1bac501d5c49dac9eff1d461621a46e91b89fa70ae5a9737870c9092f486"
+        }
+      },
+      "area": "minitosis/src",
+      "x": 1088,
+      "y": 496,
+      "w": 440,
+      "h": 400,
+      "collapsed": false,
+      "reading": {
+        "section": 70,
+        "top": 0,
+        "left": 0
+      }
+    },
+    {
+      "id": "v5",
+      "kind": "source",
+      "symbol": {
+        "id": "2d9f947c558ba96faeb79548a895f5f233e0718f343cc60e410719a604ac37c1",
+        "kind": "function",
+        "name": "next",
+        "parents": [
+          "DryDelay"
+        ],
+        "source": {
+          "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+          "end_line": 39,
+          "file": "a0c63ad80adcd73c9be9ad5cbf35e730e7fcfe90dd1d44b65a40fdf2df773d12",
+          "line": 31,
+          "path": "minitosis/src/engine.rs",
+          "version": "b98c1bac501d5c49dac9eff1d461621a46e91b89fa70ae5a9737870c9092f486"
+        }
+      },
+      "area": "minitosis/src",
+      "x": 1600,
+      "y": 64,
+      "w": 440,
+      "h": 400,
+      "collapsed": false,
+      "reading": {
+        "section": 31,
+        "top": 0,
+        "left": 0
+      }
+    }
+  ],
+  "links": [
+    {
+      "id": "v1|v2|0b953368e58dd6222a4fd4351f1f4df4d1f2af27b214a9146ef6473da924f9c5|272|self.render",
+      "from": "v1",
+      "to": "v2",
+      "kind": "candidate",
+      "spelling": "self.render",
+      "source": {
+        "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+        "end_line": 272,
+        "file": "0b953368e58dd6222a4fd4351f1f4df4d1f2af27b214a9146ef6473da924f9c5",
+        "line": 272,
+        "path": "minitosis/src/lib.rs",
+        "version": "93aa3ffecc2cb51fc57e5de494ca69f65bb65e8938b8de1bcee05979a57fb438"
+      }
+    },
+    {
+      "id": "v2|v3|0b953368e58dd6222a4fd4351f1f4df4d1f2af27b214a9146ef6473da924f9c5|167|self.processor.process_sample",
+      "from": "v2",
+      "to": "v3",
+      "kind": "candidate",
+      "spelling": "self.processor.process_sample",
+      "source": {
+        "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+        "end_line": 167,
+        "file": "0b953368e58dd6222a4fd4351f1f4df4d1f2af27b214a9146ef6473da924f9c5",
+        "line": 167,
+        "path": "minitosis/src/lib.rs",
+        "version": "93aa3ffecc2cb51fc57e5de494ca69f65bb65e8938b8de1bcee05979a57fb438"
+      }
+    },
+    {
+      "id": "v2|v4|0b953368e58dd6222a4fd4351f1f4df4d1f2af27b214a9146ef6473da924f9c5|158|self.processor.begin_block",
+      "from": "v2",
+      "to": "v4",
+      "kind": "candidate",
+      "spelling": "self.processor.begin_block",
+      "source": {
+        "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+        "end_line": 158,
+        "file": "0b953368e58dd6222a4fd4351f1f4df4d1f2af27b214a9146ef6473da924f9c5",
+        "line": 158,
+        "path": "minitosis/src/lib.rs",
+        "version": "93aa3ffecc2cb51fc57e5de494ca69f65bb65e8938b8de1bcee05979a57fb438"
+      }
+    },
+    {
+      "id": "v3|v5|a0c63ad80adcd73c9be9ad5cbf35e730e7fcfe90dd1d44b65a40fdf2df773d12|90|self.dry.next",
+      "from": "v3",
+      "to": "v5",
+      "kind": "candidate",
+      "spelling": "self.dry.next",
+      "source": {
+        "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+        "end_line": 90,
+        "file": "a0c63ad80adcd73c9be9ad5cbf35e730e7fcfe90dd1d44b65a40fdf2df773d12",
+        "line": 90,
+        "path": "minitosis/src/engine.rs",
+        "version": "b98c1bac501d5c49dac9eff1d461621a46e91b89fa70ae5a9737870c9092f486"
+      }
+    }
+  ],
+  "camera": {
+    "x": 96,
+    "y": -168.5,
+    "scale": 1.2
+  }
+}

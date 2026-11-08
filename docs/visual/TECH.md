@@ -9,7 +9,9 @@ operations when explicitly requested. Language-specific destination evidence sta
 analyzer and captured call metadata; the browser never chooses a type based on names or paths.
 The first [source-local binding](../explanation/call-destinations.md) covers direct Rust `self`
 receivers across inherent/trait impl blocks in one lexical scope/file. The projection returns
-a sole target and its evidence kind, or the existing bounded candidates.
+a sole target and its evidence kind, or the existing bounded candidates. The optional
+[definition provider](SEMANTIC_TECH.md) handles other calls on demand through standard LSP,
+without adding type heuristics to the browser or structure index.
 
 A browser presentation module owns a versioned visual-workspace document: view identities,
 source bindings, rectangles/collapse state, reading sections/scrolls, camera and visual links.

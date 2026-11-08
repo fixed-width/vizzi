@@ -19,3 +19,8 @@ After mutation results have been archived/reviewed, remove their ignored `mutant
 logs and `.stryker-tmp` sandboxes. Keep current `node_modules` when browser validation still
 needs it. Avoid a broad `git clean -fdx`: private session notes and retained measurement
 inputs can be ignored too. Check tracked paths and preserve recorded data before deletion.
+
+Mutation runs can retain multiple compiled variants in the normal development target,
+even when their source copies and reports live under `/tmp`. After integration checks
+and archiving results, `cargo clean --profile dev` removes those variants while keeping
+the optimised viewer. Avoid copying build output elsewhere merely to hide its size.

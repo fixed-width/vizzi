@@ -1,3 +1,4 @@
+import {readFileSync} from 'node:fs';
 import assert from 'node:assert/strict';
 import {Workspace,worldPoint} from './visual-model.js';
 const token=n=>n.toString(16).repeat(64),snapshot=token(1);
@@ -114,3 +115,19 @@ assert.throws(()=>bound.follow(boundRoot,{...boundSite,binding:'unknown'},b));
 assert.throws(()=>bound.follow(boundRoot,{...boundSite,candidates:[b,c],candidate_count:1},b));
 assert.throws(()=>bound.follow(boundRoot,{...boundSite,candidate_count:2},b));
 assert.equal(model.links[0].kind,'candidate','a name candidate must not be promoted to a source-local binding');
+const semanticModel=new Workspace(snapshot),semanticRoot=semanticModel.openRoot(a,'src');
+const semanticSite={...call(a,b),binding:'language_server_definition',semantic_context:snapshot};
+semanticModel.follow(semanticRoot,semanticSite,b);assert.equal(semanticModel.links[0].kind,'definition');assert.equal(semanticModel.links[0].semantic_context,snapshot);assert.equal(Workspace.restore(semanticModel.serialize(),snapshot).links[0].kind,'definition');
+assert.throws(()=>semanticModel.follow(semanticRoot,{...semanticSite,semantic_context:'missing'},b));
+for(const total of [0,1.5,65,undefined])assert.throws(()=>semanticModel.follow(semanticRoot,{...semanticSite,candidate_count:total},b));
+const otherContext=token(6);semanticModel.follow(semanticRoot,{...semanticSite,semantic_context:otherContext},b);assert.equal(semanticModel.links.length,2,'distinct semantic configurations keep distinct link evidence');assert.deepEqual(Workspace.restore(semanticModel.serialize(),snapshot).links.map(l=>l.semantic_context),[snapshot,otherContext]);
+for(const context of ['missing',token(7)]){const data=JSON.parse(semanticModel.serialize());data.links[0].semantic_context=context;assert.throws(()=>Workspace.restore(JSON.stringify(data),snapshot));}
+
+const legacyLayout=readFileSync(new URL('./fixtures/visual-v1.json',import.meta.url),'utf8'),legacyData=JSON.parse(legacyLayout);
+const legacyModel=Workspace.restore(legacyLayout,legacyData.snapshot);assert.equal(legacyModel.views.length,5);assert.equal(legacyModel.links.length,4);assert.ok(legacyModel.links.every(l=>l.kind==='candidate'));
+for(const badKind of ['bogus','resolved']){const data=JSON.parse(semanticModel.serialize());const link=data.links[0];link.kind=badKind;link.id=[link.from,link.to,link.source.file,link.source.line,link.spelling].join('|');assert.throws(()=>Workspace.restore(JSON.stringify(data),snapshot));}
+{const data=JSON.parse(semanticModel.serialize()),link=data.links[0];link.semantic_context='invalid';link.id=[link.from,link.to,link.source.file,link.source.line,link.spelling,link.semantic_context].join('|');assert.throws(()=>Workspace.restore(JSON.stringify(data),snapshot));}
+
+assert.throws(()=>semanticModel.follow(semanticRoot,{...semanticSite,binding:'unknown'},b));
+assert.throws(()=>semanticModel.follow(semanticRoot,{...semanticSite,binding:null},b));
+{const data=JSON.parse(saved);data.links[0].semantic_context=snapshot;assert.throws(()=>Workspace.restore(JSON.stringify(data),snapshot));}

@@ -12,6 +12,9 @@ independent of directory ranking. The browser opens it directly and draws a soli
 call** link. Unresolved receivers retain candidates and dashed links. No repository build,
 new dependency, unsafe code or browser-side type guessing was introduced.
 
+The [project-aware follow-up](SEMANTIC_RESULTS.md) extends field/alias navigation through
+rust-analyzer; the results below describe the source-local-only implementation.
+
 ## Real-source check
 
 A [functional replay](results/self-calls/result.json) on unchanged Tract Plugin Pack

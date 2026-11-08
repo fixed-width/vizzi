@@ -120,6 +120,9 @@ pub enum SourceEncoding {
 /// A lexical declaration before binding to a workspace path.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Fact {
+    /// Exact declaration identifier when available; absent for legacy/custom facts.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name_span: Option<Range<usize>>,
     /// Ordinal of the enclosing emitted lexical scope in this analysis, always earlier.
     #[serde(default)]
     pub parent: Option<usize>,
@@ -267,6 +270,14 @@ impl Document {
             }
             let analysis_start = outline_depths.len();
             for (ordinal, fact) in analysis.facts.iter().enumerate() {
+                if fact.name_span.as_ref().is_some_and(|span| {
+                    span.start >= span.end
+                        || span.start < fact.span.start
+                        || span.end > fact.span.end
+                        || text.and_then(|s| s.get(span.clone())) != Some(fact.name.as_str())
+                }) {
+                    return Err(ModelError("invalid declaration identifier range".into()));
+                }
                 let depth = if let Some(parent) = fact.parent {
                     let enclosing = analysis.facts.get(parent).filter(|p| {
                         parent < ordinal
@@ -565,6 +576,7 @@ mod tests {
             },
             coverage: Coverage::Syntax,
             facts: vec![Fact {
+                name_span: None,
                 parent: None,
                 key: "fn::f".into(),
                 name: "f".into(),

@@ -10,3 +10,5 @@
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 
 #workspace-links path.self-call{stroke-dasharray:none}
+
+#workspace-links path.definition-call{stroke-dasharray:none}

@@ -20,6 +20,12 @@ with [separate binding/candidate evidence](../explanation/call-destinations.md).
 choices while retaining the caller. Broader receiver/type analysis remains a separate
 capability; maintain the chooser where current analysis cannot establish a destination.
 
+The [project-aware follow-up](../../experiments/visual/SEMANTIC_RESULTS.md) now uses an
+opt-in native LSP definition provider. Actual GsMeter and Minitosis field calls bypass
+unrelated name matches, with captured-source/version and late-response safeguards.
+Keep this as supporting infrastructure for visual call trails; broad type/compiler
+coverage and cold-start cost remain distinct from independent workspace usefulness.
+
 The prepared Minitosis search-led leave/return session was stopped after the direction
 correction on 2026-11-08. Preserve its notes and treat the maintainer's feedback as product
 direction, without inventing task completion/time scores. Earlier checkpoints below are

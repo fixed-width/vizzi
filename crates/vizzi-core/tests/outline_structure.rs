@@ -163,6 +163,7 @@ fn escaped_hierarchy_labels_and_styles_still_fit_the_document_window_budget() {
     let text = format!("{}\n", "\u{1}".repeat(341)).repeat(96);
     let facts = (0usize..201)
         .map(|i| Fact {
+            name_span: None,
             parent: i.checked_sub(1),
             key: i.to_string(),
             kind: "\u{1}".repeat(32),

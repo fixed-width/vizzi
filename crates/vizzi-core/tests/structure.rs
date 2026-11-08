@@ -306,6 +306,7 @@ fn declaration_and_call_allowances_are_finite_and_expose_omissions() {
     analysis.calls = None;
     analysis.facts = (0..65537)
         .map(|n| Fact {
+            name_span: None,
             parent: None,
             key: format!("k{n}"),
             name: format!("item_{n}"),
@@ -383,4 +384,40 @@ fn exhausted_pages_never_offer_an_empty_continuation() {
         .collect::<String>();
     let index = Structure::new(&snapshot(&[("one/file.rs", &data)]));
     assert_eq!(index.inventory("one", "", 0).unwrap().next, None);
+}
+
+#[test]
+fn native_call_identity_and_exact_definition_positions_do_not_depend_on_name_ranking() {
+    let text = "fn start() { module::renamed(); } mod module { fn original() {} }";
+    let index = Structure::new(&snapshot(&[("src/lib.rs", text)]));
+    let start = &index.inventory("src", "start", 0).unwrap().items[0].symbol;
+    let invocation = &index.outgoing(&start.id, "src", 0).unwrap().items[0];
+    assert_eq!(invocation.id.len(), 64);
+    let lookup = index.call(&invocation.id).unwrap();
+    assert_eq!(&text[lookup.identifier.unwrap()], "renamed");
+    assert_eq!(lookup.language, "rust");
+    let definition = index
+        .definition("src/lib.rs", text.find("original").unwrap())
+        .unwrap();
+    assert_eq!(definition.name, "original");
+    assert!(index.definition("missing.rs", 0).is_none());
+    assert!(index.call("not-a-call").is_none());
+}
+
+#[test]
+fn a_local_variable_definition_is_not_misreported_as_its_enclosing_function() {
+    let text = "fn owner() { let callback = || {}; callback(); }";
+    let index = Structure::new(&snapshot(&[("src/lib.rs", text)]));
+    assert!(
+        index
+            .definition("src/lib.rs", text.find("callback").unwrap())
+            .is_none()
+    );
+    assert_eq!(
+        index
+            .definition("src/lib.rs", text.find("owner").unwrap())
+            .unwrap()
+            .name,
+        "owner"
+    );
 }

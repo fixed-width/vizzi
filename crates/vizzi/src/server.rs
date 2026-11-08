@@ -60,8 +60,22 @@ pub fn router_with_companion(
     reviews: Arc<crate::review_application::ReviewApplication>,
     investigation: Arc<crate::companion::Companion>,
 ) -> Router {
+    router_with_definitions(host, reviews, investigation, None)
+}
+/// Adds an explicitly configured definition provider to the companion host.
+pub fn router_with_definitions(
+    host: Arc<crate::host::Host>,
+    reviews: Arc<crate::review_application::ReviewApplication>,
+    investigation: Arc<crate::companion::Companion>,
+    definitions: Option<Arc<dyn crate::definitions::Provider>>,
+) -> Router {
     let search = Arc::new(crate::question_search::QuestionSearch::new(host.clone()));
-    let structure = Arc::new(crate::structural::StructureHost::new(host.clone()));
+    let structure = Arc::new(match definitions {
+        Some(provider) => {
+            crate::structural::StructureHost::with_definitions(host.clone(), provider)
+        }
+        None => crate::structural::StructureHost::new(host.clone()),
+    });
     router_with_host(host, reviews).merge(companion::router(investigation, search, structure))
 }
 

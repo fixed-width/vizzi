@@ -13,6 +13,8 @@ pub const SPELLING_BYTES: usize = 256;
 pub enum TargetBasis {
     /// Same shorthand Rust `self` receiver and one inherent method in its lexical scope.
     RustSelfReceiver,
+    /// Definition locations supplied by a host language server, never raw syntax.
+    LanguageServerDefinition,
 }
 /// A language-supported destination in the same captured analysis.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -32,6 +34,9 @@ pub struct CallSite {
     pub owner: Option<usize>,
     /// Terminal callee name when recognizable; dynamic expressions remain unnamed.
     pub name: Option<String>,
+    /// Exact terminal identifier; absent in legacy captures and dynamic callees.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name_span: Option<Range<usize>>,
     /// Exact callee spelling from captured source, excluding its argument list.
     pub spelling: String,
     /// Nonempty UTF-8 source range of that spelling.
@@ -48,7 +53,7 @@ pub struct CallFacts {
 pub(crate) fn supported(language: &str) -> bool {
     matches!(language, "rust" | "python")
 }
-fn name(mut node: Node<'_>, text: &str) -> Option<String> {
+fn name(mut node: Node<'_>, text: &str) -> Option<(String, Range<usize>)> {
     for _ in 0..8 {
         if matches!(
             node.kind(),
@@ -57,7 +62,7 @@ fn name(mut node: Node<'_>, text: &str) -> Option<String> {
             return text
                 .get(node.byte_range())
                 .filter(|s| !s.is_empty() && s.len() <= 128)
-                .map(str::to_owned);
+                .map(|name| (name.to_owned(), node.byte_range()));
         }
         node = match node.kind() {
             "scoped_identifier" | "scoped_type_identifier" => node.child_by_field_name("name"),
@@ -111,10 +116,15 @@ pub(crate) fn collect(
         }
         parent = current.parent();
     }
+    let (name, name_span) = match name(callee, text) {
+        Some((name, span)) => (Some(name), Some(span)),
+        None => (None, None),
+    };
     output.sites.push(CallSite {
         target: None,
         owner,
-        name: name(callee, text),
+        name,
+        name_span,
         spelling: spelling.into(),
         span: callee.byte_range(),
     });
@@ -137,8 +147,18 @@ impl CallFacts {
             ));
         }
         for call in &self.sites {
+            if call.name_span.as_ref().is_some_and(|span| {
+                span.start >= span.end
+                    || span.start < call.span.start
+                    || span.end > call.span.end
+                    || call.name.is_none()
+                    || text.and_then(|s| s.get(span.clone())) != call.name.as_deref()
+            }) {
+                return Err(ModelError("invalid captured callee identifier span".into()));
+            }
             if let Some(target) = &call.target
-                && (language != "rust"
+                && (target.basis != TargetBasis::RustSelfReceiver
+                    || language != "rust"
                     || *coverage != Coverage::Syntax
                     || call.owner.is_none()
                     || facts.get(target.declaration).is_none_or(|fact| {
