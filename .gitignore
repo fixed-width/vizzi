@@ -4,3 +4,4 @@
 /node_modules/
 /experiments/browser/results/local/
 /.stryker-tmp/
+/experiments/companion/results/local/

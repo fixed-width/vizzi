@@ -17,6 +17,11 @@ The frozen [Sketchlayer evaluation](../../experiments/structure/SKETCHLAYER_RESU
 finds relevant tool/canvas locations through explicit operations, with call-site evidence
 retained. Ordinary search is competitive on the nine-file repo; maintain the experimental
 status and stop expanding natural-language heuristics pending actual maintainer value.
+The current [maintainer leave/return session](../how-to/maintainer-return-trial.md) now
+uses the chosen Minitosis input/output investigation. Setup is verified and the participant
+investigation starts empty. Familiarity, retained-context benefit and editor duplication
+remain operator observations to collect. A successful setup check does not establish
+usability or justify another search/model/backend experiment.
 The prototype below establishes safe browsing/comparison and performance foundations; it
 does not establish added value alongside an editor. Further IDE-surface feature work is
 paused as a delivery priority. Complete the companion slice and evaluate its contribution

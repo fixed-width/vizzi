@@ -36,3 +36,8 @@ Use a disposable checkout. Do not run the inspected project's build/scripts to c
 the source-reading task. No real editor window should be launched by automated checks
 without confirming a separate display/session; an isolated data profile alone is not an
 isolated desktop.
+
+For the current self-run Minitosis session, use the shorter
+[investigate/leave/return guide](../how-to/maintainer-return-trial.md) and
+[worksheet](../../experiments/companion/maintainer/WORKSHEET.md). Its observations remain
+pending until the operator uses the product; existing source-aware replays are not a substitute.
