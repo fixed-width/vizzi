@@ -1,5 +1,9 @@
 # Structural exploration implementation
 
+This document describes the existing prototype slice. The active product direction is
+[visual working sets](../explanation/visual-working-sets.md); search/list navigation is
+supporting infrastructure rather than the primary experience.
+
 Read [the behaviour contract](PRODUCT.md). The implementation follows the source/analysis/
 projection/host/editor seams in DESIGN.md. No new external dependency or unsafe code is needed.
 

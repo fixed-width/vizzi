@@ -1,5 +1,9 @@
 # Evaluate the editor-companion workflow
 
+The 2026-11-08 direction correction supersedes this search-led protocol as the active
+next step. See [visual working sets](../explanation/visual-working-sets.md). Preserve
+existing notes; the prior setup check is not a completed visual-working-set evaluation.
+
 This how-to is for a facilitator. Use the existing pinned lpc-rs learning question and
 source archive from the [trial kit](../../experiments/usability/README.md). Record the
 operator's familiarity with the project and fixture. Keep expected paths/answers and

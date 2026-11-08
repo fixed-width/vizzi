@@ -7,34 +7,43 @@ Contributor standards belong in [AGENTS.md](AGENTS.md).
 
 ## Product role
 
-Vizzi supplements an editor by helping a developer assemble and navigate an understanding
-of a subsystem or change across files and revisions. Questions, source evidence and
-relationships retain an understanding as it develops. The starting experience must
-also help readers discover an unfamiliar repository without known paths or a prewritten
-explanation. Reveal authoring controls when needed. The editor remains the main surface for
-reading and changing source. A bounded source preview supports evidence inspection and
-version accuracy. Directory/declaration browsing and conventional diffs are supporting
-views, not the product's organising workflow.
+Vizzi is a visual workspace beside an editor for understanding unfamiliar source and
+reviewing changes across files and revisions. The maintainer's closest reference is
+Code Bubbles: readable source fragments and other views form a task working set that
+stays visible while the reader follows relationships. Walking a call chain should open
+the next fragment beside its caller and retain earlier steps and branches in a stable
+spatial arrangement. The [visual working-set rationale](docs/explanation/visual-working-sets.md)
+records the literature and the intended interaction; [CONTEXT.md](CONTEXT.md) defines terms.
 
-The [companion workflow](docs/companion/PRODUCT.md) is the next delivery slice. Evaluate
-what it contributes alongside an editor, rather than accepting source-browsing feature
-parity as progress towards the product goal.
+Multiple coordinated views are central: source fragments, focused relationships/overviews,
+notes and revision/diff views share source identities and context. Layout/grouping,
+collapse/expand and return to earlier reading positions support understanding; large
+repositories must remain manageable through a focused task working set. The editor
+continues to handle normal editing and its plugins remain an integration path.
 
-Natural-language questions should help discover and focus the same captured evidence.
-The optional model interprets search intent and helps narrow or rank results; the source
-engine owns locations, identities, analysis coverage and established relationships.
-Search remains useful without inference. Model suggestions must preserve inspectable
-evidence and expose unresolved relationships. Repository-specific training is not required.
-The [question-driven ranking experiment](docs/qa/SEARCH.md) evaluates this role separately
-from the earlier [CPU answer experiments](docs/qa/PRODUCT.md). The question library covers
-reusable and codebase-specific tasks; relevance and navigation usefulness are separate
-from complete-answer correctness.
+Search, directory browsing and declaration lookup help introduce a view into that working
+set. They are supporting entry points rather than the organising product workflow. The
+recent question-ranking and structural-list experiments exposed IDE duplication and do
+not qualify the desired visual interaction. Keep their evidence and reusable interfaces;
+stop expanding them as the primary delivery direction. The next milestone is a concrete
+visual call trail that preserves the caller and preceding steps concurrently.
+
+Optional model assistance may help choose or organise source views later. It is not a
+prerequisite for the spatial workspace and is not the active experiment. Source identity,
+analysis coverage, candidate relationships and reader-authored associations retain their
+meaning in every view; placement or an arrow must not manufacture semantic certainty.
 
 
 ## Architecture
 
 Keep source access, language analysis, indexing, investigations, views, and host
 integration behind small interfaces. Keep platform facilities outside portable logic.
+
+Visual-workspace state is independent of source/relationship facts. Persist the reader's
+views, layout, groups and reading/camera state separately from analysis identities. A
+fragment view references a particular source observation/version/range; it is not limited
+to the short excerpt stored by the existing investigation model. This seam also permits
+several representations of the same source and per-view revision context for reviews.
 
 Source snapshots and their comparison are independent of source-control history.
 Target Git initially without requiring Git-specific identifiers or operations in the

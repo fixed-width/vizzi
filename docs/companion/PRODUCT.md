@@ -1,5 +1,9 @@
 # An investigation alongside the editor
 
+This document describes the existing prototype slice. The active product direction is
+[visual working sets](../explanation/visual-working-sets.md); search/list navigation is
+supporting infrastructure rather than the primary experience.
+
 The opt-in [question-search trial](SEARCH_PRODUCT.md) adds a question-first path into
 the same previews, saved evidence and editor handoff. The overview below remains the default.
 

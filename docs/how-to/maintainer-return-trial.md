@@ -1,5 +1,9 @@
 # Try an investigation, leave it, and return
 
+The 2026-11-08 direction correction supersedes this search-led protocol as the active
+next step. See [visual working sets](../explanation/visual-working-sets.md). Preserve
+existing notes; the prior setup check is not a completed visual-working-set evaluation.
+
 For the maintainer deciding whether Vizzi adds useful context beside VS Code. Allow about
 20 minutes. This is a usability/retention check on a task you care about, not a fresh search
 or model evaluation. Existing source guides and previous familiarity can affect the result;

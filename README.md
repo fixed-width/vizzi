@@ -1,31 +1,23 @@
 # Vizzi
 
-Coordinated views for learning source code and reviewing changes alongside your editor.
-The primary page automatically maps captured source into areas and searchable names.
-Click through the overview and keep useful locations without entering paths or lines.
-Saved context offers optional questions, notes and reader-authored connections.
-VS Code handles normal reading and editing; an explicit
-handoff checks working-file content before opening a saved location. A source map,
-captured preview, declaration outline and comparison remain supporting views.
-A native Rust engine supplies immutable observations to a local browser host.
-Rust/Python are selected by default; explicit scopes enable raw C/C++ analysis.
+Coordinated visual working sets for learning code and reviewing changes beside your editor.
+The current direction is a [Code Bubbles-style workspace](docs/explanation/visual-working-sets.md):
+follow a call into a new source fragment while its caller, earlier steps and branches
+remain available in a stable spatial layout. Multiple source/relationship/diff views can
+share context without replacing each other. Search is a supporting entry point.
 
-An opt-in [question-search trial](docs/how-to/question-search-trial.md) at
-`/investigate?trial=search` finds and groups source starting points without a model.
-Inspect results, keep useful evidence and hand it to VS Code through the same workflow.
-The first [fresh Tract Plugin Pack trial](experiments/companion/TRACT_PLUGIN_PACK_FRESH_RESULTS.md)
-exposed intent/ranking and evidence-retention gaps. Independent maintainer navigation
-usefulness remains to be evaluated; the default overview is unchanged.
+The native Rust engine, immutable source observations, bounded previews, source/version
+checks, captured call candidates and explicit VS Code handoff are implemented foundations.
+The visual working-set interaction is the next prototype; it is not delivered by the
+current list-based views. Rust/Python are selected by default; explicit scopes enable
+raw C/C++ analysis. Normal editing stays in the editor, with richer plugin integration
+remaining a supported direction.
 
-A separate [structural exploration prototype](docs/how-to/structural-exploration.md) at
-`/investigate?trial=structure` exposes captured inventories and written-call candidates.
-Rust/Python collect call evidence in the existing syntax pass; names, ambiguity and
-unavailable analysis remain explicit. It performs no natural-language intent routing or
-semantic call/data-flow resolution. Its [evaluation protocol](docs/structure/EVALUATION.md)
-keeps reserved questions out of development.
-The [Sketchlayer checkpoint](experiments/structure/SKETCHLAYER_RESULTS.md) records useful
-explicit navigation and retained invocation text, while finding no demonstrated human
-advantage over plain search or justification for adding a model layer.
+Existing [question-search](docs/how-to/question-search-trial.md) and
+[structural exploration](docs/how-to/structural-exploration.md) trials remain as experimental
+controls/infrastructure. Their [Tract](experiments/companion/TRACT_PLUGIN_PACK_FRESH_RESULTS.md)
+and [Sketchlayer](experiments/structure/SKETCHLAYER_RESULTS.md) results document relevance,
+retention and IDE-duplication limits. They are no longer the primary product milestone.
 
 The production renderer, compiler-backed language integrations and storage engine
 remain open decisions. Both guided learning and local-change review tasks now pass

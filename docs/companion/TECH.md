@@ -1,5 +1,9 @@
 # Companion architecture and first slice
 
+This document describes the existing prototype slice. The active product direction is
+[visual working sets](../explanation/visual-working-sets.md); search/list navigation is
+supporting infrastructure rather than the primary experience.
+
 The [question-search adapter](SEARCH_TECH.md) reuses this workflow through the shared
 `vizzi-search` crate. It is an opt-in trial, separate from default metadata-only discovery.
 

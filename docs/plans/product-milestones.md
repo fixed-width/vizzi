@@ -1,4 +1,24 @@
-# Product milestones: companion workflow checkpoint
+# Product milestones: visual working sets
+
+The current delivery priority is the maintainer's [Code Bubbles-style visual working set](../explanation/visual-working-sets.md).
+The key interaction is a visual call trail: open a related function beside its caller,
+keep earlier steps readable/in place, and branch without replacing or globally rearranging
+the existing context. Multiple coordinated views and stable spatial organisation lead.
+Search, inventories and call lists support introducing views; they are not the product's
+main value proposition.
+
+The next artifact is a small interactive visual prototype on an already-known real call
+chain, followed by direct maintainer feedback on concurrent context and branching. Establish
+that visual interaction before another search benchmark, model experiment or infrastructure
+expansion. Reuse the source engine, captured provenance/calls, bounded queries and editor
+handoff. Keep candidate links and reader associations distinct from semantic relationships.
+
+The prepared Minitosis search-led leave/return session was stopped after the direction
+correction on 2026-11-08. Preserve its notes and treat the maintainer's feedback as product
+direction, without inventing task completion/time scores. Earlier checkpoints below are
+historical implementation/evaluation evidence, not the active delivery queue.
+
+# Previous checkpoint: companion exploration and retention trial
 
 The current delivery priority is [one editor-companion learning workflow](../companion/PRODUCT.md).
 The opt-in [question-search trial](../companion/SEARCH_PRODUCT.md) now tests a question-first

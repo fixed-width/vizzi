@@ -1,5 +1,9 @@
 # Structural exploration experiment
 
+This document describes the existing prototype slice. The active product direction is
+[visual working sets](../explanation/visual-working-sets.md); search/list navigation is
+supporting infrastructure rather than the primary experience.
+
 ## Summary
 
 For developers learning unfamiliar source beside an editor. This opt-in experiment offers
