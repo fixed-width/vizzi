@@ -1,0 +1,214 @@
+{
+  "schema": 1,
+  "authorship": "Source-informed automated replay after first observations and source audit. Demonstrates attributed call navigation and retained spelling; no independent effort/comprehension or semantic callback/dispatch proof.",
+  "cases": [
+    {
+      "case": "sketchlayer.add-tool",
+      "operations": [
+        {
+          "request": {
+            "snapshot": "e71e0889cc5ec9c131385874a090e5209b8dfe273786828118da6be59777e177",
+            "query": {
+              "kind": "areas",
+              "search": "",
+              "offset": 0
+            }
+          },
+          "status": 200
+        },
+        {
+          "request": {
+            "snapshot": "e71e0889cc5ec9c131385874a090e5209b8dfe273786828118da6be59777e177",
+            "query": {
+              "kind": "areas",
+              "search": "tool",
+              "offset": 0
+            }
+          },
+          "status": 200
+        },
+        {
+          "request": {
+            "snapshot": "e71e0889cc5ec9c131385874a090e5209b8dfe273786828118da6be59777e177",
+            "query": {
+              "kind": "inventory",
+              "area": "src/drawing.rs",
+              "search": "tool",
+              "offset": 0
+            }
+          },
+          "status": 200
+        },
+        {
+          "request": {
+            "snapshot": "e71e0889cc5ec9c131385874a090e5209b8dfe273786828118da6be59777e177",
+            "query": {
+              "kind": "uses",
+              "symbol": "2f1ec800f463f19802b15de4521a072066b45525bb56be6d8ee84df9f716708a",
+              "area": "src/drawing.rs",
+              "offset": 0
+            }
+          },
+          "status": 200
+        }
+      ],
+      "board": {
+        "schema": 1,
+        "workspace": "f8e5ecd7e8e93331fc49525e21cf22c9ea3bfbe06d70f72d344b5784a976d02b",
+        "revision": 2,
+        "next_id": 2,
+        "question": "Where do i go to add a new tool?",
+        "evidence": [
+          {
+            "id": 1,
+            "title": "set_tool",
+            "note": "",
+            "source": {
+              "workspace": "f8e5ecd7e8e93331fc49525e21cf22c9ea3bfbe06d70f72d344b5784a976d02b",
+              "snapshot": "e71e0889cc5ec9c131385874a090e5209b8dfe273786828118da6be59777e177",
+              "file": "f76de7a01633c533212e02fb88c6b38fa23d51307d9247d81cea6534915bc5b9",
+              "version": "3df9c599ab4e411f6d756a91cf00e00d7610d51719033da82c9b5f49e7d596e9",
+              "content": "235cd377d8ce49373f24fce91654894c3ddf8c8a13825a954aa6c1e72210f25b",
+              "path": "src/tool_window.rs",
+              "line": 163,
+              "end_line": 168,
+              "excerpt": "                    drawing_state_clone.borrow_mut().set_tool(tool);\n                    update_tool_highlighting(\n                        tool,\n                        &pencil_btn,\n                        &eraser_btn,\n                        &fill_btn,\n",
+              "truncated": true
+            }
+          }
+        ],
+        "connections": []
+      },
+      "recordingOnlyHandoff": "--reuse-window\n--goto\n/tmp/vizzi-structure-sketch-90p0pf7z/sketchlayer/src/tool_window.rs:163:1\n",
+      "pageErrors": []
+    },
+    {
+      "case": "sketchlayer.drawing-surface-border",
+      "operations": [
+        {
+          "request": {
+            "snapshot": "e71e0889cc5ec9c131385874a090e5209b8dfe273786828118da6be59777e177",
+            "query": {
+              "kind": "areas",
+              "search": "",
+              "offset": 0
+            }
+          },
+          "status": 200
+        },
+        {
+          "request": {
+            "snapshot": "e71e0889cc5ec9c131385874a090e5209b8dfe273786828118da6be59777e177",
+            "query": {
+              "kind": "areas",
+              "search": "window",
+              "offset": 0
+            }
+          },
+          "status": 200
+        },
+        {
+          "request": {
+            "snapshot": "e71e0889cc5ec9c131385874a090e5209b8dfe273786828118da6be59777e177",
+            "query": {
+              "kind": "inventory",
+              "area": "src/canvas.rs",
+              "search": "window",
+              "offset": 0
+            }
+          },
+          "status": 200
+        },
+        {
+          "request": {
+            "snapshot": "e71e0889cc5ec9c131385874a090e5209b8dfe273786828118da6be59777e177",
+            "query": {
+              "kind": "inventory",
+              "area": "src/canvas.rs",
+              "search": "",
+              "offset": 0
+            }
+          },
+          "status": 200
+        },
+        {
+          "request": {
+            "snapshot": "e71e0889cc5ec9c131385874a090e5209b8dfe273786828118da6be59777e177",
+            "query": {
+              "kind": "calls",
+              "symbol": "1b10c63a240d7f4640aa9eea2c6519eea143fc09f837e64b54be39ca9ccd6457",
+              "area": "src/canvas.rs",
+              "offset": 0
+            }
+          },
+          "status": 200
+        },
+        {
+          "request": {
+            "snapshot": "e71e0889cc5ec9c131385874a090e5209b8dfe273786828118da6be59777e177",
+            "query": {
+              "kind": "calls",
+              "symbol": "1b10c63a240d7f4640aa9eea2c6519eea143fc09f837e64b54be39ca9ccd6457",
+              "area": "src/canvas.rs",
+              "offset": 8
+            }
+          },
+          "status": 200
+        },
+        {
+          "request": {
+            "snapshot": "e71e0889cc5ec9c131385874a090e5209b8dfe273786828118da6be59777e177",
+            "query": {
+              "kind": "calls",
+              "symbol": "b7be7357fdfba4593e1555cde822ce840c7f33d76b29636fe3a634998981b12d",
+              "area": "src/canvas.rs",
+              "offset": 0
+            }
+          },
+          "status": 200
+        },
+        {
+          "request": {
+            "snapshot": "e71e0889cc5ec9c131385874a090e5209b8dfe273786828118da6be59777e177",
+            "query": {
+              "kind": "calls",
+              "symbol": "044fbbc371394a45df9c8188fe44e34f53b838013d2e1e0f82699c129ba01979",
+              "area": "src/canvas.rs",
+              "offset": 0
+            }
+          },
+          "status": 200
+        }
+      ],
+      "board": {
+        "schema": 1,
+        "workspace": "f8e5ecd7e8e93331fc49525e21cf22c9ea3bfbe06d70f72d344b5784a976d02b",
+        "revision": 2,
+        "next_id": 2,
+        "question": "how would I add a border around the main drawing surface to make it easier to tell when it's the top window?",
+        "evidence": [
+          {
+            "id": 1,
+            "title": "draw",
+            "note": "",
+            "source": {
+              "workspace": "f8e5ecd7e8e93331fc49525e21cf22c9ea3bfbe06d70f72d344b5784a976d02b",
+              "snapshot": "e71e0889cc5ec9c131385874a090e5209b8dfe273786828118da6be59777e177",
+              "file": "876d4498ecb87c967f8ea9a5929ac36a6408a9a6bfe6ab557ec652fb05543883",
+              "version": "c69d6b6e111e5da1c7e09455a76a4e2b1faa8ef74c3c8e48911d3e2f6e5e1694",
+              "content": "5db04e5262ddceff22479a5a55a72843022711d7c101636d94e3abaafe888374",
+              "path": "src/canvas.rs",
+              "line": 156,
+              "end_line": 161,
+              "excerpt": "        drawing_state_for_draw.borrow().draw(cr);\n    });\n\n    // Handle mouse press for starting strokes\n    let drawing_state_clone = Rc::clone(&drawing_state);\n    let gesture_press = GestureClick::new();\n",
+              "truncated": true
+            }
+          }
+        ],
+        "connections": []
+      },
+      "recordingOnlyHandoff": "--reuse-window\n--goto\n/tmp/vizzi-structure-sketch-90p0pf7z/sketchlayer/src/canvas.rs:156:1\n",
+      "pageErrors": []
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+// Steady metadata costs on a known development repository, after correctness work.
+import assert from 'node:assert/strict';import{readFile,writeFile,mkdir}from'node:fs/promises';import{createHash}from'node:crypto';import{join,resolve}from'node:path';import{startHost}from'../browser/support.mjs';
+const[sourceArg,outputArg,area]=process.argv.slice(2);assert.ok(sourceArg&&outputArg&&area,'Use measure.mjs SOURCE NEW_OUTPUT AREA_WITH_INVENTORY_FUNCTION');const source=resolve(sourceArg),output=resolve(outputArg);await mkdir(output);let host;
+try{
+ host=await startHost({root:source,cache:join(output,'analysis')},1);
+ const request=async(path,body)=>{const start=performance.now(),response=await fetch(host.url+path,body===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}),text=await response.text(),ms=performance.now()-start;assert.ok(response.ok,text);return{data:JSON.parse(text),ms,bytes:Buffer.byteLength(text)};};
+ const start=performance.now();await request('/api/workspace/start',{});let status;for(let i=0;;i++){status=(await request('/api/status')).data;if(status.snapshot)break;assert.ok(i<600&&!status.error);await new Promise(done=>setTimeout(done,100));}const activationMs=performance.now()-start;
+ const query=async operation=>request('/api/structure',{snapshot:status.snapshot,query:operation});
+ const cold=await query({kind:'areas',search:'',offset:0});const inventory=(await query({kind:'inventory',area,search:'inventory',offset:0})).data;const symbol=inventory.items.find(i=>i.symbol.name==='inventory').symbol;
+ const cases=[];for(const operation of [{kind:'areas',search:'syntax',offset:0},{kind:'inventory',area,search:'',offset:0},{kind:'calls',area,symbol:symbol.id,offset:0},{kind:'uses',area,symbol:symbol.id,offset:0}]){
+  const samples=[],sizes=[];let last;for(let i=0;i<35;i++){const r=await query(operation);last=r.data;if(i>=5){samples.push(r.ms);sizes.push(r.bytes);}}const sorted=[...samples].sort((a,b)=>a-b);cases.push({operation,samplesMs:samples,medianMs:sorted[15],p95Ms:sorted[28],maxMs:sorted[29],maxResponseBytes:Math.max(...sizes),matching:last.matching,items:last.items.length});
+ }
+ const report={schema:1,createdAt:new Date().toISOString(),sourceRoot:source,snapshot:status.snapshot,binarySha256:createHash('sha256').update(await readFile('target/release/vizzi')).digest('hex'),workers:1,model:null,activationMs,coldMetadataMs:cold.ms,coverage:cold.data.coverage,cases,limitations:['Known development repository only, optimized native host, no competing test/mutation cohort.','Thirty warm localhost/full-body observations after five warmups; JSON parsing follows timing.','Metadata navigation costs, not natural-language interpretation, human task times, browser frames or whole-repository/GPU qualification.']};await writeFile(join(output,'report.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));
+}finally{await host?.close();}

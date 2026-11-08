@@ -1,0 +1,1065 @@
+{
+  "schema": 1,
+  "sourceRevision": "f52314e676ead6a50913e89a458ec34c23d509f9",
+  "sourceRoot": "/tmp/vizzi-structure-sketch-90p0pf7z/sketchlayer",
+  "snapshot": "e71e0889cc5ec9c131385874a090e5209b8dfe273786828118da6be59777e177",
+  "planSha256": "68e235027f96316350130b119bc9a32db964da81100f1d74b22225aecb053142",
+  "binarySha256": "8f78d9f67e68d3677453d67ef036b6274f44d10f0f61782c4cf683e498babe9a",
+  "model": null,
+  "workers": 1,
+  "observations": [
+    {
+      "case": "sketchlayer.add-tool",
+      "seed": "tool",
+      "operations": [
+        {
+          "query": {
+            "kind": "areas",
+            "search": "tool",
+            "offset": 0
+          },
+          "data": {
+            "coverage": {
+              "available_files": 9,
+              "indexed_files": 9,
+              "omitted_areas": 0,
+              "omitted_calls": 0,
+              "omitted_files": 0,
+              "omitted_symbols": 0,
+              "partial_files": 0,
+              "unavailable_call_files": 0
+            },
+            "items": [
+              {
+                "files": 1,
+                "path": "src/drawing.rs"
+              },
+              {
+                "files": 1,
+                "path": "src/main.rs"
+              },
+              {
+                "files": 1,
+                "path": "src/tool_window.rs"
+              }
+            ],
+            "matching": 3,
+            "next": null,
+            "snapshot": "e71e0889cc5ec9c131385874a090e5209b8dfe273786828118da6be59777e177"
+          },
+          "elapsedMs": 1.751466999999991,
+          "responseBytes": 393
+        },
+        {
+          "query": {
+            "kind": "inventory",
+            "area": "",
+            "search": "tool",
+            "offset": 0
+          },
+          "data": {
+            "coverage": {
+              "available_files": 9,
+              "indexed_files": 9,
+              "omitted_areas": 0,
+              "omitted_calls": 0,
+              "omitted_files": 0,
+              "omitted_symbols": 0,
+              "partial_files": 0,
+              "unavailable_call_files": 0
+            },
+            "items": [
+              {
+                "candidate_uses": 0,
+                "same_name_definitions": 1,
+                "symbol": {
+                  "id": "82c7cf9789a7a2ad68c70f44065b4cbea8595aa1ccff597214ebfc36d55c1972",
+                  "kind": "enum",
+                  "name": "Tool",
+                  "parents": [],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 12,
+                    "file": "ff9f1e0a54a6cbd5d9925ebb999ae52e5003234c17c71d012aa8f04ce8c0c84e",
+                    "line": 5,
+                    "path": "src/drawing.rs",
+                    "version": "953b5b66dbf7f461e9d95bc688ee87147d52b8fa7f0ef74d2942aebae4a2a37a"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 1,
+                "same_name_definitions": 1,
+                "symbol": {
+                  "id": "2f1ec800f463f19802b15de4521a072066b45525bb56be6d8ee84df9f716708a",
+                  "kind": "function",
+                  "name": "set_tool",
+                  "parents": [
+                    "DrawingState"
+                  ],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 193,
+                    "file": "ff9f1e0a54a6cbd5d9925ebb999ae52e5003234c17c71d012aa8f04ce8c0c84e",
+                    "line": 191,
+                    "path": "src/drawing.rs",
+                    "version": "953b5b66dbf7f461e9d95bc688ee87147d52b8fa7f0ef74d2942aebae4a2a37a"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 0,
+                "same_name_definitions": 1,
+                "symbol": {
+                  "id": "0d87c50b756cfedfd02cfd693cbc2d2228069df68ae485c7548d1e5a2a73ec94",
+                  "kind": "module",
+                  "name": "tool_window",
+                  "parents": [],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 13,
+                    "file": "99c72202e28e470e7f3d208bfc881a2d3ba67a2e2ca31cbd2a51799a050fa1a7",
+                    "line": 13,
+                    "path": "src/main.rs",
+                    "version": "32d11c28156a7183b3b799636063aaf0630aaa0ddb99eaef3078e93207f63922"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 4,
+                "same_name_definitions": 3,
+                "symbol": {
+                  "id": "4dbcf62576b518b440578817585e4eab154d0ebcc1094d15ec70c0981ab59002",
+                  "kind": "function",
+                  "name": "handle_key_press",
+                  "parents": [],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 24,
+                    "file": "f76de7a01633c533212e02fb88c6b38fa23d51307d9247d81cea6534915bc5b9",
+                    "line": 16,
+                    "path": "src/tool_window.rs",
+                    "version": "3df9c599ab4e411f6d756a91cf00e00d7610d51719033da82c9b5f49e7d596e9"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 0,
+                "same_name_definitions": 2,
+                "symbol": {
+                  "id": "73c60ea2c9555a0f6024810ed6b609f67f7d7b50bab38abbec59ab84016ca7bb",
+                  "kind": "struct",
+                  "name": "ToolWindow",
+                  "parents": [],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 29,
+                    "file": "f76de7a01633c533212e02fb88c6b38fa23d51307d9247d81cea6534915bc5b9",
+                    "line": 27,
+                    "path": "src/tool_window.rs",
+                    "version": "3df9c599ab4e411f6d756a91cf00e00d7610d51719033da82c9b5f49e7d596e9"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 0,
+                "same_name_definitions": 2,
+                "symbol": {
+                  "id": "8df137f06459d16e5f33640eb044a2690928e981298265f2e3ffcf5bb8616e2e",
+                  "kind": "implementation",
+                  "name": "ToolWindow",
+                  "parents": [],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 293,
+                    "file": "f76de7a01633c533212e02fb88c6b38fa23d51307d9247d81cea6534915bc5b9",
+                    "line": 31,
+                    "path": "src/tool_window.rs",
+                    "version": "3df9c599ab4e411f6d756a91cf00e00d7610d51719033da82c9b5f49e7d596e9"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 43,
+                "same_name_definitions": 4,
+                "symbol": {
+                  "id": "02fa04c84bba5673b6cf70dc42342a975dbcc32905e3005e6feb36f1562271c8",
+                  "kind": "function",
+                  "name": "new",
+                  "parents": [
+                    "ToolWindow"
+                  ],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 292,
+                    "file": "f76de7a01633c533212e02fb88c6b38fa23d51307d9247d81cea6534915bc5b9",
+                    "line": 32,
+                    "path": "src/tool_window.rs",
+                    "version": "3df9c599ab4e411f6d756a91cf00e00d7610d51719033da82c9b5f49e7d596e9"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 0,
+                "same_name_definitions": 1,
+                "symbol": {
+                  "id": "3301d45ce87f9ef2994f29dcd55ae82b31a226bf859d7af579df7486fd5ec819",
+                  "kind": "implementation",
+                  "name": "SketchLayerWindow for ToolWindow",
+                  "parents": [],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 325,
+                    "file": "f76de7a01633c533212e02fb88c6b38fa23d51307d9247d81cea6534915bc5b9",
+                    "line": 295,
+                    "path": "src/tool_window.rs",
+                    "version": "3df9c599ab4e411f6d756a91cf00e00d7610d51719033da82c9b5f49e7d596e9"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 2,
+                "same_name_definitions": 3,
+                "symbol": {
+                  "id": "370c20011173ec272a12460913e24eecd8a2cd8a7766292bfd6d42fabfbbf3d7",
+                  "kind": "function",
+                  "name": "with_window",
+                  "parents": [
+                    "SketchLayerWindow for ToolWindow"
+                  ],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 299,
+                    "file": "f76de7a01633c533212e02fb88c6b38fa23d51307d9247d81cea6534915bc5b9",
+                    "line": 297,
+                    "path": "src/tool_window.rs",
+                    "version": "3df9c599ab4e411f6d756a91cf00e00d7610d51719033da82c9b5f49e7d596e9"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 5,
+                "same_name_definitions": 3,
+                "symbol": {
+                  "id": "229a55df0e6bb4db22352181869ce60fe28ab4f0311a227dc2261970ab734c09",
+                  "kind": "function",
+                  "name": "show",
+                  "parents": [
+                    "SketchLayerWindow for ToolWindow"
+                  ],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 303,
+                    "file": "f76de7a01633c533212e02fb88c6b38fa23d51307d9247d81cea6534915bc5b9",
+                    "line": 301,
+                    "path": "src/tool_window.rs",
+                    "version": "3df9c599ab4e411f6d756a91cf00e00d7610d51719033da82c9b5f49e7d596e9"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 3,
+                "same_name_definitions": 3,
+                "symbol": {
+                  "id": "a06c107060a4bbd191daeaa2e8aab6588a3b1124adeb4199706016aadbe5cc44",
+                  "kind": "function",
+                  "name": "hide",
+                  "parents": [
+                    "SketchLayerWindow for ToolWindow"
+                  ],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 307,
+                    "file": "f76de7a01633c533212e02fb88c6b38fa23d51307d9247d81cea6534915bc5b9",
+                    "line": 305,
+                    "path": "src/tool_window.rs",
+                    "version": "3df9c599ab4e411f6d756a91cf00e00d7610d51719033da82c9b5f49e7d596e9"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 5,
+                "same_name_definitions": 3,
+                "symbol": {
+                  "id": "3465a66b39d80dd2a62c650470da6ded03ab2d8f985b80640c3ac169dfe565b1",
+                  "kind": "function",
+                  "name": "quit",
+                  "parents": [
+                    "SketchLayerWindow for ToolWindow"
+                  ],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 316,
+                    "file": "f76de7a01633c533212e02fb88c6b38fa23d51307d9247d81cea6534915bc5b9",
+                    "line": 309,
+                    "path": "src/tool_window.rs",
+                    "version": "3df9c599ab4e411f6d756a91cf00e00d7610d51719033da82c9b5f49e7d596e9"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 1,
+                "same_name_definitions": 3,
+                "symbol": {
+                  "id": "857f68b5b036c1506c9fc06264fe6c9f08eeb2a9c661007fee450ec457ade936",
+                  "kind": "function",
+                  "name": "toggle_visibility",
+                  "parents": [
+                    "SketchLayerWindow for ToolWindow"
+                  ],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 324,
+                    "file": "f76de7a01633c533212e02fb88c6b38fa23d51307d9247d81cea6534915bc5b9",
+                    "line": 318,
+                    "path": "src/tool_window.rs",
+                    "version": "3df9c599ab4e411f6d756a91cf00e00d7610d51719033da82c9b5f49e7d596e9"
+                  }
+                }
+              }
+            ],
+            "matching": 13,
+            "next": null,
+            "snapshot": "e71e0889cc5ec9c131385874a090e5209b8dfe273786828118da6be59777e177"
+          },
+          "elapsedMs": 1.4060489999999959,
+          "responseBytes": 6626
+        }
+      ],
+      "textSearch": {
+        "command": [
+          "rg",
+          "-n",
+          "-i",
+          "-F",
+          "--glob",
+          "*.rs",
+          "--glob",
+          "*.py",
+          "--",
+          "tool",
+          "."
+        ],
+        "exitCode": 0,
+        "stdout": "./build.rs:2:    glib_build_tools::compile_resources(\n./src/canvas.rs:3:use crate::tool_window::ToolWindow;\n./src/canvas.rs:17:    // tool_window: Rc<RefCell<ToolWindow>>,\n./src/canvas.rs:24:        tool_window: Rc<RefCell<ToolWindow>>,\n./src/canvas.rs:65:                &tool_window,\n./src/canvas.rs:74:            // tool_window,\n./src/canvas.rs:110:// Canvas-specific handle_key_press that works with ToolWindow\n./src/canvas.rs:115:    tool_window: &Rc<RefCell<ToolWindow>>,\n./src/canvas.rs:119:        // Toggle visibility of the tool window on Escape\n./src/canvas.rs:120:        tool_window.borrow().toggle_visibility();\n./src/canvas.rs:124:        tool_window.borrow().quit();\n./src/drawing.rs:5:pub enum Tool {\n./src/drawing.rs:25:    pub tool: Tool,\n./src/drawing.rs:29:    pub fn new(points: Vec<Point>, color: RGBA, width: f64, tool: Tool) -> Self {\n./src/drawing.rs:34:            tool,\n./src/drawing.rs:40:    pub current_tool: Tool,\n./src/drawing.rs:54:            current_tool: Tool::Pencil,\n./src/drawing.rs:67:        if self.current_tool == Tool::Line\n./src/drawing.rs:68:            || self.current_tool == Tool::Circle\n./src/drawing.rs:69:            || self.current_tool == Tool::Rectangle\n./src/drawing.rs:82:                    self.current_tool,\n./src/drawing.rs:100:                        self.current_tool,\n./src/drawing.rs:113:            // Normal behavior for other tools\n./src/drawing.rs:120:                self.current_tool,\n./src/drawing.rs:128:        if (self.current_tool == Tool::Line\n./src/drawing.rs:129:            || self.current_tool == Tool::Circle\n./src/drawing.rs:130:            || self.current_tool == Tool::Rectangle)\n./src/drawing.rs:133:            // For Line and Circle tools, update the preview to show from start point to current position\n./src/drawing.rs:144:            // Normal behavior for other tools\n./src/drawing.rs:151:        // For Line, Circle, and Rectangle tools, we handle adding the stroke in start_stroke on the second click\n./src/drawing.rs:152:        if (self.current_tool == Tool::Line\n./src/drawing.rs:153:            || self.current_tool == Tool::Circle\n./src/drawing.rs:154:            || self.current_tool == Tool::Rectangle)\n./src/drawing.rs:161:        // Normal behavior for other tools\n./src/drawing.rs:191:    pub fn set_tool(&mut self, tool: Tool) {\n./src/drawing.rs:192:        self.current_tool = tool;\n./src/drawing.rs:228:        // Set stroke properties based on the tool\n./src/drawing.rs:229:        match stroke.tool {\n./src/drawing.rs:230:            Tool::Pencil | Tool::Line | Tool::Circle | Tool::Rectangle => {\n./src/drawing.rs:241:            Tool::Eraser => {\n./src/drawing.rs:247:            Tool::FloodFill => {\n./src/drawing.rs:265:        if stroke.tool == Tool::Circle && stroke.points.len() > 1 {\n./src/drawing.rs:266:            // For Circle tool with at least two points, draw an ellipse\n./src/drawing.rs:285:        } else if stroke.tool == Tool::Rectangle && stroke.points.len() > 1 {\n./src/drawing.rs:286:            // For Rectangle tool with at least two points, draw a rectangle\n./src/utils.rs:22:        // Toggle visibility of the tool window on Escape\n./src/tool_window.rs:11:use crate::drawing::{DrawingState, Tool};\n./src/tool_window.rs:27:pub struct ToolWindow {\n./src/tool_window.rs:31:impl ToolWindow {\n./src/tool_window.rs:44:            \".tool-window { background-color: #323232; }\n./src/tool_window.rs:45:             .tool-button-selected { \n./src/tool_window.rs:62:        main_box.add_css_class(\"tool-window\");\n./src/tool_window.rs:68:        // Add tool selection section\n./src/tool_window.rs:69:        let tools_frame = Frame::new(Some(\"Tools\"));\n./src/tool_window.rs:70:        let tools_box = GtkBox::new(Orientation::Horizontal, 5);\n./src/tool_window.rs:71:        tools_box.set_margin_start(5);\n./src/tool_window.rs:72:        tools_box.set_margin_end(5);\n./src/tool_window.rs:73:        tools_box.set_margin_top(5);\n./src/tool_window.rs:74:        tools_box.set_margin_bottom(5);\n./src/tool_window.rs:76:        // Create a function to update tool button highlighting\n./src/tool_window.rs:77:        let update_tool_highlighting =\n./src/tool_window.rs:78:            move |tool: Tool,\n./src/tool_window.rs:86:                pencil_btn.remove_css_class(\"tool-button-selected\");\n./src/tool_window.rs:87:                eraser_btn.remove_css_class(\"tool-button-selected\");\n./src/tool_window.rs:88:                fill_btn.remove_css_class(\"tool-button-selected\");\n./src/tool_window.rs:89:                line_btn.remove_css_class(\"tool-button-selected\");\n./src/tool_window.rs:90:                circle_btn.remove_css_class(\"tool-button-selected\");\n./src/tool_window.rs:91:                rectangle_btn.remove_css_class(\"tool-button-selected\");\n./src/tool_window.rs:94:                match tool {\n./src/tool_window.rs:95:                    Tool::Pencil => pencil_btn.add_css_class(\"tool-button-selected\"),\n./src/tool_window.rs:96:                    Tool::Eraser => eraser_btn.add_css_class(\"tool-button-selected\"),\n./src/tool_window.rs:97:                    Tool::FloodFill => fill_btn.add_css_class(\"tool-button-selected\"),\n./src/tool_window.rs:98:                    Tool::Line => line_btn.add_css_class(\"tool-button-selected\"),\n./src/tool_window.rs:99:                    Tool::Circle => circle_btn.add_css_class(\"tool-button-selected\"),\n./src/tool_window.rs:100:                    Tool::Rectangle => rectangle_btn.add_css_class(\"tool-button-selected\"),\n./src/tool_window.rs:104:        // Pencil tool button\n./src/tool_window.rs:108:        pencil_button.set_tooltip_text(Some(\"Pencil\"));\n./src/tool_window.rs:110:        // Eraser tool button\n./src/tool_window.rs:114:        eraser_button.set_tooltip_text(Some(\"Eraser\"));\n./src/tool_window.rs:116:        // Flood Fill tool button\n./src/tool_window.rs:120:        fill_button.set_tooltip_text(Some(\"Flood Fill\"));\n./src/tool_window.rs:122:        // Line tool button\n./src/tool_window.rs:126:        line_button.set_tooltip_text(Some(\"Line\"));\n./src/tool_window.rs:128:        // Circle tool button\n./src/tool_window.rs:132:        circle_button.set_tooltip_text(Some(\"Circle\"));\n./src/tool_window.rs:134:        // Rectangle tool button\n./src/tool_window.rs:138:        rectangle_button.set_tooltip_text(Some(\"Rectangle\"));\n./src/tool_window.rs:140:        // Set initial highlighting based on default tool (Pencil)\n./src/tool_window.rs:141:        update_tool_highlighting(\n./src/tool_window.rs:142:            drawing_state.borrow().current_tool,\n./src/tool_window.rs:151:        // Helper function to connect tool button click handlers\n./src/tool_window.rs:152:        let connect_tool_button =\n./src/tool_window.rs:153:            |button: &Button, tool: Tool, drawing_state: &Rc<RefCell<DrawingState>>| {\n./src/tool_window.rs:163:                    drawing_state_clone.borrow_mut().set_tool(tool);\n./src/tool_window.rs:164:                    update_tool_highlighting(\n./src/tool_window.rs:165:                        tool,\n./src/tool_window.rs:176:        // Connect click handlers for all tool buttons\n./src/tool_window.rs:177:        connect_tool_button(&pencil_button, Tool::Pencil, &drawing_state);\n./src/tool_window.rs:178:        connect_tool_button(&eraser_button, Tool::Eraser, &drawing_state);\n./src/tool_window.rs:179:        connect_tool_button(&fill_button, Tool::FloodFill, &drawing_state);\n./src/tool_window.rs:180:        connect_tool_button(&line_button, Tool::Line, &drawing_state);\n./src/tool_window.rs:181:        connect_tool_button(&circle_button, Tool::Circle, &drawing_state);\n./src/tool_window.rs:182:        connect_tool_button(&rectangle_button, Tool::Rectangle, &drawing_state);\n./src/tool_window.rs:184:        // Add buttons to the tools box\n./src/tool_window.rs:185:        tools_box.append(&pencil_button);\n./src/tool_window.rs:186:        tools_box.append(&eraser_button);\n./src/tool_window.rs:187:        tools_box.append(&fill_button);\n./src/tool_window.rs:188:        tools_box.append(&line_button);\n./src/tool_window.rs:189:        tools_box.append(&circle_button);\n./src/tool_window.rs:190:        tools_box.append(&rectangle_button);\n./src/tool_window.rs:192:        tools_frame.set_child(Some(&tools_box));\n./src/tool_window.rs:193:        main_box.append(&tools_frame);\n./src/tool_window.rs:277:        // Create a ToolWindow instance\n./src/tool_window.rs:278:        let tool_window = ToolWindow { window };\n./src/tool_window.rs:281:        tool_window.window.connect_close_request(move |window| {\n./src/tool_window.rs:291:        tool_window\n./src/tool_window.rs:295:impl SketchLayerWindow for ToolWindow {\n./src/main.rs:13:mod tool_window;\n./src/main.rs:18:use tool_window::ToolWindow;\n./src/main.rs:36:    // Create tool window\n./src/main.rs:37:    let tw = ToolWindow::new(app, Rc::clone(&drawing_state));\n./src/main.rs:38:    let tool_window = Rc::new(RefCell::new(tw));\n./src/main.rs:41:    let canvas_window = CanvasWindow::new(app, Rc::clone(&drawing_state), Rc::clone(&tool_window));\n./src/main.rs:43:    // Keep the tool window on top of the canvas window\n./src/main.rs:44:    tool_window.borrow().with_window(|tw| {\n./src/main.rs:46:            // Set the tool window as a transient for the canvas window\n./src/main.rs:53:    tool_window.borrow_mut().show();\n",
+        "stderr": "",
+        "elapsedMs": 7.5944619999999645
+      }
+    },
+    {
+      "case": "sketchlayer.drawing-surface-border",
+      "seed": "border",
+      "operations": [
+        {
+          "query": {
+            "kind": "areas",
+            "search": "border",
+            "offset": 0
+          },
+          "data": {
+            "coverage": {
+              "available_files": 9,
+              "indexed_files": 9,
+              "omitted_areas": 0,
+              "omitted_calls": 0,
+              "omitted_files": 0,
+              "omitted_symbols": 0,
+              "partial_files": 0,
+              "unavailable_call_files": 0
+            },
+            "items": [],
+            "matching": 0,
+            "next": null,
+            "snapshot": "e71e0889cc5ec9c131385874a090e5209b8dfe273786828118da6be59777e177"
+          },
+          "elapsedMs": 1.3632750000000442,
+          "responseBytes": 285
+        },
+        {
+          "query": {
+            "kind": "inventory",
+            "area": "",
+            "search": "border",
+            "offset": 0
+          },
+          "data": {
+            "coverage": {
+              "available_files": 9,
+              "indexed_files": 9,
+              "omitted_areas": 0,
+              "omitted_calls": 0,
+              "omitted_files": 0,
+              "omitted_symbols": 0,
+              "partial_files": 0,
+              "unavailable_call_files": 0
+            },
+            "items": [],
+            "matching": 0,
+            "next": null,
+            "snapshot": "e71e0889cc5ec9c131385874a090e5209b8dfe273786828118da6be59777e177"
+          },
+          "elapsedMs": 1.0735369999999875,
+          "responseBytes": 285
+        }
+      ],
+      "textSearch": {
+        "command": [
+          "rg",
+          "-n",
+          "-i",
+          "-F",
+          "--glob",
+          "*.rs",
+          "--glob",
+          "*.py",
+          "--",
+          "border",
+          "."
+        ],
+        "exitCode": 0,
+        "stdout": "./src/tool_window.rs:47:                 border-color: #2a66c8;\n",
+        "stderr": "",
+        "elapsedMs": 6.057619999999986
+      }
+    },
+    {
+      "case": "sketchlayer.drawing-surface-border",
+      "seed": "surface",
+      "operations": [
+        {
+          "query": {
+            "kind": "areas",
+            "search": "surface",
+            "offset": 0
+          },
+          "data": {
+            "coverage": {
+              "available_files": 9,
+              "indexed_files": 9,
+              "omitted_areas": 0,
+              "omitted_calls": 0,
+              "omitted_files": 0,
+              "omitted_symbols": 0,
+              "partial_files": 0,
+              "unavailable_call_files": 0
+            },
+            "items": [
+              {
+                "files": 1,
+                "path": "src/drawing.rs"
+              },
+              {
+                "files": 1,
+                "path": "src/utils.rs"
+              }
+            ],
+            "matching": 2,
+            "next": null,
+            "snapshot": "e71e0889cc5ec9c131385874a090e5209b8dfe273786828118da6be59777e177"
+          },
+          "elapsedMs": 1.2362640000000056,
+          "responseBytes": 354
+        },
+        {
+          "query": {
+            "kind": "inventory",
+            "area": "",
+            "search": "surface",
+            "offset": 0
+          },
+          "data": {
+            "coverage": {
+              "available_files": 9,
+              "indexed_files": 9,
+              "omitted_areas": 0,
+              "omitted_calls": 0,
+              "omitted_files": 0,
+              "omitted_symbols": 0,
+              "partial_files": 0,
+              "unavailable_call_files": 0
+            },
+            "items": [
+              {
+                "candidate_uses": 1,
+                "same_name_definitions": 1,
+                "symbol": {
+                  "id": "c71e0197892982261e50661e0159d58aad4b70dff31dabb4b22fde089846476d",
+                  "kind": "function",
+                  "name": "cache_surface",
+                  "parents": [
+                    "DrawingState"
+                  ],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 435,
+                    "file": "ff9f1e0a54a6cbd5d9925ebb999ae52e5003234c17c71d012aa8f04ce8c0c84e",
+                    "line": 414,
+                    "path": "src/drawing.rs",
+                    "version": "953b5b66dbf7f461e9d95bc688ee87147d52b8fa7f0ef74d2942aebae4a2a37a"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 1,
+                "same_name_definitions": 1,
+                "symbol": {
+                  "id": "ab07cb4b8065ddf466b23ee3b5fcc5670cc93d2f749df271ea789dc4325b955c",
+                  "kind": "function",
+                  "name": "write_surface_to_png",
+                  "parents": [],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 112,
+                    "file": "6745ab7c7d01f58211c1fe423d5d02112d539927327e07b706d953f30f800cf0",
+                    "line": 103,
+                    "path": "src/utils.rs",
+                    "version": "d17f50aaa3e4c9b4d04f8fc44a374c7c1c400b6ed43735bbcb5a344e6e52f543"
+                  }
+                }
+              }
+            ],
+            "matching": 2,
+            "next": null,
+            "snapshot": "e71e0889cc5ec9c131385874a090e5209b8dfe273786828118da6be59777e177"
+          },
+          "elapsedMs": 1.3724619999999845,
+          "responseBytes": 1249
+        }
+      ],
+      "textSearch": {
+        "command": [
+          "rg",
+          "-n",
+          "-i",
+          "-F",
+          "--glob",
+          "*.rs",
+          "--glob",
+          "*.py",
+          "--",
+          "surface",
+          "."
+        ],
+        "exitCode": 0,
+        "stdout": "./src/drawing.rs:1:use cairo::{Context, Format, ImageSurface, LineCap};\n./src/drawing.rs:327:        let Some((width, height, current_surface)) = Self::cache_surface(cr) else {\n./src/drawing.rs:331:        let stride = current_surface.stride() as usize;\n./src/drawing.rs:332:        let _ = current_surface.with_data(|data| {\n./src/drawing.rs:414:    fn cache_surface(cr: &Context) -> Option<(i32, i32, ImageSurface)> {\n./src/drawing.rs:421:        let Ok(cached_surface) = target.create_similar_image(Format::Rgb24, width, height) else {\n./src/drawing.rs:422:            eprintln!(\"Failed to create cached image surface\");\n./src/drawing.rs:426:            Context::new(&cached_surface).expect(\"Failed to create cache context from surface\");\n./src/drawing.rs:427:        let Ok(_) = cache_context.set_source_surface(target, 0.0, 0.0) else {\n./src/drawing.rs:428:            eprintln!(\"Failed to set source surface\");\n./src/drawing.rs:433:            .expect(\"Failed to paint cached surface\");\n./src/drawing.rs:434:        Some((width, height, cached_surface))\n./src/utils.rs:1:use cairo::ImageSurface;\n./src/utils.rs:88:    let surface = ImageSurface::create_for_data(\n./src/utils.rs:96:    let filename = write_surface_to_png(surface)?;\n./src/utils.rs:102:/// Write an ImageSurface to a PNG file\n./src/utils.rs:103:pub fn write_surface_to_png(surface: ImageSurface) -> Result<String, Box<dyn std::error::Error>> {\n./src/utils.rs:110:    surface.write_to_png(&mut file)?;\n./src/scrap_capture.rs:27:        // Return the dimensions, surface, context, and screenshot data\n",
+        "stderr": "",
+        "elapsedMs": 7.194970000000012
+      }
+    },
+    {
+      "case": "sketchlayer.drawing-surface-border",
+      "seed": "window",
+      "operations": [
+        {
+          "query": {
+            "kind": "areas",
+            "search": "window",
+            "offset": 0
+          },
+          "data": {
+            "coverage": {
+              "available_files": 9,
+              "indexed_files": 9,
+              "omitted_areas": 0,
+              "omitted_calls": 0,
+              "omitted_files": 0,
+              "omitted_symbols": 0,
+              "partial_files": 0,
+              "unavailable_call_files": 0
+            },
+            "items": [
+              {
+                "files": 1,
+                "path": "src/canvas.rs"
+              },
+              {
+                "files": 1,
+                "path": "src/main.rs"
+              },
+              {
+                "files": 1,
+                "path": "src/sketch_layer_window.rs"
+              },
+              {
+                "files": 1,
+                "path": "src/tool_window.rs"
+              }
+            ],
+            "matching": 4,
+            "next": null,
+            "snapshot": "e71e0889cc5ec9c131385874a090e5209b8dfe273786828118da6be59777e177"
+          },
+          "elapsedMs": 1.2403489999999806,
+          "responseBytes": 440
+        },
+        {
+          "query": {
+            "kind": "inventory",
+            "area": "",
+            "search": "window",
+            "offset": 0
+          },
+          "data": {
+            "coverage": {
+              "available_files": 9,
+              "indexed_files": 9,
+              "omitted_areas": 0,
+              "omitted_calls": 0,
+              "omitted_files": 0,
+              "omitted_symbols": 0,
+              "partial_files": 0,
+              "unavailable_call_files": 0
+            },
+            "items": [
+              {
+                "candidate_uses": 0,
+                "same_name_definitions": 2,
+                "symbol": {
+                  "id": "d05c6c0489943cfff8c9c0a69e88f3f32a3769f5efbb3a8805f2a8b18935b526",
+                  "kind": "struct",
+                  "name": "CanvasWindow",
+                  "parents": [],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 18,
+                    "file": "876d4498ecb87c967f8ea9a5929ac36a6408a9a6bfe6ab557ec652fb05543883",
+                    "line": 15,
+                    "path": "src/canvas.rs",
+                    "version": "c69d6b6e111e5da1c7e09455a76a4e2b1faa8ef74c3c8e48911d3e2f6e5e1694"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 0,
+                "same_name_definitions": 2,
+                "symbol": {
+                  "id": "065fa5487af438b25ac6e3c5b820874634d2c9b07a16e15174d36a19378dd965",
+                  "kind": "implementation",
+                  "name": "CanvasWindow",
+                  "parents": [],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 77,
+                    "file": "876d4498ecb87c967f8ea9a5929ac36a6408a9a6bfe6ab557ec652fb05543883",
+                    "line": 20,
+                    "path": "src/canvas.rs",
+                    "version": "c69d6b6e111e5da1c7e09455a76a4e2b1faa8ef74c3c8e48911d3e2f6e5e1694"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 0,
+                "same_name_definitions": 1,
+                "symbol": {
+                  "id": "cf574bbde8db4e0546c44fc1bd83324a3d5d5328ae3bb431cd2c0919bf1b1099",
+                  "kind": "implementation",
+                  "name": "SketchLayerWindow for CanvasWindow",
+                  "parents": [],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 108,
+                    "file": "876d4498ecb87c967f8ea9a5929ac36a6408a9a6bfe6ab557ec652fb05543883",
+                    "line": 79,
+                    "path": "src/canvas.rs",
+                    "version": "c69d6b6e111e5da1c7e09455a76a4e2b1faa8ef74c3c8e48911d3e2f6e5e1694"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 2,
+                "same_name_definitions": 3,
+                "symbol": {
+                  "id": "31a7d971d55fcf6318a7e9cc952d97aa5fe0750e7aca551a333c54edcb61c223",
+                  "kind": "function",
+                  "name": "with_window",
+                  "parents": [
+                    "SketchLayerWindow for CanvasWindow"
+                  ],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 82,
+                    "file": "876d4498ecb87c967f8ea9a5929ac36a6408a9a6bfe6ab557ec652fb05543883",
+                    "line": 80,
+                    "path": "src/canvas.rs",
+                    "version": "c69d6b6e111e5da1c7e09455a76a4e2b1faa8ef74c3c8e48911d3e2f6e5e1694"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 0,
+                "same_name_definitions": 1,
+                "symbol": {
+                  "id": "a87e230b6ee661aa4fa719abb3d81e85231186bc655d93229a7cdab3cd362a67",
+                  "kind": "module",
+                  "name": "sketch_layer_window",
+                  "parents": [],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 12,
+                    "file": "99c72202e28e470e7f3d208bfc881a2d3ba67a2e2ca31cbd2a51799a050fa1a7",
+                    "line": 12,
+                    "path": "src/main.rs",
+                    "version": "32d11c28156a7183b3b799636063aaf0630aaa0ddb99eaef3078e93207f63922"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 0,
+                "same_name_definitions": 1,
+                "symbol": {
+                  "id": "0d87c50b756cfedfd02cfd693cbc2d2228069df68ae485c7548d1e5a2a73ec94",
+                  "kind": "module",
+                  "name": "tool_window",
+                  "parents": [],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 13,
+                    "file": "99c72202e28e470e7f3d208bfc881a2d3ba67a2e2ca31cbd2a51799a050fa1a7",
+                    "line": 13,
+                    "path": "src/main.rs",
+                    "version": "32d11c28156a7183b3b799636063aaf0630aaa0ddb99eaef3078e93207f63922"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 0,
+                "same_name_definitions": 1,
+                "symbol": {
+                  "id": "8f2af48f26f6dc5228f9a8b4316d44108a1ad0a690e2e57847faa54da67a229c",
+                  "kind": "trait",
+                  "name": "SketchLayerWindow",
+                  "parents": [],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 10,
+                    "file": "2b13e7f8231aa65873b85edefc85e92ca688bcfc6dd85492b445abde93ec713c",
+                    "line": 3,
+                    "path": "src/sketch_layer_window.rs",
+                    "version": "ba22d39c216272d8152a2f46474d900d5baaee8927a644159a1edff60cf738b1"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 2,
+                "same_name_definitions": 3,
+                "symbol": {
+                  "id": "114a928a60693cec0c0164db19180d926cf6f89b1cc515470d5a63366a195879",
+                  "kind": "function",
+                  "name": "with_window",
+                  "parents": [
+                    "SketchLayerWindow"
+                  ],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 4,
+                    "file": "2b13e7f8231aa65873b85edefc85e92ca688bcfc6dd85492b445abde93ec713c",
+                    "line": 4,
+                    "path": "src/sketch_layer_window.rs",
+                    "version": "ba22d39c216272d8152a2f46474d900d5baaee8927a644159a1edff60cf738b1"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 5,
+                "same_name_definitions": 3,
+                "symbol": {
+                  "id": "a8326822ef3ccc3fe8a7570d290496b9a2ea1e73a08655e86377a6a30c5695f8",
+                  "kind": "function",
+                  "name": "show",
+                  "parents": [
+                    "SketchLayerWindow"
+                  ],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 5,
+                    "file": "2b13e7f8231aa65873b85edefc85e92ca688bcfc6dd85492b445abde93ec713c",
+                    "line": 5,
+                    "path": "src/sketch_layer_window.rs",
+                    "version": "ba22d39c216272d8152a2f46474d900d5baaee8927a644159a1edff60cf738b1"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 3,
+                "same_name_definitions": 3,
+                "symbol": {
+                  "id": "36d08f4113ef3fc7b767341b2e75fe2785727abec8f5d87bfb8ca231982d2223",
+                  "kind": "function",
+                  "name": "hide",
+                  "parents": [
+                    "SketchLayerWindow"
+                  ],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 6,
+                    "file": "2b13e7f8231aa65873b85edefc85e92ca688bcfc6dd85492b445abde93ec713c",
+                    "line": 6,
+                    "path": "src/sketch_layer_window.rs",
+                    "version": "ba22d39c216272d8152a2f46474d900d5baaee8927a644159a1edff60cf738b1"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 5,
+                "same_name_definitions": 3,
+                "symbol": {
+                  "id": "d7088cfcfb04683d218d9dc66a715f8c5acf693b9c3ff5aee5633474bde459cc",
+                  "kind": "function",
+                  "name": "quit",
+                  "parents": [
+                    "SketchLayerWindow"
+                  ],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 7,
+                    "file": "2b13e7f8231aa65873b85edefc85e92ca688bcfc6dd85492b445abde93ec713c",
+                    "line": 7,
+                    "path": "src/sketch_layer_window.rs",
+                    "version": "ba22d39c216272d8152a2f46474d900d5baaee8927a644159a1edff60cf738b1"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 1,
+                "same_name_definitions": 3,
+                "symbol": {
+                  "id": "a094efdade5f926cc0cc1757a620d7e055ccb551370843df0d62a5d0ef7a1b27",
+                  "kind": "function",
+                  "name": "toggle_visibility",
+                  "parents": [
+                    "SketchLayerWindow"
+                  ],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 9,
+                    "file": "2b13e7f8231aa65873b85edefc85e92ca688bcfc6dd85492b445abde93ec713c",
+                    "line": 9,
+                    "path": "src/sketch_layer_window.rs",
+                    "version": "ba22d39c216272d8152a2f46474d900d5baaee8927a644159a1edff60cf738b1"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 4,
+                "same_name_definitions": 3,
+                "symbol": {
+                  "id": "4dbcf62576b518b440578817585e4eab154d0ebcc1094d15ec70c0981ab59002",
+                  "kind": "function",
+                  "name": "handle_key_press",
+                  "parents": [],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 24,
+                    "file": "f76de7a01633c533212e02fb88c6b38fa23d51307d9247d81cea6534915bc5b9",
+                    "line": 16,
+                    "path": "src/tool_window.rs",
+                    "version": "3df9c599ab4e411f6d756a91cf00e00d7610d51719033da82c9b5f49e7d596e9"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 0,
+                "same_name_definitions": 2,
+                "symbol": {
+                  "id": "73c60ea2c9555a0f6024810ed6b609f67f7d7b50bab38abbec59ab84016ca7bb",
+                  "kind": "struct",
+                  "name": "ToolWindow",
+                  "parents": [],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 29,
+                    "file": "f76de7a01633c533212e02fb88c6b38fa23d51307d9247d81cea6534915bc5b9",
+                    "line": 27,
+                    "path": "src/tool_window.rs",
+                    "version": "3df9c599ab4e411f6d756a91cf00e00d7610d51719033da82c9b5f49e7d596e9"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 0,
+                "same_name_definitions": 2,
+                "symbol": {
+                  "id": "8df137f06459d16e5f33640eb044a2690928e981298265f2e3ffcf5bb8616e2e",
+                  "kind": "implementation",
+                  "name": "ToolWindow",
+                  "parents": [],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 293,
+                    "file": "f76de7a01633c533212e02fb88c6b38fa23d51307d9247d81cea6534915bc5b9",
+                    "line": 31,
+                    "path": "src/tool_window.rs",
+                    "version": "3df9c599ab4e411f6d756a91cf00e00d7610d51719033da82c9b5f49e7d596e9"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 43,
+                "same_name_definitions": 4,
+                "symbol": {
+                  "id": "02fa04c84bba5673b6cf70dc42342a975dbcc32905e3005e6feb36f1562271c8",
+                  "kind": "function",
+                  "name": "new",
+                  "parents": [
+                    "ToolWindow"
+                  ],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 292,
+                    "file": "f76de7a01633c533212e02fb88c6b38fa23d51307d9247d81cea6534915bc5b9",
+                    "line": 32,
+                    "path": "src/tool_window.rs",
+                    "version": "3df9c599ab4e411f6d756a91cf00e00d7610d51719033da82c9b5f49e7d596e9"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 0,
+                "same_name_definitions": 1,
+                "symbol": {
+                  "id": "3301d45ce87f9ef2994f29dcd55ae82b31a226bf859d7af579df7486fd5ec819",
+                  "kind": "implementation",
+                  "name": "SketchLayerWindow for ToolWindow",
+                  "parents": [],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 325,
+                    "file": "f76de7a01633c533212e02fb88c6b38fa23d51307d9247d81cea6534915bc5b9",
+                    "line": 295,
+                    "path": "src/tool_window.rs",
+                    "version": "3df9c599ab4e411f6d756a91cf00e00d7610d51719033da82c9b5f49e7d596e9"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 2,
+                "same_name_definitions": 3,
+                "symbol": {
+                  "id": "370c20011173ec272a12460913e24eecd8a2cd8a7766292bfd6d42fabfbbf3d7",
+                  "kind": "function",
+                  "name": "with_window",
+                  "parents": [
+                    "SketchLayerWindow for ToolWindow"
+                  ],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 299,
+                    "file": "f76de7a01633c533212e02fb88c6b38fa23d51307d9247d81cea6534915bc5b9",
+                    "line": 297,
+                    "path": "src/tool_window.rs",
+                    "version": "3df9c599ab4e411f6d756a91cf00e00d7610d51719033da82c9b5f49e7d596e9"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 5,
+                "same_name_definitions": 3,
+                "symbol": {
+                  "id": "229a55df0e6bb4db22352181869ce60fe28ab4f0311a227dc2261970ab734c09",
+                  "kind": "function",
+                  "name": "show",
+                  "parents": [
+                    "SketchLayerWindow for ToolWindow"
+                  ],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 303,
+                    "file": "f76de7a01633c533212e02fb88c6b38fa23d51307d9247d81cea6534915bc5b9",
+                    "line": 301,
+                    "path": "src/tool_window.rs",
+                    "version": "3df9c599ab4e411f6d756a91cf00e00d7610d51719033da82c9b5f49e7d596e9"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 3,
+                "same_name_definitions": 3,
+                "symbol": {
+                  "id": "a06c107060a4bbd191daeaa2e8aab6588a3b1124adeb4199706016aadbe5cc44",
+                  "kind": "function",
+                  "name": "hide",
+                  "parents": [
+                    "SketchLayerWindow for ToolWindow"
+                  ],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 307,
+                    "file": "f76de7a01633c533212e02fb88c6b38fa23d51307d9247d81cea6534915bc5b9",
+                    "line": 305,
+                    "path": "src/tool_window.rs",
+                    "version": "3df9c599ab4e411f6d756a91cf00e00d7610d51719033da82c9b5f49e7d596e9"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 5,
+                "same_name_definitions": 3,
+                "symbol": {
+                  "id": "3465a66b39d80dd2a62c650470da6ded03ab2d8f985b80640c3ac169dfe565b1",
+                  "kind": "function",
+                  "name": "quit",
+                  "parents": [
+                    "SketchLayerWindow for ToolWindow"
+                  ],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 316,
+                    "file": "f76de7a01633c533212e02fb88c6b38fa23d51307d9247d81cea6534915bc5b9",
+                    "line": 309,
+                    "path": "src/tool_window.rs",
+                    "version": "3df9c599ab4e411f6d756a91cf00e00d7610d51719033da82c9b5f49e7d596e9"
+                  }
+                }
+              },
+              {
+                "candidate_uses": 1,
+                "same_name_definitions": 3,
+                "symbol": {
+                  "id": "857f68b5b036c1506c9fc06264fe6c9f08eeb2a9c661007fee450ec457ade936",
+                  "kind": "function",
+                  "name": "toggle_visibility",
+                  "parents": [
+                    "SketchLayerWindow for ToolWindow"
+                  ],
+                  "source": {
+                    "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                    "end_line": 324,
+                    "file": "f76de7a01633c533212e02fb88c6b38fa23d51307d9247d81cea6534915bc5b9",
+                    "line": 318,
+                    "path": "src/tool_window.rs",
+                    "version": "3df9c599ab4e411f6d756a91cf00e00d7610d51719033da82c9b5f49e7d596e9"
+                  }
+                }
+              }
+            ],
+            "matching": 22,
+            "next": null,
+            "snapshot": "e71e0889cc5ec9c131385874a090e5209b8dfe273786828118da6be59777e177"
+          },
+          "elapsedMs": 1.2667999999999893,
+          "responseBytes": 11061
+        }
+      ],
+      "textSearch": {
+        "command": [
+          "rg",
+          "-n",
+          "-i",
+          "-F",
+          "--glob",
+          "*.rs",
+          "--glob",
+          "*.py",
+          "--",
+          "window",
+          "."
+        ],
+        "exitCode": 0,
+        "stdout": "./src/canvas.rs:2:use crate::sketch_layer_window::SketchLayerWindow;\n./src/canvas.rs:3:use crate::tool_window::ToolWindow;\n./src/canvas.rs:8:    Application, ApplicationWindow, CssProvider, DrawingArea, STYLE_PROVIDER_PRIORITY_APPLICATION,\n./src/canvas.rs:15:pub struct CanvasWindow {\n./src/canvas.rs:16:    window: ApplicationWindow,\n./src/canvas.rs:17:    // tool_window: Rc<RefCell<ToolWindow>>,\n./src/canvas.rs:20:impl CanvasWindow {\n./src/canvas.rs:24:        tool_window: Rc<RefCell<ToolWindow>>,\n./src/canvas.rs:32:        let window = ApplicationWindow::builder()\n./src/canvas.rs:38:        window.set_decorated(false); // No window decorations\n./src/canvas.rs:40:        // Make the window transparent using CSS\n./src/canvas.rs:42:        css_provider.load_from_data(\".canvas-window { background-color: rgba(0,0,0,0); }\");\n./src/canvas.rs:43:        window.add_css_class(\"canvas-window\");\n./src/canvas.rs:52:        window.fullscreen();\n./src/canvas.rs:65:                &tool_window,\n./src/canvas.rs:72:        CanvasWindow {\n./src/canvas.rs:73:            window,\n./src/canvas.rs:74:            // tool_window,\n./src/canvas.rs:79:impl SketchLayerWindow for CanvasWindow {\n./src/canvas.rs:80:    fn with_window(&self, closure: impl FnOnce(&ApplicationWindow)) {\n./src/canvas.rs:81:        closure(&self.window);\n./src/canvas.rs:85:        self.window.show()\n./src/canvas.rs:89:        self.window.hide()\n./src/canvas.rs:93:        if let Some(app) = self.window.application() {\n./src/canvas.rs:102:        if self.window.is_visible() {\n./src/canvas.rs:110:// Canvas-specific handle_key_press that works with ToolWindow\n./src/canvas.rs:115:    tool_window: &Rc<RefCell<ToolWindow>>,\n./src/canvas.rs:119:        // Toggle visibility of the tool window on Escape\n./src/canvas.rs:120:        tool_window.borrow().toggle_visibility();\n./src/canvas.rs:124:        tool_window.borrow().quit();\n./src/canvas.rs:130:            if let Some(window) = widget.ancestor(ApplicationWindow::static_type()) {\n./src/canvas.rs:131:                let window = window.downcast_ref::<ApplicationWindow>().unwrap();\n./src/canvas.rs:136:                    window,\n./src/utils.rs:5:use gtk4::{ApplicationWindow, EventControllerKey};\n./src/utils.rs:18:    window: &ApplicationWindow,\n./src/utils.rs:22:        // Toggle visibility of the tool window on Escape\n./src/utils.rs:23:        if window.is_visible() {\n./src/utils.rs:24:            window.set_visible(false);\n./src/utils.rs:26:            window.set_visible(true);\n./src/utils.rs:37:        if let Some(app) = window.application() {\n./src/tool_window.rs:4:    Application, ApplicationWindow, Box as GtkBox, Button, ColorButton, CssProvider,\n./src/tool_window.rs:12:use crate::sketch_layer_window::SketchLayerWindow;\n./src/tool_window.rs:20:    window: &ApplicationWindow,\n./src/tool_window.rs:23:    utils::handle_key_press(controller, key, modifier_type, window, drawing_state)\n./src/tool_window.rs:27:pub struct ToolWindow {\n./src/tool_window.rs:28:    window: ApplicationWindow,\n./src/tool_window.rs:31:impl ToolWindow {\n./src/tool_window.rs:33:        // Create the window\n./src/tool_window.rs:34:        let window = ApplicationWindow::builder()\n./src/tool_window.rs:41:        // Ensure the window has a solid background (not transparent)\n./src/tool_window.rs:44:            \".tool-window { background-color: #323232; }\n./src/tool_window.rs:51:        // Apply CSS to the window\n./src/tool_window.rs:62:        main_box.add_css_class(\"tool-window\");\n./src/tool_window.rs:257:        // Set the main container as the window's child\n./src/tool_window.rs:258:        window.set_child(Some(&main_box));\n./src/tool_window.rs:263:        let window_for_keys = window.clone();\n./src/tool_window.rs:270:                &window_for_keys,\n./src/tool_window.rs:275:        window.add_controller(key_controller);\n./src/tool_window.rs:277:        // Create a ToolWindow instance\n./src/tool_window.rs:278:        let tool_window = ToolWindow { window };\n./src/tool_window.rs:281:        tool_window.window.connect_close_request(move |window| {\n./src/tool_window.rs:282:            if let Some(app) = window.application() {\n./src/tool_window.rs:291:        tool_window\n./src/tool_window.rs:295:impl SketchLayerWindow for ToolWindow {\n./src/tool_window.rs:296:    /// Yield my window to the closure\n./src/tool_window.rs:297:    fn with_window(&self, closure: impl FnOnce(&ApplicationWindow)) {\n./src/tool_window.rs:298:        closure(&self.window);\n./src/tool_window.rs:302:        self.window.set_visible(true);\n./src/tool_window.rs:306:        self.window.set_visible(false);\n./src/tool_window.rs:310:        if let Some(app) = self.window.application() {\n./src/tool_window.rs:319:        if self.window.is_visible() {\n./src/sketch_layer_window.rs:1:use gtk4::ApplicationWindow;\n./src/sketch_layer_window.rs:3:pub trait SketchLayerWindow {\n./src/sketch_layer_window.rs:4:    fn with_window(&self, closure: impl FnOnce(&ApplicationWindow));\n./src/main.rs:1:use crate::sketch_layer_window::SketchLayerWindow;\n./src/main.rs:12:mod sketch_layer_window;\n./src/main.rs:13:mod tool_window;\n./src/main.rs:16:use canvas::CanvasWindow;\n./src/main.rs:18:use tool_window::ToolWindow;\n./src/main.rs:36:    // Create tool window\n./src/main.rs:37:    let tw = ToolWindow::new(app, Rc::clone(&drawing_state));\n./src/main.rs:38:    let tool_window = Rc::new(RefCell::new(tw));\n./src/main.rs:40:    // Create canvas window (transparent, fullscreen)\n./src/main.rs:41:    let canvas_window = CanvasWindow::new(app, Rc::clone(&drawing_state), Rc::clone(&tool_window));\n./src/main.rs:43:    // Keep the tool window on top of the canvas window\n./src/main.rs:44:    tool_window.borrow().with_window(|tw| {\n./src/main.rs:45:        canvas_window.with_window(|cw| {\n./src/main.rs:46:            // Set the tool window as a transient for the canvas window\n./src/main.rs:51:    // Show the windows\n./src/main.rs:52:    canvas_window.show();\n./src/main.rs:53:    tool_window.borrow_mut().show();\n",
+        "stderr": "",
+        "elapsedMs": 5.3577980000000025
+      }
+    }
+  ],
+  "interpretation": "Predeclared literal seeds; explicit operation choice, not a model/NL router. First metadata/text outputs before source audit; timings are single observations, not task times or distributions."
+}

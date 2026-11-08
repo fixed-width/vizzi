@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "authorship": "Source-informed reference after first outputs. Finite locations, not blind gold or an automatically generated answer.",
+  "cases": [
+    {
+      "id": "sketchlayer.add-tool",
+      "anchors": [
+        {
+          "path": "src/drawing.rs",
+          "needle": "pub enum Tool {",
+          "line": 5
+        },
+        {
+          "path": "src/tool_window.rs",
+          "needle": "    pub fn new(app: &Application, drawing_state:",
+          "line": 32
+        },
+        {
+          "path": "src/tool_window.rs",
+          "needle": "        let connect_tool_button =",
+          "line": 152
+        },
+        {
+          "path": "src/drawing.rs",
+          "needle": "    fn draw_stroke(",
+          "line": 221
+        },
+        {
+          "path": "resources/resources.gresource.xml",
+          "needle": "<gresources>",
+          "line": 2
+        }
+      ]
+    },
+    {
+      "id": "sketchlayer.drawing-surface-border",
+      "anchors": [
+        {
+          "path": "src/canvas.rs",
+          "needle": "    pub fn new(",
+          "line": 21
+        },
+        {
+          "path": "src/canvas.rs",
+          "needle": "        css_provider.load_from_data(",
+          "line": 42
+        },
+        {
+          "path": "src/canvas.rs",
+          "needle": "fn setup_drawing(",
+          "line": 145
+        },
+        {
+          "path": "src/drawing.rs",
+          "needle": "    pub fn draw(&self,",
+          "line": 204
+        },
+        {
+          "path": "src/main.rs",
+          "needle": "            tw.set_transient_for(Some(cw));",
+          "line": 47
+        }
+      ],
+      "missing": "No activity notification/backdrop styling currently implemented. Active-window interpretation needs clarification; source locations do not supply that design decision."
+    }
+  ],
+  "frameworkSources": [
+    "https://docs.gtk.org/gtk4/property.Window.is-active.html",
+    "https://docs.gtk.org/gtk4/css-overview.html",
+    "https://docs.gtk.org/gtk4/css-properties.html",
+    "https://docs.gtk.org/gtk4/method.Application.get_active_window.html"
+  ]
+}

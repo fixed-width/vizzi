@@ -13,6 +13,10 @@ and written-call exploration through a portable captured-metadata projection. It
 previews and editor handoff, adds no model or domain keyword pools, and reserves Sketchlayer
 until the candidate/development checks are frozen. Explicit operations and source-informed
 replay do not qualify natural-language interpretation or independent navigation benefit.
+The frozen [Sketchlayer evaluation](../../experiments/structure/SKETCHLAYER_RESULTS.md) now
+finds relevant tool/canvas locations through explicit operations, with call-site evidence
+retained. Ordinary search is competitive on the nine-file repo; maintain the experimental
+status and stop expanding natural-language heuristics pending actual maintainer value.
 The prototype below establishes safe browsing/comparison and performance foundations; it
 does not establish added value alongside an editor. Further IDE-surface feature work is
 paused as a delivery priority. Complete the companion slice and evaluate its contribution

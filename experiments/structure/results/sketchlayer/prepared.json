@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "cohort": "experiments/structure/results/sketchlayer/cohort.json",
+  "cohortSha256": "6b77d6a44ddc39e49fea8992c9e997162f6e614c3e16ba4a547ae14e34b8fdd6",
+  "sourceRevision": "f52314e676ead6a50913e89a458ec34c23d509f9",
+  "sourceRoot": "/tmp/vizzi-structure-sketch-90p0pf7z/sketchlayer",
+  "archive": "/tmp/vizzi-structure-sketch-90p0pf7z/source.tar",
+  "archiveSha256": "659f325236d8db88b12860af6b5e4749233c430f5a824d48c77cbcfc5081a6c3",
+  "regularFiles": 20,
+  "extensions": {
+    ".toml": 2,
+    "(none)": 1,
+    ".lock": 1,
+    ".rs": 9,
+    ".svg": 6,
+    ".xml": 1
+  },
+  "files": {
+    ".cargo/config.toml": {
+      "bytes": 27,
+      "sha256": "14da28fb855446f064aac1549169708f44a15cb1bfb940c798c56e6eadcc66a5"
+    },
+    ".gitignore": {
+      "bytes": 36,
+      "sha256": "f7faf579b1e9a6115f0f627f27c5945df446d4b1b54f05d33a270bc557abea25"
+    },
+    "Cargo.lock": {
+      "bytes": 49528,
+      "sha256": "a5dcd8d2cb1ea2fd19a2333f673faa2ea9f0e8e7393708275e8e21c6adc386c4"
+    },
+    "Cargo.toml": {
+      "bytes": 288,
+      "sha256": "022293848999c3b0ef4281a579a91b4e04d38a41bfae99c3a01d9fb8343726fc"
+    },
+    "build.rs": {
+      "bytes": 164,
+      "sha256": "3691fd7ebf06c26d92bc80e5c7c1623c5b1d27986ca57f1725c8d1bad3fc854a"
+    },
+    "resources/icons/ellipse-symbolic.svg": {
+      "bytes": 340,
+      "sha256": "2a2e36906fb70f9daf1cf62284ef378bdb489eff7321343162f606e79c5fcdd5"
+    },
+    "resources/icons/eraser-symbolic.svg": {
+      "bytes": 441,
+      "sha256": "55d3ce92c87f11c098515ae8f5a901a9c938c5831ebe93e649cbe989f0365498"
+    },
+    "resources/icons/fill-symbolic.svg": {
+      "bytes": 725,
+      "sha256": "d75c6d1341c6201e7e8573cf31279772bd2c7baba410a7aab463244a9b85ca4c"
+    },
+    "resources/icons/line-symbolic.svg": {
+      "bytes": 331,
+      "sha256": "8073c75b42d6fadaa7ad12e85f59017705d61b7e8bf64aa0e37289902f2c6f2f"
+    },
+    "resources/icons/pencil-symbolic.svg": {
+      "bytes": 436,
+      "sha256": "64497dfaff6888d0004bd50f3941052eaa11da3b63ecb7939099a4f6fedbf5de"
+    },
+    "resources/icons/rectangle-symbolic.svg": {
+      "bytes": 328,
+      "sha256": "e9e436d4092ac7b44c9b92afa52f0fdfed4d80af92d435b21235711614942570"
+    },
+    "resources/resources.gresource.xml": {
+      "bytes": 649,
+      "sha256": "c58e3c47efaf6310bb0116d5afe0a95b25b406c6458e06f295ce184429c90bf3"
+    },
+    "src/canvas.rs": {
+      "bytes": 6637,
+      "sha256": "65dfd2e5c1efcc7c18b67fca9041922e825615b65d84ba6f1acb0bc8f8e81996"
+    },
+    "src/drawing.rs": {
+      "bytes": 14941,
+      "sha256": "718f6d1b5028db9f0434e92235d6dfb29cfbf1762f3c56cac9281086e65d369d"
+    },
+    "src/main.rs": {
+      "bytes": 1470,
+      "sha256": "580d6e088fe3584bb6f4de27c66b1fd40289bcc904bcd5f4217032385a0cec0a"
+    },
+    "src/scap_capture.rs": {
+      "bytes": 1310,
+      "sha256": "7958c3bd87908b1a352df515850fda472ff45f2fff5c256f724097c1760efb2c"
+    },
+    "src/scrap_capture.rs": {
+      "bytes": 1023,
+      "sha256": "9824e87dc8f311194ccb6580f37331f10e760247f8d0a1c1da0cce291f42afe6"
+    },
+    "src/sketch_layer_window.rs": {
+      "bytes": 225,
+      "sha256": "169000de3f37a9d318953aa37089bd35aec2e3cf53575c9e1110c443184d80a8"
+    },
+    "src/tool_window.rs": {
+      "bytes": 12181,
+      "sha256": "a492d44319680e1ec17a45ee00c8b4522513a27eb73140cb15846c4c9416e660"
+    },
+    "src/utils.rs": {
+      "bytes": 3702,
+      "sha256": "49448aafe574e99b4dd6eb8c7d738de4a0fb85427fb1c38c863b856f902f028b"
+    }
+  },
+  "runtime": "/tmp/vizzi-structure-sketch-90p0pf7z"
+}

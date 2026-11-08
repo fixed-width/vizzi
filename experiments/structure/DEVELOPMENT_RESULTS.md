@@ -39,3 +39,8 @@ retained under `results/development/validation`. The next checkpoint follows the
 and literal-seed text search are controls; structural operations get no hidden source-aware
 seed advantage. Human/agent operation selection and later source audit are labelled, and
 independent maintainer effort remains a separate acceptance check.
+
+The subsequent [Sketchlayer results](SKETCHLAYER_RESULTS.md) preserve first controls,
+predeclared structural/text outputs, source-aware navigation, framework/source references
+and optimized development metadata costs. They do not demonstrate lower human effort or
+qualify a natural-language/model layer.

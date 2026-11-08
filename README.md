@@ -23,6 +23,9 @@ Rust/Python collect call evidence in the existing syntax pass; names, ambiguity 
 unavailable analysis remain explicit. It performs no natural-language intent routing or
 semantic call/data-flow resolution. Its [evaluation protocol](docs/structure/EVALUATION.md)
 keeps reserved questions out of development.
+The [Sketchlayer checkpoint](experiments/structure/SKETCHLAYER_RESULTS.md) records useful
+explicit navigation and retained invocation text, while finding no demonstrated human
+advantage over plain search or justification for adding a model layer.
 
 The production renderer, compiler-backed language integrations and storage engine
 remain open decisions. Both guided learning and local-change review tasks now pass

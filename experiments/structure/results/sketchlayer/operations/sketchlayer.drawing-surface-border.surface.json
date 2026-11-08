@@ -1,0 +1,124 @@
+{
+  "case": "sketchlayer.drawing-surface-border",
+  "seed": "surface",
+  "operations": [
+    {
+      "query": {
+        "kind": "areas",
+        "search": "surface",
+        "offset": 0
+      },
+      "data": {
+        "coverage": {
+          "available_files": 9,
+          "indexed_files": 9,
+          "omitted_areas": 0,
+          "omitted_calls": 0,
+          "omitted_files": 0,
+          "omitted_symbols": 0,
+          "partial_files": 0,
+          "unavailable_call_files": 0
+        },
+        "items": [
+          {
+            "files": 1,
+            "path": "src/drawing.rs"
+          },
+          {
+            "files": 1,
+            "path": "src/utils.rs"
+          }
+        ],
+        "matching": 2,
+        "next": null,
+        "snapshot": "e71e0889cc5ec9c131385874a090e5209b8dfe273786828118da6be59777e177"
+      },
+      "elapsedMs": 1.2362640000000056,
+      "responseBytes": 354
+    },
+    {
+      "query": {
+        "kind": "inventory",
+        "area": "",
+        "search": "surface",
+        "offset": 0
+      },
+      "data": {
+        "coverage": {
+          "available_files": 9,
+          "indexed_files": 9,
+          "omitted_areas": 0,
+          "omitted_calls": 0,
+          "omitted_files": 0,
+          "omitted_symbols": 0,
+          "partial_files": 0,
+          "unavailable_call_files": 0
+        },
+        "items": [
+          {
+            "candidate_uses": 1,
+            "same_name_definitions": 1,
+            "symbol": {
+              "id": "c71e0197892982261e50661e0159d58aad4b70dff31dabb4b22fde089846476d",
+              "kind": "function",
+              "name": "cache_surface",
+              "parents": [
+                "DrawingState"
+              ],
+              "source": {
+                "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                "end_line": 435,
+                "file": "ff9f1e0a54a6cbd5d9925ebb999ae52e5003234c17c71d012aa8f04ce8c0c84e",
+                "line": 414,
+                "path": "src/drawing.rs",
+                "version": "953b5b66dbf7f461e9d95bc688ee87147d52b8fa7f0ef74d2942aebae4a2a37a"
+              }
+            }
+          },
+          {
+            "candidate_uses": 1,
+            "same_name_definitions": 1,
+            "symbol": {
+              "id": "ab07cb4b8065ddf466b23ee3b5fcc5670cc93d2f749df271ea789dc4325b955c",
+              "kind": "function",
+              "name": "write_surface_to_png",
+              "parents": [],
+              "source": {
+                "context": "58ff164ea8bd8ddab542ee32902a9a57ffaff73b71a378aca74e9e2b2845d63d",
+                "end_line": 112,
+                "file": "6745ab7c7d01f58211c1fe423d5d02112d539927327e07b706d953f30f800cf0",
+                "line": 103,
+                "path": "src/utils.rs",
+                "version": "d17f50aaa3e4c9b4d04f8fc44a374c7c1c400b6ed43735bbcb5a344e6e52f543"
+              }
+            }
+          }
+        ],
+        "matching": 2,
+        "next": null,
+        "snapshot": "e71e0889cc5ec9c131385874a090e5209b8dfe273786828118da6be59777e177"
+      },
+      "elapsedMs": 1.3724619999999845,
+      "responseBytes": 1249
+    }
+  ],
+  "textSearch": {
+    "command": [
+      "rg",
+      "-n",
+      "-i",
+      "-F",
+      "--glob",
+      "*.rs",
+      "--glob",
+      "*.py",
+      "--",
+      "surface",
+      "."
+    ],
+    "exitCode": 0,
+    "stdout": "./src/drawing.rs:1:use cairo::{Context, Format, ImageSurface, LineCap};\n./src/drawing.rs:327:        let Some((width, height, current_surface)) = Self::cache_surface(cr) else {\n./src/drawing.rs:331:        let stride = current_surface.stride() as usize;\n./src/drawing.rs:332:        let _ = current_surface.with_data(|data| {\n./src/drawing.rs:414:    fn cache_surface(cr: &Context) -> Option<(i32, i32, ImageSurface)> {\n./src/drawing.rs:421:        let Ok(cached_surface) = target.create_similar_image(Format::Rgb24, width, height) else {\n./src/drawing.rs:422:            eprintln!(\"Failed to create cached image surface\");\n./src/drawing.rs:426:            Context::new(&cached_surface).expect(\"Failed to create cache context from surface\");\n./src/drawing.rs:427:        let Ok(_) = cache_context.set_source_surface(target, 0.0, 0.0) else {\n./src/drawing.rs:428:            eprintln!(\"Failed to set source surface\");\n./src/drawing.rs:433:            .expect(\"Failed to paint cached surface\");\n./src/drawing.rs:434:        Some((width, height, cached_surface))\n./src/utils.rs:1:use cairo::ImageSurface;\n./src/utils.rs:88:    let surface = ImageSurface::create_for_data(\n./src/utils.rs:96:    let filename = write_surface_to_png(surface)?;\n./src/utils.rs:102:/// Write an ImageSurface to a PNG file\n./src/utils.rs:103:pub fn write_surface_to_png(surface: ImageSurface) -> Result<String, Box<dyn std::error::Error>> {\n./src/utils.rs:110:    surface.write_to_png(&mut file)?;\n./src/scrap_capture.rs:27:        // Return the dimensions, surface, context, and screenshot data\n",
+    "stderr": "",
+    "elapsedMs": 7.194970000000012
+  }
+}

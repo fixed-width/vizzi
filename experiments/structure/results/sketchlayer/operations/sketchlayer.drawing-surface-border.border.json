@@ -1,0 +1,76 @@
+{
+  "case": "sketchlayer.drawing-surface-border",
+  "seed": "border",
+  "operations": [
+    {
+      "query": {
+        "kind": "areas",
+        "search": "border",
+        "offset": 0
+      },
+      "data": {
+        "coverage": {
+          "available_files": 9,
+          "indexed_files": 9,
+          "omitted_areas": 0,
+          "omitted_calls": 0,
+          "omitted_files": 0,
+          "omitted_symbols": 0,
+          "partial_files": 0,
+          "unavailable_call_files": 0
+        },
+        "items": [],
+        "matching": 0,
+        "next": null,
+        "snapshot": "e71e0889cc5ec9c131385874a090e5209b8dfe273786828118da6be59777e177"
+      },
+      "elapsedMs": 1.3632750000000442,
+      "responseBytes": 285
+    },
+    {
+      "query": {
+        "kind": "inventory",
+        "area": "",
+        "search": "border",
+        "offset": 0
+      },
+      "data": {
+        "coverage": {
+          "available_files": 9,
+          "indexed_files": 9,
+          "omitted_areas": 0,
+          "omitted_calls": 0,
+          "omitted_files": 0,
+          "omitted_symbols": 0,
+          "partial_files": 0,
+          "unavailable_call_files": 0
+        },
+        "items": [],
+        "matching": 0,
+        "next": null,
+        "snapshot": "e71e0889cc5ec9c131385874a090e5209b8dfe273786828118da6be59777e177"
+      },
+      "elapsedMs": 1.0735369999999875,
+      "responseBytes": 285
+    }
+  ],
+  "textSearch": {
+    "command": [
+      "rg",
+      "-n",
+      "-i",
+      "-F",
+      "--glob",
+      "*.rs",
+      "--glob",
+      "*.py",
+      "--",
+      "border",
+      "."
+    ],
+    "exitCode": 0,
+    "stdout": "./src/tool_window.rs:47:                 border-color: #2a66c8;\n",
+    "stderr": "",
+    "elapsedMs": 6.057619999999986
+  }
+}
