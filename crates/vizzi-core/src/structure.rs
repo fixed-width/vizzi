@@ -132,6 +132,7 @@ struct Site {
 }
 /// Metadata index owning no source text or native snapshot Arc.
 pub struct Structure {
+    search: Vec<crate::structure_search::Name>,
     snapshot: String,
     coverage: CoverageInfo,
     areas: BTreeMap<String, Area>,
@@ -202,6 +203,7 @@ impl Structure {
     /// Builds from already-validated captured metadata, without reading or parsing source.
     pub fn new(snapshot: &Snapshot) -> Self {
         let mut index = Self {
+            search: vec![],
             snapshot: snapshot.id().as_str().into(),
             coverage: CoverageInfo {
                 available_files: snapshot.documents().len(),
@@ -291,13 +293,17 @@ impl Structure {
                 index.files.entry(doc.path().into()).or_default().push(n);
                 index.names.entry(fact.name.clone()).or_default().push(n);
                 mapping.insert(ordinal, id.clone());
-                index.symbols.push(Symbol {
+                let symbol = Symbol {
                     id,
                     name: fact.name.clone(),
                     kind: fact.kind.clone(),
                     parents,
                     source: source(doc, analysis.context.id.as_str(), &fact.span),
-                });
+                };
+                index
+                    .search
+                    .push(crate::structure_search::Name::new(&symbol));
+                index.symbols.push(symbol);
             }
             let Some(calls) = &analysis.calls else {
                 index.coverage.unavailable_call_files += 1;
@@ -383,11 +389,13 @@ impl Structure {
     pub fn areas(&self, search: &str, offset: usize) -> Result<Page<Area>, Error> {
         validate("", search)?;
         let search = search.trim().to_lowercase();
+        let query = crate::structure_search::Query::new(&search);
         let matching_files = self
             .symbols
             .iter()
-            .filter(|s| s.name.to_lowercase().contains(&search))
-            .map(|s| s.source.path.as_str())
+            .enumerate()
+            .filter(|(n, _)| query.rank(&self.search[*n]).is_some())
+            .map(|(_, s)| s.source.path.as_str())
             .collect::<BTreeSet<_>>();
         Ok(self.page(
             self.areas.values().filter(|a| {
@@ -398,25 +406,48 @@ impl Structure {
             Clone::clone,
         ))
     }
-    /// Enumerates lexical declarations inside a directory/file, with candidate name-use counts.
+    /// Searches declarations, ranking exact/qualified names before prefixes, substrings and paths.
     pub fn inventory(&self, area: &str, search: &str, offset: usize) -> Result<Page<Entry>, Error> {
+        self.search_inventory(area, search, offset, false)
+    }
+    /// Searches only functions, filtering before ranking and paging.
+    pub fn functions(&self, area: &str, search: &str, offset: usize) -> Result<Page<Entry>, Error> {
+        self.search_inventory(area, search, offset, true)
+    }
+    fn search_inventory(
+        &self,
+        area: &str,
+        search: &str,
+        offset: usize,
+        functions: bool,
+    ) -> Result<Page<Entry>, Error> {
         validate(area, search)?;
-        let search = search.trim().to_lowercase();
-        Ok(self.page(
-            self.symbols.iter().filter(|s| {
-                within(&s.source.path, area)
-                    && (search.is_empty()
-                        || s.name.to_lowercase().contains(&search)
-                        || s.source.path.to_lowercase().contains(&search))
-            }),
-            offset,
-            PAGE,
-            |s| Entry {
-                symbol: s.clone(),
-                candidate_uses: self.uses.get(&s.name).map_or(0, Vec::len),
-                same_name_definitions: self.names.get(&s.name).map_or(0, Vec::len),
-            },
-        ))
+        let query = crate::structure_search::Query::new(search);
+        let mut matches = self
+            .symbols
+            .iter()
+            .enumerate()
+            .filter(|(_, s)| within(&s.source.path, area) && (!functions || s.kind == "function"))
+            .filter_map(|(n, s)| query.rank(&self.search[n]).map(|rank| (rank, n, s)))
+            .collect::<Vec<_>>();
+        if !query.empty() || functions {
+            matches.sort_by_key(|(rank, n, s)| {
+                (
+                    *rank,
+                    self.search[*n].simple.as_str(),
+                    self.search[*n].qualified.as_str(),
+                    self.search[*n].path.as_str(),
+                    s.source.path.as_str(),
+                    s.source.line,
+                    *n,
+                )
+            });
+        }
+        Ok(self.page(matches, offset, PAGE, |(_, _, s)| Entry {
+            symbol: s.clone(),
+            candidate_uses: self.uses.get(&s.name).map_or(0, Vec::len),
+            same_name_definitions: self.names.get(&s.name).map_or(0, Vec::len),
+        }))
     }
     fn symbol(&self, id: &str) -> Result<&Symbol, Error> {
         self.ids

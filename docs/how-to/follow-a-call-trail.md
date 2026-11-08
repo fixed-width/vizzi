@@ -10,7 +10,7 @@ CARGO_BUILD_JOBS=1 cargo build --release --offline -p vizzi
 target/release/vizzi --root /path/to/repository --cache /tmp/vizzi-call-trail --workers 1 --port 7474
 ```
 
-Open `http://127.0.0.1:7474/workspace`. Select **Add fragment**, find a function by name,
+Open `http://127.0.0.1:7474/workspace`. Select **Add fragment**, find a function by name or qualified name (for example `LufsMeter::process_sample`),
 and choose its source location. Its captured declaration opens on the canvas.
 
 Select **Calls** in that fragment, then a written call. A supported source-local destination opens directly. If
@@ -59,3 +59,9 @@ With the provider enabled, `GsMeter::process` → `self.lufs_meter.process_sampl
 `LufsMeter::process_sample` in `gs-meter/src/lufs.rs` directly. The first lookup starts
 the private language-server workspace; subsequent lookups reuse it. Basic browsing stays
 available when the server or project analysis is unavailable.
+
+Fragment search accepts `::` and `.` between captured namespace/type names and ignores
+case. Exact names come first, then exact qualified suffixes, function-name prefixes/substrings, namespace prefixes/substrings and file-path
+matches. Within a group, results sort by function name, qualified
+name, path and source position. Ranking and function filtering happen before pagination,
+so exact functions cannot be hidden behind a page of partial/type matches.

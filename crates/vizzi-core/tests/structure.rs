@@ -421,3 +421,277 @@ fn a_local_variable_definition_is_not_misreported_as_its_enclosing_function() {
         "owner"
     );
 }
+
+#[test]
+fn declaration_search_matches_qualified_names_and_partial_namespace_suffixes() {
+    let index = Structure::new(&snapshot(&[(
+        "src/audio.rs",
+        "mod audio { struct LufsMeter; impl LufsMeter { fn process_sample(&mut self) {} } }",
+    )]));
+    for query in [
+        "LufsMeter::process_sample",
+        "audio::LufsMeter::process_sample",
+        "lufsmeter.process_sample",
+        " LUFSMETER::process_sam ",
+    ] {
+        let results = index.inventory("", query, 0).unwrap();
+        assert_eq!(results.matching, 1, "{query}");
+        assert_eq!(results.items[0].symbol.name, "process_sample");
+    }
+}
+
+#[test]
+fn exact_names_rank_before_prefixes_and_substrings_across_source_paths() {
+    let index = Structure::new(&snapshot(&[
+        (
+            "a.rs",
+            "fn process_sample() {} fn preprocess() {} fn process_block() {}",
+        ),
+        ("z.rs", "fn process() {}"),
+    ]));
+    let results = index.inventory("", "process", 0).unwrap();
+    assert_eq!(
+        results
+            .items
+            .iter()
+            .map(|e| e.symbol.name.as_str())
+            .collect::<Vec<_>>(),
+        ["process", "process_block", "process_sample", "preprocess"]
+    );
+}
+
+#[test]
+fn ranking_happens_before_paging_so_later_exact_matches_reach_the_first_page() {
+    let prefixes = (0..30)
+        .map(|i| format!("fn process_{i:02}() {{}}\n"))
+        .collect::<String>();
+    let index = Structure::new(&snapshot(&[
+        ("a.rs", &prefixes),
+        ("z.rs", "fn process() {}"),
+    ]));
+    let first = index.inventory("", "process", 0).unwrap();
+    assert_eq!(first.matching, 31);
+    assert_eq!(first.items[0].symbol.name, "process");
+    assert_eq!(first.next, Some(24));
+    let second = index.inventory("", "process", 24).unwrap();
+    assert_eq!(second.items.len(), 7);
+    assert_eq!(second.next, None);
+    assert_eq!(second.items[0].symbol.name, "process_23");
+}
+
+#[test]
+fn function_search_filters_kinds_before_counting_and_paging() {
+    let types = (0..30)
+        .map(|i| format!("struct process_{i:02};\n"))
+        .collect::<String>();
+    let text = format!("{types} fn process() {{}} fn process_sample() {{}}");
+    let index = Structure::new(&snapshot(&[("src.rs", &text)]));
+    let result = index.functions("", "process", 0).unwrap();
+    assert_eq!(result.matching, 2);
+    assert_eq!(
+        result
+            .items
+            .iter()
+            .map(|e| e.symbol.name.as_str())
+            .collect::<Vec<_>>(),
+        ["process", "process_sample"]
+    );
+    assert_eq!(result.next, None);
+    assert_eq!(index.inventory("", "process", 0).unwrap().matching, 32);
+}
+
+#[test]
+fn equal_name_matches_have_consistent_qualified_path_and_source_order() {
+    let index = Structure::new(&snapshot(&[
+        ("z.rs", "mod a { fn process() {} }"),
+        ("b.rs", "mod b { fn process() {} }"),
+        ("a.rs", "mod a { fn process() {} }"),
+    ]));
+    let result = index.functions("", "process", 0).unwrap();
+    assert_eq!(
+        result
+            .items
+            .iter()
+            .map(|e| e.symbol.source.path.as_str())
+            .collect::<Vec<_>>(),
+        ["a.rs", "z.rs", "b.rs"]
+    );
+    let scoped = index.functions("b.rs", "process", 0).unwrap();
+    assert_eq!(scoped.matching, 1);
+    assert_eq!(scoped.items[0].symbol.source.path, "b.rs");
+}
+
+#[test]
+fn dotted_python_names_and_trait_impl_labels_are_searchable() {
+    let index = Structure::new(&snapshot(&[
+        (
+            "meter.py",
+            "class Meter:\n    def process_sample(self):\n        pass\n",
+        ),
+        (
+            "plugin.rs",
+            "struct GsMeter; impl Plugin for GsMeter { fn process(&mut self) {} }",
+        ),
+    ]));
+    assert_eq!(
+        index
+            .functions("", "Meter.process_sample", 0)
+            .unwrap()
+            .items[0]
+            .symbol
+            .name,
+        "process_sample"
+    );
+    assert_eq!(
+        index.functions("", "GsMeter::process", 0).unwrap().items[0]
+            .symbol
+            .name,
+        "process"
+    );
+    assert_eq!(
+        index.areas("Meter.process_sample", 0).unwrap().items[0].path,
+        "meter.py"
+    );
+}
+
+#[test]
+fn complete_qualified_names_outrank_suffixes_prefixes_and_scope_substrings() {
+    let source = "struct Meter; impl Meter { fn run() {} fn runner() {} } mod outer { struct Meter; impl Meter { fn run() {} } } struct NotMeter; impl NotMeter { fn run() {} } mod prefix { mod Meter { mod run_module { fn aardvark() {} } } }";
+    let index = Structure::new(&snapshot(&[("src.rs", source)]));
+    let result = index.functions("", "Meter::run", 0).unwrap();
+    assert_eq!(
+        result
+            .items
+            .iter()
+            .map(|e| e.symbol.parents.join("::") + "::" + &e.symbol.name)
+            .collect::<Vec<_>>(),
+        [
+            "Meter::run",
+            "outer::Meter::run",
+            "prefix::Meter::run_module::aardvark",
+            "Meter::runner",
+            "NotMeter::run"
+        ]
+    );
+}
+
+#[test]
+fn path_only_matches_follow_names_and_function_browsing_is_alphabetical() {
+    let index = Structure::new(&snapshot(&[
+        ("process.rs", "fn aardvark() {}"),
+        ("z.rs", "fn process() {} fn process_sample() {}"),
+    ]));
+    assert_eq!(
+        index
+            .functions("", "process", 0)
+            .unwrap()
+            .items
+            .iter()
+            .map(|e| e.symbol.name.as_str())
+            .collect::<Vec<_>>(),
+        ["process", "process_sample", "aardvark"]
+    );
+    assert_eq!(
+        index
+            .functions("", "", 0)
+            .unwrap()
+            .items
+            .iter()
+            .map(|e| e.symbol.name.as_str())
+            .collect::<Vec<_>>(),
+        ["aardvark", "process", "process_sample"]
+    );
+    let result = index.functions("", "PROCESS.RS", 0).unwrap();
+    assert_eq!(result.matching, 1);
+    assert_eq!(result.items[0].symbol.name, "aardvark");
+}
+
+#[test]
+fn same_qualified_names_in_one_file_use_source_lines_to_break_ties() {
+    let index = Structure::new(&snapshot(&[(
+        "src.rs",
+        "fn process() {}\nfn process() {}\n",
+    )]));
+    assert_eq!(
+        index
+            .functions("", "process", 0)
+            .unwrap()
+            .items
+            .iter()
+            .map(|e| e.symbol.source.line)
+            .collect::<Vec<_>>(),
+        [1, 2]
+    );
+}
+
+#[test]
+fn unicode_namespaces_are_casefolded() {
+    let index = Structure::new(&snapshot(&[("src.rs", "mod Δ { fn Über() {} }")]));
+    let result = index.functions("", "δ::über", 0).unwrap();
+    assert_eq!(result.matching, 1);
+    assert_eq!(result.items[0].symbol.name, "Über");
+}
+
+#[test]
+fn unfiltered_empty_inventories_keep_lexical_order() {
+    let index = Structure::new(&snapshot(&[("src.rs", "fn zeta() {} fn alpha() {}")]));
+    assert_eq!(
+        index
+            .inventory("", "", 0)
+            .unwrap()
+            .items
+            .iter()
+            .map(|e| e.symbol.name.as_str())
+            .collect::<Vec<_>>(),
+        ["zeta", "alpha"]
+    );
+    assert_eq!(
+        index
+            .functions("", "", 0)
+            .unwrap()
+            .items
+            .iter()
+            .map(|e| e.symbol.name.as_str())
+            .collect::<Vec<_>>(),
+        ["alpha", "zeta"]
+    );
+}
+
+#[test]
+fn identical_search_keys_preserve_source_order_even_on_one_line() {
+    let source = "fn process() {} ".repeat(8);
+    let index = Structure::new(&snapshot(&[("src.rs", &source)]));
+    let source_order = index
+        .inventory("src.rs", "", 0)
+        .unwrap()
+        .items
+        .into_iter()
+        .map(|e| e.symbol.id)
+        .collect::<Vec<_>>();
+    let search_order = index
+        .functions("src.rs", "process", 0)
+        .unwrap()
+        .items
+        .into_iter()
+        .map(|e| e.symbol.id)
+        .collect::<Vec<_>>();
+    assert_eq!(search_order, source_order);
+}
+
+#[test]
+fn function_name_matches_outrank_matches_only_in_the_enclosing_type() {
+    let index = Structure::new(&snapshot(&[(
+        "src.rs",
+        "struct Processor; impl Processor { fn begin_block() {} fn process_sample() {} } fn preprocess() {} fn process() {}",
+    )]));
+    assert_eq!(
+        index
+            .functions("", "process", 0)
+            .unwrap()
+            .items
+            .iter()
+            .map(|e| e.symbol.name.as_str())
+            .collect::<Vec<_>>(),
+        ["process", "process_sample", "preprocess", "begin_block"]
+    );
+}

@@ -165,3 +165,50 @@ async fn structural_http_caps_schema_and_source_conflicts_are_bounded() {
         assert_eq!(response.status, status, "{}", response.body);
     }
 }
+
+#[test]
+fn function_search_requests_rank_and_filter_in_the_native_adapter() {
+    let root = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    let source = "struct process; struct LufsMeter; impl LufsMeter { fn process_sample() {} } fn process_sample() {} fn process() {}";
+    std::fs::write(root.path().join("lib.rs"), source).unwrap();
+    let host = Arc::new(
+        Host::start_with_options(
+            Engine::new(
+                Directory::open(root.path()).unwrap(),
+                Cache::new(cache.path().join("analysis")),
+                1,
+            )
+            .unwrap(),
+            HostOptions {
+                watch: false,
+                reconcile_interval: std::time::Duration::from_secs(3600),
+                idle_maintenance: false,
+            },
+        )
+        .unwrap(),
+    );
+    let snapshot = host
+        .application()
+        .snapshot()
+        .unwrap()
+        .id()
+        .as_str()
+        .to_owned();
+    let app = StructureHost::new(host);
+    let req:Request=serde_json::from_value(json!({"snapshot":snapshot,"query":{"kind":"inventory","area":"","search":"process","offset":0,"functions_only":true}})).unwrap();
+    let results = app.query(&req).unwrap();
+    assert_eq!(results["matching"], 3);
+    assert_eq!(results["items"][0]["symbol"]["name"], "process");
+    assert!(
+        results["items"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .all(|e| e["symbol"]["kind"] == "function")
+    );
+    let req:Request=serde_json::from_value(json!({"snapshot":snapshot,"query":{"kind":"inventory","area":"","search":"LufsMeter::process_sample","offset":0,"functions_only":true}})).unwrap();
+    let results = app.query(&req).unwrap();
+    assert_eq!(results["matching"], 1);
+    assert_eq!(results["items"][0]["symbol"]["name"], "process_sample");
+}

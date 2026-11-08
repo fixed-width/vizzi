@@ -1,0 +1,633 @@
+{
+  "schema": 1,
+  "kind": "known-source qualified function-search replay",
+  "sourceRevision": "951cf85413029423e036c641638b845edafe75cf",
+  "records": [
+    {
+      "query": "process",
+      "elapsedMs": 371.76241800000025,
+      "data": {
+        "coverage": {
+          "available_files": 625,
+          "indexed_files": 625,
+          "omitted_areas": 0,
+          "omitted_calls": 6839,
+          "omitted_files": 0,
+          "omitted_symbols": 10617,
+          "partial_files": 0,
+          "unavailable_call_files": 0
+        },
+        "items": [
+          {
+            "candidate_uses": 226,
+            "same_name_definitions": 58,
+            "symbol": {
+              "id": "da3fb18c31919bcdb19f8f9a6bf8e857454936d69a6cba8db01b3453a8245585",
+              "kind": "function",
+              "name": "process",
+              "parents": [
+                "AllpassDelayStage"
+              ],
+              "source": {
+                "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+                "end_line": 77,
+                "file": "9525e32f2de1d0cdfa171a2191d2959d3f709616a5d0434962a17ab2a66dfaea",
+                "line": 61,
+                "path": "imagine/src/decorrelator.rs",
+                "version": "132ad46caff43ba63942783d95fe3dc686f08d8988e37b8e7c3b5dc130ceb64e"
+              }
+            }
+          },
+          {
+            "candidate_uses": 226,
+            "same_name_definitions": 58,
+            "symbol": {
+              "id": "92b29b4dc4fdf414f5476d7697fb6c1980d7d9ba2fb5e8ecfe727b860a4e9df2",
+              "kind": "function",
+              "name": "process",
+              "parents": [
+                "ApComp"
+              ],
+              "source": {
+                "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+                "end_line": 217,
+                "file": "b9b01e599c2b1895801a24f99bc1b367a3ecb7977ba893ac681541a2da2b9c97",
+                "line": 215,
+                "path": "imagine/src/crossover.rs",
+                "version": "7ce1fe708aca2999f66959716b5c792c130405d085fdfc8267503fb45ff22f56"
+              }
+            }
+          },
+          {
+            "candidate_uses": 226,
+            "same_name_definitions": 58,
+            "symbol": {
+              "id": "3e65b1cab00684ab84206c4d4f8b016fc9551e7cd3842aa0d7305f2a342f308f",
+              "kind": "function",
+              "name": "process",
+              "parents": [
+                "AudioEngine"
+              ],
+              "source": {
+                "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+                "end_line": 384,
+                "file": "6ea8330a853521f9cef6010806ef9ae049721eee8f305026089aa76965dc5604",
+                "line": 270,
+                "path": "multosis/src/engine.rs",
+                "version": "47f24034d0ac84c8329f540ebd8dfc8a02bb05e958ba74cdd934c119850dd6ed"
+              }
+            }
+          },
+          {
+            "candidate_uses": 226,
+            "same_name_definitions": 58,
+            "symbol": {
+              "id": "973f12ba4c0fed647a404d07e269e3a2c4c42299d6ce7211281e6d7a512ff7da",
+              "kind": "function",
+              "name": "process",
+              "parents": [
+                "Band"
+              ],
+              "source": {
+                "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+                "end_line": 138,
+                "file": "1508148014ccbb8c244881e3a9e015ec191f96c0b2dcbd65684896e263e6b1e8",
+                "line": 92,
+                "path": "imagine/src/bands.rs",
+                "version": "1f91c348a090d2426997825b31db449ac1b18e57783f43921e31180c99e4c55d"
+              }
+            }
+          },
+          {
+            "candidate_uses": 226,
+            "same_name_definitions": 58,
+            "symbol": {
+              "id": "a843cd4699fa87c079e34f07c1085d20dd782b90cf85cc26b020753089ae458f",
+              "kind": "function",
+              "name": "process",
+              "parents": [
+                "Biquad"
+              ],
+              "source": {
+                "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+                "end_line": 47,
+                "file": "b9b01e599c2b1895801a24f99bc1b367a3ecb7977ba893ac681541a2da2b9c97",
+                "line": 42,
+                "path": "imagine/src/crossover.rs",
+                "version": "7ce1fe708aca2999f66959716b5c792c130405d085fdfc8267503fb45ff22f56"
+              }
+            }
+          },
+          {
+            "candidate_uses": 226,
+            "same_name_definitions": 58,
+            "symbol": {
+              "id": "c3600db962a64ce23a74c9dd226d674879a2ebb79ecaa6a014747047536f1a45",
+              "kind": "function",
+              "name": "process",
+              "parents": [
+                "Biquad<T>"
+              ],
+              "source": {
+                "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+                "end_line": 74,
+                "file": "679650c450b5dfe3c592ca01fe42af3daac6566660e384cc13039568a825fa9c",
+                "line": 67,
+                "path": "nih-plug/plugins/crisp/src/filter.rs",
+                "version": "0979216a5a4016cfd4813a3cb2ee47d674fb36fe46401f48bd2cc4780500f046"
+              }
+            }
+          },
+          {
+            "candidate_uses": 226,
+            "same_name_definitions": 58,
+            "symbol": {
+              "id": "3fb464cc88d3cec4029d0d693ff97db0bd649ee41f3bf41eb32d6ff49e7b5d5f",
+              "kind": "function",
+              "name": "process",
+              "parents": [
+                "Biquad<T>"
+              ],
+              "source": {
+                "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+                "end_line": 80,
+                "file": "90c8e203c9406f4222f4e84c8c62c584414d8c3827a7fdabfdec490aa697ebef",
+                "line": 73,
+                "path": "nih-plug/plugins/crossover/src/crossover/iir/biquad.rs",
+                "version": "d7702f44004cd17b185d503a846342452f5b3cc6740fa4cfda9d1b514c313e9e"
+              }
+            }
+          },
+          {
+            "candidate_uses": 226,
+            "same_name_definitions": 58,
+            "symbol": {
+              "id": "e1dd3f818aa5937da03f04852e7e1f9ab250c5318e51cbaf35e53d4d4eba991a",
+              "kind": "function",
+              "name": "process",
+              "parents": [
+                "Biquad<T>"
+              ],
+              "source": {
+                "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+                "end_line": 74,
+                "file": "cd303d504943c9bae8505e8e42d34f31af6b1d824f45675be5cd26c9ad1291ae",
+                "line": 67,
+                "path": "nih-plug/plugins/diopser/src/filter.rs",
+                "version": "0a0352233063b3c3faf968caa5dd43c108625d63f6445e22b6ae0603f02880b0"
+              }
+            }
+          },
+          {
+            "candidate_uses": 226,
+            "same_name_definitions": 58,
+            "symbol": {
+              "id": "27986952e7455fe0bb78ab3f41d0ea956a0307556784f4b5ea6302c771f2abca",
+              "kind": "function",
+              "name": "process",
+              "parents": [
+                "Biquad<T>"
+              ],
+              "source": {
+                "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+                "end_line": 74,
+                "file": "064beb7ca091e26f34f69dbcd37917248ff075919e5bde8b822af69cb94411ee",
+                "line": 67,
+                "path": "nih-plug/plugins/loudness_war_winner/src/filter.rs",
+                "version": "3645e912aca3b1d41bbdfcc6c5d43ec599c147d9310232a73c841e0fcd44a2c5"
+              }
+            }
+          },
+          {
+            "candidate_uses": 226,
+            "same_name_definitions": 58,
+            "symbol": {
+              "id": "bd90ab52909274a615e9bc91561c206b29ab88106bfe4b5c2269ac83bd3b5efb",
+              "kind": "function",
+              "name": "process",
+              "parents": [
+                "CompressorBank"
+              ],
+              "source": {
+                "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+                "end_line": 673,
+                "file": "aeed4b1ac30dc9b9c8717eabc137ba9440b46e7a60784f0893efc34cb458db10",
+                "line": 583,
+                "path": "nih-plug/plugins/spectral_compressor/src/compressor_bank.rs",
+                "version": "ecbe3c5095bf5a80b9b278255baabd2805179e71c024d684252bcc2b4a9b2f72"
+              }
+            }
+          },
+          {
+            "candidate_uses": 226,
+            "same_name_definitions": 58,
+            "symbol": {
+              "id": "7fd08ede4f76a5e06b270b73e190b78e74c4143bfdc99f3da08525c753e03c9b",
+              "kind": "function",
+              "name": "process",
+              "parents": [
+                "CrossoverFir"
+              ],
+              "source": {
+                "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+                "end_line": 602,
+                "file": "b9b01e599c2b1895801a24f99bc1b367a3ecb7977ba893ac681541a2da2b9c97",
+                "line": 564,
+                "path": "imagine/src/crossover.rs",
+                "version": "7ce1fe708aca2999f66959716b5c792c130405d085fdfc8267503fb45ff22f56"
+              }
+            }
+          },
+          {
+            "candidate_uses": 226,
+            "same_name_definitions": 58,
+            "symbol": {
+              "id": "5565532e24fb8eddecb7d90503e489f4c486f7801f4f8cf0b98e012821b424d8",
+              "kind": "function",
+              "name": "process",
+              "parents": [
+                "CrossoverIir"
+              ],
+              "source": {
+                "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+                "end_line": 292,
+                "file": "b9b01e599c2b1895801a24f99bc1b367a3ecb7977ba893ac681541a2da2b9c97",
+                "line": 272,
+                "path": "imagine/src/crossover.rs",
+                "version": "7ce1fe708aca2999f66959716b5c792c130405d085fdfc8267503fb45ff22f56"
+              }
+            }
+          },
+          {
+            "candidate_uses": 226,
+            "same_name_definitions": 58,
+            "symbol": {
+              "id": "c0a6c150dafc5048f5e99944e327315fbb8c5f1835649a7d26cf03fe51511374",
+              "kind": "function",
+              "name": "process",
+              "parents": [
+                "Decorrelator"
+              ],
+              "source": {
+                "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+                "end_line": 125,
+                "file": "9525e32f2de1d0cdfa171a2191d2959d3f709616a5d0434962a17ab2a66dfaea",
+                "line": 119,
+                "path": "imagine/src/decorrelator.rs",
+                "version": "132ad46caff43ba63942783d95fe3dc686f08d8988e37b8e7c3b5dc130ceb64e"
+              }
+            }
+          },
+          {
+            "candidate_uses": 226,
+            "same_name_definitions": 58,
+            "symbol": {
+              "id": "f2aab0f8e202dd90461c04e61b3409f1040ea78a4695b9eb780c2cc3c7895e32",
+              "kind": "function",
+              "name": "process",
+              "parents": [
+                "FftFirFilter"
+              ],
+              "source": {
+                "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+                "end_line": 138,
+                "file": "481a096ab815223466cb5a004f5f7869df9ae3ce33acbb57548f7b86784c43cf",
+                "line": 99,
+                "path": "nih-plug/plugins/crossover/src/crossover/fir/filter.rs",
+                "version": "96d53fab3f3e5d8314f5e25e3574259cfef55917c799314008c2c85af8c4d5df"
+              }
+            }
+          },
+          {
+            "candidate_uses": 226,
+            "same_name_definitions": 58,
+            "symbol": {
+              "id": "a2fb4463bbe4273d91d802c44de4c657c410fa58abad0eee577f62a7d66aeb65",
+              "kind": "function",
+              "name": "process",
+              "parents": [
+                "FirCrossover"
+              ],
+              "source": {
+                "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+                "end_line": 207,
+                "file": "1aba74304d1b357afa6fcf9b2c455901ea3ea19f5ce0f37fd1dbbf6fb68f19fd",
+                "line": 124,
+                "path": "nih-plug/plugins/crossover/src/crossover/fir.rs",
+                "version": "0532f19e687a5ef8989ee81ac8c60feecbd3921252fcd0c66c7bb1b8f0591e9d"
+              }
+            }
+          },
+          {
+            "candidate_uses": 226,
+            "same_name_definitions": 58,
+            "symbol": {
+              "id": "5751b67f68766d735083514ee13e67ad35de39d489de5f05c449ab95b0f6198b",
+              "kind": "function",
+              "name": "process",
+              "parents": [
+                "HardVacuum"
+              ],
+              "source": {
+                "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+                "end_line": 63,
+                "file": "48da8c898143dcd1d509764a93bc7a224e692987c57a5930e510898b51dd2026",
+                "line": 59,
+                "path": "nih-plug/plugins/soft_vacuum/src/hard_vacuum.rs",
+                "version": "9b80b46fbd4b561ed02066688f02f3be4c5d0fdb1a99e79e3506e6603632f3d1"
+              }
+            }
+          },
+          {
+            "candidate_uses": 226,
+            "same_name_definitions": 58,
+            "symbol": {
+              "id": "c94895cf4b88fdaf0096ce2b0b161e32a430b91b26b1b73046cccc17d7b215c3",
+              "kind": "function",
+              "name": "process",
+              "parents": [
+                "IAudioProcessorTrait for Wrapper<P>"
+              ],
+              "source": {
+                "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+                "end_line": 1687,
+                "file": "850beb831385e7e554b556c4f4b64f04a6231dbfa1db629fcc60e67457289516",
+                "line": 947,
+                "path": "nih-plug/src/wrapper/vst3/wrapper.rs",
+                "version": "724d9abe55da2b287f7204add4a4bb09460324711c402b86857aa4fbee67c6ab"
+              }
+            }
+          },
+          {
+            "candidate_uses": 226,
+            "same_name_definitions": 58,
+            "symbol": {
+              "id": "699402c6e6373bb3b5d8fa939f3749794a084143e90f15bea6c67c4a90ece701",
+              "kind": "function",
+              "name": "process",
+              "parents": [
+                "IirCrossover"
+              ],
+              "source": {
+                "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+                "end_line": 129,
+                "file": "6a97b749090355f8b05ed0889c9e8addd67fa7fdb1960d60c9f186cf25def4f7",
+                "line": 93,
+                "path": "nih-plug/plugins/crossover/src/crossover/iir.rs",
+                "version": "81feaec8af0cd076dc000c2d22d321e84f297efe33652ec3a9ecedd858666908"
+              }
+            }
+          },
+          {
+            "candidate_uses": 226,
+            "same_name_definitions": 58,
+            "symbol": {
+              "id": "237cab95bfb5bccf5381d57e893b18dcb5ffd425501a111353f10ab85262ca40",
+              "kind": "function",
+              "name": "process",
+              "parents": [
+                "Lanczos3Oversampler"
+              ],
+              "source": {
+                "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+                "end_line": 185,
+                "file": "d5d015cdd775dcab7a256f24b6419e58c46ca2928475c6a771ec441d30b53927",
+                "line": 168,
+                "path": "nih-plug/plugins/soft_vacuum/src/oversampling.rs",
+                "version": "4ba3f51b511ad9e101ee3b32c248175364fbcaa80d148a9bc0dd208f661de1cf"
+              }
+            }
+          },
+          {
+            "candidate_uses": 226,
+            "same_name_definitions": 58,
+            "symbol": {
+              "id": "c01f562c6da99b0ac594c43230bd2c23c19293c741e495fc65fd8f9bdb9de7bc",
+              "kind": "function",
+              "name": "process",
+              "parents": [
+                "Lr4Highpass"
+              ],
+              "source": {
+                "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+                "end_line": 189,
+                "file": "b9b01e599c2b1895801a24f99bc1b367a3ecb7977ba893ac681541a2da2b9c97",
+                "line": 187,
+                "path": "imagine/src/crossover.rs",
+                "version": "7ce1fe708aca2999f66959716b5c792c130405d085fdfc8267503fb45ff22f56"
+              }
+            }
+          },
+          {
+            "candidate_uses": 226,
+            "same_name_definitions": 58,
+            "symbol": {
+              "id": "9dff4a7ab0290db6741c928e689917d923134188b92db35cce592541c2e75adb",
+              "kind": "function",
+              "name": "process",
+              "parents": [
+                "Lr4Lowpass"
+              ],
+              "source": {
+                "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+                "end_line": 157,
+                "file": "b9b01e599c2b1895801a24f99bc1b367a3ecb7977ba893ac681541a2da2b9c97",
+                "line": 155,
+                "path": "imagine/src/crossover.rs",
+                "version": "7ce1fe708aca2999f66959716b5c792c130405d085fdfc8267503fb45ff22f56"
+              }
+            }
+          },
+          {
+            "candidate_uses": 226,
+            "same_name_definitions": 58,
+            "symbol": {
+              "id": "1d48140fd0414fe857884d1e54da3a5fa9eea5bf842c6e6668c4f9f1e6ca159e",
+              "kind": "function",
+              "name": "process",
+              "parents": [
+                "OnePole"
+              ],
+              "source": {
+                "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+                "end_line": 28,
+                "file": "e569a6a728ddad4a5d1823008235fb7742840b2336fd97caf1590204d9504a43",
+                "line": 25,
+                "path": "nap/src/coloration.rs",
+                "version": "95dbe40743968a8652d3f88a14cfad6b13f3a69205212fb5251e988bd30d037c"
+              }
+            }
+          },
+          {
+            "candidate_uses": 226,
+            "same_name_definitions": 58,
+            "symbol": {
+              "id": "49074d308899992994a60971f28438c6dfb17ccd704ddbf9a3c5932e644aba46",
+              "kind": "function",
+              "name": "process",
+              "parents": [
+                "OnePoleHp"
+              ],
+              "source": {
+                "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+                "end_line": 75,
+                "file": "94f646a1e5095427da4a3411e869a59a361e63f8b6405ca79426c75317a7a803",
+                "line": 70,
+                "path": "hd26/src/dimension.rs",
+                "version": "4802f27f9657f473ab7fb0360ec7b774eaf08fa803a1be57ae46b755c54fc8f7"
+              }
+            }
+          },
+          {
+            "candidate_uses": 226,
+            "same_name_definitions": 58,
+            "symbol": {
+              "id": "a0e97522a6c1301ca041d2e8fec0af7338124f7852ee1cad6bfca1eb4d046868",
+              "kind": "function",
+              "name": "process",
+              "parents": [
+                "PhaselessChannel"
+              ],
+              "source": {
+                "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+                "end_line": 79,
+                "file": "64d267fb48d13e3f63180b206632530e8c43b8293280bcd9387faaefe059fbb1",
+                "line": 77,
+                "path": "miff/src/convolution.rs",
+                "version": "4f83985164f704ba6a0c0a9c77190551c9d7fa04672f03c521469cbec3fbd666"
+              }
+            }
+          }
+        ],
+        "matching": 176,
+        "next": 24,
+        "snapshot": "7140b3bad8b5c030a75df94df81d06c2fed0942846653189a61abbe53232471e"
+      },
+      "exactFunctions": 57
+    },
+    {
+      "query": "GsMeter::process",
+      "elapsedMs": 49.37327000000005,
+      "data": {
+        "coverage": {
+          "available_files": 625,
+          "indexed_files": 625,
+          "omitted_areas": 0,
+          "omitted_calls": 6839,
+          "omitted_files": 0,
+          "omitted_symbols": 10617,
+          "partial_files": 0,
+          "unavailable_call_files": 0
+        },
+        "items": [
+          {
+            "candidate_uses": 226,
+            "same_name_definitions": 58,
+            "symbol": {
+              "id": "e3c082652ed2f6cd8df529fdfd03adf26a069b2eec9f9460812e4e2f5aa645b6",
+              "kind": "function",
+              "name": "process",
+              "parents": [
+                "Plugin for GsMeter"
+              ],
+              "source": {
+                "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+                "end_line": 387,
+                "file": "2570c9080f44372153dd4ee9fff51eee596544db7c743d0522f9d3db76978e3f",
+                "line": 267,
+                "path": "gs-meter/src/lib.rs",
+                "version": "e0e11a8f70008733377ab1681425861144f47d485b828650052dffed9086cafd"
+              }
+            }
+          }
+        ],
+        "matching": 1,
+        "next": null,
+        "snapshot": "7140b3bad8b5c030a75df94df81d06c2fed0942846653189a61abbe53232471e"
+      }
+    },
+    {
+      "query": "LufsMeter::process_sample",
+      "elapsedMs": 47.28322599999956,
+      "data": {
+        "coverage": {
+          "available_files": 625,
+          "indexed_files": 625,
+          "omitted_areas": 0,
+          "omitted_calls": 6839,
+          "omitted_files": 0,
+          "omitted_symbols": 10617,
+          "partial_files": 0,
+          "unavailable_call_files": 0
+        },
+        "items": [
+          {
+            "candidate_uses": 631,
+            "same_name_definitions": 8,
+            "symbol": {
+              "id": "f6ab05de663a8622955cd770727a3ae5ee2849dbdc2e7ddad59a205700551f97",
+              "kind": "function",
+              "name": "process_sample",
+              "parents": [
+                "LufsMeter"
+              ],
+              "source": {
+                "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+                "end_line": 346,
+                "file": "3855c767d40575e42896bec422903acfbe2473ca9e3124741c4267146cdbf4d8",
+                "line": 290,
+                "path": "gs-meter/src/lufs.rs",
+                "version": "dbfd1aae98158154a678e0610d159c965bd0f264c73d9e210ffd2bdc695c8359"
+              }
+            }
+          }
+        ],
+        "matching": 1,
+        "next": null,
+        "snapshot": "7140b3bad8b5c030a75df94df81d06c2fed0942846653189a61abbe53232471e"
+      }
+    },
+    {
+      "query": "LufsMeter.process_sample",
+      "elapsedMs": 47.53970400000071,
+      "data": {
+        "coverage": {
+          "available_files": 625,
+          "indexed_files": 625,
+          "omitted_areas": 0,
+          "omitted_calls": 6839,
+          "omitted_files": 0,
+          "omitted_symbols": 10617,
+          "partial_files": 0,
+          "unavailable_call_files": 0
+        },
+        "items": [
+          {
+            "candidate_uses": 631,
+            "same_name_definitions": 8,
+            "symbol": {
+              "id": "f6ab05de663a8622955cd770727a3ae5ee2849dbdc2e7ddad59a205700551f97",
+              "kind": "function",
+              "name": "process_sample",
+              "parents": [
+                "LufsMeter"
+              ],
+              "source": {
+                "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+                "end_line": 346,
+                "file": "3855c767d40575e42896bec422903acfbe2473ca9e3124741c4267146cdbf4d8",
+                "line": 290,
+                "path": "gs-meter/src/lufs.rs",
+                "version": "dbfd1aae98158154a678e0610d159c965bd0f264c73d9e210ffd2bdc695c8359"
+              }
+            }
+          }
+        ],
+        "matching": 1,
+        "next": null,
+        "snapshot": "7140b3bad8b5c030a75df94df81d06c2fed0942846653189a61abbe53232471e"
+      }
+    }
+  ],
+  "limitations": "Single optimized-host session; browser request observations include UI scheduling and initial index construction. Not search-latency distributions or independent task usefulness."
+}

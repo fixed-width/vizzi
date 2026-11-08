@@ -18,6 +18,7 @@ pub mod query;
 pub mod rust;
 mod rust_calls;
 pub mod structure;
+mod structure_search;
 mod syntax;
 mod syntax_state;
 pub mod text_diff;

@@ -32,6 +32,9 @@ pub enum Operation {
         search: String,
         /// Continuation offset.
         offset: usize,
+        /// Restrict the result set to functions before ranking and paging.
+        #[serde(default)]
+        functions_only: bool,
     },
     /// Follow written invocations in one declaration.
     Calls {
@@ -115,10 +118,14 @@ impl StructureHost {
                 area,
                 search,
                 offset,
+                functions_only,
             } => serde_json::to_value(
-                index
-                    .inventory(area, search, *offset)
-                    .map_err(|e| CompanionError::Invalid(e.to_string()))?,
+                (if *functions_only {
+                    index.functions(area, search, *offset)
+                } else {
+                    index.inventory(area, search, *offset)
+                })
+                .map_err(|e| CompanionError::Invalid(e.to_string()))?,
             ),
             Operation::Calls {
                 symbol,

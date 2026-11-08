@@ -26,6 +26,11 @@ unrelated name matches, with captured-source/version and late-response safeguard
 Keep this as supporting infrastructure for visual call trails; broad type/compiler
 coverage and cold-start cost remain distinct from independent workspace usefulness.
 
+The [fragment-search follow-up](../../experiments/visual/SEARCH_RESULTS.md) supports captured
+qualified names and ranks exact function names before partial or enclosing-scope matches.
+Function filtering/ranking precede paging; this remains a supporting entry into the visual
+working set rather than a new search-led product direction.
+
 The prepared Minitosis search-led leave/return session was stopped after the direction
 correction on 2026-11-08. Preserve its notes and treat the maintainer's feedback as product
 direction, without inventing task completion/time scores. Earlier checkpoints below are

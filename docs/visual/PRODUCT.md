@@ -6,7 +6,10 @@ editor companion; source search introduces a fragment rather than taking over th
 Reuse the existing light/dark palette and fonts; Code Bubbles is the supplied interaction
 reference, with no separate design mock.
 
-- `/workspace` opens the canvas. **Add fragment** reveals a source-name chooser. A known
+- `/workspace` opens the canvas. **Add fragment** reveals a function chooser supporting
+  captured qualified names with `::` or `.`. Rank the complete function result set before
+  paging: exact names/qualified names, exact qualified suffixes, function-name prefixes/substrings, namespace prefixes/substrings,
+  then path matches; break ties alphabetically and by source location. A known
   Minitosis example can open its entry function for a guided visual demonstration, clearly
   distinguished from automatic task interpretation or a fresh search evaluation.
 - Selecting a written call opens its destination beside the caller. Earlier views
