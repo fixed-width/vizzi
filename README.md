@@ -17,6 +17,13 @@ The first [fresh Tract Plugin Pack trial](experiments/companion/TRACT_PLUGIN_PAC
 exposed intent/ranking and evidence-retention gaps. Independent maintainer navigation
 usefulness remains to be evaluated; the default overview is unchanged.
 
+A separate [structural exploration prototype](docs/how-to/structural-exploration.md) at
+`/investigate?trial=structure` exposes captured inventories and written-call candidates.
+Rust/Python collect call evidence in the existing syntax pass; names, ambiguity and
+unavailable analysis remain explicit. It performs no natural-language intent routing or
+semantic call/data-flow resolution. Its [evaluation protocol](docs/structure/EVALUATION.md)
+keeps reserved questions out of development.
+
 The production renderer, compiler-backed language integrations and storage engine
 remain open decisions. Both guided learning and local-change review tasks now pass
 on the frozen reference repository. [Focused review measurements](experiments/review-workflow/SCALE_RESULTS.md)

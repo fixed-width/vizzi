@@ -651,6 +651,7 @@ fn analysis_coverage_changes_identity_without_inventing_a_content_change() {
                 "code.rs".into(),
                 bytes,
                 vec![Analysis {
+                    calls: None,
                     coloring: None,
                     content: ContentId::derive(&[bytes]),
                     context: Context {

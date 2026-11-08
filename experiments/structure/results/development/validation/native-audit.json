@@ -1,0 +1,148 @@
+{
+  "generated": 4,
+  "latestDispositions": {
+    "CaughtMutant": 4
+  },
+  "variants": [
+    {
+      "phase": "initial",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/structural.rs:74:9: replace StructureHost::query -> Result<Value, CompanionError> with Ok(Default::default())",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/structural.rs",
+        "function": {
+          "function_name": "StructureHost::query",
+          "return_type": "-> Result<Value, CompanionError>",
+          "span": {
+            "start": {
+              "line": 72,
+              "column": 5
+            },
+            "end": {
+              "line": 152,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 74,
+            "column": 9
+          },
+          "end": {
+            "line": 151,
+            "column": 18
+          }
+        },
+        "replacement": "Ok(Default::default())",
+        "genre": "FnValue"
+      }
+    },
+    {
+      "phase": "initial",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/structural.rs:79:35: replace != with == in StructureHost::query",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/structural.rs",
+        "function": {
+          "function_name": "StructureHost::query",
+          "return_type": "-> Result<Value, CompanionError>",
+          "span": {
+            "start": {
+              "line": 72,
+              "column": 5
+            },
+            "end": {
+              "line": 152,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 79,
+            "column": 35
+          },
+          "end": {
+            "line": 79,
+            "column": 37
+          }
+        },
+        "replacement": "==",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "final",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/structural.rs:95:40: replace != with == in StructureHost::query",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/structural.rs",
+        "function": {
+          "function_name": "StructureHost::query",
+          "return_type": "-> Result<Value, CompanionError>",
+          "span": {
+            "start": {
+              "line": 72,
+              "column": 5
+            },
+            "end": {
+              "line": 152,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 95,
+            "column": 40
+          },
+          "end": {
+            "line": 95,
+            "column": 42
+          }
+        },
+        "replacement": "==",
+        "genre": "BinaryOperator"
+      }
+    },
+    {
+      "phase": "initial",
+      "summary": "CaughtMutant",
+      "mutation": {
+        "name": "crates/vizzi/src/structural.rs:145:48: replace != with == in StructureHost::query",
+        "package": "vizzi",
+        "file": "crates/vizzi/src/structural.rs",
+        "function": {
+          "function_name": "StructureHost::query",
+          "return_type": "-> Result<Value, CompanionError>",
+          "span": {
+            "start": {
+              "line": 72,
+              "column": 5
+            },
+            "end": {
+              "line": 152,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 145,
+            "column": 48
+          },
+          "end": {
+            "line": 145,
+            "column": 50
+          }
+        },
+        "replacement": "==",
+        "genre": "BinaryOperator"
+      }
+    }
+  ]
+}

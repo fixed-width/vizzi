@@ -172,6 +172,7 @@ fn escaped_hierarchy_labels_and_styles_still_fit_the_document_window_budget() {
         })
         .collect();
     let analysis = Analysis {
+        calls: None,
         content: ContentId::derive(&[text.as_bytes()]),
         context: Context {
             language: "fixture".into(),

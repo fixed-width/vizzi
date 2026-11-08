@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "frozenAt": "2026-11-08T00:47:20.039209+00:00",
+  "candidateBinarySha256": "8f78d9f67e68d3677453d67ef036b6274f44d10f0f61782c4cf683e498babe9a",
+  "cohortSha256": "de96d28d0344e56d1855ba0f01f92d42b0c68a4cc5474bfe05e733e522e5f61d",
+  "authorship": "Agent-chosen literal seeds copied from verbatim reserved questions, after candidate freeze and before repository export/source inspection. Explicit operation choices, not automatic model planning.",
+  "cases": [
+    {
+      "id": "sketchlayer.add-tool",
+      "selectorOrder": [
+        "original",
+        "focused"
+      ],
+      "seeds": [
+        "tool"
+      ]
+    },
+    {
+      "id": "sketchlayer.drawing-surface-border",
+      "selectorOrder": [
+        "focused",
+        "original"
+      ],
+      "seeds": [
+        "border",
+        "surface",
+        "window"
+      ]
+    }
+  ],
+  "operations": [
+    "areas(search=seed,offset=0)",
+    "inventory(area=\"\",search=seed,offset=0)"
+  ],
+  "baseline": "Same literal seeds in ordinary rg over the frozen source language files; preserve text-search context separately from metadata rows. No query/seed/ranking changes after results."
+}

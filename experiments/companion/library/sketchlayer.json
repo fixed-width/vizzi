@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "companion.sketchlayer.reserved-2026-11-07",
+  "split": "reserved_maintainer_evaluation",
+  "createdAt": "2026-11-07T23:56:21.843422+00:00",
+  "authorship": "Verbatim maintainer questions. Only repository existence, revision and status inspected at reservation; do not inspect source or retrieve before the structural prototype/development checks are frozen.",
+  "source": {
+    "repository": "sketchlayer",
+    "localPath": "/home/mpd/git-sources/sketchlayer",
+    "revision": "f52314e676ead6a50913e89a458ec34c23d509f9",
+    "worktreeStatusAtReservation": ""
+  },
+  "candidateBaseCommit": "164ef66dfdd34e3e4d3de59e5da782bdb913a29c",
+  "policy": {
+    "tuning": "Exclude these questions and repository source from development/tuning. Record first outputs before later source audit.",
+    "model": "No model or query-specific weight/ranking edits planned.",
+    "source": "Evaluate an immutable export of this recorded revision; report working-tree differences if any.",
+    "editor": "Recording-only automation, no real desktop editor launch."
+  },
+  "cases": [
+    {
+      "id": "sketchlayer.add-tool",
+      "question": "Where do i go to add a new tool?"
+    },
+    {
+      "id": "sketchlayer.drawing-surface-border",
+      "question": "how would I add a border around the main drawing surface to make it easier to tell when it's the top window?"
+    }
+  ]
+}

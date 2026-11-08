@@ -3,17 +3,19 @@ import {createMessage,textRow} from '/messages.js';
 import {followChanges} from '/updates.js';
 import {installDiscovery} from '/discovery.js';
 import {installQuestionSearch} from '/question-search.js';
+import {installStructure} from '/structure.js';
 const element=id=>document.getElementById(id),node=(tag,text)=>{const n=document.createElement(tag);n.textContent=text;return n;};
 installAppearance(element('theme'));
 const error=createMessage(element('investigation-error'),{label:'Dismiss investigation error'}),notice=createMessage(element('investigation-notice'),{label:'Dismiss investigation notice'}),sourceLabel=textRow(element('source-state'));
 let view,sourceStatus,selected,request=0,busy=false,questionDirty=false,noteDirty=false,wantIndex=false,updates;
-const trialSearch=new URLSearchParams(location.search).get('trial')==='search';
-const keepLocation=location=>mutate(trialSearch?'/api/search/evidence':'/api/investigation/evidence',{revision:view.board.revision,snapshot:location.snapshot,file:location.file,version:location.version,line:location.line,title:location.title});
-const discovery=installDiscovery({transport,openEditor,showError,keep:keepLocation,browseEnabled:!trialSearch});
+const trialSearch=new URLSearchParams(location.search).get('trial')==='search',trialStructure=new URLSearchParams(location.search).get('trial')==='structure';
+const keepLocation=location=>mutate((trialSearch||trialStructure)?'/api/search/evidence':'/api/investigation/evidence',{revision:view.board.revision,snapshot:location.snapshot,file:location.file,version:location.version,line:location.line,title:location.title});
+const discovery=installDiscovery({transport,openEditor,showError,keep:keepLocation,browseEnabled:!trialSearch&&!trialStructure});
 const questionSearch=installQuestionSearch({enabled:trialSearch,transport,inspect:discovery.inspect,keep:keepLocation,openEditor,showError,startIndex,saveQuestion:text=>mutate('/api/investigation',{action:'question',revision:view.board.revision,text})});
+const structure=installStructure({enabled:trialStructure,transport,inspect:discovery.inspect,showError});
 function showMode(saved){
  if(noteDirty && !saved){notice.show('Save the current note before changing views.');return;}
- element('saved-workspace').hidden=!saved;element('discovery-panel').hidden=saved||trialSearch;element('question-search-panel').hidden=saved||!trialSearch;
+ element('saved-workspace').hidden=!saved;element('discovery-panel').hidden=saved||trialSearch||trialStructure;element('structure-panel').hidden=saved||!trialStructure;element('question-search-panel').hidden=saved||!trialSearch;
  element('show-saved').setAttribute('aria-pressed',String(saved));element('show-discovery').setAttribute('aria-pressed',String(!saved));
  discovery.closePreview();if(!saved)element('evidence-detail').hidden=true;
  history.replaceState(null,'',saved?'#saved':location.pathname+location.search);
@@ -66,6 +68,6 @@ element('close-detail').addEventListener('click',()=>{if(noteDirty){notice.show(
 element('add-source').addEventListener('click',addSource);element('empty-add-source').addEventListener('click',()=>showMode(false));element('index-source').addEventListener('click',startIndex);element('cancel-source').addEventListener('click',()=>element('source-dialog').close());
 element('export').addEventListener('click',()=>{if(!view)return;const url=URL.createObjectURL(new Blob([JSON.stringify(view.board,null,2)+'\n'],{type:'application/json'}));const link=node('a','');link.href=url;link.download='investigation.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),0);});
 new ResizeObserver(()=>requestAnimationFrame(drawConnections)).observe(element('evidence-map'));
-updates=followChanges({session:()=>({receive(change){const old=sourceStatus?.snapshot;sourceStatus=change.status;updateSourceControls();discovery.receiveStatus(sourceStatus);questionSearch.receiveStatus(sourceStatus);if(old!==sourceStatus.snapshot && view)void load();return true;},close(e){if(e)sourceLabel.show('Source updates disconnected; saved investigation is kept');}})});
+updates=followChanges({session:()=>({receive(change){const old=sourceStatus?.snapshot;sourceStatus=change.status;updateSourceControls();discovery.receiveStatus(sourceStatus);questionSearch.receiveStatus(sourceStatus);structure.receiveStatus(sourceStatus);if(old!==sourceStatus.snapshot && view)void load();return true;},close(e){if(e)sourceLabel.show('Source updates disconnected; saved investigation is kept');}})});
 showMode(location.hash==='#saved');
 void load();void startIndex();

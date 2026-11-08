@@ -34,10 +34,12 @@ impl IntoResponse for Error {
 pub(super) fn router(
     app: Arc<Companion>,
     search: Arc<crate::question_search::QuestionSearch>,
+    structure: Arc<crate::structural::StructureHost>,
 ) -> Router {
     Router::new()
         .route("/api/investigation", get(view).post(edit))
         .route("/api/discovery", get(discover))
+        .route("/api/structure", get(||async {Json(serde_json::json!({"trial":true,"resolution":"candidate_only","call_languages":["rust","python"]}))}).post(move |Json(request):Json<crate::structural::Request>| {let structure=structure.clone();async move {work(move ||structure.query(&request)).await}}))
         .route(
             "/api/search",
             get(|| async {

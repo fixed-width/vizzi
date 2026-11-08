@@ -163,6 +163,7 @@ impl SyntaxAnalyzer {
             return Ok(None);
         }
         let mut analysis = Analysis {
+            calls: crate::calls::supported(&self.context.language).then(Default::default),
             coloring: None,
             content: ContentId::derive(&[bytes]),
             context: self.context.clone(),
@@ -171,6 +172,7 @@ impl SyntaxAnalyzer {
             diagnostics: Vec::new(),
         };
         let Ok(text) = std::str::from_utf8(bytes) else {
+            analysis.calls = None;
             analysis.coverage = Coverage::Unavailable;
             analysis
                 .diagnostics
@@ -278,6 +280,9 @@ impl SyntaxAnalyzer {
                         unique: true,
                     });
                 }
+            }
+            if let Some(calls) = &mut analysis.calls {
+                crate::calls::collect(&self.context.language, node, text, &scope_facts, calls);
             }
             if cursor.goto_first_child() {
                 continue;

@@ -18,6 +18,7 @@ fn document(text: &str, names: &[String]) -> Arc<Document> {
             "a.rs".into(),
             text.as_bytes(),
             vec![Analysis {
+                calls: None,
                 coloring: None,
                 content: ContentId::derive(&[text.as_bytes()]),
                 context: Context {

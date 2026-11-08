@@ -42,6 +42,7 @@ impl RustAnalyzer {
             id: ContextId::derive(&[
                 include_bytes!("rust.rs"),
                 include_bytes!("syntax.rs"),
+                include_bytes!("calls.rs"),
                 include_bytes!("coloring.rs"),
                 include_bytes!("syntax_state.rs"),
                 include_bytes!("analysis.rs"),

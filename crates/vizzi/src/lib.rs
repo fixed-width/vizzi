@@ -39,3 +39,6 @@ pub mod foreground_maintenance;
 
 #[cfg(feature = "qualification")]
 pub mod idle_probe;
+
+/// Current-observation structural exploration adapter.
+pub mod structural;

@@ -15,7 +15,7 @@
     <span id="source-state" role="status">Mapping source…</span>
     <details class="workspace-menu"><summary>More</summary><div>
       <a href="/review">Review changes</a><a href="/explore">Detailed source browser</a>
-      <a href="/investigate?trial=search">Try question search</a>
+      <a href="/investigate?trial=structure">Try structural exploration</a><a href="/investigate?trial=search">Try question search</a>
       <button id="add-source" type="button">Add a known source location</button>
       <button id="export" type="button">Export investigation</button>
       <label class="theme-control">Theme<select id="theme" aria-label="Theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
@@ -23,6 +23,14 @@
   </header>
   <p id="investigation-notice" role="status" hidden></p><p id="investigation-error" role="alert" hidden></p>
   <main class="companion-main">
+    <section id="structure-panel" aria-label="Structural exploration" hidden>
+      <h1>Explore source structure</h1><p>Choose a source area, inspect its declarations, and follow written call candidates.</p>
+      <form id="structure-form"><label for="structure-search">Find a source area or name<input id="structure-search" type="search" maxlength="256" autocomplete="off"></label><button type="submit">Find areas</button></form>
+      <div class="search-actions"><button id="structure-areas" type="button">Source areas</button><button id="structure-inventory" type="button">Area inventory</button></div>
+      <p id="structure-limit">Raw syntax candidates, not a resolved call graph, runtime order or data flow. Zero recorded calls does not prove a declaration is unused.</p>
+      <p id="structure-scope"></p><p id="structure-summary" role="status">Preparing source structure…</p><p id="structure-stale" hidden>Source changed. Find an area again before using these locations.</p>
+      <nav id="structure-trail" aria-label="Selected call trail"></nav><div id="structure-results" aria-busy="false"></div>
+    </section>
     <section id="question-search-panel" aria-label="Question source search" hidden>
       <div class="discovery-heading"><h1 id="search-repository-title">Find a starting point in the code</h1><p>Ask a question, then inspect and keep useful source locations.</p></div>
       <form id="source-question-form"><label for="source-question">Ask about this codebase<input id="source-question" type="search" maxlength="2048" autocomplete="off" placeholder="For example: where are new transactions created?"></label><div class="search-actions"><button type="submit">Search sources</button><button id="search-keep-question" type="button" disabled>Keep question</button></div></form>

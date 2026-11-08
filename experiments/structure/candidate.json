@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "frozenAt": "2026-11-08T00:47:20.016874+00:00",
+  "baseCommit": "164ef66dfdd34e3e4d3de59e5da782bdb913a29c",
+  "binarySha256": "8f78d9f67e68d3677453d67ef036b6274f44d10f0f61782c4cf683e498babe9a",
+  "files": {
+    "README.md": "902d23baee358cc4a94c97ab8070e0ddc35785f3c527ea799b01d06c55cb481d",
+    "crates/vizzi-core/src/calls.rs": "59494e99090c3bdf41362ba23c7f1fc878596b73affd65f5cf803d0706682e07",
+    "crates/vizzi-core/src/lib.rs": "b9218921d23c7a3d09e38ff8060afa7df387def0f07c6f1ed810505e39c52135",
+    "crates/vizzi-core/src/model.rs": "ee1811f545de01963e529b7b8ea3d3dff0eeb1cff1cea2d561f834bb94bcb8dd",
+    "crates/vizzi-core/src/python.rs": "026fbea12586ead0ed532caae37f0c3899458c79746000f4dbe92d6f480dc537",
+    "crates/vizzi-core/src/rust.rs": "b49853e5d463ad1bd0eae28183106dfa70580dc8f3ca50dd345b5da32e8c9647",
+    "crates/vizzi-core/src/structure.rs": "c770c660e7f9ddea1c7d017f3123b6bf5456340a2febff24b7dcbe7091d03af4",
+    "crates/vizzi-core/src/syntax.rs": "7cdabf8f32341b81eec83f815287963f0476e1f5773fc49eeafac9b2b176c55f",
+    "crates/vizzi-core/tests/calls.rs": "0f0b51e6965a1a69b263159013e8a0c96d6301b1deb9d4f1f1a9a4af8c609409",
+    "crates/vizzi-core/tests/comparison.rs": "f2444cae34023329e3ca44a52089fa7d4c8b6b94ac3ca68a83be78ae2539c32b",
+    "crates/vizzi-core/tests/discovery.rs": "aa3074ec3a2d52e1655b8d8b780985606c8fff96debf4dd6fa3c259bc684beb5",
+    "crates/vizzi-core/tests/outline_structure.rs": "fdf39bc8722b51ef0787e75c83c9985dc203387b199d3aa5238c9979f50e03ca",
+    "crates/vizzi-core/tests/projection.rs": "7adb57181c222f5cf0b1e0526d66c7e9b24e822d55cb1d94277eef3a403ccf7e",
+    "crates/vizzi-core/tests/structure.rs": "30062766bc765616ede3f3bde466450cb1dd991e290188be5b66a30ff0a309a5",
+    "crates/vizzi/src/analysis_jobs.rs": "40bbd2a1429f31de66e6ff9bb5c39998bdf7f6b42db23d2cc71d4ceb94927aca",
+    "crates/vizzi/src/lib.rs": "570c59a3c062b35cd92392910c5b72a40ea5cf46b01cc44c4df66f2de25cc4c2",
+    "crates/vizzi/src/server.rs": "3faab9955b3f72773f8c5df69984f720724800780c32ac2a1619632d24097f53",
+    "crates/vizzi/src/server/companion.rs": "b682c95730eff50d47ed1ffad4e3a40d44d0a26cf6b566596a68e809949edfad",
+    "crates/vizzi/src/structural.rs": "889bcf1c374bba901120a2ab1a46cc613acf6304fd6b979a0c0bfb5ca41dad51",
+    "crates/vizzi/tests/structure.rs": "a4fa788fe5567c8391ba3a0e07f7b3b02259e24d2d9eb36d9db060752b85ad28",
+    "crates/vizzi/web/companion.css": "01417d57c53cefca467f86c2ca3622ec442653677b2a9e5251775437a1827cb6",
+    "crates/vizzi/web/companion.html": "bb5ab4be41b371830202293e727a32962918e88cbeac3eedcf9d670b74e7adea",
+    "crates/vizzi/web/companion.js": "a236550eaf1445f0a8c22992c1cc07c071bcc37bdd3d57f20fb6acc9aab166a7",
+    "crates/vizzi/web/structure.js": "3ef49e770860224215eb4699f92b7b38a7ea572751bcacd00dcfb1b640550e84",
+    "docs/how-to/structural-exploration.md": "4f332da3c9f1141b4d8aad6ac1233dd8a2123c66458e2eb52e18b2509e8cb46d",
+    "docs/plans/product-milestones.md": "3d425536d280a2e4108d0cdb88254fa127476021aed37d78ae634995ec0c3395",
+    "docs/structure/EVALUATION.md": "6cbf7fd0841d23b91fc9a8ad7ef546264762ba1434a4c6102b3a276b95e61d57",
+    "docs/structure/PRODUCT.md": "a9963a3d71f43e69c79716aafa320071e4e2b1f3a8976f7fe0b08ff19845c8e4",
+    "docs/structure/TECH.md": "0991e68b298ebf966cfd9783cd7a6d08ad6d30226dfb29b31d862f54a419c982",
+    "experiments/browser/run.mjs": "47145ae939895ed7905c0f42034256c3914d1f826212ad2ecec20c1f67d6c43a",
+    "experiments/browser/structure.test.mjs": "115ec8a3e7a9244ed0444ddb17a3929762eb2a4225da6c6749ca07a91ab69af1",
+    "experiments/companion/library/sketchlayer.json": "de96d28d0344e56d1855ba0f01f92d42b0c68a4cc5474bfe05e733e522e5f61d"
+  },
+  "reservedCohort": "experiments/companion/library/sketchlayer.json",
+  "reservedCohortSha256": "de96d28d0344e56d1855ba0f01f92d42b0c68a4cc5474bfe05e733e522e5f61d",
+  "sourceInspectionBeforeFreeze": "Sketchlayer: only directory/revision/status inspected; no source, filenames, archives or queries inspected.",
+  "checks": {
+    "workspaceTestsAndDoctests": 533,
+    "clippy": "all targets, warnings denied, passed",
+    "formatting": "passed",
+    "browser": "full suite passed",
+    "qaNodeFiles": 20,
+    "coreMutations": {
+      "generated": 118,
+      "caught": 91,
+      "reviewedEquivalent": 2,
+      "unviable": 24,
+      "timeout": 1
+    },
+    "nativeMutations": {
+      "generated": 4,
+      "caught": 4
+    }
+  },
+  "modelsLoaded": 0,
+  "capability": "Explicit inventory/written-call operations; no natural-language routing, semantic call/type/import resolution or runtime/data-flow proof."
+}

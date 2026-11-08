@@ -274,6 +274,7 @@ fn clues_are_unique_and_limited_and_deferred_coverage_is_visible() {
     let pending = base.file_by_path("pending.rs").unwrap();
     let mut analysis = pending.analyses()[0].clone();
     analysis.coverage = Coverage::Deferred;
+    analysis.calls = None;
     analysis.facts.clear();
     analysis.coloring = None;
     let deferred = Arc::new(

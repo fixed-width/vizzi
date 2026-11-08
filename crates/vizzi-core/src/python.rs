@@ -16,6 +16,7 @@ impl LanguageAdapter for PythonAdapter {
             id: ContextId::derive(&[
                 include_bytes!("python.rs"),
                 include_bytes!("syntax.rs"),
+                include_bytes!("calls.rs"),
                 include_bytes!("coloring.rs"),
                 include_bytes!("syntax_state.rs"),
                 include_bytes!("analysis.rs"),

@@ -8,6 +8,11 @@ separate from known-question replay; independent usefulness remains to be evalua
 The first [fresh Tract Plugin Pack pair](../../experiments/companion/TRACT_PLUGIN_PACK_FRESH_RESULTS.md)
 now exposes wrong intent routing and insufficient retained spans. Keep search opt-in; use
 separate development cases before expanding the keyword pools or claiming generalization.
+The next bounded [structural experiment](../structure/PRODUCT.md) provides inventories
+and written-call exploration through a portable captured-metadata projection. It reuses
+previews and editor handoff, adds no model or domain keyword pools, and reserves Sketchlayer
+until the candidate/development checks are frozen. Explicit operations and source-informed
+replay do not qualify natural-language interpretation or independent navigation benefit.
 The prototype below establishes safe browsing/comparison and performance foundations; it
 does not establish added value alongside an editor. Further IDE-surface feature work is
 paused as a delivery priority. Complete the companion slice and evaluate its contribution

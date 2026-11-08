@@ -138,6 +138,9 @@ pub struct Fact {
 /// Path-independent facts that can be persisted in an analysis cache.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Analysis {
+    /// Captured raw call syntax; absent means unavailable, not zero calls.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub calls: Option<crate::calls::CallFacts>,
     /// Optional source-bound lexical styles; absent for custom or unavailable analysis.
     #[serde(default)]
     pub coloring: Option<crate::coloring::Coloring>,
@@ -287,6 +290,9 @@ impl Document {
                         "invalid or duplicate declaration range/key".into(),
                     ));
                 }
+            }
+            if let Some(calls) = &analysis.calls {
+                calls.validate(text, &analysis.facts, &analysis.coverage)?;
             }
             if source.encoding() == SourceEncoding::Unsupported
                 && !matches!(
@@ -544,6 +550,7 @@ mod tests {
     }
     fn analysis(text: &[u8]) -> Analysis {
         Analysis {
+            calls: None,
             coloring: None,
             content: ContentId::derive(&[text]),
             context: Context {
@@ -646,6 +653,7 @@ mod tests {
         assert_eq!(first.documents()[0].path(), "a.rs");
         assert!(crate::model::fixture_snapshot(workspace(), vec![a.clone(), a]).is_err());
         let changed = Analysis {
+            calls: None,
             coloring: None,
             content: ContentId::derive(&[b""]),
             facts: vec![],

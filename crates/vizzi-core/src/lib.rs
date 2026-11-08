@@ -2,6 +2,7 @@
 
 pub mod analysis;
 pub mod c_family;
+pub mod calls;
 pub mod capture;
 mod captured_source;
 pub mod coloring;
@@ -15,6 +16,7 @@ pub mod publication;
 pub mod python;
 pub mod query;
 pub mod rust;
+pub mod structure;
 mod syntax;
 mod syntax_state;
 pub mod text_diff;

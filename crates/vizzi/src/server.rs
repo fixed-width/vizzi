@@ -61,7 +61,8 @@ pub fn router_with_companion(
     investigation: Arc<crate::companion::Companion>,
 ) -> Router {
     let search = Arc::new(crate::question_search::QuestionSearch::new(host.clone()));
-    router_with_host(host, reviews).merge(companion::router(investigation, search))
+    let structure = Arc::new(crate::structural::StructureHost::new(host.clone()));
+    router_with_host(host, reviews).merge(companion::router(investigation, search, structure))
 }
 
 /// Adds comparison operations to the live workspace router without sharing status schemas.
@@ -83,6 +84,7 @@ pub fn router(application: Arc<Application>) -> Router {
         .route("/companion.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/companion.js")) }))
         .route("/discovery.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/discovery.js")) }))
         .route("/question-search.js",get(||async{asset("text/javascript; charset=utf-8",include_str!("../web/question-search.js"))}))
+        .route("/structure.js",get(||async{asset("text/javascript; charset=utf-8",include_str!("../web/structure.js"))}))
         .route("/question-state.js",get(||async{asset("text/javascript; charset=utf-8",include_str!("../web/question-state.js"))}))
         .route("/companion.css", get(|| async { asset("text/css; charset=utf-8", include_str!("../web/companion.css")) }))
         .route("/review", get(|| async { asset("text/html; charset=utf-8", include_str!("../web/review.html")) }))
