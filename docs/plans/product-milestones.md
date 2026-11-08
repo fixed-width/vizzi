@@ -7,11 +7,12 @@ the existing context. Multiple coordinated views and stable spatial organisation
 Search, inventories and call lists support introducing views; they are not the product's
 main value proposition.
 
-The next artifact is a small interactive visual prototype on an already-known real call
-chain, followed by direct maintainer feedback on concurrent context and branching. Establish
-that visual interaction before another search benchmark, model experiment or infrastructure
-expansion. Reuse the source engine, captured provenance/calls, bounded queries and editor
-handoff. Keep candidate links and reader associations distinct from semantic relationships.
+The first [interactive prototype](../how-to/follow-a-call-trail.md) now opens real captured
+fragments concurrently at `/workspace`. The [known-source Minitosis replay](../../experiments/visual/RESULTS.md)
+checks stable callers, branching, candidate choices and reload. The next step is direct
+maintainer feedback on concurrent context and spatial organisation before another search
+benchmark, model experiment or infrastructure expansion. Reuse the source engine, captured
+provenance/calls, bounded queries and editor handoff. Keep candidate links and reader associations distinct from semantic relationships.
 
 The prepared Minitosis search-led leave/return session was stopped after the direction
 correction on 2026-11-08. Preserve its notes and treat the maintainer's feedback as product

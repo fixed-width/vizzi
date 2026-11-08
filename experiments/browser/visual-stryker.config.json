@@ -1,0 +1,33 @@
+{
+  "$schema": "../../node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "mutate": [
+    "crates/vizzi/web/visual-model.js"
+  ],
+  "testRunner": "command",
+  "commandRunner": {
+    "command": "node crates/vizzi/web/visual-model.test.js"
+  },
+  "coverageAnalysis": "off",
+  "concurrency": 1,
+  "timeoutMS": 5000,
+  "reporters": [
+    "clear-text",
+    "json"
+  ],
+  "clearTextReporter": {
+    "reportMutants": false,
+    "logTests": false
+  },
+  "jsonReporter": {
+    "fileName": "/tmp/vizzi-visual-model-mutations.json"
+  },
+  "thresholds": {
+    "break": null
+  },
+  "ignorePatterns": [
+    "**",
+    "!package.json",
+    "!crates/vizzi/web/visual-model.js",
+    "!crates/vizzi/web/visual-model.test.js"
+  ]
+}

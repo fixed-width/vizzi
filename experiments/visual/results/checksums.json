@@ -1,0 +1,12 @@
+{
+  "browser-tests.log.gz": "131ee61a13226813afff2dfa2199ae96c0e8389bc460f284b76d604f6e70cd1c",
+  "cleanup.json": "3b55729efa51e298b924e9530b04d91ae86b9a1056a58d88f0663e6e0372284e",
+  "clippy.log.gz": "9d6354a01bfc9a90726ae2777b5647bc262d6d7060fa3f2483d3fee0e55e37c9",
+  "model-mutations.json.gz": "14e61d7d568f5c31ffe04ce8733c8ca524517779502ba062c5fc570c0eaa6da5",
+  "native-tests.log.gz": "6ab9d297d4ec96ac47c08af53e66ba9fe5b30ad164b8edbd9b32229b0ceec789",
+  "reading-dark.png": "4acfa8399c66cf5db26366beb0e95d1161e46c00f420c4393d76b46dd991a76e",
+  "result.json": "eba1fe447f3d4414cbb09f072f31816e179378c8c295573d698e70567780957e",
+  "working-set-dark.png": "3728893e4f2c5101d06b09a4aedb5378b0224894df694d3b240bd25051ba0d5b",
+  "working-set-light.png": "6e87b38491c4ee0be7c7416279aa30246bfb07f22a3c41016523caea7438938f",
+  "workspace.json": "1f7346bd32dbd208f55288da86644ecb3f30bd247983622f5fd1c2dcdae316d2"
+}

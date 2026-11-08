@@ -1,0 +1,25 @@
+{
+  "createdAt": "2026-11-08T17:03:57.916540+00:00",
+  "preservedBackend": "/tmp/vizzi-cleanup-20261108/vizzi-backend",
+  "backendSha256": "8f78d9f67e68d3677453d67ef036b6274f44d10f0f61782c4cf683e498babe9a",
+  "legacyMutationSummary": "/tmp/vizzi-cleanup-20261108/legacy-mutation-summaries.json.gz",
+  "removedScratch": [
+    "mutants.out",
+    "mutants.out.old",
+    ".stryker-tmp"
+  ],
+  "trackedEvidenceRemoved": false,
+  "installedDependenciesKept": true,
+  "participantNotesKept": true,
+  "preservedBackendRemovedAfterRebuild": true,
+  "beforeApproxGiB": {
+    "checkout": 39,
+    "target": 38,
+    "debug": 37
+  },
+  "afterVerificationApproxGiB": {
+    "checkout": 3.1,
+    "debug": 2.3,
+    "release": 0.27
+  }
+}

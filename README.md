@@ -8,8 +8,10 @@ share context without replacing each other. Search is a supporting entry point.
 
 The native Rust engine, immutable source observations, bounded previews, source/version
 checks, captured call candidates and explicit VS Code handoff are implemented foundations.
-The visual working-set interaction is the next prototype; it is not delivered by the
-current list-based views. Rust/Python are selected by default; explicit scopes enable
+The first [visual call-trail prototype](docs/how-to/follow-a-call-trail.md) is available
+at `/workspace`: source fragments stay open while callees and branches are added; their
+layout, camera and reading state restore locally in the browser. Candidate arrows retain
+the analysis limitations. Rust/Python are selected by default; explicit scopes enable
 raw C/C++ analysis. Normal editing stays in the editor, with richer plugin integration
 remaining a supported direction.
 
@@ -26,9 +28,10 @@ are recorded; independent usability and whole-repository qualification remain op
 The Canvas2D overview is a reference view for
 validating coordination; it does not qualify large-codebase GPU performance.
 
-The current [product checkpoint](docs/plans/product-milestones.md) evaluates the
-investigation's contribution alongside an editor. Guided functional checks do not
-establish that contribution; the editor-only comparison and maintainer trial remain open.
+The current [product checkpoint](docs/plans/product-milestones.md) evaluates whether a
+visual call trail preserves useful context alongside an editor. The
+[Minitosis replay](experiments/visual/RESULTS.md) checks functionality; direct maintainer
+feedback on the spatial interaction remains open.
 
 The [CPU repository-question experiment](experiments/qa/MODEL_COMPARISON_RESULTS.md) supplies a
 versioned question library and compares small local models with an external index.
