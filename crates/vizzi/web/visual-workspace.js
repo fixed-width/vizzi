@@ -1,4 +1,5 @@
 import {Workspace,worldPoint} from '/visual-model.js';
+import {DefinitionWarmup} from '/definition-warmup.js';
 import {renderStyledText} from '/presentation.js';
 import {installAppearance} from '/appearance.js';
 import {createMessage} from '/messages.js';
@@ -12,6 +13,10 @@ installAppearance(el('theme'));
 const fail=e=>error.show(e?.message??String(e));
 async function transport(path,options){const response=await fetch(path,options);if(!response.ok){let text=await response.text();try{text=JSON.parse(text).message??text;}catch{}const error=new Error(text);error.status=response.status;throw error;}return response.json();}
 const post=(path,body,signal)=>transport(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal});
+const definitionWarmup=new DefinitionWarmup((snapshot,call)=>post('/api/call-definition',{snapshot,call}));
+function updateFragmentStatus(r){r.state.textContent=r.resolving?'Finding definition…':r.warming?'Preparing type navigation…':r.sourceStatus??'Captured source';}
+function sourceStatus(r,text){r.sourceStatus=text;updateFragmentStatus(r);}
+async function prepareDefinitions(id){await definitionCapabilities;const r=mounted.get(id);if(!definitionProvider||!r||model.stale)return;if(definitionWarmup.start(model.snapshot,r.sites)){const pending=setTimeout(()=>{if(mounted.get(id)===r){r.warming=true;updateFragmentStatus(r);}},150);void definitionWarmup.wait().finally(()=>{clearTimeout(pending);if(mounted.get(id)===r){r.warming=false;updateFragmentStatus(r);}});}}
 function save(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{if(!model||!storageKey)return;try{localStorage.setItem(storageKey,model.serialize());}catch{notice.show('This browser could not save the visual layout.');}},120);}
 function size(){const r=el('workspace-canvas').getBoundingClientRect();return{w:r.width,h:r.height};}
 function focus(ids){const s=size();model.reveal(ids,s.w,s.h);geometry();save();}
@@ -55,12 +60,12 @@ async function loadSource(id,start){
  try{const query=new URLSearchParams({snapshot:expected,file:s.file,version:s.version,line_start:String(start),line_count:String(Math.min(96,s.end_line-start+1)),outline_count:'1'});const data=await transport('/api/window?'+query,{signal:r.controller.signal});if(mounted.get(id)!==r||r.sourceTicket!==ticket)return;
   if(data.snapshot!==expected||data.file!==s.file||data.version!==s.version||!Array.isArray(data.lines)||data.lines.length>96)throw new Error('Captured source version differs');r.code.replaceChildren();
   for(const line of data.lines){if(line.number>s.end_line)break;const row=node('div');row.className='code-line';row.dataset.line=String(line.number);const number=node('span',String(line.number)),text=node('span');number.className='line-number';renderStyledText(text,line);row.append(number,text);r.code.append(row);}
-  const last=Math.min(s.end_line,data.lines.at(-1)?.number??start);r.sectionLabel.textContent=`Lines ${start}–${last} · ${s.end_line-s.line+1}-line fragment`;r.prev.hidden=start<=s.line;r.next.hidden=last>=s.end_line;r.state.textContent=data.coloring==='ready'?'Captured source':'Styling '+data.coloring;
+  const last=Math.min(s.end_line,data.lines.at(-1)?.number??start);r.sectionLabel.textContent=`Lines ${start}–${last} · ${s.end_line-s.line+1}-line fragment`;r.prev.hidden=start<=s.line;r.next.hidden=last>=s.end_line;sourceStatus(r,data.coloring==='ready'?'Captured source':'Styling '+data.coloring);
   model.read(id,{section:start,top:start===saved.section?saved.top:0,left:saved.left});r.code.scrollTop=model.view(id).reading.top;r.code.scrollLeft=saved.left;save();
- }catch(e){if(e.name==='AbortError')return;if(mounted.get(id)===r&&r.sourceTicket===ticket){r.code.replaceChildren(node('p','Captured fragment unavailable. Old source is not replaced with current bytes.'));r.sectionLabel.textContent='Source unavailable';r.state.textContent=e.message;}}
+ }catch(e){if(e.name==='AbortError')return;if(mounted.get(id)===r&&r.sourceTicket===ticket){r.code.replaceChildren(node('p','Captured fragment unavailable. Old source is not replaced with current bytes.'));r.sectionLabel.textContent='Source unavailable';sourceStatus(r,e.message);}}
 }
 async function loadCalls(id,offset){
- const r=mounted.get(id);if(!r||model.stale)return;const v=model.view(id);try{const data=await post('/api/structure',{snapshot:model.snapshot,query:{kind:'calls',symbol:v.symbol.id,area:v.area||v.symbol.source.path,offset}},r.controller.signal);if(mounted.get(id)!==r||model.stale)return;if(data.snapshot!==model.snapshot||!Array.isArray(data.items)||data.items.length>8)throw new Error('Call response differs');r.sites=offset===0?data.items:[...r.sites,...data.items];r.nextCalls=data.next;r.matching=data.matching;r.callsReady=true;renderCalls(id);}catch(e){if(e.name!=='AbortError'){r.callsReady=true;r.popup.replaceChildren(node('p',e.message));}}
+ const r=mounted.get(id);if(!r||model.stale)return;const v=model.view(id);try{const data=await post('/api/structure',{snapshot:model.snapshot,query:{kind:'calls',symbol:v.symbol.id,area:v.area||v.symbol.source.path,offset}},r.controller.signal);if(mounted.get(id)!==r||model.stale)return;if(data.snapshot!==model.snapshot||!Array.isArray(data.items)||data.items.length>8)throw new Error('Call response differs');r.sites=offset===0?data.items:[...r.sites,...data.items];r.nextCalls=data.next;r.matching=data.matching;r.callsReady=true;renderCalls(id);void prepareDefinitions(id);}catch(e){if(e.name!=='AbortError'){r.callsReady=true;r.popup.replaceChildren(node('p',e.message));}}
 }
 function renderCalls(id){const r=mounted.get(id);if(!r)return;r.popup.replaceChildren(node('p',`${r.sites.length} of ${r.matching} written calls.`));for(const site of r.sites)r.popup.append(button(`${site.name??'Dynamic call'} · line ${site.source.line}`,null,()=>chooseCall(id,site)));if(r.nextCalls!==null&&r.nextCalls!==undefined&&r.sites.length<64)r.popup.append(button('More written calls',null,()=>void loadCalls(id,r.nextCalls)));if(!r.matching)r.popup.append(node('p','No attributed calls recorded. This does not prove no runtime calls.'));}
 function toggleCalls(id){const r=mounted.get(id);if(!r||model.stale)return;hideDestinations();for(const[other,x]of mounted)if(other!==id)x.popup.hidden=true;r.popup.hidden=!r.popup.hidden;if(!r.callsReady)r.popup.replaceChildren(node('p','Loading written calls…'));else renderCalls(id);}
@@ -69,14 +74,14 @@ async function chooseCall(id,site){
  const record=mounted.get(id);if(!record||model.stale)return;const ticket=record.navigation=(record.navigation??0)+1,expected=model.snapshot;let attempted=false,note='',semantic=false;
  await definitionCapabilities;
  if(definitionProvider&&!site.binding&&site.id){
-  attempted=true;record.popup.hidden=true;const pending=setTimeout(()=>{if(mounted.get(id)===record&&record.navigation===ticket)record.state.textContent='Finding definition…';},150);
-  try{const response=await post('/api/call-definition',{snapshot:expected,call:site.id},record.controller.signal);
+  attempted=true;record.popup.hidden=true;const pending=setTimeout(()=>{if(mounted.get(id)===record&&record.navigation===ticket){record.resolving=true;updateFragmentStatus(record);}},150);
+  try{await definitionWarmup.wait();if(mounted.get(id)!==record||record.navigation!==ticket||model.snapshot!==expected||model.stale)return;const response=await post('/api/call-definition',{snapshot:expected,call:site.id},record.controller.signal);
    if(mounted.get(id)!==record||record.navigation!==ticket||model.snapshot!==expected||model.stale)return;
    if(response.snapshot!==expected||response.invocation?.id!==site.id)throw new Error('Definition response differs from the selected call');
    note=response.detail??'';
    if(['unique','ambiguous','outside'].includes(response.state)){site=response.invocation;semantic=site.binding==='language_server_definition';}
   }catch(e){if(e.name==='AbortError')return;if(e.status===409){fail(e);return;}note=e.message;}
-  finally{clearTimeout(pending);if(mounted.get(id)===record&&record.navigation===ticket)record.state.textContent='Captured source';}
+  finally{clearTimeout(pending);if(mounted.get(id)===record&&record.navigation===ticket){record.resolving=false;updateFragmentStatus(record);}}
  }
  if(mounted.get(id)!==record||record.navigation!==ticket||model.snapshot!==expected)return;
 

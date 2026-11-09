@@ -56,8 +56,9 @@ offline; if dependency sources are missing, fetch the locked metadata explicitly
 nor that metadata operation builds the repository.
 
 With the provider enabled, `GsMeter::process` → `self.lufs_meter.process_sample` opens
-`LufsMeter::process_sample` in `gs-meter/src/lufs.rs` directly. The first lookup starts
-the private language-server workspace; subsequent lookups reuse it. Basic browsing stays
+`LufsMeter::process_sample` in `gs-meter/src/lufs.rs` directly. Opening a function starts a single relevant background preparation request.
+A selected call waits for preparation if necessary and is then resolved again against the
+current capture/configuration. Subsequent lookups reuse the private server. Basic browsing stays
 available when the server or project analysis is unavailable.
 
 Fragment search accepts `::` and `.` between captured namespace/type names and ignores

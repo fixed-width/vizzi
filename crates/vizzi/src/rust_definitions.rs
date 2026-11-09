@@ -9,7 +9,7 @@ use std::{
     fs,
     io::Read,
     path::{Path, PathBuf},
-    sync::{Arc, Mutex, TryLockError},
+    sync::{Arc, Mutex},
 };
 use vizzi_core::{model::Snapshot, structure::CallLookup};
 const FILE_BYTES: usize = 8 * 1024 * 1024;
@@ -248,13 +248,10 @@ impl Provider for RustAnalyzer {
         if call.language != "rust" {
             return Err("No definition provider for this language".into());
         }
-        let mut state = match self.state.try_lock() {
-            Ok(g) => g,
-            Err(TryLockError::Poisoned(e)) => e.into_inner(),
-            Err(TryLockError::WouldBlock) => {
-                return Err("Another type-aware lookup is running; retry".into());
-            }
-        };
+        let mut state = self
+            .state
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
         let source = &call.invocation.source;
         let doc = snapshot
             .file(&source.file)

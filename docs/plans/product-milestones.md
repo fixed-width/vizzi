@@ -31,6 +31,12 @@ qualified names and ranks exact function names before partial or enclosing-scope
 Function filtering/ranking precede paging; this remains a supporting entry into the visual
 working set rather than a new search-led product direction.
 
+The [cold-lookup investigation](../../experiments/visual/COLD_LOOKUP_RESULTS.md) isolates
+standard-library import/name-map construction as the dominant first-definition cost.
+One relevant background preparation can now overlap function reading, and the selected
+call is always revalidated. Larger caches, a newer server and full priming did not reduce
+total cold work in the diagnostic runs; cold-start limits remain explicit.
+
 The prepared Minitosis search-led leave/return session was stopped after the direction
 correction on 2026-11-08. Preserve its notes and treat the maintainer's feedback as product
 direction, without inventing task completion/time scores. Earlier checkpoints below are

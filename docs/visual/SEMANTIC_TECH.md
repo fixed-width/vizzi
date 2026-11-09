@@ -26,8 +26,12 @@ changes restart the session; source-only updates reuse it. Targets outside the m
 snapshot remain unavailable to the source viewer. Native snapshot/configuration checks reject
 superseded results. No unrelated source is substituted after a failure.
 
-The browser requests semantic selection only when following a call that lacks a native
-source-local binding. It keeps per-view request guards, displays pending work without
+The browser can prepare analysis with one real unbound captured call after a function
+opens. A small scheduling module admits one preparation at a time, discards destinations
+and resets on capture changes. The foreground selection waits for pending work, then
+requests a fresh definition; it never navigates using speculative results. Native requests
+serialize within the host's bounded work admission, so concurrent preparation cannot produce
+a busy name-match fallback. It keeps per-view request guards, displays pending work without
 replacing the caller, and stores definition evidence with the visual link. A sole complete
 destination opens immediately; a truncated page is not a unique result. Automated tests use
 small real projects and fake protocol peers; user repositories remain read-only. Run focused

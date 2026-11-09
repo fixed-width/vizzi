@@ -169,3 +169,37 @@ fn aliases_and_returned_receiver_values_resolve_without_terminal_name_filters() 
         );
     }
 }
+
+#[test]
+#[ignore = "requires installed rust-analyzer; run explicitly during semantic-provider integration"]
+fn overlapping_definition_requests_share_the_same_preparation() {
+    let root = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    std::fs::write(root.path().join("Cargo.toml"),"[package]\nname=\"semantic_overlap\"\nversion=\"0.1.0\"\nedition=\"2024\"\n[lib]\npath=\"lib.rs\"\n").unwrap();
+    let caller = "mod worker; trait Plugin { fn process(&mut self); } struct Service { meter: worker::Meter } impl Plugin for Service { fn process(&mut self) { self.meter.run(); } }";
+    let worker = "pub struct Meter; impl Meter { pub fn run(&mut self) {} }";
+    for (path, text) in [("lib.rs", caller), ("worker.rs", worker)] {
+        std::fs::write(root.path().join(path), text).unwrap();
+    }
+    let snapshot = capture(&[("lib.rs", caller), ("worker.rs", worker)]);
+    let service = Arc::new(Service::new(
+        root.path().into(),
+        cache.path().into(),
+        "rust-analyzer".into(),
+    ));
+    let first_service = service.clone();
+    let first_snapshot = snapshot.clone();
+    let first = std::thread::spawn(move || {
+        first_service.resolve(first_snapshot.clone(), &call(&first_snapshot))
+    });
+    let start = std::time::Instant::now();
+    while std::fs::read_dir(cache.path()).unwrap().next().is_none() {
+        assert!(start.elapsed() < std::time::Duration::from_secs(10));
+        std::thread::sleep(std::time::Duration::from_millis(1));
+    }
+    let second = service.resolve(snapshot.clone(), &call(&snapshot));
+    let first = first.join().unwrap();
+    assert!(first.is_ok(), "{first:?}");
+    assert!(second.is_ok(), "{second:?}");
+    assert_eq!(std::fs::read_dir(cache.path()).unwrap().count(), 1);
+}

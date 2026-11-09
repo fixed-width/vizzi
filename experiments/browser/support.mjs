@@ -24,7 +24,7 @@ export async function workspace({ files, source, name = "source", sourceArgument
 }
 
 export async function startHost(input, workers = 4, port = 0) {
-  const child = spawn(resolve("target/release/vizzi"), ["--root", input.root, "--cache", input.cache, "--port", String(port), "--workers", String(workers), ...(input.sourceArguments ?? [])], { stdio: ["ignore", "ignore", "pipe"] });
+  const child = spawn(resolve(input.executable ?? "target/release/vizzi"), ["--root", input.root, "--cache", input.cache, "--port", String(port), "--workers", String(workers), ...(input.sourceArguments ?? [])], { stdio: ["ignore", "ignore", "pipe"] });
   let stderr = "";
   const url = await new Promise((accept, reject) => {
     const timeout = setTimeout(() => { child.kill("SIGKILL"); reject(new Error(`Host startup timed out: ${stderr}`)); }, input.startupTimeoutMs ?? 30000);

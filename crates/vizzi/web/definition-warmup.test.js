@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import {DefinitionWarmup} from './definition-warmup.js';
+const a='a'.repeat(64),b='b'.repeat(64),call='c'.repeat(64);
+let complete;const requests=[];
+const warmup=new DefinitionWarmup(async(snapshot,id)=>{requests.push([snapshot,id]);return new Promise(resolve=>{complete=resolve;});});
+assert.equal(warmup.start(a,[{id:call,name:'run'}]),true);assert.equal(warmup.start(a,[{id:'d'.repeat(64),name:'other'}]),false);await Promise.resolve();assert.deepEqual(requests,[[a,call]]);
+let finished=false;const wait=warmup.wait().then(()=>{finished=true;});await Promise.resolve();assert.equal(finished,false);complete({snapshot:a,state:'outside'});await wait;assert.equal(finished,true);assert.equal(warmup.start(a,[{id:'d'.repeat(64),name:'other'}]),false);
+assert.equal(warmup.start(b,[{id:call,name:'run',binding:'rust_self_receiver'}]),false);assert.equal(warmup.start(b,[{id:call,name:null}]),false);assert.equal(warmup.start(b,[{id:call,name:'run'}]),true);await Promise.resolve();complete({snapshot:b,state:'unavailable'});await warmup.wait();assert.equal(warmup.start(b,[{id:call,name:'run'}]),false);assert.equal(warmup.start(b,[{id:'d'.repeat(64),name:'other'}]),true);await Promise.resolve();complete({snapshot:b,state:'unique'});await warmup.wait();
+const failure=new DefinitionWarmup(async()=>{throw new Error('provider unavailable');});assert.equal(failure.start(a,[{id:call,name:'run'}]),true);await failure.wait();assert.equal(failure.start(a,[{id:'e'.repeat(64),name:'retry'}]),true);await failure.wait();
+let endOld;const changed=new DefinitionWarmup(async()=>new Promise(resolve=>{endOld=resolve;}));changed.start(a,[{id:call,name:'run'}]);await Promise.resolve();assert.equal(changed.start(b,[{id:call,name:'run'}]),false);endOld({snapshot:a,state:'unique'});await changed.wait();assert.equal(changed.start(b,[{id:call,name:'run'}]),true);await Promise.resolve();endOld({snapshot:b,state:'unique'});await changed.wait();
+console.log('definition warmup: one background job, foreground waiting, no cached destinations, source change, unsupported/failed analysis and retries');
+for(const state of ['unique','ambiguous','outside','unresolved']){const ready=new DefinitionWarmup(async()=>({snapshot:a,state}));ready.start(a,[{id:call,name:'run'}]);await ready.wait();assert.equal(ready.start(a,[{id:'f'.repeat(64),name:'different'}]),false,state);}
+const wrongSnapshot=new DefinitionWarmup(async()=>({snapshot:b,state:'unique'}));wrongSnapshot.start(a,[{id:call,name:'run'}]);await wrongSnapshot.wait();assert.equal(wrongSnapshot.start(a,[{id:'f'.repeat(64),name:'different'}]),true);await wrongSnapshot.wait();
+const invalidState=new DefinitionWarmup(async()=>({snapshot:a,state:'bogus'}));invalidState.start(a,[{id:call,name:'run'}]);await invalidState.wait();assert.equal(invalidState.start(a,[{id:'f'.repeat(64),name:'different'}]),true);await invalidState.wait();
