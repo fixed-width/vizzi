@@ -259,6 +259,14 @@ fn metadata_operations_do_not_load_private_backing() {
     let inv = index.inventory("scope", "start", 0).unwrap();
     assert_eq!(
         index
+            .actions(&inv.items[0].symbol.id, 1, 1, 0)
+            .unwrap()
+            .items[0]
+            .name,
+        "finish"
+    );
+    assert_eq!(
+        index
             .outgoing(&inv.items[0].symbol.id, "scope", 0)
             .unwrap()
             .items[0]

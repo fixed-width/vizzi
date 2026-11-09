@@ -17,6 +17,17 @@ pub struct Request {
 #[derive(Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
 pub enum Operation {
+    /// Decorate exact call identifiers in a captured source section.
+    Actions {
+        /// Declaration identity from this observation.
+        symbol: String,
+        /// First visible one-based line.
+        line_start: usize,
+        /// Visible line allowance, at most 96.
+        line_count: usize,
+        /// Continuation offset for the finite action page.
+        offset: usize,
+    },
     /// Find source directories/files.
     Areas {
         /// Literal name/path substring.
@@ -109,6 +120,16 @@ impl StructureHost {
             .ok_or_else(|| CompanionError::Unavailable("Structure is unavailable".into()))?
             .index;
         let value = match &request.query {
+            Operation::Actions {
+                symbol,
+                line_start,
+                line_count,
+                offset,
+            } => serde_json::to_value(
+                index
+                    .actions(symbol, *line_start, *line_count, *offset)
+                    .map_err(|e| CompanionError::Invalid(e.to_string()))?,
+            ),
             Operation::Areas { search, offset } => serde_json::to_value(
                 index
                     .areas(search, *offset)

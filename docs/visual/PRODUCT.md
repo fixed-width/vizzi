@@ -18,6 +18,14 @@ reference, with no separate design mock.
   distinct from name candidates, as described in [call destination selection](../explanation/call-destinations.md).
   The [type-aware follow-up](SEMANTIC_PRODUCT.md) resolves ordinary receivers through a
   configured language provider. Links identify their call site and evidence rather than claiming runtime execution.
+- Captured call identifiers are underlined directly in the source, with hover and keyboard
+  focus feedback. Click opens a small action menu; **Open definition** follows the call.
+  Ctrl-click (Cmd-click on macOS) follows directly using the same destination rules.
+  Enter/Space/Down opens the menu on a focused identifier, Ctrl/Cmd+Enter follows directly,
+  and Escape dismisses the menu and returns focus. Source remains selectable; dragging
+  a selection does not navigate. Comments, strings and declaration names are not call links.
+  The menu admits future actions without presenting unimplemented controls. **Calls** remains
+  available when an identifier is outside the visible section or cannot be decorated safely.
 - Following another step retains the chain. A branch opens into free space without globally
   rearranging existing views. Recursion/revisiting an open fragment reveals that existing
   view and link instead of recursively creating an unbounded graph.

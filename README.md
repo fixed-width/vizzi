@@ -11,7 +11,8 @@ checks, captured call candidates and explicit VS Code handoff are implemented fo
 The first [visual call-trail prototype](docs/how-to/follow-a-call-trail.md) is available
 at `/workspace`: source fragments stay open while callees and branches are added; their
 layout, camera and reading state restore locally in the browser. Candidate arrows retain
-the analysis limitations. Optional [type-aware navigation](docs/visual/SEMANTIC_PRODUCT.md)
+the analysis limitations. Underlined call names open an action menu; Ctrl/Cmd-click follows
+directly ([validation](experiments/visual/INLINE_CALL_RESULTS.md)). Optional [type-aware navigation](docs/visual/SEMANTIC_PRODUCT.md)
 uses rust-analyzer definitions for field/variable calls while keeping captured-source checks.
 Rust/Python are selected by default; explicit scopes enable
 raw C/C++ analysis. Normal editing stays in the editor, with richer plugin integration

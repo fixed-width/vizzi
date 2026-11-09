@@ -13,7 +13,8 @@ target/release/vizzi --root /path/to/repository --cache /tmp/vizzi-call-trail --
 Open `http://127.0.0.1:7474/workspace`. Select **Add fragment**, find a function by name or qualified name (for example `LufsMeter::process_sample`),
 and choose its source location. Its captured declaration opens on the canvas.
 
-Select **Calls** in that fragment, then a written call. A supported source-local destination opens directly. If
+Click an underlined call name in the source, then choose **Open definition**. Use
+Ctrl-click (Cmd-click on macOS) to follow it immediately. A supported source-local destination opens directly. If
 several unresolved declarations share the terminal name, choose a candidate using its
 containing declaration and file. The destination
 opens beside the caller; an already-open destination is revealed instead. Follow another
@@ -21,6 +22,11 @@ step, or return to an earlier caller and open a branch. Existing panes retain th
 and reading positions. Solid **self call** arrows record Rust receiver bindings; dashed **candidate** arrows
 record name-based choices. [Destination selection](../explanation/call-destinations.md) explains
 the distinction.
+
+With the keyboard, Tab to a call name and press Enter, Space or Down to open its menu;
+Ctrl/Cmd+Enter follows directly. Escape closes the menu and returns focus to the name.
+You can still select and copy source text. **Calls** lists written calls when their
+identifiers are outside the current section or cannot be decorated.
 
 Drag a header to arrange a fragment. Drag its lower-right grip to resize it; focus a header
 or grip and use arrow keys for the same operations. Collapse an earlier step to retain its

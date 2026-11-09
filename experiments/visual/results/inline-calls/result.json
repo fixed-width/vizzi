@@ -1,0 +1,135 @@
+{
+  "schema": 1,
+  "kind": "source-informed semantic functional replay",
+  "sourceRevision": "951cf85413029423e036c641638b845edafe75cf",
+  "binarySha256": "b0d474c9d461cac1eaeca4e828dcac1464cc73dd9b8dc79e6953ce2ded0a57b4",
+  "records": [
+    {
+      "case": {
+        "owner": "process",
+        "parents": "GsMeter",
+        "area": "gs-meter/src/lib.rs",
+        "spelling": "self.lufs_meter.process_sample",
+        "path": "gs-meter/src/lufs.rs",
+        "target": "LufsMeter"
+      },
+      "interaction": "inline menu",
+      "initialNameCandidates": 8,
+      "semantic": {
+        "snapshot": "7140b3bad8b5c030a75df94df81d06c2fed0942846653189a61abbe53232471e",
+        "state": "unique",
+        "invocation": {
+          "semantic_context": "3a5091c15879901ce2f6aa940481a9e500ef7b4febe33b134951c8cce92b9b9e",
+          "id": "c0f618bbc2d23942073b77c2fdacfc795560c94b6ebcc1f068993689b36b4ec3",
+          "binding": "language_server_definition",
+          "spelling": "self.lufs_meter.process_sample",
+          "name": "process_sample",
+          "source": {
+            "path": "gs-meter/src/lib.rs",
+            "file": "2570c9080f44372153dd4ee9fff51eee596544db7c743d0522f9d3db76978e3f",
+            "version": "e0e11a8f70008733377ab1681425861144f47d485b828650052dffed9086cafd",
+            "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+            "line": 317,
+            "end_line": 317
+          },
+          "owner": "e3c082652ed2f6cd8df529fdfd03adf26a069b2eec9f9460812e4e2f5aa645b6",
+          "candidates": [
+            {
+              "id": "f6ab05de663a8622955cd770727a3ae5ee2849dbdc2e7ddad59a205700551f97",
+              "name": "process_sample",
+              "kind": "function",
+              "parents": [
+                "LufsMeter"
+              ],
+              "source": {
+                "path": "gs-meter/src/lufs.rs",
+                "file": "3855c767d40575e42896bec422903acfbe2473ca9e3124741c4267146cdbf4d8",
+                "version": "dbfd1aae98158154a678e0610d159c965bd0f264c73d9e210ffd2bdc695c8359",
+                "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+                "line": 290,
+                "end_line": 346
+              }
+            }
+          ],
+          "candidate_count": 1,
+          "outside_area": false
+        },
+        "detail": null
+      },
+      "callerRetained": true,
+      "browserRequestMs": 111.84134300000005,
+      "readingMs": 12000,
+      "fragmentToResponseMs": 12113.771082000001,
+      "warmRequestMs": [
+        7.65756699999838,
+        8.039279000000533,
+        4.773185999998532
+      ]
+    },
+    {
+      "case": {
+        "owner": "render",
+        "parents": "Minitosis",
+        "area": "minitosis/src/lib.rs",
+        "spelling": "self.processor.process_sample",
+        "path": "minitosis/src/engine.rs",
+        "target": "Processor"
+      },
+      "interaction": "Ctrl-click",
+      "initialNameCandidates": 8,
+      "semantic": {
+        "snapshot": "7140b3bad8b5c030a75df94df81d06c2fed0942846653189a61abbe53232471e",
+        "state": "unique",
+        "invocation": {
+          "semantic_context": "3a5091c15879901ce2f6aa940481a9e500ef7b4febe33b134951c8cce92b9b9e",
+          "id": "e36618d4b90ff34dbdf2eb8cfd1d4bfed9e35ede8520d753e699f0931105bef6",
+          "binding": "language_server_definition",
+          "spelling": "self.processor.process_sample",
+          "name": "process_sample",
+          "source": {
+            "path": "minitosis/src/lib.rs",
+            "file": "0b953368e58dd6222a4fd4351f1f4df4d1f2af27b214a9146ef6473da924f9c5",
+            "version": "056e36f133e4d4272382b0cf9b326492698c095f9eb49d83353acb260c2bfb3a",
+            "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+            "line": 167,
+            "end_line": 167
+          },
+          "owner": "9430e98e55372a8d0da180a9271c467d8a27b8b0f93b905f7b37b7c939562f21",
+          "candidates": [
+            {
+              "id": "282a1407c16f1dbff9302bb48e6f632e013684621120f3811e4c77e8b3952413",
+              "name": "process_sample",
+              "kind": "function",
+              "parents": [
+                "Processor"
+              ],
+              "source": {
+                "path": "minitosis/src/engine.rs",
+                "file": "a0c63ad80adcd73c9be9ad5cbf35e730e7fcfe90dd1d44b65a40fdf2df773d12",
+                "version": "92e813a4227bca34e7d0eb94b82107b84b2adcc4a4813b9ebed89178d4970343",
+                "context": "310544086952f61f46b9f6a94b3d78ea5c5fd7d010e48e64f9a770a80d589e95",
+                "line": 89,
+                "end_line": 104
+              }
+            }
+          ],
+          "candidate_count": 1,
+          "outside_area": false
+        },
+        "detail": null
+      },
+      "callerRetained": true,
+      "browserRequestMs": 158.88054499999998,
+      "readingMs": 12000,
+      "fragmentToResponseMs": 12160.183289,
+      "warmRequestMs": [
+        8.05290999999852,
+        4.829946000001655,
+        4.342753999997512
+      ]
+    }
+  ],
+  "pageErrors": [],
+  "measurement": "Single sequential session after other checks stopped; cold/warm observations, not latency qualification.",
+  "limitations": "Known source, configured Rust language server, builds/procedural macros disabled; not runtime dispatch, complete language coverage or independent usability."
+}

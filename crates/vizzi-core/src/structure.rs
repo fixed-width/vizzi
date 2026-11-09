@@ -120,7 +120,30 @@ pub struct Invocation {
     /// Site is outside the selected source area.
     pub outside_area: bool,
 }
+/// A captured identifier range, with UTF-8 byte columns within one source line.
+#[derive(Clone, Debug, Serialize)]
+pub struct CallPosition {
+    /// One-based source line containing the identifier.
+    pub line: usize,
+    /// Inclusive UTF-8 byte column.
+    pub start: usize,
+    /// Exclusive UTF-8 byte column.
+    pub end: usize,
+}
+/// Lightweight source action; destinations are retrieved by native identity on selection.
+#[derive(Clone, Debug, Serialize)]
+pub struct CallAction {
+    /// Observation-bound call identity.
+    pub id: String,
+    /// Exact identifier text.
+    pub name: String,
+    /// Captured location to decorate without text-name matching.
+    pub position: CallPosition,
+    /// Source-local evidence, when already known.
+    pub binding: Option<TargetBasis>,
+}
 struct Site {
+    position: Option<CallPosition>,
     id: String,
     identifier: Option<std::ops::Range<usize>>,
     language: String,
@@ -324,6 +347,15 @@ impl Structure {
                     index.uses.entry(name.clone()).or_default().push(n);
                 }
                 index.sites.push(Site {
+                    position: call.name_span.as_ref().and_then(|span| {
+                        let lines = doc.lines(span);
+                        let line = doc.captured().line_range(lines.start)?;
+                        (lines.start == lines.end && span.end <= line.end).then_some(CallPosition {
+                            line: lines.start,
+                            start: span.start - line.start,
+                            end: span.end - line.start,
+                        })
+                    }),
                     id: blake3::hash(
                         format!(
                             "{}:{}:{}:{}:{}:{}",
@@ -551,6 +583,39 @@ impl Structure {
             offset,
             SITES,
             |n| self.invocation(&self.sites[*n], area),
+        ))
+    }
+    /// Returns identifier actions in a bounded visible section, without source IO or name expansion.
+    pub fn actions(
+        &self,
+        id: &str,
+        line_start: usize,
+        line_count: usize,
+        offset: usize,
+    ) -> Result<Page<CallAction>, Error> {
+        self.symbol(id)?;
+        if line_start == 0 || !(1..=96).contains(&line_count) {
+            return Err(Error(
+                "Call actions require a positive source line and at most 96 lines".into(),
+            ));
+        }
+        let end = line_start.saturating_add(line_count);
+        Ok(self.page(
+            self.owners.get(id).into_iter().flatten().filter_map(|n| {
+                let site = &self.sites[*n];
+                let position = site.position.as_ref()?;
+                let name = site.name.as_ref()?;
+                (position.line >= line_start && position.line < end)
+                    .then_some((site, position, name))
+            }),
+            offset,
+            256,
+            |(site, position, name)| CallAction {
+                id: site.id.clone(),
+                name: name.clone(),
+                position: position.clone(),
+                binding: site.target.as_ref().map(|(_, basis)| *basis),
+            },
         ))
     }
     /// Lists sites sharing a declaration's terminal name; same-name ambiguity is preserved.

@@ -53,6 +53,18 @@ fn native_operations_bind_symbols_to_the_current_capture_and_refuse_old_requests
     assert_eq!(symbol["source"]["version"], doc.version().as_str());
     let calls:Request=serde_json::from_value(json!({"snapshot":snapshot,"query":{"kind":"calls","symbol":symbol["id"],"area":"pipe","offset":0}})).unwrap();
     assert_eq!(app.query(&calls).unwrap()["items"][0]["spelling"], "relay");
+    let actions: Request = serde_json::from_value(json!({"snapshot":snapshot,"query":{"kind":"actions","symbol":symbol["id"],"line_start":1,"line_count":1,"offset":0}})).unwrap();
+    let annotations = app.query(&actions).unwrap();
+    assert_eq!(annotations["snapshot"], snapshot);
+    assert_eq!(
+        annotations["items"][0]["id"],
+        app.query(&calls).unwrap()["items"][0]["id"]
+    );
+    assert_eq!(
+        annotations["items"][0]["position"],
+        json!({"line":1,"start":13,"end":18})
+    );
+    assert!(serde_json::from_value::<Request>(json!({"snapshot":snapshot,"query":{"kind":"actions","symbol":symbol["id"],"line_start":1,"line_count":1,"offset":0,"text":"relay"}})).is_err());
     std::fs::write(root.path().join("pipe/main.rs"), "fn changed() {}\n").unwrap();
     host.request(vizzi::source::CaptureScope::Reconcile);
     let start = std::time::Instant::now();
@@ -61,6 +73,7 @@ fn native_operations_bind_symbols_to_the_current_capture_and_refuse_old_requests
         std::thread::sleep(std::time::Duration::from_millis(10));
     }
     assert!(app.query(&calls).is_err());
+    assert!(app.query(&actions).is_err());
     let current_snapshot = host
         .application()
         .snapshot()

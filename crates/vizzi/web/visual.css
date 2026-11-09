@@ -12,3 +12,6 @@
 #workspace-links path.self-call{stroke-dasharray:none}
 
 #workspace-links path.definition-call{stroke-dasharray:none}
+
+.code-call{display:inline;margin:0;padding:0;border:0;border-radius:2px;background:transparent;color:var(--link);font:inherit;line-height:inherit;vertical-align:baseline;text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:3px;cursor:pointer;user-select:text}.code-call:hover,.code-call[aria-expanded="true"]{background:var(--selected-bg)}.code-call:focus-visible{outline:2px solid var(--focus);outline-offset:2px;background:var(--selected-bg)}.code-call[aria-disabled="true"]{cursor:default;text-decoration-color:var(--muted)}
+.call-action-menu{position:fixed;z-index:60;min-width:210px;max-width:calc(100vw - 16px);padding:5px;background:var(--paper);color:var(--text);border:1px solid var(--border);border-radius:6px;box-shadow:0 7px 22px #0003}.call-action-menu button{display:flex;align-items:center;justify-content:space-between;gap:18px;width:100%;text-align:left;border:0;padding:10px;font-size:12px}.call-action-menu small{font-size:10px;color:var(--muted)}

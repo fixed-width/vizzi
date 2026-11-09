@@ -13,6 +13,21 @@ a sole target and its evidence kind, or the existing bounded candidates. The opt
 [definition provider](SEMANTIC_TECH.md) handles other calls on demand through standard LSP,
 without adding type heuristics to the browser or structure index.
 
+The `actions` structure projection returns captured identifier line/UTF-8 byte columns,
+opaque call identity and any source-local binding. It reads metadata, without loading source
+or expanding name candidates. Queries cover at most 96 lines and page at 256 actions; the
+browser permits at most 16 pages/4,096 actions per section. Captured source and action
+metadata load together. The renderer validates exact identifier bytes, rejects overlapping
+or left-clipped ranges, and preserves syntax spans and source characters. An identifier's
+action retrieves the full native call witness through `/api/call-definition`, including
+when no language provider is configured. Existing source/current-snapshot checks and
+destination rules apply to both inline and Calls navigation.
+
+A separate menu overlay uses viewport coordinates outside the transformed canvas, so zoom
+and pane clipping do not scale or cut off its controls. Focus, selection, keyboard shortcuts
+and dismissal belong to this presentation module; future actions can extend its action list.
+Stale observations disable inline actions and dismiss the menu while retaining loaded source.
+
 A browser presentation module owns a versioned visual-workspace document: view identities,
 source bindings, rectangles/collapse state, reading sections/scrolls, camera and visual links.
 Its small interface opens roots/destinations, moves/resizes/collapses/closes views and
