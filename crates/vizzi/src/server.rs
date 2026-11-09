@@ -97,6 +97,7 @@ pub fn router(application: Arc<Application>) -> Router {
         .route("/visual.css", get(|| async { asset("text/css; charset=utf-8", include_str!("../web/visual.css")) }))
         .route("/reflow.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/reflow.js")) }))
         .route("/reflow-text.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/reflow-text.js")) }))
+        .route("/source-margin.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/source-margin.js")) }))
         .route("/source-pane.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/source-pane.js")) }))
         .route("/call-actions.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/call-actions.js")) }))
         .route("/call-ranges.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/call-ranges.js")) }))

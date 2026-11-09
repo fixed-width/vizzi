@@ -1,5 +1,5 @@
 // Layout uses captured byte offsets; language rules stay in the native hint provider.
-export function planReflow(line,width,measure) {
+export function planReflow(line,width,measure,margin={bytes:0,columns:0}) {
     const bytes=new TextEncoder().encode(line.text),original=[{start:0,end:bytes.length,indent:0}],h=line.reflow;
     if(line.left||!h||!Array.isArray(h.points)||h.points.length>256||!h.points.length||bytes.length>4096||!Number.isFinite(width)||width<=0)return original;
     const indices=new Map([[0,0]]);let at=0,index=0;
@@ -10,7 +10,7 @@ export function planReflow(line,width,measure) {
     try {
         const cache=new Map();let work=0;
         const measured=text=>{if(!cache.has(text)){if(++work>4096)throw Error('Reflow work allowance');const value=measure(text);if(!Number.isFinite(value)||value<0)throw Error('Invalid font measure');cache.set(text,value);}return cache.get(text);};
-        const slice=(start,end)=>line.text.slice(indices.get(start),indices.get(end));
+        const slice=(start,end)=>start===0?(end===0?'':' '.repeat(margin.columns)+line.text.slice(indices.get(Math.min(margin.bytes,end)),indices.get(end))):line.text.slice(indices.get(start),indices.get(end));
         const size=(start,end)=>measured(slice(start,end).replace(/[ \t]+$/,''));
         const base=measured(slice(0,h.leading)),step=measured('    ');
         const indentation=point=>{const aligned=point.anchor==null?Infinity:measured(slice(0,point.anchor));return aligned<=width/2?aligned:Math.min(base+step,width/3);};

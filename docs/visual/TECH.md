@@ -52,6 +52,15 @@ do not change the layout width. Keep the existing palette/fonts and avoid extra 
 controls or formatting animation. The Code Bubbles papers are the interaction reference;
 there is no separate mock.
 
+The source pane also accepts a fixed function margin in display columns (four-column tab
+stops). Its controller derives it from the captured declaration line, caching it for later
+sections. A restored later section fetches one bounded, pinned declaration window alongside
+its body and validates the same snapshot/file/version. Baselines do not come from the
+visible body's minimum indentation. Rendering hides original leading whitespace in the DOM
+and supplies the remaining relative width as decoration; source strings and call offsets
+are unchanged. Reflow measures the displayed prefix and delimiter anchors. Both layout
+modes apply the same margin. Copying from a visible line start restores its hidden prefix.
+
 A browser presentation module owns a versioned visual-workspace document: view identities,
 source bindings, rectangles/collapse state, reading sections/scrolls, camera and visual links.
 Its small interface opens roots/destinations, moves/resizes/collapses/closes views and

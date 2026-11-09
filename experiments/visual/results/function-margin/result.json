@@ -1,0 +1,385 @@
+{
+  "schema": 1,
+  "kind": "known-source reflow functional replay and instrumented local layout observation",
+  "sourceRevision": "951cf85413029423e036c641638b845edafe75cf",
+  "binarySha256": "5225615457bc405be8bcb4a2e62d3044cddfaa8547c7d3204e7b57542d3b2a72",
+  "observations": [
+    {
+      "title": "Plugin for Minitosis::process",
+      "physicalRows": 19,
+      "displayRows": 20,
+      "calls": 8,
+      "textSha256": "405356f05f8f2d23da0b9c5982f13f732f883993e8877939bd9b976be1ba5af9"
+    },
+    {
+      "title": "Minitosis::render",
+      "physicalRows": 72,
+      "displayRows": 96,
+      "calls": 36,
+      "textSha256": "b81b450a1c75f008945b05e82b0ae7e26bf3babe1d3875d2f2839ada7435dc7c"
+    },
+    {
+      "title": "Plugin for GsMeter::process",
+      "physicalRows": 96,
+      "displayRows": 137,
+      "calls": 47,
+      "textSha256": "9253b6fc8bfe22ae3c40c3ab0fb30b468ff8c2bc5992775296c8399f75ad14c9"
+    }
+  ],
+  "summary": {
+    "samples": 69,
+    "medianMs": 1,
+    "p95Ms": 1.9000000059604645,
+    "maxMs": 4.5999999940395355,
+    "sourceRequestsDuringResize": 0
+  },
+  "costs": [
+    {
+      "ms": 3,
+      "width": "424px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 4.5999999940395355,
+      "width": "376px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1.5,
+      "width": "344px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1.2000000178813934,
+      "width": "328px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1.2999999821186066,
+      "width": "320px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1.2999999821186066,
+      "width": "320px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1.699999988079071,
+      "width": "368px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1.4000000059604645,
+      "width": "384px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1.4000000059604645,
+      "width": "400px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1.0999999940395355,
+      "width": "432px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1.0999999940395355,
+      "width": "448px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.6000000238418579,
+      "width": "448px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1.9000000059604645,
+      "width": "496px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.800000011920929,
+      "width": "512px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1,
+      "width": "528px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.699999988079071,
+      "width": "560px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.699999988079071,
+      "width": "576px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.7000000178813934,
+      "width": "592px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.7000000178813934,
+      "width": "624px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.699999988079071,
+      "width": "640px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.699999988079071,
+      "width": "656px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.699999988079071,
+      "width": "672px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.5999999940395355,
+      "width": "704px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.800000011920929,
+      "width": "720px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1.5,
+      "width": "720px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1.2999999821186066,
+      "width": "768px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.8999999761581421,
+      "width": "784px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1,
+      "width": "800px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.5999999940395355,
+      "width": "816px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.5999999940395355,
+      "width": "848px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.7999999821186066,
+      "width": "880px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.7999999821186066,
+      "width": "896px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.9000000059604645,
+      "width": "912px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1,
+      "width": "928px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1,
+      "width": "944px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1,
+      "width": "960px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.7999999821186066,
+      "width": "960px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.9000000059604645,
+      "width": "928px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.7999999821186066,
+      "width": "912px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.800000011920929,
+      "width": "896px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1.4000000059604645,
+      "width": "880px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1,
+      "width": "864px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1.7000000178813934,
+      "width": "848px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1.7000000178813934,
+      "width": "848px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.5999999940395355,
+      "width": "800px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1.2000000178813934,
+      "width": "768px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1.199999988079071,
+      "width": "752px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.699999988079071,
+      "width": "752px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.7999999821186066,
+      "width": "704px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1.0999999940395355,
+      "width": "688px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1.4000000059604645,
+      "width": "672px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1.100000023841858,
+      "width": "640px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.8999999761581421,
+      "width": "640px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.699999988079071,
+      "width": "592px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1.199999988079071,
+      "width": "592px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.7000000178813934,
+      "width": "560px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1.199999988079071,
+      "width": "544px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.5,
+      "width": "528px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.5999999940395355,
+      "width": "496px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1.300000011920929,
+      "width": "480px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.699999988079071,
+      "width": "464px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.699999988079071,
+      "width": "448px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1,
+      "width": "448px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1.4000000059604645,
+      "width": "400px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1.5999999940395355,
+      "width": "384px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1.4000000059604645,
+      "width": "368px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 2.2000000178813934,
+      "width": "336px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 1.9000000059604645,
+      "width": "320px",
+      "physicalRows": 19
+    },
+    {
+      "ms": 0.7999999821186066,
+      "width": "320px",
+      "physicalRows": 19
+    }
+  ],
+  "pageErrors": [],
+  "limitations": "One isolated Chromium session on this host after other checks stopped. Instrumentation includes SourcePane.update and synchronous layout, not full frame/GPU time or baseline-laptop qualification. Known Rust call trail; mixed-language correctness has separate fixtures. No source edits, repository builds or editor launch."
+}

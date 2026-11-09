@@ -1,0 +1,36 @@
+{
+  "$schema": "../../node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "mutate": [
+    "crates/vizzi/web/source-margin.js",
+    "crates/vizzi/web/reflow.js"
+  ],
+  "testRunner": "command",
+  "commandRunner": {
+    "command": "node crates/vizzi/web/source-margin.test.js && node crates/vizzi/web/reflow.test.js"
+  },
+  "coverageAnalysis": "off",
+  "concurrency": 1,
+  "timeoutMS": 5000,
+  "reporters": [
+    "clear-text",
+    "json"
+  ],
+  "clearTextReporter": {
+    "reportMutants": false,
+    "logTests": false
+  },
+  "jsonReporter": {
+    "fileName": "/tmp/vizzi-function-margin-mutations.json"
+  },
+  "thresholds": {
+    "break": null
+  },
+  "ignorePatterns": [
+    "**",
+    "!package.json",
+    "!crates/vizzi/web/source-margin.js",
+    "!crates/vizzi/web/source-margin.test.js",
+    "!crates/vizzi/web/reflow.js",
+    "!crates/vizzi/web/reflow.test.js"
+  ]
+}

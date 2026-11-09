@@ -37,6 +37,14 @@ the canvas therefore does not reformat source. Resizing coalesces through the br
 animation frame and changes only affected line layouts. Source-window queries opt into
 hints once; resizing and changing layout mode do not request source or run a formatter.
 
+A function fragment removes its enclosing file indentation from the display. The captured
+declaration line supplies a fixed baseline, including when a later section is restored.
+Tabs are interpreted at four-column stops and internal indentation is retained relative to
+that baseline. Original whitespace remains in hidden DOM text; decorative width represents
+the remaining columns, so copying and call byte offsets retain the original source. Reflow
+uses those displayed columns for width and hanging alignment. This differs from removing
+the smallest indentation in whichever body section happens to be loaded.
+
 ## Preserve the reader's context
 
 Every logical row retains its physical source line number. Continuations have a separate

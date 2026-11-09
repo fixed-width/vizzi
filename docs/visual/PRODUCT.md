@@ -43,6 +43,12 @@ reference, with no separate design mock.
   identifiers and other indivisible tokens may still require horizontal scrolling; clipped
   source remains explicitly clipped. Missing language/style support falls back to original
   lines. Language rules must not be hard-coded into the browser layout.
+- Source fragments remove the function's file-level leading indentation from display in
+  both layout modes. The first captured declaration line establishes a fixed baseline;
+  later sections and reloads use that same baseline. Relative body/continuation indentation,
+  including tabs and mixed whitespace, is retained. Lines indented less than the baseline
+  stop at the gutter. Copying retains original source indentation and original byte/line
+  identities continue to drive navigation and editor handoff.
 - Canvas/background dragging and ordinary wheel panning move the workspace. Zoom is explicit
   through controls or modified wheel. Code-pane scrolling stays local. Opening a destination
   reveals it with its parent where viewport size allows; overview/fit controls recover earlier

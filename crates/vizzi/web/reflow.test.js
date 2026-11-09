@@ -46,3 +46,15 @@ let calls=0;const words=Array.from({length:255},(_,i)=>'w'+i.toString().padStart
 planReflow(stressful,100,value=>{calls++;if(!value.trim())return 0;if(value.includes('END'))return 101;return value.trim().includes(' ')?0:99;});assert.ok(calls<=4096,'measurement work stays bounded even for a pathological font provider');
 const badEnd={...line(utf,[]),reflow:{leading:0,points:[p(offset),p(bytes.length)]}};assert.deepEqual(planReflow(badEnd,17,mono),original(badEnd));
 assert.equal(planReflow(line('aaa bbb ccc ddd',[p(4),p(8),p(12)]),7,mono)[0].end,8);
+
+// Removing a fragment margin increases usable width while source byte partitions stay original.
+const shifted=planReflow(input,35,mono,{bytes:4,columns:0});
+assert.equal(shifted.map(s=>text.slice(s.start,s.end)).join(''),text);
+assert.equal(shifted[1].indent,8,'delimiter alignment uses the displayed column');
+assert.deepEqual(planReflow(input,text.length-4,mono,{bytes:4,columns:0}),original(input));
+const tabbed=line('\t\tf(firstarg, secondarg)',[p(4,1,4),p(14,0,4)],2);
+assert.equal(planReflow(tabbed,18,mono,{bytes:2,columns:2})[1].indent,4);
+const topLevel=line('extremely_long_function_name(first_argument, second_argument)',[p(29,1,29),p(45,0,29)]);
+assert.equal(planReflow(topLevel,40,mono)[1].indent,4);
+const relative=line('        f(first_argument, second_argument)',[p(26,0,0)],8);
+assert.equal(planReflow(relative,30,mono,{bytes:8,columns:4})[1].indent,0);

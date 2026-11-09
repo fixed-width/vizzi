@@ -2,8 +2,8 @@ import {renderReflowText} from './reflow-text.js';
 import {callRanges} from './call-ranges.js';
 
 // Keep source characters and syntax spans intact; controls wrap only native identifier ranges.
-export function renderCallText(node,line,actions,activate,plan=null) {
-    renderReflowText(node,line,plan);
+export function renderCallText(node,line,actions,activate,plan=null,margin={bytes:0,columns:0}) {
+    renderReflowText(node,line,plan,margin);
     const ranges=callRanges(line,actions);if(!ranges.length)return;
     const document=node.ownerDocument,offsets=new Map([[0,0]]);let byte=0,index=0;
     for(const ch of line.text){const value=ch.codePointAt(0);byte+=value<128?1:value<2048?2:value<65536?3:4;index+=ch.length;offsets.set(byte,index);}

@@ -12,6 +12,9 @@ target/release/vizzi --root /path/to/repository --cache /tmp/vizzi-call-trail --
 
 Open `http://127.0.0.1:7474/workspace`. Select **Add fragment**, find a function by name or qualified name (for example `LufsMeter::process_sample`),
 and choose its source location. Its captured declaration opens on the canvas.
+The function starts at the code gutter, with its enclosing file/class/implementation
+indentation removed from display. Internal nesting stays relative to it. This applies
+across sections and both code-layout modes; copied source keeps its original indentation.
 
 Click an underlined call name in the source, then choose **Open definition**. Use
 Ctrl-click (Cmd-click on macOS) to follow it immediately. A supported source-local destination opens directly. If

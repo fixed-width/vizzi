@@ -1,0 +1,14 @@
+{
+  "browser-tests.log.gz": "a34b04287cd403a30f989e7c14f6e4b95112fd5146258a7bf89193250d97021f",
+  "clippy.log.gz": "6b5c0d7418e1e0f5d93e8cece757b39b28d75e4ead4db1bf5ddaa81800654871",
+  "mutations-final.json.gz": "269cb1bd781a1035fa8ca17731cc61131c4b3acb62bd34fde618572c34267cab",
+  "mutations-final.log.gz": "b931b3afd391616e1bdbec9f8f74109a09c0cb910a2526847dfce50c4cbbe6c3",
+  "mutations-initial.log.gz": "7556ab43ac61c35d74725f3e555f0484b9b17cb57a1210e8ad05e37a7dc05b5b",
+  "native-cli-followup.log.gz": "72008d8651660c010c699c5990c253ee79ccce1acb8e870c850219206f3d66e0",
+  "native-initial-failure.log.gz": "f3578ad5d25113b96e8f630b5ae9c8ee99841a3a92d9ab28df1305b9adf2797a",
+  "native-tests.log.gz": "e543338e7f87f2cf932e637eb1b961f87a1208b71f116cffa00e0bf4a67c2d3d",
+  "real-browser.log.gz": "e9f65a66b7f3638a1e95254eaca67e26d1983a2e3ceb9280b748e23a2ad53cee",
+  "result.json": "5bd86a748a7740e5bf7bc2d7b9507bd046b29a6c7b0e32a60a8867f7f32b1511",
+  "smart-dark.png": "4c880ed8277049a0d4b4045cb02bf4878c3ef51581966a4503b23b5c220411b4",
+  "smart-light.png": "883c9d45dbfb89add08d82f87ac8f666030e90e827902a92d7c05e6912f189d4"
+}

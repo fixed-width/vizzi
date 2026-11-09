@@ -1,4 +1,5 @@
 import {planReflow} from './reflow.js';
+import {sourceMargin} from './source-margin.js';
 
 // Owns local display layout, source selection/copy, and resize reading anchors.
 export class SourcePane {
@@ -10,11 +11,11 @@ export class SourcePane {
         this.selection=()=>{if(this.pending&&!this.selected())this.schedule();};document.addEventListener('selectionchange',this.selection);
         this.copy=event=>this.copySelection(event);document.addEventListener('copy',this.copy);
     }
-    set(lines,reading={top:0,left:0}) {
+    set(lines,reading={top:0,left:0},baseline=0) {
         this.rows=lines.map(line=>{
             const row=this.document.createElement('div');row.className='code-line';row.dataset.line=String(line.number);
             const number=this.document.createElement('span');number.className='line-number';number.textContent=String(line.number);
-            const text=this.document.createElement('span');text.className='code-text';row.append(number,text);return {line,row,text,key:null};
+            const text=this.document.createElement('span');text.className='code-text';row.append(number,text);return {line,row,text,key:null,margin:sourceMargin(line,baseline)};
         });
         this.element.replaceChildren(...this.rows.map(r=>r.row));
         const legacy=this.rows.find(r=>r.row.offsetTop+r.row.offsetHeight>reading.top);
@@ -40,7 +41,7 @@ export class SourcePane {
         this.context.font=`${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;this.context.fontKerning='none';}
         const measure=text=>{const parts=text.split('\t'),tab=this.context.measureText('    ').width;let result=0;for(const [i,part] of parts.entries()){result+=this.context.measureText(part).width;if(i<parts.length-1)result=(Math.floor(result/tab)+1)*tab;}return result;};
         const anchor=preserve?this.anchor():null;let changed=false;
-        for(const row of this.rows){const plan=this.enabled&&this.context?planReflow(row.line,width,measure):null,key=JSON.stringify(plan);if(key!==row.key){this.render(row.text,row.line,plan);row.key=key;changed=true;}}
+        for(const row of this.rows){const plan=this.enabled&&this.context?planReflow(row.line,width,measure,row.margin):null,key=JSON.stringify(plan);if(key!==row.key){this.render(row.text,row.line,plan,row.margin);row.key=key;changed=true;}}
         if(changed&&anchor)this.restore(anchor);
     }
     copySelection(event){
@@ -49,8 +50,9 @@ export class SourcePane {
         const rows=this.rows.filter(r=>range.intersectsNode(r.text));if(!rows.length||rows.some(r=>r.line.left||r.line.right))return;
         const pieces=[];
         for(const [index,row] of rows.entries()){
-            const walker=this.document.createTreeWalker(row.text,4);let node,text='';
-            while((node=walker.nextNode())){if(!node.parentElement.closest('.source-chunk')||!range.intersectsNode(node))continue;const start=range.startContainer===node?range.startOffset:0,end=range.endContainer===node?range.endOffset:node.length;text+=node.textContent.slice(start,end);}
+            const walker=this.document.createTreeWalker(row.text,4);let node,text='',at=0,first=null;
+            while((node=walker.nextNode())){if(!node.parentElement.closest('.source-chunk'))continue;if(range.intersectsNode(node)){const start=range.startContainer===node?range.startOffset:0,end=range.endContainer===node?range.endOffset:node.length;if(start<end){first??=at+start;text+=node.textContent.slice(start,end);}}at+=node.length;}
+            if(first===row.margin.bytes&&first>0)text=row.line.text.slice(0,first)+text;
             const contents=this.document.createRange();contents.selectNodeContents(row.text);
             if(index<rows.length-1||range.compareBoundaryPoints(2,contents)>0)text+=row.line.ending??'\n';pieces.push(text);
         }
