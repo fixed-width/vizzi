@@ -505,3 +505,218 @@ async fn investigation_http_preserves_state_on_invalid_stale_and_oversized_edits
     assert_eq!(app.view().board.question, "Saved question");
     assert_eq!(app.view().board.revision, 1);
 }
+
+fn direct_request(target: &SourceMatch, line: usize) -> OpenSource {
+    OpenSource {
+        snapshot: target.snapshot.clone(),
+        file: target.file.clone(),
+        version: target.version.clone(),
+        line,
+    }
+}
+#[test]
+fn a_current_location_opens_without_evidence_or_writable_investigation_storage() {
+    let (root, cache, host) = setup();
+    let editor = Arc::new(Recording(Mutex::new(vec![])));
+    let storage = cache.path().join("board.json");
+    let app = Companion::new(host, Some(storage.clone()), editor.clone()).unwrap();
+    let target = app.lookup("src/a.rs").unwrap();
+    let before = serde_json::to_value(app.view().board).unwrap();
+    std::fs::create_dir(&storage).unwrap();
+    app.open_source(&direct_request(&target, 2)).unwrap();
+    let opened = editor.0.lock().unwrap();
+    assert_eq!(opened.len(), 1);
+    assert_eq!(opened[0].path, root.path().join("src/a.rs"));
+    assert_eq!(opened[0].line, 2);
+    assert_eq!(serde_json::to_value(app.view().board).unwrap(), before);
+    assert!(storage.is_dir());
+}
+#[test]
+fn direct_handoff_rejects_wrong_capture_version_file_and_line() {
+    let (_root, _cache, host) = setup();
+    let editor = Arc::new(Recording(Mutex::new(vec![])));
+    let app = Companion::new(host, None, editor.clone()).unwrap();
+    let target = app.lookup("src/a.rs").unwrap();
+    let mut snapshot = direct_request(&target, 1);
+    snapshot.snapshot = "expired".into();
+    let mut file = direct_request(&target, 1);
+    file.file = "absent".into();
+    let mut version = direct_request(&target, 1);
+    version.version = "other".into();
+    for request in [
+        snapshot,
+        file,
+        version,
+        direct_request(&target, 0),
+        direct_request(&target, target.lines + 1),
+    ] {
+        assert!(app.open_source(&request).is_err());
+    }
+    assert!(editor.0.lock().unwrap().is_empty());
+    app.open_source(&direct_request(&target, target.lines))
+        .unwrap();
+    assert_eq!(editor.0.lock().unwrap()[0].line, target.lines);
+    assert!(app.view().board.evidence.is_empty());
+}
+#[test]
+fn direct_handoff_checks_disk_even_before_the_index_sees_a_change() {
+    let (root, _cache, host) = setup();
+    let editor = Arc::new(Recording(Mutex::new(vec![])));
+    let app = Companion::new(host, None, editor.clone()).unwrap();
+    let target = app.lookup("src/a.rs").unwrap();
+    std::fs::write(
+        root.path().join("src/a.rs"),
+        "fn other() {}\nfn reader() {}\n",
+    )
+    .unwrap();
+    assert!(app.open_source(&direct_request(&target, 1)).is_err());
+    std::fs::remove_file(root.path().join("src/a.rs")).unwrap();
+    assert!(app.open_source(&direct_request(&target, 1)).is_err());
+    assert!(editor.0.lock().unwrap().is_empty());
+    assert!(app.view().board.evidence.is_empty());
+}
+#[test]
+fn direct_handoff_rejects_an_obsolete_snapshot_even_when_its_file_is_unchanged() {
+    let (root, _cache, host) = setup();
+    let editor = Arc::new(Recording(Mutex::new(vec![])));
+    let app = Companion::new(host.clone(), None, editor.clone()).unwrap();
+    let target = app.lookup("src/a.rs").unwrap();
+    std::fs::write(root.path().join("other.rs"), "fn other() {}\n").unwrap();
+    host.request(vizzi::source::CaptureScope::Reconcile);
+    let deadline = std::time::Instant::now();
+    while host.application().snapshot().unwrap().id().as_str() == target.snapshot {
+        assert!(deadline.elapsed() < std::time::Duration::from_secs(10));
+        std::thread::sleep(std::time::Duration::from_millis(10));
+    }
+    let fresh = app.lookup("src/a.rs").unwrap();
+    assert_eq!(fresh.version, target.version);
+    assert!(app.open_source(&direct_request(&target, 1)).is_err());
+    assert!(editor.0.lock().unwrap().is_empty());
+    app.open_source(&direct_request(&fresh, 1)).unwrap();
+    assert_eq!(editor.0.lock().unwrap().len(), 1);
+}
+#[cfg(unix)]
+#[test]
+fn direct_handoff_refuses_a_symlink_even_to_matching_bytes() {
+    let (root, cache, host) = setup();
+    let editor = Arc::new(Recording(Mutex::new(vec![])));
+    let app = Companion::new(host, None, editor.clone()).unwrap();
+    let target = app.lookup("src/a.rs").unwrap();
+    let outside = cache.path().join("outside.rs");
+    std::fs::copy(root.path().join("src/a.rs"), &outside).unwrap();
+    std::fs::remove_file(root.path().join("src/a.rs")).unwrap();
+    std::os::unix::fs::symlink(outside, root.path().join("src/a.rs")).unwrap();
+    assert!(app.open_source(&direct_request(&target, 1)).is_err());
+    assert!(editor.0.lock().unwrap().is_empty());
+}
+#[test]
+fn direct_handoff_propagates_editor_refusal_without_saving_evidence() {
+    struct Refusing;
+    impl Editor for Refusing {
+        fn name(&self) -> &str {
+            "refusing"
+        }
+        fn open(&self, _: &EditorLocation) -> Result<(), EditorError> {
+            Err(EditorError("refused".into()))
+        }
+    }
+    let (_root, _cache, host) = setup();
+    let app = Companion::new(host, None, Arc::new(Refusing)).unwrap();
+    let target = app.lookup("src/a.rs").unwrap();
+    assert!(matches!(
+        app.open_source(&direct_request(&target, 1)),
+        Err(CompanionError::Editor(_))
+    ));
+    assert!(app.view().board.evidence.is_empty());
+}
+
+#[tokio::test]
+async fn direct_editor_http_accepts_only_captured_locations_and_never_creates_evidence() {
+    use serde_json::json;
+    use vizzi::{
+        review_application::ReviewApplication,
+        review_source::CaptureLimits,
+        server::{diagnostic_request, router_with_companion},
+    };
+    let (_root, _cache, host) = setup();
+    let editor = Arc::new(Recording(Mutex::new(vec![])));
+    let app = Arc::new(Companion::new(host.clone(), None, editor.clone()).unwrap());
+    let target = app.lookup("src/a.rs").unwrap();
+    let before = serde_json::to_value(app.view().board).unwrap();
+    let reviews =
+        Arc::new(ReviewApplication::start(host.clone(), CaptureLimits::default()).unwrap());
+    let router = router_with_companion(host, reviews, app.clone());
+    let body =
+        json!({"snapshot":target.snapshot,"file":target.file,"version":target.version,"line":2});
+    let response = diagnostic_request(
+        router.clone(),
+        json!(1),
+        "POST",
+        "/api/editor/open",
+        Some(body.clone()),
+    )
+    .await
+    .unwrap();
+    assert_eq!(response.status, 200, "{}", response.body);
+    assert_eq!(
+        serde_json::from_str::<serde_json::Value>(&response.body).unwrap()["requested"],
+        true
+    );
+    assert_eq!(editor.0.lock().unwrap()[0].line, 2);
+    let mut stale = body.clone();
+    stale["snapshot"] = json!("expired");
+    let mut line = body.clone();
+    line["line"] = json!(0);
+    let mut command = body.clone();
+    command["command"] = json!("code");
+    let mut path = body.clone();
+    path["path"] = json!("/tmp/other.rs");
+    let mut oversized = body.clone();
+    oversized["file"] = json!("x".repeat(20000));
+    for (value, status) in [
+        (stale, 409),
+        (line, 400),
+        (command, 422),
+        (path, 422),
+        (oversized, 413),
+        (json!({}), 422),
+    ] {
+        let response = diagnostic_request(
+            router.clone(),
+            json!(1),
+            "POST",
+            "/api/editor/open",
+            Some(value),
+        )
+        .await
+        .unwrap();
+        assert_eq!(response.status, status, "{}", response.body);
+    }
+    assert_eq!(editor.0.lock().unwrap().len(), 1);
+    assert_eq!(serde_json::to_value(app.view().board).unwrap(), before);
+}
+
+#[test]
+fn direct_handoff_requires_a_published_source_observation() {
+    let (root, cache, old_host) = setup();
+    let old = Companion::new(old_host, None, Arc::new(Recording(Mutex::new(vec![])))).unwrap();
+    let target = old.lookup("src/a.rs").unwrap();
+    let engine = Engine::new(
+        Directory::open(root.path()).unwrap(),
+        Cache::new(cache.path().join("unstarted")),
+        1,
+    )
+    .unwrap();
+    let editor = Arc::new(Recording(Mutex::new(vec![])));
+    let app = Companion::new(
+        Arc::new(Host::prepare(engine).unwrap()),
+        None,
+        editor.clone(),
+    )
+    .unwrap();
+    assert!(matches!(
+        app.open_source(&direct_request(&target, 1)),
+        Err(CompanionError::Unavailable(_))
+    ));
+    assert!(editor.0.lock().unwrap().is_empty());
+}

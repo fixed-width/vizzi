@@ -13,6 +13,7 @@ connection explanations at 512. Native state is outside the source checkout.
 | `POST /api/investigation/evidence` | JSON revision, snapshot, file, version, line, title → captured evidence ID and current view. |
 | `POST /api/investigation` | Tagged reader edit: question, annotate, connect, disconnect or remove, each with expected revision. |
 | `POST /api/investigation/evidence/{id}/open` | JSON `{}` → verified editor handoff requested; the executable/arguments cannot be supplied by the request. |
+| `POST /api/editor/open` | JSON `{snapshot,file,version,line}` → verified current-source handoff, without saving evidence. `line` is the original one-based source line. No path, executable or arguments are accepted. |
 
 Mutations require JSON and deny unknown fields. Bodies cap at 16 KiB. Obsolete board or
 source versions return 409; invalid bounds/links 400; unavailable source/index 503;
@@ -25,6 +26,11 @@ no-follow regular-file read with matching complete content identity. Verificatio
 cap at 16 MiB. Symlinks, deleted/changed paths, invalid saved line numbers and unsupported
 verification fail explicitly. A successful CLI result does not confirm the current
 editor buffer; unsaved edits and changes after verification need plugin-level handling.
+Direct source handoff additionally requires the exact current snapshot and document version,
+with a line inside its captured text. Stale source returns 409, invalid locations return
+400, invalid JSON shape/extra fields return 422, and missing live indexing returns 503.
+Neither the evidence list nor its revision changes. Direct and saved handoffs share the
+same single editor-operation allowance.
 
 The primary page is `/` (also `/investigate`); `/explore` and `/review` are supporting
 surfaces. The primary page activates read-only indexing automatically; fetching saved

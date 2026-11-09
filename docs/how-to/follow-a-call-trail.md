@@ -48,9 +48,11 @@ update marks the retained workspace stale. Use **More → New workspace** to nav
 source. If the old capture has expired after a host restart, the pane reports it rather than
 substituting current bytes.
 
-Use **Keep** to retain a location in the existing investigation. If the host was started with
-`--editor-code /path/to/code`, **Editor** opens that kept location after checking working-file
-contents. These actions are explicit; opening a fragment never launches an editor.
+Use **Editor** to open a current fragment at its original declaration line in VS Code.
+The host checks the captured location and working-file contents first. **Keep** independently
+retains a location in the investigation; saving is optional for editor handoff. The host's
+`--editor-code /path/to/code` option selects the trusted launcher. These actions are explicit;
+opening a fragment never launches an editor automatically.
 
 For the known Minitosis example, point the host at `tract-plugin-pack` and open
 `/workspace?demo=minitosis`. Follow `process → render → Processor::process_sample` and

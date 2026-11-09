@@ -1,5 +1,5 @@
 //! Thin investigation and verified-editor HTTP adapter.
-use crate::companion::{Companion, CompanionError, EditInvestigation, PinEvidence};
+use crate::companion::{Companion, CompanionError, EditInvestigation, OpenSource, PinEvidence};
 use axum::{
     Json, Router,
     extract::{DefaultBodyLimit, Path, Query, State},
@@ -59,6 +59,7 @@ pub(super) fn router(
         .route("/api/investigation/lookup", get(lookup))
         .route("/api/investigation/evidence", post(pin))
         .route("/api/investigation/evidence/{id}/open", post(open))
+        .route("/api/editor/open", post(open_source))
         .layer(DefaultBodyLimit::max(16 * 1024))
         .layer(axum::middleware::map_response(
             |mut response: Response| async move {
@@ -147,6 +148,17 @@ async fn open(
     Path(id): Path<u32>,
     Json(_): Json<Empty>,
 ) -> Result<Json<serde_json::Value>, Error> {
+    editor_handoff(move || app.open(id)).await
+}
+async fn open_source(
+    State(app): State<Arc<Companion>>,
+    Json(request): Json<OpenSource>,
+) -> Result<Json<serde_json::Value>, Error> {
+    editor_handoff(move || app.open_source(&request)).await
+}
+async fn editor_handoff(
+    job: impl FnOnce() -> Result<(), CompanionError> + Send + 'static,
+) -> Result<Json<serde_json::Value>, Error> {
     let permit = EDITORS.try_acquire().map_err(|_| {
         Error(CompanionError::Unavailable(
             "An editor handoff is already running".into(),
@@ -154,7 +166,7 @@ async fn open(
     })?;
     work(move || {
         let _permit = permit;
-        app.open(id)?;
+        job()?;
         Ok(serde_json::json!({"requested":true}))
     })
     .await

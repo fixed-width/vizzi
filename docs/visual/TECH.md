@@ -13,6 +13,13 @@ a sole target and its evidence kind, or the existing bounded candidates. The opt
 [definition provider](SEMANTIC_TECH.md) handles other calls on demand through standard LSP,
 without adding type heuristics to the browser or structure index.
 
+Fragment editor handoff posts a captured snapshot/file/version and original line to
+`/api/editor/open`. It validates the current observation and exact document version, then
+uses the same bounded, no-follow working-file/content verification as saved evidence.
+Neither evidence nor an investigation revision is required, and opening does not mutate
+the investigation. Both handoff routes share the editor concurrency limit and configured
+editor adapter. **Keep** remains a separate action.
+
 The `actions` structure projection returns captured identifier line/UTF-8 byte columns,
 opaque call identity and any source-local binding. It reads metadata, without loading source
 or expanding name candidates. Queries cover at most 96 lines and page at 256 actions; the

@@ -5,7 +5,7 @@ use std::{
     process::{Command, Stdio},
     time::{Duration, Instant},
 };
-/// A local location verified against saved source immediately before handoff.
+/// A local location verified against captured source immediately before handoff.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct EditorLocation {
     /// Absolute path within the configured workspace.

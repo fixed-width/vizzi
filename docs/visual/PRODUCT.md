@@ -57,6 +57,10 @@ reference, with no separate design mock.
 - Controls are keyboard accessible, source/names render as text, themes follow system/override
   settings, and small viewports can pan/zoom without overflowing the page. No desktop editor
   opens automatically. Automated verification uses recording-only adapters.
+- **Editor** opens a current fragment at its original declaration line without requiring
+  **Keep**. The host verifies its snapshot/file/version and current working bytes first.
+  Opening does not create evidence or change the investigation, including when saving is
+  unavailable. **Keep** remains independent. Stale fragments cannot request a handoff.
 
 The first acceptance question is whether the maintainer can walk and branch through a real
 call trail while retaining previous-step context. Groups, alternative representations and

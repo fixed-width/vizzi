@@ -36,8 +36,10 @@ it does not mutate saved anchors. The application optionally stores a validated 
 file atomically outside the source root, keeping it separate from analysis cache data.
 Use revision checks to refuse obsolete board edits rather than losing another edit.
 
-An editor module verifies a saved location against the current document and a no-follow
-working-file read. Editor adapters consume a verified local location. The first adapter
+The source host verifies a captured location against the current document and a no-follow
+working-file read. Direct fragment and saved-evidence handoffs share that verification;
+direct handoff leaves investigation state untouched. Editor adapters consume a verified
+local location. The first adapter
 uses the documented VS Code `--reuse-window --goto file:line:character` CLI:
 https://code.visualstudio.com/docs/configure/command-line . It uses an argument vector,
 never a shell or a command supplied by an HTTP request. Tests use a recording adapter.

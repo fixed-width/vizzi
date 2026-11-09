@@ -14,7 +14,7 @@ use std::{
 use vizzi_core::{
     comparison::{EntryKind, ReviewPath},
     investigation::*,
-    model::{ContentId, FileId, Snapshot},
+    model::{ContentId, Document, FileId, Snapshot},
     projection::WindowQuery,
 };
 /// Native application errors with distinct recovery meanings.
@@ -71,6 +71,19 @@ pub struct PinEvidence {
     pub line: usize,
     /// Reader-assigned title.
     pub title: String,
+}
+/// Current captured location for an editor handoff, independent of saved evidence.
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct OpenSource {
+    /// Required current observation identity.
+    pub snapshot: String,
+    /// Native file identity within that observation.
+    pub file: String,
+    /// Required captured document version.
+    pub version: String,
+    /// One-based original source line.
+    pub line: usize,
 }
 /// Reader-only edits, separated from source acquisition.
 #[derive(Deserialize)]
@@ -202,7 +215,7 @@ impl Companion {
     fn snapshot(&self) -> Result<Arc<Snapshot>, CompanionError> {
         self.host.application().snapshot().ok_or_else(|| {
             CompanionError::Unavailable(
-                "Start the source index before adding or opening evidence".into(),
+                "Start the source index before opening a location or keeping evidence".into(),
             )
         })
     }
@@ -417,7 +430,33 @@ impl Companion {
         {
             return Err(CompanionError::Conflict("Saved source has changed. Keep the captured excerpt or add fresh evidence; the editor location was not opened.".into()));
         }
-        let path = ReviewPath::parse(evidence.source.path.as_bytes().to_vec())
+        self.open_working(doc, evidence.source.line)
+    }
+    /// Opens an exactly current source location without reading or changing the investigation.
+    pub fn open_source(&self, request: &OpenSource) -> Result<(), CompanionError> {
+        let snapshot = self.snapshot()?;
+        if snapshot.id().as_str() != request.snapshot {
+            return Err(CompanionError::Conflict(
+                "Source changed; open a current fragment before requesting the editor".into(),
+            ));
+        }
+        let doc = snapshot.file(&request.file).ok_or_else(|| {
+            CompanionError::Invalid("File is absent from the current observation".into())
+        })?;
+        if doc.version().as_str() != request.version {
+            return Err(CompanionError::Conflict(
+                "Source document version differs".into(),
+            ));
+        }
+        if request.line == 0 || request.line > doc.captured().line_count() {
+            return Err(CompanionError::Invalid(
+                "Editor line is outside the captured text".into(),
+            ));
+        }
+        self.open_working(doc, request.line)
+    }
+    fn open_working(&self, doc: &Document, line: usize) -> Result<(), CompanionError> {
+        let path = ReviewPath::parse(doc.path().as_bytes().to_vec())
             .map_err(|e| CompanionError::Invalid(e.to_string()))?;
         let mut input = DirectoryInput::open(self.host.root())
             .map_err(|e| CompanionError::Unavailable(e.to_string()))?;
@@ -428,15 +467,17 @@ impl Companion {
             ReadEntry::Present {
                 kind: EntryKind::Regular { .. },
                 bytes,
-            } if ContentId::derive(&[&bytes]) == evidence.source.content => {}
-            _ => return Err(CompanionError::Conflict(
-                "Working source differs or cannot be verified; the saved location was not opened"
-                    .into(),
-            )),
+            } if ContentId::derive(&[&bytes]) == *doc.content() => {}
+            _ => {
+                return Err(CompanionError::Conflict(
+                    "Working source differs or cannot be verified; the location was not opened"
+                        .into(),
+                ));
+            }
         }
         self.editor.open(&EditorLocation {
             path: self.host.root().join(doc.path()),
-            line: evidence.source.line,
+            line,
         })?;
         Ok(())
     }
