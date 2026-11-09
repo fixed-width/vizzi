@@ -16,6 +16,8 @@ pub const STYLE_SPANS: usize = 1024;
 /// Source and outline ranges within one pinned document version.
 #[derive(Clone, Debug, Default, Deserialize)]
 pub struct WindowQuery {
+    /// Include bounded display-break hints and original line terminators.
+    pub reflow: Option<bool>,
     /// One-based first source line.
     pub line_start: Option<usize>,
     /// Source row count, clamped to 1..96.
@@ -76,6 +78,12 @@ pub struct Summary {
 /// One bounded fragment, never a silently truncated whole line.
 #[derive(Debug, Serialize)]
 pub struct Line {
+    /// Optional width-independent display hints for this captured fragment.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reflow: Option<crate::reflow::Hints>,
+    /// Original line terminator, supplied with the display projection for exact copying.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ending: Option<&'static str>,
     /// Styles in fragment-relative UTF-8 byte coordinates.
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub styles: Vec<StyledSpan>,
@@ -215,7 +223,8 @@ impl Document {
             .min(line_total.saturating_sub(line_start - 1));
         let allowance = SOURCE_BYTES / count.max(1);
         let mut lines = Vec::new();
-        let coloring = self.analyses().iter().find_map(|a| a.coloring.as_ref());
+        let colored = self.analyses().iter().find(|a| a.coloring.is_some());
+        let coloring = colored.and_then(|a| a.coloring.as_ref());
         let mut coloring_status = coloring.map_or("unavailable", |c| {
             if c.available() { "ready" } else { "limited" }
         });
@@ -261,6 +270,18 @@ impl Document {
                         Vec::new()
                     };
                     lines.push(Line {
+                        reflow: None,
+                        ending: (query.reflow == Some(true)).then(|| {
+                            let next = self
+                                .captured()
+                                .line_range(number + 1)
+                                .map_or(self.captured().len(), |line| line.start);
+                            match next - range.end {
+                                2 => "\r\n",
+                                1 => "\n",
+                                _ => "",
+                            }
+                        }),
                         styles,
                         number,
                         column,
@@ -277,6 +298,22 @@ impl Document {
         if coloring_status != "ready" {
             for line in &mut lines {
                 line.styles.clear();
+            }
+        }
+        if query.reflow == Some(true) && coloring_status == "ready" {
+            let mut allowance = crate::reflow::WINDOW_POINTS;
+            for line in &mut lines {
+                if !line.left {
+                    line.reflow = colored.and_then(|a| {
+                        crate::reflow::hints(
+                            &a.context.language,
+                            &line.text,
+                            &line.styles,
+                            allowance,
+                        )
+                    });
+                    allowance -= line.reflow.as_ref().map_or(0, |h| h.points.len());
+                }
             }
         }
         let cursor = query

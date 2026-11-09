@@ -32,6 +32,7 @@ never substitutes current source for its requested pin.
 | --- | --- |
 | `line_start` | One-based source line, clamped to the document |
 | `line_count` | 1–96 rows, default 96 |
+| `reflow` | Optional boolean; `true` includes display-break hints and original line terminators |
 | `column_line`, `column` | One line's UTF-8 byte-column start; rounded down to a character boundary |
 | `outline_start` | Zero-based ordinal across captured analysis contexts |
 | `outline_count` | 1–200 rows, default 200 |
@@ -58,9 +59,18 @@ Legacy adapters without parent links remain flat. Names/kinds
 are at most 128/32 UTF-8 bytes, respectively. The cursor can lie outside the page.
 
 These count/text/name limits also bound JSON escaping and fixed metadata. Adversarial
-control-character/name tests verify a document-window body below 512 KiB. This bound
+control-character/name tests verify an ordinary document-window body below 512 KiB. This bound
 applies to the document-window reply, not the overview or explicit bulk diagnostics.
 Truncated labels do not replace full source: fragments retain complete source access.
+
+With `reflow=true`, each line also has `ending` (`"\n"`, `"\r\n"`, or `""`). Eligible lines
+have `reflow:{leading,points:[{offset,anchor,priority}]}`. Offsets and nullable delimiter
+anchors are fragment-relative UTF-8 bytes; `leading` ends the initial spaces/tabs. Lower
+priorities prefer structural breaks; eight is a whitespace fallback. The projection admits
+at most 256 points per line and 1,024 per window, atomically per line. Unknown language
+profiles, limited/unavailable styles and left-clipped fragments omit hints. This optional
+metadata adds less than 64 KiB to the ordinary reply bound and does not change source or
+snapshot identity. [Source reflow](../explanation/source-reflow.md) explains display policy.
 
 ## Captured syntax styles
 

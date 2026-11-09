@@ -32,6 +32,17 @@ reference, with no separate design mock.
 - Fragment headers support moving, resizing, collapsing and closing. Closing removes that
   view's presentation links, not source facts. Code remains syntax-coloured and readable;
   long functions use explicit bounded sections instead of silent short excerpt replacement.
+- Smart reflow fits long code lines to their pane using ranked, language-aware break hints
+  and bounded hanging indentation. It is enabled by default; **More → Code layout** can
+  restore original lines. Resizing recomputes display breaks locally, without source reads
+  or moving neighbouring fragments. Each physical source line keeps its original number;
+  continuation marks distinguish display rows from source lines. Copying returns the
+  selected original text from fully captured rows, with original whitespace and line endings.
+  Clipped selections retain browser copying and their visible omission marks.
+  Syntax colours, call actions and the visible source location survive reflow. Strings,
+  identifiers and other indivisible tokens may still require horizontal scrolling; clipped
+  source remains explicitly clipped. Missing language/style support falls back to original
+  lines. Language rules must not be hard-coded into the browser layout.
 - Canvas/background dragging and ordinary wheel panning move the workspace. Zoom is explicit
   through controls or modified wheel. Code-pane scrolling stays local. Opening a destination
   reveals it with its parent where viewport size allows; overview/fit controls recover earlier

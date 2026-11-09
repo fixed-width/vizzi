@@ -14,6 +14,9 @@ layout, camera and reading state restore locally in the browser. Candidate arrow
 the analysis limitations. Underlined call names open an action menu; Ctrl/Cmd-click follows
 directly ([validation](experiments/visual/INLINE_CALL_RESULTS.md)). Optional [type-aware navigation](docs/visual/SEMANTIC_PRODUCT.md)
 uses rust-analyzer definitions for field/variable calls while keeping captured-source checks.
+Smart [source reflow](docs/explanation/source-reflow.md) fits code to each pane while
+preserving original line numbers, copying and call controls; Original lines is available
+in More → Code layout ([validation](experiments/visual/REFLOW_RESULTS.md)).
 Rust/Python are selected by default; explicit scopes enable
 raw C/C++ analysis. Normal editing stays in the editor, with richer plugin integration
 remaining a supported direction.

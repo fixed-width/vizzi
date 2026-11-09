@@ -28,6 +28,23 @@ and pane clipping do not scale or cut off its controls. Focus, selection, keyboa
 and dismissal belong to this presentation module; future actions can extend its action list.
 Stale observations disable inline actions and dismiss the menu while retaining loaded source.
 
+Source reflow is presentation-only. The opt-in `reflow=true` source-window projection uses
+the captured language and parser-derived styling to emit UTF-8 break offsets, priorities
+and delimiter-alignment anchors. Rust, Python and C/C++ share the projection; a language
+profile classifies operators while literals remain protected. No formatter, new parse,
+source mutation or cache-identity change is required. Bound hints per line and window;
+unavailable/limited styling and left-clipped lines have no hints.
+
+A language-neutral browser planner chooses display segments for actual font/pane width.
+A source-pane module owns rendering, resize coalescing, selection/copy and reading anchors;
+the workspace controller owns captured-source requests and call-navigation intent. Retain
+source byte coordinates through styled segments. Decorative indentation/continuations are
+excluded from copied text. Reflow only changed layouts, defer resize work while source is
+selected, and preserve the visible source line/segment on width changes. Camera transforms
+do not change the layout width. Keep the existing palette/fonts and avoid extra toolbar
+controls or formatting animation. The Code Bubbles papers are the interaction reference;
+there is no separate mock.
+
 A browser presentation module owns a versioned visual-workspace document: view identities,
 source bindings, rectangles/collapse state, reading sections/scrolls, camera and visual links.
 Its small interface opens roots/destinations, moves/resizes/collapses/closes views and
@@ -36,6 +53,8 @@ first source-view prototype deduplicates an already-open symbol while leaving th
 schema capable of other representation kinds later. Store source metadata/IDs, not copied
 source text, in browser persistence. Bounds/validation reject malformed, oversized and
 nonfinite layout data. Do not mutate analysed relationships while arranging presentation.
+Reading state may include a source line/byte anchor in addition to legacy pixel offsets.
+It belongs to the displayed captured source and remains independent of display breaks.
 
 This presentation model starts in the existing browser implementation so the maintainer
 can evaluate interaction before a durable portable model/storage migration. A production

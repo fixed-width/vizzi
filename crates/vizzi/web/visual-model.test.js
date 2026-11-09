@@ -131,3 +131,8 @@ for(const badKind of ['bogus','resolved']){const data=JSON.parse(semanticModel.s
 assert.throws(()=>semanticModel.follow(semanticRoot,{...semanticSite,binding:'unknown'},b));
 assert.throws(()=>semanticModel.follow(semanticRoot,{...semanticSite,binding:null},b));
 {const data=JSON.parse(saved);data.links[0].semantic_context=snapshot;assert.throws(()=>Workspace.restore(JSON.stringify(data),snapshot));}
+
+const anchoredModel=new Workspace(snapshot),anchoredRoot=anchoredModel.openRoot(a,'src');
+const sourceReading={section:a.source.line,top:44,left:0,anchor:{line:a.source.line+1,byte:32,offset:4}};
+anchoredModel.read(anchoredRoot,sourceReading);assert.deepEqual(Workspace.restore(anchoredModel.serialize(),snapshot).view(anchoredRoot).reading,sourceReading);
+for(const anchor of [{line:a.source.line-1,byte:0,offset:0},{line:a.source.end_line+1,byte:0,offset:0},{line:a.source.line,byte:-1,offset:0},{line:a.source.line,byte:32769,offset:0},{line:a.source.line,byte:1.5,offset:0},{line:a.source.line,byte:0,offset:Infinity}])assert.throws(()=>anchoredModel.read(anchoredRoot,{...sourceReading,anchor}));

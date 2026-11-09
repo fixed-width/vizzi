@@ -9,7 +9,7 @@ const clone=value=>structuredClone(value);
 function source(s){return s&&typeof s.path==='string'&&bytes(s.path)<=4096&&!s.path.includes('\\')&&!s.path.split('/').some(p=>!p||p==='.'||p==='..')&&opaque(s.file)&&opaque(s.version)&&opaque(s.context)&&integer(s.line,1,1e8)&&integer(s.end_line,s.line,1e8);}
 function symbol(s){return s&&opaque(s.id)&&typeof s.name==='string'&&bytes(s.name)>0&&bytes(s.name)<=128&&typeof s.kind==='string'&&bytes(s.kind)<=128&&Array.isArray(s.parents)&&s.parents.length<=16&&s.parents.every(p=>typeof p==='string'&&bytes(p)<=128)&&source(s.source);}
 function geometry(v){return finite(v.x,-1e5,1e5)&&finite(v.y,-1e5,1e5)&&finite(v.w,320,960)&&finite(v.h,200,960);}
-function reading(r,s){return r&&finite(r.top,0,1e7)&&finite(r.left,0,1e7)&&integer(r.section,s.line,s.end_line);}
+function reading(r,s){return r&&finite(r.top,0,1e7)&&finite(r.left,0,1e7)&&integer(r.section,s.line,s.end_line)&&(r.anchor==null||(integer(r.anchor.line,r.section,Math.min(s.end_line,r.section+95))&&integer(r.anchor.byte,0,32768)&&finite(r.anchor.offset,-1024,1024)));}
 function camera(c){return c&&finite(c.x,-1e5,1e5)&&finite(c.y,-1e5,1e5)&&finite(c.scale,MIN_SCALE,MAX_SCALE);}
 function within(call,owner){return source(call)&&call.path===owner.path&&call.file===owner.file&&call.version===owner.version&&call.context===owner.context&&call.line>=owner.line&&call.end_line<=owner.end_line;}
 function sameSymbol(a,b){return symbol(a)&&a.id===b.id&&a.name===b.name&&a.kind===b.kind&&JSON.stringify(a.parents)===JSON.stringify(b.parents)&&['path','file','version','context','line','end_line'].every(k=>a.source[k]===b.source[k]);}
