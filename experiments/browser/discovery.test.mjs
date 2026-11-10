@@ -23,7 +23,7 @@ try {
   await page.goto(host.url);
   await page.waitForFunction(() => document.querySelectorAll('.discovery-entry').length > 0);
   assert.equal(await page.locator('input:visible,textarea:visible').count(), 1);
-  assert.equal(await page.locator('#question').isVisible(), false);
+  assert.equal(await page.locator('#question').count(), 0);
   assert.equal(await page.locator('#connection-form').isVisible(), false);
   assert.equal(await page.locator('#source-form').isVisible(), false);
   assert.equal(await page.locator('#evidence-detail').isVisible(), false);

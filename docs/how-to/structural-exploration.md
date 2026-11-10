@@ -12,8 +12,8 @@ CARGO_BUILD_JOBS=1 cargo run --release -p vizzi -- \
 ```
 
 Open the printed address with `/investigate?trial=structure` appended, or choose
-**More → Try structural exploration** from the companion. The default overview and
-question-search trial remain available.
+**More → Try structural exploration** from the companion. The default repository overview
+remains available.
 
 Enter a literal source-area or declaration name. Choose a returned directory/file to
 see its inventory. A name filter stays applied when its file opens; **Area inventory**

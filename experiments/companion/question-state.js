@@ -1,3 +1,4 @@
+// Offline helpers for archived question-search evaluations.
 const bytes=text=>new TextEncoder().encode(text).length;
 const opaque=value=>typeof value==='string'&&/^[a-f0-9]{64}$/.test(value);
 const integer=value=>Number.isSafeInteger(value)&&value>=0;

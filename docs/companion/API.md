@@ -16,6 +16,9 @@ connection explanations at 512. Native state is outside the source checkout.
 | `POST /api/editor/open` | JSON `{snapshot,file,version,line}` → verified current-source handoff, without saving evidence. `line` is the original one-based source line. No path, executable or arguments are accepted. |
 | `POST /api/visual/refresh` | Coherent current bindings, source windows and relationship checks for a visual working set. See [the live interface](../visual/LIVE_API.md) for its schema and 192 KiB body limit. |
 
+Question metadata and its edit action remain for compatibility with existing saved data
+and native clients. The browser no longer exposes question search or question authoring.
+
 Mutations require JSON and deny unknown fields. Except for visual refresh, bodies cap at 16 KiB. Obsolete board or
 source versions return 409; invalid bounds/links 400; unavailable source/index 503;
 persistence failure 500; editor command failure 502. Failed save/edit leaves the last

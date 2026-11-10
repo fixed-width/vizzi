@@ -1,11 +1,14 @@
 # Question-search companion trial results
 
+Historical evidence: this browser workflow is retired. The [archived trial instructions](QUESTION_SEARCH_TRIAL.md)
+identify the checkout required for UI reproduction.
+
 For contributors deciding whether the question-first workflow is ready for a maintainer
 trial. The opt-in `/investigate?trial=search` view connects a question to grouped source
 candidates, captured previews, explicit saved evidence and verified VS Code handoff.
 The default repository overview remains unchanged. No model is loaded or needed.
 
-Use [the trial guide](../../docs/how-to/question-search-trial.md) to try another repository.
+Use [the trial guide](QUESTION_SEARCH_TRIAL.md) to try another repository.
 It need not be one of the three reference repositories. Fresh maintainer questions and
 independent navigation usefulness remain unevaluated; the eight earlier reserved
 real-source cases remain unrun. This slice establishes a working trial, not acceptance

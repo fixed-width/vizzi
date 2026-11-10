@@ -1,4 +1,9 @@
-# Try question search beside your editor
+# Question-search trial instructions (archived)
+
+This browser workflow is retired. These instructions describe revision `7cb4956`; use
+that checkout to reproduce the historical UI trials. Current Vizzi has no question-search
+entry point or question editor. Use the [visual call workspace](../../docs/how-to/follow-a-call-trail.md)
+for current usage.
 
 For a maintainer evaluating whether Vizzi helps find useful source in an unfamiliar
 repository. This trial returns source starting points, rather than a generated answer.
@@ -67,10 +72,10 @@ kind of information in the editor alone, noting familiarity and order effects. E
 saved evidence using **More → Export investigation** if no investigation file was configured.
 Stop the host with Ctrl-C afterwards.
 
-The [behaviour contract](../companion/SEARCH_PRODUCT.md) and
-[architecture](../companion/SEARCH_TECH.md) describe the bounds and version guarantees.
+The [behaviour contract](../../docs/companion/SEARCH_PRODUCT.md) and
+[architecture](../../docs/companion/SEARCH_TECH.md) describe the bounds and version guarantees.
 Automated replay and optimized-build measurements are recorded in
-[the implementation results](../../experiments/companion/QUESTION_SEARCH_RESULTS.md);
+[the implementation results](QUESTION_SEARCH_RESULTS.md);
 they do not replace a fresh-question maintainer trial.
 
 ## Reproduce the automated checks

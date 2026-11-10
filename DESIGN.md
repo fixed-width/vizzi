@@ -25,7 +25,8 @@ Search, directory browsing and declaration lookup help introduce a view into tha
 set. They are supporting entry points rather than the organising product workflow. The
 recent question-ranking and structural-list experiments exposed IDE duplication and do
 not qualify the desired visual interaction. Keep their evidence and reusable interfaces;
-stop expanding them as the primary delivery direction. The next milestone is a concrete
+remove question-search entry points and question-authoring controls from the browser.
+Retain legacy saved metadata and offline evaluation interfaces. The next milestone is a concrete
 visual call trail that preserves the caller and preceding steps concurrently.
 
 Optional model assistance may help choose or organise source views later. It is not a

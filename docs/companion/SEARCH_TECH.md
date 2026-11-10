@@ -1,5 +1,10 @@
 # Native question-search trial architecture
 
+Historical contract: the question-search browser workflow is retired. Its UI entry points
+and browser modules have been removed. Native retrieval/evaluation interfaces remain
+experimental infrastructure; use [the visual workspace](../how-to/follow-a-call-trail.md)
+for current usage.
+
 Read [the behaviour contract](SEARCH_PRODUCT.md) first. The existing portable search code
 is extracted from vizzi-qa into vizzi-search, a safe Rust 2024 workspace crate depending
 on vizzi-core and existing workspace dependencies. The QA acquisition/stdio runner stays

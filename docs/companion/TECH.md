@@ -4,8 +4,10 @@ This document describes the existing prototype slice. The active product directi
 [visual working sets](../explanation/visual-working-sets.md); search/list navigation is
 supporting infrastructure rather than the primary experience.
 
-The [question-search adapter](SEARCH_TECH.md) reuses this workflow through the shared
-`vizzi-search` crate. It is an opt-in trial, separate from default metadata-only discovery.
+The [question-search browser adapter](SEARCH_TECH.md) is retired. Native retrieval and
+offline evaluation helpers remain separate from metadata-only discovery. Saved context
+ignores legacy question text in the UI; loading, editing evidence and exporting preserve
+that metadata without a schema migration.
 
 Read [the behaviour contract](PRODUCT.md) first. Source access/analysis, investigations,
 visual projection and host integration retain separate interfaces.

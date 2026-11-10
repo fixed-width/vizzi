@@ -4,8 +4,8 @@ This document describes the existing prototype slice. The active product directi
 [visual working sets](../explanation/visual-working-sets.md); search/list navigation is
 supporting infrastructure rather than the primary experience.
 
-The opt-in [question-search trial](SEARCH_PRODUCT.md) adds a question-first path into
-the same previews, saved evidence and editor handoff. The overview below remains the default.
+The [question-search trial](SEARCH_PRODUCT.md) is retired from the browser. Its entry points
+and saved-question editor are removed; the overview below remains available.
 
 This contract implements the maintainer's product-alignment decision after `0968fe4`.
 The primary experience helps an unfamiliar reader discover how source is organised,
@@ -28,14 +28,13 @@ the exact snapshot, file/content/document identities, line and literal bounded e
 Normal source reading and editing still belong in VS Code. Existing saved data remains
 available through **Saved locations**; the landing overview does not overwrite it.
 
-Questions and notes are optional. The question editor is disclosed on request in saved
-context, notes only when inspecting one saved item, and connection controls only on request
+Notes are available when inspecting one saved item, and connection controls only on request
 when at least two items exist. Export and advanced path entry live under secondary controls.
 The initial page must not show an empty investigation form or require the reader to
 describe relationships before discovering any relevant source.
 
 The developer can connect two cards with an explanation. Every connection is explicitly
-reader-authored, not an inferred call/dependency/impact claim. A question, evidence and
+reader-authored, not an inferred call/dependency/impact claim. Evidence, notes and
 connections form an explanation that can be revisited or exported. The first slice has
 one investigation per configured workspace, at most 32 cards and 64 connections. It
 starts empty; the lpc-rs oracle is not preloaded into the product.

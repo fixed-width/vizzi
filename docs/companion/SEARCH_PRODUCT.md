@@ -1,5 +1,10 @@
 # Question-to-evidence companion trial
 
+Historical contract: the question-search browser workflow is retired. Its UI entry points
+and browser modules have been removed. Native retrieval/evaluation interfaces remain
+experimental infrastructure; use [the visual workspace](../how-to/follow-a-call-trail.md)
+for current usage.
+
 For the maintainer evaluating source search alongside an editor. This opt-in slice tests
 navigation usefulness after the known-question ranking work. It generates no answer,
 inferred call graph or automatic connection and requires no model.

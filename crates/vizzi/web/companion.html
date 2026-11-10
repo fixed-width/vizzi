@@ -16,7 +16,7 @@
     <details class="workspace-menu"><summary>More</summary><div>
       <a href="/workspace">Visual call workspace</a>
       <a href="/review">Review changes</a><a href="/explore">Detailed source browser</a>
-      <a href="/investigate?trial=structure">Try structural exploration</a><a href="/investigate?trial=search">Try question search</a>
+      <a href="/investigate?trial=structure">Try structural exploration</a>
       <button id="add-source" type="button">Add a known source location</button>
       <button id="export" type="button">Export investigation</button>
       <label class="theme-control">Theme<select id="theme" aria-label="Theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
@@ -31,15 +31,6 @@
       <p id="structure-limit">Raw syntax candidates, not a resolved call graph, runtime order or data flow. Zero recorded calls does not prove a declaration is unused.</p>
       <p id="structure-scope"></p><p id="structure-summary" role="status">Preparing source structure…</p><p id="structure-stale" hidden>Source changed. Find an area again before using these locations.</p>
       <nav id="structure-trail" aria-label="Selected call trail"></nav><div id="structure-results" aria-busy="false"></div>
-    </section>
-    <section id="question-search-panel" aria-label="Question source search" hidden>
-      <div class="discovery-heading"><h1 id="search-repository-title">Find a starting point in the code</h1><p>Ask a question, then inspect and keep useful source locations.</p></div>
-      <form id="source-question-form"><label for="source-question">Ask about this codebase<input id="source-question" type="search" maxlength="2048" autocomplete="off" placeholder="For example: where are new transactions created?"></label><div class="search-actions"><button type="submit">Search sources</button><button id="search-keep-question" type="button" disabled>Keep question</button></div></form>
-      <details id="search-comparison"><summary>Trial comparison</summary><label><input id="search-original" type="checkbox">Original matching</label><p>Compare the original matching order for the same captured source.</p></details>
-      <p id="search-scope">Searches captured indexed source.</p><p id="search-summary" role="status">Enter a question to find source starting points.</p>
-      <p id="search-stale" hidden>Source changed. Search again before keeping these results.</p>
-      <div id="search-results" aria-label="Suggested source groups" aria-busy="false"></div><p id="search-empty" hidden>No matches in the searched source. Try a symbol or rephrase the question.</p>
-      <button id="search-retry-index" type="button" hidden>Retry source indexing</button><p><a href="/">Browse repository areas instead</a></p>
     </section>
     <section id="discovery-panel" aria-label="Repository overview">
       <div class="discovery-heading"><h1 id="repository-title">Explore this repository</h1><p id="discovery-summary">Preparing the source overview…</p></div>
@@ -60,7 +51,6 @@
     <section id="saved-workspace" aria-label="Saved context" hidden>
       <div class="saved-heading"><h1 id="investigation-title">Your saved context</h1><p id="investigation-counts">No saved locations yet</p><p id="save-mode"></p></div>
       <div class="optional-tools">
-        <details><summary>Add or edit a question</summary><form id="question-form"><label for="question">What are you investigating?</label><textarea id="question" rows="2" maxlength="2048" placeholder="An optional question to keep with these locations"></textarea><button type="submit">Save question</button></form></details>
         <details id="connection-tools" hidden><summary>Explain a connection</summary><form id="connection-form"><label for="connection-from">From</label><select id="connection-from" required></select><label for="connection-to">To</label><select id="connection-to" required></select><label>What connects them?<textarea id="connection-text" rows="3" maxlength="512" required></textarea></label><button type="submit">Connect evidence</button></form></details>
       </div>
       <div id="evidence-map" aria-label="Saved source map"><svg id="evidence-links" aria-hidden="true"></svg><div id="evidence-cards"></div><div id="empty-investigation"><h2>No saved locations yet.</h2><p>Explore the repository and keep a location when you find something useful.</p><button id="empty-add-source" type="button">Explore repository</button></div></div>

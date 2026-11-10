@@ -69,10 +69,8 @@ try {
     await page.getByRole('button',{name:'Close source preview',exact:true}).click();
   }
   report.interaction = 'Declaration search and one-click keep; no typed paths, lines or titles.';
-  await page.locator('#show-saved').click();await page.getByText('Add or edit a question',{exact:true}).click();
-  await page.getByLabel('What are you investigating?', {exact: true}).fill('How does the compiler obtain source, retry the c extension, and report read failure?');
-  await page.getByRole('button', {name: 'Save question', exact: true}).click();
-  await page.waitForFunction(() => document.querySelector('#investigation-title').textContent.startsWith('How does the compiler'));
+  await page.locator('#show-saved').click();
+  report.task = 'How does the compiler obtain source, retry the c extension, and report read failure?';
   for (const [title, path, line, note] of locations) {
     const card = page.locator('.evidence-card').filter({has: page.getByRole('heading', {name: title, exact: true})});
     await card.getByRole('button', {name: 'Inspect evidence', exact: true}).click();

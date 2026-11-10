@@ -24,11 +24,11 @@ Rust/Python are selected by default; explicit scopes enable
 raw C/C++ analysis. Normal editing stays in the editor, with richer plugin integration
 remaining a supported direction.
 
-Existing [question-search](docs/how-to/question-search-trial.md) and
-[structural exploration](docs/how-to/structural-exploration.md) trials remain as experimental
-controls/infrastructure. Their [Tract](experiments/companion/TRACT_PLUGIN_PACK_FRESH_RESULTS.md)
+The question-search browser trial is retired; its [evaluation records](experiments/companion/QUESTION_SEARCH_RESULTS.md)
+remain available. [Structural exploration](docs/how-to/structural-exploration.md) remains a
+supporting prototype. The [Tract](experiments/companion/TRACT_PLUGIN_PACK_FRESH_RESULTS.md)
 and [Sketchlayer](experiments/structure/SKETCHLAYER_RESULTS.md) results document relevance,
-retention and IDE-duplication limits. They are no longer the primary product milestone.
+retention and IDE-duplication limits.
 
 The production renderer, compiler-backed language integrations and storage engine
 remain open decisions. Both guided learning and local-change review tasks now pass

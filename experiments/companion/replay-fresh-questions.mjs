@@ -4,7 +4,7 @@ import {readFile, writeFile, mkdir, chmod} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import {join, resolve} from 'node:path';
 import {browser, startHost, paint} from '../browser/support.mjs';
-import {groupResults} from '../../crates/vizzi/web/question-state.js';
+import {groupResults} from './question-state.js';
 
 const [preparedPath, firstPath, outputPath] = process.argv.slice(2);
 assert.ok(preparedPath && firstPath && outputPath, 'Use replay-fresh-questions.mjs PREPARED_JSON FIRST_RESULTS_JSON NEW_OUTPUT_DIRECTORY');

@@ -1,11 +1,11 @@
 {
   "$schema": "../../node_modules/@stryker-mutator/core/schema/stryker-schema.json",
   "mutate": [
-    "crates/vizzi/web/question-state.js"
+    "experiments/companion/question-state.js"
   ],
   "testRunner": "command",
   "commandRunner": {
-    "command": "node crates/vizzi/web/question-state.test.js"
+    "command": "node experiments/companion/question-state.test.js"
   },
   "coverageAnalysis": "off",
   "concurrency": 1,
@@ -27,7 +27,7 @@
   "ignorePatterns": [
     "**",
     "!package.json",
-    "!crates/vizzi/web/question-state.js",
-    "!crates/vizzi/web/question-state.test.js"
+    "!experiments/companion/question-state.js",
+    "!experiments/companion/question-state.test.js"
   ]
 }
