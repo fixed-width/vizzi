@@ -46,10 +46,18 @@ and fallback limits.
 Drag or scroll the background to pan, use **+**/**−** or Ctrl/⌘ + wheel to zoom, and use
 **Fit working set** or a fragment in the overview to return to earlier context.
 
-The layout and reading positions restore on reload in the same browser and origin. A source
-update marks the retained workspace stale. Use **More → New workspace** to navigate current
-source. If the old capture has expired after a host restart, the pane reports it rather than
-substituting current bytes.
+The layout and reading positions restore on reload in the same browser and origin. Live
+bubbles follow files saved in your editor, retaining their arrangement. Reading positions
+follow an unchanged nearby source line where it can be identified; otherwise the view
+returns to the function start and says its reading position was reset.
+
+Use a bubble's **Pin version** to keep its current source. **Follow live** resumes updates.
+Pinning is separate from **Keep**. Older pinned versions disable current-source actions;
+their loaded text stays visible. Further paging or reload can report capture expiry.
+A removed, renamed, moved or ambiguous function retains its earlier view with a notice;
+reopen it through **Add fragment** to choose its current identity. Historical arrows say
+**previous call** or **removed call** until current evidence or a fresh follow validates
+them. Unsaved editor buffers need a future plugin; this mode follows disk saves.
 
 Use **Editor** to open a current fragment at its original declaration line in VS Code.
 The host checks the captured location and working-file contents first. **Keep** independently

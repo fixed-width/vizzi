@@ -83,8 +83,9 @@ when another opens so scroll/selection state survives. Place only the new view i
 space beside its parent; avoid reflowing older nodes. A camera changes presentation transforms,
 not view geometry. Load up to 96 captured lines per section and at most 24 source views;
 page long declarations and call lists explicitly. Handle per-view fetch cancellation and
-late replies without replacing/duplicating another view's source. A global source change
-invalidates navigation while retaining old loaded views; expired backing is explicit.
+late replies without replacing/duplicating another view's source. The
+[live refresh transaction](LIVE_TECH.md) advances working-tree bindings coherently while
+preserving pinned/uncertain earlier views. Expired backing remains explicit.
 
 The model is independent of DOM/SVG and any future wgpu/Canvas renderer. The prototype does
 not settle the production renderer. A large source workspace requires only a focused task

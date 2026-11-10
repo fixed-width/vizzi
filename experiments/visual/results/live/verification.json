@@ -1,0 +1,38 @@
+{
+  "nativeTests": {
+    "passed": 605,
+    "ignored": 3,
+    "includesDoctests": true
+  },
+  "format": "passed",
+  "clippy": "passed, warnings denied",
+  "browser": "complete default suite passed",
+  "mutation": {
+    "nativeRefresh": {
+      "scope": "complete new native refresh module; latest outcomes across full and targeted runs",
+      "total": 114,
+      "caught": 105,
+      "survived": 4,
+      "unviable": 5,
+      "timeouts": 0
+    },
+    "core": {
+      "scope": "complete resolve and check_link methods",
+      "total": 11,
+      "caught": 9,
+      "unviable": 2,
+      "survived": 0,
+      "timeouts": 0
+    },
+    "javascript": {
+      "scope": "complete presentation model and live publication coordinator",
+      "total": 1089,
+      "caught": 1063,
+      "survived": 26,
+      "timeouts": 0,
+      "errors": 0
+    },
+    "limits": "DOM/controller changes have browser regressions; no whole-project mutation claim. Interrupted and zero-match runs excluded."
+  },
+  "cleanup": "Removed dev artifacts after checks: 3042 files, 3.1 GiB; retained release and browser dependencies."
+}

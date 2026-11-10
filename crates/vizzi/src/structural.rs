@@ -1,4 +1,7 @@
 //! Current-observation adapter for metadata-only structural operations.
+
+/// Coherent live working-set refresh.
+pub mod live;
 use crate::{companion::CompanionError, host::Host};
 use serde::Deserialize;
 use serde_json::Value;

@@ -17,16 +17,24 @@ export function renderCallText(node,line,actions,activate,plan=null,margin={byte
         const start=offsets.get(range.start),end=offsets.get(range.end);if(start===undefined||end===undefined)continue;
         const first=endpoint(start,false),last=endpoint(end,true);if(!first||!last)continue;
         const selection=document.createRange();selection.setStart(first.node,start-first.start);selection.setEnd(last.node,end-last.start);
-        const button=document.createElement('span');button.className='code-call';button.dataset.callId=range.id;button.setAttribute('role','button');button.tabIndex=0;
+        const button=document.createElement('span');button.className='code-call';button.dataset.callId=range.id;button.callAction=range.action;button.setAttribute('role','button');button.tabIndex=0;
         button.setAttribute('aria-label',`Actions for ${range.name}`);button.setAttribute('aria-haspopup','menu');button.setAttribute('aria-expanded','false');button.title='Call actions · Ctrl/⌘-click opens the definition';
         button.append(selection.extractContents());selection.insertNode(button);
         const selected=()=>{const value=document.getSelection();if(!value||value.isCollapsed)return false;for(let i=0;i<value.rangeCount;i++)if(value.getRangeAt(i).intersectsNode(button))return true;return false;};
         const disabled=()=>button.getAttribute('aria-disabled')==='true';
-        button.addEventListener('click',event=>{if(disabled()||selected()||event.detail>1)return;event.preventDefault();activate(range.action,button,Boolean(event.ctrlKey||event.metaKey),event.detail===0);});
-        button.addEventListener('contextmenu',event=>{if(disabled()||selected())return;event.preventDefault();activate(range.action,button,false,true);});
-        button.addEventListener('keydown',event=>{if(disabled())return;if(event.key==='Enter'){event.preventDefault();activate(range.action,button,Boolean(event.ctrlKey||event.metaKey),true);}else if(event.key==='ArrowDown'||event.key==='ContextMenu'||(event.shiftKey&&event.key==='F10')){event.preventDefault();activate(range.action,button,false,true);}else if(event.key===' ')event.preventDefault();});
-        button.addEventListener('keyup',event=>{if(event.key===' '&&!disabled()){event.preventDefault();activate(range.action,button,false,true);}});
+        button.addEventListener('click',event=>{if(disabled()||selected()||event.detail>1)return;event.preventDefault();activate(button.callAction,button,Boolean(event.ctrlKey||event.metaKey),event.detail===0);});
+        button.addEventListener('contextmenu',event=>{if(disabled()||selected())return;event.preventDefault();activate(button.callAction,button,false,true);});
+        button.addEventListener('keydown',event=>{if(disabled())return;if(event.key==='Enter'){event.preventDefault();activate(button.callAction,button,Boolean(event.ctrlKey||event.metaKey),true);}else if(event.key==='ArrowDown'||event.key==='ContextMenu'||(event.shiftKey&&event.key==='F10')){event.preventDefault();activate(button.callAction,button,false,true);}else if(event.key===' ')event.preventDefault();});
+        button.addEventListener('keyup',event=>{if(event.key===' '&&!disabled()){event.preventDefault();activate(button.callAction,button,false,true);}});
     }
+}
+
+const actionKey=action=>JSON.stringify([action.name,action.position?.line,action.position?.start,action.position?.end]);
+export function retargetCalls(root,before,after){
+    if(before.length!==after.length)return false;const fresh=new Map(after.map(a=>[actionKey(a),a]));
+    if(fresh.size!==after.length||!before.every(a=>fresh.has(actionKey(a))))return false;
+    const buttons=[...root.querySelectorAll('.code-call')];if(!buttons.every(b=>fresh.has(actionKey(b.callAction))))return false;
+    for(const button of buttons){button.callAction=fresh.get(actionKey(button.callAction));button.dataset.callId=button.callAction.id;}return true;
 }
 
 export function createCallMenu(root) {

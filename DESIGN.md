@@ -44,6 +44,10 @@ views, layout, groups and reading/camera state separately from analysis identiti
 fragment view references a particular source observation/version/range; it is not limited
 to the short excerpt stored by the existing investigation model. This seam also permits
 several representations of the same source and per-view revision context for reviews.
+Working-tree views follow saved changes through explicit declaration tracking and coherent
+source/relationship refreshes. Individual views can pin a captured version. Ambiguous or
+missing declarations retain earlier context rather than adopting a guessed target; see
+the [live view contract](docs/visual/LIVE_PRODUCT.md).
 
 Source snapshots and their comparison are independent of source-control history.
 Target Git initially without requiring Git-specific identifiers or operations in the

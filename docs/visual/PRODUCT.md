@@ -57,9 +57,11 @@ reference, with no separate design mock.
   bindings separately from source facts and the existing investigation. Refresh restores
   those views; storage failure is visible. This prototype's persistence is browser-local,
   not a portable/multi-device source archive.
-- Source updates preserve the existing views/loaded bytes and mark them stale. Never silently
-  retarget a fragment. New/current source starts an explicit new workspace. Exact captured
-  windows and existing current-only keep/verified editor actions retain their safeguards.
+- Working-tree views follow saved changes through native declaration tracking, preserving
+  their visual arrangement. **Pin version** retains one view; **Follow live** resumes it.
+  Missing/ambiguous functions and unverified links retain explicit earlier-version context.
+  The [live behaviour contract](LIVE_PRODUCT.md) defines refresh, selection deferral and
+  capture-expiry limits. Current-only Keep/editor safeguards remain in effect per view.
 - Controls are keyboard accessible, source/names render as text, themes follow system/override
   settings, and small viewports can pan/zoom without overflowing the page. No desktop editor
   opens automatically. Automated verification uses recording-only adapters.

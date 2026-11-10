@@ -36,12 +36,14 @@ pub(super) fn router(
     search: Arc<crate::question_search::QuestionSearch>,
     structure: Arc<crate::structural::StructureHost>,
 ) -> Router {
+    let refresh = structure.clone();
     let definitions = structure.clone();
     let capabilities = structure.clone();
     Router::new()
         .route("/api/investigation", get(view).post(edit))
         .route("/api/discovery", get(discover))
         .route("/api/structure", get(move || {let capabilities=capabilities.clone();async move {Json(serde_json::json!({"trial":true,"resolution":"candidate_only","call_languages":["rust","python"],"definition_provider":capabilities.definitions_available()}))}}).post(move |Json(request):Json<crate::structural::Request>| {let structure=structure.clone();async move {work(move ||structure.query(&request)).await}}))
+        .route("/api/visual/refresh", post({let structure=refresh.clone();move |Json(request):Json<crate::structural::live::Request>|{let structure=structure.clone();async move{work(move ||structure.refresh(&request)).await}}}).layer(DefaultBodyLimit::max(192*1024)))
         .route("/api/call-definition", post(move |Json(request):Json<crate::structural::DefinitionRequest>| {let definitions=definitions.clone();async move {work(move ||definitions.definition(&request)).await}}))
         .route(
             "/api/search",

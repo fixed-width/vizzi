@@ -1,0 +1,9 @@
+// Supersession and interaction deferral belong to the live publication transaction.
+export class LiveUpdates {
+ constructor({capture,request,apply,blocked=()=>false,pending=()=>{},failed=()=>{},schedule=(fn,delay)=>setTimeout(fn,delay),cancel=handle=>clearTimeout(handle)}){Object.assign(this,{capture,request,apply,blocked,pending,failed,schedule,cancel});this.target=null;this.ticket=0;this.timer=null;this.controller=null;this.ready=null;this.backoff=100;this.closed=false;}
+ changed(snapshot,force=false,aligned=false){if(this.closed||(!force&&snapshot===this.target))return;this.target=snapshot;this.ticket++;this.controller?.abort();this.ready=null;if(aligned&&!force)return;this.pending(snapshot);this.queue(40);}
+ queue(delay){this.cancel(this.timer);this.timer=this.schedule(()=>{this.timer=null;void this.run();},delay);}
+ async run(){const ticket=this.ticket,snapshot=this.target;this.controller=new AbortController();try{const base=this.capture();const data=await this.request({...base.body,snapshot},this.controller.signal);if(this.closed||ticket!==this.ticket)return;if(this.capture().key!==base.key){this.queue(40);return;}this.ready={data,base,ticket};this.resume();}catch(error){if(this.closed||ticket!==this.ticket||error.name==='AbortError')return;this.failed(error);this.queue(this.backoff);this.backoff=Math.min(2000,this.backoff*2);}}
+ resume(){const ready=this.ready;if(!ready||this.closed||ready.ticket!==this.ticket||this.blocked())return;if(this.capture().key!==ready.base.key){this.ready=null;this.queue(40);return;}try{this.apply(ready.data,ready.base);this.ready=null;this.backoff=100;}catch(error){this.ready=null;this.failed(error);this.queue(this.backoff);}}
+ close(){this.closed=true;this.ticket++;this.cancel(this.timer);this.controller?.abort();this.ready=null;}
+}

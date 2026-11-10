@@ -32,6 +32,7 @@ export class SourcePane {
         return segment?{line:row.line.number,byte:Number(segment.dataset.start),offset:top-row.row.offsetTop-segment.offsetTop}:null;
     }
     reading(){return {top:this.element.scrollTop,left:this.element.scrollLeft,anchor:this.anchor()};}
+    readingContext(){const reading=this.reading(),row=this.rows.find(r=>r.line.number===reading.anchor?.line);return {reading,text:row&&!row.line.left&&!row.line.right&&new TextEncoder().encode(row.line.text).length<=1024?row.line.text:''};}
     restore(anchor){const row=this.rows.find(r=>r.line.number===anchor.line),segment=row&&[...row.text.querySelectorAll('.reflow-segment')].find(s=>Number(s.dataset.start)<=anchor.byte&&(anchor.byte<Number(s.dataset.end)||Number(s.dataset.start)===Number(s.dataset.end)));if(segment)this.element.scrollTop=row.row.offsetTop+segment.offsetTop+Math.min(anchor.offset,Math.max(0,segment.offsetHeight-1));}
     update(preserve,force=false){
         if(this.closed||!this.rows.length)return;

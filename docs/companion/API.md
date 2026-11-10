@@ -14,8 +14,9 @@ connection explanations at 512. Native state is outside the source checkout.
 | `POST /api/investigation` | Tagged reader edit: question, annotate, connect, disconnect or remove, each with expected revision. |
 | `POST /api/investigation/evidence/{id}/open` | JSON `{}` → verified editor handoff requested; the executable/arguments cannot be supplied by the request. |
 | `POST /api/editor/open` | JSON `{snapshot,file,version,line}` → verified current-source handoff, without saving evidence. `line` is the original one-based source line. No path, executable or arguments are accepted. |
+| `POST /api/visual/refresh` | Coherent current bindings, source windows and relationship checks for a visual working set. See [the live interface](../visual/LIVE_API.md) for its schema and 192 KiB body limit. |
 
-Mutations require JSON and deny unknown fields. Bodies cap at 16 KiB. Obsolete board or
+Mutations require JSON and deny unknown fields. Except for visual refresh, bodies cap at 16 KiB. Obsolete board or
 source versions return 409; invalid bounds/links 400; unavailable source/index 503;
 persistence failure 500; editor command failure 502. Failed save/edit leaves the last
 investigation active. Two blocking operations and one editor handoff are admitted at a

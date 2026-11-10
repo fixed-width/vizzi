@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "kind": "known-source live-save functional replay on temporary source copies",
+  "environment": {
+    "platform": "linux",
+    "architecture": "x64",
+    "node": "v22.14.0",
+    "chromium": "156.0.8078.4",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13700H",
+    "logicalCpus": 20,
+    "memoryBytes": 67080228864,
+    "workers": 1
+  },
+  "inputFilesSha256": {
+    "minitosis/src/lib.rs": "629967a245cf5ab9967e640aab45d0cb39da0c93946c60dc11c6221443f1a187",
+    "gs-meter/src/lib.rs": "9977b6faafe91742c72db047e3c157be98bd3658664e11fbbd0a2e32ca16e12b"
+  },
+  "sourceRevision": "951cf85413029423e036c641638b845edafe75cf",
+  "binarySha256": "133d90d0ec03afdaccac0892ba52d4d91b92d6e5479749657d0fee6bda298694",
+  "samplesMs": [
+    99.53626299999996,
+    105.0108439999999,
+    109.62886299999991,
+    93.76711599999999,
+    106.31277299999988
+  ],
+  "medianMs": 105.0108439999999,
+  "maxMs": 109.62886299999991,
+  "callerGeometryPreserved": true,
+  "pinnedDomPreserved": true,
+  "relationshipRevalidated": true,
+  "pageErrors": [],
+  "limitations": "Five sequential saves in one isolated Chromium session after other own checks stopped; includes filesystem capture, index, native preparation, transport and polling. Not a latency distribution, baseline-laptop or independent usability qualification. Original repository unchanged; no inspected builds, editor or language server launched."
+}

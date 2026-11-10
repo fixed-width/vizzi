@@ -19,3 +19,5 @@
 .code-pane{position:relative;scrollbar-gutter:stable;font-variant-ligatures:none;font-kerning:none}.code-line{display:grid;grid-template-columns:45px minmax(0,1fr);width:100%}.code-text{min-width:0;position:relative;white-space:pre}.line-number{align-self:start}.reflow-segment{display:block;position:relative;min-height:21px;white-space:pre}.reflow-marker{position:absolute;left:-30px;color:var(--muted);font-size:10px}.reflow-marker::before{content:'↪'}.source-clip{color:var(--warning-text)}
 
 .source-margin{display:none}.source-margin-remainder{display:inline-block;height:0}
+
+#workspace-links path.historical-call{stroke:var(--muted);stroke-dasharray:2 5;opacity:.65}

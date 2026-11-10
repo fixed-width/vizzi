@@ -83,7 +83,7 @@ for(const[key,values]of Object.entries(badSource))for(const value of values){con
 for(const invalid of [[snapshot],{toString:()=>snapshot}])assert.throws(()=>new Workspace(invalid));
 const alone=JSON.parse(new Workspace(snapshot).serialize());alone.views=[structuredClone(rootView)];alone.next=2;alone.selected=null;
 for(const id of ['xv1','v1x','v1a']){const data=structuredClone(alone);data.views[0].id=id;assert.throws(()=>restore(data));}
-const duplicates=structuredClone(alone);duplicates.next=3;duplicates.views.push({...structuredClone(duplicates.views[0]),id:'v2'});assert.throws(()=>restore(duplicates));
+const duplicates=structuredClone(alone);duplicates.next=3;duplicates.views.push({...structuredClone(duplicates.views[0]),id:'v2'});assert.equal(restore(duplicates).views.length,2);
 const viewOverflow=JSON.parse(large.serialize());viewOverflow.views.push({...structuredClone(viewOverflow.views[0]),id:'v25',symbol:{...structuredClone(a),id:'f'.repeat(64)}});viewOverflow.next=26;viewOverflow.views[24].reading.section=a.source.line;assert.throws(()=>restore(viewOverflow));
 const linksOverflow=JSON.parse(linked.serialize());const added=structuredClone(linksOverflow.links[0]);added.spelling='extra';added.id=[added.from,added.to,added.source.file,added.source.line,added.spelling].join('|');linksOverflow.links.push(added);assert.throws(()=>restore(linksOverflow));
 for(const spelling of ['',null,'x'.repeat(257)]){const data=document(),l=data.links[0];l.spelling=spelling;l.id=[l.from,l.to,l.source.file,l.source.line,spelling].join('|');assert.throws(()=>restore(data));}

@@ -31,6 +31,8 @@ pub struct Source {
 /// Captured declaration, not a resolved runtime entity.
 #[derive(Clone, Debug, Serialize)]
 pub struct Symbol {
+    /// Tracking identity; duplicate lexical keys are scoped to captured content.
+    pub tracking: String,
     /// Opaque identity for this observation/version/context.
     pub id: String,
     /// Literal declaration name.
@@ -155,6 +157,7 @@ struct Site {
 }
 /// Metadata index owning no source text or native snapshot Arc.
 pub struct Structure {
+    tracking: BTreeMap<String, Option<usize>>,
     search: Vec<crate::structure_search::Name>,
     snapshot: String,
     coverage: CoverageInfo,
@@ -226,6 +229,7 @@ impl Structure {
     /// Builds from already-validated captured metadata, without reading or parsing source.
     pub fn new(snapshot: &Snapshot) -> Self {
         let mut index = Self {
+            tracking: BTreeMap::new(),
             search: vec![],
             snapshot: snapshot.id().as_str().into(),
             coverage: CoverageInfo {
@@ -317,6 +321,7 @@ impl Structure {
                 index.names.entry(fact.name.clone()).or_default().push(n);
                 mapping.insert(ordinal, id.clone());
                 let symbol = Symbol {
+                    tracking: doc.entity_id(analysis, fact).as_str().into(),
                     id,
                     name: fact.name.clone(),
                     kind: fact.kind.clone(),
@@ -326,6 +331,11 @@ impl Structure {
                 index
                     .search
                     .push(crate::structure_search::Name::new(&symbol));
+                index
+                    .tracking
+                    .entry(symbol.tracking.clone())
+                    .and_modify(|n| *n = None)
+                    .or_insert(Some(n));
                 index.symbols.push(symbol);
             }
             let Some(calls) = &analysis.calls else {
@@ -627,5 +637,76 @@ impl Structure {
             SITES,
             |n| self.invocation(&self.sites[*n], area),
         ))
+    }
+}
+
+/// Fresh evidence for a retained visual relationship.
+#[derive(Debug, Serialize)]
+pub struct LinkCheck {
+    /// Current, removed, or unverified; uncertainty never establishes a call target.
+    pub state: &'static str,
+    /// Fresh source-local or reader-selected candidate evidence kind.
+    pub kind: Option<&'static str>,
+    /// Current written call location when uniquely available.
+    pub source: Option<Source>,
+}
+impl Structure {
+    /// Resolves a declaration tracking reference, with exact-ID migration for older clients.
+    pub fn resolve(&self, tracking: Option<&str>, id: &str) -> Option<&Symbol> {
+        let n = match tracking {
+            Some(key) => self.tracking.get(key).copied().flatten()?,
+            None => *self.ids.get(id)?,
+        };
+        self.symbols.get(n)
+    }
+    /// Revalidates one unique written site without carrying old language-server certainty forward.
+    pub fn check_link(
+        &self,
+        from: &str,
+        to: &str,
+        spelling: &str,
+        kind: &str,
+    ) -> Result<LinkCheck, Error> {
+        self.symbol(from)?;
+        let target = self.symbol(to)?;
+        let mut sites = self
+            .owners
+            .get(from)
+            .into_iter()
+            .flatten()
+            .map(|n| &self.sites[*n])
+            .filter(|s| s.spelling == spelling);
+        let Some(site) = sites.next() else {
+            return Ok(LinkCheck {
+                state: "removed",
+                kind: None,
+                source: None,
+            });
+        };
+        let evidence = if sites.next().is_some() {
+            None
+        } else if site
+            .target
+            .as_ref()
+            .is_some_and(|(id, basis)| id == to && *basis == TargetBasis::RustSelfReceiver)
+        {
+            Some("self")
+        } else if kind == "candidate"
+            && site.name.as_deref() == Some(target.name.as_str())
+            && site.target.is_none()
+        {
+            Some("candidate")
+        } else {
+            None
+        };
+        Ok(LinkCheck {
+            state: if evidence.is_some() {
+                "current"
+            } else {
+                "unverified"
+            },
+            kind: evidence,
+            source: Some(site.source.clone()),
+        })
     }
 }
