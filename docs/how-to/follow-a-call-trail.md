@@ -35,13 +35,21 @@ Drag a header to arrange a bubble. Drag its lower-right grip to resize it; focus
 or grip and use arrow keys for the same operations. Collapse an earlier step to retain its
 place while freeing space. Closing a bubble removes its visual connections.
 
-Use **↕ Expand height** or **↔ Expand width** in a bubble header to fit the current code
-section. Nearby bubbles move down or right to make room. The bubble stays anchored and
+Use **↕ Fit height** or **↔ Fit width** in a bubble header to fit the current code
+section. These controls can grow or shrink the bubble. When growing, nearby bubbles move
+down or right to make room; shrinking leaves them in place. The bubble stays anchored and
 zoom stays unchanged. Expansion uses loaded source; long sections can still require
 scrolling at the maximum size. Ordinary corner resizing remains available.
 
 **Workspace** contains New workspace and Saved locations. **Settings** contains Theme
 and Code layout. Minimap boxes show function names and source locations when hovered.
+
+Hover over an opened bubble to highlight its originating call lines and arrows. Hover
+over a call line to highlight its opened destinations and their arrows. Call names spanning lines
+light up across those original lines, including reflowed text. Arrow hover identifies
+both ends. Keyboard focus provides the same cues. These highlights are temporary and
+do not move the workspace or fetch source. Older arrows retain their historical style;
+they never highlight unrelated replacement code after an edit.
 
 Click **×** at the right of a transient notice or error banner to dismiss it.
 

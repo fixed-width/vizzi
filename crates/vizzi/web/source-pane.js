@@ -40,7 +40,7 @@ export class SourcePane {
         const textWidth=text=>context?context.measureText(text).width:text.length*parseFloat(style.fontSize)*.6;
         const tab=textWidth('    '),measure=text=>{let width=0;const parts=text.split('\t');for(const [i,part]of parts.entries()){width+=textWidth(part);if(i<parts.length-1)width=(Math.floor(width/tab)+1)*tab;}return width;};
         const width=Math.max(...this.rows.map(r=>measure(' '.repeat(r.margin.columns)+r.line.text.slice(r.margin.bytes))));
-        return {width:Math.ceil(width+67+this.element.offsetWidth-this.element.clientWidth),height:this.rows.reduce((sum,r)=>sum+r.row.offsetHeight,0)+parseFloat(style.paddingTop)+parseFloat(style.paddingBottom)};
+        return {width:Math.ceil(width+67+this.element.offsetWidth-this.element.clientWidth),height:Math.max(parseFloat(style.minHeight)||0,this.rows.reduce((sum,r)=>sum+r.row.offsetHeight,0)+parseFloat(style.paddingTop)+parseFloat(style.paddingBottom))};
     }
     restore(anchor){const row=this.rows.find(r=>r.line.number===anchor.line),segment=row&&[...row.text.querySelectorAll('.reflow-segment')].find(s=>Number(s.dataset.start)<=anchor.byte&&(anchor.byte<Number(s.dataset.end)||Number(s.dataset.start)===Number(s.dataset.end)));if(segment)this.element.scrollTop=row.row.offsetTop+segment.offsetTop+Math.min(anchor.offset,Math.max(0,segment.offsetHeight-1));}
     update(preserve,force=false){

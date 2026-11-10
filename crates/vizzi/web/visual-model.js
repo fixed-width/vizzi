@@ -1,4 +1,4 @@
-import {expandViews,BUBBLE_SIZE} from './layout-growth.js';
+import {fitViews,BUBBLE_SIZE} from './layout-growth.js';
 // Presentation state is independent of captured source and relationship facts.
 export const LIMIT=24,MIN_SCALE=0.02,MAX_SCALE=1.5;
 const bytes=s=>new TextEncoder().encode(s).length;
@@ -69,8 +69,8 @@ export class Workspace {
  move(id,x,y){require(finite(x,-1e5,1e5)&&finite(y,-1e5,1e5),'Invalid fragment position');const v=this.view(id);v.x=x;v.y=y;}
  resize(id,w,h){require(finite(w,320,BUBBLE_SIZE.maxWidth)&&finite(h,200,BUBBLE_SIZE.maxHeight),'Invalid fragment size');const v=this.view(id);v.w=w;v.h=h;}
  read(id,r){const v=this.view(id);require(reading(r,v.symbol.source),'Invalid fragment reading state');v.reading=clone(r);}
- expand(id,axis,extent){this.views=expandViews(this.views,id,axis,extent);this.selected=id;}
- collapse(id){const v=this.view(id);if(v.collapsed)this.expand(id,'height',v.h);else v.collapsed=true;this.selected=id;}
+ fitSize(id,axis,extent){this.views=fitViews(this.views,id,axis,extent);this.selected=id;}
+ collapse(id){const v=this.view(id);if(v.collapsed)this.fitSize(id,'height',v.h);else v.collapsed=true;this.selected=id;}
  close(id){this.view(id);this.views=this.views.filter(v=>v.id!==id);this.links=this.links.filter(l=>l.from!==id&&l.to!==id);if(this.selected===id)this.selected=this.views.at(-1)?.id??null;}
  pan(dx,dy){require(finite(dx,-1e5,1e5)&&finite(dy,-1e5,1e5),'Invalid camera movement');this.camera.x=Math.max(-1e5,Math.min(1e5,this.camera.x-dx/this.camera.scale));this.camera.y=Math.max(-1e5,Math.min(1e5,this.camera.y-dy/this.camera.scale));}
  zoomAt(scale,point){require(Number.isFinite(scale)&&finite(point.x,-1e5,1e5)&&finite(point.y,-1e5,1e5),'Invalid zoom');const p=worldPoint(point,this.camera);const next=Math.max(MIN_SCALE,Math.min(MAX_SCALE,scale));this.camera={x:Math.max(-1e5,Math.min(1e5,p.x-point.x/next)),y:Math.max(-1e5,Math.min(1e5,p.y-point.y/next)),scale:next};}

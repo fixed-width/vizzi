@@ -111,7 +111,7 @@ retain their existing names and meanings.
 `SourcePane.contentSize()` measures loaded text locally, respecting the declaration
 margin, tabs and current reflow. Width uses original line measurements; height uses the
 current displayed rows. The controller adds the actual surrounding chrome and requests
-one axis from `Workspace.expand(id, axis, extent)`. No source transport or model inference
+one fitting axis from `Workspace.fitSize(id, axis, extent)`. No source transport or model inference
 is involved. Growth caps at 1,600 by 2,400 canvas pixels, with scrolling beyond the cap.
 
 A pure layout module plans the complete expansion before the model adopts it. The chosen
@@ -128,3 +128,15 @@ pair cannot both fit. `fit` explicitly computes scale. Arrow provenance/freshnes
 native and presentation data, styles and hover/accessibility details; inline labels are
 removed. Minimap rectangles have qualified function/path/line SVG titles and accessible
 names.
+
+
+Fit size clamps the requested axis to its minimum and maximum. A smaller size is applied
+without pulling neighbours into the released space. Only growth or uncollapsing enters
+the existing push planner. Source measurement includes the code pane minimum height so
+short sections still leave the header and footer usable.
+
+A pure highlight projection reads the current views, retained links and hover/focus
+intent. It returns bubble/link IDs and original source-line ranges; captured witness
+identity gates line association. A delegated DOM adapter applies temporary classes to
+bubbles, arrows and visible code rows. It recomputes after layout/source changes, without
+adding text wrappers, changing selection, paging, source requests or persisted data.

@@ -17,10 +17,11 @@ Opening or returning to a bubble pans only as needed, preserving the reader's zo
 Fit workspace and zoom controls are explicit scale changes. When caller and destination
 cannot both fit at the current scale, reveal the destination without changing scale.
 
-Separate **Expand height** and **Expand width** actions grow a bubble to fit its currently
+Separate **Fit height** and **Fit width** actions grow or shrink a bubble to fit its currently
 loaded section, including current reflow for height and original line widths for width.
-Expansion never fetches more source, shrinks a bubble, changes camera scale or rearranges
-unrelated bubbles. Directly obstructing bubbles, and any bubbles they obstruct in turn,
+Fitting never fetches more source, changes camera scale or rearranges
+unrelated bubbles. Shrinking leaves neighbours where they are. Selected bubbles keep their controls above
+overlapping neighbours. Directly obstructing bubbles, and any bubbles they obstruct in turn,
 move down for height growth or right for width growth with a fixed gap. The selected
 bubble stays anchored. Compute the complete bounded change before applying it; failure
 leaves the layout intact. Width caps at 1,600 and height at 2,400 canvas pixels; code that
@@ -94,3 +95,15 @@ call trail while retaining previous-step context. Groups, alternative representa
 revision/diff views are supported by the design direction but are not required in this small
 prototype. No new model, parser or GPU backend is introduced. Source-local Rust bindings extend the
 existing captured call metadata without requiring a repository build.
+
+
+Hovering a bubble highlights its originating call lines and connecting arrows. Hovering
+an original physical call line highlights all opened destinations for captured callee spellings spanning
+that line and their arrows. Wrapped rows retain the original line association. Multiple
+callers, repeated calls and branches remain distinct. Arrow hover identifies both ends.
+Keyboard-visible focus provides the same connection cues. This transient feedback changes
+no selection, layout, camera, source capture or stored state, and performs no source IO.
+Only a call witness matching the caller's displayed file/version/context/range can colour
+code lines. Historical arrows can still be emphasised as retained context, with their
+historical styling, without colouring unrelated lines in newer source. Reflow, paging,
+refresh and closure recompute/clear these cues without fetching or auto-scrolling.

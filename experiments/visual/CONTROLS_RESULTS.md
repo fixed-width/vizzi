@@ -48,3 +48,33 @@ claim. Reproduce with `experiments/visual/replay-controls.mjs ROOT NEW_OUTPUT` a
 the release host. [Logs, mutation outcomes, screenshots and source/binary hashes](results/controls/checksums.json)
 are archived compactly. See the [usage guide](../../docs/how-to/follow-a-call-trail.md),
 [behaviour contract](../../docs/visual/PRODUCT.md) and [architecture](../../docs/visual/TECH.md).
+
+## Fit and linked-hover follow-up
+
+The axis controls are now **Fit height** and **Fit width**. They clamp either upward or
+downward to the current section's measured size, preserve the code pane minimum height,
+and leave neighbours in place when shrinking. Selected bubbles stay above overlaps so
+their fit controls remain reachable after manual resizing.
+
+Hover/focus identifies a bubble's originating callee lines, opened destinations for a
+hovered call line, and their connecting arrows. Arrow hover identifies both ends. Native
+callee spans supply the line ranges, including qualified names spanning lines; argument
+lists are not guessed from text. Temporary DOM classes do not change selection, layout,
+source, camera or persistence. Exact captured file/version/context/range matching prevents
+old witnesses from highlighting replacement code. Historical arrows keep their styling.
+
+Formatting, the full browser suite, 605 native tests/doctests (3 opt-in tests ignored),
+and Clippy pass. Browser fixtures cover shrinking, minimum-size control visibility,
+overlapping controls, multi-line names, multiple callers, reciprocal line/node/arrow
+cues, keyboard focus, live line shifts, removed calls and closure. Source-request counts
+remain unchanged during fit/hover. The Minitosis replay verifies shrinking and linked
+hover in both themes on a temporary source copy, with no editor/build launch.
+
+The complete fit planner and pure relationship-highlight projection have a passing
+unmodified baseline and **216 caught, 9 surviving, zero timeouts/errors** with one
+lower-priority worker. All 92 highlight-projection mutations are caught. The nine planner
+survivors are the same diagnostic strings, redundant guard and equivalent bounded
+traversal/finite-input cases described above. There are no exclusions. The delegated DOM
+adapter is verified by browser regressions rather than a complete mutation scope. Use
+`experiments/browser/fit-links-stryker.config.json` to reproduce the focused run. Follow-up
+logs and screenshots have a `fit-hover-` prefix in the existing checksum manifest.
