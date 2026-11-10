@@ -35,6 +35,7 @@
     "!crates/vizzi/web/link-highlights.test.js",
     "!crates/vizzi/web/workspace-layout.test.js",
     "!crates/vizzi/web/visual-model.test.js",
-    "!crates/vizzi/web/fixtures/visual-v1.json"
+    "!crates/vizzi/web/fixtures/visual-v1.json",
+    "!crates/vizzi/web/source-origin.js"
   ]
 }

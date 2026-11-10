@@ -1,3 +1,4 @@
+import {validOrigin} from './source-origin.js';
 import {validModule} from './module-identity.js';
 import {fitViews,BUBBLE_SIZE} from './layout-growth.js';
 // Presentation state is independent of captured source and relationship facts.
@@ -9,7 +10,7 @@ const integer=(n,min,max)=>Number.isSafeInteger(n)&&n>=min&&n<=max;
 const require=(value,message)=>{if(!value)throw new Error(message);};
 const clone=value=>structuredClone(value);
 function source(s){return s&&typeof s.path==='string'&&bytes(s.path)<=4096&&!s.path.includes('\\')&&!s.path.split('/').some(p=>!p||p==='.'||p==='..')&&opaque(s.file)&&opaque(s.version)&&opaque(s.context)&&integer(s.line,1,1e8)&&integer(s.end_line,s.line,1e8);}
-function symbol(s){return s&&validModule(s.module)&&(s.tracking==null||opaque(s.tracking))&&opaque(s.id)&&typeof s.name==='string'&&bytes(s.name)>0&&bytes(s.name)<=128&&typeof s.kind==='string'&&bytes(s.kind)<=128&&Array.isArray(s.parents)&&s.parents.length<=16&&s.parents.every(p=>typeof p==='string'&&bytes(p)<=128)&&source(s.source);}
+function symbol(s){return s&&validOrigin(s.origin)&&validModule(s.module)&&(s.tracking==null||opaque(s.tracking))&&opaque(s.id)&&typeof s.name==='string'&&bytes(s.name)>0&&bytes(s.name)<=128&&typeof s.kind==='string'&&bytes(s.kind)<=128&&Array.isArray(s.parents)&&s.parents.length<=16&&s.parents.every(p=>typeof p==='string'&&bytes(p)<=128)&&source(s.source);}
 function geometry(v){return finite(v.x,-1e5,1e5)&&finite(v.y,-1e5,1e5)&&finite(v.w,320,BUBBLE_SIZE.maxWidth)&&finite(v.h,200,BUBBLE_SIZE.maxHeight);}
 function reading(r,s){return r&&finite(r.top,0,1e7)&&finite(r.left,0,1e7)&&integer(r.section,s.line,s.end_line)&&(r.anchor==null||(integer(r.anchor.line,r.section,Math.min(s.end_line,r.section+95))&&integer(r.anchor.byte,0,32768)&&finite(r.anchor.offset,-1024,1024)));}
 function camera(c){return c&&finite(c.x,-1e5,1e5)&&finite(c.y,-1e5,1e5)&&finite(c.scale,MIN_SCALE,MAX_SCALE);}
@@ -31,7 +32,7 @@ export class Workspace {
  }
  add(s,area,parent){
   require(symbol(s),'Invalid captured symbol');require(typeof area==='string'&&bytes(area)<=4096,'Invalid source area');
-  const existing=this.views.find(v=>v.symbol.id===s.id);if(existing){this.selected=existing.id;return existing.id;}
+  const existing=this.views.find(v=>v.symbol.id===s.id&&(!s.origin||v.snapshot===this.snapshot));if(existing){if(s.origin&&existing.state==='unresolved'){existing.state='current';existing.symbol=clone(s);}this.selected=existing.id;return existing.id;}
   require(this.views.length<LIMIT,'Close a fragment before opening more views.');
   const w=440,h=400,p=this.place(parent?parent.x+parent.w+72:64,parent?parent.y:64,w,h);
   const v={id:'v'+this.next,kind:'source',snapshot:this.snapshot,mode:parent?.mode??'live',state:'current',symbol:clone(s),area,x:p.x,y:p.y,w,h,collapsed:false,reading:{section:s.source.line,top:0,left:0}};
@@ -43,7 +44,7 @@ export class Workspace {
   require(site&&site.owner===parent.symbol.id&&within(site.source,s)&&typeof site.spelling==='string'&&bytes(site.spelling)>0&&bytes(site.spelling)<=256&&Array.isArray(site.candidates)&&site.candidates.some(c=>sameSymbol(target,c)),'Call witness differs from the visible caller');
   require(site.binding==null||(site.binding==='rust_self_receiver'&&site.candidates.length===1&&site.candidate_count===1)||(site.binding==='language_server_definition'&&opaque(site.semantic_context)&&integer(site.candidate_count,site.candidates.length,64)),'Invalid definition binding');
   require(site.binding==='language_server_definition'||site.semantic_context==null,'Unexpected semantic context');
-  const existing=this.views.find(v=>v.symbol.id===target.id),key=linkKey(parentId,existing?.id??'v'+this.next,site.source,site.spelling,site.binding==='language_server_definition'?site.semantic_context:null);
+  const existing=this.views.find(v=>v.symbol.id===target.id&&(!target.origin||v.snapshot===this.snapshot)),key=linkKey(parentId,existing?.id??'v'+this.next,site.source,site.spelling,site.binding==='language_server_definition'?site.semantic_context:null);
   require(this.links.length<96||this.links.some(l=>l.id===key),'Workspace link allowance reached');const to=this.add(target,parent.area,parent);
   const fresh={id:key,from:parentId,to,kind:site.binding==='rust_self_receiver'?'self':site.binding==='language_server_definition'?'definition':'candidate',...(site.binding==='language_server_definition'?{semantic_context:site.semantic_context}:{}),spelling:site.spelling,source:clone(site.source)};
   const previous=this.links.filter(l=>l.from===parentId&&l.to===to&&l.spelling===site.spelling&&l.state!=null&&l.state!=='current');

@@ -31,6 +31,9 @@ pub struct Source {
 /// Captured declaration, not a resolved runtime entity.
 #[derive(Clone, Debug, Serialize)]
 pub struct Symbol {
+    /// Dependency provenance and its independent source capture, when outside the repository.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub origin: Option<SourceOrigin>,
     /// Captured language module, absent when membership cannot be established.
     pub module: Option<crate::modules::Module>,
     /// Tracking identity; duplicate lexical keys are scoped to captured content.
@@ -45,6 +48,20 @@ pub struct Symbol {
     pub parents: Vec<String>,
     /// Captured definition location.
     pub source: Source,
+}
+/// Public source provenance; physical dependency paths stay in the native host.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct SourceOrigin {
+    /// Opaque language/package source scope.
+    pub id: String,
+    /// Independent captured-source snapshot reference.
+    pub capture: String,
+    /// Package label supplied by the language adapter.
+    pub label: String,
+    /// Package version when available locally.
+    pub version: Option<String>,
+    /// Supplying language.
+    pub language: String,
 }
 /// Projection allowances and unavailable capability, not a completeness guarantee.
 #[derive(Default, Clone, Debug, Serialize)]
@@ -349,6 +366,7 @@ impl Structure {
                 index.names.entry(fact.name.clone()).or_default().push(n);
                 mapping.insert(ordinal, id.clone());
                 let symbol = Symbol {
+                    origin: None,
                     module: modules.for_fact(doc, analysis, ordinal),
                     tracking: doc.entity_id(analysis, fact).as_str().into(),
                     id,

@@ -13,6 +13,7 @@ offsets and byte positions are zero-based. String limits are UTF-8 bytes.
 | `views` | At most 24 live view bindings; pinned views are omitted. |
 | `views[].id` | Unique presentation ID beginning `v`, with decimal suffix, at most 8 bytes. |
 | `views[].tracking` | Native declaration tracking reference or null for exact current-ID migration. |
+| `views[].capture` | Optional independent dependency capture reference; omitted/null for repository views. |
 | `views[].symbol` | Earlier observation-bound symbol reference. |
 | `views[].version` | Captured document version, or a different valid reference to request source bytes. |
 | `views[].file`, `views[].context` | Optional pair of earlier file/analysis references for exact native tracking recovery after an analyzer-context upgrade. Supply both or neither. |

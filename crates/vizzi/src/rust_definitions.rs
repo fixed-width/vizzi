@@ -17,6 +17,7 @@ const WORKSPACE_BYTES: usize = 128 * 1024 * 1024;
 
 /// One lazy, serialized language-server session; ordinary indexing remains independent.
 pub struct RustAnalyzer {
+    sources: crate::dependency_sources::Catalog,
     root: PathBuf,
     cache: PathBuf,
     executable: PathBuf,
@@ -26,6 +27,9 @@ impl RustAnalyzer {
     /// Configures an explicitly enabled provider without starting project tooling.
     pub fn new(root: PathBuf, cache: PathBuf, executable: PathBuf) -> Self {
         Self {
+            sources: crate::dependency_sources::Catalog::new(
+                cache.join("dependency-references.json"),
+            ),
             root,
             cache,
             executable,
@@ -34,6 +38,7 @@ impl RustAnalyzer {
     }
 }
 struct Workspace {
+    external_opened: BTreeMap<PathBuf, String>,
     directory: tempfile::TempDir,
     client: Client,
     configuration: String,
@@ -149,6 +154,26 @@ fn write(root: &Path, path: &str, bytes: &[u8]) -> Result<(), String> {
     fs::write(destination, bytes).map_err(|e| e.to_string())
 }
 impl Workspace {
+    fn open_external(&mut self, path: &Path, source: &str, version: &str) -> Result<bool, String> {
+        if self.external_opened.get(path).is_some_and(|v| v == version) {
+            return Ok(false);
+        }
+        self.next = self
+            .next
+            .checked_add(1)
+            .ok_or("Semantic document versions exhausted")?;
+        let uri = crate::lsp::uri(path)?;
+        if self
+            .external_opened
+            .insert(path.into(), version.into())
+            .is_some()
+        {
+            self.client.notify("textDocument/didChange",json!({"textDocument":{"uri":uri,"version":self.next},"contentChanges":[{"text":source}]}))?;
+        } else {
+            self.client.notify("textDocument/didOpen",json!({"textDocument":{"uri":uri,"languageId":"rust","version":self.next,"text":source}}))?;
+        }
+        Ok(true)
+    }
     fn new(
         owner: &RustAnalyzer,
         snapshot: &Snapshot,
@@ -161,7 +186,12 @@ impl Workspace {
             .tempdir_in(&owner.cache)
             .map_err(|e| e.to_string())?;
         for (path, bytes) in values {
-            write(directory.path(), path, bytes)?;
+            let transformed = if path.ends_with("Cargo.toml") {
+                crate::rust_dependencies::manifest(bytes, path, &owner.root, directory.path())?
+            } else {
+                bytes.clone()
+            };
+            write(directory.path(), path, &transformed)?;
         }
         let mut files = BTreeMap::new();
         let mut total = 0;
@@ -177,6 +207,7 @@ impl Workspace {
         let mut client = Client::start(&owner.executable, directory.path())?;
         client.wait_ready()?;
         Ok(Self {
+            external_opened: BTreeMap::new(),
             directory,
             client,
             configuration,
@@ -245,7 +276,7 @@ impl Workspace {
         hash.update(include_bytes!("lsp.rs"));
         hash.update(include_bytes!("definitions.rs"));
         for value in [
-            "readonly-rust-analyzer-definitions-v1",
+            "readonly-rust-analyzer-definitions-v2",
             snapshot.id().as_str(),
             self.configuration.as_str(),
             self.client.version.as_str(),
@@ -256,10 +287,20 @@ impl Workspace {
         if let Ok(bytes) = fs::read(self.directory.path().join("Cargo.lock")) {
             hash.update(&bytes);
         }
+        for (path, version) in &self.external_opened {
+            let path = path.as_os_str().as_encoded_bytes();
+            hash.update(&(path.len() as u64).to_le_bytes());
+            hash.update(path);
+            hash.update(&(version.len() as u64).to_le_bytes());
+            hash.update(version.as_bytes());
+        }
         hash.finalize().to_hex().to_string()
     }
 }
 impl Provider for RustAnalyzer {
+    fn dependencies(&self) -> Option<&crate::dependency_sources::Catalog> {
+        Some(&self.sources)
+    }
     fn resolve(&self, snapshot: Arc<Snapshot>, call: &CallLookup) -> Result<Answer, String> {
         if call.language != "rust" {
             return Err("No definition provider for this language".into());
@@ -269,8 +310,18 @@ impl Provider for RustAnalyzer {
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner);
         let source = &call.invocation.source;
-        let doc = snapshot
-            .file(&source.file)
+        let external = if snapshot.file(&source.file).is_none() {
+            self.sources
+                .sources()?
+                .into_iter()
+                .find(|s| s.index.call(&call.invocation.id).is_some())
+        } else {
+            None
+        };
+        let doc = external
+            .as_ref()
+            .map(|s| s.doc())
+            .or_else(|| snapshot.file(&source.file).map(AsRef::as_ref))
             .ok_or("Captured caller is absent")?;
         if doc.version().as_str() != source.version {
             return Err("Captured caller version differs".into());
@@ -291,30 +342,124 @@ impl Provider for RustAnalyzer {
             _ => Workspace::new(self, &snapshot, &values, configuration.clone())?,
         };
         workspace.sync(&snapshot)?;
-        if !workspace.opened.contains_key(&source.path) {
+        if external.is_none() && !workspace.opened.contains_key(&source.path) {
             workspace.open(&source.path, &caller)?;
         }
-        let definitions = workspace
-            .client
-            .definitions(&workspace.directory.path().join(&source.path), position)?;
-        if digest(&inputs(&self.root, &snapshot)?) != configuration {
-            return Err("Project configuration changed during definition lookup".into());
+        let caller_path = external
+            .as_ref()
+            .map(|s| s.path())
+            .unwrap_or_else(|| workspace.directory.path().join(&source.path));
+        if let Some(source) = &external {
+            if source.input.configuration != configuration || source.verify().is_err() {
+                let context = workspace.context(&snapshot);
+                *state = Some(workspace);
+                return Ok(Answer {
+                    locations: vec![],
+                    outside: 1,
+                    context,
+                });
+            }
+            workspace.open_external(&caller_path, &caller, doc.version().as_str())?;
         }
         let mut locations = vec![];
         let mut outside = 0;
-        for (path, position) in definitions {
-            if let Some(path) = path
-                && let Ok(relative) = path.strip_prefix(workspace.directory.path())
-            {
-                let path = relative
-                    .to_str()
-                    .ok_or("Definition path is not UTF-8")?
-                    .replace('\\', "/");
-                relative_path(&path)?;
-                locations.push(Location { path, position });
-            } else {
-                outside += 1;
+        let mut verified = vec![];
+        let mut stable = false;
+        for _ in 0..3 {
+            let definitions = workspace.client.definitions(&caller_path, position)?;
+            locations.clear();
+            outside = 0;
+            verified.clear();
+            let mut changed = false;
+            for (path, position) in definitions {
+                let Some(path) = path.map(|p| fs::canonicalize(&p).unwrap_or(p)) else {
+                    outside += 1;
+                    continue;
+                };
+                if let Ok(path) = path.strip_prefix(workspace.directory.path()) {
+                    let path = path
+                        .to_str()
+                        .ok_or("Definition path is not UTF-8")?
+                        .replace('\\', "/");
+                    relative_path(&path)?;
+                    locations.push(Location {
+                        capture: None,
+                        path,
+                        position,
+                    });
+                    continue;
+                }
+                if let Ok(relative) = path.strip_prefix(&self.root) {
+                    let relative = relative
+                        .to_str()
+                        .ok_or("Definition path is not UTF-8")?
+                        .replace('\\', "/");
+                    if let Some(doc) = snapshot.file_by_path(&relative) {
+                        changed |=
+                            workspace.open_external(&path, &text(doc)?, doc.version().as_str())?;
+                        locations.push(Location {
+                            capture: None,
+                            path: relative,
+                            position,
+                        });
+                        continue;
+                    }
+                    outside += 1;
+                    continue;
+                }
+                let captured = crate::rust_dependencies::input(&path, &configuration)
+                    .and_then(|i| self.sources.capture(i));
+                match captured {
+                    Ok(capture) => {
+                        changed |= workspace.open_external(
+                            &capture.path(),
+                            &text(capture.doc())?,
+                            capture.doc().version().as_str(),
+                        )?;
+                        locations.push(Location {
+                            capture: Some(capture.origin.capture.clone()),
+                            path: capture.doc().path().into(),
+                            position,
+                        });
+                        verified.push(capture);
+                    }
+                    Err(_) => outside += 1,
+                }
             }
+            if !changed {
+                stable = true;
+                break;
+            }
+        }
+        if !stable {
+            outside += locations.len();
+            locations.clear();
+        }
+        if verified.iter().any(|s| s.verify().is_err()) {
+            outside += locations.len();
+            locations.clear();
+        }
+        if digest(&inputs(&self.root, &snapshot)?) != configuration {
+            return Err("Project configuration changed during definition lookup".into());
+        }
+        let retained = self
+            .sources
+            .sources()?
+            .iter()
+            .map(|s| s.path())
+            .collect::<BTreeSet<_>>();
+        for path in workspace
+            .external_opened
+            .keys()
+            .filter(|p| !retained.contains(*p))
+            .cloned()
+            .collect::<Vec<_>>()
+        {
+            workspace.client.notify(
+                "textDocument/didClose",
+                json!({"textDocument":{"uri":crate::lsp::uri(&path)?}}),
+            )?;
+            workspace.external_opened.remove(&path);
         }
         let context = workspace.context(&snapshot);
         *state = Some(workspace);

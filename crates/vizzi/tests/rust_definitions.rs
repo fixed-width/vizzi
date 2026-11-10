@@ -10,10 +10,10 @@ use vizzi_core::{
     rust::RustAnalyzer,
     structure::Structure,
 };
-fn capture(files: &[(&str, &str)]) -> Arc<Snapshot> {
+fn capture(root: &std::path::Path, files: &[(&str, &str)]) -> Arc<Snapshot> {
     let workspace = WorkspaceId::derive(&[b"semantic fixture"]);
     let mut parser = RustAnalyzer::new().unwrap();
-    let docs = files
+    let mut docs: Vec<_> = files
         .iter()
         .map(|(path, text)| {
             Arc::new(
@@ -33,6 +33,23 @@ fn capture(files: &[(&str, &str)]) -> Arc<Snapshot> {
             )
         })
         .collect();
+    let manifest = std::fs::read(root.join("Cargo.toml")).unwrap();
+    docs.push(Arc::new(
+        Document::capture(
+            workspace.clone(),
+            "Cargo.toml".into(),
+            &manifest,
+            vec![],
+            Classification::SourceOnly {
+                language: Some("cargo".into()),
+                provenance: Provenance::ExplicitScope {
+                    scope: "Cargo.toml".into(),
+                },
+                reason: vizzi_core::policy::SourceOnlyReason::ProjectMetadata,
+            },
+        )
+        .unwrap(),
+    ));
     Arc::new(Snapshot::new(workspace, docs, CapturePolicyId::derive(&[b"fixture"])).unwrap())
 }
 fn call(snapshot: &Snapshot) -> vizzi_core::structure::CallLookup {
@@ -70,11 +87,14 @@ fn field_types_resolve_across_captured_files_and_reuse_the_session_after_changes
     ] {
         std::fs::write(root.path().join(path), text).unwrap();
     }
-    let snapshot = capture(&[
-        ("lib.rs", caller),
-        ("worker.rs", worker),
-        ("build.rs", &build),
-    ]);
+    let snapshot = capture(
+        root.path(),
+        &[
+            ("lib.rs", caller),
+            ("worker.rs", worker),
+            ("build.rs", &build),
+        ],
+    );
     std::fs::write(
         root.path().join("worker.rs"),
         "pub struct Wrong; impl Wrong { fn unrelated() {} }",
@@ -104,11 +124,14 @@ fn field_types_resolve_across_captured_files_and_reuse_the_session_after_changes
         .collect::<Vec<_>>();
     assert_eq!(mirrors.len(), 1);
     let changed = format!("// moved definition\n{worker}");
-    let next = capture(&[
-        ("lib.rs", caller),
-        ("worker.rs", &changed),
-        ("build.rs", &build),
-    ]);
+    let next = capture(
+        root.path(),
+        &[
+            ("lib.rs", caller),
+            ("worker.rs", &changed),
+            ("build.rs", &build),
+        ],
+    );
     let result = service.resolve(next.clone(), &call(&next)).unwrap();
     assert_eq!(result.locations.len(), 1);
     assert_eq!(result.locations[0].position.line, 1);
@@ -136,7 +159,7 @@ fn aliases_and_returned_receiver_values_resolve_without_terminal_name_filters() 
     for (path, text) in [("lib.rs", caller), ("worker.rs", worker)] {
         std::fs::write(root.path().join(path), text).unwrap();
     }
-    let snapshot = capture(&[("lib.rs", caller), ("worker.rs", worker)]);
+    let snapshot = capture(root.path(), &[("lib.rs", caller), ("worker.rs", worker)]);
     let index = Structure::new(&snapshot);
     let entry = index
         .inventory("lib.rs", "entry", 0)
@@ -181,7 +204,7 @@ fn overlapping_definition_requests_share_the_same_preparation() {
     for (path, text) in [("lib.rs", caller), ("worker.rs", worker)] {
         std::fs::write(root.path().join(path), text).unwrap();
     }
-    let snapshot = capture(&[("lib.rs", caller), ("worker.rs", worker)]);
+    let snapshot = capture(root.path(), &[("lib.rs", caller), ("worker.rs", worker)]);
     let service = Arc::new(Service::new(
         root.path().into(),
         cache.path().into(),
@@ -202,4 +225,198 @@ fn overlapping_definition_requests_share_the_same_preparation() {
     assert!(first.is_ok(), "{first:?}");
     assert!(second.is_ok(), "{second:?}");
     assert_eq!(std::fs::read_dir(cache.path()).unwrap().count(), 1);
+}
+#[test]
+#[ignore = "requires installed rust-analyzer; local dependencies only, no network or builds"]
+fn local_dependency_definitions_can_be_followed_across_captured_files() {
+    let root = tempfile::tempdir().unwrap();
+    let dependency = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    std::fs::write(root.path().join("Cargo.toml"),format!("[package]\nname='consumer'\nversion='0.1.0'\nedition='2024'\n[lib]\npath='lib.rs'\n[dependencies]\nhelper={{path={:?}}}\n",dependency.path().to_str().unwrap())).unwrap();
+    std::fs::write(
+        dependency.path().join("Cargo.toml"),
+        "[package]\nname='helper'\nversion='1.2.3'\nedition='2024'\n[lib]\npath='lib.rs'\n",
+    )
+    .unwrap();
+    let caller = "pub fn entry(){ helper::start(); }";
+    let callee = "pub fn start(){ leaf::finish(); } mod leaf;";
+    std::fs::write(root.path().join("lib.rs"), caller).unwrap();
+    std::fs::write(dependency.path().join("lib.rs"), callee).unwrap();
+    std::fs::write(dependency.path().join("leaf.rs"), "pub fn finish(){}\n").unwrap();
+    std::fs::write(
+        dependency.path().join("build.rs"),
+        format!(
+            "fn main(){{std::fs::write({:?},b\"built\").unwrap();}}",
+            dependency.path().join("BUILT").to_str().unwrap()
+        ),
+    )
+    .unwrap();
+    let snapshot = capture(root.path(), &[("lib.rs", caller)]);
+    let index = Structure::new(&snapshot);
+    let entry = index
+        .functions("", "entry", 0)
+        .unwrap()
+        .items
+        .remove(0)
+        .symbol;
+    let lookup = index
+        .call(&index.outgoing(&entry.id, "lib.rs", 0).unwrap().items[0].id)
+        .unwrap();
+    let service = Service::new(
+        root.path().into(),
+        cache.path().into(),
+        "rust-analyzer".into(),
+    );
+    let answer = service.resolve(snapshot.clone(), &lookup).unwrap();
+    assert_eq!(answer.locations.len(), 1, "{answer:?}");
+    let loc = &answer.locations[0];
+    let source = service
+        .dependencies()
+        .unwrap()
+        .get(loc.capture.as_deref().unwrap())
+        .unwrap()
+        .unwrap();
+    assert_eq!(source.origin.label, "helper");
+    assert_eq!(source.origin.version.as_deref(), Some("1.2.3"));
+    let start = source
+        .index
+        .definition(&loc.path, byte_offset(callee, loc.position).unwrap())
+        .unwrap();
+    assert_eq!(start.name, "start");
+    let site = &source.index.outgoing(&start.id, "lib.rs", 0).unwrap().items[0];
+    let next = service
+        .resolve(snapshot.clone(), &source.index.call(&site.id).unwrap())
+        .unwrap();
+    assert_eq!(next.locations.len(), 1);
+    let leaf = &next.locations[0];
+    assert_ne!(leaf.capture, loc.capture);
+    let leaf_source = service
+        .dependencies()
+        .unwrap()
+        .get(leaf.capture.as_deref().unwrap())
+        .unwrap()
+        .unwrap();
+    assert_eq!(
+        leaf_source
+            .index
+            .definition(
+                &leaf.path,
+                byte_offset(leaf_source.doc().resident_source().unwrap(), leaf.position).unwrap()
+            )
+            .unwrap()
+            .name,
+        "finish"
+    );
+    std::fs::write(dependency.path().join("lib.rs"), "pub fn start(){}\n").unwrap();
+    let stale = service
+        .resolve(snapshot, &source.index.call(&site.id).unwrap())
+        .unwrap();
+    assert!(stale.locations.is_empty());
+    assert!(stale.outside > 0);
+    assert_eq!(source.doc().resident_source().unwrap(), callee);
+    assert!(!dependency.path().join("BUILT").exists());
+    assert!(!root.path().join("Cargo.lock").exists());
+}
+#[test]
+#[ignore = "requires installed rust-analyzer and the registry sources already used to build Vizzi"]
+fn cached_registry_definitions_are_captured_without_fetching_or_building() {
+    let lock: toml::Table = include_str!("../../../Cargo.lock").parse().unwrap();
+    let version = lock["package"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|p| p["name"].as_str() == Some("blake3"))
+        .unwrap()["version"]
+        .as_str()
+        .unwrap();
+    let root = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    std::fs::write(root.path().join("Cargo.toml"),format!("[package]\nname='cached_consumer'\nversion='0.1.0'\nedition='2024'\n[lib]\npath='lib.rs'\n[dependencies]\nblake3='={version}'\n")).unwrap();
+    let caller = "pub fn entry(){ let _=blake3::hash(b\"already local\"); }";
+    std::fs::write(root.path().join("lib.rs"), caller).unwrap();
+    let snapshot = capture(root.path(), &[("lib.rs", caller)]);
+    let index = Structure::new(&snapshot);
+    let entry = index
+        .functions("", "entry", 0)
+        .unwrap()
+        .items
+        .remove(0)
+        .symbol;
+    let site = &index.outgoing(&entry.id, "lib.rs", 0).unwrap().items[0];
+    let service = Service::new(
+        root.path().into(),
+        cache.path().into(),
+        "rust-analyzer".into(),
+    );
+    let answer = service
+        .resolve(snapshot, &index.call(&site.id).unwrap())
+        .unwrap();
+    assert_eq!(answer.locations.len(), 1, "{answer:?}");
+    let loc = &answer.locations[0];
+    let source = service
+        .dependencies()
+        .unwrap()
+        .get(loc.capture.as_deref().unwrap())
+        .unwrap()
+        .unwrap();
+    assert_eq!(source.origin.label, "blake3");
+    assert_eq!(source.origin.version.as_deref(), Some(version));
+    assert_eq!(
+        source
+            .index
+            .definition(
+                &loc.path,
+                byte_offset(source.doc().resident_source().unwrap(), loc.position).unwrap()
+            )
+            .unwrap()
+            .name,
+        "hash"
+    );
+    assert!(!root.path().join("Cargo.lock").exists());
+}
+#[test]
+#[ignore = "requires installed rust-analyzer and rust-src; never installs missing sources"]
+fn installed_standard_library_source_can_be_opened_as_an_independent_capture() {
+    let root = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    std::fs::write(root.path().join("Cargo.toml"),"[package]\nname='standard_consumer'\nversion='0.1.0'\nedition='2024'\n[lib]\npath='lib.rs'\n").unwrap();
+    let caller = "pub fn entry(){ let _=core::ptr::null::<u8>(); }";
+    std::fs::write(root.path().join("lib.rs"), caller).unwrap();
+    let snapshot = capture(root.path(), &[("lib.rs", caller)]);
+    let index = Structure::new(&snapshot);
+    let entry = index
+        .functions("", "entry", 0)
+        .unwrap()
+        .items
+        .remove(0)
+        .symbol;
+    let site = &index.outgoing(&entry.id, "lib.rs", 0).unwrap().items[0];
+    let service = Service::new(
+        root.path().into(),
+        cache.path().into(),
+        "rust-analyzer".into(),
+    );
+    let result = service
+        .resolve(snapshot, &index.call(&site.id).unwrap())
+        .unwrap();
+    assert_eq!(result.locations.len(), 1, "{result:?}");
+    let loc = &result.locations[0];
+    let source = service
+        .dependencies()
+        .unwrap()
+        .get(loc.capture.as_deref().unwrap())
+        .unwrap()
+        .unwrap();
+    assert_eq!(source.origin.label, "core");
+    assert_eq!(
+        source
+            .index
+            .definition(
+                &loc.path,
+                byte_offset(source.doc().resident_source().unwrap(), loc.position).unwrap()
+            )
+            .unwrap()
+            .name,
+        "null"
+    );
 }

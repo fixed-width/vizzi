@@ -455,6 +455,12 @@ impl Companion {
         }
         self.open_working(doc, request.line)
     }
+    pub(crate) fn open_verified_location(
+        &self,
+        location: &EditorLocation,
+    ) -> Result<(), CompanionError> {
+        self.editor.open(location).map_err(CompanionError::Editor)
+    }
     fn open_working(&self, doc: &Document, line: usize) -> Result<(), CompanionError> {
         let path = ReviewPath::parse(doc.path().as_bytes().to_vec())
             .map_err(|e| CompanionError::Invalid(e.to_string()))?;

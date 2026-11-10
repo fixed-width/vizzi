@@ -11,6 +11,51 @@ use std::{
 };
 use url::Url;
 const FRAME: usize = 4 * 1024 * 1024;
+fn local_sysroot_source(root: &Path) -> PathBuf {
+    if let Some(path) = std::env::var_os("RUST_SRC_PATH").map(PathBuf::from)
+        && path.is_absolute()
+        && path.join("core").is_dir()
+    {
+        return path;
+    }
+    let missing = root.join(".vizzi-unavailable-rust-src");
+    let Ok(mut child) = Command::new("rustc")
+        .args(["--print", "sysroot"])
+        .current_dir(root)
+        .env("RUSTUP_AUTO_INSTALL", "0")
+        .stdin(Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::null())
+        .spawn()
+    else {
+        return missing;
+    };
+    let deadline = Instant::now() + Duration::from_secs(5);
+    loop {
+        match child.try_wait() {
+            Ok(Some(status)) => {
+                let mut value = String::new();
+                if status.success()
+                    && let Some(output) = child.stdout.take()
+                    && output.take(4097).read_to_string(&mut value).is_ok()
+                    && value.len() <= 4096
+                {
+                    let source = PathBuf::from(value.trim()).join("lib/rustlib/src/rust/library");
+                    if source.is_absolute() && source.join("core").is_dir() {
+                        return source;
+                    }
+                }
+                return missing;
+            }
+            Ok(None) if Instant::now() < deadline => thread::sleep(Duration::from_millis(10)),
+            _ => {
+                let _ = child.kill();
+                let _ = child.wait();
+                return missing;
+            }
+        }
+    }
+}
 fn read_message(reader: &mut impl BufRead) -> Result<Option<Value>, String> {
     let mut length = None;
     let mut total = 0;
@@ -96,6 +141,7 @@ impl Client {
             .stdout(Stdio::piped())
             .stderr(Stdio::null())
             .env("CARGO_NET_OFFLINE", "true")
+            .env("RUSTUP_AUTO_INSTALL", "0")
             .env("CARGO_BUILD_JOBS", "1")
             .env("RAYON_NUM_THREADS", "1")
             .env("CARGO_TARGET_DIR", root.join("target"))
@@ -136,7 +182,7 @@ impl Client {
                 }
             }
         });
-        let options = json!({"cargo":{"buildScripts":{"enable":false},"autoreload":true,"extraArgs":["--offline"]},"procMacro":{"enable":false},"checkOnSave":false,"cachePriming":{"enable":false,"numThreads":1},"numThreads":1,"diagnostics":{"enable":false},"lru":{"capacity":64}});
+        let options = json!({"cargo":{"sysrootSrc":local_sysroot_source(root),"buildScripts":{"enable":false},"autoreload":true,"extraArgs":["--offline"]},"procMacro":{"enable":false},"checkOnSave":false,"cachePriming":{"enable":false,"numThreads":1},"numThreads":1,"diagnostics":{"enable":false},"lru":{"capacity":64}});
         let mut client = Self {
             child,
             input,
@@ -430,6 +476,9 @@ request=read()
 send({'id':'config','method':'workspace/configuration','params':{'items':[{'section':'rust-analyzer'}]}})
 config=read()['result'][0]
 assert config['cargo']['buildScripts']['enable']==False and config['procMacro']['enable']==False and config['numThreads']==1
+assert isinstance(config['cargo']['sysrootSrc'],str) and config['cargo']['sysrootSrc']
+import os
+assert os.environ['RUSTUP_AUTO_INSTALL']=='0'
 send({'id':'edit','method':'workspace/applyEdit','params':{'edit':{}}})
 assert read()['error']['code']==-32601
 send({'id':request['id'],'result':{'capabilities':{'definitionProvider':True,'positionEncoding':'utf-16'},'serverInfo':{'version':'fixture'}}})

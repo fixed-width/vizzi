@@ -116,6 +116,25 @@ A selected call waits for preparation if necessary and is then resolved again ag
 current capture/configuration. Subsequent lookups reuse the private server. Basic browsing stays
 available when the server or project analysis is unavailable.
 
+
+The Rust provider can also open definitions in dependencies already on disk: local path
+dependencies, cached registry/Git packages, and installed standard-library source. Follow
+the call as usual; the new bubble shows **Dependency · package version** when known.
+Its source keeps the same styling, reflow, copying, paging and navigation controls.
+Dependencies are captured as you reach them, without adding their trees to repository
+search or the map. Other languages need their own provider support.
+
+**Captured dependency** means the displayed bytes are retained rather than watched for
+disk saves. Reopen a definition from its caller to obtain updated source. **Editor** works
+when the file still matches the capture. Saving a location remains repository-only; the
+visual layout retains dependency references across reload while those captures or matching
+local files remain available. Older pinned project contexts remain separate.
+
+No source is downloaded and no dependency build runs. Missing standard-library sources
+remain unavailable; Vizzi does not install `rust-src`. Virtual/generated definitions and
+unavailable source can remain unresolved. See the [dependency contract](../visual/DEPENDENCIES_PRODUCT.md)
+for retention and scope.
+
 Fragment search accepts `::` and `.` between captured namespace/type names and ignores
 case. Exact names come first, then exact qualified suffixes, function-name prefixes/substrings, namespace prefixes/substrings and file-path
 matches. Within a group, results sort by function name, qualified

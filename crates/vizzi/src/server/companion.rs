@@ -9,6 +9,7 @@ use axum::{
 };
 use serde::Deserialize;
 use std::sync::Arc;
+static DEPENDENCY_READS: tokio::sync::Semaphore = tokio::sync::Semaphore::const_new(4);
 static WORK: tokio::sync::Semaphore = tokio::sync::Semaphore::const_new(2);
 static EDITORS: tokio::sync::Semaphore = tokio::sync::Semaphore::const_new(1);
 #[derive(Debug)]
@@ -39,7 +40,12 @@ pub(super) fn router(
     let refresh = structure.clone();
     let definitions = structure.clone();
     let capabilities = structure.clone();
+    let dependency_windows = structure.clone();
+    let dependency_locations = structure.clone();
+    let dependency_editor = app.clone();
     Router::new()
+        .route("/api/dependency/window",get(move |Query(binding):Query<DependencyWindow>,Query(query):Query<vizzi_core::projection::WindowQuery>|{let app=dependency_windows.clone();async move{dependency_read(move||app.dependency_window(&binding.snapshot,&binding.file,&binding.version,&query)).await}}))
+        .route("/api/dependency/editor",post(move |Json(request):Json<OpenSource>|{let structure=dependency_locations.clone();let app=dependency_editor.clone();async move{editor_handoff(move||app.open_verified_location(&structure.dependency_location(&request)?)).await}}))
         .route("/api/investigation", get(view).post(edit))
         .route("/api/discovery", get(discover))
         .route("/api/structure", get(move || {let capabilities=capabilities.clone();async move {Json(serde_json::json!({"trial":true,"resolution":"candidate_only","call_languages":["rust","python"],"definition_provider":capabilities.definitions_available()}))}}).post(move |Json(request):Json<crate::structural::Request>| {let structure=structure.clone();async move {work(move ||structure.query(&request)).await}}))
@@ -77,6 +83,12 @@ pub(super) fn router(
             },
         ))
         .with_state(app)
+}
+#[derive(Deserialize)]
+struct DependencyWindow {
+    snapshot: String,
+    file: String,
+    version: String,
 }
 async fn work<T: Send + 'static>(
     job: impl FnOnce() -> Result<T, CompanionError> + Send + 'static,
@@ -172,4 +184,20 @@ async fn editor_handoff(
         Ok(serde_json::json!({"requested":true}))
     })
     .await
+}
+
+async fn dependency_read<T: Send + 'static>(
+    job: impl FnOnce() -> Result<T, CompanionError> + Send + 'static,
+) -> Result<Json<T>, Error> {
+    let permit = DEPENDENCY_READS
+        .acquire()
+        .await
+        .map_err(|_| Error(CompanionError::Unavailable("Source reader closed".into())))?;
+    let result = tokio::task::spawn_blocking(move || {
+        let _permit = permit;
+        job()
+    })
+    .await
+    .map_err(|e| Error(CompanionError::Unavailable(e.to_string())))?;
+    result.map(Json).map_err(Error)
 }

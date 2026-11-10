@@ -1,0 +1,47 @@
+{
+  "$schema": "../../node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "mutate": [
+    "crates/vizzi/web/source-origin.js",
+    "crates/vizzi/web/read-retry.js",
+    "crates/vizzi/web/visual-model.js"
+  ],
+  "testRunner": "command",
+  "commandRunner": {
+    "command": "node crates/vizzi/web/source-origin.test.js && node crates/vizzi/web/read-retry.test.js && node crates/vizzi/web/dependency-model.test.js && node crates/vizzi/web/visual-model.test.js && node crates/vizzi/web/live-model.test.js"
+  },
+  "coverageAnalysis": "off",
+  "concurrency": 1,
+  "timeoutMS": 5000,
+  "reporters": [
+    "clear-text",
+    "json"
+  ],
+  "clearTextReporter": {
+    "reportMutants": false,
+    "logTests": false
+  },
+  "jsonReporter": {
+    "fileName": "/tmp/vizzi-dependency-js-mutants.json"
+  },
+  "thresholds": {
+    "break": null
+  },
+  "ignorePatterns": [
+    "**",
+    "!package.json",
+    "!crates/vizzi/web/visual-model.js",
+    "!crates/vizzi/web/module-identity.js",
+    "!crates/vizzi/web/layout-growth.js",
+    "!crates/vizzi/web/link-highlights.js",
+    "!crates/vizzi/web/link-highlights.test.js",
+    "!crates/vizzi/web/workspace-layout.test.js",
+    "!crates/vizzi/web/visual-model.test.js",
+    "!crates/vizzi/web/fixtures/visual-v1.json",
+    "!crates/vizzi/web/source-origin.js",
+    "!crates/vizzi/web/read-retry.js",
+    "!crates/vizzi/web/source-origin.test.js",
+    "!crates/vizzi/web/read-retry.test.js",
+    "!crates/vizzi/web/dependency-model.test.js",
+    "!crates/vizzi/web/live-model.test.js"
+  ]
+}

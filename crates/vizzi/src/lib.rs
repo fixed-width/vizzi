@@ -41,8 +41,11 @@ pub mod foreground_maintenance;
 pub mod idle_probe;
 
 pub mod definitions;
+/// Captured dependency source, independent of repository snapshots.
+pub mod dependency_sources;
 mod lsp;
 /// Optional Rust definition adapter over captured source.
 pub mod rust_definitions;
+mod rust_dependencies;
 /// Current-observation structural exploration adapter.
 pub mod structural;

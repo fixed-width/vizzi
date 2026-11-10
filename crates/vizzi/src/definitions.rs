@@ -14,6 +14,8 @@ pub struct Position {
 /// A provider definition within the captured workspace.
 #[derive(Clone, Debug)]
 pub struct Location {
+    /// Independent dependency capture, absent for repository source.
+    pub capture: Option<String>,
     /// Normalized workspace-relative source path.
     pub path: String,
     /// Exact definition identifier position.
@@ -31,6 +33,10 @@ pub struct Answer {
 }
 /// An editor-neutral definition seam over one immutable source observation.
 pub trait Provider: Send + Sync {
+    /// Captured dependency sources admitted by this language provider, if supported.
+    fn dependencies(&self) -> Option<&crate::dependency_sources::Catalog> {
+        None
+    }
     /// Resolves the captured call; implementations must not substitute live source bytes.
     fn resolve(&self, snapshot: Arc<Snapshot>, call: &CallLookup) -> Result<Answer, String>;
 }

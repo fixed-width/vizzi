@@ -22,8 +22,8 @@ with didOpen/didChange/didClose notifications; source stays fixed throughout a l
 Cargo metadata stays offline, with build scripts, procedural macros and check-on-save disabled.
 Cargo output goes outside analysed source; project wrappers are disabled. Project inputs,
 server version/configuration and document versions identify the semantic context. Configuration
-changes restart the session; source-only updates reuse it. Targets outside the mirror/admitted
-snapshot remain unavailable to the source viewer. Native snapshot/configuration checks reject
+changes restart the session; source-only updates reuse it. Targets outside the mirror can enter the separate [dependency capture catalog](DEPENDENCIES_TECH.md)
+when the language provider can synchronize and verify their local source. Native snapshot/configuration checks reject
 superseded results. No unrelated source is substituted after a failure.
 
 The browser can prepare analysis with one real unbound captured call after a function

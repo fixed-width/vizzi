@@ -57,6 +57,9 @@ shared model. Preserve an integration path for other source-control systems.
 Support mixed-language workspaces and differing analysis capabilities. Preserve
 source locations, provenance, configuration, and analysis coverage. Language-specific
 findings should retain their meaning when presented through shared views.
+Local dependency source uses independent, bounded captures admitted by language providers.
+Discovery stays language-specific; repository snapshots and watchers retain their scope.
+See [dependency source](docs/visual/DEPENDENCIES_TECH.md).
 Native module/package identity uses captured project configuration and language declarations.
 Its labels, accents and optional contours are independent of reader-authored groups and
 call relationships; unknown membership stays neutral. See [module identity](docs/visual/MODULES_TECH.md).

@@ -92,6 +92,79 @@ pub struct StructureHost {
     definitions: Option<Arc<dyn crate::definitions::Provider>>,
 }
 impl StructureHost {
+    pub(crate) fn dependency(
+        &self,
+        id: &str,
+    ) -> Result<Option<Arc<crate::dependency_sources::Capture>>, CompanionError> {
+        self.definitions
+            .as_ref()
+            .and_then(|p| p.dependencies())
+            .map(|c| c.get(id).map_err(CompanionError::Unavailable))
+            .transpose()
+            .map(Option::flatten)
+    }
+    fn external(
+        &self,
+        id: &str,
+    ) -> Result<Option<Arc<crate::dependency_sources::Capture>>, CompanionError> {
+        let Some(catalog) = self.definitions.as_ref().and_then(|p| p.dependencies()) else {
+            return Ok(None);
+        };
+        Ok(catalog
+            .sources()
+            .map_err(CompanionError::Unavailable)?
+            .into_iter()
+            .find(|s| s.index.resolve(None, id).is_some() || s.index.call(id).is_some()))
+    }
+    /// Reads a version-bound dependency window; no filesystem pathname is accepted.
+    pub fn dependency_window(
+        &self,
+        snapshot: &str,
+        file: &str,
+        version: &str,
+        query: &vizzi_core::projection::WindowQuery,
+    ) -> Result<Value, CompanionError> {
+        let source = self.dependency(snapshot)?.ok_or_else(|| {
+            CompanionError::Conflict("Dependency capture expired; reopen it from its caller".into())
+        })?;
+        if source.doc().id().as_str() != file || source.doc().version().as_str() != version {
+            return Err(CompanionError::Invalid(
+                "Dependency source reference differs".into(),
+            ));
+        }
+        let mut value = serde_json::to_value(
+            source
+                .doc()
+                .window(query, None)
+                .map_err(|e| CompanionError::Unavailable(e.to_string()))?,
+        )
+        .map_err(|e| CompanionError::Unavailable(e.to_string()))?;
+        value["snapshot"] = snapshot.into();
+        Ok(value)
+    }
+    /// Verifies an explicit dependency editor location against the captured bytes.
+    pub fn dependency_location(
+        &self,
+        request: &crate::companion::OpenSource,
+    ) -> Result<crate::editor::EditorLocation, CompanionError> {
+        let source = self
+            .dependency(&request.snapshot)?
+            .ok_or_else(|| CompanionError::Conflict("Dependency capture expired".into()))?;
+        if source.doc().id().as_str() != request.file
+            || source.doc().version().as_str() != request.version
+            || request.line == 0
+            || request.line > source.doc().captured().line_count()
+        {
+            return Err(CompanionError::Invalid(
+                "Invalid dependency editor reference".into(),
+            ));
+        }
+        source.verify().map_err(CompanionError::Conflict)?;
+        Ok(crate::editor::EditorLocation {
+            path: source.path(),
+            line: request.line,
+        })
+    }
     /// Creates an idle projection adapter without source reads or parsing.
     pub fn new(host: Arc<Host>) -> Self {
         Self {
@@ -132,7 +205,18 @@ impl StructureHost {
             .as_ref()
             .ok_or_else(|| CompanionError::Unavailable("Structure is unavailable".into()))?
             .index;
-        let value = match &request.query {
+        let foreign = match &request.query {
+            Operation::Actions { symbol, .. }
+            | Operation::Calls { symbol, .. }
+            | Operation::Uses { symbol, .. }
+                if index.resolve(None, symbol).is_none() =>
+            {
+                self.external(symbol)?
+            }
+            _ => None,
+        };
+        let index = foreign.as_ref().map_or(index, |s| &s.index);
+        let mut value = match &request.query {
             Operation::Actions {
                 symbol,
                 line_start,
@@ -165,6 +249,17 @@ impl StructureHost {
                 symbol,
                 area,
                 offset,
+            } if foreign.is_some() => serde_json::to_value(
+                foreign
+                    .as_ref()
+                    .ok_or_else(|| CompanionError::Unavailable("Dependency source expired".into()))?
+                    .calls(symbol, *offset)
+                    .map_err(CompanionError::Unavailable)?,
+            ),
+            Operation::Calls {
+                symbol,
+                area,
+                offset,
             } => serde_json::to_value(
                 index
                     .outgoing(symbol, area, *offset)
@@ -181,6 +276,9 @@ impl StructureHost {
             ),
         }
         .map_err(|e| CompanionError::Unavailable(e.to_string()))?;
+        if foreign.is_some() {
+            value["snapshot"] = request.snapshot.clone().into();
+        }
         if self
             .host
             .application()
@@ -279,9 +377,29 @@ impl StructureHost {
                 let previous = cache.take();
                 *cache = Some(Cached::rebuild(&snapshot, previous));
             }
-            cache
-                .as_ref()
-                .and_then(|c| c.index.call(&request.call))
+            let local = cache.as_ref().and_then(|c| c.index.call(&request.call));
+            let foreign = if local.is_none() {
+                self.external(&request.call)?
+            } else {
+                None
+            };
+            local
+                .or_else(|| {
+                    foreign
+                        .as_ref()
+                        .and_then(|s| s.index.call(&request.call))
+                        .map(|mut call| {
+                            if let Some(s) = &foreign {
+                                call.invocation.candidates = call
+                                    .invocation
+                                    .candidates
+                                    .into_iter()
+                                    .map(|c| s.symbol(c))
+                                    .collect();
+                            }
+                            call
+                        })
+                })
                 .ok_or_else(|| {
                     CompanionError::Invalid("Call is absent from this observation".into())
                 })?
@@ -325,7 +443,28 @@ impl StructureHost {
                             )
                         })?;
                     for location in answer.locations {
-                        let found = if let Some(doc) = snapshot
+                        let found = if let Some(capture) = &location.capture {
+                            if let Some(source) = self.dependency(capture)? {
+                                if source.doc().path() != location.path {
+                                    None
+                                } else {
+                                    let text = source.doc().resident_source().ok_or_else(|| {
+                                        CompanionError::Unavailable(
+                                            "Dependency text unavailable".into(),
+                                        )
+                                    })?;
+                                    let byte =
+                                        crate::definitions::byte_offset(text, location.position)
+                                            .map_err(CompanionError::Unavailable)?;
+                                    source
+                                        .index
+                                        .definition(&location.path, byte)
+                                        .map(|symbol| source.symbol(symbol))
+                                }
+                            } else {
+                                None
+                            }
+                        } else if let Some(doc) = snapshot
                             .documents()
                             .iter()
                             .find(|d| d.path() == location.path)

@@ -244,3 +244,17 @@ then run `node experiments/browser/module-upgrade.test.mjs --previous /path/to/o
 It uses temporary source/cache directories and one origin across the host replacement.
 For serial mutation checks use `modules-stryker.config.json`; the vendored library is
 excluded. Results and bounds are recorded in [module validation](../visual/MODULE_RESULTS.md).
+
+## Check dependency navigation
+
+Run `npm test -- --dependencies` with installed rust-analyzer (or set
+`VIZZI_RUST_ANALYZER`). This opt-in test creates a local path dependency and checks a
+three-bubble call trail, provenance, zoom/layout, capture retention and host restart.
+It does not launch an editor, build the fixture, or download dependency source.
+
+Run `cargo test -p vizzi --test rust_definitions -- --ignored` for real-provider
+integration, including the already-cached registry package and installed `rust-src`.
+Those prerequisites are explicit; the tests never install them. Ordinary workspace
+checks use deterministic native fixtures and protocol peers. The native resource tests
+cover exact file/reference/declaration bounds and cache eviction. JavaScript helper
+mutation configuration is `dependencies-stryker.config.json`, with one runner.

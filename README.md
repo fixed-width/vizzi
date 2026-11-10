@@ -14,6 +14,8 @@ layout, camera and reading state restore locally in the browser. Candidate arrow
 the analysis limitations. Underlined call names open an action menu; Ctrl/Cmd-click follows
 directly ([validation](experiments/visual/INLINE_CALL_RESULTS.md)). Optional [type-aware navigation](docs/visual/SEMANTIC_PRODUCT.md)
 uses rust-analyzer definitions for field/variable calls while keeping captured-source checks.
+It can also follow calls into [local dependency source](docs/visual/DEPENDENCIES_PRODUCT.md),
+with package labels and independent captured versions; downloads/builds remain disabled.
 Smart [source reflow](docs/explanation/source-reflow.md) fits code to each pane while
 preserving original line numbers, copying and call controls; Original lines is available
 in Settings → Code layout ([validation](experiments/visual/REFLOW_RESULTS.md)).

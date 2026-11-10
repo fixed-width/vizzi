@@ -9,7 +9,8 @@ The existing source-local rule is a fast path, not a substitute for that analysi
   opens directly beside the caller; unrelated name matches do not appear first.
 - Multiple semantic destinations use the chooser. Missing/failed/unsupported analysis keeps
   the explicit candidate fallback and explains its lower precision. A known destination
-  outside captured source is reported rather than replaced with an unrelated name match.
+  outside repository source can enter the [local dependency capture catalog](DEPENDENCIES_PRODUCT.md).
+  Unavailable source/declarations are reported rather than replaced with unrelated name matches.
 - Definition links identify language-server evidence separately from source-local and
   name-candidate evidence. Definition navigation does not prove runtime dispatch.
 - The previous fragment, reading state and layout remain intact during and after lookup.

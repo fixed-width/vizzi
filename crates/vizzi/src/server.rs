@@ -103,6 +103,8 @@ pub fn router(application: Arc<Application>) -> Router {
         .route("/call-ranges.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/call-ranges.js")) }))
         .route("/definition-warmup.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/definition-warmup.js")) }))
         .route("/live-updates.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/live-updates.js")) }))
+        .route("/read-retry.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/read-retry.js")) }))
+        .route("/source-origin.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/source-origin.js")) }))
         .route("/module-identity.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/module-identity.js")) }))
         .route("/module-outlines.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/module-outlines.js")) }))
         .route("/module-contours.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/module-contours.js")) }))

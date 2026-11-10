@@ -8,6 +8,7 @@ publish = false
 workspace = true
 
 [dependencies]
+toml = { workspace = true, features = ["display"] }
 url.workspace = true
 vizzi-search = { path = "../vizzi-search" }
 vizzi-core = { path = "../vizzi-core" }

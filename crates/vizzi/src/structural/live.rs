@@ -25,6 +25,9 @@ pub struct Anchor {
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct View {
+    /// Independent dependency source capture; repository views omit it.
+    #[serde(default)]
+    pub capture: Option<String>,
     /// Stable presentation identity.
     pub id: String,
     /// Native declaration tracking identity, absent in older saved layouts.
@@ -167,6 +170,7 @@ impl StructureHost {
                 || !ids.insert(&view.id)
                 || !opaque(&view.symbol)
                 || !opaque(&view.version)
+                || view.capture.as_deref().is_some_and(|s| !opaque(s))
                 || view.file.is_some() != view.context.is_some()
                 || view.file.as_deref().is_some_and(|s| !opaque(s))
                 || view.context.as_deref().is_some_and(|s| !opaque(s))
@@ -221,23 +225,41 @@ impl StructureHost {
         let mut resolved = BTreeMap::new();
         let mut views = Vec::new();
         for view in &request.views {
-            let symbol = index
+            let external = if let Some(id) = &view.capture {
+                self.dependency(id)?
+            } else {
+                None
+            };
+            if view.capture.is_some() && external.is_none() {
+                views.push(json!({"id":view.id,"state":"unresolved"}));
+                continue;
+            }
+            let view_index = external.as_ref().map_or(index, |s| &s.index);
+            let symbol = view_index
                 .resolve(view.tracking.as_deref(), &view.symbol)
                 .or_else(|| {
-                    index.resolve_context(
-                        snapshot.file(view.file.as_deref()?)?,
+                    view_index.resolve_context(
+                        external
+                            .as_ref()
+                            .map(|s| s.doc())
+                            .or_else(|| snapshot.file(view.file.as_deref()?).map(AsRef::as_ref))?,
                         view.tracking.as_deref()?,
                         view.context.as_deref()?,
                     )
                 });
-            let Some(symbol) = symbol else {
+            let Some(symbol) = symbol.cloned() else {
                 views.push(json!({"id":view.id,"state":"unresolved"}));
                 continue;
             };
-            let doc = snapshot
-                .file(&symbol.source.file)
+            let symbol = external
+                .as_ref()
+                .map_or_else(|| symbol.clone(), |s| s.symbol(symbol.clone()));
+            let doc = external
+                .as_ref()
+                .map(|s| s.doc())
+                .or_else(|| snapshot.file(&symbol.source.file).map(AsRef::as_ref))
                 .ok_or_else(|| unavailable("Tracked source unavailable"))?;
-            let reading = position(doc, symbol, view)?;
+            let reading = position(doc, &symbol, view)?;
             let changed = view.version != symbol.source.version;
             let (window, origin) = if changed {
                 let window = doc
@@ -272,7 +294,7 @@ impl StructureHost {
             let mut actions = Vec::new();
             let mut offset = 0;
             loop {
-                let page = index
+                let page = view_index
                     .actions(
                         &symbol.id,
                         reading.section,
@@ -287,7 +309,7 @@ impl StructureHost {
                     break;
                 }
             }
-            let calls = index
+            let mut calls = view_index
                 .outgoing(
                     &symbol.id,
                     if view.area.is_empty() {
@@ -298,6 +320,10 @@ impl StructureHost {
                     0,
                 )
                 .map_err(|e| invalid(&e.to_string()))?;
+            if let Some(s) = &external {
+                calls = s.calls(&symbol.id, 0).map_err(unavailable)?;
+                calls.snapshot = request.snapshot.clone();
+            }
             views.push(json!({"id":view.id,"state":"current","symbol":symbol,"position":reading,"window":window,"origin":origin,"actions":actions,"calls":calls}));
             resolved.insert(view.id.as_str(), symbol);
         }
@@ -307,6 +333,13 @@ impl StructureHost {
                 resolved.get(link.from.as_str()),
                 resolved.get(link.to.as_str()),
             ) {
+                (Some(from), Some(to)) if from.origin.is_some() || to.origin.is_some() => {
+                    Some(vizzi_core::structure::LinkCheck {
+                        state: "unverified",
+                        kind: None,
+                        source: None,
+                    })
+                }
                 (Some(from), Some(to)) => Some(
                     index
                         .check_link(&from.id, &to.id, &link.spelling, &link.kind)

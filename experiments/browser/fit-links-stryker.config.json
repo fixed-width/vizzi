@@ -38,6 +38,7 @@
     "!crates/vizzi/web/fixtures/visual-v1.json",
     "!crates/vizzi/web/live-model.test.js",
     "!crates/vizzi/web/live-updates.js",
-    "!crates/vizzi/web/live-updates.test.js"
+    "!crates/vizzi/web/live-updates.test.js",
+    "!crates/vizzi/web/source-origin.js"
   ]
 }
