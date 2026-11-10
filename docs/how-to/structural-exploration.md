@@ -34,7 +34,7 @@ Selecting a candidate extends a short trail. Choose an earlier trail step to ret
 no branches expand automatically, so recursion does not create an unbounded diagram.
 The order of written sites is syntax order, not execution order.
 
-**Inspect call → Keep this location** uses the existing captured-source drawer. Keeps start
+**Inspect call → Save location** uses the existing captured-source drawer. Keeps start
 at the invocation's source line and retain a finite window; they do not save an entire
 function or infer a relationship. Saved locations remain available beside optional notes
 and reader-authored connections. **Open in VS Code** is explicit and verifies the working

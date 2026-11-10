@@ -1,0 +1,10 @@
+{
+  "kind": "known-source functional replay, temporary Minitosis source copy",
+  "sourceSha256": "629967a245cf5ab9967e640aab45d0cb39da0c93946c60dc11c6221443f1a187",
+  "binarySha256": "b5c05129b0162010cbc8a9f7951cf1e94311f6fa18bf4b8204a40799a98cbe1d",
+  "zoomPreservedOnExpansion": true,
+  "inlineArrowLabels": 0,
+  "minimapTitles": true,
+  "pageErrors": [],
+  "limitations": "No independent usability or timing claim. No inspected source edits, repository builds, language server or editor launch."
+}

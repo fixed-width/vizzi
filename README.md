@@ -16,7 +16,7 @@ directly ([validation](experiments/visual/INLINE_CALL_RESULTS.md)). Optional [ty
 uses rust-analyzer definitions for field/variable calls while keeping captured-source checks.
 Smart [source reflow](docs/explanation/source-reflow.md) fits code to each pane while
 preserving original line numbers, copying and call controls; Original lines is available
-in More → Code layout ([validation](experiments/visual/REFLOW_RESULTS.md)).
+in Settings → Code layout ([validation](experiments/visual/REFLOW_RESULTS.md)).
 Working-tree fragments follow disk saves while retaining their layout. **Pin version**
 holds an earlier view; **Follow live** resumes updates. Missing declarations and historical
 arrows retain explicit earlier context ([validation](experiments/visual/LIVE_RESULTS.md)).

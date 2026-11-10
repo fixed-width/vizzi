@@ -18,7 +18,7 @@ Fragment editor handoff posts a captured snapshot/file/version and original line
 uses the same bounded, no-follow working-file/content verification as saved evidence.
 Neither evidence nor an investigation revision is required, and opening does not mutate
 the investigation. Both handoff routes share the editor concurrency limit and configured
-editor adapter. **Keep** remains a separate action.
+editor adapter. **Save** remains a separate action.
 
 The `actions` structure projection returns captured identifier line/UTF-8 byte columns,
 opaque call identity and any source-local binding. It reads metadata, without loading source
@@ -98,3 +98,33 @@ Perform mutation checks on the presentation model and native binding rules with 
 worker/compiler task at nice 10. Persist source-local and candidate link kinds separately. Run existing workspace tests/doctests, formatting,
 Clippy and the affected/full browser suite. Capture the real Minitosis interaction for
 review after correctness checks. Do not fabricate semantic links or usability results.
+
+
+## Workspace controls and local expansion
+
+Keep the established theme tokens and Noto Sans/DejaVu Sans Mono roles. The header groups
+Workspace actions at the left and Settings at the right. Source takes priority over
+chrome; axis-expansion controls belong to each bubble. Use bubble for a canvas view and
+saved location for an anchor in the saved collection; native evidence/source schemas
+retain their existing names and meanings.
+
+`SourcePane.contentSize()` measures loaded text locally, respecting the declaration
+margin, tabs and current reflow. Width uses original line measurements; height uses the
+current displayed rows. The controller adds the actual surrounding chrome and requests
+one axis from `Workspace.expand(id, axis, extent)`. No source transport or model inference
+is involved. Growth caps at 1,600 by 2,400 canvas pixels, with scrolling beyond the cap.
+
+A pure layout module plans the complete expansion before the model adopts it. The chosen
+bubble is first; other bubbles are ordered by original position on the growth axis and
+stable view identity. A bubble touched by a growing/moved predecessor advances past all
+conflicting fixed predecessors, with a 24-pixel forward gap (including edge contact). Later bubbles see that final position.
+This gives a bounded acyclic local push, without a force simulation or global repacking.
+Collapsed bubbles occupy their header height. Uncollapsing uses the same vertical push.
+Out-of-range plans fail atomically. Sizes and positions persist through the existing schema;
+source bindings, reading anchors and camera remain independent.
+
+`reveal` pans at the existing scale and prioritises the destination when a caller/destination
+pair cannot both fit. `fit` explicitly computes scale. Arrow provenance/freshness stays in
+native and presentation data, styles and hover/accessibility details; inline labels are
+removed. Minimap rectangles have qualified function/path/line SVG titles and accessible
+names.

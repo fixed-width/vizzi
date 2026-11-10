@@ -1,3 +1,4 @@
+import {expandViews,BUBBLE_SIZE} from './layout-growth.js';
 // Presentation state is independent of captured source and relationship facts.
 export const LIMIT=24,MIN_SCALE=0.02,MAX_SCALE=1.5;
 const bytes=s=>new TextEncoder().encode(s).length;
@@ -8,7 +9,7 @@ const require=(value,message)=>{if(!value)throw new Error(message);};
 const clone=value=>structuredClone(value);
 function source(s){return s&&typeof s.path==='string'&&bytes(s.path)<=4096&&!s.path.includes('\\')&&!s.path.split('/').some(p=>!p||p==='.'||p==='..')&&opaque(s.file)&&opaque(s.version)&&opaque(s.context)&&integer(s.line,1,1e8)&&integer(s.end_line,s.line,1e8);}
 function symbol(s){return s&&(s.tracking==null||opaque(s.tracking))&&opaque(s.id)&&typeof s.name==='string'&&bytes(s.name)>0&&bytes(s.name)<=128&&typeof s.kind==='string'&&bytes(s.kind)<=128&&Array.isArray(s.parents)&&s.parents.length<=16&&s.parents.every(p=>typeof p==='string'&&bytes(p)<=128)&&source(s.source);}
-function geometry(v){return finite(v.x,-1e5,1e5)&&finite(v.y,-1e5,1e5)&&finite(v.w,320,960)&&finite(v.h,200,960);}
+function geometry(v){return finite(v.x,-1e5,1e5)&&finite(v.y,-1e5,1e5)&&finite(v.w,320,BUBBLE_SIZE.maxWidth)&&finite(v.h,200,BUBBLE_SIZE.maxHeight);}
 function reading(r,s){return r&&finite(r.top,0,1e7)&&finite(r.left,0,1e7)&&integer(r.section,s.line,s.end_line)&&(r.anchor==null||(integer(r.anchor.line,r.section,Math.min(s.end_line,r.section+95))&&integer(r.anchor.byte,0,32768)&&finite(r.anchor.offset,-1024,1024)));}
 function camera(c){return c&&finite(c.x,-1e5,1e5)&&finite(c.y,-1e5,1e5)&&finite(c.scale,MIN_SCALE,MAX_SCALE);}
 function within(call,owner){return source(call)&&call.path===owner.path&&call.file===owner.file&&call.version===owner.version&&call.context===owner.context&&call.line>=owner.line&&call.end_line<=owner.end_line;}
@@ -66,18 +67,24 @@ export class Workspace {
   this.views=views;this.links=links;this.snapshot=snapshot;this.stale=false;
  }
  move(id,x,y){require(finite(x,-1e5,1e5)&&finite(y,-1e5,1e5),'Invalid fragment position');const v=this.view(id);v.x=x;v.y=y;}
- resize(id,w,h){require(finite(w,320,960)&&finite(h,200,960),'Invalid fragment size');const v=this.view(id);v.w=w;v.h=h;}
+ resize(id,w,h){require(finite(w,320,BUBBLE_SIZE.maxWidth)&&finite(h,200,BUBBLE_SIZE.maxHeight),'Invalid fragment size');const v=this.view(id);v.w=w;v.h=h;}
  read(id,r){const v=this.view(id);require(reading(r,v.symbol.source),'Invalid fragment reading state');v.reading=clone(r);}
- collapse(id){const v=this.view(id);v.collapsed=!v.collapsed;this.selected=id;}
+ expand(id,axis,extent){this.views=expandViews(this.views,id,axis,extent);this.selected=id;}
+ collapse(id){const v=this.view(id);if(v.collapsed)this.expand(id,'height',v.h);else v.collapsed=true;this.selected=id;}
  close(id){this.view(id);this.views=this.views.filter(v=>v.id!==id);this.links=this.links.filter(l=>l.from!==id&&l.to!==id);if(this.selected===id)this.selected=this.views.at(-1)?.id??null;}
  pan(dx,dy){require(finite(dx,-1e5,1e5)&&finite(dy,-1e5,1e5),'Invalid camera movement');this.camera.x=Math.max(-1e5,Math.min(1e5,this.camera.x-dx/this.camera.scale));this.camera.y=Math.max(-1e5,Math.min(1e5,this.camera.y-dy/this.camera.scale));}
  zoomAt(scale,point){require(Number.isFinite(scale)&&finite(point.x,-1e5,1e5)&&finite(point.y,-1e5,1e5),'Invalid zoom');const p=worldPoint(point,this.camera);const next=Math.max(MIN_SCALE,Math.min(MAX_SCALE,scale));this.camera={x:Math.max(-1e5,Math.min(1e5,p.x-point.x/next)),y:Math.max(-1e5,Math.min(1e5,p.y-point.y/next)),scale:next};}
- reveal(ids,width,height,minimum=0.65){
-  require(finite(width,1,1e5)&&finite(height,1,1e5),'Invalid viewport');const views=ids.map(id=>this.view(id));if(!views.length){this.camera={x:0,y:0,scale:1};return;}
-  const b=bounds(views),scale=Math.max(MIN_SCALE,Math.min(1,Math.max(minimum,Math.min((width-64)/(b.right-b.x),(height-64)/(b.bottom-b.y)))));
+ reveal(ids,width,height){
+  require(finite(width,1,1e5)&&finite(height,1,1e5),'Invalid viewport');const views=ids.map(id=>this.view(id));if(!views.length)return;
+  const scale=this.camera.scale,pad=24/scale,w=width/scale,h=height/scale,all=bounds(views),b=all.right-all.x+2*pad<=w&&all.bottom-all.y+2*pad<=h?all:bounds([views.at(-1)]);
+  const position=(start,end,current,span)=>Math.max(-1e5,Math.min(1e5,Math.min(start-pad,Math.max(current,end+pad-span))));
+  this.camera={x:position(b.x,b.right,this.camera.x,w),y:position(b.y,b.bottom,this.camera.y,h),scale};
+ }
+ fit(width,height){
+  require(finite(width,1,1e5)&&finite(height,1,1e5),'Invalid viewport');if(!this.views.length){this.camera={x:0,y:0,scale:1};return;}
+  const b=bounds(this.views),scale=Math.max(MIN_SCALE,Math.min(1,(width-64)/(b.right-b.x),(height-64)/(b.bottom-b.y)));
   this.camera={x:(b.x+b.right)/2-width/(2*scale),y:(b.y+b.bottom)/2-height/(2*scale),scale};
  }
- fit(width,height){this.reveal(this.views.map(v=>v.id),width,height,MIN_SCALE);}
  serialize(){return JSON.stringify({schema:1,snapshot:this.snapshot,next:this.next,selected:this.selected,views:this.views,links:this.links,camera:this.camera});}
  static restore(raw,currentSnapshot){
   require(typeof raw==='string'&&bytes(raw)<=524288,'Invalid visual workspace size');let data;try{data=JSON.parse(raw);}catch{throw new Error('Invalid visual workspace JSON');}

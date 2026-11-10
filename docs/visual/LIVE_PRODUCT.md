@@ -14,11 +14,11 @@ version. Existing explicit revision-review interfaces retain their pinned semant
   location. If mapping is unavailable or ambiguous, return to the declaration start and
   report the reset. Recompute the displayed function margin for a new source version.
 - Retain the visual call trail. Revalidate unique written sites and source-local/candidate
-  evidence; show removed or unverified relationships as historical. Old language-server
+  evidence; show removed or unverified relationships as historical using line style and hover details. Old language-server
   evidence never silently becomes current evidence. Following again can establish a fresh
   relationship. Pinning either end makes a cross-version relation historical.
 - **Pin version** holds one bubble's captured version; **Follow live** resumes tracking.
-  Pinning is independent of **Keep**, which captures saved evidence. Loaded pinned bytes
+  Pinning is independent of **Save**, which captures saved evidence. Loaded pinned bytes
   remain visible, while further paging after native capture expiry is explicitly unavailable;
   this slice does not create a durable source archive.
 - Old actions are disabled while a refresh is pending or their view is retained from an

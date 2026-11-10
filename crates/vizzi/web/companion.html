@@ -17,8 +17,8 @@
       <a href="/workspace">Visual call workspace</a>
       <a href="/review">Review changes</a><a href="/explore">Detailed source browser</a>
       <a href="/investigate?trial=structure">Try structural exploration</a>
-      <button id="add-source" type="button">Add a known source location</button>
-      <button id="export" type="button">Export investigation</button>
+      <button id="add-source" type="button">Add a location</button>
+      <button id="export" type="button">Export locations</button>
       <label class="theme-control">Theme<select id="theme" aria-label="Theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
     </div></details>
   </header>
@@ -46,23 +46,23 @@
       <p id="preview-path"></p><p id="preview-status" role="status"></p>
       <div id="preview-names" aria-label="Names in this file"></div><button id="preview-more-names" type="button" hidden>More names</button>
       <pre id="preview-source"></pre>
-      <div class="preview-actions"><button id="keep-discovered" type="button">Keep this location</button><button id="preview-editor" type="button" hidden>Open in VS Code</button></div>
+      <div class="preview-actions"><button id="keep-discovered" type="button">Save location</button><button id="preview-editor" type="button" hidden>Open in VS Code</button></div>
     </aside>
-    <section id="saved-workspace" aria-label="Saved context" hidden>
-      <div class="saved-heading"><h1 id="investigation-title">Your saved context</h1><p id="investigation-counts">No saved locations yet</p><p id="save-mode"></p></div>
+    <section id="saved-workspace" aria-label="Saved locations" hidden>
+      <div class="saved-heading"><h1 id="investigation-title">Saved locations</h1><p id="investigation-counts">No saved locations yet</p><p id="save-mode"></p></div>
       <div class="optional-tools">
         <details id="connection-tools" hidden><summary>Explain a connection</summary><form id="connection-form"><label for="connection-from">From</label><select id="connection-from" required></select><label for="connection-to">To</label><select id="connection-to" required></select><label>What connects them?<textarea id="connection-text" rows="3" maxlength="512" required></textarea></label><button type="submit">Connect evidence</button></form></details>
       </div>
-      <div id="evidence-map" aria-label="Saved source map"><svg id="evidence-links" aria-hidden="true"></svg><div id="evidence-cards"></div><div id="empty-investigation"><h2>No saved locations yet.</h2><p>Explore the repository and keep a location when you find something useful.</p><button id="empty-add-source" type="button">Explore repository</button></div></div>
+      <div id="evidence-map" aria-label="Saved locations map"><svg id="evidence-links" aria-hidden="true"></svg><div id="evidence-cards"></div><div id="empty-investigation"><h2>No saved locations yet.</h2><p>Explore the repository and save a location when you find something useful.</p><button id="empty-add-source" type="button">Explore repository</button></div></div>
       <section id="connection-list-panel" hidden><h2>Your connections</h2><ol id="connection-list"></ol></section>
     </section>
-    <aside id="evidence-detail" aria-label="Evidence detail" hidden>
-      <div class="detail-heading"><h2 id="detail-title"></h2><button id="close-detail" type="button">Close evidence</button></div>
+    <aside id="evidence-detail" aria-label="Location details" hidden>
+      <div class="detail-heading"><h2 id="detail-title"></h2><button id="close-detail" type="button">Close location</button></div>
       <p id="detail-location"></p><p id="detail-freshness"></p><button id="detail-editor" type="button">Open in VS Code</button>
       <form id="note-form"><label>Your interpretation<textarea id="evidence-note" rows="5" maxlength="2048"></textarea></label><button type="submit">Save note</button></form>
-      <details id="captured-evidence"><summary>Captured source evidence</summary><p id="detail-version"></p><pre id="detail-excerpt"></pre></details><button id="remove-evidence" type="button">Remove evidence and its connections</button>
+      <details id="captured-evidence"><summary>Saved source</summary><p id="detail-version"></p><pre id="detail-excerpt"></pre></details><button id="remove-evidence" type="button">Remove location and its connections</button>
     </aside>
   </main>
-  <dialog id="source-dialog"><form id="source-form"><h2>Add a known source location</h2><p>For a location you already have open in your editor.</p><label>Workspace-relative path<input id="source-path" required autocomplete="off"></label><label>Starting line<input id="source-line" type="number" min="1" value="1" required></label><label>What does this location contribute?<input id="source-title" maxlength="128" required></label><p id="source-dialog-state" role="status"></p><p id="source-dialog-error" role="alert" hidden></p><div class="dialog-actions"><button id="cancel-source" type="button">Cancel</button><button id="pin-source" type="submit">Keep source evidence</button></div></form></dialog>
+  <dialog id="source-dialog"><form id="source-form"><h2>Add a location</h2><p>For a location you already have open in your editor.</p><label>Workspace-relative path<input id="source-path" required autocomplete="off"></label><label>Starting line<input id="source-line" type="number" min="1" value="1" required></label><label>What does this location contribute?<input id="source-title" maxlength="128" required></label><p id="source-dialog-state" role="status"></p><p id="source-dialog-error" role="alert" hidden></p><div class="dialog-actions"><button id="cancel-source" type="button">Cancel</button><button id="pin-source" type="submit">Save location</button></div></form></dialog>
   <script type="module" src="/companion.js"></script>
 </body></html>

@@ -13,7 +13,7 @@ export function installDiscovery({transport, keep, openEditor, showError, browse
   }
   function syncSaved() {
     const saved = savedLocation();
-    el('keep-discovered').textContent = saved ? 'Kept' : 'Keep this location';
+    el('keep-discovered').textContent = saved ? 'Saved' : 'Save location';
     el('keep-discovered').disabled = !board || saving || !preview?.available || Boolean(saved);
     el('preview-editor').hidden = !saved;
   }

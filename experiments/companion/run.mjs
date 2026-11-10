@@ -64,8 +64,8 @@ try {
     await response;
     const match = page.locator('.discovery-entry').filter({has: page.getByRole('heading',{name:title,exact:true})}).filter({hasText:path}).first();
     await match.click();
-    await page.getByRole('button',{name:'Keep this location',exact:true}).click();
-    await page.waitForFunction(() => document.querySelector('#keep-discovered').textContent === 'Kept');
+    await page.getByRole('button',{name:'Save location',exact:true}).click();
+    await page.waitForFunction(() => document.querySelector('#keep-discovered').textContent === 'Saved');
     await page.getByRole('button',{name:'Close source preview',exact:true}).click();
   }
   report.interaction = 'Declaration search and one-click keep; no typed paths, lines or titles.';
@@ -73,11 +73,11 @@ try {
   report.task = 'How does the compiler obtain source, retry the c extension, and report read failure?';
   for (const [title, path, line, note] of locations) {
     const card = page.locator('.evidence-card').filter({has: page.getByRole('heading', {name: title, exact: true})});
-    await card.getByRole('button', {name: 'Inspect evidence', exact: true}).click();
+    await card.getByRole('button', {name: 'Inspect location', exact: true}).click();
     await page.getByLabel('Your interpretation', {exact: true}).fill(note);
     await page.getByRole('button', {name: 'Save note', exact: true}).click();
     await page.waitForFunction(note => [...document.querySelectorAll('.evidence-summary')].some(n => n.textContent === note), note);
-    await page.getByRole('button', {name: 'Close evidence', exact: true}).click();
+    await page.getByRole('button', {name: 'Close location', exact: true}).click();
   }
   await page.getByText('Explain a connection',{exact:true}).click();
   for (const [from, to, explanation] of [

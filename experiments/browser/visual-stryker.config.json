@@ -1,11 +1,12 @@
 {
   "$schema": "../../node_modules/@stryker-mutator/core/schema/stryker-schema.json",
   "mutate": [
-    "crates/vizzi/web/visual-model.js"
+    "crates/vizzi/web/visual-model.js",
+    "crates/vizzi/web/layout-growth.js"
   ],
   "testRunner": "command",
   "commandRunner": {
-    "command": "node crates/vizzi/web/visual-model.test.js"
+    "command": "node crates/vizzi/web/workspace-layout.test.js && node crates/vizzi/web/visual-model.test.js"
   },
   "coverageAnalysis": "off",
   "concurrency": 1,
@@ -28,6 +29,8 @@
     "**",
     "!package.json",
     "!crates/vizzi/web/visual-model.js",
+    "!crates/vizzi/web/layout-growth.js",
+    "!crates/vizzi/web/workspace-layout.test.js",
     "!crates/vizzi/web/visual-model.test.js",
     "!crates/vizzi/web/fixtures/visual-v1.json"
   ]

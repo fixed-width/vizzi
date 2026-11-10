@@ -33,6 +33,15 @@ export class SourcePane {
     }
     reading(){return {top:this.element.scrollTop,left:this.element.scrollLeft,anchor:this.anchor()};}
     readingContext(){const reading=this.reading(),row=this.rows.find(r=>r.line.number===reading.anchor?.line);return {reading,text:row&&!row.line.left&&!row.line.right&&new TextEncoder().encode(row.line.text).length<=1024?row.line.text:''};}
+    contentSize(){
+        if(!this.rows.length)return null;
+        const style=this.view.getComputedStyle(this.element),context=this.context;
+        if(context){context.font=`${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;context.fontKerning='none';}
+        const textWidth=text=>context?context.measureText(text).width:text.length*parseFloat(style.fontSize)*.6;
+        const tab=textWidth('    '),measure=text=>{let width=0;const parts=text.split('\t');for(const [i,part]of parts.entries()){width+=textWidth(part);if(i<parts.length-1)width=(Math.floor(width/tab)+1)*tab;}return width;};
+        const width=Math.max(...this.rows.map(r=>measure(' '.repeat(r.margin.columns)+r.line.text.slice(r.margin.bytes))));
+        return {width:Math.ceil(width+67+this.element.offsetWidth-this.element.clientWidth),height:this.rows.reduce((sum,r)=>sum+r.row.offsetHeight,0)+parseFloat(style.paddingTop)+parseFloat(style.paddingBottom)};
+    }
     restore(anchor){const row=this.rows.find(r=>r.line.number===anchor.line),segment=row&&[...row.text.querySelectorAll('.reflow-segment')].find(s=>Number(s.dataset.start)<=anchor.byte&&(anchor.byte<Number(s.dataset.end)||Number(s.dataset.start)===Number(s.dataset.end)));if(segment)this.element.scrollTop=row.row.offsetTop+segment.offsetTop+Math.min(anchor.offset,Math.max(0,segment.offsetHeight-1));}
     update(preserve,force=false){
         if(this.closed||!this.rows.length)return;

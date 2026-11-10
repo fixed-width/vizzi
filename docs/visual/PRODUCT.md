@@ -6,12 +6,31 @@ editor companion; source search introduces a fragment rather than taking over th
 Reuse the existing light/dark palette and fonts; Code Bubbles is the supplied interaction
 reference, with no separate design mock.
 
-- `/workspace` opens the canvas. **Add fragment** reveals a function chooser supporting
+Workspace controls use **bubble** for a canvas view and **saved location** for a retained
+source anchor. Workspace actions (New workspace, Saved locations) have their own menu;
+Settings contains Theme and Code layout. The example button is absent from the header.
+Call arrows have no inline evidence/status labels. Hover/focus details retain provenance
+and stale-call meaning; old or uncertain links remain visually distinct. Minimap items
+name the qualified function and source path/line through a tooltip and accessible label.
+
+Opening or returning to a bubble pans only as needed, preserving the reader's zoom.
+Fit workspace and zoom controls are explicit scale changes. When caller and destination
+cannot both fit at the current scale, reveal the destination without changing scale.
+
+Separate **Expand height** and **Expand width** actions grow a bubble to fit its currently
+loaded section, including current reflow for height and original line widths for width.
+Expansion never fetches more source, shrinks a bubble, changes camera scale or rearranges
+unrelated bubbles. Directly obstructing bubbles, and any bubbles they obstruct in turn,
+move down for height growth or right for width growth with a fixed gap. The selected
+bubble stays anchored. Compute the complete bounded change before applying it; failure
+leaves the layout intact. Width caps at 1,600 and height at 2,400 canvas pixels; code that
+still exceeds these bounds remains scrollable. Manual resizing and section paging remain.
+
+- `/workspace` opens the canvas. **Add bubble** reveals a function chooser supporting
   captured qualified names with `::` or `.`. Rank the complete function result set before
   paging: exact names/qualified names, exact qualified suffixes, function-name prefixes/substrings, namespace prefixes/substrings,
-  then path matches; break ties alphabetically and by source location. A known
-  Minitosis example can open its entry function for a guided visual demonstration, clearly
-  distinguished from automatic task interpretation or a fresh search evaluation.
+  then path matches; break ties alphabetically and by source location. A guided Minitosis
+  URL remains available for reproducible demonstrations, outside the workspace header.
 - Selecting a written call opens its destination beside the caller. Earlier views
   retain position, dimensions and reading state. A language-supported unique destination opens directly;
   unresolved multiple candidates require a choice. Source-local Rust `self` bindings are
@@ -33,7 +52,7 @@ reference, with no separate design mock.
   view's presentation links, not source facts. Code remains syntax-coloured and readable;
   long functions use explicit bounded sections instead of silent short excerpt replacement.
 - Smart reflow fits long code lines to their pane using ranked, language-aware break hints
-  and bounded hanging indentation. It is enabled by default; **More → Code layout** can
+  and bounded hanging indentation. It is enabled by default; **Settings → Code layout** can
   restore original lines. Resizing recomputes display breaks locally, without source reads
   or moving neighbouring fragments. Each physical source line keeps its original number;
   continuation marks distinguish display rows from source lines. Copying returns the
@@ -66,9 +85,9 @@ reference, with no separate design mock.
   settings, and small viewports can pan/zoom without overflowing the page. No desktop editor
   opens automatically. Automated verification uses recording-only adapters.
 - **Editor** opens a current fragment at its original declaration line without requiring
-  **Keep**. The host verifies its snapshot/file/version and current working bytes first.
+  **Save**. The host verifies its snapshot/file/version and current working bytes first.
   Opening does not create evidence or change the investigation, including when saving is
-  unavailable. **Keep** remains independent. Stale fragments cannot request a handoff.
+  unavailable. **Save** remains independent. Stale fragments cannot request a handoff.
 
 The first acceptance question is whether the maintainer can walk and branch through a real
 call trail while retaining previous-step context. Groups, alternative representations and

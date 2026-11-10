@@ -37,7 +37,7 @@ try {
   assert.equal(await page.locator('#preview-names').getByRole('button', {name:'macro source_readers',exact:true}).count(),1);
   assert.equal(await page.locator('#preview-names').getByRole('button', {name:'function hidden_reader',exact:true}).count(),0);
   await page.locator('#preview-names').getByRole('button', {name: 'trait SourceReader', exact: true}).click();
-  await page.getByRole('button', {name:'Keep this location', exact:true}).click();
+  await page.getByRole('button', {name:'Save location', exact:true}).click();
   await page.waitForFunction(() => document.querySelector('#show-saved').textContent.includes('1'));
   assert.equal((await (await fetch(host.url+'/api/investigation')).json()).board.evidence[0].title, 'SourceReader');
   await page.getByRole('button', {name:'Open in VS Code', exact:true}).filter({visible:true}).click();
@@ -48,7 +48,7 @@ try {
   await page.getByLabel('Find a name or file', {exact:true}).fill('read_file');
   await page.waitForFunction(() => document.querySelectorAll('.discovery-entry').length === 1 && document.querySelector('.discovery-entry').textContent.includes('read_file'));
   await page.locator('.discovery-entry').first().click();
-  await page.getByRole('button', {name:'Keep this location', exact:true}).click();
+  await page.getByRole('button', {name:'Save location', exact:true}).click();
   await page.waitForFunction(() => document.querySelector('#show-saved').textContent.includes('2'));
   await page.locator('#show-saved').click();
   assert.equal(await page.locator('.evidence-card').count(), 2);

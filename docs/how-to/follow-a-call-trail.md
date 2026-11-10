@@ -10,7 +10,7 @@ CARGO_BUILD_JOBS=1 cargo build --release --offline -p vizzi
 target/release/vizzi --root /path/to/repository --cache /tmp/vizzi-call-trail --workers 1 --port 7474
 ```
 
-Open `http://127.0.0.1:7474/workspace`. Select **Add fragment**, find a function by name or qualified name (for example `LufsMeter::process_sample`),
+Open `http://127.0.0.1:7474/workspace`. Select **Add bubble**, find a function by name or qualified name (for example `LufsMeter::process_sample`),
 and choose its source location. Its captured declaration opens on the canvas.
 The function starts at the code gutter, with its enclosing file/class/implementation
 indentation removed from display. Internal nesting stays relative to it. This applies
@@ -22,8 +22,8 @@ several unresolved declarations share the terminal name, choose a candidate usin
 containing declaration and file. The destination
 opens beside the caller; an already-open destination is revealed instead. Follow another
 step, or return to an earlier caller and open a branch. Existing panes retain their geometry
-and reading positions. Solid **self call** arrows record Rust receiver bindings; dashed **candidate** arrows
-record name-based choices. [Destination selection](../explanation/call-destinations.md) explains
+and reading positions. Arrows connect the caller to the selected destination; hover over
+an arrow for its source and resolution details. [Destination selection](../explanation/call-destinations.md) explains
 the distinction.
 
 With the keyboard, Tab to a call name and press Enter, Space or Down to open its menu;
@@ -31,22 +31,30 @@ Ctrl/Cmd+Enter follows directly. Escape closes the menu and returns focus to the
 You can still select and copy source text. **Calls** lists written calls when their
 identifiers are outside the current section or cannot be decorated.
 
-Drag a header to arrange a fragment. Drag its lower-right grip to resize it; focus a header
+Drag a header to arrange a bubble. Drag its lower-right grip to resize it; focus a header
 or grip and use arrow keys for the same operations. Collapse an earlier step to retain its
-place while freeing space. Closing a fragment removes its visual connections.
+place while freeing space. Closing a bubble removes its visual connections.
+
+Use **↕ Expand height** or **↔ Expand width** in a bubble header to fit the current code
+section. Nearby bubbles move down or right to make room. The bubble stays anchored and
+zoom stays unchanged. Expansion uses loaded source; long sections can still require
+scrolling at the maximum size. Ordinary corner resizing remains available.
+
+**Workspace** contains New workspace and Saved locations. **Settings** contains Theme
+and Code layout. Minimap boxes show function names and source locations when hovered.
 
 Click **×** at the right of a transient notice or error banner to dismiss it.
 
 Scroll inside code to read it. **Next section** and **Previous section** page long declarations.
 Long lines reflow at suggested code boundaries as you resize the pane. A continuation mark
-in the gutter refers to the same original source line. Use **More → Code layout → Original
+in the gutter refers to the same original source line. Use **Settings → Code layout → Original
 lines** to turn reflow off; the preference survives reload. Copying within fully captured
 rows preserves original whitespace and line endings. Long indivisible tokens can still
 scroll horizontally. See [source reflow](../explanation/source-reflow.md) for the design
 and fallback limits.
 
 Drag or scroll the background to pan, use **+**/**−** or Ctrl/⌘ + wheel to zoom, and use
-**Fit working set** or a fragment in the overview to return to earlier context.
+**Fit workspace** or a bubble in the overview to return to earlier context.
 
 The layout and reading positions restore on reload in the same browser and origin. Live
 bubbles follow files saved in your editor, retaining their arrangement. Reading positions
@@ -54,18 +62,16 @@ follow an unchanged nearby source line where it can be identified; otherwise the
 returns to the function start and says its reading position was reset.
 
 Use a bubble's **Pin version** to keep its current source. **Follow live** resumes updates.
-Pinning is separate from **Keep**. Older pinned versions disable current-source actions;
+Pinning is separate from **Save**. Older pinned versions disable current-source actions;
 their loaded text stays visible. Further paging or reload can report capture expiry.
 A removed, renamed, moved or ambiguous function retains its earlier view with a notice;
-reopen it through **Add fragment** to choose its current identity. Historical arrows say
-**previous call** or **removed call** until current evidence or a fresh follow validates
-them. Unsaved editor buffers need a future plugin; this mode follows disk saves.
+reopen it through **Add bubble** to choose its current identity. Historical arrows use a muted broken line; hover over one for its current status. Unsaved editor buffers need a future plugin; this mode follows disk saves.
 
-Use **Editor** to open a current fragment at its original declaration line in VS Code.
-The host checks the captured location and working-file contents first. **Keep** independently
+Use **Editor** to open a current bubble at its original declaration line in VS Code.
+The host checks the captured location and working-file contents first. **Save** independently
 retains a location in the investigation; saving is optional for editor handoff. The host's
 `--editor-code /path/to/code` option selects the trusted launcher. These actions are explicit;
-opening a fragment never launches an editor automatically.
+opening a bubble never launches an editor automatically.
 
 For the known Minitosis example, point the host at `tract-plugin-pack` and open
 `/workspace?demo=minitosis`. Follow `process → render → Processor::process_sample` and

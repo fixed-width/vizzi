@@ -1,0 +1,14 @@
+// Known-source functional replay on temporary copies; no latency qualification.
+import assert from 'node:assert/strict';
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {join} from 'node:path';
+import {createHash} from 'node:crypto';
+import {workspace,startHost,browser,paint} from '../browser/support.mjs';
+const [root,output]=process.argv.slice(2);assert.ok(root&&output,'Use replay-controls.mjs ROOT NEW_OUTPUT');await mkdir(output);
+const text=await readFile(join(root,'minitosis/src/lib.rs'),'utf8'),input=await workspace({files:{'minitosis/src/lib.rs':text}});let host,chrome;
+try{
+ host=await startHost(input,1);chrome=await browser({desktopBus:false});const page=await chrome.newPage({viewport:{width:1600,height:1100}}),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(host.url+'/workspace?demo=minitosis');const caller=page.locator('[data-view][data-name="process"]');await caller.locator('.code-call').first().waitFor();await caller.getByRole('button',{name:'Calls',exact:true}).click();const render=caller.getByRole('button',{name:/^render · line/});await render.click();await page.locator('[data-view][data-name="render"] .code-line').first().waitFor();await page.getByRole('button',{name:'Fit workspace',exact:true}).click();await paint(page);
+ const zoom=await page.locator('#visual-zoom').textContent();await caller.getByRole('button',{name:'Expand height',exact:true}).click();await caller.getByRole('button',{name:'Expand width',exact:true}).click();await paint(page);assert.equal(await page.locator('#visual-zoom').textContent(),zoom);assert.equal(await page.locator('#workspace-links text').count(),0);assert.match(await page.locator('#overview-map .overview-fragment title').first().textContent(),/process.*minitosis\/src\/lib.rs/);await page.getByRole('button',{name:'Fit workspace',exact:true}).click();await paint(page);
+ await page.screenshot({path:join(output,'controls-light.png')});await page.emulateMedia({colorScheme:'dark'});await page.screenshot({path:join(output,'controls-dark.png')});assert.deepEqual(errors,[]);
+ const result={kind:'known-source functional replay, temporary Minitosis source copy',sourceSha256:createHash('sha256').update(text).digest('hex'),binarySha256:createHash('sha256').update(await readFile('target/release/vizzi')).digest('hex'),zoomPreservedOnExpansion:true,inlineArrowLabels:0,minimapTitles:true,pageErrors:errors,limitations:'No independent usability or timing claim. No inspected source edits, repository builds, language server or editor launch.'};await writeFile(join(output,'result.json'),JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));
+}finally{await chrome?.close();await host?.close();await input.close();}
