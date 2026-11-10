@@ -27,3 +27,5 @@
 #workspace-actions>div{left:0;right:auto;width:210px}#workspace-links path{pointer-events:stroke}#workspace-links path:focus-visible{stroke-width:3;outline:none}.fragment-header .bubble-fit{width:26px;height:26px;padding:2px;font-size:16px;flex:none}.fragment-footer{flex-wrap:wrap}.fragment-footer>span{min-width:25px}
 
 .fragment.is-related{outline:2px solid var(--link);outline-offset:3px}.code-line.is-linked-call{background:var(--selected-bg);box-shadow:inset 3px 0 var(--link)}.code-line.is-linked-call .line-number{color:var(--link);font-weight:700}#workspace-links path.is-linked-edge{stroke-width:3;opacity:1}
+
+#workspace-links path{cursor:help}#workspace-links path.link-hit{fill:none;stroke:transparent;stroke-width:var(--link-hit-width);stroke-dasharray:none;vector-effect:none;pointer-events:stroke;cursor:help}

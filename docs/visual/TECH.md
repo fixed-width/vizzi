@@ -140,3 +140,12 @@ intent. It returns bubble/link IDs and original source-line ranges; captured wit
 identity gates line association. A delegated DOM adapter applies temporary classes to
 bubbles, arrows and visible code rows. It recomputes after layout/source changes, without
 adding text wrappers, changing selection, paging, source requests or persisted data.
+
+
+Arrow inspection uses a transparent continuous stroke behind the visible arrow layer.
+Its world-space width is divided by camera scale to keep a 20-pixel screen target under
+the outer HTML transform. All visible strokes sit above all targets, so an actual painted
+arrow wins over another arrow's nearby invisible band. Hit strokes share link identities
+and titles but are hidden from accessibility traversal; visible arrows retain one keyboard
+focus stop each. Highlight classes apply only to visible strokes. Arrow pointer-down is
+excluded from canvas drag initiation, and both stroke types use the information cursor.

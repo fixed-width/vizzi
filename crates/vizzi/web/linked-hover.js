@@ -17,7 +17,7 @@ export function installLinkHighlights(root,read){
    const id=bubble.dataset.view;if(h.nodes.has(id))bubbles.add(bubble);
    const ranges=h.lines.filter(r=>r.view===id);if(ranges.length)for(const row of bubble.querySelectorAll('.code-line'))if(ranges.some(r=>Number(row.dataset.line)>=r.start&&Number(row.dataset.line)<=r.end))rows.add(row);
   }
-  for(const edge of root.querySelectorAll('[data-link-id]'))if(h.links.has(edge.dataset.linkId))edges.add(edge);
+  for(const edge of root.querySelectorAll('[data-link-id]:not(.link-hit)'))if(h.links.has(edge.dataset.linkId))edges.add(edge);
   apply('is-related',bubbles);apply('is-linked-call',rows);apply('is-linked-edge',edges);
  }
  const schedule=()=>{if(frame===null)frame=view.requestAnimationFrame(()=>{frame=null;refresh();});};

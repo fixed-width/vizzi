@@ -47,7 +47,8 @@ and Code layout. Minimap boxes show function names and source locations when hov
 Hover over an opened bubble to highlight its originating call lines and arrows. Hover
 over a call line to highlight its opened destinations and their arrows. Call names spanning lines
 light up across those original lines, including reflowed text. Arrow hover identifies
-both ends. Keyboard focus provides the same cues. These highlights are temporary and
+both ends. Arrows have a wide hover area, including their dotted gaps, and an information
+cursor; drag the background to pan. Keyboard focus provides the same cues. These highlights are temporary and
 do not move the workspace or fetch source. Older arrows retain their historical style;
 they never highlight unrelated replacement code after an edit.
 

@@ -78,3 +78,20 @@ traversal/finite-input cases described above. There are no exclusions. The deleg
 adapter is verified by browser regressions rather than a complete mutation scope. Use
 `experiments/browser/fit-links-stryker.config.json` to reproduce the focused run. Follow-up
 logs and screenshots have a `fit-hover-` prefix in the existing checksum manifest.
+
+## Arrow inspection target follow-up
+
+Thin visible arrows now have a continuous transparent 20-screen-pixel inspection stroke,
+including across dotted gaps and at different zoom levels. The information cursor replaces
+the inherited panning cursor. Arrow pointer-down does not start canvas dragging; background
+dragging and wheel navigation remain available. All visible arrows are painted above all
+invisible targets, preserving direct hits on visible strokes near other links. Each arrow
+still has one accessible keyboard focus stop and the same provenance tooltip.
+
+The browser regression first reproduced the missing target off the thin stroke. It now
+checks near the band edge, tooltip equality, cursor, highlight and pan behaviour at normal,
+roughly 23% and 144% zoom. The complete browser suite and stricter focused check pass;
+605 native tests/doctests (3 ignored), formatting and Clippy pass. A single deliberate
+division-to-multiplication mutation in hover-width scaling is caught by the zoomed-out
+check. This targeted browser mutation is not a full renderer mutation run. Existing pure
+relationship/fit logic is unchanged. Logs have an `arrow-band-` prefix in the manifest.

@@ -1,4 +1,10 @@
 {
+  "arrow-band-browser.log.gz": "ab253b6bf13a9be155121b89407b6c3513a1e87620444e09578dadbbf954151c",
+  "arrow-band-clippy.log.gz": "1ffdda77d5f58d35dd12edda5c3a1eed738c6c54c5ca70b399ca93126d1c4c0c",
+  "arrow-band-focused.log.gz": "882fd2e8095ca9bfc931ac714c35c2bba91d8f1ef5f0b591ec46e87740ca6794",
+  "arrow-band-native.log.gz": "17bec2167c48d948e37fb2e146a53137e26f0de60ad4a419ac8402efb2659dab",
+  "arrow-band-red.log.gz": "dac1345aa2ca5eb088b09aaf1e8233a79beb19b0b9e576fa5dc2e692f34a057e",
+  "arrow-band-scale-mutant.log.gz": "47ad0e7692f162837173901ebb811660c3f9b5525ee37b0c2e5b1da7cfe6220c",
   "browser-red.log.gz": "ed00c42fa9b83e8d2c6860d9096cc01246e4c404c1ff0b9bdc8b70f425e7447c",
   "browser.log.gz": "cfa65049ae901c4c325ae7a825990890a49641b5f832195259d55d5f507d38c8",
   "clippy.log.gz": "579f1f5360afb2c67f137b9928f6093d6321ad58ad526a37cc351771800902cb",

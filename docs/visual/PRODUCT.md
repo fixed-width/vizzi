@@ -9,7 +9,10 @@ reference, with no separate design mock.
 Workspace controls use **bubble** for a canvas view and **saved location** for a retained
 source anchor. Workspace actions (New workspace, Saved locations) have their own menu;
 Settings contains Theme and Code layout. The example button is absent from the header.
-Call arrows have no inline evidence/status labels. Hover/focus details retain provenance
+Call arrows have a continuous 20-screen-pixel inspection target across dash gaps and zoom
+levels, with an information cursor. Arrow inspection does not start canvas dragging;
+background dragging and wheel navigation remain available. Visible strokes retain their
+thin evidence styles. Call arrows have no inline evidence/status labels. Hover/focus details retain provenance
 and stale-call meaning; old or uncertain links remain visually distinct. Minimap items
 name the qualified function and source path/line through a tooltip and accessible label.
 
