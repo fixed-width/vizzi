@@ -41,8 +41,20 @@ down or right to make room; shrinking leaves them in place. The bubble stays anc
 zoom stays unchanged. Expansion uses loaded source; long sections can still require
 scrolling at the maximum size. Ordinary corner resizing remains available.
 
-**Workspace** contains New workspace and Saved locations. **Settings** contains Theme
-and Code layout. Minimap boxes show function names and source locations when hovered.
+**Workspace** contains New workspace and Saved locations. **Settings** contains Theme,
+Code layout and Module outlines. Minimap boxes show function names and source locations when hovered.
+
+Read the module label beneath a bubble's function name to distinguish language scopes.
+Bubbles in the same module share a header accent and minimap colour. Hover or focus the
+label to highlight its peers. This currently covers Cargo Rust targets/modules and Python
+modules/packages; unknown or ambiguous membership has no label. Types in one module share
+the cue, even when their names differ. It describes captured syntax rather than a compiled
+configuration.
+
+Enable **Settings → Module outlines** to draw optional Bubble Sets contours around shared
+modules. They sit behind the bubbles without rearranging them. Outlines are off by default;
+the preference survives reload. Small, overlapping or otherwise unavailable contours may
+be omitted. See the [module behaviour contract](../visual/MODULES_PRODUCT.md) for scope.
 
 Hover over an opened bubble to highlight its originating call lines and arrows. Hover
 over a call line to highlight its opened destinations and their arrows. Call names spanning lines

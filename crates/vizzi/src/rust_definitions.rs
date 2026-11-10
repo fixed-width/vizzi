@@ -77,6 +77,22 @@ fn inputs(root: &Path, snapshot: &Snapshot) -> Result<BTreeMap<String, Vec<u8>>,
                 format!("{dir}/{name}")
             };
             relative(&path)?;
+            if name == "Cargo.toml" {
+                if let Some(doc) = snapshot.file_by_path(&path) {
+                    let bytes = doc
+                        .captured()
+                        .read_all(1024 * 1024)
+                        .map_err(|e| e.to_string())?
+                        .bytes()
+                        .to_vec();
+                    total += bytes.len();
+                    if total > 16 * 1024 * 1024 {
+                        return Err("Project configuration exceeds semantic allowance".into());
+                    }
+                    values.insert(path, bytes);
+                }
+                continue;
+            }
             let absolute = root.join(&path);
             let metadata = match fs::symlink_metadata(&absolute) {
                 Ok(m) => m,
@@ -311,4 +327,55 @@ impl Provider for RustAnalyzer {
 }
 fn relative_path(path: &str) -> Result<(), String> {
     relative(path)
+}
+
+#[cfg(test)]
+mod captured_project_inputs {
+    use super::*;
+    use crate::{
+        cache::Cache,
+        engine::Engine,
+        host::{Host, HostOptions},
+        source::Directory,
+    };
+    #[test]
+    fn manifests_follow_the_captured_observation_even_when_working_files_change_or_disappear() {
+        let root = tempfile::tempdir().unwrap();
+        let cache = tempfile::tempdir().unwrap();
+        fs::write(
+            root.path().join("Cargo.toml"),
+            "[package]\nname='captured'\n",
+        )
+        .unwrap();
+        fs::write(root.path().join("lib.rs"), "fn run(){}\n").unwrap();
+        let host = Host::start_with_options(
+            Engine::new(
+                Directory::open(root.path()).unwrap(),
+                Cache::new(cache.path().to_path_buf()),
+                1,
+            )
+            .unwrap(),
+            HostOptions {
+                watch: false,
+                idle_maintenance: false,
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let snapshot = host.application().snapshot().unwrap();
+        fs::write(
+            root.path().join("Cargo.toml"),
+            "[package]\nname='working'\n",
+        )
+        .unwrap();
+        assert_eq!(
+            inputs(root.path(), &snapshot).unwrap()["Cargo.toml"],
+            b"[package]\nname='captured'\n"
+        );
+        fs::remove_file(root.path().join("Cargo.toml")).unwrap();
+        assert_eq!(
+            inputs(root.path(), &snapshot).unwrap()["Cargo.toml"],
+            b"[package]\nname='captured'\n"
+        );
+    }
 }

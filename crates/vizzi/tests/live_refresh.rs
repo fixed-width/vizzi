@@ -574,3 +574,44 @@ fn changed_reading_finds_the_last_line_in_its_bounded_neighbourhood() {
             .any(|a| a["name"] == "checkpoint")
     );
 }
+#[test]
+fn context_upgrade_recovery_uses_exact_native_file_and_lexical_keys() {
+    let (_root, _cache, host, app) = fixture();
+    let snapshot = host.application().snapshot().unwrap();
+    let syms = symbols(&host, &app);
+    let start = syms.iter().find(|s| s["name"] == "start").unwrap();
+    let doc = snapshot
+        .file(start["source"]["file"].as_str().unwrap())
+        .unwrap();
+    let analysis = &doc.analyses()[0];
+    let fact = analysis.facts.iter().find(|f| f.name == "start").unwrap();
+    let previous = vizzi_core::model::ContextId::derive(&[b"previous-context"]);
+    let tracking = vizzi_core::model::EntityId::derive(&[
+        doc.id().as_str().as_bytes(),
+        previous.as_str().as_bytes(),
+        fact.key.as_bytes(),
+    ]);
+    let mut req = request(snapshot.id().as_str(), std::slice::from_ref(start));
+    req["views"][0]["symbol"] = json!("0".repeat(64));
+    req["views"][0]["version"] = json!("0".repeat(64));
+    req["views"][0]["tracking"] = json!(tracking.as_str());
+    req["views"][0]["file"] = json!(doc.id().as_str());
+    req["views"][0]["context"] = json!(previous.as_str());
+    let answer = app
+        .refresh(&serde_json::from_value(req.clone()).unwrap())
+        .unwrap();
+    assert_eq!(answer["views"][0]["state"], "current");
+    assert_eq!(answer["views"][0]["symbol"]["id"], start["id"]);
+    assert_eq!(
+        answer["views"][0]["window"]["version"],
+        start["source"]["version"]
+    );
+    req["views"][0]["context"] = json!("f".repeat(64));
+    assert_eq!(
+        app.refresh(&serde_json::from_value(req.clone()).unwrap())
+            .unwrap()["views"][0]["state"],
+        "unresolved"
+    );
+    req["views"][0]["context"] = Value::Null;
+    assert!(app.refresh(&serde_json::from_value(req).unwrap()).is_err());
+}

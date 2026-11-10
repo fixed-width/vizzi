@@ -58,6 +58,8 @@ pub enum Provenance {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum SourceOnlyReason {
+    /// Project declarations are captured for language context, without an analyser.
+    ProjectMetadata,
     /// Review source is retained outside the engine's selected analysis scope.
     OutsideAnalysisScope,
     /// This source capture deliberately runs no language analysis.
@@ -181,6 +183,13 @@ impl SourcePolicy {
             return Ok(None);
         }
         let filename = path.rsplit('/').next().unwrap_or(path);
+        if filename == "Cargo.toml" {
+            return Ok(Some(Classification::SourceOnly {
+                language: Some("cargo".into()),
+                provenance: Provenance::ExplicitScope { scope: path.into() },
+                reason: SourceOnlyReason::ProjectMetadata,
+            }));
+        }
         let Some((stem, extension)) = filename.rsplit_once('.') else {
             return Ok(None);
         };

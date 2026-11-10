@@ -42,8 +42,9 @@ separate mock is supplied.
 8. Raw Rust/Python call syntax is supported initially. Other adapters/source-only/deferred
    documents report unavailable call analysis rather than zero use. Imports, traits, receiver
    types, macro expansion and runtime dispatch are not resolved by this slice.
-9. Operations use bounded metadata and do not parse or execute the inspected project during
-   navigation. No inference, source-control-specific identifiers or additional editor action
+9. Operations use bounded captured inputs and do not execute the inspected project during
+   navigation. Module preparation may parse bounded resident declarations; call navigation
+   uses captured call facts. No inference, source-control-specific identifiers or additional editor action
    is needed. The default theme follows the existing system/override setting; keyboard and
    narrow-screen behaviour follow the companion.
 10. Development uses independent Rust/Python fixtures for inventory, call ownership, same-

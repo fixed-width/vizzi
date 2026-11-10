@@ -31,6 +31,8 @@ pub struct Source {
 /// Captured declaration, not a resolved runtime entity.
 #[derive(Clone, Debug, Serialize)]
 pub struct Symbol {
+    /// Captured language module, absent when membership cannot be established.
+    pub module: Option<crate::modules::Module>,
     /// Tracking identity; duplicate lexical keys are scoped to captured content.
     pub tracking: String,
     /// Opaque identity for this observation/version/context.
@@ -226,14 +228,31 @@ fn bounded(text: &str) -> String {
     text[..end].into()
 }
 impl Structure {
-    /// Builds from already-validated captured metadata, without reading or parsing source.
+    /// Builds from captured facts and bounded resident module declarations; no source IO.
     pub fn new(snapshot: &Snapshot) -> Self {
+        Self::with_module_cache(snapshot, &mut crate::modules::ModuleCache::default())
+    }
+    /// Reuses bounded module metadata across source observations without source IO.
+    pub fn with_module_cache(snapshot: &Snapshot, cache: &mut crate::modules::ModuleCache) -> Self {
+        let modules = crate::modules::ModuleIndex::new(snapshot, cache);
         let mut index = Self {
             tracking: BTreeMap::new(),
             search: vec![],
             snapshot: snapshot.id().as_str().into(),
             coverage: CoverageInfo {
-                available_files: snapshot.documents().len(),
+                available_files: snapshot
+                    .documents()
+                    .iter()
+                    .filter(|d| {
+                        !matches!(
+                            d.classification(),
+                            crate::policy::Classification::SourceOnly {
+                                reason: crate::policy::SourceOnlyReason::ProjectMetadata,
+                                ..
+                            }
+                        )
+                    })
+                    .count(),
                 ..Default::default()
             },
             areas: BTreeMap::new(),
@@ -248,6 +267,15 @@ impl Structure {
             call_ids: BTreeMap::new(),
         };
         for doc in snapshot.documents() {
+            if matches!(
+                doc.classification(),
+                crate::policy::Classification::SourceOnly {
+                    reason: crate::policy::SourceOnlyReason::ProjectMetadata,
+                    ..
+                }
+            ) {
+                continue;
+            }
             if index.coverage.indexed_files == FILES || doc.path().len() > 4096 {
                 index.coverage.omitted_files += 1;
                 continue;
@@ -321,6 +349,7 @@ impl Structure {
                 index.names.entry(fact.name.clone()).or_default().push(n);
                 mapping.insert(ordinal, id.clone());
                 let symbol = Symbol {
+                    module: modules.for_fact(doc, analysis, ordinal),
                     tracking: doc.entity_id(analysis, fact).as_str().into(),
                     id,
                     name: fact.name.clone(),
@@ -658,6 +687,35 @@ impl Structure {
             None => *self.ids.get(id)?,
         };
         self.symbols.get(n)
+    }
+    /// Reconstructs earlier tracking only from exact native unique lexical keys in this file.
+    /// New source and relationship facts always come from the current observation.
+    pub fn resolve_context(
+        &self,
+        doc: &Document,
+        tracking: &str,
+        context: &str,
+    ) -> Option<&Symbol> {
+        let analysis = doc
+            .analyses()
+            .iter()
+            .find(|a| matches!(a.coverage, Coverage::Syntax | Coverage::Partial))?;
+        let mut found = None;
+        for fact in analysis.facts.iter().filter(|f| f.unique) {
+            let prior = crate::model::EntityId::derive(&[
+                doc.id().as_str().as_bytes(),
+                context.as_bytes(),
+                fact.key.as_bytes(),
+            ]);
+            if prior.as_str() == tracking {
+                let current = self.resolve(Some(doc.entity_id(analysis, fact).as_str()), "")?;
+                if found.is_some() {
+                    return None;
+                }
+                found = Some(current);
+            }
+        }
+        found
     }
     /// Revalidates one unique written site without carrying old language-server certainty forward.
     pub fn check_link(

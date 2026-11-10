@@ -5,6 +5,7 @@ export function installLinkHighlights(root,read){
  const applied=new Map();
  const target=element=>{
   if(!element||!root.contains(element))return null;
+  const module=element.closest('.module-tag[data-module-id]');if(module)return {module:module.dataset.moduleId};
   const edge=element.closest('[data-link-id]');if(edge)return {link:edge.dataset.linkId};
   const bubble=element.closest('[data-view]');if(!bubble)return null;
   const row=element.closest('.code-line');return {view:bubble.dataset.view,...(row?{line:Number(row.dataset.line)}:{})};
@@ -18,6 +19,7 @@ export function installLinkHighlights(root,read){
    const ranges=h.lines.filter(r=>r.view===id);if(ranges.length)for(const row of bubble.querySelectorAll('.code-line'))if(ranges.some(r=>Number(row.dataset.line)>=r.start&&Number(row.dataset.line)<=r.end))rows.add(row);
   }
   for(const edge of root.querySelectorAll('[data-link-id]:not(.link-hit)'))if(h.links.has(edge.dataset.linkId))edges.add(edge);
+  const peers=new Set();if(intent?.module)for(const element of root.querySelectorAll('[data-module-id]'))if(element.dataset.moduleId===intent.module)peers.add(element);apply('is-module-peer',peers);
   apply('is-related',bubbles);apply('is-linked-call',rows);apply('is-linked-edge',edges);
  }
  const schedule=()=>{if(frame===null)frame=view.requestAnimationFrame(()=>{frame=null;refresh();});};

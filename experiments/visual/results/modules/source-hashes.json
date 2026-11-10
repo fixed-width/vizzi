@@ -1,0 +1,11 @@
+{
+  "crates/vizzi/web/module-contours.test.js": "a7ac0fd16d07483897c1fb5903716c08339f8369c0a92022375d4c3044124474",
+  "crates/vizzi/web/module-outlines.js": "f74940f3382a9a3290e2edf0779a3d5296dbc89abe8aed95ffe0e5d278644455",
+  "crates/vizzi/web/module-identity.js": "1ddb3b9ba4d0baaf9f5dd687a9d0991fa05231cd0255555083a0b3529f7ed3c3",
+  "crates/vizzi/web/module-outlines.worker.js": "a80ab764ae99aef47612e67a90c54886bd8d00a74c85900f35108b2f1f7e5bfd",
+  "crates/vizzi/web/module-contours.js": "c31b2c8e091c89708c53816830976860a26a141380c25a2a17ffc9ee4610c3a0",
+  "crates/vizzi/web/module-identity.test.js": "48d77869e17a169d8ff6702936acca47742ba9dab7dbf7919654c9d177257610",
+  "crates/vizzi-core/src/modules.rs": "3adae83feed45094a8ae2a8c72e1c9afc7b3cc5b532641645f00eb966ad86628",
+  "Cargo.lock": "50fb58753bffde8331858fbbda6727da359cfaba87dabeb95a9d6e91311f9fc9",
+  "package-lock.json": "12c12f85798210681346c1265d0a4497500d0bd538b5a9ad870bf978a5083dc9"
+}

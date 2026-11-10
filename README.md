@@ -20,6 +20,9 @@ in Settings → Code layout ([validation](experiments/visual/REFLOW_RESULTS.md))
 Working-tree fragments follow disk saves while retaining their layout. **Pin version**
 holds an earlier view; **Follow live** resumes updates. Missing declarations and historical
 arrows retain explicit earlier context ([validation](experiments/visual/LIVE_RESULTS.md)).
+Module labels and shared header/minimap accents distinguish native Rust/Python scopes.
+Settings → Module outlines adds optional Bubble Sets contours without moving bubbles
+([scope](docs/visual/MODULES_PRODUCT.md)).
 Rust/Python are selected by default; explicit scopes enable
 raw C/C++ analysis. Normal editing stays in the editor, with richer plugin integration
 remaining a supported direction.

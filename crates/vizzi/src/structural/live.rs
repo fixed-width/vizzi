@@ -7,7 +7,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use vizzi_core::{
     model::Document,
     projection::{SOURCE_ROWS, WindowQuery},
-    structure::{Structure, Symbol},
+    structure::Symbol,
 };
 
 /// Source-line hint used only to preserve reading position, never to identify a function.
@@ -33,6 +33,12 @@ pub struct View {
     pub symbol: String,
     /// Previous captured document version.
     pub version: String,
+    /// Earlier exact file identity for lexical-context recovery.
+    #[serde(default)]
+    pub file: Option<String>,
+    /// Earlier analyser context for reconstructing the native tracking hash.
+    #[serde(default)]
+    pub context: Option<String>,
     /// Original source area used for candidate ordering.
     pub area: String,
     /// Previous section offset from the declaration start.
@@ -161,6 +167,9 @@ impl StructureHost {
                 || !ids.insert(&view.id)
                 || !opaque(&view.symbol)
                 || !opaque(&view.version)
+                || view.file.is_some() != view.context.is_some()
+                || view.file.as_deref().is_some_and(|s| !opaque(s))
+                || view.context.as_deref().is_some_and(|s| !opaque(s))
                 || view.tracking.as_deref().is_some_and(|s| !opaque(s))
                 || view.area.len() > 4096
                 || view.section_offset > 100_000_000
@@ -202,10 +211,8 @@ impl StructureHost {
             .as_ref()
             .is_none_or(|c| c.snapshot != request.snapshot)
         {
-            *cache = Some(Cached {
-                snapshot: request.snapshot.clone(),
-                index: Structure::new(&snapshot),
-            });
+            let previous = cache.take();
+            *cache = Some(Cached::rebuild(&snapshot, previous));
         }
         let index = &cache
             .as_ref()
@@ -214,7 +221,16 @@ impl StructureHost {
         let mut resolved = BTreeMap::new();
         let mut views = Vec::new();
         for view in &request.views {
-            let Some(symbol) = index.resolve(view.tracking.as_deref(), &view.symbol) else {
+            let symbol = index
+                .resolve(view.tracking.as_deref(), &view.symbol)
+                .or_else(|| {
+                    index.resolve_context(
+                        snapshot.file(view.file.as_deref()?)?,
+                        view.tracking.as_deref()?,
+                        view.context.as_deref()?,
+                    )
+                });
+            let Some(symbol) = symbol else {
                 views.push(json!({"id":view.id,"state":"unresolved"}));
                 continue;
             };

@@ -225,3 +225,22 @@ remote keyboard focus and cached rendering. Use `--config /tmp/focused.config.js
 for a deliberate focused follow-up; preserve the full relevant scope at integration.
 The controller/reader and source-audit scopes use the serial Node runner documented
 above. Surviving equivalent checks, timeouts and failing-test catches remain separate.
+
+## Check module cues
+
+The normal browser suite includes native module identity, module-label peer highlighting,
+outline-worker lifecycle and rendered SVG geometry checks. For a focused run:
+
+```sh
+node crates/vizzi/web/module-identity.test.js
+node crates/vizzi/web/module-contours.test.js
+node experiments/browser/module-contours-dom.test.mjs
+node experiments/browser/module-outlines.test.mjs
+node experiments/browser/module-identity.test.mjs
+```
+
+To check a real upgrade, retain a pre-module `vizzi` executable, build the current release,
+then run `node experiments/browser/module-upgrade.test.mjs --previous /path/to/old-vizzi`.
+It uses temporary source/cache directories and one origin across the host replacement.
+For serial mutation checks use `modules-stryker.config.json`; the vendored library is
+excluded. Results and bounds are recorded in [module validation](../visual/MODULE_RESULTS.md).

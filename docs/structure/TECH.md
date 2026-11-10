@@ -21,7 +21,7 @@ resolution. Validate ranges, literal spelling and enclosing declaration containm
 capturing Documents. Include the collector in analyzer fingerprints so persisted/reused
 analysis invalidates correctly. Deferred/unsupported input must not claim call coverage.
 Existing source capture and cancellation checks remain in charge; no extra parser pool or
-hidden reparsing is introduced. C-family analysis initially reports no call capability.
+hidden call reparsing is introduced. C-family analysis initially reports no call capability.
 
 ## Portable structural projection
 
@@ -30,6 +30,11 @@ Snapshot. Its interface returns source areas, paged inventory, written calls and
 uses/targets. Opaque symbol identities include native file/version/context/fact identity.
 The index owns compact labels/ranges/native bindings, not an Arc to a retired Snapshot or
 copies of source text. Queries do not read backing storage.
+
+[Module identity](../visual/MODULES_TECH.md) adds a bounded, cached Rust module-declaration
+pass over resident captured text when preparing the index. It reads captured Cargo
+configuration and Python package metadata, with no mutable-source IO or build tooling.
+Ordinary call queries reuse the prepared projection.
 
 Bound admitted documents/declarations/calls and expose omissions, partial syntax and
 unavailable call analysis. Index calls by terminal name, preserving all same-name ambiguity.

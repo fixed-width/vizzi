@@ -15,6 +15,7 @@ offsets and byte positions are zero-based. String limits are UTF-8 bytes.
 | `views[].tracking` | Native declaration tracking reference or null for exact current-ID migration. |
 | `views[].symbol` | Earlier observation-bound symbol reference. |
 | `views[].version` | Captured document version, or a different valid reference to request source bytes. |
+| `views[].file`, `views[].context` | Optional pair of earlier file/analysis references for exact native tracking recovery after an analyzer-context upgrade. Supply both or neither. |
 | `views[].area` | Original candidate-ordering area, at most 4,096 bytes. Empty uses the function's path. |
 | `views[].section_offset` | Section offset from the earlier declaration start, at most 100,000,000. |
 | `views[].anchor` | Null, or `{offset, byte, text}`. Offset at most 100,000,000; byte at most 32,768; complete earlier line text at most 1,024 bytes. |
@@ -27,6 +28,10 @@ offsets and byte positions are zero-based. String limits are UTF-8 bytes.
 The response has the same `snapshot`, one result per requested view and one per link.
 An unresolved view has `{id, state: "unresolved"}`. A resolved view has `state: "current"`,
 its current `symbol`, `position`, visible `actions`, and the first eight written `calls`.
+The symbol includes `module`, either null (examined but unavailable) or a descriptor with
+opaque `id`, qualified `label` (at most 512 UTF-8 bytes), `language`, captured `root`
+(at most 4,096 bytes), and provenance `basis`. Rust uses `rust_declarations`, Python
+`python_module`. A missing field in a saved legacy symbol triggers native hydration.
 `position` contains the loaded section's first line, a matched reading `line` or null,
 segment `byte`, and a `reset` flag. The visible window has at most 96 physical lines.
 Changed or missing display buffers receive a `window` and a declaration-header `origin`;

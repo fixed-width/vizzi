@@ -1,0 +1,24 @@
+{
+  "kind": "known-source module replay, copied Minitosis manifests/source",
+  "sourceSha256": {
+    "Cargo.toml": "ee675656876b9d3cc7548c90a7b0ea2765d8cceeead5d8e6554717f02710501b",
+    "minitosis/Cargo.toml": "c02cbed29144dba09578d9b36ea938a3e6df100b1987a5b44cda00b166da73e1",
+    "minitosis/src/lib.rs": "629967a245cf5ab9967e640aab45d0cb39da0c93946c60dc11c6221443f1a187",
+    "minitosis/src/engine.rs": "fe48eef3f464b28fe667cf20827edea13f97f2b626e5fbe7e298a284e1c81e75"
+  },
+  "binarySha256": "a1354403d75ab66aa954e2035398fcc9e430fc40c1bb1c46ccb0f8458e3b081b",
+  "bubbleCount": 4,
+  "moduleGroups": 2,
+  "outlinesDefaultOff": true,
+  "outlinePaths": 2,
+  "layoutRetained": true,
+  "cameraOnlyPosts": 0,
+  "worker": {
+    "posts": 1,
+    "durations": [
+      21.899999976158142
+    ]
+  },
+  "pageErrors": [],
+  "limitations": "One local run; includes worker startup and browser scheduling. No baseline-laptop, whole-repository, or independent usability qualification. No inspected repository build, source edit, language server or editor launch."
+}

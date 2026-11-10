@@ -13,6 +13,10 @@ add the candidate suffixes in [the C-family policy](C_FAMILY_POLICY.md), includi
 Ambiguous headers, unassigned fragments, and CUDA remain source-only. An unavailable
 factory in a custom registry still preserves source without fake analysis.
 
+`Cargo.toml` is also captured by default as immutable, source-only project metadata.
+It supplies [native module identity](../visual/MODULES_TECH.md) without an analyzer,
+Cargo execution or repository build. Exclusions still apply; unrelated TOML is omitted.
+
 `SourcePolicy::new(config, available_languages)` validates and freezes the configuration.
 `classify(path)` returns no capture for excluded/out-of-scope files, or one immutable
 `Classification`. `excludes(path)` also applies to directory pruning. Invalid relative
@@ -27,6 +31,7 @@ paths return errors rather than silently behaving like absent source.
 | `dialect_unsupported` | Recognized CUDA source/header without a supported analyzer |
 | `fragment_unassigned` | Textual fragment without an explicit language |
 | `analyzer_unavailable` | A language was requested but has no registered factory |
+| `project_metadata` | Captured Cargo manifest; no syntax analyzer requested |
 
 Provenance is an exact suffix (`extension`) or normalized explicit rule scope
 (`explicit_scope`). Encoding is independent: `utf8` permits text preview; `unsupported`

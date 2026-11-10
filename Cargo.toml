@@ -35,3 +35,4 @@ tower = { version = "0.5.3", features = ["util"] }
 http-body-util = "0.1.5"
 futures-util = { version = "0.3.34", default-features = false, features = ["std"] }
 getrandom = { version = "0.4.3", features = ["std"] }
+toml = { version = "1.2.1", default-features = false, features = ["std", "parse", "serde"] }

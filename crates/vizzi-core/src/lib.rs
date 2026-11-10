@@ -10,6 +10,7 @@ pub mod comparison;
 pub mod discovery;
 pub mod investigation;
 pub mod model;
+pub mod modules;
 pub mod policy;
 pub mod projection;
 pub mod publication;

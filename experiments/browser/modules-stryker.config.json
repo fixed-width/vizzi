@@ -1,0 +1,39 @@
+{
+  "$schema": "../../node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "mutate": [
+    "crates/vizzi/web/module-identity.js",
+    "crates/vizzi/web/module-contours.js"
+  ],
+  "testRunner": "command",
+  "commandRunner": {
+    "command": "node crates/vizzi/web/module-identity.test.js && node crates/vizzi/web/module-contours.test.js && node experiments/browser/module-contours-dom.test.mjs"
+  },
+  "coverageAnalysis": "off",
+  "concurrency": 1,
+  "timeoutMS": 5000,
+  "reporters": [
+    "clear-text",
+    "json"
+  ],
+  "clearTextReporter": {
+    "reportMutants": false,
+    "logTests": false
+  },
+  "jsonReporter": {
+    "fileName": "/tmp/vizzi-module-js-mutations.json"
+  },
+  "thresholds": {
+    "break": null
+  },
+  "ignorePatterns": [
+    "**",
+    "!package.json",
+    "!crates/vizzi/web/module-identity.js",
+    "!crates/vizzi/web/module-contours.js",
+    "!crates/vizzi/web/module-identity.test.js",
+    "!crates/vizzi/web/module-contours.test.js",
+    "!crates/vizzi/web/vendor/bubblesets.js",
+    "!experiments/browser/module-contours-dom.test.mjs",
+    "!experiments/browser/support.mjs"
+  ]
+}

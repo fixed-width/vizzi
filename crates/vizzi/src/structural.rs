@@ -72,6 +72,18 @@ pub enum Operation {
 struct Cached {
     snapshot: String,
     index: Structure,
+    modules: vizzi_core::modules::ModuleCache,
+}
+impl Cached {
+    fn rebuild(snapshot: &vizzi_core::model::Snapshot, previous: Option<Self>) -> Self {
+        let mut modules = previous.map(|c| c.modules).unwrap_or_default();
+        let index = Structure::with_module_cache(snapshot, &mut modules);
+        Self {
+            snapshot: snapshot.id().as_str().into(),
+            index,
+            modules,
+        }
+    }
 }
 /// One lazily constructed metadata projection; no retired snapshot is retained.
 pub struct StructureHost {
@@ -113,10 +125,8 @@ impl StructureHost {
             .as_ref()
             .is_none_or(|c| c.snapshot != request.snapshot)
         {
-            *cache = Some(Cached {
-                snapshot: request.snapshot.clone(),
-                index: Structure::new(&snapshot),
-            });
+            let previous = cache.take();
+            *cache = Some(Cached::rebuild(&snapshot, previous));
         }
         let index = &cache
             .as_ref()
@@ -266,10 +276,8 @@ impl StructureHost {
                 .as_ref()
                 .is_none_or(|c| c.snapshot != request.snapshot)
             {
-                *cache = Some(Cached {
-                    snapshot: request.snapshot.clone(),
-                    index: Structure::new(&snapshot),
-                });
+                let previous = cache.take();
+                *cache = Some(Cached::rebuild(&snapshot, previous));
             }
             cache
                 .as_ref()

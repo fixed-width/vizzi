@@ -29,6 +29,7 @@
     "**",
     "!package.json",
     "!crates/vizzi/web/visual-model.js",
+    "!crates/vizzi/web/module-identity.js",
     "!crates/vizzi/web/layout-growth.js",
     "!crates/vizzi/web/link-highlights.js",
     "!crates/vizzi/web/link-highlights.test.js",
