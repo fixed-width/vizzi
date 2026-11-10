@@ -9,6 +9,8 @@
 @media(max-width:950px){.workspace-toolbar{gap:8px;padding:8px 12px;flex-wrap:wrap}.workspace-title{display:none}#minitosis-example{display:none}#visual-source-status{font-size:10px}.canvas-hint{max-width:55%;line-height:1.5}#workspace-overview{right:10px;width:150px;height:90px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 
+.message-close::before{content:"×"}
+
 #workspace-links path.self-call{stroke-dasharray:none}
 
 #workspace-links path.definition-call{stroke-dasharray:none}

@@ -35,6 +35,8 @@ Drag a header to arrange a fragment. Drag its lower-right grip to resize it; foc
 or grip and use arrow keys for the same operations. Collapse an earlier step to retain its
 place while freeing space. Closing a fragment removes its visual connections.
 
+Click **×** at the right of a transient notice or error banner to dismiss it.
+
 Scroll inside code to read it. **Next section** and **Previous section** page long declarations.
 Long lines reflow at suggested code boundaries as you resize the pane. A continuation mark
 in the gutter refers to the same original source line. Use **More → Code layout → Original
