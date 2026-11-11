@@ -1,4 +1,4 @@
-Vizzi - follow calls in a visual workspace beside your editor.
+Vizzi - visual codebase inspection.
 
 Usage: vizzi [--root DIR] [--cache DIR] [OPTIONS]
 
