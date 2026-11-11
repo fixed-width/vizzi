@@ -1,59 +1,60 @@
-# How call destinations are chosen
+# Call destinations, candidates and references
 
-For readers and contributors understanding why a call opens immediately or offers choices.
-The visual workspace uses native analyzer evidence and an optional language-server definition provider. Directory
-proximity and matching names alone do not identify the receiver of a method call.
+Vizzi shows static source relationships so that you can read related code together.
+It does not trace a running program. The confidence of a destination matters separately
+from where its bubble appears on the canvas.
 
-The Rust adapter currently recognises a small source-local case: a direct `self.method()`
-inside a non-generic `impl`, with one inherent method for that same type in the same lexical
-scope and captured file. Both methods must use the same shorthand receiver form: `self`,
-`&self`, or `&mut self`. Explicit lifetimes, whitespace, comments and method type arguments
-are supported. The caller can belong to a trait implementation, as with
-`Minitosis::process → Minitosis::render`.
+## Why a call sometimes opens directly
 
-The exact receiver restriction matters because Rust searches receiver types in order,
-including automatic references and dereferences; a trait method on an earlier receiver can
-precede an inherent method on a later one. See the
-[Rust Reference's method lookup rules](https://doc.rust-lang.org/reference/expressions/method-call-expr.html).
-This implementation recognises a matching inherent receiver without following that broader
-search. It is deliberately narrower than compiler-backed Rust analysis.
+Some Rust `self.method()` calls have a source-local binding. With rust-analyzer configured,
+project-aware definition lookup can resolve additional Rust calls. A unique supported
+destination opens directly; multiple semantic destinations still require a choice.
 
-Conditional/attributed definitions, duplicate methods, generic implementing types, typed
-`self` parameters, syntax recovery and receivers such as `self.processor` or arbitrary
-variables remain name candidates in the source-local rule. A configured definition provider
-handles receiver types, imports and cross-file definitions using the project model. No repository build or dependency
-execution occurs during this analysis.
+Without stronger evidence, Vizzi offers declarations matching a written call name. A
+sole complete name candidate can open directly, but that does not turn it into a resolved
+receiver type. Python currently uses this name-based navigation. Larger projects can
+have many unrelated functions with the same name.
 
-The analyzer records an optional declaration ordinal and evidence kind on the captured
-call. Model validation checks its language, coverage, owner and destination bounds/name.
-The analyzer fingerprint includes the binding implementation, so incompatible cached
-analysis is not reused. The structure projection translates that ordinal to a version-bound
-symbol identity; queries do not reload source, parse it again or infer types in the browser.
-If a destination was omitted by projection allowances, the query falls back to candidates.
+Conditional compilation, aliases, generated code, inheritance and dynamic dispatch can
+make a plausible name match wrong. The containing declaration and source path help a
+reader choose, but directory proximity does not prove which implementation runs.
 
-A source-local binding supplies one destination and the `rust_self_receiver` evidence kind.
-Selecting that call opens the fragment directly. Its solid arrow is labelled **self call**.
-With a provider configured, other calls use standard LSP definition lookup before any
-name-match chooser. A unique captured definition opens directly with a solid **definition**
-link; multiple semantic destinations require a choice. Failed/unsupported analysis offers
-explicitly weaker name matches. Without a provider, sole complete name candidates retain
-the earlier direct-opening behaviour; other candidates use the chooser and dashed arrows. A one-item response that reports more total
-candidates does not bypass the chooser. Neither arrow claims observed runtime execution.
+## What the arrows mean
 
-Definition lookup uses the exact captured identifier span, UTF-16 positions and a private
-source mirror. Returned locations map to captured declaration identifiers, not enclosing
-functions or matching names. Caller/target versions, source changes and project inputs are
-checked; known external definitions do not produce unrelated local choices. The semantic
-context is saved with the link. See the [provider contract](../visual/SEMANTIC_TECH.md).
+A solid current arrow has a supported source binding or language-server definition.
+A dashed candidate arrow records the destination chosen from name candidates. Hover
+an arrow for its evidence and source location. Neither is a runtime execution trace.
 
-The first adapter uses rust-analyzer with Cargo metadata offline, build scripts/procedural
-macros/check-on-save disabled, and one worker. Dependency sources must already be available.
-Macro-generated declarations, external source and unsupported project models may remain
-unavailable. Standard [LSP definition lookup](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/languageFeatures/#textDocument_definition)
-identifies declarations; it does not establish concrete runtime dispatch. The disabled
-[project execution settings](https://rust-analyzer.github.io/book/configuration.html) remain
-part of the adapter configuration.
+After a save, a relationship may become historical, unverified or removed. Its earlier
+context can remain useful, but it must not be read as a proven call in the new source.
+Module accents and task-group frames encode other relationships: language membership
+and the reader's organisation, respectively.
 
-The browser preserves the link kind with the layout. Earlier candidate links remain
-candidates; upgrading the analyzer does not silently promote saved links or retarget their
-source versions. The [call-trail guide](../how-to/follow-a-call-trail.md) covers interaction.
+## Callers and references
+
+A caller invokes the target function. A reference is any use of it, including a call
+or using it as a value:
+
+```python
+def process():
+    pass
+
+
+def example():
+    process()           # a call and a reference
+    callback = process  # a reference, not a call
+```
+
+**Find callers** filters to supported written call sites and identifies their enclosing
+declarations. **Find references** can include other uses when the language provider
+supports them. Several calls in one function can produce several result rows.
+
+Without semantic reference support, both commands fall back to written-call name
+candidates. They can therefore show identical lists even though reference is a broader
+concept. Even semantic results are bounded by available captured source and analysis.
+An empty result does not prove a function is unused.
+
+[Language support](../reference/languages.md) lists these differences. The
+[call-trail guide](../how-to/follow-a-call-trail.md) covers the controls, and
+[configured Rust navigation](../how-to/configure-rust.md) enables the optional provider.
+Contributors can consult the [Rust implementation details](../development/call-resolution.md).

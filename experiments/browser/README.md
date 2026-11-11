@@ -1,5 +1,8 @@
 # Validate browser interaction
 
+Contributor procedure. For installing and using Vizzi, start with the
+[user documentation](../../docs/README.md).
+
 Use this procedure to exercise the real browser UI and measure its reference renderer
 while the native engine refreshes source. It builds Vizzi itself; analysed projects are
 never built. Browser results and their limits are explained in [the report](RESULTS.md).

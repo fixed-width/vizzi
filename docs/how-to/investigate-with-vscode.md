@@ -1,52 +1,60 @@
-# Explore unfamiliar source beside VS Code
+# Save source locations and use VS Code
 
-Launch Vizzi on a local source checkout, keeping analysis cache and investigation data
-outside it:
+Saved locations hold source anchors, notes and reader-authored connections. They are
+separate from visual task layouts and pinned bubbles.
+
+## Keep locations between server runs
+
+Start Vizzi with a state file outside both the inspected project and its cache:
 
 ```sh
-cargo run --release -p vizzi -- \
-  --root /path/to/repository --cache /tmp/vizzi-analysis \
-  --investigation-file /path/to/notes/repository-investigation.json --workers 1
+./target/release/vizzi \
+  --root /path/to/project \
+  --cache "$HOME/.cache/vizzi/my-project" \
+  --investigation-file "$HOME/.local/share/vizzi/my-project/locations.json" \
+  --workers 1
 ```
 
-The editor adapter uses `code` from PATH. Use `--editor-code /path/to/code` to choose
-another VS Code executable. Loading the page starts read-only source indexing. Opening
-an editor location is an explicit button action.
+The parent directory is created when needed. Without `--investigation-file`, locations
+belong to the running server session. The [storage reference](../reference/storage.md)
+describes which data each storage mechanism retains.
 
-Append `/investigate` to the printed URL and open it. The overview fills itself with source areas, languages and file
-counts. Choose an area to see its contents; use **Repository** and the breadcrumbs to go
-back. Example names on an area are literal captured declarations. They are clues to its
-contents, not an inferred description of its responsibilities.
+## Save and annotate a location
 
-You can also use **Find a name or file** with a word such as `reader` or `compile`;
-no path is needed. Search matches declaration names and paths, not full source text.
-Choose a result to see a short, syntax-coloured preview and names from that file. Choose
-a name to move the preview to its declaration, then **Keep this location** to save it.
-No line, title or question needs to be entered. Full reading and editing remain in VS Code.
+Choose **Save** on a repository source bubble, or **Save location** in the Source browser.
+Then choose **Saved locations** in the shared header. Open **Inspect location** on a
+saved card to read its captured excerpt or edit your interpretation and choose **Save note**.
 
-Open **Saved locations** to revisit what you kept. **Inspect evidence** reveals a note
-editor and captured excerpt. **Add or edit a question** is optional. Once two locations
-exist, **Explain a connection** reveals the controls to explain why they matter together.
-Dashed connections and their list entries represent your assertions; Vizzi does not infer
-that they prove a call, dependency or impact relationship.
+To find another location, choose **Explore repository** within this view. Select a source
+area or use **Find a name or file**, inspect a result and choose **Save location**.
+This lookup matches names and paths, not full source text. **Locations → Add a location**
+provides a path/line/title form for a location you already know.
 
-**Open in VS Code** checks current indexed and actual working-file content against the
-saved source identity. Changed, missing, replaced or unverifiable source is refused;
-the saved excerpt and notes stay available. Add fresh evidence and reconsider affected
-connections rather than assuming an old line still means the same thing. The CLI opens a
-live working file: it cannot inspect an existing unsaved editor buffer or guarantee bytes
-shown after launch. This is a location handoff, not a bidirectional plugin handshake.
+Once two locations exist, **Explain a connection** lets you record why they matter
+together. These connections are your assertions, not analysed calls or proof of impact.
 
-With an investigation file configured, saves are atomic and survive host restart. Without
-one, the saved-context view identifies session state. **More → Export investigation**
-keeps a portable copy of the question, evidence and reader assertions before stopping the
-host. The first slice does not import an arbitrary artifact through the UI.
+**Locations → Export locations** downloads the current saved-location record, including
+notes and reader connections. There is no general import UI or visual-task export yet.
+For normal persistence, keep using the same configured state file.
 
-For a location already open in your editor, **More → Add a known source location** keeps
-the advanced path/line/title form available. It is not needed to explore an unfamiliar
-repository. The overview covers configured source types, not every document or build
-configuration; source-only and deferred coverage are shown explicitly.
+## Open source in VS Code
 
-Detailed source browsing remains at `/explore`, with **Keep as evidence** returning to
-saved context. Conventional comparison remains at `/review`; comparison-side evidence
-and historical editor buffers are later extensions.
+Vizzi uses `code` from `PATH`. To choose another executable, add:
+
+```sh
+--editor-code /path/to/code
+```
+
+Use **Editor** on a current bubble or **Open in VS Code** on a saved location. The
+launcher requests the existing VS Code window when available. Run Vizzi on the desktop
+where you want the editor to open; a browser connection is not a remote-editor bridge.
+No editor is launched merely by opening a bubble.
+
+Vizzi verifies the current working-file content against the source location before
+handoff. Changed, missing or unverifiable files can be refused while the saved excerpt
+and notes remain available. Save the current location again when that is what you intend
+to work on. This opens a disk file, not an unsaved or historical editor buffer.
+
+Dependency bubbles can use editor handoff when their bytes still match, but saving a
+location from dependency source is not supported in this slice. Other editor integrations
+are not implemented yet.

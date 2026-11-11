@@ -1,5 +1,8 @@
 # What changing model weights can improve
 
+Contributor research record. This does not describe a current question/chat feature.
+Start at the [user documentation](../README.md) for the supported reading workflows.
+
 For contributors deciding how to improve the small local QA model. Weight changes can
 alter how it uses supplied evidence as well as reduce storage. Vizzi's stable purpose
 could make behavioural editing useful across repositories, while the external index

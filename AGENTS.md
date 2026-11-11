@@ -18,6 +18,9 @@ Build coordinated codebase views for learning unfamiliar code and reviewing chan
 
 ## Documentation
 
+- Keep the README focused on the product and a first run. Index user guidance in
+  [docs/README.md](docs/README.md); keep contributor contracts, history and experiment
+  records behind [the contributor index](docs/development/README.md), not in the README.
 - Update [CHANGELOG.md](CHANGELOG.md) in the same change as notable user-visible behaviour.
   Add concise entries under `Unreleased`, using applicable change categories. Keep plans
   and detailed validation in their existing documents; omit routine internal-only changes.

@@ -1,5 +1,8 @@
 # Questions as an entry into source views
 
+Contributor research record. This does not describe a current question/chat feature.
+Start at the [user documentation](../README.md) for the supported reading workflows.
+
 For contributors designing how a small local model assists unfamiliar-codebase exploration.
 The useful output is a focused collection of source locations that a developer can inspect
 and carry into coordinated views. A natural-language question can express intent before

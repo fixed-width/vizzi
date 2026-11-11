@@ -1,0 +1,9 @@
+[package]
+name = "vizzi_tutorial"
+version = "0.1.0"
+edition.workspace = true
+
+[workspace]
+
+[workspace.package]
+edition = "2024"

@@ -1,79 +1,63 @@
-# Review working changes or two Git revisions
+# Review working changes or two Git commits
 
-Start Vizzi with the repository as its configured root and a cache outside it:
+Start Vizzi [on the Git repository](run-workspace.md), then choose **Review changes**.
+To review before live exploration starts, open the printed server address with `/review`
+appended. The review captures only the repository path you select.
 
-```sh
-cargo run --release -p vizzi -- \
-  --root /path/to/repository --cache /tmp/vizzi-review-cache --workers 1
-```
+## Compare working changes
 
-Append `/review` to the printed local URL to begin without starting live exploration.
-Enter a **Base revision** and a literal **Repository path** (`.` or blank for the
-repository root), then select **Compare with working tree**. The path selects a file
-or directory; it does not accept a revision. Check the resolved baseline and
-working observation interval above the panes. The working capture includes staged,
-unstaged and non-ignored untracked source as observed on disk.
+Choose **Working tree**, enter a **Base revision** and a **Repository path**, then select
+**Compare with working tree**. Use `.` or blank for the repository root. The path is a
+literal file/directory under that root, not a revision.
 
-To compare existing commits, choose **Two commits**, enter the base and **Target
-revision**, then select **Compare commits**. Both inputs resolve once, including
-branch/tag names. The right pane is labelled **Target**; working disk changes are
-excluded and working refresh is hidden. Comparing a new pair requires another submit.
-Revision expressions such as `HEAD~1`, `HEAD^^` and unique short hashes use Git's local
-revision resolution. A shallow checkout can lack the requested parents/objects. Make
-that history available outside Vizzi, or choose a locally available revision; capture
-never fetches. Errors distinguish that case from a revision unavailable in a full checkout.
+The working side includes staged, unstaged and non-ignored untracked source observed on
+disk. Unsaved editor buffers are not included. Check the resolved baseline and the
+working observation interval above the panes.
 
-An invalid revision or a non-root path absent from both sides shows an error beside
-the form and keeps the previous comparison visible.
+## Compare existing commits
 
-Choose a changed file, then a hunk to reveal its base and working ranges. The panes
-scroll independently. Drag the dividers to resize the file list, paired panes or
-declaration lists. Focus a divider and use Left/Right (Shift for a larger step), or
-Home/End for its width limits. Width preferences survive reload when local storage
-is available. Their declaration outlines provide lexical context on each
-side; arrow keys, Home/End and Page Up/Down move through an outline, and Enter selects
-a declaration. Each entry labels its kind and starting **Line N**. The **Base** and **Working** buttons select a side explicitly.
+Choose **Two commits**, enter the base and **Target revision**, then select **Compare
+commits**. Branches, tags, `HEAD~1`, `HEAD^^` and unique short hashes use Git's local
+revision resolution. Both sides resolve once; the right pane is labelled **Target**.
+Working disk edits are not part of that comparison.
 
-To inspect a related contract or test, select **Include unchanged context**, filter
-its path and choose the file. The filter changes the list while retaining the same
-captured scope. Back/Forward, including the browser controls, returns to accepted
-locations and their reading positions within that exact comparison.
+The requested objects must exist locally. A shallow checkout can lack parent commits;
+make that history available outside Vizzi or choose an available revision. Capture never
+fetches. Invalid revisions or paths show an error while retaining the previous comparison.
 
-Use the page controls when more files, hunks or change ranges remain. Only loaded
-change ranges receive addition/removal backgrounds. Lexical syntax colours are
-independent of those backgrounds and can be unavailable when styling limits are reached. Expand **Exact change ranges** for raw line/byte
-coordinates when whitespace, line-ending or final-newline edits look alike in the
-text preview. Long source lines have First/Earlier/Later/Last fragment controls.
+## Read changes and surrounding code
 
-Read the availability labels when text is absent: a missing side, empty file,
-unsupported encoding, literal symlink/reference, executable change and unobserved
-path have different meanings. Unavailable textual hunks do not establish equality;
-retained text can still be inspected where available.
+Choose a file and a hunk to reveal the corresponding source ranges on each side. The
+panes scroll independently. Select declarations for lexical context. Use **Include
+unchanged context** and the path filter to inspect related source in the captured scope.
 
-Select **Refresh working** to observe disk changes against the pinned baseline.
-Refresh keeps the selected file, side, filter and unchanged-context setting. Panes
-whose source versions are unchanged keep their reading positions. A surviving selected
-declaration in changed source opens at its current location; other changed source opens
-at file start. Missing files/sides/declarations have a notice and explicit fallback.
-Hunk selection clears; select a fresh hunk to reveal its ranges. Comparing a new
-baseline resets context. Failed capture keeps the previous coherent view.
-A history visit to a replaced or closed comparison
-explains expiry; **Open current comparison** explicitly returns to the active capture.
-Use **Retry inspection** for temporary query refusal and **Reconnect** after a lost
-review stream. **Close comparison** retires the current pair.
+Back/Forward, including browser history, returns to accepted locations and reading
+positions in the same comparison. Drag dividers to resize the file list, paired panes
+or declaration lists. Focus a divider and use Left/Right, Shift for a larger step,
+or Home/End for its limits.
 
-At paired desktop widths, pan each source pane horizontally when a long condition is
-clipped; Back/Forward retains those independent reading positions. The
-[validation record](../../experiments/review-workflow/WALKTHROUGH_RESULTS.md) includes
-both guided review variants, recordings and remaining scale/usability limits.
+Use the file/hunk page controls when more results remain. Only loaded change ranges
+receive addition/removal backgrounds. Syntax colours are independent of those backgrounds.
+**Exact change ranges** shows raw line/byte ranges when whitespace or final-newline edits
+look alike. Long lines have First/Earlier/Later/Last fragment controls.
 
-Use **Theme** for System/Light/Dark appearance. Syntax colours and type/keyword weights
-are independent of addition/removal backgrounds. Full-width ephemeral banners outside the panes have × controls; persistent capture
-labels, source evidence and pane notes stay visible. Closing a banner keeps the current comparison and its source unchanged. Repeated
-updates of the same message/context stay dismissed; a new context or operation can show
-another message.
+Missing, empty, unsupported-encoding and unobserved source have different availability
+labels. An unavailable hunk is not evidence of equality.
 
-Declaration rows show compact enclosing-scope/depth context without growing indentation.
-A refresh keeps the readiness label stable while the captured comparison remains usable;
-initial capture and real failures still have explicit status. The refresh control remains
-disabled while its operation is pending.
+## Refresh or replace a comparison
+
+**Refresh working** captures disk changes against the pinned baseline. It retains the
+selected file, side, filter and unchanged-context setting. Unchanged source keeps its
+reading position; surviving declarations in changed source open at their current location.
+Other changed source returns to file start with a notice. Hunk selection clears.
+
+Two-commit comparisons have no working refresh. Submit another pair to change either
+revision. **Close comparison** retires the active capture. A history visit to an expired
+comparison offers **Open current comparison** rather than silently reusing another pair.
+
+Use **Retry inspection** for temporary query refusal and **Reconnect** after a lost review
+stream. Failed capture retains the previous coherent view. Server restart does not persist
+a review capture; reopen the desired revisions. See [storage](../reference/storage.md).
+
+**Settings → Theme** is shared with the other views. Dismiss transient error/notice
+banners with their × controls; this does not close the comparison.

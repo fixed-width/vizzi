@@ -12,8 +12,8 @@ remains in Git and the project documentation.
   retained caller context, branches and direct navigation from highlighted call names.
   Function lookup accepts qualified names and ranks exact matches first.
 - Caller and reference result stacks with source previews. Configured rust-analyzer
-  supplies semantic Rust results; other languages expose labelled written-call name
-  candidates.
+  supplies semantic Rust results; Python and unconfigured Rust expose labelled
+  written-call name candidates.
 - Named task groups that move and collapse related bubbles together, plus a browser-local
   task shelf that retains layouts, zoom and reading positions between tasks.
 - Syntax colouring, smart source reflow, content-fit controls and resizable bubbles.
@@ -31,6 +31,9 @@ remains in Git and the project documentation.
 
 ### Changed
 
+- Refreshed user documentation with Python and Rust tutorials, focused task guides,
+  command/language/storage references and troubleshooting. The README is a first-run
+  introduction; development history and experiment links have a separate contributor index.
 - The call workspace opens at the launch URL. A shared header connects Call workspace,
   Review changes, Source browser and Saved locations, with consistent Settings and
   separate mode-specific controls. Theme selection follows the system by default and

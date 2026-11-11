@@ -1,10 +1,12 @@
 # Explore inventories and written calls beside your editor
 
-For a developer trying the structural prototype on a local repository. It searches
-captured source areas/names and exposes raw call candidates. It does not interpret a
+For contributors exercising the structural prototype. For the main user workflow, start
+with the [Python tutorial](../tutorials/python-call-trail.md) or [call workspace guide](follow-a-call-trail.md).
+
+This prototype searches captured source areas/names and exposes raw call candidates. It does not interpret a
 natural-language task, resolve imports/types, or reconstruct runtime/data flow.
 
-Launch the native viewer with external state and one indexing worker:
+Launch the native viewer with an external cache and one indexing worker:
 
 ```sh
 CARGO_BUILD_JOBS=1 cargo run --release -p vizzi -- \
@@ -12,7 +14,7 @@ CARGO_BUILD_JOBS=1 cargo run --release -p vizzi -- \
 ```
 
 Open the printed address with `/investigate?trial=structure` appended, or choose
-**More → Try structural exploration** from the companion. The default repository overview
+**Locations → Try structural exploration** from the companion. The default repository overview
 remains available.
 
 Enter a literal source-area or declaration name. Choose a returned directory/file to
