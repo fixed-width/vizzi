@@ -11,12 +11,16 @@ From the Vizzi checkout:
 ```sh
 ./target/release/vizzi \
   --root /path/to/project \
-  --cache "$HOME/.cache/vizzi/my-project" \
   --workers 1
 ```
 
-Replace the project and cache paths. The cache must be outside the inspected project,
-including through symlinks. Give different projects separate cache directories.
+Replace the project path. If Vizzi is on your `PATH`, you can instead run
+`vizzi --workers 1` from the directory you want to inspect. Omitting `--root` uses the
+current directory; it does not search upwards for a repository root.
+
+Vizzi selects a platform cache location and separates projects automatically. Add
+`--cache /path/to/cache` to override it. The chosen cache must be outside the source
+root, including through symlinks. See [cache locations](../reference/storage.md#cache-location).
 
 For a Python project with a virtual environment inside the root, add
 `--exclude-source .venv` (or its actual directory). Repeat that option for other generated

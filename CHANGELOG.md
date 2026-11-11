@@ -34,6 +34,9 @@ remains in Git and the project documentation.
 
 ### Changed
 
+- `--root` now defaults to the current directory. `--cache` defaults to the platform
+  user cache with a separate directory for each canonical source root; both options
+  remain available as overrides.
 - Refreshed user documentation with Python and Rust tutorials, focused task guides,
   command/language/storage references and troubleshooting. The README is a first-run
   introduction; development history and experiment links have a separate contributor index.

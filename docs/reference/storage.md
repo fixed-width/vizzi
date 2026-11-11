@@ -9,12 +9,35 @@ For users checking what will remain after navigation, reload or a server restart
 | Saved locations, notes and reader connections | Server memory, or `--investigation-file` | Session-only without a file; persisted with a configured file |
 | Captured source and pinned views | Native retained source/session data | Older captures can expire; pinning is not permanent storage |
 | Active review comparison | Running server | Not persisted across server restart |
-| Analysis cache and semantic working data | `--cache` directory | Derived data, separate from saved-location state |
+| Analysis cache and semantic working data | Platform workspace cache, or `--cache` override | Derived data, separate from saved-location state |
 
 An origin includes scheme, hostname and port. `127.0.0.1:7474`, `localhost:7474` and
 `127.0.0.1:7475` have different browser storage. Returning to a visual task therefore
 requires the same address/profile as well as the intended repository. Clearing site
 data removes browser tasks and preferences.
+
+## Cache location
+
+Without `--cache`, Vizzi uses the platform's user cache location:
+
+| Platform | Vizzi cache base |
+| --- | --- |
+| Linux | `$XDG_CACHE_HOME/vizzi`, or `$HOME/.cache/vizzi` when XDG_CACHE_HOME is unset, empty or relative |
+| macOS | `$HOME/Library/Caches/vizzi` |
+| Windows | Local AppData known folder, normally `%LOCALAPPDATA%\vizzi\cache` |
+
+These follow the [`directories` platform conventions](https://docs.rs/directories/6.0.0/directories/struct.ProjectDirs.html#method.cache_dir).
+Each source root gets `workspaces/<root-hash>` beneath that base. The hash uses the
+canonical absolute source path: symlink aliases share a cache, while different roots
+have separate directories. No Git repository is required. An explicit `--cache DIR`
+uses that directory directly, without adding a workspace subdirectory.
+
+Both automatic and explicit cache paths must remain outside the inspected root after
+resolving symlinks. If the platform location cannot be determined or lies inside the
+source root, startup reports an error requesting an explicit `--cache DIR` override.
+This can happen when inspecting the whole home directory. No source-local cache is
+created as a fallback. Linux behaviour is checked locally; macOS and Windows path
+selection uses the platform library and has not yet been qualified on those systems.
 
 ## Current task bounds
 

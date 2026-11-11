@@ -36,7 +36,6 @@ From the Vizzi checkout:
 ```sh
 ./target/release/vizzi \
   --root /path/to/project \
-  --cache "$HOME/.cache/vizzi/my-project" \
   --workers 1 \
   --rust-analyzer rust-analyzer
 ```

@@ -19,6 +19,11 @@ The cache must be outside `--root`, even when paths use symlinks. A persistent
 `--investigation-file` must be outside both root and cache. Use separate state and cache
 directories rather than putting saved locations inside disposable cache data.
 
+Both launch paths have defaults: `--root` uses the current directory and `--cache`
+uses a platform cache directory for that root. If that automatic cache falls inside
+the source scope, choose an external directory with `--cache`. The
+[storage reference](../reference/storage.md#cache-location) lists the platform paths.
+
 If the port is occupied, choose another with `--port 7475` and open the printed address.
 Changing the address/port also changes the browser storage used for tasks and preferences.
 Return to the original address to recover its saved tasks.

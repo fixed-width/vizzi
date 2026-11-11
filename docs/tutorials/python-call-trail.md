@@ -14,7 +14,6 @@ vizzi_demo=$(mktemp -d)
 cp -R docs/tutorials/first-call-trail-python/. "$vizzi_demo/"
 ./target/release/vizzi \
   --root "$vizzi_demo" \
-  --cache "$HOME/.cache/vizzi/python-tutorial" \
   --workers 1
 ```
 

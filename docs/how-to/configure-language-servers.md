@@ -20,7 +20,6 @@ Node.js is not a requirement for basic Vizzi browsing.
 ```sh
 ./target/release/vizzi \
   --root /path/to/python-project \
-  --cache "$HOME/.cache/vizzi/python-project" \
   --workers 1 \
   --pyright pyright-langserver
 ```
@@ -58,7 +57,6 @@ For a C++ project, for example:
 ```sh
 ./target/release/vizzi \
   --root /path/to/cpp-project \
-  --cache "$HOME/.cache/vizzi/cpp-project" \
   --workers 1 \
   --c-family-root . \
   --syntax-language include=cpp \

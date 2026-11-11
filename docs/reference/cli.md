@@ -5,7 +5,7 @@ For users looking up launch and analysis options. Build instructions are in
 [run a project](../how-to/run-workspace.md).
 
 ```text
-vizzi --root DIR --cache DIR [options]
+vizzi [--root DIR] [--cache DIR] [options]
 ```
 
 The HTTP server binds to `127.0.0.1`. It prints the address it actually uses. Browser
@@ -15,8 +15,8 @@ assets are embedded in the executable. There is no separate frontend server.
 
 | Option | Default | Meaning |
 | --- | --- | --- |
-| `--root DIR` | Required | Directory to inspect. Git review uses a repository root; Rust semantic navigation uses a Cargo project/workspace. |
-| `--cache DIR` | Required | Cache directory outside the inspected root, including through symlinks. |
+| `--root DIR` | Current directory | Directory to inspect, without searching parent directories for a repository. Git review uses a repository root; Rust semantic navigation uses a Cargo project/workspace. |
+| `--cache DIR` | Platform user cache, scoped to the source root | Override the cache directory. Must be outside the inspected root, including through symlinks. See [cache locations](storage.md#cache-location). |
 | `--workers N` | `4` | Shared analysis worker count, from 1 to 32. User guides use 1. |
 | `--port N` | `7474` | Local HTTP port. `0` requests an available port; its address can change between runs. |
 | `--investigation-file FILE` | None | Persist saved locations, notes and reader connections. Must be outside both root and cache. Does not persist visual task layouts or review captures. |
@@ -27,6 +27,8 @@ assets are embedded in the executable. There is no separate frontend server.
 | `--clangd EXECUTABLE` | Disabled | C/C++ language server; source scopes and compilation context remain explicit. |
 | `--compile-commands FILE` | Root database or flags file | Captured compilation database; requires `--clangd`. |
 | `--help`, `-h` | — | Print usage and exit. |
+
+Relative root/cache overrides resolve against the process's current directory.
 
 ## Source selection
 
@@ -60,7 +62,7 @@ of complete analysis.
 
 `--once` performs one capture, prints a JSON status report and exits. `--stdio` starts a
 live diagnostic process accepting one JSON request per stdin line rather than an HTTP
-listener. The options are mutually exclusive; root and cache remain required.
+listener. The options are mutually exclusive; both use the normal root and cache defaults.
 
 The diagnostic protocol is a contributor interface. Its request envelopes, pinned views
 and streaming limitations are documented in the [host API reference](../prototype/API.md).

@@ -10,7 +10,6 @@ Start Vizzi with a state file outside both the inspected project and its cache:
 ```sh
 ./target/release/vizzi \
   --root /path/to/project \
-  --cache "$HOME/.cache/vizzi/my-project" \
   --investigation-file "$HOME/.local/share/vizzi/my-project/locations.json" \
   --workers 1
 ```

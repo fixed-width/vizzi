@@ -7,6 +7,28 @@ use std::{
 };
 use vizzi_core::model::{Analysis, ContentId, ContextId, Coverage};
 
+/// Chooses a stable workspace cache beneath the platform's user cache directory.
+pub fn default_path(root: &Path) -> std::io::Result<PathBuf> {
+    let project = directories::ProjectDirs::from("", "", "vizzi").ok_or_else(|| {
+        std::io::Error::other("Cannot determine the user cache directory; specify --cache DIR")
+    })?;
+    let root = root.canonicalize()?;
+    let workspace = blake3::hash(root.as_os_str().as_encoded_bytes());
+    external_path(
+        &project
+            .cache_dir()
+            .join("workspaces")
+            .join(workspace.to_hex().as_str()),
+        &root,
+    )
+    .map_err(|error| {
+        std::io::Error::new(
+            error.kind(),
+            format!("Cannot use the default cache: {error}; specify --cache DIR"),
+        )
+    })
+}
+
 /// Resolves existing symlinks and rejects caches inside the read-only source root.
 pub fn external_path(path: &Path, root: &Path) -> std::io::Result<PathBuf> {
     let absolute = std::path::absolute(path)?;
@@ -98,6 +120,18 @@ impl Cache {
 mod tests {
     use super::*;
     use vizzi_core::rust::RustAnalyzer;
+    #[test]
+    fn default_cache_paths_are_canonical_workspace_specific_and_lazy() {
+        let root = tempfile::tempdir().unwrap();
+        let child = root.path().join("child");
+        std::fs::create_dir(&child).unwrap();
+        let cache = default_path(root.path()).unwrap();
+        assert!(cache.is_absolute());
+        assert_eq!(cache, default_path(&child.join("..")).unwrap());
+        assert_ne!(cache, default_path(&child).unwrap());
+        assert!(!cache.starts_with(root.path()));
+        assert!(!cache.exists());
+    }
     #[test]
     fn cache_separation_handles_parent_components_and_existing_symlinks() {
         let temp = tempfile::tempdir().unwrap();

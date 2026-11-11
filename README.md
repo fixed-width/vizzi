@@ -22,12 +22,13 @@ From a Vizzi checkout:
 cargo build --locked --release -p vizzi
 ./target/release/vizzi \
   --root /path/to/project \
-  --cache "$HOME/.cache/vizzi/my-project" \
   --workers 1
 ```
 
 Open the printed address, normally <http://127.0.0.1:7474/>. Select **Add bubble**, find a
-function, and follow a highlighted call. The cache must be outside the project you inspect.
+function, and follow a highlighted call. With `vizzi` on your `PATH`, you can run it
+without arguments from the project directory. `--root` selects another directory;
+`--cache` overrides the automatically chosen [workspace cache](docs/reference/storage.md#cache-location).
 Stop the server with Ctrl-C.
 
 For semantic navigation on a real project, [configure its language server](docs/how-to/configure-language-servers.md):

@@ -140,7 +140,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             "--help" | "-h" => {
                 println!(
-                    "vizzi --root DIR --cache DIR [--workers 1..32] [--port 7474] [--stdio | --once]\n  [--investigation-file FILE] [--editor-code EXECUTABLE] [--rust-analyzer EXECUTABLE]\n  [--pyright EXECUTABLE] [--python-path INTERPRETER]\n  [--clangd EXECUTABLE] [--compile-commands FILE]\n  [--syntax-cache-mib N] (0 disables, default 0; weighted retention, not a heap cap)\n  [--analysis-input-mib N] (0 disables; active input volume, not a heap cap)\n  [--source-spool-mib N] (0 disables; private session disk capacity)\n  [--c-family-root SCOPE] [--exclude-source SCOPE] [--syntax-language SCOPE=c|cpp] (repeatable)"
+                    "vizzi [--root DIR] [--cache DIR] [--workers 1..32] [--port 7474] [--stdio | --once]\n  [--investigation-file FILE] [--editor-code EXECUTABLE] [--rust-analyzer EXECUTABLE]\n  [--pyright EXECUTABLE] [--python-path INTERPRETER]\n  [--clangd EXECUTABLE] [--compile-commands FILE]\n  [--syntax-cache-mib N] (0 disables, default 0; weighted retention, not a heap cap)\n  [--analysis-input-mib N] (0 disables; active input volume, not a heap cap)\n  [--source-spool-mib N] (0 disables; private session disk capacity)\n  [--c-family-root SCOPE] [--exclude-source SCOPE] [--syntax-language SCOPE=c|cpp] (repeatable)\nDefaults: root is the current directory; cache is a per-workspace platform user cache directory."
                 );
                 return Ok(());
             }
@@ -151,13 +151,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         return Err("choose either --once or --stdio".into());
     }
     let mut directory = Directory::with_policy(
-        &root.ok_or("--root is required")?,
+        &root.unwrap_or_else(|| PathBuf::from(".")),
         policy,
         Arc::new(Languages::builtin()?),
     )?;
-    let cache =
-        cache.ok_or("--cache is required; choose a directory outside the analyzed workspace")?;
-    let cache = vizzi::cache::external_path(&cache, directory.root())?;
+    let cache = match cache {
+        Some(path) => vizzi::cache::external_path(&path, directory.root())?,
+        None => vizzi::cache::default_path(directory.root())?,
+    };
     let investigation_file = investigation_file
         .map(|path| vizzi::cache::external_path(&path, directory.root()))
         .transpose()?;

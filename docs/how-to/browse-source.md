@@ -43,7 +43,6 @@ Enable capture for a relative source scope when starting the server:
 ```sh
 ./target/release/vizzi \
   --root /path/to/project \
-  --cache "$HOME/.cache/vizzi/my-project" \
   --workers 1 \
   --c-family-root src \
   --syntax-language src/include=cpp \
