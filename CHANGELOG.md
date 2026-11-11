@@ -36,6 +36,8 @@ remains in Git and the project documentation.
 
 ### Changed
 
+- Expanded `--help` with grouped option descriptions, defaults, requirements and
+  launch examples for Python, Rust and C/C++.
 - `--root` now defaults to the current directory. `--cache` defaults to the platform
   user cache with a separate directory for each canonical source root; both options
   remain available as overrides.

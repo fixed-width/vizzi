@@ -1,0 +1,89 @@
+Vizzi - follow calls in a visual workspace beside your editor.
+
+Usage: vizzi [--root DIR] [--cache DIR] [OPTIONS]
+
+Paths and server:
+  --root DIR
+      Directory to inspect [default: current directory].
+  --cache DIR
+      Derived-data cache [default: platform user cache, separate per project].
+      Must be outside the source root, including through symlinks.
+  --port N
+      HTTP port on 127.0.0.1 [default: 7474]. Use 0 for an available port.
+  --workers N
+      Number of analysis workers, from 1 to 32 [default: 4].
+
+Source selection:
+  Rust and Python are included by default. These options are repeatable;
+  scopes are file/directory paths relative to --root. Use . for the whole root.
+
+  --c-family-root SCOPE
+      Include C/C++ source within this scope.
+  --syntax-language SCOPE=LANG
+      Assign raw C/C++ syntax, including headers. LANG is c or cpp.
+      Example: include=cpp. Requires a matching --c-family-root scope.
+  --exclude-source SCOPE
+      Exclude a file or directory from source capture, across all languages.
+
+Language servers (optional; disabled until configured):
+  Use executable names or paths, without shell arguments.
+
+  --rust-analyzer EXECUTABLE
+      Enable Rust definitions and references using rust-analyzer.
+  --pyright EXECUTABLE
+      Enable Python definitions and references using pyright-langserver.
+  --python-path INTERPRETER
+      Select a Python interpreter/environment; requires --pyright.
+      Default: the language server's environment selection.
+  --clangd EXECUTABLE
+      Enable C/C++ definitions and references using clangd.
+      Requires C/C++ source scopes and existing compilation context.
+  --compile-commands FILE
+      Compilation database for clangd; requires --clangd.
+      Default: compile_commands.json, then compile_flags.txt in the source root.
+      Vizzi does not build the project to generate these files.
+
+Saved locations and editor:
+  --investigation-file FILE
+      Persist saved locations, notes and reader connections to this file.
+      Must be outside both root and cache [default: session memory only].
+      Visual task layouts are saved separately in browser storage.
+  --editor-code EXECUTABLE
+      VS Code launcher used by the Editor action [default: code].
+      Supply an executable name/path, without shell arguments.
+
+Resource budgets (MiB; each defaults to 0, which disables that mechanism):
+  These controls are independent; they do not cap total process memory.
+
+  --syntax-cache-mib N
+      Retain parsed syntax trees within a weighted memory budget.
+  --analysis-input-mib N
+      Limit source bytes admitted to active analysis jobs.
+      Files may be deferred when the allowance is unavailable.
+  --source-spool-mib N
+      Capacity of private disk storage for captured source.
+      This is session storage, not permanent storage for pinned versions.
+
+Diagnostics (--once and --stdio are mutually exclusive):
+  --once
+      Capture once, print JSON status to stdout, then exit.
+  --stdio
+      Run live JSON diagnostics through stdin/stdout instead of HTTP.
+
+Help:
+  -h, --help
+      Show this help and exit.
+
+Examples:
+  vizzi
+      Open the current directory with automatic cache selection.
+  vizzi --root /path/to/project --workers 1
+      Inspect another directory using one analysis worker.
+  vizzi --pyright pyright-langserver
+      Enable Python semantic navigation in the current directory.
+  vizzi --rust-analyzer rust-analyzer
+      Enable Rust semantic navigation in the current Cargo project.
+  vizzi --c-family-root . --syntax-language .=cpp --clangd clangd
+      Inspect C++ using compilation context already in the source root.
+
+Full reference and platform cache locations: docs/reference/cli.md

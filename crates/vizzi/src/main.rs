@@ -139,9 +139,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 });
             }
             "--help" | "-h" => {
-                println!(
-                    "vizzi [--root DIR] [--cache DIR] [--workers 1..32] [--port 7474] [--stdio | --once]\n  [--investigation-file FILE] [--editor-code EXECUTABLE] [--rust-analyzer EXECUTABLE]\n  [--pyright EXECUTABLE] [--python-path INTERPRETER]\n  [--clangd EXECUTABLE] [--compile-commands FILE]\n  [--syntax-cache-mib N] (0 disables, default 0; weighted retention, not a heap cap)\n  [--analysis-input-mib N] (0 disables; active input volume, not a heap cap)\n  [--source-spool-mib N] (0 disables; private session disk capacity)\n  [--c-family-root SCOPE] [--exclude-source SCOPE] [--syntax-language SCOPE=c|cpp] (repeatable)\nDefaults: root is the current directory; cache is a per-workspace platform user cache directory."
-                );
+                print!("{}", include_str!("cli-help.txt"));
                 return Ok(());
             }
             _ => return Err(format!("unknown argument: {argument}").into()),

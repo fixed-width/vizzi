@@ -10,6 +10,8 @@ vizzi [--root DIR] [--cache DIR] [options]
 
 The HTTP server binds to `127.0.0.1`. It prints the address it actually uses. Browser
 assets are embedded in the executable. There is no separate frontend server.
+`vizzi --help` (or `vizzi -h`) prints grouped option descriptions, defaults, constraints
+and launch examples without starting the server or creating cache data.
 
 ## Launch and integration
 
