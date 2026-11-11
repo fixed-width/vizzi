@@ -244,6 +244,8 @@ then run `node experiments/browser/module-upgrade.test.mjs --previous /path/to/o
 It uses temporary source/cache directories and one origin across the host replacement.
 For serial mutation checks use `modules-stryker.config.json`; the vendored library is
 excluded. Results and bounds are recorded in [module validation](../visual/MODULE_RESULTS.md).
+`module-outline-stryker.config.json` exercises the worker adapter separately, including
+result stacks, collapsed task groups and source bubbles without module metadata.
 
 ## Check dependency navigation
 

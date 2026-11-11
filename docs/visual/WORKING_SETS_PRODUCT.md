@@ -10,7 +10,9 @@ source line and location. Hover/focus previews source. Opening a caller adds its
 bubble and the supported caller-to-target connection. Other references can open source
 without manufacturing a call. Language-supported results retain semantic evidence.
 Name-only candidates are labelled explicitly. Counts expose omissions and unavailable
-analysis. Source changes make earlier results stale until refreshed.
+analysis. Repository changes make earlier results stale until refreshed, even if the
+target's own file is unchanged: a different file can add or remove callers. Background
+checks that retain the same source observation must not invalidate results.
 
 Named task groups collect chosen source bubbles and result stacks. The group editor names
 and selects members. Each item belongs to at most one task group. Move, collapse, expand,

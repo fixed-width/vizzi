@@ -70,3 +70,29 @@ These checks establish fixture behaviour, not usability on large working sets. S
 references cover captured repository source and already admitted dependencies; other languages
 currently receive written-call name candidates. The browser-local shelf is bounded and does
 not provide cross-device persistence. A maintainer trial remains the next usability evidence.
+
+## Reload regression follow-up
+
+Module outlines still assumed every canvas item had a source symbol. Enabling the saved
+outline preference with a result stack or collapsed group reproduced the reported
+`Cannot read properties of undefined (reading 'module')` exception. The worker adapter
+now admits these as neutral obstacles, including when matching a worker reply. Unknown
+and legacy source-module metadata also remain valid. The failing reproduction, passing
+checks and mutation reports are retained in [reload evidence](results/working-sets/reload-fix).
+
+The browser regression now enables outlines throughout task switching, group collapse
+and reload. It also replays unchanged pending/completed status notifications: caller
+results remain enabled and the stream stays connected. A subsequent real file edit
+still invalidates results. The message now says **Repository updated**, since reference
+results depend on the whole repository rather than just the displayed function.
+
+A 20-second observation of the live host recorded 21 events and ten pending checks,
+all with the same snapshot identity. Background checks alone did not change source.
+The full native/browser suites, formatting and Clippy pass after the production fix.
+
+The full outline-adapter mutation run caught 76 of 134 cases, with 58 survivors and no
+timeouts or runner errors. Additional unknown-module fixtures then caught all seven
+optional-access mutations, including removal of each of the three new symbol guards.
+That is a focused follow-up, not a fresh full-file run. The remaining broad-run gaps
+include worker error/timeout cleanup, default worker construction, frame scheduling and
+SVG details; they are not claimed equivalent or counted as assertion kills.

@@ -1,0 +1,35 @@
+{
+  "$schema": "../../node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "mutate": [
+    "crates/vizzi/web/module-outlines.js"
+  ],
+  "testRunner": "command",
+  "commandRunner": {
+    "command": "node experiments/browser/module-outlines.test.mjs"
+  },
+  "coverageAnalysis": "off",
+  "concurrency": 1,
+  "timeoutMS": 5000,
+  "reporters": [
+    "clear-text",
+    "json"
+  ],
+  "clearTextReporter": {
+    "reportMutants": false,
+    "logTests": false
+  },
+  "jsonReporter": {
+    "fileName": "/tmp/vizzi-outline-guards-mutations.json"
+  },
+  "thresholds": {
+    "break": null
+  },
+  "ignorePatterns": [
+    "**",
+    "!package.json",
+    "!crates/vizzi/web/module-outlines.js",
+    "!crates/vizzi/web/module-identity.js",
+    "!experiments/browser/module-outlines.test.mjs",
+    "!experiments/browser/support.mjs"
+  ]
+}

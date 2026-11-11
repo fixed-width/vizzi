@@ -75,7 +75,7 @@ export function installReferenceStacks(root, {read, post, transport, open, chang
    record.list.append(entry);
   }
   const shown = data.items.length ? `${record.offset + 1}–${record.offset + data.items.length} of ${data.matching}` : '0 results';
-  record.status.textContent = stale ? 'Source changed. Refresh results.' : `${shown} · ${data.precision === 'semantic' ? 'Language references' : 'Name-based candidates'}${data.outside ? ` · ${data.outside} outside captured source` : ''}${data.omitted ? ` · ${data.omitted} omitted` : ''}`;
+  record.status.textContent = stale ? 'Repository updated. Refresh results.' : `${shown} · ${data.precision === 'semantic' ? 'Language references' : 'Name-based candidates'}${data.outside ? ` · ${data.outside} outside captured source` : ''}${data.omitted ? ` · ${data.omitted} omitted` : ''}`;
   record.status.title = data.detail ?? '';
   record.previous.disabled = stale || record.offset === 0;
   record.next.disabled = stale || data.next === null;
