@@ -12,16 +12,20 @@ cargo run --release -p vizzi -- \
   --cache /tmp/vizzi-cache/lpc-rs
 ```
 
-Open **http://127.0.0.1:7474/explore** for source browsing. The root page is the
-[editor-companion investigation](investigate-with-vscode.md). All assets and source data are local. The
-server binds to loopback. Choose another port with `--port 7475` if needed. Stop it with
-Ctrl-C. The cache must be outside the inspected workspace, including through symlinks.
+Open the printed URL, normally `http://127.0.0.1:7474/`, to start a visual call trail.
+Choose **Add bubble** to open your first function. [Follow a call trail](follow-a-call-trail.md).
 
-The URL becomes available before live indexing. Opening `/` or `/explore` starts
-that index and shows its progress. To begin a focused review directly, open
-**http://127.0.0.1:7474/review**; review captures only the explicitly selected scope,
-without starting the live index. Once exploration has activated indexing, live watching
-and reconciliation continue until the host stops.
+The server binds to loopback. Choose another port with `--port 7475` if needed. Stop it
+with Ctrl-C. The cache must be outside the inspected workspace, including through symlinks.
+
+Opening the call workspace, `/explore` or `/investigate` starts live indexing. Live
+watching continues until the host stops. Opening `/review` directly captures only the
+scope you select. Visit `/investigate` to use the editor-companion investigation.
+[Explore beside VS Code](investigate-with-vscode.md).
+
+## Browse files and declarations
+
+Open `/explore` for the source map and declaration outline.
 
 Select a file on the map to open its frozen source and declaration outline. Select a
 declaration to reveal its lines. Kind badges distinguish types and callables; **Line N**

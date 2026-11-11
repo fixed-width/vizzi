@@ -13,7 +13,7 @@ The editor adapter uses `code` from PATH. Use `--editor-code /path/to/code` to c
 another VS Code executable. Loading the page starts read-only source indexing. Opening
 an editor location is an explicit button action.
 
-Open the printed URL. The overview fills itself with source areas, languages and file
+Append `/investigate` to the printed URL and open it. The overview fills itself with source areas, languages and file
 counts. Choose an area to see its contents; use **Repository** and the breadcrumbs to go
 back. Example names on an area are literal captured declarations. They are clues to its
 contents, not an inferred description of its responsibilities.

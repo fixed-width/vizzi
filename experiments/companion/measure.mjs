@@ -38,7 +38,7 @@ try {
   chromium = await browser({desktopBus: false});
   const page = await chromium.newPage({viewport: {width: 1600, height: 1000}}), errors = [];
   page.on('pageerror', e => errors.push(e.message));
-  await page.goto(host.url+'/#saved');
+  await page.goto(host.url+'/investigate#saved');
   await page.waitForFunction(() => document.querySelectorAll('.evidence-card').length === 32 && document.querySelectorAll('#evidence-links path').length === 64);
   const samples = [];
   for (let i = 0; i < 35; i++) {

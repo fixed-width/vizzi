@@ -8,10 +8,13 @@ share context without replacing each other. Search is a supporting entry point.
 
 The native Rust engine, immutable source observations, bounded previews, source/version
 checks, captured call candidates and explicit VS Code handoff are implemented foundations.
-The first [visual call-trail prototype](docs/how-to/follow-a-call-trail.md) is available
-at `/workspace`: source fragments stay open while callees and branches are added; their
-layout, camera and reading state restore locally in the browser. Candidate arrows retain
-the analysis limitations. Underlined call names open an action menu; Ctrl/Cmd-click follows
+The visual call workspace opens at the address printed when Vizzi starts. Add a function
+bubble and follow its calls to open callees alongside it. The browser restores your layout,
+zoom and reading position. The source browser, investigation and review prototypes are
+available at `/explore`, `/investigate` and `/review`. [Follow a call trail](docs/how-to/follow-a-call-trail.md).
+
+Candidate arrows retain the analysis limitations. Underlined call names open an action menu.
+Ctrl/Cmd-click follows
 directly ([validation](experiments/visual/INLINE_CALL_RESULTS.md)). Optional [type-aware navigation](docs/visual/SEMANTIC_PRODUCT.md)
 uses rust-analyzer definitions for field/variable calls while keeping captured-source checks.
 It can also follow calls into [local dependency source](docs/visual/DEPENDENCIES_PRODUCT.md),

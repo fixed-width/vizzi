@@ -12,7 +12,7 @@ try{
  const seeded=await fetch(host.url+'/api/investigation',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'question',revision:(await board()).revision,text:legacy})});assert.ok(seeded.ok);
  const before=await board(),page=await chromium.newPage(),errors=[],requests=[];
  page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>requests.push(new URL(r.url()).pathname));
- for(const path of ['/','/investigate','/investigate?trial=search','/investigate?trial=search#saved','/investigate?trial=structure']){
+ for(const path of ['/#saved','/investigate','/investigate?trial=search','/investigate?trial=search#saved','/investigate?trial=structure']){
   await page.goto('about:blank');await page.goto(host.url+path);await page.waitForFunction(()=>document.querySelector('#save-mode').textContent);
   assert.equal(await page.locator('#question-search-panel,#source-question-form,#question-form,#question').count(),0,`${path}: retired question controls are absent`);
   assert.equal(await page.locator('a[href*="trial=search"]').count(),0);
@@ -20,7 +20,7 @@ try{
   if(path.includes('#saved'))assert.equal(await page.getByRole('heading',{name:'Saved locations',exact:true}).isVisible(),true);
   else if(!path.includes('trial=structure'))await page.locator('#discovery-panel').waitFor({state:'visible'});
  }
- await page.goto(host.url+'/workspace');await page.getByRole('button',{name:'Add bubble',exact:true}).waitFor();assert.equal(await page.locator('#source-question-form,#question-form').count(),0);
+ await page.goto(host.url);await page.getByRole('button',{name:'Add bubble',exact:true}).waitFor();assert.equal(await page.locator('#source-question-form,#question-form').count(),0);
  for(const path of ['/question-search.js','/question-state.js'])assert.equal((await fetch(host.url+path)).status,404);
  assert.equal(requests.includes('/question-search.js'),false);assert.equal(requests.includes('/question-state.js'),false);assert.equal(requests.includes('/api/search'),false);
  assert.deepEqual(await board(),before,'opening retired URLs preserves all saved investigation data');assert.deepEqual(errors,[]);

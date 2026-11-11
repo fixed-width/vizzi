@@ -20,7 +20,7 @@ try {
   const page = await chromium.newPage({viewport: {width: 1440, height: 1000}}), errors = [];
   page.on('pageerror', e => errors.push(e.message));
   page.setDefaultTimeout(10000);
-  await page.goto(host.url);
+  await page.goto(host.url+'/investigate');
   await page.waitForFunction(() => document.querySelectorAll('.discovery-entry').length > 0);
   assert.equal(await page.locator('input:visible,textarea:visible').count(), 1);
   assert.equal(await page.locator('#question').count(), 0);

@@ -43,7 +43,7 @@ try {
   report.browser = chromium.version();
   const page = await chromium.newPage({viewport: {width: 1600, height: 1000}});
   page.on('pageerror', e => report.errors.push(e.message));
-  await page.goto(host.url);
+  await page.goto(host.url+'/investigate');
   await page.waitForFunction(() => document.querySelector('#save-mode').textContent);
   await page.waitForFunction(() => document.querySelectorAll('.discovery-entry').length > 0);
   assert.equal(await page.locator('input:visible,textarea:visible').count(), 1);

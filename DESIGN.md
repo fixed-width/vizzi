@@ -7,6 +7,9 @@ Contributor standards belong in [AGENTS.md](AGENTS.md).
 
 ## Product role
 
+The visual call workspace is Vizzi's main mode and opens at the launch URL. The source
+browser, investigation and review prototypes are available through their direct routes.
+
 Vizzi is a visual workspace beside an editor for understanding unfamiliar source and
 reviewing changes across files and revisions. The maintainer's closest reference is
 Code Bubbles: readable source fragments and other views form a task working set that
@@ -26,8 +29,8 @@ set. They are supporting entry points rather than the organising product workflo
 recent question-ranking and structural-list experiments exposed IDE duplication and do
 not qualify the desired visual interaction. Keep their evidence and reusable interfaces;
 remove question-search entry points and question-authoring controls from the browser.
-Retain legacy saved metadata and offline evaluation interfaces. The next milestone is a concrete
-visual call trail that preserves the caller and preceding steps concurrently.
+Retain legacy saved metadata and offline evaluation interfaces. Develop additional views
+around tasks that benefit from the spatial call trail.
 
 Optional model assistance may help choose or organise source views later. It is not a
 prerequisite for the spatial workspace and is not the active experiment. Source identity,

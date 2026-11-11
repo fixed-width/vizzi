@@ -92,8 +92,8 @@ pub fn router(application: Arc<Application>) -> Router {
     Router::new()
         .route("/api/status", get(status)).route("/api/view", get(view)).route("/api/source", get(source))
         .route("/api/events", get(events)).route("/api/window",get(window))
-        .route("/", get(|| async { asset("text/html; charset=utf-8", include_str!("../web/companion.html")) }))
-        .route("/workspace", get(|| async { asset("text/html; charset=utf-8", include_str!("../web/visual.html")) }))
+        .route("/", get(visual_workspace))
+        .route("/workspace", get(visual_workspace))
         .route("/visual.css", get(|| async { asset("text/css; charset=utf-8", include_str!("../web/visual.css")) }))
         .route("/reflow.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/reflow.js")) }))
         .route("/reflow-text.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/reflow-text.js")) }))
@@ -154,6 +154,12 @@ pub fn router(application: Arc<Application>) -> Router {
             response
         }))
         .with_state(application)
+}
+async fn visual_workspace() -> Response {
+    asset(
+        "text/html; charset=utf-8",
+        include_str!("../web/visual.html"),
+    )
 }
 async fn status(State(app): State<Arc<Application>>) -> Json<crate::application::Status> {
     Json(app.status())
@@ -369,6 +375,25 @@ pub async fn diagnostic_request(
 mod tests {
     use super::*;
     use crate::{cache::Cache, engine::Engine, source::Directory};
+
+    #[tokio::test]
+    async fn launch_url_serves_the_call_workspace_and_direct_modes_remain_available() {
+        let app = router(Arc::new(Application::new("fixture".into()).unwrap()));
+        for (path, marker) in [
+            ("/", "id=\"workspace-canvas\""),
+            ("/workspace", "id=\"workspace-canvas\""),
+            ("/investigate", "id=\"discovery-panel\""),
+            ("/explore", "id=\"map\""),
+            ("/review", "id=\"review-workspace\""),
+        ] {
+            let page = diagnostic(app.clone(), serde_json::json!(1), path)
+                .await
+                .unwrap();
+            assert_eq!(page.status, 200, "{path}");
+            assert!(page.content_type.starts_with("text/html"), "{path}");
+            assert!(page.body.contains(marker), "{path} is missing {marker}");
+        }
+    }
     #[tokio::test]
     async fn handlers_pin_source_across_edits_and_diagnostics_share_results() {
         let root = tempfile::tempdir().unwrap();
@@ -446,11 +471,6 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(malformed.status, 400);
-        let page = diagnostic(router.clone(), serde_json::json!(5), "/")
-            .await
-            .unwrap();
-        assert_eq!(page.status, 200);
-        assert!(page.body.contains("Repository overview"));
         assert_eq!(
             diagnostic(router, serde_json::Value::Null, "/absent")
                 .await

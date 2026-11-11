@@ -10,7 +10,7 @@ CARGO_BUILD_JOBS=1 cargo build --release --offline -p vizzi
 target/release/vizzi --root /path/to/repository --cache /tmp/vizzi-call-trail --workers 1 --port 7474
 ```
 
-Open `http://127.0.0.1:7474/workspace`. Select **Add bubble**, find a function by name or qualified name (for example `LufsMeter::process_sample`),
+Open `http://127.0.0.1:7474/`. Select **Add bubble**, find a function by name or qualified name (for example `LufsMeter::process_sample`),
 and choose its source location. Its captured declaration opens on the canvas.
 The function starts at the code gutter, with its enclosing file/class/implementation
 indentation removed from display. Internal nesting stays relative to it. This applies
