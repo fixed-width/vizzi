@@ -17,13 +17,13 @@ try{
  assert.equal(await page.getByLabel('Theme',{exact:true}).inputValue(),'system');
  const background=()=>page.locator('body').evaluate(n=>getComputedStyle(n).backgroundColor==='rgba(0, 0, 0, 0)'?getComputedStyle(document.documentElement).backgroundColor:getComputedStyle(n).backgroundColor);
  assert.equal(await background(),'rgb(12, 19, 30)');
- await page.getByLabel('Theme',{exact:true}).selectOption('light');assert.equal(await background(),'rgb(243, 246, 249)');await page.reload();await page.waitForFunction(()=>document.querySelector('#snapshot').textContent.length===8);assert.equal(await page.getByLabel('Theme',{exact:true}).inputValue(),'light');
+ await setTheme(page,'light');assert.equal(await background(),'rgb(243, 246, 249)');await page.reload();await page.waitForFunction(()=>document.querySelector('#snapshot').textContent.length===8);assert.equal(await page.getByLabel('Theme',{exact:true}).inputValue(),'light');
  for(const choice of ['dark','light']){
-  await page.getByLabel('Theme',{exact:true}).selectOption(choice);await paint(page);
+  await setTheme(page,choice);await paint(page);
   const colours=await page.evaluate(()=>['keyword','type','function','string','number','comment'].map(kind=>{const node=document.querySelector(`.syntax-${kind}`);if(!node)throw new Error('missing '+kind);return {kind,color:getComputedStyle(node).color,weight:getComputedStyle(node).fontWeight};}));
   assert.equal(new Set(colours.map(c=>c.color)).size,6);assert.ok(Number(colours.find(c=>c.kind==='type').weight)>=650);
  }
- await page.getByLabel('Theme',{exact:true}).selectOption('system');assert.equal(await background(),'rgb(12, 19, 30)');await page.emulateMedia({colorScheme:'light'});assert.equal(await background(),'rgb(243, 246, 249)');
+ await setTheme(page,'system');assert.equal(await background(),'rgb(12, 19, 30)');await page.emulateMedia({colorScheme:'light'});assert.equal(await background(),'rgb(243, 246, 249)');
  const snapshot=await page.locator('#snapshot').textContent();assert.equal(await page.locator('#status .message-close').count(),0);assert.equal(await page.locator('#explore-workspace .message-close').count(),0);assert.equal(await page.locator('#snapshot').textContent(),snapshot);
  const initial=await page.evaluate(()=>window.vizziMetrics.scene);
  assert.ok(initial.groups.some(g=>g.path==='src' && g.parent==='.'),'directory containment is visible');
@@ -41,6 +41,8 @@ try{
  assert.equal(await page.locator('#comparison-labels .message-close').count(),0);assert.equal(await page.locator('#review-workspace .message-close').count(),0);
  await page.setViewportSize({width:600,height:900});await paint(page);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
  assert.deepEqual(errors,[]);
- if(process.argv.includes('--screenshots')){const dir=process.argv[process.argv.indexOf('--screenshots')+1];await mkdir(dir,{recursive:true});for(const theme of ['dark','light']){await page.setViewportSize({width:1600,height:1000});await page.getByLabel('Theme',{exact:true}).selectOption(theme);await page.screenshot({path:join(dir,theme+'-review.png'),fullPage:true});await page.goto(host.url+"/explore");await page.waitForFunction(()=>document.querySelector('#snapshot').textContent.length===8);await page.screenshot({path:join(dir,theme+'-map.png'),fullPage:true});await page.goto(host.url+'/review');await page.waitForFunction(()=>document.querySelector('#review-workspace').dataset.token);}}
+ if(process.argv.includes('--screenshots')){const dir=process.argv[process.argv.indexOf('--screenshots')+1];await mkdir(dir,{recursive:true});for(const theme of ['dark','light']){await page.setViewportSize({width:1600,height:1000});await setTheme(page,theme);await page.screenshot({path:join(dir,theme+'-review.png'),fullPage:true});await page.goto(host.url+"/explore");await page.waitForFunction(()=>document.querySelector('#snapshot').textContent.length===8);await page.screenshot({path:join(dir,theme+'-map.png'),fullPage:true});await page.goto(host.url+'/review');await page.waitForFunction(()=>document.querySelector('#review-workspace').dataset.token);}}
  console.log('orientation browser: revision syntax, themes, message dismissal, hierarchy/collapse/reordering, persisted layout, focus, source identity and narrow layout passed');
 }finally{await chromium?.close();await host?.close();await input.close();}
+
+async function setTheme(page,value){const select=page.getByLabel('Theme',{exact:true});if(!await select.isVisible())await page.locator('#workspace-settings > summary').click();await select.selectOption(value);await page.keyboard.press('Escape');}

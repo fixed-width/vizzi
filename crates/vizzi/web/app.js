@@ -1,3 +1,4 @@
+import {installAppHeader} from '/app-header.js';
 import {headingPlacement} from "/map-headings.js";
 import {workspaceLabel} from "/view-status.js";
 import {createMapModel} from "/map-scene.js";
@@ -14,6 +15,7 @@ import { createInspector } from "/inspector.js";
 import { createNavigation } from "/navigation.js";
 import { createStartup } from "/startup.js";
 
+installAppHeader(document.querySelector('body > header'));
 const element = id => document.getElementById(id);
 const canvas = element("map"), context = canvas.getContext("2d");
 const overview=element("map-overview"),overviewContext=overview.getContext("2d");

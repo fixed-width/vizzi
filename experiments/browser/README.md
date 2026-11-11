@@ -269,3 +269,20 @@ recovery. Normal browser runs include it and the TaskWorkspace/TaskShelf model t
 `cargo test -p vizzi --test references` checks native reference evidence and paging.
 The real local Rust reference case is opt-in with `-- --ignored` and installed rust-analyzer.
 Mutation configuration is `working-set-stryker.config.json`, using one runner.
+
+## Check shared navigation
+
+Run `node experiments/browser/app-header.test.mjs` for the header interface and
+`node experiments/browser/header-navigation.test.mjs` for real navigation through all
+four modes, shared theme settings, task restoration and narrow layouts. Both run in the
+normal browser suite. The latter builds and checks the embedded native assets by default;
+`--no-build --source-assets` is available for quick frontend iterations only.
+
+`app-header-stryker.config.json` mutates the complete shared header module with one runner.
+Use the packaged Node runtime and run at lower priority:
+
+```sh
+PATH="$PWD/node_modules/node/bin:$PATH" nice -n 10 node \
+  node_modules/@stryker-mutator/core/bin/stryker.js run \
+  experiments/browser/app-header-stryker.config.json
+```

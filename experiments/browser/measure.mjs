@@ -215,7 +215,7 @@ async function singleEdits(page, input, host, picking) {
 async function largeSource(page, input, host, file) {
   const path = file.path.slice(input.root.length + 1);
   await settled(host);
-  if (!await page.locator("summary").evaluate(node => node.parentElement.open)) await page.locator("summary").click();
+  if (!await page.getByText("Accessible file list",{exact:true}).evaluate(node => node.parentElement.open)) await page.getByText("Accessible file list",{exact:true}).click();
   await page.locator("#filter").fill(path);
   const button = page.getByRole("button", { name: path, exact: true });
   await button.waitFor();

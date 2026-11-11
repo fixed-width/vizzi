@@ -13,7 +13,8 @@ bubble and follow its calls to open callees alongside it. The browser restores y
 zoom and reading position. Caller/reference stacks expand the trail, while named task
 groups and a task shelf preserve related views between tasks. The source browser,
 investigation and review prototypes are available at `/explore`, `/investigate` and
-`/review`. [Follow a call trail](docs/how-to/follow-a-call-trail.md).
+`/review`, with the same view navigation and Settings menu on every page.
+[Follow a call trail](docs/how-to/follow-a-call-trail.md).
 
 Candidate arrows retain the analysis limitations. Underlined call names open an action menu.
 Ctrl/Cmd-click follows

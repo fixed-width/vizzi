@@ -41,8 +41,13 @@ down or right to make room; shrinking leaves them in place. The bubble stays anc
 zoom stays unchanged. Expansion uses loaded source; long sections can still require
 scrolling at the maximum size. Ordinary corner resizing remains available.
 
-**Workspace** contains task, group and Saved locations controls. **Settings** contains Theme,
-Code layout and Module outlines. Minimap boxes show function names and source locations when hovered.
+Use the top navigation row to switch between **Call workspace**, **Review changes**,
+**Source browser** and **Saved locations**. These links use the same tab. Returning to
+the call workspace restores its saved task layout and reading positions.
+
+**Workspace** contains task and group controls in the row below navigation. **Settings**
+is in the same place in every mode; it contains Theme, plus Code layout and Module outlines
+in the call workspace. Minimap boxes show function names and source locations when hovered.
 
 Read the module label beneath a bubble's function name to distinguish language scopes.
 Bubbles in the same module share a header accent and minimap colour. Hover or focus the

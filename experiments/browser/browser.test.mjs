@@ -37,7 +37,7 @@ test("a benchmark browser can isolate its desktop bus and still load the workspa
 test("a large outline keeps bounded DOM and keyboard/source identity across edits", async () => {
   const session = await openWorkspace(chromium, host); const { page } = session;
   try {
-    await page.locator("summary").click();
+    await page.getByText("Accessible file list",{exact:true}).click();
     await page.getByRole("button", { name: "zzz/large.rs", exact: true }).click();
     await page.waitForFunction(() => document.getElementById("file-title").textContent === "zzz/large.rs");
     assert.ok(await page.locator("#outline button[data-declaration]").count() <= 200);
@@ -66,7 +66,7 @@ test("source-only headers expose reasons, encoding, and pinned metadata without 
   const session = await openWorkspace(chromium, host);
   const { page } = session;
   try {
-    await page.locator("summary").click();
+    await page.getByText("Accessible file list",{exact:true}).click();
     await page.getByRole("button", { name: "include/shared.h", exact: true }).click();
     await page.waitForFunction(() => document.getElementById("file-title").textContent === "include/shared.h");
     assert.ok((await page.locator("#coverage").textContent()).includes("Source only"));
@@ -113,7 +113,7 @@ test("C/C++ definitions and explicitly assigned headers share source selection a
   const session = await openWorkspace(chromium, host);
   const { page } = session;
   try {
-    await page.locator("summary").click();
+    await page.getByText("Accessible file list",{exact:true}).click();
     await page.getByRole("button", { name: "include/sample.c", exact: true }).click();
     await page.waitForFunction(() => document.getElementById("file-title").textContent === "include/sample.c");
     assert.ok((await page.locator("#coverage").textContent()).includes("c: syntax parsed"));
@@ -136,7 +136,7 @@ test("Python source and outline share selection and update through native notifi
   const session = await openWorkspace(chromium, host);
   const { page } = session;
   try {
-    await page.locator("summary").click();
+    await page.getByText("Accessible file list",{exact:true}).click();
     await page.getByRole("button", { name: "src/z.py", exact: true }).click();
     await page.waitForFunction(() => document.getElementById("file-title").textContent === "src/z.py");
     assert.ok((await page.locator("#coverage").textContent()).includes("python"));
@@ -189,7 +189,7 @@ test("an edit preserves declaration selection and the reader's scroll position",
   const session = await openWorkspace(chromium, host);
   const { page } = session;
   try {
-    await page.locator("summary").click();
+    await page.getByText("Accessible file list",{exact:true}).click();
     await page.getByRole("button", { name: "src/a.rs", exact: true }).click();
     await page.getByRole("button", { name: /^Reveal function anchor starting at Line/ }).click();
     await page.waitForFunction(() => document.querySelector('#outline button[data-declaration][aria-current="true"]')?.textContent.startsWith("anchor"));
@@ -264,7 +264,7 @@ test("opening the file list resizes the canvas with its viewport", async () => {
   try {
     await paint(session.page);
     const original = await session.page.locator("#map").evaluate(canvas => canvas.clientHeight);
-    await session.page.locator("summary").click();
+    await session.page.getByText("Accessible file list",{exact:true}).click();
     await paint(session.page);
     const dimensions = await session.page.evaluate(() => ({ actual: document.getElementById("map").clientHeight, pixels: document.getElementById("map").height, dpr: Math.min(devicePixelRatio, 2), drawn: window.vizziMetrics.lastFrame.height }));
     assert.ok(dimensions.actual < original, "fixture must change the map viewport height");
@@ -277,7 +277,7 @@ test("a live client resynchronises after host restart without polling or losing 
   const session = await openWorkspace(chromium, host);
   const { page } = session;
   try {
-    await page.locator("summary").click();
+    await page.getByText("Accessible file list",{exact:true}).click();
     await page.getByRole("button", { name: "src/b.rs", exact: true }).click();
     await page.getByRole("button", { name: /^Reveal function beta starting at Line/ }).click();
     await page.waitForFunction(() => document.querySelector('#outline [aria-current="true"]')?.textContent.startsWith("beta"));
@@ -302,7 +302,7 @@ test("source text stays text, and syntax/encoding limits are visible", async () 
   try {
     assert.equal(await page.locator("#source img").count(), 0);
     assert.equal(await page.evaluate(() => window.injected), undefined);
-    await page.locator("summary").click();
+    await page.getByText("Accessible file list",{exact:true}).click();
     await page.getByRole("button", { name: "src/partial.rs", exact: true }).click();
     await page.waitForFunction(() => document.getElementById("coverage").textContent.includes("partial syntax"));
     assert.equal(await page.locator("#diagnostics").isVisible(), true);

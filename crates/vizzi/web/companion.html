@@ -2,26 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Vizzi · explore</title><script src="/theme-init.js"></script>
+  <title>Vizzi · Saved locations</title><script src="/theme-init.js"></script>
   <link rel="stylesheet" href="/theme.css"><link rel="stylesheet" href="/app.css"><link rel="stylesheet" href="/companion.css">
-</head>
+<link rel="stylesheet" href="/app-header.css"></head>
 <body class="companion-page">
-  <header>
-    <a class="brand" href="/">vizzi</a>
-    <nav aria-label="Workspace views">
-      <button id="show-discovery" type="button" aria-pressed="true">Explore repository</button>
-      <button id="show-saved" type="button" aria-pressed="false">Saved locations (0)</button>
-    </nav>
-    <span id="source-state" role="status">Mapping source…</span>
-    <details class="workspace-menu"><summary>More</summary><div>
-      <a href="/">Visual call workspace</a>
-      <a href="/review">Review changes</a><a href="/explore">Detailed source browser</a>
-      <a href="/investigate?trial=structure">Try structural exploration</a>
-      <button id="add-source" type="button">Add a location</button>
-      <button id="export" type="button">Export locations</button>
-      <label class="theme-control">Theme<select id="theme" aria-label="Theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
-    </div></details>
-  </header>
+  <header data-app-view="locations"><div data-header-controls>
+<nav aria-label="Location views"><button id="show-discovery" type="button" aria-pressed="true">Explore repository</button><button id="show-saved" type="button" aria-pressed="false">Saved locations (0)</button></nav>
+<details id="locations-actions" class="app-menu"><summary>Locations</summary><div><button id="add-source" type="button">Add a location</button><button id="export" type="button">Export locations</button><a href="/investigate?trial=structure">Try structural exploration</a></div></details>
+<span id="source-state" data-header-status role="status">Mapping source…</span>
+</div></header>
   <p id="investigation-notice" role="status" hidden></p><p id="investigation-error" role="alert" hidden></p>
   <main class="companion-main">
     <section id="structure-panel" aria-label="Structural exploration" hidden>

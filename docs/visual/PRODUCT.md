@@ -7,8 +7,10 @@ Reuse the existing light/dark palette and fonts; Code Bubbles is the supplied in
 reference, with no separate design mock.
 
 Workspace controls use **bubble** for a canvas view and **saved location** for a retained
-source anchor. Workspace actions (tasks, task shelf, groups and Saved locations) have their own menu;
-Settings contains Theme, Code layout and optional Module outlines. The example button is absent from the header.
+source anchor. Workspace actions (tasks, task shelf and groups) have their own menu.
+The [shared header](HEADER_PRODUCT.md) connects Call workspace, Review changes, Source
+browser and Saved locations. Settings contains Theme, Code layout and optional Module
+outlines. The example button is absent from the header.
 Call arrows have a continuous 20-screen-pixel inspection target across dash gaps and zoom
 levels, with an information cursor. Arrow inspection does not start canvas dragging;
 background dragging and wheel navigation remain available. Visible strokes retain their

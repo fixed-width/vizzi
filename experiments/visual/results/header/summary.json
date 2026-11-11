@@ -1,0 +1,14 @@
+{
+  "date": "2026-11-11",
+  "mutated": "crates/vizzi/web/app-header.js",
+  "killed": 94,
+  "survived": 0,
+  "timeouts": 0,
+  "runner_errors": 0,
+  "exclusions": [],
+  "production_sha256": {
+    "crates/vizzi/web/app-header.js": "5ceb242670c23b486f95df647bdb8c7cc50d9c5d383d0f35589bee667c27e2da",
+    "crates/vizzi/web/app-header.css": "63e74df90f051083aec322da82e359a7f8ef86c3026bed7f1995d47b8eec9db4"
+  },
+  "scope": "Complete shared header JavaScript module; styles and native embedding checked by browser integration."
+}

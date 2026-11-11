@@ -16,7 +16,7 @@ async function fixture() {
   async function file(path) {
     await page.locator("#filter").fill(path);
     await page.waitForFunction(path => document.querySelector("#counts").textContent.startsWith("1 of ") && document.querySelector("#filter").value === path, path);
-    if (!await page.locator("details").evaluate(node => node.open)) await page.locator("summary").click();
+    if (!await page.getByText("Accessible file list",{exact:true}).evaluate(node => node.parentElement.open)) await page.getByText("Accessible file list",{exact:true}).click();
     await page.locator("#file-list").getByRole("button", { name: path, exact: true }).click();
     await page.waitForFunction(path => document.querySelector("#file-title").textContent === path, path);
   }

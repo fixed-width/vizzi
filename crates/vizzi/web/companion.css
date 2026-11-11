@@ -1,5 +1,3 @@
-.companion-page header nav { display:flex;gap:22px;font-size:12px; }
-#source-state { margin-left:auto;color:var(--muted);font-size:11px; }
 #investigation-notice,#investigation-error { margin:0;padding:10px 24px;font-size:12px; }
 #investigation-notice { background:var(--warning-bg);color:var(--warning-text); }
 #investigation-error { background:var(--error-bg);color:var(--error-text); }
@@ -62,15 +60,6 @@
 
 /* Discovery is the default; authoring controls are disclosed in saved context. */
 .companion-page [hidden] { display:none !important; }
-.companion-page header { position:relative;gap:20px; }
-.companion-page header nav { gap:5px; }
-.companion-page header nav button { border-color:transparent;background:transparent;font-size:12px; }
-.companion-page header nav button[aria-pressed="true"] { background:var(--selected-bg);color:var(--selected-text); }
-.workspace-menu { position:relative;border:0;padding:0;font-size:12px; }
-.workspace-menu summary { cursor:pointer; }
-.workspace-menu > div { position:absolute;right:0;top:30px;z-index:8;display:flex;flex-direction:column;gap:14px;padding:18px;background:var(--paper);border:1px solid var(--border);min-width:230px;box-shadow:0 7px 20px #0002; }
-.workspace-menu button { text-align:left; }
-.workspace-menu .theme-control { display:flex;justify-content:space-between;gap:10px; }
 .companion-main { overflow:hidden;align-items:stretch; }
 #discovery-panel,#saved-workspace { flex:1;min-width:0;overflow:auto;padding:30px clamp(18px,4vw,60px); }
 .discovery-heading h1,.saved-heading h1 { font:650 25px/1.35 "Noto Sans",sans-serif;white-space:normal; }
@@ -109,7 +98,7 @@
 #connection-form { border:0;margin-top:16px;padding-top:0; }
 #evidence-map { min-height:200px; }
 @media(max-width:1100px){#source-preview { position:fixed;top:80px;right:15px;bottom:15px;z-index:5;width:min(420px,calc(100vw - 30px));box-shadow:0 8px 40px #0004; } }
-@media(max-width:740px){.companion-page header { flex-wrap:wrap;height:auto;min-height:64px;padding:12px 16px;gap:10px; } .companion-page header nav { order:3;width:100%; } #source-state { margin-left:auto; } .companion-main { overflow:visible; } #discovery-panel,#saved-workspace { overflow:visible;padding:24px 16px; } .optional-tools { gap:12px; } .discovery-heading h1 { font-size:22px; } }
+@media(max-width:740px){.companion-main { overflow:visible; } #discovery-panel,#saved-workspace { overflow:visible;padding:24px 16px; } .optional-tools { gap:12px; } .discovery-heading h1 { font-size:22px; } }
 
 #structure-panel { flex:1; min-width:0; overflow:auto; padding:28px 4vw; }
 #structure-form { max-width:760px; margin:20px 0; }

@@ -1,3 +1,4 @@
+import {installAppHeader} from '/app-header.js';
 import {reviewLabel} from "/view-status.js";
 import {createMessage,textRow} from "/messages.js";
 import {installAppearance} from "/appearance.js";
@@ -8,6 +9,7 @@ import {createReviewWindowReader} from "/review-windows.js";
 import {createInspector} from "/inspector.js";
 import {followChanges} from "/updates.js";
 
+installAppHeader(document.querySelector('body > header'));
 const element=id=>document.getElementById(id);
 const node=(tag,text)=>{const value=document.createElement(tag);value.textContent=text;return value;};
 const sides=["base","working"],inspectors={};

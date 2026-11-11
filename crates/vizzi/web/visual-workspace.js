@@ -1,3 +1,4 @@
+import {installAppHeader} from '/app-header.js';
 import {fetchRead} from '/read-retry.js';
 import {captureFor,originLabel} from '/source-origin.js';
 import {modulePresentation} from '/module-identity.js';
@@ -16,6 +17,7 @@ import {renderCallText,createCallMenu,retargetCalls} from '/call-actions.js';
 import {installAppearance} from '/appearance.js';
 import {createMessage} from '/messages.js';
 import {followChanges} from '/updates.js';
+installAppHeader(document.querySelector('body > header'));
 const el=id=>document.getElementById(id),node=(tag,text='')=>{const n=document.createElement(tag);n.textContent=text;return n;},svg=(tag,attrs={})=>{const n=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const[k,v]of Object.entries(attrs))n.setAttribute(k,String(v));return n;};
 const error=createMessage(el('visual-error'),{label:'Dismiss workspace error'}),notice=createMessage(el('visual-notice'),{label:'Dismiss workspace notice'});
 let definitionProvider=false;const definitionCapabilities=transport('/api/structure').then(c=>{definitionProvider=c.definition_provider===true;}).catch(()=>{});
@@ -195,9 +197,6 @@ async function findFragments(offset=0){const id=++paletteTicket;try{if(!model||m
  }catch(e){fail(e);}}
 async function openMinitosis(){try{if(!model||model.stale)throw new Error('Wait for current source.');const data=await post('/api/structure',{snapshot:model.snapshot,query:{kind:'inventory',area:'minitosis/src/lib.rs',search:'process',offset:0}});const s=data.items.map(i=>i.symbol).find(s=>s.name==='process'&&s.kind==='function');if(!s)throw new Error('Minitosis example is not in this source workspace. Use Add bubble.');const id=model.openRoot(s,'minitosis/src');mount(id);focus([id]);save();}catch(e){fail(e);}}
 const openDialog=()=>{el('fragment-dialog').showModal();el('fragment-search').focus();};el('add-fragment').onclick=openDialog;el('empty-add').onclick=openDialog;el('close-fragment-dialog').onclick=()=>el('fragment-dialog').close();el('fragment-form').onsubmit=e=>{e.preventDefault();void findFragments();};el('more-fragment-results').onclick=()=>void findFragments(Number(el('more-fragment-results').dataset.offset));
-for(const menu of document.querySelectorAll('.workspace-menu'))menu.addEventListener('toggle',()=>{if(menu.open)for(const other of document.querySelectorAll('.workspace-menu'))if(other!==menu)other.open=false;});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')for(const menu of document.querySelectorAll('.workspace-menu'))if(menu.open){menu.open=false;menu.querySelector('summary').focus();}});
-document.addEventListener('pointerdown',e=>{for(const menu of document.querySelectorAll('.workspace-menu'))if(!menu.contains(e.target))menu.open=false;});
 el('fit-workspace').onclick=()=>{if(!model)return;const s=size();model.fit(s.w,s.h);geometry();save();};for(const[id,factor]of[['zoom-in',1.2],['zoom-out',1/1.2]])el(id).onclick=()=>{if(!model)return;const s=size();model.zoomAt(model.camera.scale*factor,{x:s.w/2,y:s.h/2});geometry();save();};
 const canvas=el('workspace-canvas');canvas.addEventListener('pointerdown',e=>{if(e.button!==0||e.target.closest('.fragment,.reference-stack,.task-group-header,#destination-stack,#workspace-overview,#visual-empty,[data-link-id]'))return;if(!model)return;e.preventDefault();canvas.setPointerCapture(e.pointerId);let last={x:e.clientX,y:e.clientY};const move=event=>{model.pan(event.clientX-last.x,event.clientY-last.y);last={x:event.clientX,y:event.clientY};geometry();};const end=()=>{canvas.removeEventListener('pointermove',move);canvas.removeEventListener('pointerup',end);canvas.removeEventListener('pointercancel',end);save();};canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',end);canvas.addEventListener('pointercancel',end);});
 canvas.addEventListener('wheel',e=>{callMenu.hide();if(!model||e.target.closest('.code-pane,.reference-body,.calls-popover,#destination-stack'))return;e.preventDefault();if(e.ctrlKey||e.metaKey){const rect=canvas.getBoundingClientRect();model.zoomAt(model.camera.scale*Math.exp(-e.deltaY/500),{x:e.clientX-rect.left,y:e.clientY-rect.top});}else model.pan(-e.deltaX,-e.deltaY);geometry();save();},{passive:false});canvas.addEventListener('keydown',e=>{if(e.target!==canvas||!model)return;const moves={ArrowLeft:[70,0],ArrowRight:[-70,0],ArrowUp:[0,70],ArrowDown:[0,-70]};if(moves[e.key]){e.preventDefault();model.pan(...moves[e.key]);geometry();save();}if(e.key==='Escape')hideDestinations();});new ResizeObserver(()=>geometry()).observe(canvas);

@@ -1,8 +1,10 @@
+import {installAppHeader} from '/app-header.js';
 import {installAppearance} from '/appearance.js';
 import {createMessage,textRow} from '/messages.js';
 import {followChanges} from '/updates.js';
 import {installDiscovery} from '/discovery.js';
 import {installStructure} from '/structure.js';
+installAppHeader(document.querySelector('body > header'));
 const element=id=>document.getElementById(id),node=(tag,text)=>{const n=document.createElement(tag);n.textContent=text;return n;};
 installAppearance(element('theme'));
 const error=createMessage(element('investigation-error'),{label:'Dismiss investigation error'}),notice=createMessage(element('investigation-notice'),{label:'Dismiss investigation notice'}),sourceLabel=textRow(element('source-state'));
@@ -46,7 +48,7 @@ function drawConnections(){if(!view)return;const svg=element('evidence-links'),b
 async function startIndex(){wantIndex=true;try{await transport('/api/workspace/start',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});}catch(e){showError(e);}}
 function updateSourceControls(){const ready=Boolean(sourceStatus?.snapshot);element('pin-source').disabled=busy || !ready;element('index-source').disabled=Boolean(sourceStatus?.pending);element('index-source').hidden=ready || !sourceStatus?.error;element('source-dialog-state').textContent=ready?'The saved excerpt will use the current captured version.':sourceStatus?.error?sourceStatus.error:wantIndex?'Preparing the source index…':'Start the source index to capture evidence.';if(sourceStatus)sourceLabel.show(ready?'Source ready':sourceStatus.error?'Source indexing failed':'Mapping source…');}
 function showSourceError(e){element('source-dialog-error').textContent=e?.message ?? '';element('source-dialog-error').hidden=!e;}
-function addSource(){document.querySelector('.workspace-menu').open=false;showSourceError(null);element('source-dialog').showModal();if(!sourceStatus?.snapshot)void startIndex();updateSourceControls();element('source-path').focus();}
+function addSource(){element('locations-actions').open=false;showSourceError(null);element('source-dialog').showModal();if(!sourceStatus?.snapshot)void startIndex();updateSourceControls();element('source-path').focus();}
 async function openEditor(id){if(busy)return;setBusy(true);error.show(null);try{await transport(`/api/investigation/evidence/${id}/open`,{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});notice.show(`${view.editor} handoff requested for the verified working file. The editor opens a live file.`);}catch(e){showError(e);await load();}finally{setBusy(false);}}
 element('evidence-note').addEventListener('input',()=>{noteDirty=true;});
 element('source-form').addEventListener('submit',async event=>{
