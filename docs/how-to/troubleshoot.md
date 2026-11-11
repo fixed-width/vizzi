@@ -40,11 +40,11 @@ This changes the reading scope, not the repository.
 
 ## Calls offer unrelated choices or cannot open library source
 
-Name candidates are not type resolution. This is the current Python behaviour and a
-fallback for other supported calls. Check the containing declaration and path before
+Name candidates are not type resolution. This is a fallback when semantic analysis is not configured or is unavailable. Check the containing declaration and path before
 choosing. Missing targets are not proof that a call is absent.
 
-For Rust, [enable rust-analyzer](configure-rust.md) and check that the root is a Cargo
+[Configure the language provider](configure-language-servers.md) for the project.
+For Rust, enable rust-analyzer and check that the root is a Cargo
 project/workspace. Its toolchain, dependencies and any standard-library source must be
 available locally. The provider does not execute build scripts/procedural macros, so
 some generated or configuration-dependent targets remain unavailable.

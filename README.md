@@ -12,8 +12,9 @@ and debugging stay in the editor.
 ## Try it
 
 Vizzi is an early preview built from source. The tested setup is Linux with a recent
-Chromium-based browser. You need a current stable Rust toolchain and native C build tools;
-Node.js is not needed to run Vizzi. See the [installation guide](docs/how-to/install.md).
+Chromium-based browser. You need a current stable Rust toolchain and native C build tools.
+Basic browsing does not need Node.js. Optional servers have their own runtime requirements.
+See the [installation guide](docs/how-to/install.md).
 
 From a Vizzi checkout:
 
@@ -29,6 +30,10 @@ Open the printed address, normally <http://127.0.0.1:7474/>. Select **Add bubble
 function, and follow a highlighted call. The cache must be outside the project you inspect.
 Stop the server with Ctrl-C.
 
+For semantic navigation on a real project, [configure its language server](docs/how-to/configure-language-servers.md):
+`--pyright pyright-langserver` for Python, `--rust-analyzer rust-analyzer` for Rust,
+or `--clangd clangd` with C/C++ compilation context.
+
 For a guided first run, [follow a Python call trail](docs/tutorials/python-call-trail.md)
 or [a Rust call trail](docs/tutorials/first-call-trail.md) using the included examples.
 No project build, language server or editor integration is required for either lesson.
@@ -36,7 +41,8 @@ No project build, language server or editor integration is required for either l
 ## What you can do
 
 - Follow calls into neighbouring bubbles, inspect callers and references, and keep branches
-  visible. Rust type-aware navigation is available with an optional rust-analyzer setup.
+  visible. Configured language servers resolve typed receivers, imports and references
+  for Python, Rust and C/C++.
 - Arrange related views into groups and save browser-local tasks. Follow saved file changes
   live or pin an earlier source view.
 - Browse source, compare Git revisions or working changes, and keep source locations and
@@ -50,7 +56,7 @@ a candidate match is not proof of a runtime call.
 
 - [Documentation home](docs/README.md)
 - [Run Vizzi on your project](docs/how-to/run-workspace.md)
-- [Configure Rust navigation and local dependency source](docs/how-to/configure-rust.md)
+- [Configure semantic navigation and local dependency source](docs/how-to/configure-language-servers.md)
 - [Review changes](docs/how-to/review-local-changes.md)
 - [Troubleshooting](docs/how-to/troubleshoot.md)
 - [Changelog](CHANGELOG.md)

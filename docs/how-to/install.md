@@ -1,7 +1,7 @@
 # Build and install Vizzi
 
-Use this guide to build the local server. You do not need Node.js, a frontend build step,
-a model download or a GPU for code analysis.
+Use this guide to build the local server. You do not need a frontend build step, a model download or a GPU for code analysis. Node.js is only
+needed if you choose a language server that uses it, such as the Node-based Pyright server.
 
 ## Prepare the build tools
 
@@ -55,7 +55,7 @@ your `PATH`. Rebuild it after updating the checkout; it does not update itself.
 [a Rust call trail](../tutorials/first-call-trail.md) for a self-contained lesson, or
 [run Vizzi on your project](run-workspace.md).
 
-rust-analyzer is optional. [Configure Rust navigation](configure-rust.md) when you want
-project-aware definitions, semantic references or local dependency source. VS Code is
+Language servers are optional for basic browsing. [Configure semantic navigation](configure-language-servers.md)
+for Python, Rust or C/C++ project-aware definitions, references and local dependency source. VS Code is
 only needed for the editor handoff. The [troubleshooting guide](troubleshoot.md) covers
 build tools, startup and missing results.

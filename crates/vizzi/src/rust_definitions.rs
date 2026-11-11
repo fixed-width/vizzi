@@ -17,7 +17,7 @@ const WORKSPACE_BYTES: usize = 128 * 1024 * 1024;
 
 /// One lazy, serialized language-server session; ordinary indexing remains independent.
 pub struct RustAnalyzer {
-    sources: crate::dependency_sources::Catalog,
+    sources: Arc<crate::dependency_sources::Catalog>,
     root: PathBuf,
     cache: PathBuf,
     executable: PathBuf,
@@ -26,10 +26,19 @@ pub struct RustAnalyzer {
 impl RustAnalyzer {
     /// Configures an explicitly enabled provider without starting project tooling.
     pub fn new(root: PathBuf, cache: PathBuf, executable: PathBuf) -> Self {
+        let sources = Arc::new(crate::dependency_sources::Catalog::new(
+            cache.join("dependency-references.json"),
+        ));
+        Self::with_sources(root, cache, executable, sources)
+    }
+    pub(crate) fn with_sources(
+        root: PathBuf,
+        cache: PathBuf,
+        executable: PathBuf,
+        sources: Arc<crate::dependency_sources::Catalog>,
+    ) -> Self {
         Self {
-            sources: crate::dependency_sources::Catalog::new(
-                cache.join("dependency-references.json"),
-            ),
+            sources,
             root,
             cache,
             executable,

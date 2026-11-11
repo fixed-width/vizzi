@@ -2,9 +2,13 @@
 
 For native/browser contributors. Read [the behaviour contract](DEPENDENCIES_PRODUCT.md).
 Use the existing language-provider seam. Add a language-neutral capture catalog, separate
-from the repository snapshot and its filesystem watcher. Rust owns discovery of source
-files reached through rust-analyzer; a language-server definition is the admission witness.
+from the repository snapshot and its filesystem watcher. Language providers own discovery
+of local source reached through their servers; a definition is the admission witness.
 Browser requests use opaque native identities, never filesystem paths.
+
+Rust retains its Cargo adapter. Python/Pyright and C-family/clangd share the project-mirror
+adapter described in [language-server integration](LANGUAGE_SERVERS_TECH.md). All providers
+use one bounded capture catalog, with language-specific configuration identities.
 
 Each capture has its own source scope, snapshot, parsed document and structural projection.
 A public origin descriptor identifies package/language/version and the capture reference;

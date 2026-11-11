@@ -17,7 +17,9 @@ Saved-location support remains repository-only in this slice; the visual layout 
 dependency references. Reload restores retained captures/references where still available;
 expired or changed source remains explicit.
 
-Start with Rust through the opt-in rust-analyzer provider: cached registry/Git sources,
+Configured [Pyright/clangd providers](LANGUAGE_SERVERS_PRODUCT.md) also admit locally
+reached Python/stub and C/C++ source through the shared catalog. Rust uses the opt-in
+rust-analyzer provider: cached registry/Git sources,
 local path dependencies and installed standard-library source when the server can resolve
 them. Keep local Cargo path dependencies valid in the private mirror. No fetches, downloads,
 repository builds, build scripts or procedural macros. Other languages need their own

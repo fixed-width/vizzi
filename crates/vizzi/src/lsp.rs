@@ -2,6 +2,7 @@
 use crate::definitions::Position;
 use serde_json::{Value, json};
 use std::{
+    collections::BTreeMap,
     io::{BufRead, BufReader, Read, Write},
     path::{Path, PathBuf},
     process::{Child, ChildStdin, Command, Stdio},
@@ -123,19 +124,49 @@ pub(crate) struct Client {
     reader: Option<JoinHandle<()>>,
     next: u64,
     options: Value,
+    initialization: Value,
+    status_notifications: bool,
+    diagnostics: BTreeMap<String, i32>,
     ready: bool,
     pub version: String,
 }
+pub(crate) struct Setup {
+    pub arguments: Vec<String>,
+    pub initialization: Value,
+    pub configuration: Value,
+    pub status_notifications: bool,
+}
 impl Client {
     pub(crate) fn start(executable: &Path, root: &Path) -> Result<Self, String> {
+        let options = json!({"cargo":{"sysrootSrc":local_sysroot_source(root),"buildScripts":{"enable":false},"autoreload":true,"extraArgs":["--offline"]},"procMacro":{"enable":false},"checkOnSave":false,"cachePriming":{"enable":false,"numThreads":1},"numThreads":1,"diagnostics":{"enable":false},"lru":{"capacity":64}});
+        Self::configured(
+            executable,
+            root,
+            Setup {
+                arguments: vec![],
+                initialization: options.clone(),
+                configuration: json!({"rust-analyzer":options}),
+                status_notifications: true,
+            },
+        )
+    }
+    pub(crate) fn configured(executable: &Path, root: &Path, setup: Setup) -> Result<Self, String> {
+        let executable = if executable.is_relative() && executable.components().count() > 1 {
+            std::env::current_dir()
+                .map_err(|e| e.to_string())?
+                .join(executable)
+        } else {
+            executable.to_owned()
+        };
         let mut command = if cfg!(unix) {
             let mut c = Command::new("nice");
-            c.args(["-n", "10"]).arg(executable);
+            c.args(["-n", "10"]).arg(&executable);
             c
         } else {
-            Command::new(executable)
+            Command::new(&executable)
         };
         let mut child = command
+            .args(&setup.arguments)
             .current_dir(root)
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
@@ -182,18 +213,20 @@ impl Client {
                 }
             }
         });
-        let options = json!({"cargo":{"sysrootSrc":local_sysroot_source(root),"buildScripts":{"enable":false},"autoreload":true,"extraArgs":["--offline"]},"procMacro":{"enable":false},"checkOnSave":false,"cachePriming":{"enable":false,"numThreads":1},"numThreads":1,"diagnostics":{"enable":false},"lru":{"capacity":64}});
         let mut client = Self {
             child,
             input,
             messages,
             reader: Some(reader),
             next: 0,
-            options,
-            ready: false,
+            options: setup.configuration,
+            initialization: setup.initialization,
+            status_notifications: setup.status_notifications,
+            diagnostics: BTreeMap::new(),
+            ready: !setup.status_notifications,
             version: String::new(),
         };
-        let result=client.request("initialize",json!({"processId":null,"rootUri":uri(root)?,"workspaceFolders":[{"uri":uri(root)?,"name":"captured source"}],"capabilities":{"general":{"positionEncodings":["utf-16"]},"textDocument":{"definition":{"linkSupport":true}},"experimental":{"serverStatusNotification":true},"workspace":{"configuration":true}},"initializationOptions":client.options}),Duration::from_secs(20))?;
+        let result=client.request("initialize",json!({"processId":null,"rootUri":uri(root)?,"workspaceFolders":[{"uri":uri(root)?,"name":"captured source"}],"capabilities":{"general":{"positionEncodings":["utf-16"]},"textDocument":{"definition":{"linkSupport":true},"references":{},"publishDiagnostics":{"versionSupport":true}},"experimental":{"serverStatusNotification":client.status_notifications},"workspace":{"configuration":true}},"initializationOptions":client.initialization}),Duration::from_secs(20))?;
         if !result["capabilities"]["definitionProvider"].is_object()
             && result["capabilities"]["definitionProvider"] != true
         {
@@ -213,6 +246,16 @@ impl Client {
         Ok(client)
     }
     pub(crate) fn notify(&mut self, method: &str, params: Value) -> Result<(), String> {
+        if matches!(method, "textDocument/didOpen" | "textDocument/didChange")
+            && let Some(uri) = params["textDocument"]["uri"].as_str()
+        {
+            self.diagnostics.entry(uri.into()).or_insert(i32::MIN);
+        }
+        if method == "textDocument/didClose"
+            && let Some(uri) = params["textDocument"]["uri"].as_str()
+        {
+            self.diagnostics.remove(uri);
+        }
         write_message(
             &mut self.input,
             &json!({"jsonrpc":"2.0","method":method,"params":params}),
@@ -222,8 +265,18 @@ impl Client {
         let Some(method) = message["method"].as_str() else {
             return Ok(());
         };
-        if method == "experimental/serverStatus" {
+        if self.status_notifications && method == "experimental/serverStatus" {
             self.ready = message["params"]["quiescent"] == true;
+        }
+        if method == "textDocument/publishDiagnostics"
+            && let (Some(uri), Some(version)) = (
+                message["params"]["uri"].as_str(),
+                message["params"]["version"].as_i64(),
+            )
+            && let Ok(version) = i32::try_from(version)
+            && let Some(current) = self.diagnostics.get_mut(uri)
+        {
+            *current = (*current).max(version);
         }
         if let Some(id) = message.get("id") {
             let result = match method {
@@ -238,14 +291,9 @@ impl Client {
                         items
                             .iter()
                             .map(|item| {
-                                let section = item["section"].as_str().unwrap_or("rust-analyzer");
+                                let section = item["section"].as_str().unwrap_or("");
                                 let mut value = &self.options;
-                                for key in section
-                                    .strip_prefix("rust-analyzer.")
-                                    .unwrap_or("")
-                                    .split('.')
-                                    .filter(|s| !s.is_empty())
-                                {
+                                for key in section.split('.').filter(|s| !s.is_empty()) {
                                     value = &value[key];
                                 }
                                 value.clone()
@@ -311,6 +359,19 @@ impl Client {
     pub(crate) fn wait_ready(&mut self) -> Result<(), String> {
         let deadline = Instant::now() + Duration::from_secs(20);
         while !self.ready {
+            let message = self.receive(deadline)?;
+            self.event(message)?;
+        }
+        Ok(())
+    }
+    pub(crate) fn wait_document(&mut self, path: &Path, version: i32) -> Result<(), String> {
+        let uri = uri(path)?;
+        let deadline = Instant::now() + Duration::from_secs(10);
+        while self
+            .diagnostics
+            .get(&uri)
+            .is_none_or(|current| *current < version)
+        {
             let message = self.receive(deadline)?;
             self.event(message)?;
         }
@@ -521,5 +582,72 @@ while True:
                 .contains("timed out")
         );
         drop(client);
+    }
+}
+
+#[cfg(all(test, unix))]
+mod standard_peer_tests {
+    use super::*;
+    use std::os::unix::fs::PermissionsExt;
+    #[test]
+    fn python_configuration_and_stdio_startup_do_not_require_rust_status_notifications() {
+        let root = tempfile::tempdir().unwrap();
+        let executable = root.path().join("peer");
+        std::fs::write(&executable,r#"#!/usr/bin/env python3
+import json,sys
+assert sys.argv[1:]==['--stdio']
+def read():
+ h={}
+ while True:
+  line=sys.stdin.buffer.readline()
+  if not line:sys.exit(0)
+  if line==b'\r\n':break
+  k,v=line.decode().split(':',1);h[k.lower()]=v.strip()
+ return json.loads(sys.stdin.buffer.read(int(h['content-length'])))
+def send(m):
+ b=json.dumps({'jsonrpc':'2.0',**m}).encode();sys.stdout.buffer.write(('Content-Length: %d\r\n\r\n'%len(b)).encode()+b);sys.stdout.buffer.flush()
+m=read()
+assert m['params']['initializationOptions']=={'mode':'python'}
+assert m['params']['capabilities']['experimental']['serverStatusNotification']==False
+send({'id':'cfg','method':'workspace/configuration','params':{'items':[{'section':'python'},{'section':'python.analysis'},{'section':'unknown'},{}]}})
+cfg=read()['result'];assert cfg==[{'analysis':{'useLibraryCodeForTypes':True}},{'useLibraryCodeForTypes':True},None,{'python':{'analysis':{'useLibraryCodeForTypes':True}}}]
+send({'id':m['id'],'result':{'capabilities':{'definitionProvider':True},'serverInfo':{'version':'python-peer'}}})
+assert read()['method']=='initialized'
+while True:
+ m=read()
+ if m.get('method')=='textDocument/didOpen':
+  doc=m['params']['textDocument'];assert doc['languageId']=='python'
+  send({'method':'textDocument/publishDiagnostics','params':{'uri':doc['uri'],'version':doc['version']-1,'diagnostics':[]}})
+  send({'method':'textDocument/publishDiagnostics','params':{'uri':doc['uri'],'version':doc['version'],'diagnostics':[]}})
+ if m.get('method')=='textDocument/definition':send({'id':m['id'],'result':[]})
+"#).unwrap();
+        std::fs::set_permissions(&executable, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let mut client = Client::configured(
+            &executable,
+            root.path(),
+            Setup {
+                arguments: vec!["--stdio".into()],
+                initialization: json!({"mode":"python"}),
+                configuration: json!({"python":{"analysis":{"useLibraryCodeForTypes":true}}}),
+                status_notifications: false,
+            },
+        )
+        .unwrap();
+        let path = root.path().join("app.py");
+        client.notify("textDocument/didOpen",json!({"textDocument":{"uri":uri(&path).unwrap(),"languageId":"python","version":7,"text":"value=1"}})).unwrap();
+        client.wait_document(&path, 7).unwrap();
+        assert!(
+            client
+                .definitions(
+                    &root.path().join("app.py"),
+                    Position {
+                        line: 0,
+                        character: 0
+                    }
+                )
+                .unwrap()
+                .is_empty()
+        );
+        assert_eq!(client.version, "python-peer");
     }
 }

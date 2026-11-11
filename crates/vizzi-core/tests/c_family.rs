@@ -32,7 +32,7 @@ fn analyze(language: &str, text: &str) -> Analysis {
 }
 
 #[test]
-fn c_definitions_and_every_typedef_keep_original_spans_without_inventing_variables_or_prototypes() {
+fn c_declarations_and_every_typedef_keep_original_spans_without_inventing_variables() {
     let text = "struct Tag { int member; }; union U { int n; float f; }; enum E { A, B };\ntypedef struct Tag Alias, *Pointer; typedef int Array[3], (*Callback)(int);\nint global; struct Tag *reference; int prototype(int); int (*function_pointer)(int);\nint add(int a, int b) { return a + b; } int (*factory(void))(int) { return 0; }\n";
     let analysis = analyze("c", text);
     assert_eq!(analysis.coverage, Coverage::Syntax);
@@ -50,6 +50,7 @@ fn c_definitions_and_every_typedef_keep_original_spans_without_inventing_variabl
             ("typedef", "Pointer"),
             ("typedef", "Array"),
             ("typedef", "Callback"),
+            ("function", "prototype"),
             ("function", "add"),
             ("function", "factory"),
         ]
@@ -60,7 +61,13 @@ fn c_definitions_and_every_typedef_keep_original_spans_without_inventing_variabl
     );
     assert_eq!(analysis.facts[3].span, analysis.facts[4].span);
     assert_eq!(
-        &text[analysis.facts[8].span.clone()],
+        &text[analysis
+            .facts
+            .iter()
+            .find(|fact| fact.name == "factory")
+            .unwrap()
+            .span
+            .clone()],
         "int (*factory(void))(int) { return 0; }"
     );
     assert!(analysis.facts.iter().all(|f| f.unique));
@@ -98,6 +105,7 @@ namespace two { int read() { return 2; } }
             ("function", "read"),
             ("function", "operator+"),
             ("function", "operator bool"),
+            ("function", "declared"),
             ("alias", "Count"),
             ("function", "identity"),
             ("function", "Box<int>::declared"),
@@ -105,10 +113,10 @@ namespace two { int read() { return 2; } }
             ("function", "read"),
         ]
     );
-    assert_ne!(analysis.facts[4].key, analysis.facts[11].key);
+    assert_ne!(analysis.facts[4].key, analysis.facts[12].key);
     assert!(analysis.facts[4].key.contains("class:Box"));
-    assert!(analysis.facts[8].key.contains("namespace:one"));
-    assert!(!analysis.facts[8].key.contains("class:Box"));
+    assert!(analysis.facts[9].key.contains("namespace:one"));
+    assert!(!analysis.facts[9].key.contains("class:Box"));
     assert_eq!(
         &text[analysis.facts[6].span.clone()],
         "operator bool() const { return true; }"

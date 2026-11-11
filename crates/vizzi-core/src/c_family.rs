@@ -58,6 +58,7 @@ fn context(language: &str, description: &str) -> Context {
             language.as_bytes(),
             include_bytes!("c_family.rs"),
             include_bytes!("syntax.rs"),
+            include_bytes!("calls.rs"),
             include_bytes!("coloring.rs"),
             include_bytes!("syntax_state.rs"),
             include_bytes!("analysis.rs"),
@@ -70,7 +71,11 @@ fn context(language: &str, description: &str) -> Context {
 
 fn collect(node: Node<'_>, text: &str, output: &mut Vec<Declaration>) {
     if let Some((kind, name)) = scope(node, text) {
-        output.push(Declaration::at(node, kind, name));
+        let mut declaration = Declaration::at(node, kind, name);
+        if kind == "function" {
+            declaration.name_span = declarator_span(node, text, &declaration.name);
+        }
+        output.push(declaration);
     } else if node.kind() == "type_definition" {
         let mut cursor = node.walk();
         for declarator in node.children_by_field_name("declarator", &mut cursor) {
@@ -87,7 +92,63 @@ fn collect(node: Node<'_>, text: &str, output: &mut Vec<Declaration>) {
     }
 }
 
+fn declarator_span(mut node: Node<'_>, text: &str, name: &str) -> Option<std::ops::Range<usize>> {
+    loop {
+        let end = node.start_byte().checked_add(name.len())?;
+        if end <= node.end_byte() && text.get(node.start_byte()..end) == Some(name) {
+            return Some(node.start_byte()..end);
+        }
+        if let Some(child) = node.child_by_field_name("declarator") {
+            node = child;
+        } else if matches!(
+            node.kind(),
+            "parenthesized_declarator" | "reference_declarator" | "attributed_declarator"
+        ) {
+            let mut cursor = node.walk();
+            node = node
+                .named_children(&mut cursor)
+                .find(|child| child.kind() != "ms_call_modifier")?;
+        } else {
+            return None;
+        }
+    }
+}
+
 fn scope(node: Node<'_>, text: &str) -> Option<(&'static str, String)> {
+    if node.kind() == "function_declarator" {
+        let declarator = node.child_by_field_name("declarator")?;
+        if !matches!(
+            declarator.kind(),
+            "identifier"
+                | "field_identifier"
+                | "type_identifier"
+                | "qualified_identifier"
+                | "operator_name"
+                | "destructor_name"
+                | "template_function"
+                | "template_method"
+        ) {
+            return None;
+        }
+        let mut parent = node.parent();
+        for _ in 0..32 {
+            let current = parent?;
+            if matches!(current.kind(), "declaration" | "field_declaration") {
+                return Some(("function", declarator_name(node, text)?));
+            }
+            if matches!(
+                current.kind(),
+                "function_definition"
+                    | "parameter_declaration"
+                    | "type_definition"
+                    | "type_descriptor"
+            ) {
+                return None;
+            }
+            parent = current.parent();
+        }
+        return None;
+    }
     let kind = match node.kind() {
         "function_definition" => "function",
         "struct_specifier" => "struct",

@@ -43,6 +43,8 @@ pub mod idle_probe;
 pub mod definitions;
 /// Captured dependency source, independent of repository snapshots.
 pub mod dependency_sources;
+/// Configured language servers selected by captured source language.
+pub mod language_servers;
 mod lsp;
 /// Optional Rust definition adapter over captured source.
 pub mod rust_definitions;

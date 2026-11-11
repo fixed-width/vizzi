@@ -183,9 +183,17 @@ impl SourcePolicy {
             return Ok(None);
         }
         let filename = path.rsplit('/').next().unwrap_or(path);
-        if filename == "Cargo.toml" {
+        let metadata = match filename {
+            "Cargo.toml" | "Cargo.lock" => Some("cargo"),
+            "pyrightconfig.json" | "pyproject.toml" => Some("python-project"),
+            "compile_commands.json" | "compile_flags.txt" if !self.roots.is_empty() => {
+                Some("c-project")
+            }
+            _ => None,
+        };
+        if let Some(language) = metadata {
             return Ok(Some(Classification::SourceOnly {
-                language: Some("cargo".into()),
+                language: Some(language.into()),
                 provenance: Provenance::ExplicitScope { scope: path.into() },
                 reason: SourceOnlyReason::ProjectMetadata,
             }));
@@ -201,7 +209,7 @@ impl SourcePolicy {
         };
         let language = match extension {
             "rs" => Some("rust"),
-            "py" => Some("python"),
+            "py" | "pyi" => Some("python"),
             _ => {
                 if !self.roots.iter().any(|scope| within(path, scope)) {
                     return Ok(None);

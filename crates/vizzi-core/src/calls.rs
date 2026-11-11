@@ -51,7 +51,7 @@ pub struct CallFacts {
     pub omitted: usize,
 }
 pub(crate) fn supported(language: &str) -> bool {
-    matches!(language, "rust" | "python")
+    matches!(language, "rust" | "python" | "c" | "cpp")
 }
 fn name(mut node: Node<'_>, text: &str) -> Option<(String, Range<usize>)> {
     for _ in 0..8 {
@@ -65,7 +65,11 @@ fn name(mut node: Node<'_>, text: &str) -> Option<(String, Range<usize>)> {
                 .map(|name| (name.to_owned(), node.byte_range()));
         }
         node = match node.kind() {
-            "scoped_identifier" | "scoped_type_identifier" => node.child_by_field_name("name"),
+            "scoped_identifier"
+            | "scoped_type_identifier"
+            | "qualified_identifier"
+            | "template_function"
+            | "template_method" => node.child_by_field_name("name"),
             "generic_function" => node.child_by_field_name("function"),
             "field_expression" => node.child_by_field_name("field"),
             "attribute" => node.child_by_field_name("attribute"),
@@ -82,7 +86,7 @@ pub(crate) fn collect(
     output: &mut CallFacts,
 ) {
     let is_call = match language {
-        "rust" => node.kind() == "call_expression",
+        "rust" | "c" | "cpp" => node.kind() == "call_expression",
         "python" => node.kind() == "call",
         _ => false,
     };

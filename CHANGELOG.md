@@ -8,12 +8,15 @@ remains in Git and the project documentation.
 
 ### Added
 
+- Language-aware LSP navigation for Python/Pyright and C/C++/clangd alongside Rust.
+  Typed receivers, imports and references resolve before name fallback; local dependency
+  source uses bounded captures. C/C++ written calls and header declarations are navigable.
 - A [visual call workspace](docs/how-to/follow-a-call-trail.md) with source bubbles,
   retained caller context, branches and direct navigation from highlighted call names.
   Function lookup accepts qualified names and ranks exact matches first.
 - Caller and reference result stacks with source previews. Configured rust-analyzer
-  supplies semantic Rust results; Python and unconfigured Rust expose labelled
-  written-call name candidates.
+  supplies semantic Rust results; configured Pyright/clangd supply Python/C-family results.
+  Unconfigured analysis retains labelled written-call name candidates.
 - Named task groups that move and collapse related bubbles together, plus a browser-local
   task shelf that retains layouts, zoom and reading positions between tasks.
 - Syntax colouring, smart source reflow, content-fit controls and resizable bubbles.

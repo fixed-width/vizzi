@@ -6,13 +6,13 @@ from where its bubble appears on the canvas.
 
 ## Why a call sometimes opens directly
 
-Some Rust `self.method()` calls have a source-local binding. With rust-analyzer configured,
-project-aware definition lookup can resolve additional Rust calls. A unique supported
+Some Rust `self.method()` calls have a source-local binding. With a language server
+configured, project-aware definition lookup resolves additional Rust, Python and C/C++ calls. A unique supported
 destination opens directly; multiple semantic destinations still require a choice.
 
 Without stronger evidence, Vizzi offers declarations matching a written call name. A
 sole complete name candidate can open directly, but that does not turn it into a resolved
-receiver type. Python currently uses this name-based navigation. Larger projects can
+receiver type. Unconfigured Python uses this name-based navigation. Larger projects can
 have many unrelated functions with the same name.
 
 Conditional compilation, aliases, generated code, inheritance and dynamic dispatch can
@@ -56,5 +56,5 @@ An empty result does not prove a function is unused.
 
 [Language support](../reference/languages.md) lists these differences. The
 [call-trail guide](../how-to/follow-a-call-trail.md) covers the controls, and
-[configured Rust navigation](../how-to/configure-rust.md) enables the optional provider.
+[configured language servers](../how-to/configure-language-servers.md) enable semantic navigation.
 Contributors can consult the [Rust implementation details](../development/call-resolution.md).

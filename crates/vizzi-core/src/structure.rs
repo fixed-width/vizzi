@@ -369,6 +369,12 @@ impl Structure {
                 index.ranges.push(fact.span.clone());
                 index.files.entry(doc.path().into()).or_default().push(n);
                 index.names.entry(fact.name.clone()).or_default().push(n);
+                if matches!(analysis.context.language.as_str(), "c" | "cpp")
+                    && fact.kind == "function"
+                    && let Some((_, terminal)) = fact.name.rsplit_once("::")
+                {
+                    index.names.entry(terminal.into()).or_default().push(n);
+                }
                 mapping.insert(ordinal, id.clone());
                 let symbol = Symbol {
                     origin: None,

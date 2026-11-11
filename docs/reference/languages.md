@@ -5,23 +5,24 @@ are separate capabilities; recognising a declaration does not imply resolving it
 
 | Capability | Python | Rust | C/C++ |
 | --- | --- | --- | --- |
-| Default source selection | `.py` | `.rs` | Explicit C-family scopes required |
+| Default source selection | `.py`, `.pyi` | `.rs` | Explicit C-family scopes required |
 | Syntax-coloured source and declaration outlines | Supported within parser/view bounds | Supported within parser/view bounds | Raw syntax for assigned C/C++; ambiguous headers can be source-only |
-| Written-call navigation | Name-based candidates | Candidates plus a narrow source-local `self` method rule | Not provided by the current call adapter |
-| Project-aware definitions and semantic references | Not implemented | Optional rust-analyzer provider | Not implemented |
-| Caller/reference search without a semantic provider | Written-call name candidates | Written-call name candidates | No equivalent call coverage |
-| Source outside the configured repository | Not resolved as Python dependencies | Supported local dependency captures through rust-analyzer | Not implemented |
+| Written-call navigation | Semantic with Pyright; otherwise name candidates | Semantic with rust-analyzer; source-local bindings and candidate fallback | Semantic with clangd and compilation context; candidate fallback |
+| Project-aware definitions and semantic references | Pyright provider | rust-analyzer provider | clangd provider |
+| Caller/reference search without a semantic provider | Written-call name candidates | Written-call name candidates | Written-call name candidates |
+| Source outside the configured repository | Locally available Python/stub captures through Pyright | Local captures through rust-analyzer | Local C/C++ captures through clangd |
 | Language module/package cues | Recognised Python modules/packages | Captured Cargo target/module structure | Not available |
 
 ## Python
 
 Python does not need a runtime, virtual environment or language server for syntax browsing.
-Vizzi does not run the program. Navigation matches captured written call names; it does
-not perform Python import resolution, infer receiver types or establish dynamic dispatch.
+Vizzi does not run the program. The configured Pyright provider resolves imports, aliases
+and inferred receiver types. Without it, navigation matches captured written call names.
+Neither mode establishes dynamic runtime dispatch.
 Aliases, decorators, inheritance, generated code and callbacks can limit or mislead a
 name-only match. The UI preserves candidate status when opening one.
 
-Without semantic reference support, **Find references** falls back to written-call
+When no semantic provider is configured, **Find references** falls back to written-call
 candidates; it does not enumerate all assignments, imports or callback uses. See
 [call destinations and references](../explanation/call-destinations.md).
 
@@ -41,18 +42,26 @@ runtime call trace.
 
 Explicit scopes enable source capture and raw declaration/type outlines. Unassigned `.h`
 files can remain readable without an outline because their language is ambiguous. CUDA
-is an unavailable dialect in this implementation. No compilation database or compiler
-configuration is consumed; configuration coverage remains unknown.
+is an unavailable dialect in this implementation. Raw syntax does not consume build
+configuration. The optional clangd provider consumes a frozen compilation database or
+flags file for semantic lookup; it does not run a build to obtain one. Ordinary function
+prototypes and method declarations are admitted for navigation. Implicit constructor/operator
+calls and some generated/unsupported syntax remain outside written-call capture.
 
 Other languages can share `.c`/`.h` suffixes. Exclude their paths instead of treating them
 as C-family source. See [source-scope examples](../how-to/browse-source.md#show-cc-source).
+
+[Configure language servers](../how-to/configure-language-servers.md) for setup and
+project-context requirements. Returned declarations can be stubs or headers rather than
+implementation bodies.
 
 ## Shared limits
 
 Vizzi uses its own source policy. At the inspected root, `.git`, `target` and
 `node_modules` are excluded. Other paths ignored by Git are not automatically excluded;
 use `--exclude-source` for virtual environments, generated source or vendor trees you
-do not want in the reading scope.
+do not want in the reading scope. Cargo lockfiles, Python project settings and enabled
+C-family compilation metadata participate in change detection.
 
 Workspace capture does not follow source-file symlinks. Unsupported encodings, parser
 recovery, deferred analysis, projection limits and missing dependency source are distinct
@@ -65,3 +74,8 @@ does not establish that code is unused or absent from a running program.
 Large-repository interaction and cross-browser support are still being qualified. The
 current user documentation is checked on Linux with Chromium, not a performance or
 platform guarantee for every repository.
+
+The Python/C-family semantic mirror currently admits up to 8 MiB per source file and
+128 MiB of source per provider workspace. Exceeding these bounds makes semantic lookup
+unavailable; ordinary captured-source browsing has separate limits. Local dependency
+captures retain at most 2 MiB per file, 32 MiB total and 32 files.

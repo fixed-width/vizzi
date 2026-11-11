@@ -27,15 +27,37 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut policy = PolicyConfig::default();
     let mut investigation_file = None;
     let mut editor_code = PathBuf::from("code");
-    let mut rust_analyzer = None;
+    let mut language_servers = vizzi::language_servers::Configuration::default();
     let mut arguments = std::env::args().skip(1);
     while let Some(argument) = arguments.next() {
         match argument.as_str() {
             "--rust-analyzer" => {
-                rust_analyzer = Some(PathBuf::from(
+                language_servers.rust_analyzer = Some(PathBuf::from(
                     arguments
                         .next()
                         .ok_or("--rust-analyzer needs an executable")?,
+                ))
+            }
+            "--pyright" => {
+                language_servers.pyright = Some(PathBuf::from(
+                    arguments.next().ok_or("--pyright needs an executable")?,
+                ))
+            }
+            "--clangd" => {
+                language_servers.clangd = Some(PathBuf::from(
+                    arguments.next().ok_or("--clangd needs an executable")?,
+                ))
+            }
+            "--python-path" => {
+                language_servers.python_path = Some(PathBuf::from(
+                    arguments
+                        .next()
+                        .ok_or("--python-path needs an interpreter")?,
+                ))
+            }
+            "--compile-commands" => {
+                language_servers.compilation_database = Some(PathBuf::from(
+                    arguments.next().ok_or("--compile-commands needs a file")?,
                 ))
             }
             "--root" => {
@@ -118,7 +140,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             "--help" | "-h" => {
                 println!(
-                    "vizzi --root DIR --cache DIR [--workers 1..32] [--port 7474] [--stdio | --once]\n  [--investigation-file FILE] [--editor-code EXECUTABLE] [--rust-analyzer EXECUTABLE]\n  [--syntax-cache-mib N] (0 disables, default 0; weighted retention, not a heap cap)\n  [--analysis-input-mib N] (0 disables; active input volume, not a heap cap)\n  [--source-spool-mib N] (0 disables; private session disk capacity)\n  [--c-family-root SCOPE] [--exclude-source SCOPE] [--syntax-language SCOPE=c|cpp] (repeatable)"
+                    "vizzi --root DIR --cache DIR [--workers 1..32] [--port 7474] [--stdio | --once]\n  [--investigation-file FILE] [--editor-code EXECUTABLE] [--rust-analyzer EXECUTABLE]\n  [--pyright EXECUTABLE] [--python-path INTERPRETER]\n  [--clangd EXECUTABLE] [--compile-commands FILE]\n  [--syntax-cache-mib N] (0 disables, default 0; weighted retention, not a heap cap)\n  [--analysis-input-mib N] (0 disables; active input volume, not a heap cap)\n  [--source-spool-mib N] (0 disables; private session disk capacity)\n  [--c-family-root SCOPE] [--exclude-source SCOPE] [--syntax-language SCOPE=c|cpp] (repeatable)"
                 );
                 return Ok(());
             }
@@ -153,13 +175,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             &cache, capacity,
         )?))?;
     }
-    let definitions = rust_analyzer.map(|executable| {
-        Arc::new(vizzi::rust_definitions::RustAnalyzer::new(
+    let definitions = if language_servers.is_empty() {
+        if language_servers.python_path.is_some() || language_servers.compilation_database.is_some()
+        {
+            return Err("Language-server project options require a configured server".into());
+        }
+        None
+    } else {
+        Some(Arc::new(vizzi::language_servers::Servers::new(
             directory.root().to_owned(),
             cache.join("semantic"),
-            executable,
-        )) as Arc<dyn vizzi::definitions::Provider>
-    });
+            language_servers,
+        )?) as Arc<dyn vizzi::definitions::Provider>)
+    };
     let mut engine = Engine::new(directory, Cache::new(cache), workers)?;
     if analysis_input_mib != 0 {
         let bytes = analysis_input_mib

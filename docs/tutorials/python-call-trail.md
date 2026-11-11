@@ -34,9 +34,11 @@ Its bubble opens beside `greet`. Read the call to `strip()` while keeping the ca
 visible. An arrow connects the two source bubbles.
 
 The example has one recorded definition named `prepare_name`, so it opens directly.
-Python navigation currently uses written call names, rather than type-aware resolution.
+This lesson starts without a language server, so navigation uses written call names.
+[Configure Pyright](../how-to/configure-language-servers.md#python-with-pyright) for type-aware
+navigation on a real Python project.
 The candidate arrow preserves that distinction; it does not establish runtime dispatch.
-The Python adapter does not resolve built-in string methods into standard-library source.
+Without the optional provider, built-in string methods are not resolved into library source.
 
 ## 4. Open the second branch
 

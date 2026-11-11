@@ -42,8 +42,8 @@ an admitted declaration can be listed without an openable function bubble.
 
 The stack identifies semantic language results or name-based candidates. Without a
 semantic provider, references fall back to written-call candidates and cannot enumerate
-all function-value uses. Rust can use the [optional provider](configure-rust.md);
-Python currently uses the name-based fallback.
+all function-value uses. [Configure a language server](configure-language-servers.md)
+for Python, Rust or C/C++ to use semantic definitions and references.
 
 Use Previous/Next to page results. Counts report admitted matches, omitted results and
 known locations outside captured source. Several calls in one function can produce

@@ -184,26 +184,26 @@ fn forged_names_unsupported_coverage_and_invalid_owner_ordinals_are_rejected() {
 }
 
 #[test]
-fn other_language_adapters_do_not_claim_empty_call_coverage() {
-    use vizzi_core::c_family::{CAdapter, CppAdapter};
-    assert!(
-        CAdapter
+fn c_family_adapters_record_written_call_coverage() {
+    use vizzi_core::{
+        analysis::LanguageAdapter,
+        c_family::{CAdapter, CppAdapter},
+    };
+    for adapter in [
+        &CAdapter as &dyn LanguageAdapter,
+        &CppAdapter as &dyn LanguageAdapter,
+    ] {
+        let analysis = adapter
             .create()
             .unwrap()
             .analyze(b"void run(void) { call(); }")
-            .unwrap()
-            .calls
-            .is_none()
-    );
-    assert!(
-        CppAdapter
-            .create()
-            .unwrap()
-            .analyze(b"void run() { call(); }")
-            .unwrap()
-            .calls
-            .is_none()
-    );
+            .unwrap();
+        let calls = analysis.calls.unwrap();
+        assert_eq!(calls.sites.len(), 1);
+        assert_eq!(calls.sites[0].name.as_deref(), Some("call"));
+        assert!(calls.sites[0].name_span.is_some());
+        assert_eq!(calls.omitted, 0);
+    }
 }
 
 #[test]

@@ -409,7 +409,10 @@ impl ModuleIndex {
                 .any(|a| a.context.language == "python")
             {
                 let file = path.rsplit('/').next().unwrap_or(path);
-                let Some(stem) = file.strip_suffix(".py") else {
+                let Some(stem) = file
+                    .strip_suffix(".py")
+                    .or_else(|| file.strip_suffix(".pyi"))
+                else {
                     continue;
                 };
                 let mut names = if stem == "__init__" {

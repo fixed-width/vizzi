@@ -50,8 +50,8 @@ their × button; dismissing a message does not cancel its operation.
 
 ## Add optional capabilities
 
-- [Configure Rust navigation](configure-rust.md) for type-aware calls, references and
-  locally available dependency source.
+- [Configure language servers](configure-language-servers.md) for Python, Rust and C/C++
+  type-aware calls, references and locally available dependency source.
 - [Keep saved locations between server runs](investigate-with-vscode.md) with an external
   `--investigation-file`. Visual task layouts already use browser storage.
 - [Enable C/C++ source scopes](browse-source.md#show-cc-source) for raw source browsing.

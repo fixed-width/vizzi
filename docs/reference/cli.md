@@ -22,6 +22,10 @@ assets are embedded in the executable. There is no separate frontend server.
 | `--investigation-file FILE` | None | Persist saved locations, notes and reader connections. Must be outside both root and cache. Does not persist visual task layouts or review captures. |
 | `--editor-code EXECUTABLE` | `code` | VS Code launcher path/name. This accepts an executable, not an executable plus shell arguments. |
 | `--rust-analyzer EXECUTABLE` | Disabled | Optional Rust definition/reference provider. Dependencies and toolchains must already be available locally. |
+| `--pyright EXECUTABLE` | Disabled | Pyright-compatible Python stdio language server. |
+| `--python-path INTERPRETER` | Server default | Python interpreter/environment; requires `--pyright`. |
+| `--clangd EXECUTABLE` | Disabled | C/C++ language server; source scopes and compilation context remain explicit. |
+| `--compile-commands FILE` | Root database or flags file | Captured compilation database; requires `--clangd`. |
 | `--help`, `-h` | — | Print usage and exit. |
 
 ## Source selection

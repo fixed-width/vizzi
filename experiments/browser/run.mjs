@@ -95,6 +95,8 @@ if (process.argv.includes("--dependencies")) {
 } else if (process.argv.includes("--window-mutations")) {
   const result = spawnSync(process.execPath, ["node_modules/@stryker-mutator/core/bin/stryker.js", "run", "experiments/browser/window-stryker.config.json"], { stdio: "inherit" });
   process.exit(result.status ?? 1);
+} else if (process.argv.includes("--language-servers")) {
+  const result=spawnSync(process.execPath,["experiments/browser/language-servers.test.mjs",...process.argv.slice(2).filter(arg=>arg!=="--language-servers")],{stdio:"inherit"});process.exit(result.status??1);
 } else if (process.argv.includes("--outline-mutations")) {
   const result = spawnSync(process.execPath, ["node_modules/@stryker-mutator/core/bin/stryker.js", "run", "experiments/browser/outline-stryker.config.json"], { stdio: "inherit" });
   process.exit(result.status ?? 1);

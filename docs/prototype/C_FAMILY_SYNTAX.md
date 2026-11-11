@@ -16,6 +16,7 @@ The [policy reference](SOURCE_POLICY.md) defines precedence.
 | Input form | Fact kind | Extraction rule |
 | --- | --- | --- |
 | Function definition with a body | `function` | Named declarator, including supported pointer/reference wrappers |
+| Ordinary function/method prototype | `function` | Direct function declarator; function-pointer fields and parameter function types are excluded |
 | Named struct/union/enum definition | `struct`, `union`, `enum` | Requires a body; references and forward declarations are excluded |
 | `typedef` declaration | `typedef` | Every declarator, including arrays and function-pointer aliases |
 | Named C++ class definition | `class` | Requires a body |
@@ -32,7 +33,7 @@ outline capability.
 Templates are traversed without inventing declarations for template parameters or
 wrappers. The underlying class/function/type alias is extracted. There is no template
 instantiation, overload resolution, or unification of different qualified spellings.
-Variables, fields, prototypes, bodyless defaulted/deleted methods, and standalone
+Variables, ordinary fields, unsupported bodyless methods, and standalone
 anonymous types/namespaces have no outline facts. Typedef aliases for anonymous types
 are supported. These extraction limits are independent of grammar acceptance.
 
@@ -80,3 +81,11 @@ and published latest documentation when added to `vizzi-core`.
 The workspace already used these releases for experiments; no older-release or
 prerelease exception is needed. Tests qualify these extraction rules, not every
 language-standard feature accepted by a compiler.
+
+## Semantic navigation
+
+C/C++ call expressions retain their written callee, exact identifier and enclosing
+source declaration. Raw name candidates remain distinct from configured clangd
+results. The [language-server integration](../visual/LANGUAGE_SERVERS_TECH.md) consumes
+captured compilation context without invoking a build; raw syntax coverage alone still
+does not establish compiler acceptance or runtime dispatch.

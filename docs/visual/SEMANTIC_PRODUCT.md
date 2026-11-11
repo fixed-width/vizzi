@@ -27,6 +27,9 @@ The existing source-local rule is a fast path, not a substitute for that analysi
 - One low-priority server/worker handles lookups. Sessions stay warm and synchronize changed
   captures; ordinary source indexing does not wait for semantic navigation.
 
+[Python and C-family providers](LANGUAGE_SERVERS_PRODUCT.md) extend the same semantic
+interface and source checks; the initial Rust adapter remains supported.
+
 The first real acceptance case is `GsMeter::process`, line 317, opening
 `LufsMeter::process_sample` in `gs-meter/src/lufs.rs` without a name-match chooser. Validate
 additional independent field/alias/qualified calls, ambiguous/unavailable providers, external

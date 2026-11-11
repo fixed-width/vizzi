@@ -44,6 +44,22 @@ removed after each run.
 The standalone outline tests use real Chromium without the native host; an integration
 fixture also checks 50,000 declarations through the actual HTTP/source-selection path.
 
+## Check language-server navigation
+
+Install Pyright and clangd separately, then run:
+
+```sh
+npm test -- --language-servers
+```
+
+This opt-in check uses real servers to follow typed Python/C++ receivers despite competing
+method names, inspect semantic references, and refresh Python results after a saved edit.
+It uses disposable source trees and disables desktop editor integration. Set
+`VIZZI_PYRIGHT` or `VIZZI_CLANGD` to select executable paths; defaults are
+`pyright-langserver` and `clangd`. Add `--no-build` to reuse an already rebuilt release host.
+The [configuration guide](../../docs/how-to/configure-language-servers.md) describes
+user setup and analysis limits.
+
 ## Check the actual rendering environment
 
 ```sh

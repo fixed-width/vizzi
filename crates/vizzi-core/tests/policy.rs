@@ -13,6 +13,48 @@ fn policy(config: PolicyConfig) -> SourcePolicy {
 }
 
 #[test]
+fn semantic_project_inputs_and_python_stubs_participate_in_source_capture() {
+    let plain = policy(PolicyConfig::default());
+    let c_family = policy(PolicyConfig {
+        c_family_roots: vec!["src".into()],
+        ..PolicyConfig::default()
+    });
+    for path in ["Cargo.lock", "pyproject.toml", "pyrightconfig.json"] {
+        assert!(
+            matches!(
+                plain.classify(path).unwrap(),
+                Some(Classification::SourceOnly {
+                    reason: SourceOnlyReason::ProjectMetadata,
+                    ..
+                })
+            ),
+            "{path}"
+        );
+    }
+    for path in ["compile_commands.json", "compile_flags.txt"] {
+        assert!(plain.classify(path).unwrap().is_none());
+        assert!(
+            matches!(
+                c_family.classify(path).unwrap(),
+                Some(Classification::SourceOnly {
+                    reason: SourceOnlyReason::ProjectMetadata,
+                    ..
+                })
+            ),
+            "{path}"
+        );
+    }
+    assert_eq!(
+        plain
+            .classify("package/api.pyi")
+            .unwrap()
+            .unwrap()
+            .assigned_language(),
+        Some("python")
+    );
+}
+
+#[test]
 fn scopes_and_explicit_exclusions_preserve_unsupported_and_ambiguous_inputs() {
     let policy = policy(PolicyConfig {
         c_family_roots: vec!["src".into()],
