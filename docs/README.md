@@ -10,8 +10,9 @@ keeps earlier functions visible while you follow a call or explore a branch.
 3. [Run Vizzi on your own project](how-to/run-workspace.md) and
    [configure semantic navigation](how-to/configure-language-servers.md).
 
-Prefer Rust? [Follow a Rust call trail](tutorials/first-call-trail.md) covers the same
-workflow with a small Cargo project and source-local method navigation.
+Prefer another language? [Follow a Rust call trail](tutorials/rust-call-trail.md) uses a
+small Cargo project. [Follow a C/C++ call trail](tutorials/cpp-call-trail.md) walks from
+a C++ function into C helpers and opens a branch alongside them.
 
 ## Complete a task
 

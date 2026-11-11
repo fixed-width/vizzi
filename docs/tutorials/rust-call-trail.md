@@ -3,7 +3,7 @@
 This Rust lesson builds a small reading workspace around a greeting function. You will follow
 two calls, keep their shared caller visible, and save the arrangement as a task.
 Allow about ten minutes after [building Vizzi](../how-to/install.md). The
-[example source](first-call-trail/src/lib.rs) is a small Cargo library.
+[example source](first-call-trail-rust/src/lib.rs) is a small Cargo library.
 
 ## 1. Open the example
 
@@ -11,7 +11,7 @@ From your Vizzi checkout, copy the included example into a fresh temporary direc
 
 ```sh
 vizzi_demo=$(mktemp -d)
-cp -R docs/tutorials/first-call-trail/. "$vizzi_demo/"
+cp -R docs/tutorials/first-call-trail-rust/. "$vizzi_demo/"
 ./target/release/vizzi \
   --root "$vizzi_demo" \
   --workers 1

@@ -1,7 +1,7 @@
 # Configure Rust navigation and local dependencies
 
 Use rust-analyzer for project-aware Rust definitions and references, including source
-outside the repository. Basic browsing and the [Rust tutorial](../tutorials/first-call-trail.md)
+outside the repository. Basic browsing and the [Rust tutorial](../tutorials/rust-call-trail.md)
 work without it. [Python and C/C++ setup](configure-language-servers.md) uses the same
 semantic navigation interface.
 

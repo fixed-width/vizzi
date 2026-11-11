@@ -51,9 +51,9 @@ your `PATH`. Rebuild it after updating the checkout; it does not update itself.
 
 ## Make a first run
 
-[Follow a Python call trail](../tutorials/python-call-trail.md) or
-[a Rust call trail](../tutorials/first-call-trail.md) for a self-contained lesson, or
-[run Vizzi on your project](run-workspace.md).
+The [Python](../tutorials/python-call-trail.md), [Rust](../tutorials/rust-call-trail.md)
+and [C/C++](../tutorials/cpp-call-trail.md) call-trail lessons use included examples.
+To inspect existing code, [run Vizzi on your project](run-workspace.md).
 
 Language servers are optional for basic browsing. [Configure semantic navigation](configure-language-servers.md)
 for Python, Rust or C/C++ project-aware definitions, references and local dependency source. VS Code is

@@ -8,6 +8,8 @@ remains in Git and the project documentation.
 
 ### Added
 
+- A C/C++ call-trail tutorial with a mixed-language example. The Rust tutorial and its
+  example now have explicit Rust names alongside the Python lesson.
 - Language-aware LSP navigation for Python/Pyright and C/C++/clangd alongside Rust.
   Typed receivers, imports and references resolve before name fallback; local dependency
   source uses bounded captures. C/C++ written calls and header declarations are navigable.

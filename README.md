@@ -35,9 +35,10 @@ For semantic navigation on a real project, [configure its language server](docs/
 `--pyright pyright-langserver` for Python, `--rust-analyzer rust-analyzer` for Rust,
 or `--clangd clangd` with C/C++ compilation context.
 
-For a guided first run, [follow a Python call trail](docs/tutorials/python-call-trail.md)
-or [a Rust call trail](docs/tutorials/first-call-trail.md) using the included examples.
-No project build, language server or editor integration is required for either lesson.
+For a guided first run, follow a [Python](docs/tutorials/python-call-trail.md),
+[Rust](docs/tutorials/rust-call-trail.md) or [C/C++](docs/tutorials/cpp-call-trail.md)
+call trail using the included examples. No project build, language server or editor
+integration is required for these lessons.
 
 ## What you can do
 

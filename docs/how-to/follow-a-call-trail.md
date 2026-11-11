@@ -2,7 +2,8 @@
 
 Use the Call workspace to read related functions without replacing earlier context.
 Start Vizzi [on your project](run-workspace.md), or use the guided
-[Python](../tutorials/python-call-trail.md) or [Rust](../tutorials/first-call-trail.md) lesson.
+[Python](../tutorials/python-call-trail.md), [Rust](../tutorials/rust-call-trail.md) or
+[C/C++](../tutorials/cpp-call-trail.md) lesson.
 
 ## Open a function
 
