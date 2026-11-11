@@ -1,5 +1,7 @@
 # Vizzi
 
+[Changelog](CHANGELOG.md)
+
 Coordinated visual working sets for learning code and reviewing changes beside your editor.
 The current direction is a [Code Bubbles-style workspace](docs/explanation/visual-working-sets.md):
 follow a call into a new source fragment while its caller, earlier steps and branches

@@ -18,6 +18,9 @@ Build coordinated codebase views for learning unfamiliar code and reviewing chan
 
 ## Documentation
 
+- Update [CHANGELOG.md](CHANGELOG.md) in the same change as notable user-visible behaviour.
+  Add concise entries under `Unreleased`, using applicable change categories. Keep plans
+  and detailed validation in their existing documents; omit routine internal-only changes.
 - Apply [Diátaxis](https://diataxis.fr/) principles: tutorials for learning by doing,
   how-to guides for completing tasks, reference for factual lookup, and explanations
   for understanding concepts and trade-offs.
