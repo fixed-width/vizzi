@@ -298,6 +298,106 @@ impl Workspace {
     }
 }
 impl Provider for RustAnalyzer {
+    fn references(
+        &self,
+        snapshot: Arc<Snapshot>,
+        symbol: &vizzi_core::structure::Symbol,
+        identifier: usize,
+    ) -> Result<Answer, String> {
+        let external = if let Some(origin) = &symbol.origin {
+            self.sources.get(&origin.capture)?
+        } else {
+            None
+        };
+        let doc = external
+            .as_ref()
+            .map(|s| s.doc())
+            .or_else(|| snapshot.file(&symbol.source.file).map(AsRef::as_ref))
+            .ok_or("Reference target is unavailable")?;
+        if !doc.analyses().iter().any(|a| a.context.language == "rust")
+            || doc.version().as_str() != symbol.source.version
+        {
+            return Err("Reference target version or language differs".into());
+        }
+        let text = text(doc)?;
+        if text.get(identifier..identifier + symbol.name.len()) != Some(symbol.name.as_str()) {
+            return Err("Reference target identifier differs".into());
+        }
+        let position = definitions::position(&text, identifier)?;
+        let values = inputs(&self.root, &snapshot)?;
+        let configuration = digest(&values);
+        let mut state = self
+            .state
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        let mut workspace = match state.take() {
+            Some(w) if w.configuration == configuration => w,
+            _ => Workspace::new(self, &snapshot, &values, configuration.clone())?,
+        };
+        workspace.sync(&snapshot)?;
+        let path = if let Some(source) = &external {
+            if source.input.configuration != configuration {
+                return Err("Dependencies changed; reopen the target from its caller".into());
+            }
+            source.verify()?;
+            workspace.open_external(&source.path(), &text, doc.version().as_str())?;
+            source.path()
+        } else {
+            if !workspace.opened.contains_key(&symbol.source.path) {
+                workspace.open(&symbol.source.path, &text)?;
+            }
+            workspace.directory.path().join(&symbol.source.path)
+        };
+        let captures = self.sources.sources()?;
+        for source in &captures {
+            if source.input.configuration == configuration && source.verify().is_ok() {
+                workspace.open_external(
+                    &source.path(),
+                    &crate::rust_definitions::text(source.doc())?,
+                    source.doc().version().as_str(),
+                )?;
+            }
+        }
+        let raw = workspace.client.references(&path, position)?;
+        let mut locations = vec![];
+        let mut outside = 0;
+        for (path, position) in raw {
+            let Some(path) = path.map(|p| fs::canonicalize(&p).unwrap_or(p)) else {
+                outside += 1;
+                continue;
+            };
+            if let Ok(relative) = path.strip_prefix(workspace.directory.path()) {
+                locations.push(Location {
+                    capture: None,
+                    path: relative
+                        .to_str()
+                        .ok_or("Reference path is not UTF-8")?
+                        .replace('\\', "/"),
+                    position,
+                });
+            } else if let Some(source) = captures.iter().find(|s| {
+                s.path() == path && s.input.configuration == configuration && s.verify().is_ok()
+            }) {
+                locations.push(Location {
+                    capture: Some(source.origin.capture.clone()),
+                    path: source.doc().path().into(),
+                    position,
+                });
+            } else {
+                outside += 1;
+            }
+        }
+        if digest(&inputs(&self.root, &snapshot)?) != configuration {
+            return Err("Project configuration changed during reference lookup".into());
+        }
+        let context = workspace.context(&snapshot);
+        *state = Some(workspace);
+        Ok(Answer {
+            locations,
+            outside,
+            context,
+        })
+    }
     fn dependencies(&self) -> Option<&crate::dependency_sources::Catalog> {
         Some(&self.sources)
     }

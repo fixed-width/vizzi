@@ -188,7 +188,9 @@ pub struct Structure {
     owners: BTreeMap<String, Vec<usize>>,
     uses: BTreeMap<String, Vec<usize>>,
     spans: Vec<Option<std::ops::Range<usize>>>,
+    ranges: Vec<std::ops::Range<usize>>,
     files: BTreeMap<String, Vec<usize>>,
+    file_sites: BTreeMap<String, Vec<usize>>,
     call_ids: BTreeMap<String, usize>,
 }
 /// Captured call witness used by a host definition provider.
@@ -280,7 +282,9 @@ impl Structure {
             owners: BTreeMap::new(),
             uses: BTreeMap::new(),
             spans: vec![],
+            ranges: vec![],
             files: BTreeMap::new(),
+            file_sites: BTreeMap::new(),
             call_ids: BTreeMap::new(),
         };
         for doc in snapshot.documents() {
@@ -362,6 +366,7 @@ impl Structure {
                 let n = index.symbols.len();
                 index.ids.insert(id.clone(), n);
                 index.spans.push(fact.name_span.clone());
+                index.ranges.push(fact.span.clone());
                 index.files.entry(doc.path().into()).or_default().push(n);
                 index.names.entry(fact.name.clone()).or_default().push(n);
                 mapping.insert(ordinal, id.clone());
@@ -397,6 +402,11 @@ impl Structure {
                 }
                 let owner = call.owner.and_then(|n| mapping.get(&n)).cloned();
                 let n = index.sites.len();
+                index
+                    .file_sites
+                    .entry(doc.path().into())
+                    .or_default()
+                    .push(n);
                 if let Some(owner) = &owner {
                     index.owners.entry(owner.clone()).or_default().push(n);
                 }
@@ -624,6 +634,50 @@ impl Structure {
             return None;
         }
         Some(first.1.clone())
+    }
+    /// Exact captured declaration identifier offset for a native symbol.
+    pub fn identifier(&self, id: &str) -> Option<usize> {
+        self.spans
+            .get(*self.ids.get(id)?)?
+            .as_ref()
+            .map(|span| span.start)
+    }
+    /// Innermost admitted declaration containing a source reference.
+    pub fn enclosing(&self, path: &str, byte: usize) -> Option<Symbol> {
+        self.files
+            .get(path)?
+            .iter()
+            .filter(|n| self.ranges[**n].contains(&byte))
+            .min_by_key(|n| self.ranges[**n].len())
+            .map(|n| self.symbols[*n].clone())
+    }
+    /// Finds one exact captured written-call identifier at a reference position.
+    pub fn call_at(&self, path: &str, byte: usize) -> Option<CallLookup> {
+        let matches = self
+            .file_sites
+            .get(path)?
+            .iter()
+            .filter(|n| {
+                self.sites[**n]
+                    .identifier
+                    .as_ref()
+                    .is_some_and(|span| span.contains(&byte))
+            })
+            .collect::<Vec<_>>();
+        if matches.len() != 1 {
+            return None;
+        }
+        self.call(&self.sites[*matches[0]].id)
+    }
+    /// Candidate written uses of a terminal name, preserving all declaration ambiguity.
+    pub fn name_uses(&self, name: &str, offset: usize) -> Result<Page<Invocation>, Error> {
+        validate("", name)?;
+        Ok(self.page(
+            self.uses.get(name).into_iter().flatten(),
+            offset,
+            SITES,
+            |n| self.invocation(&self.sites[*n], ""),
+        ))
     }
     fn anchored(&self, id: &str, area: &str) -> Result<&Symbol, Error> {
         validate(area, "")?;

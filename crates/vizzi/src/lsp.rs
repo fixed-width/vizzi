@@ -329,15 +329,30 @@ impl Client {
         )?;
         locations(result)
     }
+    pub(crate) fn references(
+        &mut self,
+        path: &Path,
+        position: Position,
+    ) -> Result<Vec<(Option<PathBuf>, Position)>, String> {
+        self.wait_ready()?;
+        let result=self.request("textDocument/references",json!({"textDocument":{"uri":uri(path)?},"position":position,"context":{"includeDeclaration":false}}),Duration::from_secs(10))?;
+        locations_with_limit(result, 1024)
+    }
 }
 fn locations(result: Value) -> Result<Vec<(Option<PathBuf>, Position)>, String> {
+    locations_with_limit(result, 64)
+}
+fn locations_with_limit(
+    result: Value,
+    limit: usize,
+) -> Result<Vec<(Option<PathBuf>, Position)>, String> {
     let items = match result {
         Value::Null => vec![],
         Value::Array(v) => v,
         v if v.is_object() => vec![v],
         _ => return Err("Invalid definition result".into()),
     };
-    if items.len() > 64 {
+    if items.len() > limit {
         return Err("Too many definition destinations".into());
     }
     let mut output = vec![];

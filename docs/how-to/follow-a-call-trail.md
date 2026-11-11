@@ -41,7 +41,7 @@ down or right to make room; shrinking leaves them in place. The bubble stays anc
 zoom stays unchanged. Expansion uses loaded source; long sections can still require
 scrolling at the maximum size. Ordinary corner resizing remains available.
 
-**Workspace** contains New workspace and Saved locations. **Settings** contains Theme,
+**Workspace** contains task, group and Saved locations controls. **Settings** contains Theme,
 Code layout and Module outlines. Minimap boxes show function names and source locations when hovered.
 
 Read the module label beneath a bubble's function name to distinguish language scopes.
@@ -63,6 +63,30 @@ both ends. Arrows have a wide hover area, including their dotted gaps, and an in
 cursor; drag the background to pan. Keyboard focus provides the same cues. These highlights are temporary and
 do not move the workspace or fetch source. Older arrows retain their historical style;
 they never highlight unrelated replacement code after an edit.
+
+Open a bubble’s **⋯** menu and choose **Find callers** or **Find references**. Each query
+opens a result stack on the canvas. Hover or focus a result for a source preview and select
+it to open its containing declaration. A caller result adds the supported connection to
+the target. The stack identifies language-supported results and name-based candidates.
+Use Previous/Next for further pages. After source changes, choose **Refresh** to update results.
+Rust reference analysis uses the configured rust-analyzer. Without language support,
+the stack offers written-call name candidates; it cannot enumerate all value references.
+Results cover captured source and already admitted dependencies, with known outside
+locations counted separately.
+
+Choose **Workspace → Groups** to name a task group and select its members. Bubbles and
+result stacks can share a group. Selecting a member already in another group moves it
+into the edited group. Drag the group header, or focus it and use arrow keys, to move all
+members. Collapse/Expand preserves their positions. **Ungroup** keeps the members on the
+canvas. **Close** removes the group and its members. Newly opened callees inherit their
+caller’s group.
+
+The current task name appears in the toolbar. **Workspace → Rename task** gives it a name.
+**New task** saves the current task and opens an empty one. **Task shelf** switches between
+saved tasks and offers Rename/Delete for saved entries. Layout, groups, source bindings,
+reading positions and reference queries restore locally. Resumed queries use current
+source analysis. Older captures may expire, and unavailable functions stay explicit.
+Source-only layouts from earlier versions migrate when opened.
 
 Click **×** at the right of a transient notice or error banner to dismiss it.
 

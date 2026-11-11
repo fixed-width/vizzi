@@ -258,3 +258,12 @@ Those prerequisites are explicit; the tests never install them. Ordinary workspa
 checks use deterministic native fixtures and protocol peers. The native resource tests
 cover exact file/reference/declaration bounds and cache eviction. JavaScript helper
 mutation configuration is `dependencies-stryker.config.json`, with one runner.
+
+## Check task working sets
+
+`node experiments/browser/working-sets.test.mjs` exercises caller stacks and previews,
+group operations, task-shelf switching, reload, legacy layout migration and storage-failure
+recovery. Normal browser runs include it and the TaskWorkspace/TaskShelf model tests.
+`cargo test -p vizzi --test references` checks native reference evidence and paging.
+The real local Rust reference case is opt-in with `-- --ignored` and installed rust-analyzer.
+Mutation configuration is `working-set-stryker.config.json`, using one runner.

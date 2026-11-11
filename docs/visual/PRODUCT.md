@@ -7,7 +7,7 @@ Reuse the existing light/dark palette and fonts; Code Bubbles is the supplied in
 reference, with no separate design mock.
 
 Workspace controls use **bubble** for a canvas view and **saved location** for a retained
-source anchor. Workspace actions (New workspace, Saved locations) have their own menu;
+source anchor. Workspace actions (tasks, task shelf, groups and Saved locations) have their own menu;
 Settings contains Theme, Code layout and optional Module outlines. The example button is absent from the header.
 Call arrows have a continuous 20-screen-pixel inspection target across dash gaps and zoom
 levels, with an information cursor. Arrow inspection does not start canvas dragging;
@@ -93,10 +93,10 @@ still exceeds these bounds remains scrollable. Manual resizing and section pagin
   Opening does not create evidence or change the investigation, including when saving is
   unavailable. **Save** remains independent. Stale fragments cannot request a handoff.
 
-The first acceptance question is whether the maintainer can walk and branch through a real
-call trail while retaining previous-step context. Groups, alternative representations and
-revision/diff views are supported by the design direction but are not required in this small
-prototype. No new model, parser or GPU backend is introduced. Source-local Rust bindings extend the
+The acceptance question is whether the maintainer can walk and branch through a real
+call trail while retaining previous-step context. [Working-set controls](WORKING_SETS_PRODUCT.md)
+add caller/reference stacks, named task groups and task shelving. Alternative representations
+and revision/diff views remain part of the design direction. No new model, parser or GPU backend is introduced. Source-local Rust bindings extend the
 existing captured call metadata without requiring a repository build.
 
 

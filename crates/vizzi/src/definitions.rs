@@ -1,7 +1,10 @@
 //! Host definition providers with captured-source positions and explicit semantic context.
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
-use vizzi_core::{model::Snapshot, structure::CallLookup};
+use vizzi_core::{
+    model::Snapshot,
+    structure::{CallLookup, Symbol},
+};
 
 /// LSP position measured in UTF-16 code units, with zero-based lines.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -33,6 +36,15 @@ pub struct Answer {
 }
 /// An editor-neutral definition seam over one immutable source observation.
 pub trait Provider: Send + Sync {
+    /// Finds semantic references to a captured declaration identifier.
+    fn references(
+        &self,
+        _snapshot: Arc<Snapshot>,
+        _symbol: &Symbol,
+        _identifier: usize,
+    ) -> Result<Answer, String> {
+        Err("Reference analysis is unavailable for this language".into())
+    }
     /// Captured dependency sources admitted by this language provider, if supported.
     fn dependencies(&self) -> Option<&crate::dependency_sources::Catalog> {
         None

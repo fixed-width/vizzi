@@ -2,6 +2,8 @@
 
 /// Coherent live working-set refresh.
 pub mod live;
+/// Captured caller/reference queries and observation-bound result paging.
+pub mod references;
 use crate::{companion::CompanionError, host::Host};
 use serde::Deserialize;
 use serde_json::Value;
@@ -87,6 +89,7 @@ impl Cached {
 }
 /// One lazily constructed metadata projection; no retired snapshot is retained.
 pub struct StructureHost {
+    reference_sets: Mutex<Vec<references::ReferenceSet>>,
     host: Arc<Host>,
     cache: Mutex<Option<Cached>>,
     definitions: Option<Arc<dyn crate::definitions::Provider>>,
@@ -168,6 +171,7 @@ impl StructureHost {
     /// Creates an idle projection adapter without source reads or parsing.
     pub fn new(host: Arc<Host>) -> Self {
         Self {
+            reference_sets: Mutex::new(Vec::new()),
             host,
             cache: Mutex::new(None),
             definitions: None,
@@ -336,6 +340,7 @@ impl StructureHost {
         provider: Arc<dyn crate::definitions::Provider>,
     ) -> Self {
         Self {
+            reference_sets: Mutex::new(Vec::new()),
             host,
             cache: Mutex::new(None),
             definitions: Some(provider),

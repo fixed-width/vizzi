@@ -1,0 +1,40 @@
+{
+  "$schema": "../../node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "mutate": [
+    "crates/vizzi/web/task-workspace.js",
+    "crates/vizzi/web/task-shelf.js"
+  ],
+  "testRunner": "command",
+  "commandRunner": {
+    "command": "node crates/vizzi/web/task-workspace.test.js && node crates/vizzi/web/task-shelf.test.js"
+  },
+  "coverageAnalysis": "off",
+  "concurrency": 1,
+  "timeoutMS": 5000,
+  "reporters": [
+    "clear-text",
+    "json"
+  ],
+  "clearTextReporter": {
+    "reportMutants": false,
+    "logTests": false
+  },
+  "jsonReporter": {
+    "fileName": "/tmp/vizzi-working-set-mutations.json"
+  },
+  "thresholds": {
+    "break": null
+  },
+  "ignorePatterns": [
+    "**",
+    "!package.json",
+    "!crates/vizzi/web/task-workspace.js",
+    "!crates/vizzi/web/task-shelf.js",
+    "!crates/vizzi/web/task-workspace.test.js",
+    "!crates/vizzi/web/task-shelf.test.js",
+    "!crates/vizzi/web/visual-model.js",
+    "!crates/vizzi/web/source-origin.js",
+    "!crates/vizzi/web/module-identity.js",
+    "!crates/vizzi/web/layout-growth.js"
+  ]
+}

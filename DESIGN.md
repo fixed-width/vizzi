@@ -21,8 +21,9 @@ records the literature and the intended interaction; [CONTEXT.md](CONTEXT.md) de
 Multiple coordinated views are central: source fragments, focused relationships/overviews,
 notes and revision/diff views share source identities and context. Layout/grouping,
 collapse/expand and return to earlier reading positions support understanding; large
-repositories must remain manageable through a focused task working set. The editor
-continues to handle normal editing and its plugins remain an integration path.
+repositories must remain manageable through a focused task working set. Editing,
+refactoring and debugging are outside Vizzi’s scope. Editor plugins remain an integration
+path for source navigation and live context.
 
 Search, directory browsing and declaration lookup help introduce a view into that working
 set. They are supporting entry points rather than the organising product workflow. The
@@ -30,7 +31,8 @@ recent question-ranking and structural-list experiments exposed IDE duplication 
 not qualify the desired visual interaction. Keep their evidence and reusable interfaces;
 remove question-search entry points and question-authoring controls from the browser.
 Retain legacy saved metadata and offline evaluation interfaces. Develop additional views
-around tasks that benefit from the spatial call trail.
+around tasks that benefit from the spatial call trail. Caller/reference stacks, named task
+groups and a task shelf support this workflow. See [working sets](docs/visual/WORKING_SETS_PRODUCT.md).
 
 Optional model assistance may help choose or organise source views later. It is not a
 prerequisite for the spatial workspace and is not the active experiment. Source identity,

@@ -34,3 +34,31 @@
 :root[data-theme=dark]{--module-0:#81cebc;--module-1:#cea7e8;--module-2:#e2bd7c;--module-3:#e6aaa4;--module-4:#88c9dd;--module-5:#d0bf95;--module-tint-0:#24463f;--module-tint-1:#42314f;--module-tint-2:#483c28;--module-tint-3:#4b3433;--module-tint-4:#25414b;--module-tint-5:#403b2e}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--module-0:#81cebc;--module-1:#cea7e8;--module-2:#e2bd7c;--module-3:#e6aaa4;--module-4:#88c9dd;--module-5:#d0bf95;--module-tint-0:#24463f;--module-tint-1:#42314f;--module-tint-2:#483c28;--module-tint-3:#4b3433;--module-tint-4:#25414b;--module-tint-5:#403b2e}}
 .fragment-header{position:relative}.fragment.has-module .fragment-header::before{content:'';position:absolute;inset:0 auto 0 0;width:4px;background:var(--module-accent);pointer-events:none}.fragment-context{display:flex;align-items:center;gap:8px;margin-top:4px;min-width:0}.fragment-context small{margin-top:0;flex:1;min-width:0}.module-tag{color:var(--module-accent);font-size:10px;font-weight:700;max-width:65%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:help}.fragment.is-module-peer .fragment-header{box-shadow:inset 0 0 0 2px var(--module-accent)}.fragment.is-module-peer .module-tag{text-decoration:underline;text-underline-offset:3px}#overview-map .overview-fragment{fill:var(--module-tint,var(--map-file));stroke:var(--module-accent,var(--border));vector-effect:non-scaling-stroke}#overview-map .overview-fragment.selected{fill:var(--module-tint,var(--map-file));stroke:var(--focus);stroke-width:2}#overview-map .overview-fragment.is-module-peer{stroke:var(--module-accent);stroke-width:3}#module-outlines{position:absolute;left:0;top:0;width:1px;height:1px;overflow:visible;pointer-events:none}.module-outline{fill:var(--module-accent);fill-opacity:.08;stroke:var(--module-accent);stroke-width:1.5;stroke-opacity:.6;vector-effect:non-scaling-stroke}.module-outline.is-module-peer{fill-opacity:.14;stroke-opacity:1}
+
+#task-title{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--muted)}
+#task-group-layer{position:absolute;inset:0;pointer-events:none}
+.task-group{position:absolute;border:1px dashed var(--muted);border-radius:8px;pointer-events:none}
+.task-group-header{display:flex;align-items:center;gap:5px;padding:6px 8px;min-height:32px;background:var(--paper);border-radius:7px;pointer-events:auto;cursor:grab;box-sizing:border-box}
+.task-group-header strong{flex:1;min-width:40px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;line-height:20px}
+.task-group-header button{font-size:10px;padding:3px 5px}
+.task-group.collapsed{border-style:solid}
+.reference-stack{position:absolute;display:flex;flex-direction:column;background:var(--paper);border:1px solid var(--border);border-radius:5px;box-shadow:0 3px 10px #0001;cursor:default;overflow:hidden}
+.reference-stack .fragment-header{gap:5px;cursor:grab}
+.reference-stack .fragment-header strong{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+.reference-stack .fragment-header button{font-size:10px;padding:3px 5px}
+.reference-body{overflow:auto;flex:1;min-height:0;padding:8px;font-size:12px}
+.reference-body>p{margin:0 0 8px;color:var(--muted)}
+.reference-entry button{display:block;width:100%;text-align:left;margin-bottom:6px;overflow:hidden}
+.reference-entry small,.reference-entry code{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;margin-top:3px}
+.reference-entry code{font-family:var(--code-font,monospace);font-weight:400}
+.reference-preview{margin-top:10px;border-top:1px solid var(--border);padding-top:8px}
+.reference-preview>.code-pane{height:220px;min-height:100px;margin-top:6px}
+.task-row{display:flex;align-items:center;gap:8px;margin:8px 0}.task-row>button:first-child{flex:1;text-align:left}.task-row [aria-current=true]{font-weight:700;border-color:var(--focus)}.task-row small{font-size:10px;color:var(--muted)}
+#task-shelf-dialog{width:min(680px,90vw)}
+#task-name-form,#group-form{display:grid;gap:12px;min-width:280px}
+#task-name-form label,#group-form>label{display:grid;gap:5px}
+#group-members{display:grid;gap:6px;max-height:320px;overflow:auto}
+#group-members label{display:flex;align-items:center;gap:6px}
+@media(max-width:900px){#task-title{max-width:100px}.task-row{flex-wrap:wrap}.task-row small{display:none}}
+
+.reference-preview .is-reference-line{background:var(--highlight,#dceaff55)}
