@@ -52,7 +52,7 @@ def package(tag, target, binary, output, root=ROOT):
                 'Run ./vizzi from a project directory, or use ./vizzi --root /path/to/project.\n'
                 'Use ./vizzi --help for options. No compiler is needed to run this executable.\n'
                 'Language servers are optional and installed separately.\n\n'
-                'Documentation: https://github.com/fixed-width/vizzi/tree/main/docs\n'
+                f'Documentation: https://github.com/fixed-width/vizzi/tree/{tag}/docs\n'
             ),
         }
         for name, text in documents.items():

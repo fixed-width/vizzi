@@ -39,6 +39,8 @@ class PackageTests(unittest.TestCase):
             metadata = json.load(contents.extractfile(prefix + '/BUILD.json'))
             self.assertEqual(metadata['tag'], 'v0.1.0')
             self.assertEqual(metadata['target'], release.TARGETS[0])
+            readme = contents.extractfile(prefix + '/README.txt').read().decode()
+            self.assertIn('https://github.com/fixed-width/vizzi/tree/v0.1.0/docs', readme)
         expected = hashlib.sha256(archive.read_bytes()).hexdigest() + '  ' + archive.name + '\n'
         self.assertEqual(Path(str(archive) + '.sha256').read_text(), expected)
         with self.assertRaises(FileExistsError):

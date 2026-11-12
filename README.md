@@ -9,12 +9,14 @@ and debugging stay in the editor.
 
 ## Try it
 
-Vizzi is an early preview built from source. The tested setup is Linux with a recent
-Chromium-based browser. You need a current stable Rust toolchain and native C build tools.
-Basic browsing does not need Node.js. Optional servers have their own runtime requirements.
-See the [installation guide](docs/how-to/install.md).
+Vizzi is an early preview. [Download a release](https://github.com/fixed-width/vizzi/releases/latest)
+for Linux or macOS on x86-64 or ARM64, or build from source below. Prebuilt executables
+do not need Rust or a C compiler. Browser checks use Chromium on Linux; native checks
+also run on macOS. Basic browsing does not need Node.js. Optional language servers have
+their own runtime requirements. See the [installation guide](docs/how-to/install.md).
 
-From a Vizzi checkout:
+To build from a Vizzi checkout, install a current stable Rust toolchain and native C
+build tools, then run:
 
 ```sh
 cargo build --locked --release -p vizzi

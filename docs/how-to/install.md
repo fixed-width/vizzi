@@ -1,12 +1,38 @@
-# Build and install Vizzi
+# Install Vizzi
 
-Use this guide to build the local server. You do not need a frontend build step, a model download or a GPU for code analysis. Node.js is only
-needed if you choose a language server that uses it, such as the Node-based Pyright server.
+Use a prebuilt executable or build the local server from source. You do not need a
+frontend build step, a model download or a GPU for code analysis. Node.js is only needed
+if you choose a language server that uses it, such as the Node-based Pyright server.
 
-## Prepare the build tools
+## Install a prebuilt executable
 
-The checked setup is Linux with a recent Chromium-based browser. The commands below use
-a POSIX shell. Other platforms and browsers have not yet been qualified.
+Download an archive and `SHA256SUMS` from the
+[latest release](https://github.com/fixed-width/vizzi/releases/latest). Choose the target
+for your operating system and processor; `uname -m` reports the processor architecture.
+
+| System | Processor | Archive target |
+| --- | --- | --- |
+| Linux | x86-64 (`x86_64`) | `x86_64-unknown-linux-musl` |
+| Linux | ARM64 (`aarch64`) | `aarch64-unknown-linux-musl` |
+| macOS | Intel (`x86_64`) | `x86_64-apple-darwin` |
+| macOS | Apple Silicon (`arm64`) | `aarch64-apple-darwin` |
+
+Compare the archive's SHA-256 with its entry in `SHA256SUMS`, using `sha256sum ARCHIVE`
+on Linux or `shasum -a 256 ARCHIVE` on macOS. Extract the archive, then run the `vizzi`
+executable inside it. For example, for the Linux x86-64 release:
+
+```sh
+tar -xzf vizzi-v0.1.0-x86_64-unknown-linux-musl.tar.gz
+cd vizzi-v0.1.0-x86_64-unknown-linux-musl
+./vizzi --help
+```
+
+Copy `vizzi` to a directory on your `PATH` if desired. No Rust or C compiler is needed
+to run it. The browser assets are embedded. Linux executables use static musl linking;
+macOS executables are ad-hoc signed and are not notarized. Git is needed for Git review
+comparisons. Native checks run on Linux and macOS; browser checks use Chromium on Linux.
+
+## Build from source
 
 Install a current stable Rust toolchain using the [official Rust instructions](https://rust-lang.org/tools/install/).
 You also need a C compiler and native linker: Vizzi's syntax parsers include C code.
@@ -24,8 +50,6 @@ git --version
 
 The documentation was checked with Rust/Cargo 1.99.1. Vizzi uses Rust 2024; the project
 does not yet declare a minimum supported compiler version.
-
-## Build the server
 
 Get access to the repository and clone it, or use a source checkout provided by the
 maintainer:

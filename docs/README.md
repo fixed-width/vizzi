@@ -5,7 +5,7 @@ keeps earlier functions visible while you follow a call or explore a branch.
 
 ## Start here
 
-1. [Build and install Vizzi](how-to/install.md).
+1. [Install Vizzi](how-to/install.md).
 2. [Follow a Python call trail](tutorials/python-call-trail.md) in the included example.
 3. [Run Vizzi on your own project](how-to/run-workspace.md) and
    [configure semantic navigation](how-to/configure-language-servers.md).

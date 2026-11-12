@@ -6,6 +6,8 @@ remains in Git and the project documentation.
 
 ## Unreleased
 
+## 0.1.0 - 2026-11-11
+
 ### Added
 
 - CI workflows for native/browser checks and immutable Linux/macOS release archives
@@ -70,5 +72,5 @@ remains in Git and the project documentation.
 
 ### Removed
 
-- Retired the question-driven browser workflow. Offline evaluation tooling and experiment
-  records remain available.
+- Retired the question-driven browser workflow and archived its native experiment tool.
+  Experiment records and historical source remain available.
