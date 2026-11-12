@@ -73,6 +73,37 @@ fn policy() -> CapturePolicy {
 }
 
 #[test]
+fn supplied_inputs_preserve_non_utf8_inventory_without_creating_a_text_path() {
+    let odd = b"odd\xff\n\\file";
+    let mut input = MemoryInput::with(vec![(odd, file(b"raw"))]);
+    let captured = acquire(&mut input, &policy(), CaptureLimits::default(), &|| false).unwrap();
+    assert_eq!(captured.observation.inventory().len(), 1);
+    assert_eq!(captured.observation.inventory()[0].path, path(odd));
+    assert!(captured.observation.snapshot().documents().is_empty());
+    assert_eq!(captured.bytes, 3);
+}
+
+// APFS rejects non-UTF-8 filenames; retain native raw-name coverage on Linux.
+#[cfg(target_os = "linux")]
+#[test]
+fn directory_inputs_preserve_non_utf8_file_names() {
+    use std::os::unix::ffi::OsStringExt;
+    let root = tempfile::tempdir().unwrap();
+    let odd = b"odd\xff\n\\file";
+    std::fs::write(
+        root.path().join(std::ffi::OsString::from_vec(odd.to_vec())),
+        b"raw",
+    )
+    .unwrap();
+    let mut input = DirectoryInput::open(root.path()).unwrap();
+    let captured = acquire(&mut input, &policy(), CaptureLimits::default(), &|| false).unwrap();
+    assert_eq!(captured.observation.inventory().len(), 1);
+    assert_eq!(captured.observation.inventory()[0].path, path(odd));
+    assert!(captured.observation.snapshot().documents().is_empty());
+    assert_eq!(captured.bytes, 3);
+}
+
+#[test]
 fn supplied_inputs_capture_source_only_text_and_complete_nonregular_inventory() {
     let mut input = MemoryInput::with(vec![
         (b"guide.md", file(b"hello\n")),
@@ -526,10 +557,7 @@ fn unmerged_and_assume_unchanged_index_flags_do_not_choose_after_bytes() {
 #[cfg(unix)]
 #[test]
 fn no_follow_reads_preserve_symlinks_modes_unusual_names_and_avoid_special_file_reads() {
-    use std::os::unix::{
-        ffi::OsStringExt,
-        fs::{PermissionsExt, symlink},
-    };
+    use std::os::unix::fs::{PermissionsExt, symlink};
     let fixture = Repo::init();
     fixture.write("a.rs", b"same\n");
     fixture.commit();
@@ -545,14 +573,8 @@ fn no_follow_reads_preserve_symlinks_modes_unusual_names_and_avoid_special_file_
     let outside = tempfile::tempdir().unwrap();
     std::fs::write(outside.path().join("secret"), b"outside").unwrap();
     symlink(outside.path(), fixture.root().join("link")).unwrap();
-    let odd = b"odd\xff\n\\file";
-    std::fs::write(
-        fixture
-            .root()
-            .join(std::ffi::OsString::from_vec(odd.to_vec())),
-        b"raw",
-    )
-    .unwrap();
+    let odd = "odd\n\\file";
+    fixture.write(odd, b"raw");
     fixture.write("empty", b"");
     let after = acquire(
         &mut repo.working(&base).unwrap(),
@@ -567,7 +589,7 @@ fn no_follow_reads_preserve_symlinks_modes_unusual_names_and_avoid_special_file_
             .observation
             .inventory()
             .iter()
-            .any(|entry| entry.path == path(odd))
+            .any(|entry| entry.path == path(odd.as_bytes()))
     );
     let before = acquire(&mut base, &policy(), CaptureLimits::default(), &|| false).unwrap();
     let pair = Comparison::between(before.observation, after.observation).unwrap();

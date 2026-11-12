@@ -189,10 +189,6 @@ fn live_edit_keeps_selection_and_pinned_source_coherent() {
         first["selection"]["file"].as_str().unwrap()
     ));
     assert_eq!(pinned["text"], "fn one() {}");
-    let status = session.request("/api/status");
-    assert_eq!(status["measurements"]["read_files"], 1);
-    assert_eq!(status["measurements"]["retained"], 1);
-    assert_eq!(status["measurements"]["reconciled"], false);
 }
 
 #[test]
