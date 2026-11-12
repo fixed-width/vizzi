@@ -31,7 +31,8 @@ set. They are supporting entry points rather than the organising product workflo
 recent question-ranking and structural-list experiments exposed IDE duplication and do
 not qualify the desired visual interaction. Keep their evidence and reusable interfaces;
 remove question-search entry points and question-authoring controls from the browser.
-Retain legacy saved metadata and offline evaluation interfaces. Develop additional views
+Retain legacy saved metadata. Preserve retired question-experiment records and source
+history outside the active workspace. Develop additional views
 around tasks that benefit from the spatial call trail. Caller/reference stacks, named task
 groups and a task shelf support this workflow. See [working sets](docs/visual/WORKING_SETS_PRODUCT.md).
 

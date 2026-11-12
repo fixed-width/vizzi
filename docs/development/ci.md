@@ -23,6 +23,11 @@ Optional real-language-server integrations remain opt-in because they need separ
 installed tools and dependency source. Performance/mutation runs remain separate from
 normal correctness CI.
 
+The retired `vizzi-qa` experiment tool is outside the active Cargo workspace and CI/release
+checks. Its source history and reproduction procedure are in the
+[question-experiment archive](../../experiments/qa/README.md). The app still uses and tests
+the shared `vizzi-search` library.
+
 ## Action dependencies
 
 The [gh-actions-lock skill](../../.agents/skills/gh-actions-lock/SKILL.md) governs updates.

@@ -41,8 +41,10 @@ experiments; use DESIGN.md and the current user guides to determine the active s
 The archive preserves the former README's research and measurement links, including
 source-capture/retention work, performance scopes, earlier learning/review trials and
 the retired repository-question experiments. These are evidence and historical context,
-not product setup instructions or current support guarantees. The [QA contracts](../qa/)
-remain available for reproducing that work; Vizzi has no current question/chat UI.
+not product setup instructions or current support guarantees. The [question-experiment
+archive](../../experiments/qa/README.md) records how to retrieve the retired native tool
+and reproduce that work. Its [contracts](../qa/) remain available; Vizzi has no current
+question/chat UI.
 
 For further design rationale, see [visual working sets](../explanation/visual-working-sets.md),
 [source reflow](../explanation/source-reflow.md), [repository layouts](../explanation/repository-layouts.md)

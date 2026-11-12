@@ -1,4 +1,25 @@
-# Run the CPU repository-question pilot
+# Archived repository-question experiments
+
+For contributors studying the former repository-question and source-ranking experiments.
+These experiments are retired from the product direction and active build. Their records,
+fixtures and scripts remain here; `vizzi-qa` has been removed from the Cargo workspace
+and current source tree. The app still uses the shared `vizzi-search` library.
+
+The native experiment source is preserved in Git at
+[`5f92480`](https://github.com/fixed-width/vizzi/tree/5f92480cf211babaeb7dff46bd0cff430a10f69a/crates/vizzi-qa).
+For historical reproduction, use a separate checkout of that revision before following
+the procedures below:
+
+```sh
+git worktree add --detach ../vizzi-qa-archive 5f92480cf211babaeb7dff46bd0cff430a10f69a
+cd ../vizzi-qa-archive
+```
+
+The historical procedures retain their original source paths, commands and provenance
+hashes. They describe Linux experiments and are outside current platform qualification.
+They are historical evidence, not a current development plan.
+
+## Historical pilot
 
 The current development direction is [question-driven source ranking](SEARCH.md): an
 optional small model helps order inspectable search results. The earlier answer studies
