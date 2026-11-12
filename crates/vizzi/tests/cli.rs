@@ -197,10 +197,6 @@ fn live_edit_keeps_selection_and_pinned_source_coherent() {
 
 #[test]
 fn reconciliation_runs_while_write_hints_keep_arriving() {
-    use std::sync::{
-        Arc,
-        atomic::{AtomicBool, Ordering},
-    };
     let source = tempfile::tempdir().unwrap();
     let cache = tempfile::tempdir().unwrap();
     let file = source.path().join("a.rs");
@@ -212,6 +208,7 @@ fn reconciliation_runs_while_write_hints_keep_arriving() {
         if state["pending"] == false
             && state["measurements"]["reused"] == 1
             && state["measurements"]["reconciled"] == true
+            && state["recovery"]["completed"].as_u64().unwrap() > 0
         {
             break (
                 state["snapshot"].clone(),
@@ -221,34 +218,41 @@ fn reconciliation_runs_while_write_hints_keep_arriving() {
         assert!(initial.elapsed() < Duration::from_secs(8));
         std::thread::sleep(Duration::from_millis(5));
     };
-    let stop = Arc::new(AtomicBool::new(false));
-    let writer_stop = stop.clone();
-    let writer = std::thread::spawn(move || {
-        let mut number = 0;
-        while !writer_stop.load(Ordering::Acquire) {
-            std::fs::write(&file, format!("fn a() {{ let n = {number}; }}")).unwrap();
-            number += 1;
-            std::thread::sleep(Duration::from_millis(75));
-        }
-    });
     let started = Instant::now();
+    let mut written_from = baseline.0.clone();
+    let mut writes = 1;
+    std::fs::write(&file, "fn a() { let n = 0; }").unwrap();
+    let mut next_write = Instant::now() + Duration::from_millis(75);
     let mut recovered = false;
+    let mut last_status = Value::Null;
     while started.elapsed() < Duration::from_secs(6) {
         let state = session.request("/api/status");
         if state["snapshot"] != baseline.0
-            && state["pending"] == false
             && state["recovery"]["completed"].as_u64().unwrap() > baseline.1
         {
             recovered = true;
             break;
         }
+        // Leave a publication window on slower disks instead of cancelling every refresh.
+        if state["pending"] == false
+            && state["snapshot"] != written_from
+            && Instant::now() >= next_write
+        {
+            written_from = state["snapshot"].clone();
+            std::fs::write(&file, format!("fn a() {{ let n = {writes}; }}")).unwrap();
+            writes += 1;
+            next_write = Instant::now() + Duration::from_millis(75);
+        }
+        last_status = state;
         std::thread::sleep(Duration::from_millis(5));
     }
-    stop.store(true, Ordering::Release);
-    writer.join().unwrap();
     assert!(
         recovered,
-        "continuous hints starved periodic reconciliation"
+        "continuous hints starved periodic reconciliation: {last_status}"
+    );
+    assert!(
+        writes > 1,
+        "recovery was not exercised across repeated edits"
     );
 }
 

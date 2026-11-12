@@ -586,12 +586,12 @@ fn no_follow_reads_preserve_symlinks_modes_unusual_names_and_avoid_special_file_
         directory.read(&path(b"absent"), 100, &|| false).unwrap(),
         ReadEntry::Absent
     ));
-    rustix::fs::mkfifoat(
-        rustix::fs::CWD,
-        fixture.root().join("pipe"),
-        rustix::fs::Mode::RUSR | rustix::fs::Mode::WUSR,
-    )
-    .unwrap();
+    let fifo = std::process::Command::new("mkfifo")
+        .args(["-m", "600"])
+        .arg(fixture.root().join("pipe"))
+        .output()
+        .unwrap();
+    assert!(fifo.status.success(), "mkfifo failed: {fifo:?}");
     assert!(matches!(
         directory.read(&path(b"pipe"), 100, &|| false).unwrap(),
         ReadEntry::Unavailable {
