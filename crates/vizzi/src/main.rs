@@ -8,151 +8,32 @@ use std::{
 use vizzi::admission::Admission;
 use vizzi::syntax_cache::SyntaxCache;
 use vizzi::{cache::Cache, engine::Engine, host::Host, source::Directory};
-use vizzi_core::{
-    analysis::Languages,
-    policy::{Assignment, FamilyLanguage, PolicyConfig},
-};
+use vizzi_core::analysis::Languages;
+
+mod configuration;
 
 #[tokio::main(worker_threads = 2)]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut root = None;
-    let mut cache = None;
-    let mut workers = 4;
-    let mut port = 7474;
-    let mut stdio = false;
-    let mut once = false;
-    let mut syntax_cache_mib = 0usize;
-    let mut analysis_input_mib = 0usize;
-    let mut source_spool_mib = 0usize;
-    let mut policy = PolicyConfig::default();
-    let mut investigation_file = None;
-    let mut editor_code = PathBuf::from("code");
-    let mut language_servers = vizzi::language_servers::Configuration::default();
-    let mut arguments = std::env::args().skip(1);
-    while let Some(argument) = arguments.next() {
-        match argument.as_str() {
-            "--ruby-lsp" => {
-                language_servers.ruby_lsp = Some(PathBuf::from(
-                    arguments.next().ok_or("--ruby-lsp needs an executable")?,
-                ));
-            }
-            "--rust-analyzer" => {
-                language_servers.rust_analyzer = Some(PathBuf::from(
-                    arguments
-                        .next()
-                        .ok_or("--rust-analyzer needs an executable")?,
-                ))
-            }
-            "--pyright" => {
-                language_servers.pyright = Some(PathBuf::from(
-                    arguments.next().ok_or("--pyright needs an executable")?,
-                ))
-            }
-            "--clangd" => {
-                language_servers.clangd = Some(PathBuf::from(
-                    arguments.next().ok_or("--clangd needs an executable")?,
-                ))
-            }
-            "--python-path" => {
-                language_servers.python_path = Some(PathBuf::from(
-                    arguments
-                        .next()
-                        .ok_or("--python-path needs an interpreter")?,
-                ))
-            }
-            "--compile-commands" => {
-                language_servers.compilation_database = Some(PathBuf::from(
-                    arguments.next().ok_or("--compile-commands needs a file")?,
-                ))
-            }
-            "--root" => {
-                root = Some(PathBuf::from(
-                    arguments.next().ok_or("--root needs a directory")?,
-                ))
-            }
-            "--cache" => {
-                cache = Some(PathBuf::from(
-                    arguments.next().ok_or("--cache needs a directory")?,
-                ))
-            }
-            "--investigation-file" => {
-                investigation_file = Some(PathBuf::from(
-                    arguments
-                        .next()
-                        .ok_or("--investigation-file needs a file")?,
-                ))
-            }
-            "--editor-code" => {
-                editor_code = PathBuf::from(
-                    arguments
-                        .next()
-                        .ok_or("--editor-code needs an executable")?,
-                )
-            }
-            "--workers" => workers = arguments.next().ok_or("--workers needs a count")?.parse()?,
-            "--port" => {
-                port = arguments
-                    .next()
-                    .ok_or("--port needs a number")?
-                    .parse::<u16>()?
-            }
-            "--stdio" => stdio = true,
-            "--once" => once = true,
-            "--syntax-cache-mib" => {
-                syntax_cache_mib = arguments
-                    .next()
-                    .ok_or("--syntax-cache-mib needs a weight budget")?
-                    .parse()?
-            }
-            "--source-spool-mib" => {
-                source_spool_mib = arguments
-                    .next()
-                    .ok_or("--source-spool-mib needs a disk capacity")?
-                    .parse()?;
-            }
-            "--analysis-input-mib" => {
-                analysis_input_mib = arguments
-                    .next()
-                    .ok_or("--analysis-input-mib needs an input-byte budget")?
-                    .parse()?;
-            }
-            "--c-family-root" => policy.c_family_roots.push(
-                arguments
-                    .next()
-                    .ok_or("--c-family-root needs a relative scope")?,
-            ),
-            "--exclude-source" => policy.exclusions.push(
-                arguments
-                    .next()
-                    .ok_or("--exclude-source needs a relative scope")?,
-            ),
-            "--syntax-language" => {
-                let rule = arguments
-                    .next()
-                    .ok_or("--syntax-language needs SCOPE=c|cpp")?;
-                let (scope, language) = rule
-                    .rsplit_once('=')
-                    .ok_or("--syntax-language needs SCOPE=c|cpp")?;
-                let language = match language {
-                    "c" => FamilyLanguage::C,
-                    "cpp" => FamilyLanguage::Cpp,
-                    _ => return Err("syntax language must be c or cpp".into()),
-                };
-                policy.assignments.push(Assignment {
-                    scope: scope.into(),
-                    language,
-                });
-            }
-            "--help" | "-h" => {
-                print!("{}", include_str!("cli-help.txt"));
-                return Ok(());
-            }
-            _ => return Err(format!("unknown argument: {argument}").into()),
-        }
-    }
-    if once && stdio {
-        return Err("choose either --once or --stdio".into());
-    }
+    let Some(options) = configuration::load(std::env::args().skip(1))? else {
+        print!("{}", include_str!("cli-help.txt"));
+        return Ok(());
+    };
+    let policy = options.policy()?;
+    let configuration::Options {
+        root,
+        cache,
+        workers,
+        port,
+        stdio,
+        once,
+        syntax_cache_mib,
+        analysis_input_mib,
+        source_spool_mib,
+        investigation_file,
+        editor_code,
+        language_servers,
+        ..
+    } = options;
     let mut directory = Directory::with_policy(
         &root.unwrap_or_else(|| PathBuf::from(".")),
         policy,

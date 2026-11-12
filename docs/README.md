@@ -22,6 +22,7 @@ branches together, with shared module labels.
 - [Arrange bubbles, groups and saved tasks](how-to/manage-tasks.md)
 - [Follow saved changes or pin a view](how-to/follow-live-changes.md)
 - [Configure language servers and local dependencies](how-to/configure-language-servers.md)
+- [Save launch settings and reuse VS Code analysis](how-to/configure-vizzi.md)
 - [Browse files and declarations](how-to/browse-source.md)
 - [Review working changes or two Git commits](how-to/review-local-changes.md)
 - [Save source locations and use VS Code](how-to/investigate-with-vscode.md)
@@ -30,6 +31,7 @@ branches together, with shared module labels.
 ## Look something up
 
 - [Command-line options](reference/cli.md)
+- [Configuration files](reference/configuration.md)
 - [Language support and analysis limits](reference/languages.md)
 - [Views, controls and keyboard shortcuts](reference/workspace.md)
 - [Storage and persistence](reference/storage.md)

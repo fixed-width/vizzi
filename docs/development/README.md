@@ -15,6 +15,8 @@ For people extending Vizzi or investigating its implementation. The
 - [Ruby analysis and navigation](../prototype/RUBY.md)
 - [Language-server integration](../visual/LANGUAGE_SERVERS_TECH.md) and
   [detailed Rust call-resolution rules](call-resolution.md)
+- [Launch configuration and editor sharing behaviour](../configuration/PRODUCT.md),
+  [implementation](../configuration/TECH.md) and [VS Code plugin](../../editors/vscode/README.md)
 - [Native host architecture](../prototype/TECH.md), [API](../prototype/API.md),
   [source policy](../prototype/SOURCE_POLICY.md), [comparison architecture](../prototype/COMPARISON_TECH.md)
   and [comparison API](../prototype/COMPARISON_API.md)
@@ -32,6 +34,7 @@ experiments; use DESIGN.md and the current user guides to determine the active s
 - [Ruby validation](../../experiments/languages/RUBY_RESULTS.md)
 - [Browser validation](../../experiments/browser/README.md)
 - [Python/C-family language-server validation](../../experiments/visual/LANGUAGE_SERVER_RESULTS.md)
+- [Configuration, VS Code sharing and VSIX validation](configuration-validation.md)
 - [Reference-repository qualification](../../experiments/qualification/README.md)
 - [Review fixture and walkthrough](../../experiments/review-workflow/README.md)
 - [Keep local build output small](../how-to/keep-build-output-small.md)

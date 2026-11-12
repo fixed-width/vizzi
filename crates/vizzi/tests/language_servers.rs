@@ -116,6 +116,46 @@ fn configuration_is_lazy_and_unconfigured_languages_do_not_use_another_server() 
     );
 }
 
+#[test]
+fn managed_servers_expose_the_shared_catalog_for_admitted_dependency_source() {
+    use vizzi::dependency_sources::Input;
+    let root = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    let dependency = tempfile::tempdir().unwrap();
+    let text = "def leaf(): return 1\n";
+    std::fs::write(dependency.path().join("leaf.py"), text).unwrap();
+    let servers = Servers::new(
+        root.path().into(),
+        cache.path().into(),
+        Configuration {
+            pyright: Some("must-not-start".into()),
+            rust_analyzer: Some("must-not-start".into()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let captured = servers
+        .dependencies()
+        .expect("managed providers expose dependency source")
+        .capture(Input {
+            root: dependency.path().canonicalize().unwrap(),
+            path: "leaf.py".into(),
+            language: "python".into(),
+            package: "fixture".into(),
+            version: None,
+            configuration: "a".repeat(64),
+        })
+        .unwrap();
+    let retained = servers
+        .dependencies()
+        .unwrap()
+        .get(&captured.origin.capture)
+        .unwrap()
+        .unwrap();
+    assert_eq!(retained.doc().resident_source(), Some(text));
+    assert_eq!(retained.doc().path(), "leaf.py");
+}
+
 #[cfg(unix)]
 #[test]
 fn ruby_full_capture_updates_follow_the_document_lifecycle_protocol() {

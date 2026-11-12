@@ -19,6 +19,8 @@ targets run even after a failure so one failing binary cannot hide later failure
 Hosted compiler jobs use two tasks; local contributor and mutation limits remain in
 AGENTS.md. Browser checks use the locked npm development dependencies and installed
 Playwright Chromium.
+The browser job also runs the VS Code plugin's deterministic Node protocol/provider tests.
+The isolated real VS Code extension-host check remains a separate local integration check.
 Optional real-language-server integrations remain opt-in because they need separately
 installed tools and dependency source. Performance/mutation runs remain separate from
 normal correctness CI.

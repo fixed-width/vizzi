@@ -522,14 +522,7 @@ impl Provider for ProjectServer {
         {
             return Err("Reference target identifier differs".into());
         }
-        let offset = if matches!(language(doc), Some("c" | "cpp")) {
-            name.rfind("::operator")
-                .map(|at| at + 2)
-                .or_else(|| name.starts_with("operator").then_some(0))
-                .unwrap_or_else(|| name.rfind("::").map_or(0, |at| at + 2))
-        } else {
-            0
-        };
+        let offset = definitions::reference_offset(language(doc), name);
         self.lookup(
             snapshot.clone(),
             doc,

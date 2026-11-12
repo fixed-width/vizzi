@@ -6,6 +6,15 @@ remains in Git and the project documentation.
 
 ## Unreleased
 
+### Added
+
+- TOML launch settings through `--config FILE`, with command-line overrides, explicit
+  path rules and strict validation.
+- A development VS Code plugin and `--vscode-connection` option to share editor definition
+  and reference providers without launching duplicate Vizzi-managed language servers.
+  Shared analysis checks saved/captured source and reports unavailable analysis on
+  dirty buffers or disconnect; managed-server fallback is never automatic.
+
 ## 0.1.1 - 2026-11-11
 
 ### Fixed

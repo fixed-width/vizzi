@@ -3,6 +3,9 @@ Vizzi - visual codebase inspection.
 Usage: vizzi [--root DIR] [--cache DIR] [OPTIONS]
 
 Paths and server:
+  --config FILE
+      Load TOML launch settings. Explicit flags override file values.
+      File paths are relative to the config directory; source scopes to --root.
   --root DIR
       Directory to inspect [default: current directory].
   --cache DIR
@@ -27,6 +30,10 @@ Source selection:
 
 Language servers (optional; disabled until configured):
   Use executable names or paths, without shell arguments.
+
+  --vscode-connection FILE
+      Reuse providers through the Vizzi VS Code plugin's connection file.
+      Cannot be combined with managed-server options. Never spawns a fallback server.
 
   --rust-analyzer EXECUTABLE
       Enable Rust definitions and references using rust-analyzer.
