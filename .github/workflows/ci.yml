@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_BUILD_JOBS: '2'
+  RUST_TEST_THREADS: '1'
+  CARGO_TERM_COLOR: always
+
+jobs:
+  native:
+    name: Native checks (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-26]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install stable Rust
+        run: |
+          rustup toolchain install stable --profile minimal --component rustfmt --component clippy
+          rustup default stable
+          rustc --version --verbose
+      - uses: Swatinem/rust-cache@v2.9.3
+        with:
+          save-if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+      - name: Formatting, tests, doctests and Clippy
+        run: bash scripts/ci/check-native.sh
+
+  browser:
+    name: Browser and tutorials
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install stable Rust
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+      - uses: Swatinem/rust-cache@v2.9.3
+        with:
+          save-if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: '26'
+          cache: npm
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.x'
+      - uses: ruby/setup-ruby@v1.338.0
+        with:
+          ruby-version: ruby
+      - run: npm ci
+      - run: node_modules/.bin/playwright install --with-deps chromium
+      - run: cargo build --locked --release -p vizzi
+      - run: npm test -- --no-build
+      - run: node_modules/node/bin/node experiments/browser/documentation.test.mjs --no-build
+      - name: Release helper checks
+        run: python3 -m unittest discover -s scripts/release -p 'test_*.py'

@@ -26,6 +26,9 @@ experiments; use DESIGN.md and the current user guides to determine the active s
 
 ## Verification and research
 
+- [CI, action locking and release protections](ci.md)
+- [Publish a release](../how-to/release.md)
+
 - [Ruby validation](../../experiments/languages/RUBY_RESULTS.md)
 - [Browser validation](../../experiments/browser/README.md)
 - [Python/C-family language-server validation](../../experiments/visual/LANGUAGE_SERVER_RESULTS.md)

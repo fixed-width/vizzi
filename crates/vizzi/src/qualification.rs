@@ -18,6 +18,7 @@ use vizzi_core::{
     policy::PolicyConfig,
     python::PythonAdapter,
     query::{View, ViewQuery},
+    ruby::RubyAdapter,
     rust::RustAdapter,
 };
 
@@ -178,6 +179,7 @@ fn qualify(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Error>
     let inner: Vec<Arc<dyn LanguageAdapter>> = vec![
         Arc::new(RustAdapter),
         Arc::new(PythonAdapter),
+        Arc::new(RubyAdapter),
         Arc::new(CAdapter),
         Arc::new(CppAdapter),
     ];

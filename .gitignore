@@ -5,3 +5,6 @@
 /experiments/browser/results/local/
 /.stryker-tmp/
 /experiments/companion/results/local/
+
+/dist/
+__pycache__/

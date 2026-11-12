@@ -36,17 +36,20 @@ user-visible changes. Verify runnable examples and interface labels when they ch
 Keep the root README focused on the product and a first run. It is not a progress log,
 release plan or experiment index.
 
-The tutorial check exercises both languages, task restoration and saved-note persistence:
+The tutorial check exercises all four languages, task restoration and saved-note persistence:
 
 ```sh
 CARGO_BUILD_JOBS=1 RUST_TEST_THREADS=1 nice -n 10 \
   node experiments/browser/documentation.test.mjs
 ```
 
-It explicitly runs the toy examples and needs the browser-test dependencies, Python 3
-and Rust. Vizzi itself does not build or execute the inspected project. Add `--with-rust-analyzer` to
+It explicitly runs the toy examples and needs the browser-test dependencies, Python 3,
+Ruby, C/C++ compilers and Rust. Vizzi itself does not build or execute the inspected project. Add `--with-rust-analyzer` to
 check the optional provider when its prerequisites are installed. `--update-images`
 refreshes the README screenshot; without it, the check writes only temporary artifacts.
+
+The [CI reference](docs/development/ci.md) describes hosted checks, action locking and
+release targets; [publishing a release](docs/how-to/release.md) is a maintainer procedure.
 
 The [contributor documentation](docs/development/README.md) indexes feature contracts,
 historical investigations and validation procedures. Those records remain separate from

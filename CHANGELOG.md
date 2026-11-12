@@ -8,6 +8,9 @@ remains in Git and the project documentation.
 
 ### Added
 
+- CI workflows for native/browser checks and immutable Linux/macOS release archives
+  on x86-64 and ARM64, with checksums and locked GitHub Actions dependencies.
+
 - A Ruby call-trail tutorial with an included greeting example, module cues and
   saved-task walkthrough.
 - Ruby source browsing, colouring, reflow, module cues and call navigation, including
