@@ -8,6 +8,12 @@ its Cargo-specific adapter. Python, Ruby and C-family profiles use a shared capt
 mirror and lookup implementation. Executables are chosen by native launch configuration,
 never browser input.
 
+An optional native connection file selects `editor_bridge::Bridge` behind the same
+Provider interface for all supported languages. Managed options are then rejected before
+startup. The [configuration contract](../configuration/TECH.md) defines transport,
+ownership, source checks and the VS Code plugin. The remainder of this document covers
+Vizzi-managed servers and their captured mirrors.
+
 The stdio client separates initialization options, configuration-section values, process
 arguments and readiness. Rust uses its quiescence notification; standard servers do not
 wait for a Rust-specific event. Framing, response correlation, UTF-16 conversion, deadlines,

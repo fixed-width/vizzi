@@ -101,6 +101,16 @@ pub fn byte_offset(text: &str, position: Position) -> Result<usize, String> {
     }
 }
 
+pub(crate) fn reference_offset(language: Option<&str>, name: &str) -> usize {
+    if !matches!(language, Some("c" | "cpp")) {
+        return 0;
+    }
+    name.rfind("::operator")
+        .map(|at| at + 2)
+        .or_else(|| name.starts_with("operator").then_some(0))
+        .unwrap_or_else(|| name.rfind("::").map_or(0, |at| at + 2))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

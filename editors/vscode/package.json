@@ -1,0 +1,20 @@
+{
+  "name": "vizzi",
+  "displayName": "Vizzi",
+  "description": "Share VS Code language providers with the Vizzi visual workspace.",
+  "version": "0.1.0",
+  "publisher": "vizzi",
+  "license": "Apache-2.0",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Other"],
+  "main": "./extension.cjs",
+  "extensionKind": ["workspace"],
+  "capabilities": { "untrustedWorkspaces": { "supported": false }, "virtualWorkspaces": { "supported": false } },
+  "contributes": {
+    "commands": [
+      { "command": "vizzi.shareLanguageProviders", "title": "Vizzi: Share Language Providers" },
+      { "command": "vizzi.stopSharing", "title": "Vizzi: Stop Sharing Language Providers" }
+    ]
+  },
+  "scripts": { "test": "node --test bridge.test.cjs providers.test.cjs" }
+}

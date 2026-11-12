@@ -67,6 +67,12 @@ uses configured language servers for supported languages: rust-analyzer, Pyright
 and clangd share captured-source result checks and an editor-neutral definition/reference
 interface. Name matching remains an explicit fallback. See [language servers](docs/visual/LANGUAGE_SERVERS_TECH.md). Language-specific
 findings should retain their meaning when presented through shared views.
+Native launch settings can come from an explicitly selected TOML file. Semantic analysis
+can use Vizzi-managed captured-source servers or editor-owned providers through a local
+connection. The first VS Code plugin supplies shared definitions/references; further
+editor plugins can extend the same editor-neutral provider seam. Shared editor analysis
+requires matching saved source and does not claim a frozen editor environment. See
+[configuration and editor sharing](docs/configuration/TECH.md).
 Local dependency source uses independent, bounded captures admitted by language providers.
 Discovery stays language-specific; repository snapshots and watchers retain their scope.
 See [dependency source](docs/visual/DEPENDENCIES_TECH.md).

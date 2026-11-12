@@ -7,6 +7,7 @@ pub mod cache;
 pub mod changes;
 pub mod companion;
 pub mod editor;
+mod editor_bridge;
 pub mod engine;
 pub mod host;
 mod invalidation;

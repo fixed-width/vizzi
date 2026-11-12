@@ -15,7 +15,7 @@ Unique admitted targets open directly; ambiguous results retain a choice. Unavai
 servers, project context or source retain clear fallback evidence. Semantic definitions
 are static analysis, not observed runtime dispatch.
 
-Providers analyse a private mirror of captured source. Initialization, configuration
+Vizzi-managed providers analyse a private mirror of captured source. Initialization, configuration
 sections, language IDs, arguments and readiness differ by server; JSON-RPC framing,
 position conversion, result limits and read-only requests are shared. A Python environment
 can be selected explicitly. Clangd uses captured compilation commands rather than running
@@ -32,3 +32,8 @@ method names, aliases, references used as values, UTF-16 positions, mixed langua
 configuration changes, incremental source sync, missing servers, external source and late
 replies. C/C++ call extraction must preserve exact written identifiers and source ownership.
 Keep worker limits, mutation testing and performance checks consistent with AGENTS.md.
+
+The optional [editor-sharing mode](../configuration/PRODUCT.md) reuses VS Code providers
+without starting or owning another language server. It verifies saved/captured source,
+rejects dirty buffers and admits repository-local results. Its live editor context and
+dependency limitations remain distinct from the managed captured-source providers.

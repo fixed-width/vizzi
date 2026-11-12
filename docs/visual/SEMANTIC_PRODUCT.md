@@ -18,13 +18,13 @@ The existing source-local rule is a fast path, not a substitute for that analysi
 - The Rust provider uses rust-analyzer through standard LSP behind an editor-neutral native
   definition interface. It is explicitly enabled at host startup. Basic browsing works
   without it. No automatic editor launch, repository builds or procedural-macro execution.
-- Lookups use a private source mirror from captured documents and frozen project inputs.
+- Vizzi-managed lookups use a private source mirror from captured documents and frozen project inputs.
   Changes/configuration are checked before results are returned; target locations must map
   to admitted, version-bound native symbols. A working-tree pathname alone is insufficient.
 - Opening a function may prepare its analysis in the background using one recognizable
   captured call. Preparation never opens a destination or supplies a cached navigation
   result. A foreground selection waits and requests a fresh definition.
-- One low-priority server/worker handles lookups. Sessions stay warm and synchronize changed
+- One low-priority managed server/worker handles lookups. Sessions stay warm and synchronize changed
   captures; ordinary source indexing does not wait for semantic navigation.
 
 [Python and C-family providers](LANGUAGE_SERVERS_PRODUCT.md) extend the same semantic

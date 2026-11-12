@@ -10,6 +10,7 @@ For users checking what will remain after navigation, reload or a server restart
 | Captured source and pinned views | Native retained source/session data | Older captures can expire; pinning is not permanent storage |
 | Active review comparison | Running server | Not persisted across server restart |
 | Analysis cache and semantic working data | Platform workspace cache, or `--cache` override | Derived data, separate from saved-location state |
+| VS Code bridge connection | VS Code extension global storage | Local session credential and endpoint; sharing republishes it and stopping closes the connection |
 
 An origin includes scheme, hostname and port. `127.0.0.1:7474`, `localhost:7474` and
 `127.0.0.1:7475` have different browser storage. Returning to a visual task therefore

@@ -17,6 +17,7 @@ and launch examples without starting the server or creating cache data.
 
 | Option | Default | Meaning |
 | --- | --- | --- |
+| `--config FILE` | None | Load TOML launch settings. CLI values override file values; source-rule lists append. See [configuration files](configuration.md). |
 | `--root DIR` | Current directory | Directory to inspect, without searching parent directories for a repository. Git review uses a repository root; Rust semantic navigation uses a Cargo project/workspace. |
 | `--cache DIR` | Platform user cache, scoped to the source root | Override the cache directory. Must be outside the inspected root, including through symlinks. See [cache locations](storage.md#cache-location). |
 | `--workers N` | `4` | Shared analysis worker count, from 1 to 32. User guides use 1. |
@@ -24,6 +25,7 @@ and launch examples without starting the server or creating cache data.
 | `--investigation-file FILE` | None | Persist saved locations, notes and reader connections. Must be outside both root and cache. Does not persist visual task layouts or review captures. |
 | `--editor-code EXECUTABLE` | `code` | VS Code launcher path/name. This accepts an executable, not an executable plus shell arguments. |
 | `--rust-analyzer EXECUTABLE` | Disabled | Optional Rust definition/reference provider. Dependencies and toolchains must already be available locally. |
+| `--vscode-connection FILE` | Disabled | Reuse providers through the Vizzi VS Code plugin. Cannot be combined with managed-server/project options; no managed fallback on disconnect. |
 | `--pyright EXECUTABLE` | Disabled | Pyright-compatible Python stdio language server. |
 | `--ruby-lsp EXECUTABLE` | Disabled | Installed Ruby LSP executable. Uses a private bundle configuration and local gems; project add-ons are disabled. |
 | `--python-path INTERPRETER` | Server default | Python interpreter/environment; requires `--pyright`. |
@@ -32,6 +34,8 @@ and launch examples without starting the server or creating cache data.
 | `--help`, `-h` | — | Print usage and exit. |
 
 Relative root/cache overrides resolve against the process's current directory.
+Paths supplied by a config file resolve against its directory; source scopes still use
+the selected root. `--help` does not open the file.
 
 ## Source selection
 

@@ -5,6 +5,10 @@ than written-name candidates. Vizzi supports rust-analyzer for Rust, Pyright for
 Ruby LSP for Ruby, and clangd for C/C++. Several can be configured in one mixed-language workspace.
 Basic syntax browsing remains available without them.
 
+To save these settings in TOML or reuse VS Code's existing providers, see
+[save launch settings](configure-vizzi.md). The commands below configure Vizzi-managed
+servers, each with its own captured-source mirror.
+
 ## Python with Pyright
 
 Install Pyright outside Vizzi using its [installation instructions](https://github.com/microsoft/pyright#installation).

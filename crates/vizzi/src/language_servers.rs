@@ -13,8 +13,11 @@ mod project;
 mod ruby;
 
 /// Explicit native tool configuration; no executable is accepted from browser requests.
-#[derive(Default)]
+#[derive(Default, serde::Deserialize)]
+#[serde(default, deny_unknown_fields, rename_all = "kebab-case")]
 pub struct Configuration {
+    /// VS Code plugin connection file; mutually exclusive with managed servers.
+    pub vscode_connection: Option<PathBuf>,
     /// Optional Rust language-server executable.
     pub rust_analyzer: Option<PathBuf>,
     /// Optional Pyright-compatible stdio language-server executable.
@@ -26,12 +29,34 @@ pub struct Configuration {
     /// Optional interpreter/environment used by the Python server.
     pub python_path: Option<PathBuf>,
     /// Optional compilation database, otherwise root/compile_commands.json.
+    #[serde(rename = "compile-commands")]
     pub compilation_database: Option<PathBuf>,
 }
 impl Configuration {
+    /// Validates language-server ownership and dependent project options.
+    pub fn validate(&self) -> Result<(), String> {
+        if self.vscode_connection.is_some()
+            && (self.rust_analyzer.is_some()
+                || self.pyright.is_some()
+                || self.ruby_lsp.is_some()
+                || self.clangd.is_some()
+                || self.python_path.is_some()
+                || self.compilation_database.is_some())
+        {
+            return Err("--vscode-connection cannot be combined with Vizzi-managed language servers or their project options".into());
+        }
+        if self.python_path.is_some() && self.pyright.is_none() {
+            return Err("--python-path requires --pyright".into());
+        }
+        if self.compilation_database.is_some() && self.clangd.is_none() {
+            return Err("--compile-commands requires --clangd".into());
+        }
+        Ok(())
+    }
     /// Whether no semantic language server has been selected.
     pub fn is_empty(&self) -> bool {
-        self.rust_analyzer.is_none()
+        self.vscode_connection.is_none()
+            && self.rust_analyzer.is_none()
             && self.pyright.is_none()
             && self.clangd.is_none()
             && self.ruby_lsp.is_none()
@@ -50,14 +75,17 @@ impl Servers {
         cache: PathBuf,
         configuration: Configuration,
     ) -> Result<Self, String> {
-        if configuration.python_path.is_some() && configuration.pyright.is_none() {
-            return Err("--python-path requires --pyright".into());
-        }
-        if configuration.compilation_database.is_some() && configuration.clangd.is_none() {
-            return Err("--compile-commands requires --clangd".into());
-        }
+        configuration.validate()?;
         let sources = Arc::new(Catalog::new(cache.join("dependency-references.json")));
         let mut providers: BTreeMap<&'static str, Arc<dyn Provider>> = BTreeMap::new();
+        if let Some(connection) = configuration.vscode_connection {
+            let provider: Arc<dyn Provider> =
+                Arc::new(crate::editor_bridge::Bridge::new(root, connection));
+            for language in ["rust", "python", "ruby", "c", "cpp"] {
+                providers.insert(language, provider.clone());
+            }
+            return Ok(Self { providers, sources });
+        }
         if let Some(executable) = configuration.rust_analyzer {
             providers.insert(
                 "rust",
