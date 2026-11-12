@@ -51,8 +51,9 @@ your `PATH`. Rebuild it after updating the checkout; it does not update itself.
 
 ## Make a first run
 
-The [Python](../tutorials/python-call-trail.md), [Rust](../tutorials/rust-call-trail.md)
-and [C/C++](../tutorials/cpp-call-trail.md) call-trail lessons use included examples.
+The [Python](../tutorials/python-call-trail.md), [Rust](../tutorials/rust-call-trail.md),
+[Ruby](../tutorials/ruby-call-trail.md) and [C/C++](../tutorials/cpp-call-trail.md)
+call-trail lessons use included examples.
 To inspect existing code, [run Vizzi on your project](run-workspace.md).
 
 Language servers are optional for basic browsing. [Configure semantic navigation](configure-language-servers.md)

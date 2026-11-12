@@ -45,8 +45,8 @@ The standalone outline tests use real Chromium without the native host; an integ
 fixture also checks 50,000 declarations through the actual HTTP/source-selection path.
 
 Run `node experiments/browser/documentation.test.mjs --no-build` after rebuilding Vizzi
-to check the Python, Rust and C/C++ tutorial workflows. This contributor check uses
-`python3`, `rustc`, `cc` and `c++` to verify the included programs, then follows calls,
+to check the Python, Rust, Ruby and C/C++ tutorial workflows. This contributor check uses
+`python3`, `rustc`, `ruby`, `cc` and `c++` to verify the included programs, then follows calls,
 groups bubbles and restores saved tasks in Chromium. Users do not need to compile the
 example programs to follow the tutorials. Desktop editor handoff is disabled in the check.
 

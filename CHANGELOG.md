@@ -8,6 +8,8 @@ remains in Git and the project documentation.
 
 ### Added
 
+- A Ruby call-trail tutorial with an included greeting example, module cues and
+  saved-task walkthrough.
 - Ruby source browsing, colouring, reflow, module cues and call navigation, including
   bare calls and punctuation method names. Optional `--ruby-lsp` integration supplies
   captured-source definitions, checked references and local dependency source without

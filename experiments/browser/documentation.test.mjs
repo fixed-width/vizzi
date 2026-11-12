@@ -7,7 +7,7 @@ if(!process.argv.includes('--no-build'))buildHost();
 const project=resolve('.');
 const chrome=await browser({desktopBus:false}),reports=[];
 try{
- for(const kind of ['python','rust','cpp']){
+ for(const kind of ['python','rust','ruby','cpp']){
   const cpp=kind==='cpp',callerName=cpp?'process_sample':'greet',firstName=cpp?'prepare_sample':'prepare_name',branchName=cpp?'apply_gain':'message';
   const names=cpp?['process_sample','prepare_sample','clamp_sample','apply_gain']:['greet','prepare_name','message'];
   const group=cpp?'Signal path':'Greeting',task=cpp?'Read sample processing':'Read the greeting';
@@ -15,6 +15,7 @@ try{
   const input=await workspace({source,name:kind+'-tutorial'});let host,page;if(cpp)input.sourceArguments.push('--c-family-root','.');if(kind==='python')input.sourceArguments.push('--investigation-file',join(dirname(input.cache),'state','locations.json'));
   try{
    if(kind==='python')assert.equal(execFileSync('python3',[join(input.root,'greeting.py')],{encoding:'utf8'}).trim(),'Hello, Ada!');
+   else if(kind==='ruby')assert.equal(execFileSync('ruby',[join(input.root,'greeting.rb')],{encoding:'utf8'}).trim(),'Hello, Ada!');
    else if(kind==='rust'){
     const driver=join(input.cache,'check.rs');await mkdir(input.cache,{recursive:true});
     await writeFile(driver,`#[path = ${JSON.stringify(join(input.root,'src/lib.rs'))}] mod lesson;\nfn main(){assert_eq!(lesson::Greeter.greet("  Ada  "), "Hello, Ada!");}\n`);
@@ -28,12 +29,13 @@ try{
    }
    host=await startHost(input,1);page=await chrome.newPage({viewport:{width:1440,height:900},colorScheme:'light'});page.setDefaultTimeout(10000);
    const errors=[];page.on('pageerror',error=>errors.push(error.message));await page.goto(host.url);await page.waitForFunction(()=>document.querySelector('#visual-source-status').textContent.includes('ready'));
-   await page.getByRole('button',{name:'Add bubble',exact:true}).click();await page.getByLabel('Find a function',{exact:true}).fill(kind==='rust'?'Greeter::greet':callerName);await page.getByRole('button',{name:'Find functions',exact:true}).click();await page.locator(`[data-add-symbol][data-name="${callerName}"]`).click();
+   await page.getByRole('button',{name:'Add bubble',exact:true}).click();await page.getByLabel('Find a function',{exact:true}).fill(kind==='rust'?'Greeter::greet':kind==='ruby'?'Greetings::Greeter#greet':callerName);await page.getByRole('button',{name:'Find functions',exact:true}).click();await page.locator(`[data-add-symbol][data-name="${callerName}"]`).click();
    const caller=page.locator(`[data-view][data-name="${callerName}"]`);await caller.locator('.code-line').first().waitFor();
    await caller.getByRole('button',{name:`Actions for ${firstName}`,exact:true}).click();await page.getByRole('menuitem',{name:'Open definition',exact:false}).click();await page.locator(`[data-view][data-name="${firstName}"] .code-line`).first().waitFor();
    if(cpp){await page.locator('[data-view][data-name="prepare_sample"]').getByRole('button',{name:'Actions for clamp_sample',exact:true}).click({modifiers:['Control']});await page.locator('[data-view][data-name="clamp_sample"] .code-line').first().waitFor();await page.getByRole('button',{name:'Fit workspace',exact:true}).click();}
    await caller.getByRole('button',{name:`Actions for ${branchName}`,exact:true}).click({modifiers:['Control']});await page.locator(`[data-view][data-name="${branchName}"] .code-line`).first().waitFor();
    assert.equal(await page.locator('[data-view]').count(),names.length);assert.equal(await page.locator('#workspace-links .link-stroke').count(),names.length-1);assert.equal(await page.locator('#destination-stack').isVisible(),false);
+   if(kind==='ruby')for(const name of names)assert.equal(await page.locator(`[data-view][data-name="${name}"] .module-tag`).textContent(),'Greetings');
    await page.getByRole('button',{name:'Fit workspace',exact:true}).click();
    for(const name of names)await page.locator(`[data-view][data-name="${name}"]`).getByRole('button',{name:'Fit height',exact:true}).click();
    const message=page.locator(`[data-view][data-name="${branchName}"] .fragment-header`);await message.focus();for(let n=0;n<12;n++)await page.keyboard.press('ArrowUp');

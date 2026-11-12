@@ -13,6 +13,8 @@ keeps earlier functions visible while you follow a call or explore a branch.
 Prefer another language? [Follow a Rust call trail](tutorials/rust-call-trail.md) uses a
 small Cargo project. [Follow a C/C++ call trail](tutorials/cpp-call-trail.md) walks from
 a C++ function into C helpers and opens a branch alongside them.
+[Follow a Ruby call trail](tutorials/ruby-call-trail.md) keeps a method and two helper
+branches together, with shared module labels.
 
 ## Complete a task
 

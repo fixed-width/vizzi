@@ -36,7 +36,8 @@ For semantic navigation on a real project, [configure its language server](docs/
 `--ruby-lsp ruby-lsp` for Ruby, or `--clangd clangd` with C/C++ compilation context.
 
 For a guided first run, follow a [Python](docs/tutorials/python-call-trail.md),
-[Rust](docs/tutorials/rust-call-trail.md) or [C/C++](docs/tutorials/cpp-call-trail.md)
+[Rust](docs/tutorials/rust-call-trail.md), [Ruby](docs/tutorials/ruby-call-trail.md)
+or [C/C++](docs/tutorials/cpp-call-trail.md)
 call trail using the included examples. No project build, language server or editor
 integration is required for these lessons.
 
