@@ -1,8 +1,6 @@
 # Vizzi
 
-Vizzi helps you follow a call chain without losing the code you came from. Open functions
-as connected source bubbles, keep earlier steps and branches in view, and return to the
-same arrangement when you pick up a task again.
+Vizzi helps you visualize your code, follow a call chain without losing the code you came from, and assist reviews. 
 
 It runs locally beside your editor. Source exploration is read-only; editing, refactoring
 and debugging stay in the editor.
