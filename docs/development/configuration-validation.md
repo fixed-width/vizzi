@@ -2,8 +2,9 @@
 
 Contributor evidence for the [configuration contract](../configuration/PRODUCT.md)
 and [editor protocol](../configuration/BRIDGE.md), recorded on 2026-11-12. Implementation
-started from `3cc0677d1f06ee043354e087268d2acb9bacf3b2`. This record describes local
-Linux verification and does not qualify other operating systems or every language extension.
+started from `3cc0677d1f06ee043354e087268d2acb9bacf3b2`. Real editor/VSIX integration
+was qualified locally on Linux; hosted native checks are recorded in the CI follow-up.
+These checks do not qualify every installed language extension.
 
 ## Correctness and packaging
 
@@ -61,3 +62,26 @@ survivors were caught on rerun; unviable candidates remain compiler evidence onl
 No optimized benchmark or process-memory comparison was performed. Avoiding a second
 Vizzi-managed server follows the selected ownership path; this run does not quantify
 RSS savings or qualify an editor's full transitive configuration/dependency environment.
+
+## CI follow-up
+
+The first hosted run for PR #3, [43290165792](https://github.com/fixed-width/vizzi/actions/runs/43290165792),
+exposed two differences from the initial local Rust 1.99.1 checks:
+
+- The macOS test peer inherited nonblocking IO from its listener. Three large-transfer
+  regressions failed immediately with `WouldBlock`. Explicitly setting the accepted
+  stream to nonblocking mode reproduced the same failure on Linux; the fixture now
+  explicitly restores blocking IO before its timed reads and writes. All fifteen
+  editor-bridge tests pass locally after the correction.
+- Hosted stable Rust updated to 1.100.0. Its Clippy flags the final cancellation guard
+  in `SourceSpool::write_range` as `needless_bool`; `Ok(!cancelled())` preserves the
+  single cancellation check and its result without suppressing the lint.
+
+Rust 1.100.0 was installed in temporary toolchain directories without changing the
+maintainer's default compiler. The full native presubmit passed with that compiler:
+757 tests passed, 15 were explicitly ignored, and formatting and Clippy passed. A
+focused mutation deleting the final cancellation negation was caught by existing spool
+tests after a passing baseline: one candidate, one caught, zero survivors, unviable
+builds or timeouts. This focused check does not establish whole-spool mutation coverage.
+
+Hosted Linux/macOS confirmation is available in the [PR checks](https://github.com/fixed-width/vizzi/pull/3/checks).

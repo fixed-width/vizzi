@@ -390,10 +390,7 @@ impl SourceSpool {
             }
             at += count;
         }
-        if cancelled() {
-            return Ok(false);
-        }
-        Ok(true)
+        Ok(!cancelled())
     }
     /// Cleans at most both files once, without holding allocation state during physical IO.
     /// Failure retains the old disk charge for retry; captures can use the other file.

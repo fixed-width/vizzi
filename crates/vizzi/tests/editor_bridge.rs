@@ -115,6 +115,8 @@ impl Peer {
                     Err(error) => panic!("{error}"),
                 }
             };
+            // The peer uses blocking IO regardless of the listener's mode.
+            socket.set_nonblocking(false).unwrap();
             socket
                 .set_read_timeout(Some(Duration::from_secs(3)))
                 .unwrap();
