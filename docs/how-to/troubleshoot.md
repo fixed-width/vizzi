@@ -30,7 +30,7 @@ Return to the original address to recover its saved tasks.
 
 ## Source is ready but a file or function is missing
 
-Check the root and [language coverage](../reference/languages.md). Rust/Python are
+Check the root and [language coverage](../reference/languages.md). Rust/Python/Ruby are
 selected by default; C/C++ needs explicit scopes. Exclusions, unsupported extensions,
 source-file symlinks, parser recovery and deferred analysis can remove or limit results.
 Macro-generated functions may not have a captured declaration to open.

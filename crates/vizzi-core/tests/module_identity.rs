@@ -5,6 +5,7 @@ use vizzi_core::{
     model::{CapturePolicyId, Document, Snapshot, WorkspaceId},
     policy::{Classification, PolicyConfig, Provenance, SourceOnlyReason, SourcePolicy},
     python::PythonAdapter,
+    ruby::RubyAdapter,
     rust::RustAdapter,
     structure::Structure,
 };
@@ -12,6 +13,7 @@ fn snapshot(files: &[(&str, &str)]) -> Snapshot {
     let workspace = WorkspaceId::derive(&[b"module-fixture"]);
     let mut rust = RustAdapter.create().unwrap();
     let mut python = PythonAdapter.create().unwrap();
+    let mut ruby = RubyAdapter.create().unwrap();
     let documents = files
         .iter()
         .map(|(path, text)| {
@@ -32,6 +34,16 @@ fn snapshot(files: &[(&str, &str)]) -> Snapshot {
                         language: "python".into(),
                         provenance: Provenance::Extension {
                             extension: "py".into(),
+                        },
+                    },
+                )
+            } else if path.ends_with(".rb") {
+                (
+                    vec![ruby.analyze(text.as_bytes()).unwrap()],
+                    Classification::Assigned {
+                        language: "ruby".into(),
+                        provenance: Provenance::Extension {
+                            extension: "rb".into(),
                         },
                     },
                 )
@@ -72,6 +84,50 @@ fn module(index: &Structure, name: &str) -> vizzi_core::modules::Module {
         .symbol
         .module
         .expect(name)
+}
+#[test]
+fn ruby_reopened_modules_share_identity_without_guessing_from_filenames_or_classes() {
+    let source = snapshot(&[
+        (
+            "one.rb",
+            "module Audio; class Meter; def process; end; end; end",
+        ),
+        ("other.rb", "module Audio; def self.render; end; end"),
+        (
+            "nested.rb",
+            "module Audio; module FX; def filter; end; end; end",
+        ),
+        ("plain.rb", "class Plain; def plain; end; end"),
+        (
+            "class_module.rb",
+            "class Rack; module Nested; def inside_class; end; end; end",
+        ),
+    ]);
+    let index = Structure::new(&source);
+    let a = module(&index, "process");
+    assert_eq!(
+        index
+            .functions("", "Audio::Meter#process", 0)
+            .unwrap()
+            .items
+            .len(),
+        1
+    );
+    let b = module(&index, "render");
+    let nested = module(&index, "filter");
+    assert_eq!(a.id, b.id);
+    assert_eq!(a.label, "Audio");
+    assert_eq!(a.root, "Audio");
+    assert_eq!(a.language, "ruby");
+    assert_eq!(nested.label, "Audio::FX");
+    assert_eq!(module(&index, "inside_class").label, "Rack::Nested");
+    assert_ne!(a.id, nested.id);
+    assert!(
+        index.functions("plain.rb", "plain", 0).unwrap().items[0]
+            .symbol
+            .module
+            .is_none()
+    );
 }
 #[test]
 fn rust_types_share_their_actual_module_and_inline_scopes_remain_distinct() {

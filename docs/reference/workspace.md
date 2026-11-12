@@ -37,8 +37,8 @@ structural view remains a contributor prototype, not the main reading workflow.
 | Editor | Verify and hand off a current source location to VS Code |
 
 Function lookup accepts names and supported qualified forms, including `Type::method`,
-`Type.method`, `Type method` and `Type/method`. It ignores case. Exact function names
-rank before partial matches; qualified names and paths narrow the results.
+`Type.method`, `Type#method`, `Type method` and `Type/method`. It ignores case.
+Exact function names rank before partial matches; qualified names and paths narrow the results.
 
 Settings contains Theme everywhere. Code layout and Module outlines are call-workspace
 settings. Source reflow preserves source line numbers; copying fully captured rows

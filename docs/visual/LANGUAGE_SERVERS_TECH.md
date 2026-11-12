@@ -4,7 +4,7 @@ Contributor reference for [the behaviour contract](LANGUAGE_SERVERS_PRODUCT.md).
 
 `definitions::Provider` remains the definition/reference seam. `language_servers::Servers`
 routes by native captured language and owns the shared dependency catalog. Rust retains
-its Cargo-specific adapter. Python and C-family profiles use a shared captured-project
+its Cargo-specific adapter. Python, Ruby and C-family profiles use a shared captured-project
 mirror and lookup implementation. Executables are chosen by native launch configuration,
 never browser input.
 
@@ -15,8 +15,11 @@ result bounds and refusal of edit/execute requests stay shared.
 
 Project mirrors are bounded and reuse unchanged documents. didOpen carries the actual
 language ID; changed/deleted captures use change/close and filesystem notifications.
-Versioned diagnostic acknowledgements gate lookups after document changes, so a cached
-position cannot be paired with a newer declaration tree. Project-input digests
+Python/C-family versioned diagnostic acknowledgements gate changed-document lookups.
+Ruby LSP uses its indexing progress, full-capture reopen and an ordered document-symbol
+request; this avoids sending unsupported un-ranged changes to its incremental-only API.
+Ruby reference locations are checked against unique definitions and declarations are
+excluded. Ruby bodies take precedence over accompanying RBS signatures. Project-input digests
 include the provider profile and frozen metadata. Python JSONC/TOML settings and inherited
 configuration preserve project/source and environment paths through translation. Clangd
 receives a translated database/flags file; compilation commands are data, not shell execution.

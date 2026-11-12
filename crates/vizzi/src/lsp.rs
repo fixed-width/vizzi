@@ -126,6 +126,8 @@ pub(crate) struct Client {
     options: Value,
     initialization: Value,
     status_notifications: bool,
+    progress_token: Option<String>,
+    pub(crate) reopen_document_sync: bool,
     diagnostics: BTreeMap<String, i32>,
     ready: bool,
     pub version: String,
@@ -135,6 +137,9 @@ pub(crate) struct Setup {
     pub initialization: Value,
     pub configuration: Value,
     pub status_notifications: bool,
+    pub progress_token: Option<String>,
+    pub reopen_document_sync: bool,
+    pub environment: Vec<(std::ffi::OsString, Option<std::ffi::OsString>)>,
 }
 impl Client {
     pub(crate) fn start(executable: &Path, root: &Path) -> Result<Self, String> {
@@ -147,6 +152,9 @@ impl Client {
                 initialization: options.clone(),
                 configuration: json!({"rust-analyzer":options}),
                 status_notifications: true,
+                progress_token: None,
+                reopen_document_sync: false,
+                environment: vec![],
             },
         )
     }
@@ -165,6 +173,13 @@ impl Client {
         } else {
             Command::new(&executable)
         };
+        for (name, value) in &setup.environment {
+            if let Some(value) = value {
+                command.env(name, value);
+            } else {
+                command.env_remove(name);
+            }
+        }
         let mut child = command
             .args(&setup.arguments)
             .current_dir(root)
@@ -213,6 +228,7 @@ impl Client {
                 }
             }
         });
+        let ready = !setup.status_notifications && setup.progress_token.is_none();
         let mut client = Self {
             child,
             input,
@@ -222,11 +238,13 @@ impl Client {
             options: setup.configuration,
             initialization: setup.initialization,
             status_notifications: setup.status_notifications,
+            progress_token: setup.progress_token,
+            reopen_document_sync: setup.reopen_document_sync,
             diagnostics: BTreeMap::new(),
-            ready: !setup.status_notifications,
+            ready,
             version: String::new(),
         };
-        let result=client.request("initialize",json!({"processId":null,"rootUri":uri(root)?,"workspaceFolders":[{"uri":uri(root)?,"name":"captured source"}],"capabilities":{"general":{"positionEncodings":["utf-16"]},"textDocument":{"definition":{"linkSupport":true},"references":{},"publishDiagnostics":{"versionSupport":true}},"experimental":{"serverStatusNotification":client.status_notifications},"workspace":{"configuration":true}},"initializationOptions":client.initialization}),Duration::from_secs(20))?;
+        let result=client.request("initialize",json!({"processId":null,"rootUri":uri(root)?,"workspaceFolders":[{"uri":uri(root)?,"name":"captured source"}],"capabilities":{"general":{"positionEncodings":["utf-16"]},"textDocument":{"definition":{"linkSupport":true},"references":{},"publishDiagnostics":{"versionSupport":true}},"window":{"workDoneProgress":client.progress_token.is_some()},"experimental":{"serverStatusNotification":client.status_notifications},"workspace":{"configuration":true}},"initializationOptions":client.initialization}),Duration::from_secs(20))?;
         if !result["capabilities"]["definitionProvider"].is_object()
             && result["capabilities"]["definitionProvider"] != true
         {
@@ -267,6 +285,13 @@ impl Client {
         };
         if self.status_notifications && method == "experimental/serverStatus" {
             self.ready = message["params"]["quiescent"] == true;
+        }
+        if method == "$/progress"
+            && self.progress_token.as_deref() == message["params"]["token"].as_str()
+            && self.progress_token.is_some()
+            && message["params"]["value"]["kind"] == "end"
+        {
+            self.ready = true;
         }
         if method == "textDocument/publishDiagnostics"
             && let (Some(uri), Some(version)) = (
@@ -365,6 +390,15 @@ impl Client {
         Ok(())
     }
     pub(crate) fn wait_document(&mut self, path: &Path, version: i32) -> Result<(), String> {
+        if self.reopen_document_sync {
+            self.wait_ready()?;
+            self.request(
+                "textDocument/documentSymbol",
+                json!({"textDocument":{"uri":uri(path)?}}),
+                Duration::from_secs(10),
+            )?;
+            return Ok(());
+        }
         let uri = uri(path)?;
         let deadline = Instant::now() + Duration::from_secs(10);
         while self
@@ -630,6 +664,9 @@ while True:
                 initialization: json!({"mode":"python"}),
                 configuration: json!({"python":{"analysis":{"useLibraryCodeForTypes":true}}}),
                 status_notifications: false,
+                progress_token: None,
+                reopen_document_sync: false,
+                environment: vec![],
             },
         )
         .unwrap();
@@ -649,5 +686,80 @@ while True:
                 .is_empty()
         );
         assert_eq!(client.version, "python-peer");
+    }
+}
+
+#[cfg(all(test, unix))]
+mod progress_peer_tests {
+    use super::*;
+    use std::os::unix::fs::PermissionsExt;
+    #[test]
+    fn progress_and_ordered_document_requests_do_not_depend_on_push_diagnostics() {
+        let root = tempfile::tempdir().unwrap();
+        let executable = root.path().join("peer");
+        std::fs::write(&executable,r#"#!/usr/bin/python3
+import json,os,select,sys
+assert 'PATH' not in os.environ
+assert os.environ['VIZZI_LSP_TEST']=='selected'
+def read():
+    headers={}
+    while True:
+        line=sys.stdin.buffer.readline()
+        assert line
+        if line==b'\r\n':break
+        k,v=line.decode().split(':',1);headers[k.lower()]=v.strip()
+    return json.loads(sys.stdin.buffer.read(int(headers['content-length'])))
+def send(value):
+    data=json.dumps(value).encode();sys.stdout.buffer.write(('Content-Length: %d\r\n\r\n'%len(data)).encode()+data);sys.stdout.buffer.flush()
+init=read();assert init['params']['capabilities']['window']['workDoneProgress']
+send({'id':init['id'],'result':{'capabilities':{'definitionProvider':True,'positionEncoding':'utf-16'},'serverInfo':{'version':'progress-peer'}}})
+assert read()['method']=='initialized'
+assert read()['method']=='textDocument/didOpen'
+send({'id':'progress','method':'window/workDoneProgress/create','params':{'token':'indexing-progress'}})
+assert read()=={'jsonrpc':'2.0','id':'progress','result':None}
+send({'method':'experimental/serverStatus','params':{'quiescent':True}})
+send({'method':'$/progress','params':{'token':'unrelated','value':{'kind':'end'}}})
+assert not select.select([sys.stdin],[],[],0.06)[0], 'request before indexing finished'
+send({'method':'$/progress','params':{'token':'indexing-progress','value':{'kind':'end'}}})
+symbols=read();assert symbols['method']=='textDocument/documentSymbol'
+send({'id':symbols['id'],'result':[]})
+definition=read();assert definition['method']=='textDocument/definition'
+send({'id':definition['id'],'result':[]})
+while sys.stdin.buffer.read(1):pass
+"#).unwrap();
+        std::fs::set_permissions(&executable, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let mut client = Client::configured(
+            &executable,
+            root.path(),
+            Setup {
+                arguments: vec![],
+                initialization: json!({}),
+                configuration: json!({}),
+                status_notifications: false,
+                progress_token: Some("indexing-progress".into()),
+                reopen_document_sync: true,
+                environment: vec![
+                    ("PATH".into(), None),
+                    ("VIZZI_LSP_TEST".into(), Some("selected".into())),
+                ],
+            },
+        )
+        .unwrap();
+        let path = root.path().join("app.rb");
+        client.notify("textDocument/didOpen",json!({"textDocument":{"uri":uri(&path).unwrap(),"languageId":"ruby","version":1,"text":"def run; end"}})).unwrap();
+        client.wait_document(&path, 1).unwrap();
+        assert!(
+            client
+                .definitions(
+                    &path,
+                    Position {
+                        line: 0,
+                        character: 4
+                    }
+                )
+                .unwrap()
+                .is_empty()
+        );
+        assert_eq!(client.version, "progress-peer");
     }
 }

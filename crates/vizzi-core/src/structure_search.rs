@@ -18,7 +18,7 @@ impl Name {
                 .chain([symbol.name.as_str()])
                 .collect::<Vec<_>>()
                 .join("::")
-                .replace('.', "::")
+                .replace(['.', '#'], "::")
                 .to_lowercase(),
             path: symbol.source.path.to_lowercase(),
         }
@@ -42,7 +42,7 @@ pub(crate) struct Query {
 impl Query {
     pub(crate) fn new(input: &str) -> Self {
         let literal = input.trim().to_lowercase();
-        let qualified = literal.replace('.', "::");
+        let qualified = literal.replace(['.', '#'], "::");
         let suffix = format!("::{qualified}");
         Self {
             literal,

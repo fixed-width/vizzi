@@ -1,7 +1,7 @@
 # Run Vizzi on your project
 
 Use this guide after [building Vizzi](install.md). The project can be a plain source
-directory; Git is only required for revision review. Rust and Python are selected by
+directory; Git is only required for revision review. Rust, Python and Ruby are selected by
 default. Vizzi reads files saved on disk, not unsaved editor buffers.
 
 ## Start the local server
@@ -54,7 +54,7 @@ their × button; dismissing a message does not cancel its operation.
 
 ## Add optional capabilities
 
-- [Configure language servers](configure-language-servers.md) for Python, Rust and C/C++
+- [Configure language servers](configure-language-servers.md) for Python, Rust, Ruby and C/C++
   type-aware calls, references and locally available dependency source.
 - [Keep saved locations between server runs](investigate-with-vscode.md) with an external
   `--investigation-file`. Visual task layouts already use browser storage.

@@ -51,7 +51,7 @@ pub struct CallFacts {
     pub omitted: usize,
 }
 pub(crate) fn supported(language: &str) -> bool {
-    matches!(language, "rust" | "python" | "c" | "cpp")
+    matches!(language, "rust" | "python" | "ruby" | "c" | "cpp")
 }
 fn name(mut node: Node<'_>, text: &str) -> Option<(String, Range<usize>)> {
     for _ in 0..8 {
@@ -97,8 +97,25 @@ pub(crate) fn collect(
         output.omitted += 1;
         return;
     };
+    record(
+        node,
+        callee.byte_range(),
+        name(callee, text),
+        text,
+        owners,
+        output,
+    );
+}
+pub(crate) fn record(
+    node: Node<'_>,
+    span: Range<usize>,
+    name: Option<(String, Range<usize>)>,
+    text: &str,
+    owners: &BTreeMap<usize, usize>,
+    output: &mut CallFacts,
+) {
     let Some(spelling) = text
-        .get(callee.byte_range())
+        .get(span.clone())
         .filter(|s| !s.is_empty() && s.len() <= SPELLING_BYTES)
     else {
         output.omitted += 1;
@@ -120,7 +137,7 @@ pub(crate) fn collect(
         }
         parent = current.parent();
     }
-    let (name, name_span) = match name(callee, text) {
+    let (name, name_span) = match name {
         Some((name, span)) => (Some(name), Some(span)),
         None => (None, None),
     };
@@ -130,7 +147,7 @@ pub(crate) fn collect(
         name,
         name_span,
         spelling: spelling.into(),
-        span: callee.byte_range(),
+        span,
     });
 }
 

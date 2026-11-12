@@ -62,7 +62,7 @@ pub(crate) fn hints(
     allowance: usize,
 ) -> Option<Hints> {
     let python = match language {
-        "python" => true,
+        "python" | "ruby" => true,
         "rust" | "c" | "cpp" => false,
         _ => return None,
     };

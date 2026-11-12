@@ -186,6 +186,7 @@ impl SourcePolicy {
         let metadata = match filename {
             "Cargo.toml" | "Cargo.lock" => Some("cargo"),
             "pyrightconfig.json" | "pyproject.toml" => Some("python-project"),
+            "Gemfile.lock" | ".ruby-version" | ".tool-versions" => Some("ruby-project"),
             "compile_commands.json" | "compile_flags.txt" if !self.roots.is_empty() => {
                 Some("c-project")
             }
@@ -196,6 +197,20 @@ impl SourcePolicy {
                 language: Some(language.into()),
                 provenance: Provenance::ExplicitScope { scope: path.into() },
                 reason: SourceOnlyReason::ProjectMetadata,
+            }));
+        }
+        if matches!(filename, "Gemfile" | "Rakefile") {
+            return Ok(Some(if self.available.contains("ruby") {
+                Classification::Assigned {
+                    language: "ruby".into(),
+                    provenance: Provenance::ExplicitScope { scope: path.into() },
+                }
+            } else {
+                Classification::SourceOnly {
+                    language: Some("ruby".into()),
+                    provenance: Provenance::ExplicitScope { scope: path.into() },
+                    reason: SourceOnlyReason::AnalyzerUnavailable,
+                }
             }));
         }
         let Some((stem, extension)) = filename.rsplit_once('.') else {
@@ -210,6 +225,7 @@ impl SourcePolicy {
         let language = match extension {
             "rs" => Some("rust"),
             "py" | "pyi" => Some("python"),
+            "rb" | "rake" | "gemspec" | "ru" => Some("ruby"),
             _ => {
                 if !self.roots.iter().any(|scope| within(path, scope)) {
                     return Ok(None);

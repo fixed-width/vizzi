@@ -10,6 +10,7 @@ use vizzi_core::{
 };
 mod inputs;
 mod project;
+mod ruby;
 
 /// Explicit native tool configuration; no executable is accepted from browser requests.
 #[derive(Default)]
@@ -20,6 +21,8 @@ pub struct Configuration {
     pub pyright: Option<PathBuf>,
     /// Optional clangd executable shared by C and C++.
     pub clangd: Option<PathBuf>,
+    /// Optional Ruby LSP executable from the selected local Ruby environment.
+    pub ruby_lsp: Option<PathBuf>,
     /// Optional interpreter/environment used by the Python server.
     pub python_path: Option<PathBuf>,
     /// Optional compilation database, otherwise root/compile_commands.json.
@@ -28,7 +31,10 @@ pub struct Configuration {
 impl Configuration {
     /// Whether no semantic language server has been selected.
     pub fn is_empty(&self) -> bool {
-        self.rust_analyzer.is_none() && self.pyright.is_none() && self.clangd.is_none()
+        self.rust_analyzer.is_none()
+            && self.pyright.is_none()
+            && self.clangd.is_none()
+            && self.ruby_lsp.is_none()
     }
 }
 
@@ -73,6 +79,18 @@ impl Servers {
                     inputs::Profile::Python {
                         interpreter: configuration.python_path,
                     },
+                    sources.clone(),
+                )),
+            );
+        }
+        if let Some(executable) = configuration.ruby_lsp {
+            providers.insert(
+                "ruby",
+                Arc::new(project::ProjectServer::new(
+                    root.clone(),
+                    cache.join("ruby"),
+                    executable.clone(),
+                    inputs::Profile::Ruby { executable },
                     sources.clone(),
                 )),
             );

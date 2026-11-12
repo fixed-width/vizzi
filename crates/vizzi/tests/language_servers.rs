@@ -57,6 +57,10 @@ fn configuration_is_lazy_and_unconfigured_languages_do_not_use_another_server() 
             clangd: Some("clangd".into()),
             ..Default::default()
         },
+        Configuration {
+            ruby_lsp: Some("ruby-lsp".into()),
+            ..Default::default()
+        },
     ] {
         assert!(!configuration.is_empty());
     }
@@ -110,6 +114,271 @@ fn configuration_is_lazy_and_unconfigured_languages_do_not_use_another_server() 
             .unwrap_err()
             .contains("No language server configured for c")
     );
+}
+
+#[cfg(unix)]
+#[test]
+fn ruby_full_capture_updates_follow_the_document_lifecycle_protocol() {
+    use std::os::unix::fs::PermissionsExt;
+    let root = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    let executable = cache.path().join("peer");
+    std::fs::write(&executable,r#"#!/usr/bin/python3
+import json,sys
+opened={}
+def read():
+    headers={}
+    while True:
+        line=sys.stdin.buffer.readline()
+        if not line:return None
+        if line==b'\r\n':break
+        k,v=line.decode().split(':',1);headers[k.lower()]=v.strip()
+    return json.loads(sys.stdin.buffer.read(int(headers['content-length'])))
+def send(value):
+    data=json.dumps(value).encode();sys.stdout.buffer.write(('Content-Length: %d\r\n\r\n'%len(data)).encode()+data);sys.stdout.buffer.flush()
+while True:
+    request=read()
+    if request is None:break
+    method=request.get('method');params=request.get('params',{})
+    if method=='initialize':send({'id':request['id'],'result':{'capabilities':{'definitionProvider':True,'positionEncoding':'utf-16'},'serverInfo':{'version':'ruby-lifecycle-peer'}}})
+    elif method=='initialized':send({'method':'$/progress','params':{'token':'indexing-progress','value':{'kind':'end'}}})
+    elif method=='textDocument/didOpen':
+        doc=params['textDocument'];assert doc['uri'] not in opened
+        assert doc['languageId']=='ruby';opened[doc['uri']]=doc['text']
+    elif method=='textDocument/didClose':
+        uri=params['textDocument']['uri'];assert uri in opened;del opened[uri]
+    elif method=='textDocument/didChange':raise AssertionError('Ruby full captures must reopen')
+    elif method=='textDocument/documentSymbol':
+        assert params['textDocument']['uri'] in opened;send({'id':request['id'],'result':[]})
+    elif method=='textDocument/definition':
+        uri=params['textDocument']['uri'];text=opened[uri];offset=text.index('process');prefix=text[:offset]
+        position={'line':prefix.count('\n'),'character':len(prefix.rsplit('\n',1)[-1])}
+        send({'id':request['id'],'result':[{'uri':uri,'range':{'start':position,'end':position}}]})
+"#).unwrap();
+    std::fs::set_permissions(&executable, std::fs::Permissions::from_mode(0o700)).unwrap();
+    let server = Servers::new(
+        root.path().into(),
+        cache.path().into(),
+        Configuration {
+            ruby_lsp: Some(executable),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    for (line, text) in [
+        (
+            0,
+            "def process(value); value; end\ndef run; process(1); end\n",
+        ),
+        (
+            1,
+            "\ndef process(value); value; end\ndef run; process(1); end\n",
+        ),
+    ] {
+        let captured = snapshot(&[("app.rb", "ruby", text)]);
+        let index = Structure::new(&captured);
+        let owner = index
+            .functions("app.rb", "run", 0)
+            .unwrap()
+            .items
+            .remove(0)
+            .symbol;
+        let site = index
+            .outgoing(&owner.id, "app.rb", 0)
+            .unwrap()
+            .items
+            .remove(0);
+        let result = server
+            .resolve(captured.clone(), &index.call(&site.id).unwrap())
+            .unwrap();
+        assert_eq!(result.locations.len(), 1);
+        assert_eq!(result.locations[0].position.line, line);
+    }
+}
+
+#[test]
+#[ignore = "requires installed ruby-lsp; local source only"]
+fn ruby_definitions_references_and_updates_use_captured_source_without_running_project_configuration()
+ {
+    let root = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    let text = "module Audio\n class Other\n  def process(value); -value; end\n end\n class Meter\n  def process(value); value; end\n end\n def self.run(value)\n  Meter.new.process(value)\n  Other.new.process(value)\n end\nend\n";
+    let marker = root.path().join("project-was-executed");
+    let trap = format!(
+        "File.write({:?}, 'executed')\nraise 'project configuration must not run'\n",
+        marker.to_str().unwrap()
+    );
+    std::fs::write(root.path().join("Gemfile"), &trap).unwrap();
+    std::fs::create_dir_all(root.path().join("ruby_lsp/local")).unwrap();
+    std::fs::write(root.path().join("ruby_lsp/local/addon.rb"), &trap).unwrap();
+    std::fs::write(root.path().join("app.rb"), "raise 'live bytes differ'\n").unwrap();
+    let server = Servers::new(
+        root.path().into(),
+        cache.path().into(),
+        Configuration {
+            ruby_lsp: Some(
+                std::env::var_os("VIZZI_RUBY_LSP")
+                    .map(std::path::PathBuf::from)
+                    .unwrap_or_else(|| "ruby-lsp".into()),
+            ),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let mut previous = None;
+    for source in [text.to_owned(), format!("\n{text}")] {
+        let captured = snapshot(&[
+            ("app.rb", "ruby", &source),
+            ("Gemfile", "ruby", &trap),
+            ("ruby_lsp/local/addon.rb", "ruby", &trap),
+        ]);
+        let index = Structure::new(&captured);
+        let owner = index
+            .functions("app.rb", "Audio::run", 0)
+            .unwrap()
+            .items
+            .remove(0)
+            .symbol;
+        let invocation = index
+            .outgoing(&owner.id, "app.rb", 0)
+            .unwrap()
+            .items
+            .into_iter()
+            .find(|call| call.name.as_deref() == Some("process"))
+            .unwrap();
+        let answer = server
+            .resolve(captured.clone(), &index.call(&invocation.id).unwrap())
+            .unwrap();
+        assert_eq!(answer.locations.len(), 1, "outside: {}", answer.outside);
+        assert_eq!(answer.outside, 0);
+        let position =
+            vizzi::definitions::byte_offset(&source, answer.locations[0].position).unwrap();
+        let target=index.definition("app.rb",position).unwrap_or_else(||panic!("Ruby definition did not match captured declaration: {:?}, byte {position}, source {source:?}",answer.locations));
+        assert!(target.parents.iter().any(|name| name == "Meter"));
+        assert!(!target.parents.iter().any(|name| name == "Other"));
+        assert_eq!(target.name, "process");
+        for site in index.outgoing(&owner.id, "app.rb", 0).unwrap().items {
+            let _ = server.resolve(captured.clone(), &index.call(&site.id).unwrap());
+        }
+        let references = server
+            .references(
+                captured.clone(),
+                &target,
+                index.identifier(&target.id).unwrap(),
+            )
+            .unwrap();
+        assert_eq!(references.locations.len(), 1);
+        if let Some((line, context)) = previous {
+            assert_eq!(answer.locations[0].position.line, line + 1);
+            assert_ne!(answer.context, context);
+        }
+        previous = Some((answer.locations[0].position.line, answer.context));
+        assert!(!marker.exists());
+    }
+    assert!(!root.path().join(".ruby-lsp").exists());
+}
+
+#[test]
+#[ignore = "requires installed ruby-lsp and local Ruby standard library source"]
+fn ruby_local_standard_library_and_installed_gem_definitions_use_the_dependency_catalog() {
+    for (library, expression, method, lock) in [
+        ("core", "'example'.upcase", "upcase", None),
+        (
+            "pathname",
+            "Pathname.new('example').cleanpath",
+            "cleanpath",
+            None,
+        ),
+        (
+            "logger",
+            "Logger.new($stdout).add(1, 'example')",
+            "add",
+            Some(
+                "GEM\n  specs:\n    logger (1.7.0)\n\nPLATFORMS\n  ruby\n\nDEPENDENCIES\n  logger\n",
+            ),
+        ),
+    ] {
+        let root = tempfile::tempdir().unwrap();
+        let cache = tempfile::tempdir().unwrap();
+        let require = if library == "core" {
+            String::new()
+        } else {
+            format!("require '{library}'\n")
+        };
+        let text = format!("{require}module Audio\n def self.run\n  {expression}\n end\nend\n");
+        if let Some(lock) = lock {
+            std::fs::write(root.path().join("Gemfile.lock"), lock).unwrap();
+        }
+        let captured = snapshot(&[("app.rb", "ruby", text.as_str())]);
+        let index = Structure::new(&captured);
+        let server = Servers::new(
+            root.path().into(),
+            cache.path().into(),
+            Configuration {
+                ruby_lsp: Some(
+                    std::env::var_os("VIZZI_RUBY_LSP")
+                        .map(std::path::PathBuf::from)
+                        .unwrap_or_else(|| "ruby-lsp".into()),
+                ),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let owner = index
+            .functions("app.rb", "run", 0)
+            .unwrap()
+            .items
+            .remove(0)
+            .symbol;
+        let invocation = index
+            .outgoing(&owner.id, "app.rb", 0)
+            .unwrap()
+            .items
+            .into_iter()
+            .find(|c| c.name.as_deref() == Some(method))
+            .unwrap();
+        let answer = server
+            .resolve(captured.clone(), &index.call(&invocation.id).unwrap())
+            .unwrap();
+        if library == "core" {
+            assert!(answer.locations.is_empty());
+            assert!(answer.outside > 0);
+            continue;
+        }
+        assert!(!answer.locations.is_empty(), "{library}");
+        assert_eq!(answer.outside, 0);
+        let mut gem_source = false;
+        for location in &answer.locations {
+            let capture = server
+                .dependencies()
+                .unwrap()
+                .get(location.capture.as_ref().unwrap())
+                .unwrap()
+                .unwrap();
+            assert_eq!(capture.input.language, "ruby");
+            gem_source |= capture.input.package.starts_with("logger-");
+            let body = capture
+                .doc()
+                .captured()
+                .read_text(2 * 1024 * 1024)
+                .unwrap()
+                .unwrap();
+            let byte = vizzi::definitions::byte_offset(&body, location.position).unwrap();
+            assert_eq!(
+                capture
+                    .index
+                    .definition(capture.doc().path(), byte)
+                    .expect("Ruby source declaration at server location")
+                    .name,
+                method
+            );
+        }
+        if library == "logger" {
+            assert!(gem_source, "installed gem capture");
+        } else {
+            assert_eq!(answer.locations.len(), 1);
+        }
+    }
 }
 
 #[test]

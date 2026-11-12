@@ -33,7 +33,7 @@ Stop the server with Ctrl-C.
 
 For semantic navigation on a real project, [configure its language server](docs/how-to/configure-language-servers.md):
 `--pyright pyright-langserver` for Python, `--rust-analyzer rust-analyzer` for Rust,
-or `--clangd clangd` with C/C++ compilation context.
+`--ruby-lsp ruby-lsp` for Ruby, or `--clangd clangd` with C/C++ compilation context.
 
 For a guided first run, follow a [Python](docs/tutorials/python-call-trail.md),
 [Rust](docs/tutorials/rust-call-trail.md) or [C/C++](docs/tutorials/cpp-call-trail.md)
@@ -44,13 +44,13 @@ integration is required for these lessons.
 
 - Follow calls into neighbouring bubbles, inspect callers and references, and keep branches
   visible. Configured language servers resolve typed receivers, imports and references
-  for Python, Rust and C/C++.
+  for Python, Rust, Ruby and C/C++.
 - Arrange related views into groups and save browser-local tasks. Follow saved file changes
   live or pin an earlier source view.
 - Browse source, compare Git revisions or working changes, and keep source locations and
   notes. Hand off a current location to VS Code when you want to work on it.
 
-Rust and Python are selected by default. Raw C/C++ browsing uses explicit source scopes.
+Rust, Python and Ruby are selected by default. Raw C/C++ browsing uses explicit source scopes.
 Language support and call resolution have [important differences](docs/reference/languages.md);
 a candidate match is not proof of a runtime call.
 

@@ -7,6 +7,7 @@ use vizzi_core::{
     policy::{Classification, Provenance},
     projection::WindowQuery,
     python::PythonAdapter,
+    ruby::RubyAdapter,
     rust::RustAdapter,
 };
 fn document(language: &dyn LanguageAdapter, text: &str) -> Document {
@@ -61,9 +62,12 @@ fn parsed_literals_stay_indivisible_in_each_supported_language() {
         &PythonAdapter,
         &CAdapter,
         &CppAdapter,
+        &RubyAdapter,
     ] {
         let text = if adapter.context().language == "python" {
             "def f():\n    return transform(\"x, [ . ] and y\", 1.25, other)\n"
+        } else if adapter.context().language == "ruby" {
+            "def f\n    transform(\"x, [ . ] and y\", 1.25, other)\nend\n"
         } else {
             "int_or_fn f() { return transform(\"x, [ . ] and y\", 1.25, other); }\n"
         };

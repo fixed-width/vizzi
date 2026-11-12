@@ -27,6 +27,7 @@ impl<'a> Checkpoints<'a> {
 }
 
 pub(crate) struct Declaration {
+    pub identity: Option<String>,
     pub name_span: Option<std::ops::Range<usize>>,
     pub kind: &'static str,
     pub name: String,
@@ -35,6 +36,7 @@ pub(crate) struct Declaration {
 impl Declaration {
     pub(crate) fn at(node: tree_sitter::Node<'_>, kind: &'static str, name: String) -> Self {
         Self {
+            identity: None,
             name_span: node
                 .child_by_field_name("name")
                 .map(|name| name.byte_range()),
@@ -272,13 +274,15 @@ impl SyntaxAnalyzer {
                     if checkpoints.poll() {
                         return Ok(None);
                     }
-                    scope.push(format!("{}:{}", declaration.kind, declaration.name));
+                    let identity = declaration.identity.as_ref().unwrap_or(&declaration.name);
+                    scope.push(format!("{}:{identity}", declaration.kind));
                     let key = serde_json::to_string(&scope)
                         .map_err(|error| ModelError(error.to_string()))?;
                     scope.pop();
-                    if own_scope.as_ref().is_some_and(|(kind, name)| {
-                        *kind == declaration.kind && name == &declaration.name
-                    }) {
+                    if own_scope
+                        .as_ref()
+                        .is_some_and(|(kind, name)| *kind == declaration.kind && name == identity)
+                    {
                         scope_facts.insert(node.id(), analysis.facts.len());
                     }
                     analysis.facts.push(Fact {
@@ -329,6 +333,17 @@ impl SyntaxAnalyzer {
                     }
                     if cancelled() {
                         return Ok(None);
+                    }
+                    if self.context.language == "ruby" {
+                        let Some(calls) = crate::ruby_calls::collect(
+                            tree.root_node(),
+                            text,
+                            &scope_facts,
+                            cancelled,
+                        ) else {
+                            return Ok(None);
+                        };
+                        analysis.calls = Some(calls);
                     }
                     drop(cursor);
                     if self.context.language == "rust"

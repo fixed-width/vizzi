@@ -12,12 +12,14 @@ use std::{
 pub(super) enum Profile {
     Python { interpreter: Option<PathBuf> },
     CFamily { database: Option<PathBuf> },
+    Ruby { executable: PathBuf },
 }
 impl Profile {
     pub(super) fn accepts(&self, language: &str) -> bool {
         match self {
             Self::Python { .. } => language == "python",
             Self::CFamily { .. } => matches!(language, "c" | "cpp"),
+            Self::Ruby { .. } => language == "ruby",
         }
     }
 }
@@ -127,6 +129,11 @@ impl Inputs {
             profile: match profile {
                 Profile::Python { interpreter } => format!("python:{interpreter:?}"),
                 Profile::CFamily { database } => format!("c-family:{database:?}"),
+                Profile::Ruby { executable } => format!(
+                    "ruby:{executable:?}:{:?}:{:?}",
+                    std::env::var_os("GEM_HOME"),
+                    std::env::var_os("GEM_PATH")
+                ),
             }
             .into_bytes(),
             raw: BTreeMap::new(),
@@ -137,6 +144,11 @@ impl Inputs {
             root_config: root.join("pyrightconfig.json"),
         };
         match profile {
+            Profile::Ruby { .. } => {
+                for name in ["Gemfile", "Gemfile.lock", ".ruby-version", ".tool-versions"] {
+                    result.read(&root.join(name))?;
+                }
+            }
             Profile::Python { .. } => {
                 let config = root.join("pyrightconfig.json");
                 let pyproject = root.join("pyproject.toml");
@@ -181,6 +193,10 @@ impl Inputs {
     }
     pub(super) fn digest(&self) -> String {
         let mut hash = blake3::Hasher::new();
+        if self.profile.starts_with(b"ruby:") {
+            hash.update(include_bytes!("ruby.rs"));
+            hash.update(include_bytes!("ruby-bootstrap.rb"));
+        }
         hash.update(include_bytes!("inputs.rs"));
         hash.update(&self.profile);
         for (path, bytes) in &self.raw {
@@ -286,6 +302,12 @@ impl Inputs {
         profile: &Profile,
     ) -> Result<Setup, String> {
         match profile {
+            Profile::Ruby { .. } => super::ruby::prepare(
+                mirror,
+                self.raw
+                    .get(&root.join("Gemfile.lock"))
+                    .and_then(|v| v.as_deref()),
+            ),
             Profile::Python { interpreter } => {
                 for (path, value) in &self.configs {
                     save(
@@ -313,6 +335,9 @@ impl Inputs {
                     initialization: json!({}),
                     configuration: json!({"python":python}),
                     status_notifications: false,
+                    progress_token: None,
+                    reopen_document_sync: false,
+                    environment: vec![],
                 })
             }
             Profile::CFamily { .. } => {
@@ -355,6 +380,9 @@ impl Inputs {
                     initialization: json!({}),
                     configuration: json!({}),
                     status_notifications: false,
+                    progress_token: None,
+                    reopen_document_sync: false,
+                    environment: vec![],
                 })
             }
         }
@@ -516,7 +544,11 @@ mod tests {
     fn profiles_accept_only_their_languages_and_paths_keep_parent_semantics() {
         let python = Profile::Python { interpreter: None };
         let c = Profile::CFamily { database: None };
-        for language in ["python", "rust", "c", "cpp", "unknown"] {
+        let ruby = Profile::Ruby {
+            executable: "ruby-lsp".into(),
+        };
+        for language in ["python", "ruby", "rust", "c", "cpp", "unknown"] {
+            assert_eq!(ruby.accepts(language), language == "ruby");
             assert_eq!(python.accepts(language), language == "python");
             assert_eq!(c.accepts(language), matches!(language, "c" | "cpp"));
         }

@@ -47,6 +47,7 @@ pub struct ModuleCache {
 }
 /// Module bindings for one immutable source observation.
 pub struct ModuleIndex {
+    workspace: String,
     rust: BTreeMap<String, Option<Base>>,
     python: BTreeMap<String, Module>,
 }
@@ -521,7 +522,11 @@ impl ModuleIndex {
                 }
             }
         }
-        Self { rust, python }
+        Self {
+            workspace: snapshot.workspace().as_str().into(),
+            rust,
+            python,
+        }
     }
     /// Finds the enclosing language module; types and implementations are not modules.
     pub fn for_fact(&self, doc: &Document, analysis: &Analysis, ordinal: usize) -> Option<Module> {
@@ -530,6 +535,42 @@ impl ModuleIndex {
         }
         if analysis.context.language == "python" {
             return self.python.get(doc.path()).cloned();
+        }
+        if analysis.context.language == "ruby" {
+            let mut modules = vec![];
+            let mut found_module = false;
+            let mut next = Some(ordinal);
+            for _ in 0..16 {
+                let Some(n) = next else { break };
+                let fact = analysis.facts.get(n)?;
+                if fact.kind == "module" || (found_module && fact.kind == "class") {
+                    found_module |= fact.kind == "module";
+                    modules.push(fact.name.trim_start_matches("::"));
+                    if fact.name.starts_with("::") {
+                        next = None;
+                        break;
+                    }
+                }
+                next = fact.parent;
+            }
+            if next.is_some() || !found_module {
+                return None;
+            }
+            modules.reverse();
+            let label = modules.join("::");
+            if label.len() > 512 {
+                return None;
+            }
+            let root = label.split("::").next()?.to_owned();
+            return Some(Module {
+                id: blake3::hash(format!("{}\0ruby\0{label}", self.workspace).as_bytes())
+                    .to_hex()
+                    .to_string(),
+                label,
+                root,
+                language: "ruby",
+                basis: "ruby_declarations",
+            });
         }
         if analysis.context.language != "rust" {
             return None;

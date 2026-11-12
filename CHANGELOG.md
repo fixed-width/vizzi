@@ -8,6 +8,10 @@ remains in Git and the project documentation.
 
 ### Added
 
+- Ruby source browsing, colouring, reflow, module cues and call navigation, including
+  bare calls and punctuation method names. Optional `--ruby-lsp` integration supplies
+  captured-source definitions, checked references and local dependency source without
+  installing project dependencies or loading project add-ons.
 - A C/C++ call-trail tutorial with a mixed-language example. The Rust tutorial and its
   example now have explicit Rust names alongside the Python lesson.
 - Language-aware LSP navigation for Python/Pyright and C/C++/clangd alongside Rust.

@@ -118,6 +118,7 @@ impl ProjectServer {
         let path = fs::canonicalize(path).map_err(|e| e.to_string())?;
         let language = match path.extension().and_then(|v| v.to_str()) {
             Some("py" | "pyi") => "python",
+            Some("rb" | "rake" | "gemspec" | "ru") => "ruby",
             Some("c") => "c",
             Some("cc" | "cpp" | "cxx" | "hh" | "hpp" | "hxx" | "tcc" | "ipp" | "inl") => "cpp",
             Some("h" | "inc") | None if matches!(hint, "c" | "cpp") => hint,
@@ -127,6 +128,18 @@ impl ProjectServer {
             return Err("External source language differs".into());
         }
         let mut root = path.parent().ok_or("External source has no directory")?;
+        if language == "ruby" {
+            for candidate in path.ancestors().skip(1).take(32) {
+                if candidate
+                    .parent()
+                    .and_then(Path::file_name)
+                    .is_some_and(|name| name == "gems")
+                {
+                    root = candidate;
+                    break;
+                }
+            }
+        }
         if language == "python" {
             for _ in 0..16 {
                 let Some(parent) = root.parent() else {
@@ -153,7 +166,16 @@ impl ProjectServer {
                     .unwrap_or("Python source")
             }
         } else {
-            "C/C++ source"
+            if language == "ruby" {
+                root.parent()
+                    .and_then(Path::file_name)
+                    .filter(|name| *name == "gems")
+                    .and_then(|_| root.file_name())
+                    .and_then(|name| name.to_str())
+                    .unwrap_or("Ruby library source")
+            } else {
+                "C/C++ source"
+            }
         };
         Ok(Input {
             root: root.into(),
@@ -229,6 +251,7 @@ impl ProjectServer {
         }
         let mut locations = vec![];
         let mut outside = 0;
+        let mut signatures = 0;
         let mut stable = false;
         for _ in 0..3 {
             let raw = if references {
@@ -238,6 +261,7 @@ impl ProjectServer {
             };
             locations.clear();
             outside = 0;
+            signatures = 0;
             let mut changed = false;
             for (target, position) in raw {
                 let Some(target) = target.map(|path| fs::canonicalize(&path).unwrap_or(path))
@@ -245,6 +269,15 @@ impl ProjectServer {
                     outside += 1;
                     continue;
                 };
+                if lang == "ruby"
+                    && !references
+                    && target
+                        .extension()
+                        .is_some_and(|extension| extension == "rbs")
+                {
+                    signatures += 1;
+                    continue;
+                }
                 if let Ok(relative) = target.strip_prefix(workspace.directory.path()) {
                     let relative = relative
                         .to_str()
@@ -295,9 +328,6 @@ impl ProjectServer {
         if !stable {
             return Err("Dependency source did not stabilize during semantic lookup".into());
         }
-        if Inputs::load(&self.root, &self.profile)?.digest() != configuration {
-            return Err("Project inputs changed during semantic lookup".into());
-        }
         let mut verified = Vec::with_capacity(locations.len());
         for location in locations {
             if let Some(id) = &location.capture
@@ -311,7 +341,61 @@ impl ProjectServer {
             }
             verified.push(location);
         }
-        let locations = verified;
+        let mut locations = verified;
+        let mut seen_locations = BTreeSet::new();
+        locations.retain(|location| {
+            seen_locations.insert((
+                location.capture.clone(),
+                location.path.clone(),
+                location.position.line,
+                location.position.character,
+            ))
+        });
+        if locations.is_empty() {
+            outside += signatures;
+        }
+        if references && lang == "ruby" {
+            let mut checked = Vec::new();
+            for location in locations {
+                let external = location
+                    .capture
+                    .as_ref()
+                    .map(|id| self.sources.get(id))
+                    .transpose()?
+                    .flatten();
+                let target_doc = external
+                    .as_ref()
+                    .map(|c| c.doc())
+                    .or_else(|| snapshot.file_by_path(&location.path).map(AsRef::as_ref))
+                    .ok_or("Ruby reference source expired")?;
+                let target_text = source(target_doc)?;
+                let byte = definitions::byte_offset(&target_text, location.position)?;
+                if target_doc
+                    .analyses()
+                    .iter()
+                    .flat_map(|a| &a.facts)
+                    .any(|fact| {
+                        fact.name_span
+                            .as_ref()
+                            .is_some_and(|span| span.contains(&byte))
+                    })
+                {
+                    continue;
+                }
+                let target_path = external
+                    .as_ref()
+                    .map(|c| c.path())
+                    .unwrap_or_else(|| workspace.directory.path().join(&location.path));
+                workspace.open(&target_path, "ruby", &target_text)?;
+                let definitions = workspace
+                    .client
+                    .definitions(&target_path, location.position)?;
+                if super::ruby::matches_definition(definitions, &path, position) {
+                    checked.push(location);
+                }
+            }
+            locations = checked;
+        }
         let retained = self
             .sources
             .sources()?
@@ -324,6 +408,9 @@ impl ProjectServer {
             .map(|capture| capture.path())
             .collect();
         workspace.prune_external(&retained)?;
+        if Inputs::load(&self.root, &self.profile)?.digest() != configuration {
+            return Err("Project inputs changed during semantic lookup".into());
+        }
         let mut hash = blake3::Hasher::new();
         hash.update(include_bytes!("project.rs"));
         hash.update(include_bytes!("inputs.rs"));
@@ -482,7 +569,13 @@ impl Workspace {
             .checked_add(1)
             .ok_or("Semantic document versions exhausted")?;
         let uri = crate::lsp::uri(path)?;
-        if self.opened.insert(path.into()) {
+        // Reopen full captures when the server requires ranged incremental edits.
+        let reopen = self.client.reopen_document_sync && self.opened.contains(path);
+        if reopen {
+            self.client
+                .notify("textDocument/didClose", json!({"textDocument":{"uri":uri}}))?;
+        }
+        if self.opened.insert(path.into()) || reopen {
             self.client.notify("textDocument/didOpen",json!({"textDocument":{"uri":uri,"languageId":language,"version":self.next,"text":text}}))?;
         } else {
             self.client.notify("textDocument/didChange",json!({"textDocument":{"uri":uri,"version":self.next},"contentChanges":[{"text":text}]}))?;

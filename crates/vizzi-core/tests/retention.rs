@@ -3,9 +3,20 @@
 use vizzi_core::analysis::Languages;
 
 #[test]
-fn owned_state_reuses_trees_and_matches_fresh_facts_across_all_four_languages() {
+fn owned_state_reuses_trees_and_matches_fresh_facts_across_registered_languages() {
     let languages = Languages::builtin().unwrap();
     for (name, initial, changes) in [
+        (
+            "ruby",
+            "module Café; def self.alpha(value); helper(value); end; end",
+            vec![
+                "# π\r\nmodule Café; def self.alpha(value); helper(value); end; end",
+                "module Cafê; def beta(value); value=1; value; helper!; end; end",
+                "def broken(",
+                "",
+                "class Last; end",
+            ],
+        ),
         (
             "rust",
             "mod café { fn alpha() {} fn repeated() {} fn repeated() {} }",

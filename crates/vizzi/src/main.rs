@@ -31,6 +31,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut arguments = std::env::args().skip(1);
     while let Some(argument) = arguments.next() {
         match argument.as_str() {
+            "--ruby-lsp" => {
+                language_servers.ruby_lsp = Some(PathBuf::from(
+                    arguments.next().ok_or("--ruby-lsp needs an executable")?,
+                ));
+            }
             "--rust-analyzer" => {
                 language_servers.rust_analyzer = Some(PathBuf::from(
                     arguments

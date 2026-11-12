@@ -42,5 +42,5 @@ test('persisted descriptors reject coercible values and labels retain language a
  const roots=['pkg/a/x/lib.rs','pkg/b/y/lib.rs'],views=roots.map((root,i)=>view(i+1,module(i+1,'audio',root)));assert.deepEqual(views.map(v=>modulePresentation(v,views).label),['x/lib.rs · audio','y/lib.rs · audio']);
 });
 test('each provenance is accepted only with its supplying language',()=>{
- for(const language of ['rust','python','unknown'])for(const basis of ['rust_declarations','python_module'])assert.equal(validModule({...module(1),language,basis}),(language==='rust'&&basis==='rust_declarations')||(language==='python'&&basis==='python_module'));
+ for(const language of ['rust','python','ruby','unknown'])for(const basis of ['rust_declarations','python_module','ruby_declarations'])assert.equal(validModule({...module(1),language,basis}),(language==='rust'&&basis==='rust_declarations')||(language==='python'&&basis==='python_module')||(language==='ruby'&&basis==='ruby_declarations'));
 });

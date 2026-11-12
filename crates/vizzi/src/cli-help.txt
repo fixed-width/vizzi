@@ -14,7 +14,7 @@ Paths and server:
       Number of analysis workers, from 1 to 32 [default: 4].
 
 Source selection:
-  Rust and Python are included by default. These options are repeatable;
+  Rust, Python and Ruby are included by default. These options are repeatable;
   scopes are file/directory paths relative to --root. Use . for the whole root.
 
   --c-family-root SCOPE
@@ -35,6 +35,9 @@ Language servers (optional; disabled until configured):
   --python-path INTERPRETER
       Select a Python interpreter/environment; requires --pyright.
       Default: the language server's environment selection.
+  --ruby-lsp EXECUTABLE
+      Enable Ruby definitions and references using an installed ruby-lsp.
+      Uses local gems without installing a bundle or loading project add-ons.
   --clangd EXECUTABLE
       Enable C/C++ definitions and references using clangd.
       Requires C/C++ source scopes and existing compilation context.
@@ -83,6 +86,8 @@ Examples:
       Enable Python semantic navigation in the current directory.
   vizzi --rust-analyzer rust-analyzer
       Enable Rust semantic navigation in the current Cargo project.
+  vizzi --ruby-lsp ruby-lsp
+      Enable Ruby semantic navigation using the selected Ruby environment.
   vizzi --c-family-root . --syntax-language .=cpp --clangd clangd
       Inspect C++ using compilation context already in the source root.
 

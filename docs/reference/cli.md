@@ -25,6 +25,7 @@ and launch examples without starting the server or creating cache data.
 | `--editor-code EXECUTABLE` | `code` | VS Code launcher path/name. This accepts an executable, not an executable plus shell arguments. |
 | `--rust-analyzer EXECUTABLE` | Disabled | Optional Rust definition/reference provider. Dependencies and toolchains must already be available locally. |
 | `--pyright EXECUTABLE` | Disabled | Pyright-compatible Python stdio language server. |
+| `--ruby-lsp EXECUTABLE` | Disabled | Installed Ruby LSP executable. Uses a private bundle configuration and local gems; project add-ons are disabled. |
 | `--python-path INTERPRETER` | Server default | Python interpreter/environment; requires `--pyright`. |
 | `--clangd EXECUTABLE` | Disabled | C/C++ language server; source scopes and compilation context remain explicit. |
 | `--compile-commands FILE` | Root database or flags file | Captured compilation database; requires `--clangd`. |

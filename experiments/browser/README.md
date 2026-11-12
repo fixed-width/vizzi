@@ -66,6 +66,11 @@ It uses disposable source trees and disables desktop editor integration. Set
 The [configuration guide](../../docs/how-to/configure-language-servers.md) describes
 user setup and analysis limits.
 
+Add `--with-ruby` to include Ruby in that mixed-language check. An installed `ruby-lsp`
+executable and its RubyGems environment must be available; `VIZZI_RUBY_LSP` selects its
+path. This checks Ruby module labels and reference refresh after an edit as well as
+receiver-specific navigation. Vizzi does not install the server or project gems.
+
 ## Check the actual rendering environment
 
 ```sh

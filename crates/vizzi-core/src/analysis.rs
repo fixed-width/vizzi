@@ -5,6 +5,7 @@ use crate::{
     c_family::{CAdapter, CppAdapter},
     model::{Analysis, Context, ModelError},
     python::PythonAdapter,
+    ruby::RubyAdapter,
     rust::RustAdapter,
 };
 use std::{collections::BTreeMap, sync::Arc};
@@ -97,11 +98,12 @@ impl Languages {
         }
         Ok(Self { languages })
     }
-    /// Registers raw Rust, Python, C, and C++ factories; source policy selects inputs.
+    /// Registers raw Rust, Python, Ruby, C, and C++ factories; policy selects inputs.
     pub fn builtin() -> Result<Self, ModelError> {
         Self::new(vec![
             Arc::new(RustAdapter),
             Arc::new(PythonAdapter),
+            Arc::new(RubyAdapter),
             Arc::new(CAdapter),
             Arc::new(CppAdapter),
         ])

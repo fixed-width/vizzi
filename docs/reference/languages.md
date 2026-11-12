@@ -3,15 +3,15 @@
 For users deciding what Vizzi can show for a project. Source browsing and call resolution
 are separate capabilities; recognising a declaration does not imply resolving its calls.
 
-| Capability | Python | Rust | C/C++ |
-| --- | --- | --- | --- |
-| Default source selection | `.py`, `.pyi` | `.rs` | Explicit C-family scopes required |
-| Syntax-coloured source and declaration outlines | Supported within parser/view bounds | Supported within parser/view bounds | Raw syntax for assigned C/C++; ambiguous headers can be source-only |
-| Written-call navigation | Semantic with Pyright; otherwise name candidates | Semantic with rust-analyzer; source-local bindings and candidate fallback | Semantic with clangd and compilation context; candidate fallback |
-| Project-aware definitions and semantic references | Pyright provider | rust-analyzer provider | clangd provider |
-| Caller/reference search without a semantic provider | Written-call name candidates | Written-call name candidates | Written-call name candidates |
-| Source outside the configured repository | Locally available Python/stub captures through Pyright | Local captures through rust-analyzer | Local C/C++ captures through clangd |
-| Language module/package cues | Recognised Python modules/packages | Captured Cargo target/module structure | Not available |
+| Capability | Python | Rust | Ruby | C/C++ |
+| --- | --- | --- | --- | --- |
+| Default source selection | `.py`, `.pyi` | `.rs` | `.rb`, `.rake`, `.gemspec`, `.ru`, Gemfile, Rakefile | Explicit C-family scopes required |
+| Syntax-coloured source and declaration outlines | Supported within parser/view bounds | Supported within parser/view bounds | Modules, classes, explicit methods and constants | Raw syntax for assigned C/C++; ambiguous headers can be source-only |
+| Written-call navigation | Semantic with Pyright; otherwise name candidates | Semantic with rust-analyzer; source-local bindings and candidate fallback | Semantic with Ruby LSP; otherwise name candidates | Semantic with clangd and compilation context; candidate fallback |
+| Project-aware definitions and semantic references | Pyright provider | rust-analyzer provider | Ruby LSP; reference destinations cross-checked | clangd provider |
+| Caller/reference search without a semantic provider | Written-call name candidates | Written-call name candidates | Written-call name candidates | Written-call name candidates |
+| Source outside the configured repository | Locally available Python/stub captures through Pyright | Local captures through rust-analyzer | Local Ruby source reached through Ruby LSP | Local C/C++ captures through clangd |
+| Language module/package cues | Recognised Python modules/packages | Captured Cargo target/module structure | Declared Ruby modules, including reopened namespaces | Not available |
 
 ## Python
 
@@ -38,6 +38,26 @@ already exist on disk. Macro-generated declarations, conditional configurations 
 unsupported project/syntax forms can remain unavailable. Static resolution is not a
 runtime call trace.
 
+## Ruby
+
+Basic browsing does not need Ruby or a project build. The syntax adapter preserves class,
+module, ordinary/singleton method and constant declarations. Bare method names are
+distinguished from lexical locals, including parameters, block bindings and assignments.
+Receiver calls, arguments, punctuation names and endless methods use exact source offsets.
+The local-binding allowance is 4,096 names per file; when exceeded, bare-call evidence is
+omitted while explicit calls remain available within the shared call limits.
+
+The optional [Ruby LSP provider](../how-to/configure-language-servers.md#ruby-with-ruby-lsp)
+uses captured source, existing RubyGems and private startup configuration. Method reference
+results retain only unique verified definition matches. Dynamic dispatch, metaprogramming,
+generated methods, custom load paths and unavailable libraries can limit coverage. Operators
+expressed implicitly, such as `a + b`, are not enumerated as method calls. ERB/RBS parsing
+and reproducing the complete Bundler environment are outside this initial support.
+
+Module accents describe captured declared namespaces, not runtime aliases or file-based
+packages. A class without an enclosing module remains neutral. Ruby source can be explored
+alongside the other supported languages in the same repository.
+
 ## C/C++
 
 Explicit scopes enable source capture and raw declaration/type outlines. Unassigned `.h`
@@ -61,7 +81,8 @@ Vizzi uses its own source policy. At the inspected root, `.git`, `target` and
 `node_modules` are excluded. Other paths ignored by Git are not automatically excluded;
 use `--exclude-source` for virtual environments, generated source or vendor trees you
 do not want in the reading scope. Cargo lockfiles, Python project settings and enabled
-C-family compilation metadata participate in change detection.
+C-family compilation metadata participate in change detection. Ruby lockfiles and runtime
+selection metadata are captured as project context without execution.
 
 Workspace capture does not follow source-file symlinks. Unsupported encodings, parser
 recovery, deferred analysis, projection limits and missing dependency source are distinct
@@ -75,7 +96,7 @@ Large-repository interaction and cross-browser support are still being qualified
 current user documentation is checked on Linux with Chromium, not a performance or
 platform guarantee for every repository.
 
-The Python/C-family semantic mirror currently admits up to 8 MiB per source file and
+The Python/Ruby/C-family semantic mirror currently admits up to 8 MiB per source file and
 128 MiB of source per provider workspace. Exceeding these bounds makes semantic lookup
 unavailable; ordinary captured-source browsing has separate limits. Local dependency
 captures retain at most 2 MiB per file, 32 MiB total and 32 files.

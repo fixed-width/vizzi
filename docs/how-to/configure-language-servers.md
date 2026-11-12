@@ -2,7 +2,7 @@
 
 Use a language server when you want type-aware definition and reference lookup rather
 than written-name candidates. Vizzi supports rust-analyzer for Rust, Pyright for Python,
-and clangd for C/C++. Several can be configured in one mixed-language workspace.
+Ruby LSP for Ruby, and clangd for C/C++. Several can be configured in one mixed-language workspace.
 Basic syntax browsing remains available without them.
 
 ## Python with Pyright
@@ -45,6 +45,46 @@ use that environment's installed packages.
 Use `--rust-analyzer rust-analyzer`. The existing option and workflow remain supported.
 The [Rust guide](configure-rust.md) covers Cargo inputs, standard-library source and
 local dependencies.
+
+## Ruby with Ruby LSP
+
+Install [Ruby LSP](https://shopify.github.io/ruby-lsp/editors.html) in the Ruby environment
+you want to use, outside Vizzi:
+
+```sh
+gem install ruby-lsp
+./target/release/vizzi \
+  --root /path/to/ruby-project \
+  --workers 1 \
+  --ruby-lsp ruby-lsp
+```
+
+Use the installed RubyGems executable, or its full path for a specific Ruby version.
+The option accepts an executable, not a `bundle exec` command or project binstub. Ruby
+and the server are only needed for semantic navigation; syntax browsing works without them.
+
+Vizzi gives the server a private copy of captured source and synchronises saved changes.
+Known receiver definitions open directly. Ruby LSP's method reference results are checked
+against definitions to discard unrelated same-name methods and declarations. Ambiguous
+receiver references can be omitted; an empty result does not prove that a method is unused.
+
+The adapter skips bundle composition, installation, project add-ons, formatters and linters.
+It does not evaluate the project's Gemfile or gemspecs. Registry gem names from
+`Gemfile.lock` help the server index gems already visible in the selected RubyGems
+environment. `GEM_HOME` and `GEM_PATH` remain available for choosing that environment.
+This does not reproduce complete Bundler resolution; path/Git gems and custom load paths
+can remain unavailable. When multiple installed versions are indexed, distinct source
+bodies retain a choice; gem capture labels include their source directory. Install missing dependencies and choose the Ruby environment
+outside Vizzi. Exclude large vendor trees with `--exclude-source vendor/bundle` as needed.
+
+Local Ruby source reached by the server uses independent dependency captures, including
+available standard-library implementations. Ruby bodies take precedence over accompanying
+RBS signatures; RBS-only targets, C implementations and generated DSL/alias declarations
+without an admitted source body can remain unavailable. ERB and RBS analysis are outside
+this initial support. Static lookup does not establish Ruby runtime dispatch.
+
+The checked server is Ruby LSP 0.26.11 with Ruby 3.4.1 on Linux. A small server bootstrap
+is specific to Ruby LSP; other Ruby language servers are not interchangeable with this option.
 
 ## C/C++ with clangd
 
