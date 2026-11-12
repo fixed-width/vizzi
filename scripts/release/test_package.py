@@ -1,5 +1,6 @@
 import hashlib
 import importlib.util
+import io
 import json
 from pathlib import Path
 import tarfile
@@ -19,6 +20,7 @@ class PackageTests(unittest.TestCase):
         manifest = self.root / 'crates/vizzi/Cargo.toml'
         manifest.parent.mkdir(parents=True)
         manifest.write_text('[package]\nversion="0.1.0"\n')
+        (self.root / 'LICENSE-APACHE').write_text('Fixture project license')
         self.binary = self.root / 'built-vizzi'
         self.binary.write_bytes(b'fixture executable')
         self.output = self.root / 'dist'
@@ -46,6 +48,23 @@ class PackageTests(unittest.TestCase):
         with self.assertRaises(FileExistsError):
             release.package('v0.1.0', release.TARGETS[0], self.binary, self.output, self.root)
 
+    def test_archive_includes_project_license_variants_and_notice(self):
+        names = ['LICENSE', 'LICENSE.md', 'LICENSE.txt', 'LICENSE-APACHE', 'LICENSE-MIT', 'NOTICE']
+        for name in names:
+            (self.root / name).write_text('Fixture notice: ' + name)
+        archive = release.package('v0.1.0', release.TARGETS[0], self.binary, self.output, self.root)
+        with tarfile.open(archive) as contents:
+            prefix = archive.name.removesuffix('.tar.gz')
+            for name in names:
+                self.assertEqual(contents.extractfile(prefix + '/' + name).read(),
+                                 (self.root / name).read_bytes())
+
+    def test_packaging_requires_a_project_license_before_creating_an_archive(self):
+        (self.root / 'LICENSE-APACHE').unlink()
+        with self.assertRaisesRegex(ValueError, 'project license'):
+            release.package('v0.1.0', release.TARGETS[0], self.binary, self.output, self.root)
+        self.assertFalse(self.output.exists())
+
     def test_complete_bundle_is_required_and_tampering_is_rejected(self):
         archives = []
         for target in release.TARGETS:
@@ -55,6 +74,30 @@ class PackageTests(unittest.TestCase):
         archives[0].write_bytes(b'tampered')
         with self.assertRaises(ValueError):
             release.bundle('v0.1.0', self.output, self.root)
+
+    def test_bundle_rejects_missing_or_changed_project_license_even_with_a_matching_checksum(self):
+        for damage in ['missing', 'changed']:
+            with self.subTest(damage=damage):
+                output = self.root / damage
+                archives = [release.package('v0.1.0', target, self.binary, output, self.root)
+                            for target in release.TARGETS]
+                archive = archives[0]
+                members = []
+                with tarfile.open(archive) as contents:
+                    for member in contents.getmembers():
+                        data = contents.extractfile(member).read()
+                        if member.name.endswith('/LICENSE-APACHE'):
+                            if damage == 'missing':
+                                continue
+                            data = b'changed project license'
+                            member.size = len(data)
+                        members.append((member, data))
+                with tarfile.open(archive, 'w:gz') as contents:
+                    for member, data in members:
+                        contents.addfile(member, io.BytesIO(data))
+                Path(str(archive) + '.sha256').write_text(f'{release.digest(archive)}  {archive.name}\n')
+                with self.assertRaisesRegex(ValueError, 'project license'):
+                    release.bundle('v0.1.0', output, self.root)
 
     def test_missing_targets_and_unknown_targets_are_rejected(self):
         self.output.mkdir()

@@ -22,8 +22,8 @@ on Linux or `shasum -a 256 ARCHIVE` on macOS. Extract the archive, then run the 
 executable inside it. For example, for the Linux x86-64 release:
 
 ```sh
-tar -xzf vizzi-v0.1.0-x86_64-unknown-linux-musl.tar.gz
-cd vizzi-v0.1.0-x86_64-unknown-linux-musl
+tar -xzf vizzi-v0.1.1-x86_64-unknown-linux-musl.tar.gz
+cd vizzi-v0.1.1-x86_64-unknown-linux-musl
 ./vizzi --help
 ```
 

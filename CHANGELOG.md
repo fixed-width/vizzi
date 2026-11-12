@@ -6,6 +6,14 @@ remains in Git and the project documentation.
 
 ## Unreleased
 
+## 0.1.1 - 2026-11-11
+
+### Fixed
+
+- Include the project's `LICENSE-APACHE` and other `LICENSE*` files in binary archives.
+  Packaging requires a project license, and the publication gate checks each archive's
+  license contents against the tagged source before publishing.
+
 ## 0.1.0 - 2026-11-11
 
 ### Added

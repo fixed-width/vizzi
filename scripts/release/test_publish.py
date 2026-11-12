@@ -22,6 +22,7 @@ class PublishTests(unittest.TestCase):
         manifest = self.root / 'crates/vizzi/Cargo.toml'
         manifest.parent.mkdir(parents=True)
         manifest.write_text('[package]\nversion="0.1.0"\n')
+        (self.root / 'LICENSE-APACHE').write_text('Fixture project license')
         binary = self.root / 'binary'
         binary.write_bytes(b'fixture executable')
         for target in release.TARGETS:

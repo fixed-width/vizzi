@@ -54,8 +54,9 @@ checks upstream provenance. See [GitHub's lockfile reference](https://docs.githu
 
 Build jobs have read-only repository access. Only the final publication job can write
 release contents, after every matrix build and the browser/tutorial checks have passed. It checks that the existing tag
-still identifies the built commit and that the commit is on the default branch. All
-archives and checksums are attached to a draft; uploaded bytes are downloaded and
+still identifies the built commit and that the commit is on the default branch.
+Every archive must contain unchanged copies of the tagged source's project licenses.
+Archives and checksums are attached to a draft; uploaded bytes are downloaded and
 verified before publication. Existing releases are refused, with no asset replacement.
 
 Repository release immutability must stay enabled. GitHub locks published assets and

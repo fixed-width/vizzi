@@ -29,12 +29,20 @@ def digest(path):
         return hashlib.file_digest(source, 'sha256').hexdigest()
 
 
+def project_licenses(root):
+    licenses = sorted(path for path in root.glob('LICENSE*') if path.is_file())
+    if not licenses:
+        raise ValueError('Release input must include a project license')
+    return licenses
+
+
 def package(tag, target, binary, output, root=ROOT):
     validate(tag, root)
     if target not in TARGETS:
         raise ValueError(f'Unsupported release target: {target}')
     if not binary.is_file() or binary.is_symlink():
         raise ValueError('Release input must be a regular executable file')
+    licenses = project_licenses(root)
     output.mkdir(parents=True, exist_ok=True)
     prefix = f'vizzi-{tag}-{target}'
     archive = output / (prefix + '.tar.gz')
@@ -61,10 +69,9 @@ def package(tag, target, binary, output, root=ROOT):
             info.mode = 0o644
             info.size = len(data)
             contents.addfile(info, io.BytesIO(data))
-        for name in ['LICENSE', 'LICENSE.md', 'LICENSE.txt', 'NOTICE']:
-            path = root / name
+        for path in [*licenses, root / 'NOTICE']:
             if path.is_file():
-                contents.add(path, arcname=prefix + '/' + name, recursive=False)
+                contents.add(path, arcname=prefix + '/' + path.name, recursive=False)
         notice = root / 'crates/vizzi/web/vendor/bubblesets-LICENSE.txt'
         if notice.is_file():
             contents.add(notice, arcname=prefix + '/THIRD_PARTY_NOTICES/bubblesets-LICENSE.txt')
@@ -76,6 +83,7 @@ def package(tag, target, binary, output, root=ROOT):
 
 def bundle(tag, directory, root=ROOT):
     validate(tag, root)
+    licenses = project_licenses(root)
     names = {f'vizzi-{tag}-{target}.tar.gz' for target in TARGETS}
     expected = names | {name + '.sha256' for name in names}
     actual = {path.name for path in directory.iterdir()}
@@ -87,6 +95,15 @@ def bundle(tag, directory, root=ROOT):
         expected_line = f'{digest(path)}  {name}\n'
         if (directory / (name + '.sha256')).read_text() != expected_line:
             raise ValueError(f'Checksum mismatch: {name}')
+        prefix = name.removesuffix('.tar.gz')
+        with tarfile.open(path) as contents:
+            members = {member.name: member for member in contents.getmembers()}
+            for license in licenses:
+                member = members.get(prefix + '/' + license.name)
+                expected_license = license.read_bytes()
+                if (member is None or not member.isfile()
+                        or contents.extractfile(member).read(len(expected_license) + 1) != expected_license):
+                    raise ValueError(f'Archive project license missing or changed: {name}/{license.name}')
         lines.append(expected_line)
     manifest = directory / 'SHA256SUMS'
     contents = ''.join(lines)
