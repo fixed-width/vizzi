@@ -2,13 +2,32 @@
 use vizzi::dependency_sources::{Catalog, Input};
 fn input(root: &std::path::Path) -> Input {
     Input {
-        root: root.into(),
+        root: root.canonicalize().unwrap(),
         path: "src/lib.rs".into(),
         language: "rust".into(),
         package: "helper".into(),
         version: Some("1.2.3".into()),
         configuration: "a".repeat(64),
     }
+}
+#[cfg(unix)]
+#[test]
+fn dependency_roots_require_canonical_native_identity() {
+    let root = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    std::fs::create_dir(root.path().join("src")).unwrap();
+    std::fs::write(root.path().join("src/lib.rs"), "fn entry() {}").unwrap();
+    let alias = cache.path().join("alias");
+    std::os::unix::fs::symlink(root.path(), &alias).unwrap();
+    let catalog = Catalog::new(cache.path().join("refs.json"));
+    let native = input(root.path());
+    assert!(catalog.capture(native.clone()).is_ok());
+    let mut aliased = native;
+    aliased.root = alias;
+    assert_eq!(
+        catalog.capture(aliased).err().as_deref(),
+        Some("Dependency root must be canonical")
+    );
 }
 #[test]
 fn dependency_captures_are_distinct_frozen_and_restorable_by_native_references() {

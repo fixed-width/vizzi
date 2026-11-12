@@ -216,7 +216,7 @@ mod tests {
         for path in ["src/header.h", "src/device.cuh", "src/example.c++"] {
             let event =
                 notify::Event::new(notify::EventKind::Create(notify::event::CreateKind::File))
-                    .add_path(root.path().join(path));
+                    .add_path(directory.root().join(path));
             assert_eq!(
                 classify(&directory, Ok(event)),
                 Some(CaptureScope::Paths([path.into()].into()))
@@ -225,7 +225,7 @@ mod tests {
         for path in ["src/ignored/header.h", "src2/header.h", "src/a.lpc"] {
             let event =
                 notify::Event::new(notify::EventKind::Create(notify::event::CreateKind::File))
-                    .add_path(root.path().join(path));
+                    .add_path(directory.root().join(path));
             assert!(classify(&directory, Ok(event)).is_none());
         }
     }
@@ -462,17 +462,17 @@ mod tests {
         let metadata = Event::new(EventKind::Modify(ModifyKind::Metadata(
             notify::event::MetadataKind::Any,
         )))
-        .add_path(root.path().join("a.rs"));
+        .add_path(directory.root().join("a.rs"));
         assert_eq!(classify(&directory, Ok(metadata)), Some(paths(&["a.rs"])));
         let both = Event::new(EventKind::Modify(ModifyKind::Name(RenameMode::Both)))
-            .add_path(root.path().join("a.rs"));
+            .add_path(directory.root().join("a.rs"));
         assert_eq!(
             classify(&directory, Ok(both)),
             Some(CaptureScope::Reconcile)
         );
         let from = Event::new(EventKind::Modify(ModifyKind::Name(RenameMode::From)))
-            .add_path(root.path().join("a.rs"))
-            .add_path(root.path().join("b.rs"));
+            .add_path(directory.root().join("a.rs"))
+            .add_path(directory.root().join("b.rs"));
         assert_eq!(
             classify(&directory, Ok(from)),
             Some(CaptureScope::Reconcile)

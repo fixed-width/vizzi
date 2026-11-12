@@ -140,7 +140,7 @@ mod tests {
         assert!(external_path(&root.join("nested/../cache"), &root).is_err());
         assert_eq!(
             external_path(&temp.path().join("cache/../cache"), &root).unwrap(),
-            temp.path().join("cache")
+            temp.path().canonicalize().unwrap().join("cache")
         );
         #[cfg(unix)]
         {

@@ -180,9 +180,10 @@ mod tests {
     #[test]
     fn manifest_paths_preserve_dependency_kinds_and_private_workspace_sources() {
         let temp = tempfile::tempdir().unwrap();
-        let original = temp.path().join("project");
-        let mirror = temp.path().join("mirror");
-        let external = temp.path().join("helper");
+        let root = temp.path().canonicalize().unwrap();
+        let original = root.join("project");
+        let mirror = root.join("mirror");
+        let external = root.join("helper");
         fs::create_dir_all(&original).unwrap();
         fs::create_dir_all(&external).unwrap();
         let text=b"[package]\nname='consumer'\n[lib]\npath='source.rs'\n[dependencies]\nlocal={path='inside'}\nhelper={path='../helper'}\n[target.'cfg(unix)'.build-dependencies]\nhelper={path='../helper'}\n[workspace.dependencies]\nhelper={path='../helper'}\n[patch.crates-io]\nhelper={path='../helper'}\n[package.metadata]\npath='unchanged'\n";

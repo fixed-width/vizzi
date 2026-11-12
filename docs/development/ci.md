@@ -13,9 +13,12 @@ archives contain a static executable. macOS executables are ad-hoc signed; Devel
 signing/notarization is not configured. The workflow must pass on each native runner
 before an archive is published; authoring the matrix does not itself qualify those platforms.
 
-The native checks share `scripts/ci/check-native.sh`. Tests run serially. Hosted compiler
-jobs use two tasks; local contributor and mutation limits remain in AGENTS.md. Browser
-checks use the locked npm development dependencies and installed Playwright Chromium.
+The native checks share `scripts/ci/check-native.sh`. Tests run serially with a symlinked
+temporary directory to exercise canonical-path contracts on both platforms. All test
+targets run even after a failure so one failing binary cannot hide later failures.
+Hosted compiler jobs use two tasks; local contributor and mutation limits remain in
+AGENTS.md. Browser checks use the locked npm development dependencies and installed
+Playwright Chromium.
 Optional real-language-server integrations remain opt-in because they need separately
 installed tools and dependency source. Performance/mutation runs remain separate from
 normal correctness CI.

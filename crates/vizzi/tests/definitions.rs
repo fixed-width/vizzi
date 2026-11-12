@@ -131,7 +131,7 @@ fn dependency_source_windows_calls_refresh_and_editor_verification_keep_their_ow
     let catalog = vizzi::dependency_sources::Catalog::new(cache.path().join("dependencies.json"));
     let captured = catalog
         .capture(vizzi::dependency_sources::Input {
-            root: dependency.path().into(),
+            root: dependency.path().canonicalize().unwrap(),
             path: "target.rs".into(),
             language: "rust".into(),
             package: "helper".into(),
@@ -184,7 +184,7 @@ fn dependency_source_windows_calls_refresh_and_editor_verification_keep_their_ow
     };
     assert_eq!(
         app.dependency_location(&open).unwrap().path,
-        dependency.path().join("target.rs")
+        dependency.path().canonicalize().unwrap().join("target.rs")
     );
     let refresh:vizzi::structural::live::Request=serde_json::from_value(json!({"snapshot":req.snapshot,"views":[{"id":"v1","capture":captured.origin.capture,"symbol":symbol,"tracking":target["tracking"],"version":version,"file":file,"context":target["source"]["context"],"area":"main.rs","section_offset":0,"anchor":null}],"links":[]})).unwrap();
     assert_eq!(

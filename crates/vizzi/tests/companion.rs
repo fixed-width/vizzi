@@ -526,7 +526,10 @@ fn a_current_location_opens_without_evidence_or_writable_investigation_storage()
     app.open_source(&direct_request(&target, 2)).unwrap();
     let opened = editor.0.lock().unwrap();
     assert_eq!(opened.len(), 1);
-    assert_eq!(opened[0].path, root.path().join("src/a.rs"));
+    assert_eq!(
+        opened[0].path,
+        root.path().canonicalize().unwrap().join("src/a.rs")
+    );
     assert_eq!(opened[0].line, 2);
     assert_eq!(serde_json::to_value(app.view().board).unwrap(), before);
     assert!(storage.is_dir());

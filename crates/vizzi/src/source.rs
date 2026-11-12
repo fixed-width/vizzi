@@ -424,10 +424,10 @@ mod tests {
                 .bytes(),
             b"fn f() {}"
         );
-        assert!(!directory.relevant(&temp.path().join("target/build.rs")));
-        assert!(directory.relevant(&temp.path().join("drivers/target/real.rs")));
+        assert!(!directory.relevant(&directory.root().join("target/build.rs")));
+        assert!(directory.relevant(&directory.root().join("drivers/target/real.rs")));
         assert!(!directory.relevant(Path::new("/elsewhere/a.rs")));
-        assert!(!directory.relevant(&temp.path().join("notes.txt")));
+        assert!(!directory.relevant(&directory.root().join("notes.txt")));
         #[cfg(unix)]
         {
             std::os::unix::fs::symlink(temp.path().join("src"), temp.path().join("linked"))
