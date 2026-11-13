@@ -1,6 +1,7 @@
 const net = require('node:net');
 const crypto = require('node:crypto');
 const fs = require('node:fs/promises');
+const {constants} = require('node:fs');
 const path = require('node:path');
 
 const FRAME = 16 * 1024 * 1024;
@@ -57,10 +58,11 @@ async function startBridge({root, connectionFile, query}) {
   await new Promise((resolve,reject) => {server.once('error',reject);server.listen(0,'127.0.0.1',resolve);});
   const port = server.address().port;
   const manifest = {version:1,root,port,token};
+  const contents = Buffer.from(JSON.stringify(manifest));
   const temporary = `${connectionFile}.${session}.tmp`;
   try {
     await fs.mkdir(path.dirname(connectionFile), {recursive:true,mode:0o700});
-    await fs.writeFile(temporary, JSON.stringify(manifest), {mode:0o600,flag:'wx'});
+    await fs.writeFile(temporary, contents, {mode:0o600,flag:'wx'});
     await fs.rename(temporary,connectionFile);
   } catch (error) {
     server.close();
@@ -69,6 +71,23 @@ async function startBridge({root, connectionFile, query}) {
   }
   return {
     port,
+    async isCurrent() {
+      if (stopped) return false;
+      let file;
+      try {
+        file=await fs.open(connectionFile,constants.O_RDONLY | (constants.O_NONBLOCK || 0));
+        const info=await file.stat();
+        if (!info.isFile() || info.size!==contents.length || info.size>4096) return false;
+        const bytes=Buffer.alloc(contents.length+1);
+        let length=0;
+        while(length<bytes.length) {
+          const {bytesRead}=await file.read(bytes,length,bytes.length-length,null);
+          if(!bytesRead)break;
+          length+=bytesRead;
+        }
+        return !stopped && length===contents.length && bytes.subarray(0,length).equals(contents);
+      } catch {return false;} finally {await file?.close();}
+    },
     async dispose() {
       if (stopped) return;
       stopped = true;

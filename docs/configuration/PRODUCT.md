@@ -112,3 +112,23 @@ with that capture. This supports standard-library methods using newer syntax suc
 `[const]` bounds without guessing a same-name declaration or rewriting source. Such
 function ranges do not manufacture raw call analysis; missing syntax analysis remains
 explicit. Dependency queries use paths from retained native captures, never browser paths.
+
+## Explore a call from the editor
+
+**Vizzi: Explore Call** appears in the source editor's right-click menu and Command
+Palette. From a saved local project file, it captures the call-name position before
+changing focus, starts or reuses Vizzi, and opens its Call workspace tab. The current
+task gains the enclosing declaration and follows the selected call beside it. Existing
+bubbles, groups and reading positions are retained; repeating the action reveals the
+existing views. Ambiguous or unavailable targets use the ordinary destination chooser.
+
+The editor text must match saved disk source and Vizzi's current capture. Dirty files,
+source-file symlinks, excluded/unsupported source, non-call positions and calls without
+a captured enclosing declaration produce actionable errors. The command does not save
+buffers or guess a same-name target. It starts from captured project source; following
+the resulting call can enter an admitted Rust dependency as usual.
+
+The handoff uses a source-checked native call identity. Only opaque snapshot/call IDs
+cross the tab's URL fragment; source text, credentials and native paths do not. Changing
+from another Vizzi mode returns to Call workspace. The fragment is consumed, so the
+same call can be requested again without reloading an existing Call workspace.

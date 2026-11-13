@@ -3,7 +3,8 @@
 This extension opens Vizzi in an editor tab using VS Code's definition and reference
 providers. Platform-specific VSIX files include the native executable.
 
-Already installed? Click **Vizzi** in the status bar or run **Vizzi: Open Workspace**.
+Already installed? Right-click a saved call name and choose **Vizzi: Explore Call**,
+or click **Vizzi** in the status bar to open an empty workspace.
 The [installed-extension guide](INSTALL.md) covers installation, optional project-local
 settings and troubleshooting. The workflow below is for extension development and testing.
 
@@ -87,3 +88,6 @@ VIZZI_RUST_ANALYZER_EXTENSION=/path/to/rust-lang.rust-analyzer-version-platform 
 This requires local `rust-src`. It uses offline Cargo and disables checks, build scripts
 and proc macros in the test profile. It resolves `Option::ok_or_else` with the real
 VS Code provider, opens the captured `core` function and restores its saved task.
+
+Add `--editor-call` to the real Rust `--rust --webview` check to activate Explore Call
+from the actual editor context menu, then verify repeated navigation and layout retention.

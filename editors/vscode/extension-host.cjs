@@ -6,6 +6,7 @@ const path = require('node:path');
 const os = require('node:os');
 const readline = require('node:readline');
 const {spawn} = require('node:child_process');
+const {writeSignal}=require('./test-signals.cjs');
 
 async function verify() {
   const root = vscode.workspace.workspaceFolders[0].uri;
@@ -129,7 +130,7 @@ async function verify() {
         assert.ok(inspected.passed,inspected.error);
       }
       if (process.env.VIZZI_TEST_WEBVIEW) {
-        await fs.writeFile(process.env.VIZZI_TEST_REPORT+'.workspace',JSON.stringify({url:openedWorkspace.url}));
+        await writeSignal(process.env.VIZZI_TEST_REPORT+'.workspace',{url:openedWorkspace.url});
         await waitInspection();
       }
       await vscode.window.showTextDocument(document);
@@ -142,7 +143,7 @@ async function verify() {
       await vscode.commands.executeCommand('vizzi.openWorkspace');
       await waitTabs(1);
       if (process.env.VIZZI_TEST_WEBVIEW) {
-        await fs.writeFile(process.env.VIZZI_TEST_REPORT+'.reopened','{}');
+        await writeSignal(process.env.VIZZI_TEST_REPORT+'.reopened',{});
         await waitInspection('-reopened');
       }
       await vscode.commands.executeCommand('vizzi.stopWorkspace');

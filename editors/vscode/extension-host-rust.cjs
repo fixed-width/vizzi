@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const os = require('node:os');
+const {writeSignal}=require('./test-signals.cjs');
 
 async function verify() {
   const root = vscode.workspace.workspaceFolders[0].uri;
@@ -27,7 +28,22 @@ async function verify() {
     await vscode.workspace.getConfiguration('vizzi').update('executablePath',
       process.env.VIZZI_TEST_EXTENSION_PATH?undefined:process.env.VIZZI_TEST_BINARY,vscode.ConfigurationTarget.Global);
     await fs.writeFile(path.join(root.fsPath,'vizzi.toml'),`root = "."\nport = 0\ncache = ${JSON.stringify(path.join(temporary,'cache'))}\n`);
-    const workspace = await vscode.commands.executeCommand('vizzi.openWorkspace');
+    let workspace;
+    if (process.env.VIZZI_TEST_EDITOR_CALL==='command') {
+      const editor=await vscode.window.showTextDocument(document);
+      editor.selection=new vscode.Selection(position,position);
+      const handoff=await vscode.commands.executeCommand('vizzi.exploreCall',file);
+      assert.ok(handoff?.call,'Explore Call command did not deliver the selected call');
+      workspace=await vscode.commands.executeCommand('vizzi.openWorkspace');
+    } else if (process.env.VIZZI_TEST_EDITOR_CALL) {
+      await writeSignal(process.env.VIZZI_TEST_REPORT+'.editor-source',{callee:'ok_or_else'});
+      const deadline=Date.now()+45000;
+      while (!workspace) {
+        workspace=await fs.readFile(process.env.VIZZI_TEST_REPORT+'.editor-opened','utf8').then(JSON.parse,error=>{if(error.code!=='ENOENT')throw error;});
+        assert.ok(Date.now()<deadline,'editor context-menu action did not open Vizzi');
+        if(!workspace)await new Promise(resolve=>setTimeout(resolve,100));
+      }
+    } else workspace=await vscode.commands.executeCommand('vizzi.openWorkspace');
     assert.ok(workspace?.url,'Vizzi did not launch');
     async function get(route) {
       const response = await fetch(workspace.url+route);
@@ -78,11 +94,18 @@ async function verify() {
           await new Promise(resolve=>setTimeout(resolve,100));
         }
       }
-      await fs.writeFile(process.env.VIZZI_TEST_REPORT+'.workspace',JSON.stringify({url:workspace.url,caller:'convert',callee:'ok_or_else'}));
+      await writeSignal(process.env.VIZZI_TEST_REPORT+'.workspace',{url:workspace.url,caller:'convert',callee:'ok_or_else',editorCall:Boolean(process.env.VIZZI_TEST_EDITOR_CALL)});
       await inspect();
+      if(process.env.VIZZI_TEST_EDITOR_CALL) {
+        const editor=await vscode.window.showTextDocument(document);
+        editor.selection=new vscode.Selection(position,position);
+        assert.ok((await vscode.commands.executeCommand('vizzi.exploreCall',file))?.call);
+        await writeSignal(process.env.VIZZI_TEST_REPORT+'.editor-repeat',{});
+        await inspect('-repeat');
+      }
       await vscode.window.tabGroups.close(tabs()[0]);
       await vscode.commands.executeCommand('vizzi.openWorkspace');
-      await fs.writeFile(process.env.VIZZI_TEST_REPORT+'.reopened','{}');
+      await writeSignal(process.env.VIZZI_TEST_REPORT+'.reopened',{});
       await inspect('-reopened');
     }
     console.log('Real VS Code rust-analyzer resolved ok_or_else into a captured core source bubble.');

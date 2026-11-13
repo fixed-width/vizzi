@@ -6,6 +6,7 @@ const {startBridge} = require('./bridge.cjs');
 const {createProvider} = require('./providers.cjs');
 const {startWorkspace} = require('./launcher.cjs');
 const {createWorkspaceView} = require('./workspace-view.cjs');
+const {captureEditorCall,resolveEditorCall} = require('./editor-call.cjs');
 
 let active;
 let workspace;
@@ -101,6 +102,17 @@ function activate(context) {
     if (!opening) opening = openWorkspace(folderUri,external).finally(()=>{opening=undefined;});
     return opening;
   }
+  async function exploreCall(resource) {
+    try {
+      output.appendLine('Exploring the selected editor call…');
+      const selection=await captureEditorCall(vscode,resource);
+      const session=await open(selection.uri);
+      if (!session) return;
+      const handoff=await resolveEditorCall(session,selection);
+      await workspaceView.explore(handoff);
+      return handoff;
+    } catch (error) {await report(error);}
+  }
   async function shareLanguageProviders(folderUri,externalSettings=false) {
     output.show(true);
     if (starting) {output.appendLine('Vizzi sharing is already starting.');return;}
@@ -113,6 +125,12 @@ function activate(context) {
       if (!folder) return;
       const root = await fs.realpath(folder.uri.fsPath);
       if (invocation !== generation) return;
+      const reused=active;
+      if (!externalSettings && reused?.root===root && await reused.bridge.isCurrent()) {
+        if (invocation!==generation || active!==reused) return;
+        output.appendLine('Using the current editor connection.');
+        return {root,connectionFile:reused.connectionFile};
+      }
       await stop();
       invocation = generation;
       const key = crypto.createHash('sha256').update(root).digest('hex');
@@ -121,7 +139,7 @@ function activate(context) {
       provider = createProvider(vscode,root,folder.uri.fsPath);
       const bridge = await startBridge({root,connectionFile,query:provider.query});
       if (invocation !== generation) {provider.dispose(); await bridge.dispose(); return;}
-      active = {bridge,provider};
+      active = {bridge,provider,root,connectionFile};
       output.clear();
       output.appendLine(`Sharing language providers for ${root}`);
       if (externalSettings) {
@@ -141,6 +159,7 @@ function activate(context) {
   context.subscriptions.push(output,status,workspaceView,
     vscode.commands.registerCommand('vizzi.openWorkspace',folderUri=>open(folderUri)),
     vscode.commands.registerCommand('vizzi.openWorkspaceInBrowser',folderUri=>open(folderUri,true)),
+    vscode.commands.registerCommand('vizzi.exploreCall',exploreCall),
     vscode.commands.registerCommand('vizzi.stopWorkspace',deactivate),
     vscode.commands.registerCommand('vizzi.stopSharing',stop),
     vscode.commands.registerCommand('vizzi.shareLanguageProviders',folderUri=>shareLanguageProviders(folderUri,true)));

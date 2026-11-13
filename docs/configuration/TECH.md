@@ -33,6 +33,23 @@ explicit. This admits current Rust `[const]` methods without rewriting their sou
 adding a compiler/server. Persisted references retain the optional checked range, and
 restoration still requires identical contents and analysis identities.
 
+## Editor call handoff
+
+The editor captures its file, saved text and UTF-16 word position before opening the tab.
+`POST /api/editor/call` checks an explicitly selected snapshot and saved-source witness,
+then uses the existing exact call-position index and native enclosing declaration. Its
+invocation query accepts only the resulting call ID. The route has a separate 16 MiB
+message limit; source text is bounded to 4 MiB and paths stay repository-relative.
+
+The webview shell becomes ready independently of the inner UI. A nonce-bound host message
+sets an opaque snapshot/call fragment on the local iframe. Fragment-only navigation keeps
+an existing Call workspace document alive; another mode navigates back to its root. The
+frontend consumes the fragment, waits for coherent source, adds or reveals the caller,
+and uses ordinary call following and destination choices. Neither a second definition
+resolver nor an editor-specific call graph is maintained. Repeated launches reuse the
+current sharing session while its manifest still belongs to that window; another window's
+replacement is detected before reuse.
+
 ## Proposed changes
 
 - Move launch parsing into a binary-private `configuration` module. Deserialize a strict

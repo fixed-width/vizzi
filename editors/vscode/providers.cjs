@@ -162,4 +162,4 @@ function createProvider(vscode, root, editorRoot = root) {
   return {query,dispose(){disposed=true;for(const subscription of subscriptions) subscription.dispose();}};
 }
 
-module.exports = {createProvider};
+module.exports = {createProvider,savedSource};

@@ -44,7 +44,9 @@ pub(super) fn router(
     let dependency_windows = structure.clone();
     let dependency_locations = structure.clone();
     let dependency_editor = app.clone();
+    let editor_calls = structure.clone();
     Router::new()
+        .route("/api/editor/call",post(move|Json(request):Json<crate::structural::editor::Request>|{let structure=editor_calls.clone();async move{work(move||structure.editor_call(&request)).await}}).layer(DefaultBodyLimit::max(16*1024*1024)))
         .route("/api/dependency/window",get(move |Query(binding):Query<DependencyWindow>,Query(query):Query<vizzi_core::projection::WindowQuery>|{let app=dependency_windows.clone();async move{dependency_read(move||app.dependency_window(&binding.snapshot,&binding.file,&binding.version,&query)).await}}))
         .route("/api/dependency/editor",post(move |Json(request):Json<OpenSource>|{let structure=dependency_locations.clone();let app=dependency_editor.clone();async move{editor_handoff(move||app.open_verified_location(&structure.dependency_location(&request)?)).await}}))
         .route("/api/investigation", get(view).post(edit))

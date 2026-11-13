@@ -22,7 +22,7 @@ branches together, with shared module labels.
 - [Arrange bubbles, groups and saved tasks](how-to/manage-tasks.md)
 - [Follow saved changes or pin a view](how-to/follow-live-changes.md)
 - [Configure language servers and local dependencies](how-to/configure-language-servers.md)
-- [Connect the VS Code extension and open the visual workspace](../editors/vscode/INSTALL.md)
+- [Explore an editor call with the VS Code extension](../editors/vscode/INSTALL.md)
 - [Save launch settings](how-to/configure-vizzi.md)
 - [Browse files and declarations](how-to/browse-source.md)
 - [Review working changes or two Git commits](how-to/review-local-changes.md)

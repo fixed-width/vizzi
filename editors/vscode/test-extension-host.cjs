@@ -3,6 +3,7 @@ const path = require('node:path');
 const os = require('node:os');
 const {spawn,execFileSync} = require('node:child_process');
 const net = require('node:net');
+const {writeSignal}=require('./test-signals.cjs');
 
 async function main() {
   const repository = path.resolve(__dirname,'../..');
@@ -41,12 +42,16 @@ async function main() {
     extension = path.join(directory,'extension');
     testHost = path.join(extension,testName);
     await fs.copyFile(path.join(__dirname,testName),testHost);
+    await fs.copyFile(path.join(__dirname,'test-signals.cjs'),path.join(extension,'test-signals.cjs'));
   }
   const args = ['--verbose','--wait','--no-sandbox','--disable-gpu','--disable-updates','--disable-telemetry',
     '--disable-workspace-trust','--skip-welcome','--skip-release-notes',...(!rust?['--disable-extensions']:[]),
     `--user-data-dir=${path.join(directory,'user')}`,`--extensions-dir=${path.join(directory,'extensions')}`,
     `--extensionDevelopmentPath=${extension}`,`--extensionTestsPath=${testHost}`,workspace];
   const inspect = process.argv.includes('--webview');
+  const editorCall = process.argv.includes('--editor-call');
+  const editorCommand = process.argv.includes('--editor-command');
+  if (editorCall && (!rust || !inspect)) throw new Error('--editor-call requires --rust --webview');
   let port;
   if (inspect) {
     const listener = net.createServer();
@@ -59,13 +64,14 @@ async function main() {
   const child = spawn(headless ? 'xvfb-run' : code,headless ? ['-a',code,...args] : args,{
     stdio:['ignore',log.fd,log.fd],
     env:{...process.env,XDG_CACHE_HOME:path.join(directory,'cache'),XDG_CONFIG_HOME:path.join(directory,'config'),
-      VIZZI_TEST_BINARY:binary,VIZZI_TEST_REPORT:report,VIZZI_TEST_WEBVIEW:inspect?'1':''},
+      VIZZI_TEST_BINARY:binary,VIZZI_TEST_REPORT:report,VIZZI_TEST_WEBVIEW:inspect?'1':'',VIZZI_TEST_EDITOR_CALL:editorCall?'menu':editorCommand?'command':''},
   });
-  const inspection = inspect ? require('./test-webview.cjs').verifyWebview({port,report})
+  const inspection = inspect ? require('./test-webview.cjs').verifyWebview({port,report,editorCall})
     .catch(async error=>{
-      const result = JSON.stringify({passed:false,error:error.stack});
-      await fs.writeFile(report+'.webview',result);
-      await fs.writeFile(report+'.webview-reopened',result);
+      const result = {passed:false,error:error.stack};
+      await writeSignal(report+'.webview',result);
+      await writeSignal(report+'.webview-reopened',result);
+      await writeSignal(report+'.webview-repeat',result);
     }) : undefined;
   const timer = setTimeout(()=>child.kill(),120000);
   try {

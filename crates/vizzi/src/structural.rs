@@ -6,6 +6,7 @@ pub mod live;
 pub mod references;
 use crate::{companion::CompanionError, host::Host};
 use serde::Deserialize;
+pub mod editor;
 use serde_json::Value;
 use std::sync::{Arc, Mutex, TryLockError};
 use vizzi_core::structure::Structure;

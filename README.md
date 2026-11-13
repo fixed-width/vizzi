@@ -31,6 +31,10 @@ without arguments from the project directory. `--root` selects another directory
 `--cache` overrides the automatically chosen [workspace cache](docs/reference/storage.md#cache-location).
 Stop the server with Ctrl-C.
 
+Using VS Code? [Install the bundled extension](editors/vscode/INSTALL.md), then right-click
+a saved call name and choose **Vizzi: Explore Call** to open its caller and definition
+together in an editor tab.
+
 For semantic navigation on a real project, [configure its language server](docs/how-to/configure-language-servers.md):
 `--pyright pyright-langserver` for Python, `--rust-analyzer rust-analyzer` for Rust,
 `--ruby-lsp ruby-lsp` for Ruby, or `--clangd clangd` with C/C++ compilation context.

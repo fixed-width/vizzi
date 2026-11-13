@@ -2,7 +2,7 @@
   "name": "vizzi",
   "displayName": "Vizzi",
   "description": "Share VS Code language providers with the Vizzi visual workspace.",
-  "version": "0.3.0",
+  "version": "0.4.1",
   "publisher": "vizzi",
   "license": "Apache-2.0",
   "engines": { "vscode": "^1.85.0" },
@@ -13,12 +13,16 @@
   "capabilities": { "untrustedWorkspaces": { "supported": false }, "virtualWorkspaces": { "supported": false } },
   "contributes": {
     "commands": [
+      { "command": "vizzi.exploreCall", "title": "Vizzi: Explore Call" },
       { "command": "vizzi.openWorkspace", "title": "Vizzi: Open Workspace" },
       { "command": "vizzi.openWorkspaceInBrowser", "title": "Vizzi: Open Workspace in Browser" },
       { "command": "vizzi.stopWorkspace", "title": "Vizzi: Stop Workspace" },
       { "command": "vizzi.shareLanguageProviders", "title": "Vizzi: Share Language Providers (Advanced)" },
       { "command": "vizzi.stopSharing", "title": "Vizzi: Stop Sharing Language Providers" }
     ],
+    "menus": {
+      "editor/context": [{"command":"vizzi.exploreCall","when":"resourceScheme == file && isWorkspaceTrusted && editorLangId =~ /^(rust|python|ruby|c|cpp)$/","group":"navigation@20"}]
+    },
     "configuration": {
       "title": "Vizzi",
       "properties": {

@@ -8,6 +8,8 @@ remains in Git and the project documentation.
 
 ### Changed
 
+- Successful editor handoffs are silent in the call workspace and saved locations;
+  failures still show an error.
 - VS Code setup starts from the status bar or **Vizzi: Open Workspace**, with optional
   project-local `vizzi.toml` settings and no manual connection-file setup.
 - Plugin activation opens Vizzi in a reusable editor tab. **Vizzi: Open Workspace in
@@ -15,6 +17,8 @@ remains in Git and the project documentation.
 
 ### Added
 
+- **Vizzi: Explore Call** in the VS Code editor context menu opens the saved call's
+  caller and definition in the current visual task, with ordinary ambiguity handling.
 - Shared VS Code analysis can open local Rust dependency and standard-library functions,
   including `ok_or_else`. Checked editor function ranges support newer Rust syntax without
   rewriting captured source or launching another language server.

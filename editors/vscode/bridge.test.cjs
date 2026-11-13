@@ -54,7 +54,10 @@ test('replacing a connection does not let the previous bridge remove it', async 
   t.after(() => fs.rm(directory, {recursive:true, force:true}));
   const file = path.join(directory, 'connection.json');
   const one = await startBridge({root:directory, connectionFile:file, query:async()=>({})});
+  assert.equal(await one.isCurrent(),true);
   const two = await startBridge({root:directory, connectionFile:file, query:async()=>({})});
+  assert.equal(await one.isCurrent(),false);
+  assert.equal(await two.isCurrent(),true);
   t.after(() => two.dispose());
   await one.dispose();
   assert.equal(JSON.parse(await fs.readFile(file, 'utf8')).port, two.port);

@@ -207,3 +207,55 @@ the exact source body is readable, and no call facts are fabricated. Other exter
 languages, virtual sources, other platforms/analyzer versions and performance remain
 outside this qualification. No additional server, download, build or publication was
 performed by the product workflow.
+
+## Editor context-menu handoff, 2026-11-13
+
+The preceding preview work was committed as `7369d63` before implementing this slice.
+The 0.4.0 preview adds **Vizzi: Explore Call** to the source editor context menu and
+Command Palette. Saved source and a UTF-16 word position bind to an exact captured call;
+the tab receives only opaque snapshot/call IDs and uses ordinary call following.
+
+| Check | Result |
+| --- | --- |
+| Formatting, workspace tests/doctests and Clippy | Passed: 766 tests passed, 15 optional integrations ignored |
+| Extension and handoff Node tests | 35 passed |
+| Release-helper tests | 13 passed |
+| Browser regression suite | `npm test -- --no-build --no-desktop-bus` passed, including the new editor-link tests |
+| Actual right-click menu | Selected Explore Call on `ok_or_else` in the real Rust editor; caller and captured `core` definition opened automatically |
+| Repeat navigation | Preserved the same inner document, both bubbles and their geometry; named task restored after tab recreation |
+| Installed 0.4.0 Linux x86-64 VSIX | Ordinary sharing and real analyzer menu/repeat workflows passed in temporary profiles on virtual displays |
+
+The API regression covers exact position selection after an emoji, mismatched text,
+unaddressable paths, non-call positions, stale IDs, capture refresh and exact 4 MiB source
+through the HTTP route. A retained hidden tab initially exposed a zero-viewport reveal
+race; delivery now waits for a usable viewport. Existing model semantics retain distinct
+semantic contexts as separate evidence; repeat checks preserve that behaviour rather
+than collapsing it. Current bridge ownership is checked before reusing a session.
+
+The UI harness captures the painted menu before selecting it and publishes its JSON
+signals atomically. A transient partial-signal read in the initial installed test was
+fixed in the harness. The final installed right-click and repeat checks passed with
+real rust-analyzer 0.3.3113 and local Rust 1.99.1 source, without changing the maintainer's
+profile or language configuration.
+
+Both cargo-mutants passes used passing baselines, `nice -n 10`, one mutant/compiler task
+and serial tests. The initial complete pass tested 20 candidates: 16 caught, 3 survived,
+1 unviable build and 0 timeouts. The surviving cases prompted delegation of path authority
+to published snapshot keys and a capture-refresh regression that detects stale index reuse.
+The final complete pass tested all 16 candidates in the handoff module: 15 caught,
+0 survivors, 1 unviable build and 0 timeouts. No mutation exclusions were added. Counts
+overlap across passes; this is module-scoped Rust evidence, not full-stack mutation coverage.
+
+The action starts from saved captured project declarations. Top-level calls without an
+enclosing declaration, source-file aliases and unsupported syntax remain explicit errors.
+Other platforms and performance are outside this local qualification. The installer was
+built locally; no publication or update of the maintainer's installed extension was performed.
+
+## Silent editor navigation, 2026-11-13
+
+The 0.4.1 preview removes successful editor-handoff notices from both the Call workspace
+and Saved locations, including standalone launches. The direct-editor regression first
+failed on the visible success banner. After removal, the direct-editor and companion
+browser checks passed, verifying silent success, literal recorded arguments, unchanged
+saved evidence and visible stale-source refusal. Formatting and diff checks passed.
+No Rust implementation changed; no additional mutation coverage is claimed.

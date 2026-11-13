@@ -13,7 +13,7 @@ async function fixture(t, folders = 1) {
   await fs.writeFile(binary,'fixture executable');
   t.after(()=>fs.rm(directory,{recursive:true,force:true}));
   const folder = {uri:{scheme:'file',fsPath:root}};
-  const commands = new Map(), lines = [], errors = [], opened = [], launches = [], panels = [], connections = [];
+  const commands = new Map(), lines = [], errors = [], opened = [], launches = [], panels = [], connections = [], editorCalls = [];
   let shown = 0, picks = 0, disposed = 0;
   const output = {clear(){lines.length=0;},appendLine:line=>lines.push(line),
     append:line=>lines.push(line),show(){shown++;},dispose(){}};
@@ -24,7 +24,10 @@ async function fixture(t, folders = 1) {
     window:{createOutputChannel:()=>output,
       createWebviewPanel:(type,title,column,options)=>{
         const callbacks = [];
-        const panel = {type,title,column,options,webview:{html:''},revealed:0,closed:false,
+        const messages = [];
+        const panel = {type,title,column,options,messages,webview:{html:'',
+          onDidReceiveMessage:callback=>{queueMicrotask(()=>callback({type:'vizzi.ready'}));return {dispose(){}};},
+          postMessage:async value=>{messages.push(value);return true;}},revealed:0,closed:false,
           reveal(){this.revealed++;},onDidDispose:callback=>{callbacks.push(callback);},
           dispose(){this.closed=true;for (const callback of callbacks) callback();}};
         panels.push(panel);
@@ -49,15 +52,19 @@ async function fixture(t, folders = 1) {
   const dependencies = {
     vscode,
     './providers.cjs':{createProvider:()=>({query(){},dispose(){}})},
-    './bridge.cjs':{startBridge:async options=>{connections.push(options);return {dispose:async()=>{}};}},
+    './bridge.cjs':{startBridge:async options=>{connections.push(options);return {dispose:async()=>{},isCurrent:async()=>true};}},
     './launcher.cjs':{startWorkspace:options=>start(options)},
+    './editor-call.cjs':{
+      captureEditorCall:(...args)=>require('./editor-call.cjs').captureEditorCall(...args),
+      resolveEditorCall:async(session,selection)=>{editorCalls.push({session,selection});return {snapshot:'a'.repeat(64),call:'b'.repeat(64)};},
+    },
   };
   const source = await fs.readFile(path.join(__dirname,'extension.cjs'),'utf8');
   vm.compileFunction(source,['require','module'],{filename:'extension.cjs'})(
     name=>dependencies[name] || require(name),module);
   module.exports.activate(context);
   t.after(()=>module.exports.deactivate());
-  return {directory,root,folder,vscode,context,commands,lines,errors,opened,launches,panels,connections,
+  return {directory,root,folder,vscode,context,commands,lines,errors,opened,launches,panels,connections,editorCalls,
     shown:()=>shown,picks:()=>picks,disposed:()=>disposed,setStart:callback=>{start=callback;}};
 }
 
@@ -93,6 +100,7 @@ test('open workspace launches once, uses project-local settings and stops its ow
   await open();
   await open();
   assert.equal(f.launches.length,1);
+  assert.equal(f.connections.length,1);
   assert.equal(f.launches[0].configFile,config);
   assert.equal(f.launches[0].root,await fs.realpath(f.root));
   assert.equal(f.opened.length,0);
@@ -218,4 +226,34 @@ test('advanced provider sharing points users to automatic setup and labels optio
   assert.match(text,/Optional settings for an external Vizzi launch/);
   assert.match(text,/vscode-connection\s*=/);
   assert.doesNotMatch(text,/Add these settings/);
+});
+
+async function sourceEditor(f) {
+  const file=path.join(f.root,'a.py'),text='def caller(): leaf()\n';
+  await fs.writeFile(file,text);
+  const uri={scheme:'file',fsPath:file,toString(){return this.fsPath;}};
+  const document={uri,isDirty:false,getText:()=>text,getWordRangeAtPosition:()=>({start:{line:0,character:14}})};
+  f.vscode.window.activeTextEditor={document,selection:{isEmpty:true,active:{line:0,character:16}}};
+  return {document,text,uri};
+}
+
+test('explore call captures the source cursor before focus moves and targets the existing editor tab',async t=>{
+  const f=await fixture(t),source=await sourceEditor(f);
+  f.setStart(async()=>{f.vscode.window.activeTextEditor=undefined;return {url:'http://127.0.0.1:7474/',dispose:async()=>{}};});
+  await f.commands.get('vizzi.exploreCall')(source.uri);
+  assert.equal(f.editorCalls[0].selection.text,source.text);
+  assert.deepEqual(f.editorCalls[0].selection.position,{line:0,character:14});
+  assert.equal(f.panels.length,1);
+  assert.equal(f.panels[0].messages[0].call,'b'.repeat(64));
+  assert.equal(f.panels[0].messages[0].snapshot,'a'.repeat(64));
+  assert.equal(f.opened.length,0);
+});
+
+test('explore call asks for saved source before launching or changing the task',async t=>{
+  const f=await fixture(t),source=await sourceEditor(f);
+  source.document.isDirty=true;
+  await f.commands.get('vizzi.exploreCall')(source.uri);
+  assert.match(f.errors.join('\n'),/Save/);
+  assert.equal(f.launches.length,0);
+  assert.equal(f.panels.length,0);
 });

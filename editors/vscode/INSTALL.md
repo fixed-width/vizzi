@@ -8,14 +8,14 @@ a `vscode-connection` path into project settings.
 
 ## Install the bundled preview
 
-Use the 0.3.0 VSIX for your operating system and processor:
+Use the 0.4.1 VSIX for your operating system and processor:
 
 | System | Processor | VSIX filename |
 | --- | --- | --- |
-| Linux | x86-64 | `vizzi-vscode-0.3.0-linux-x64.vsix` |
-| Linux | ARM64 | `vizzi-vscode-0.3.0-linux-arm64.vsix` |
-| macOS | Intel | `vizzi-vscode-0.3.0-darwin-x64.vsix` |
-| macOS | Apple Silicon | `vizzi-vscode-0.3.0-darwin-arm64.vsix` |
+| Linux | x86-64 | `vizzi-vscode-0.4.1-linux-x64.vsix` |
+| Linux | ARM64 | `vizzi-vscode-0.4.1-linux-arm64.vsix` |
+| macOS | Intel | `vizzi-vscode-0.4.1-darwin-x64.vsix` |
+| macOS | Apple Silicon | `vizzi-vscode-0.4.1-darwin-arm64.vsix` |
 
 In VS Code's Extensions view, open **⋯ → Install from VSIX…** and select the file.
 If VS Code offers to reload extensions after updating, accept it. The VSIX includes
@@ -23,7 +23,7 @@ Vizzi's native executable and browser interface. Rust, Node.js and a separate na
 installation are not required to use the bundled preview.
 
 The earlier 0.1.0 extension only shares language providers. Update to the bundled
-0.3.0 preview to use the launch command. The release workflow builds these VSIX files
+0.4.1 preview to use the launch command. The release workflow builds these VSIX files
 alongside native archives; local source builds are described below.
 
 ## Open your project
@@ -46,6 +46,20 @@ window also stops the process it launched.
 
 Use **Vizzi: Open Workspace in Browser** for an external browser. Saved tasks in that
 browser use separate storage from the VS Code tab.
+
+## Explore a call from your editor
+
+Save the source file, right-click a call name and choose **Vizzi: Explore Call**.
+Vizzi starts automatically if needed and opens its Call workspace tab. The enclosing
+code and selected definition appear together in the current task. If several targets
+are possible, choose one in Vizzi's normal destination list. Earlier bubbles and groups
+stay in the task; using the action again reveals existing views.
+
+You can also place the cursor on a call name and run **Vizzi: Explore Call** from the
+Command Palette. The source must be a captured project file. Unsaved files, unsupported
+syntax, excluded source and positions without a captured call report an error rather
+than selecting a different same-name function. Rust calls can lead into locally available
+dependency and standard-library source as described below.
 
 ## Optional project settings
 
@@ -77,7 +91,7 @@ JSON, which contains a session credential, in VS Code's extension storage.
 Open **View → Output** and select **Vizzi** for startup details. Errors also appear as
 VS Code notifications.
 
-- **Open Workspace is missing:** check that the bundled 0.3.0 extension is installed
+- **Open Workspace is missing:** check that the bundled 0.4.1 extension is installed
   and enabled in this window, and reload extensions if VS Code requests it.
 - **No folder is open:** use **File → Open Folder…** and try again. This preview requires
   a trusted local folder; remote and virtual workspaces are unsupported.
