@@ -85,3 +85,125 @@ tests after a passing baseline: one candidate, one caught, zero survivors, unvia
 builds or timeouts. This focused check does not establish whole-spool mutation coverage.
 
 Hosted Linux/macOS confirmation is available in the [PR checks](https://github.com/fixed-width/vizzi/pull/3/checks).
+
+## Bundled extension follow-up, 2026-11-13
+
+The 0.2.0 extension adds Open Workspace, an optional project-root `vizzi.toml`, native
+process ownership and visible sharing progress. Regression tests first reproduced the
+silent empty-window/cancelled-picker paths and the missing no-argument single-folder
+workflow. These establish failure paths in the previous implementation; they do not
+identify which path caused the maintainer's original missing-Output report.
+
+| Check | Result |
+| --- | --- |
+| `npm run test:editor` | 20 command, native launcher, bridge and provider tests passed |
+| Release helper tests | 13 passed, including complete VSIX asset sets, matching native bytes and platform metadata |
+| Source extension host | Shared providers and Open Workspace launch, browser handoff, reuse and shutdown passed |
+| Installed Linux x86-64 VSIX | Installed into temporary VS Code directories; included executable and Open Workspace integration passed |
+| Packaged payload | Runtime sources, README, native executable, executable permissions and checksum verified |
+| Documentation | 49 local/repository links and TOML examples validated; project-local settings also launched from a parent directory |
+| Workflow dependencies | Modified CI/release workflows retain their existing locked action-reference sets |
+
+The installed-payload harness copies its test entry point into an isolated copy of the
+extension so its VS Code API context matches the runtime's. Browser opening is intercepted
+there; the tests verify the handoff URL and real HTTP listener, not the operating system's
+browser integration. The maintainer's installed extension/profile was not changed.
+
+Native formatting, workspace tests/doctests and Clippy ran during this session. The
+sandbox blocked editor-bridge socket tests; all fifteen passed on an unrestricted rerun.
+No Rust implementation changed in this follow-up, and no additional cargo-mutants run
+or mutation-coverage claim is made for the JavaScript launcher. macOS/ARM64 installed
+runtime checks and hosted release execution remain unqualified locally. No release or
+Marketplace publication was performed.
+
+## Editor tabs follow-up, 2026-11-13
+
+The 0.2.1 extension opens the workspace in a retained editor webview by default, with
+an explicit external-browser command. The first real-frame check exposed the native
+page policy's `frame-ancestors 'none'`. A failing HTTP regression preceded the change
+to permit the desktop editor's `vscode-webview:` and `vscode-file:` ancestor schemes;
+HTTP/HTTPS page ancestors remain excluded.
+
+- Native formatting, workspace tests/doctests and Clippy passed: 758 tests passed,
+  with 15 optional integration tests explicitly ignored.
+- All 23 Node command/launcher/provider tests and 13 release-helper tests passed.
+- Both source and installed Linux x86-64 extension checks rendered the real iframe,
+  followed a semantic call, renamed a reading task and restored its two source bubbles
+  after closing and reopening the tab. API checks covered tab reuse, source-tab
+  switching, the explicit browser handoff, project changes and shutdown.
+- The installed 0.2.1 payload, native executable and checksum matched the final source.
+  All 49 checked documentation links and the TOML examples remained valid.
+- A focused cargo-mutants run caught one replacement of the affected `router` body
+  after a passing unmodified baseline. It used `nice -n 10`, one mutant/compiler task
+  and serial tests. There were no survivors, unviable builds or timeouts in this run.
+  This narrow function-level mutation does not establish coverage of individual CSP
+  source expressions or the JavaScript lifecycle.
+
+Linux extension-host checks now use Xvfb by default; `--visible` is an explicit opt-in.
+An earlier visible test window displayed VS Code's temporary disabled-extensions banner;
+this affected the isolated test profile, not the maintainer's normal extension settings.
+macOS/ARM64 runtime and operating-system browser handoff remain outside this local check.
+
+## Automatic connection messaging follow-up, 2026-11-13
+
+The 0.2.2 extension separates its internal sharing step from the advanced external-launch
+command. Default editor/browser launches pass the current connection directly and do not
+print TOML copy/paste instructions. Advanced sharing is labelled in the Command Palette
+and points to Open Workspace for automatic setup.
+
+Two regression tests first failed on the obsolete prompt. All 25 Node tests now pass,
+including stopping and starting without a project config, a stable connection filename
+and automatic handoff of each new bridge. The real VS Code check on Xvfb also stops and
+restarts the native workspace without changing its TOML file, then verifies that an
+independently launched native process reconnects through its original connection path.
+Real tab rendering, call navigation and saved-task restoration remain qualified on Linux.
+The 13 release-helper tests, formatting and diff checks passed; the 0.2.2 packaged payload
+was verified against source by the packager. No Rust implementation changed in this
+follow-up, so the prior native baseline and mutation evidence are unchanged.
+
+## Shared Rust dependencies follow-up, 2026-11-13
+
+The 0.3.0 preview admits local Rust dependency and standard-library definitions through
+VS Code's existing providers. A failing native peer test first reproduced discarded
+external Rust locations, and Node regressions reproduced the missing external query
+methods. The installed `Option::ok_or_else` additionally requires a checked document-symbol
+range because the released native grammar cannot extract its `[const]` signature.
+
+| Check | Result |
+| --- | --- |
+| Formatting, workspace tests/doctests and Clippy | Passed: 764 tests passed, 15 optional integrations ignored |
+| Node protocol/provider/launcher/command tests | 29 passed, including both dependency query methods, saved-source witnesses and nonregular source refusal |
+| Release helper tests | 13 passed |
+| Source and installed VSIX, ordinary editor workflow | Passed on virtual displays |
+| Real VS Code rust-analyzer 0.3.3113 | Resolved `ok_or_else` into installed Rust 1.99.1 `core/src/option.rs`; native capture retained the exact method body |
+| Real editor UI and persistence | Followed `convert` to `ok_or_else`, saved the two-bubble task and restored it after closing and reopening the tab |
+
+The real Rust check copies the installed analyzer extension into an isolated profile.
+It selects local sysroot source, sets offline Cargo, and disables checks, build scripts
+and proc macros. Neither the maintainer's profile nor their language-server configuration
+was changed. The final installed VSIX passed both ordinary and real Rust checks.
+
+The first full native run exposed noncanonical paths in four new peer fixtures when
+TMPDIR used a symlink. The fixtures now publish canonical dependency paths as required
+by the protocol; the baseline includes the symlinked temporary-directory check.
+
+Mutation runs used cargo-mutants 27.1.0, `nice -n 10`, `CARGO_BUILD_JOBS=1`,
+`RUST_TEST_THREADS=1`, `-j 1 --jobserver-tasks 1`, and passing unmodified baselines.
+
+| Pass | Scope | Caught by failing tests | Survived | Unviable builds | Timeouts |
+| --- | --- | --- | --- | --- | --- |
+| Initial | 37 candidates in dependency admission, range validation, capture and provider methods | 21 | 10 | 6 | 0 |
+| Final | All 18 candidates in the same function scope after consolidation | 12 | 0 | 6 | 0 |
+
+Survivors exposed validation duplicated by `Document::capture`. Content, range and
+identifier-witness checks now use that shared invariant boundary. Separate tests enforce
+the provider descriptor's bounded, single-line name. The bridge also delegates file size
+and regular-file checks to the existing capture reader. No mutation exclusions were
+added. These overlapping runs are not a unique-mutant total or full-module coverage;
+compiler failures are separate from mutations caught by tests.
+
+Native call analysis inside provider-range fallback functions can remain unavailable;
+the exact source body is readable, and no call facts are fabricated. Other external
+languages, virtual sources, other platforms/analyzer versions and performance remain
+outside this qualification. No additional server, download, build or publication was
+performed by the product workflow.

@@ -31,6 +31,8 @@ verified editor handoff with small fixtures and a real installed provider.
 
 Declaration extraction remains a capability limit. In particular, some recent Rust
 `[const]` trait-bound syntax is not recognized by the pinned Tree-sitter grammar even
-when rust-analyzer resolves its location. Such a target stays outside admitted declarations;
-it must not open an unrelated same-name function. Dependency module labels can also be
+when rust-analyzer resolves its location. Without a checked editor range, such a target stays outside admitted declarations;
+it must not open an unrelated same-name function. Shared editor analysis can instead
+supply an exact, source-checked function range for that target. Native call highlighting
+inside such a function may remain unavailable. Dependency module labels can also be
 unavailable; package provenance is shown independently of module membership.

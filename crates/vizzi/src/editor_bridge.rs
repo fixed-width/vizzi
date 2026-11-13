@@ -1,5 +1,6 @@
 //! Editor-owned analysis over a bounded, authenticated local connection.
 use crate::definitions::{self, Answer, Location, Position, Provider};
+use crate::dependency_sources::{Capture, Catalog, Declaration};
 use serde::{Deserialize, Serialize};
 use std::{
     fs::File,
@@ -10,7 +11,7 @@ use std::{
     time::{Duration, Instant},
 };
 use vizzi_core::{
-    model::{ContextId, Document, Snapshot},
+    model::{ContentId, ContextId, Document, Snapshot},
     structure::{CallLookup, Symbol},
 };
 
@@ -61,12 +62,27 @@ struct Target {
     path: PathBuf,
     position: Position,
     text: String,
+    #[serde(default)]
+    declaration: Option<EditorDeclaration>,
+}
+
+#[derive(Deserialize)]
+struct EditorRange {
+    start: Position,
+    end: Position,
+}
+#[derive(Deserialize)]
+struct EditorDeclaration {
+    name: String,
+    range: EditorRange,
+    selection: EditorRange,
 }
 
 pub(crate) struct Bridge {
     root: PathBuf,
     connection: PathBuf,
     active: Mutex<()>,
+    sources: Arc<Catalog>,
 }
 fn read_file(path: &Path, limit: usize) -> Result<Vec<u8>, String> {
     let file = File::open(path).map_err(|e| format!("Cannot read {}: {e}", path.display()))?;
@@ -96,12 +112,59 @@ fn time_left(deadline: Instant) -> Result<Duration, String> {
         .ok_or_else(|| "Editor analysis timed out".into())
 }
 impl Bridge {
-    pub(crate) fn new(root: PathBuf, connection: PathBuf) -> Self {
+    pub(crate) fn new(root: PathBuf, connection: PathBuf, sources: Arc<Catalog>) -> Self {
         Self {
             root,
             connection,
             active: Mutex::new(()),
+            sources,
         }
+    }
+    fn dependency_target(
+        &self,
+        target: &Target,
+        configuration: &str,
+    ) -> Result<Option<Arc<Capture>>, String> {
+        if target.path.extension().and_then(|s| s.to_str()) != Some("rs")
+            || target.path.canonicalize().ok().as_ref() != Some(&target.path)
+        {
+            return Ok(None);
+        }
+        let Ok(input) = crate::rust_dependencies::input(&target.path, configuration) else {
+            return Ok(None);
+        };
+        let Ok(mut captured) = self.sources.capture(input.clone()) else {
+            return Ok(None);
+        };
+        if source(captured.doc())? != target.text {
+            return Err("Editor dependency target differs from saved source".into());
+        }
+        let byte = definitions::byte_offset(&target.text, target.position)?;
+        if captured
+            .index
+            .definition(captured.doc().path(), byte)
+            .is_none()
+            && let Some(range) = &target.declaration
+        {
+            let start = definitions::byte_offset(&target.text, range.range.start)?;
+            let end = definitions::byte_offset(&target.text, range.range.end)?;
+            if !(start..end).contains(&byte) {
+                return Err("Editor declaration does not contain the returned target".into());
+            }
+            let declaration = Declaration {
+                content: ContentId::derive(&[target.text.as_bytes()]),
+                name: range.name.clone(),
+                span: start..end,
+                identifier: definitions::byte_offset(&target.text, range.selection.start)?
+                    ..definitions::byte_offset(&target.text, range.selection.end)?,
+            };
+            captured = self.sources.capture_with_declaration(input, declaration)?;
+        }
+        if source(captured.doc())? != target.text {
+            return Err("Editor dependency target differs from captured source".into());
+        }
+        captured.verify()?;
+        Ok(Some(captured))
     }
     fn verify(&self, snapshot: &Snapshot) -> Result<(), String> {
         if snapshot.documents().len() > 8192 {
@@ -182,6 +245,7 @@ impl Bridge {
         doc: &Document,
         byte: usize,
         method: &str,
+        dependency: Option<&Capture>,
     ) -> Result<Answer, String> {
         let _active = self
             .active
@@ -207,26 +271,35 @@ impl Bridge {
             return Err("VS Code connection belongs to another workspace root".into());
         }
         self.verify(snapshot)?;
+        if let Some(source) = dependency {
+            source.verify()?;
+        }
         let text = source(doc)?;
+        let external_path = dependency.map(Capture::path);
+        let query_path = external_path
+            .as_ref()
+            .map(|path| path.to_str().ok_or("Editor dependency path is not UTF-8"))
+            .transpose()?
+            .unwrap_or(doc.path());
+        let query_method = if dependency.is_some() {
+            format!("dependency-{method}")
+        } else {
+            method.into()
+        };
         let response = self.request(
             &connection,
             &Request {
                 version: 1,
                 token: &connection.token,
                 root: &connection.root,
-                method,
-                path: doc.path(),
+                method: &query_method,
+                path: query_path,
                 text: &text,
                 position: definitions::position(&text, byte)?,
             },
         )?;
         if response.version != 1 {
             return Err("Unsupported editor response version".into());
-        }
-        let current: Connection = serde_json::from_slice(&read_file(&connection_path, 4096)?)
-            .map_err(|e| format!("Invalid VS Code connection file: {e}"))?;
-        if current != connection {
-            return Err("VS Code connection changed during analysis; retry navigation".into());
         }
         let (session, epoch, targets, mut outside) = match response.outcome {
             Outcome::Ok {
@@ -242,8 +315,12 @@ impl Bridge {
         if session.is_empty() || session.len() > 128 || targets.len() > RESULTS || outside > 65536 {
             return Err("Invalid or oversized editor result".into());
         }
-        self.verify(snapshot)?;
+        let configuration = ContextId::derive(&[
+            b"editor-dependencies-v1",
+            self.root.as_os_str().as_encoded_bytes(),
+        ]);
         let mut locations = vec![];
+        let mut captured_targets = vec![];
         for target in targets {
             if !target.path.is_absolute() {
                 return Err("Editor target must be an absolute file path".into());
@@ -253,7 +330,16 @@ impl Bridge {
                 .strip_prefix(&connection.root)
                 .or_else(|_| target.path.strip_prefix(&self.root))
             else {
-                outside += 1;
+                if let Some(captured) = self.dependency_target(&target, configuration.as_str())? {
+                    locations.push(Location {
+                        capture: Some(captured.origin.capture.clone()),
+                        path: captured.doc().path().into(),
+                        position: target.position,
+                    });
+                    captured_targets.push(captured);
+                } else {
+                    outside += 1;
+                }
                 continue;
             };
             let relative = relative
@@ -275,6 +361,18 @@ impl Bridge {
                 position: target.position,
             });
         }
+        self.verify(snapshot)?;
+        if let Some(source) = dependency {
+            source.verify()?;
+        }
+        for captured in captured_targets {
+            captured.verify()?;
+        }
+        let current: Connection = serde_json::from_slice(&read_file(&connection_path, 4096)?)
+            .map_err(|e| format!("Invalid VS Code connection file: {e}"))?;
+        if current != connection {
+            return Err("VS Code connection changed during analysis; retry navigation".into());
+        }
         Ok(Answer {
             locations,
             outside,
@@ -283,6 +381,7 @@ impl Bridge {
                 session.as_bytes(),
                 &epoch.to_le_bytes(),
                 snapshot.id().as_str().as_bytes(),
+                doc.version().as_str().as_bytes(),
             ])
             .as_str()
             .to_owned(),
@@ -290,9 +389,26 @@ impl Bridge {
     }
 }
 impl Provider for Bridge {
+    fn dependencies(&self) -> Option<&Catalog> {
+        Some(&self.sources)
+    }
     fn resolve(&self, snapshot: Arc<Snapshot>, call: &CallLookup) -> Result<Answer, String> {
-        let doc = snapshot
-            .file(&call.invocation.source.file)
+        let external = if snapshot.file(&call.invocation.source.file).is_none() {
+            self.sources
+                .sources()?
+                .into_iter()
+                .find(|source| source.index.call(&call.invocation.id).is_some())
+        } else {
+            None
+        };
+        let doc = external
+            .as_ref()
+            .map(|source| source.doc())
+            .or_else(|| {
+                snapshot
+                    .file(&call.invocation.source.file)
+                    .map(AsRef::as_ref)
+            })
             .ok_or("Captured editor caller is unavailable")?;
         if doc.version().as_str() != call.invocation.source.version {
             return Err("Captured caller version differs".into());
@@ -304,7 +420,13 @@ impl Provider for Bridge {
         if source(doc)?.get(identifier.clone()) != call.invocation.name.as_deref() {
             return Err("Captured call identifier differs".into());
         }
-        self.lookup(&snapshot, doc, identifier.start, "definition")
+        self.lookup(
+            &snapshot,
+            doc,
+            identifier.start,
+            "definition",
+            external.as_deref(),
+        )
     }
     fn references(
         &self,
@@ -312,11 +434,19 @@ impl Provider for Bridge {
         symbol: &Symbol,
         identifier: usize,
     ) -> Result<Answer, String> {
-        if symbol.origin.is_some() {
-            return Err("Editor dependency references are outside capture".into());
+        let external = symbol
+            .origin
+            .as_ref()
+            .map(|origin| self.sources.get(&origin.capture))
+            .transpose()?
+            .flatten();
+        if symbol.origin.is_some() && external.is_none() {
+            return Err("Captured editor dependency is unavailable".into());
         }
-        let doc = snapshot
-            .file(&symbol.source.file)
+        let doc = external
+            .as_ref()
+            .map(|source| source.doc())
+            .or_else(|| snapshot.file(&symbol.source.file).map(AsRef::as_ref))
             .ok_or("Captured editor declaration is unavailable")?;
         if doc.version().as_str() != symbol.source.version {
             return Err("Captured declaration version differs".into());
@@ -346,6 +476,7 @@ impl Provider for Bridge {
             doc,
             identifier + definitions::reference_offset(language, &fact.name),
             "references",
+            external.as_deref(),
         )
     }
 }

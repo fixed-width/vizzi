@@ -7,7 +7,7 @@ import subprocess
 import tempfile
 import unittest
 
-from test_package import release
+from test_package import release, extension_fixtures
 
 
 class PublishTests(unittest.TestCase):
@@ -27,6 +27,7 @@ class PublishTests(unittest.TestCase):
         binary.write_bytes(b'fixture executable')
         for target in release.TARGETS:
             release.package('v0.1.0', target, binary, self.root / 'dist', self.root)
+        extension_fixtures(self.root, self.root / 'dist')
         release.bundle('v0.1.0', self.root / 'dist', self.root)
         self.tools = self.root / 'bin'
         self.tools.mkdir()
@@ -78,7 +79,7 @@ else:raise AssertionError(args)
         calls = [json.loads(line) for line in (self.root / 'calls.jsonl').read_text().splitlines()]
         operations = [call[1] for call in calls if call[0] == 'release']
         self.assertEqual(operations, ['view', 'create', 'download', 'edit'])
-        self.assertEqual(len(list((self.root / 'remote').iterdir())), 5)
+        self.assertEqual(len(list((self.root / 'remote').iterdir())), 9)
         self.assertTrue((self.root / 'published').exists())
 
     def test_existing_releases_moved_tags_and_corruption_prevent_publication(self):
@@ -100,6 +101,7 @@ else:raise AssertionError(args)
         shutil.rmtree(self.root / 'dist')
         for target in release.TARGETS:
             release.package('v0.1.0-rc.1', target, self.root / 'binary', self.root / 'dist', self.root)
+        extension_fixtures(self.root, self.root / 'dist')
         release.bundle('v0.1.0-rc.1', self.root / 'dist', self.root)
         result = self.run_publish(RELEASE_TAG='v0.1.0-rc.1')
         self.assertEqual(result.returncode, 0, result.stderr)

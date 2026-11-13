@@ -28,7 +28,7 @@ if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; t
   exit 1
 fi
 
-assets=(dist/*.tar.gz dist/SHA256SUMS)
+assets=(dist/*.tar.gz dist/*.vsix dist/SHA256SUMS)
 prerelease=()
 if [[ "$RELEASE_TAG" == *-* ]]; then prerelease=(--prerelease); fi
 gh release create "$RELEASE_TAG" "${assets[@]}" --repo "$GITHUB_REPOSITORY" \

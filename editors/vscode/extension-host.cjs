@@ -24,7 +24,7 @@ async function verify() {
   const storage = await fs.mkdtemp(path.join(os.tmpdir(),'vizzi-extension-native-'));
   let child;
   try {
-    const connection = await vscode.commands.executeCommand('vizzi.shareLanguageProviders',root);
+    const connection = await vscode.commands.executeCommand('vizzi.shareLanguageProviders');
     assert.ok(connection?.connectionFile,'sharing command did not publish a connection');
     const config = path.join(storage,'vizzi.toml');
     await fs.writeFile(config,`root = ${JSON.stringify(connection.root)}\ncache = ${JSON.stringify(path.join(storage,'cache'))}\nworkers = 1\n[language-servers]\nvscode-connection = ${JSON.stringify(connection.connectionFile)}\n`);
@@ -90,9 +90,77 @@ async function verify() {
     const replacement = await vscode.commands.executeCommand('vizzi.shareLanguageProviders',root);
     assert.equal(replacement.connectionFile,connection.connectionFile);
     assert.equal((await stableDefinition()).state,'unique');
+    const originalOpen = vscode.env.openExternal;
+    const opened = [];
+    const captureOpen = async uri=>{opened.push(uri.toString());return true;};
+    vscode.env.openExternal = captureOpen;
+    assert.equal(vscode.env.openExternal,captureOpen,'browser handoff must be intercepted in the isolated test');
+    try {
+      await vscode.workspace.getConfiguration('vizzi').update('executablePath',
+        process.env.VIZZI_TEST_EXTENSION_PATH ? undefined : process.env.VIZZI_TEST_BINARY,
+        vscode.ConfigurationTarget.Global);
+      const automaticConfig = `root = "."\ncache = ${JSON.stringify(path.join(storage,'browser-cache'))}\nport = 0\n`;
+      await fs.writeFile(path.join(root.fsPath,'vizzi.toml'),automaticConfig);
+      const openedWorkspace = await vscode.commands.executeCommand('vizzi.openWorkspace');
+      assert.ok(openedWorkspace?.url,'Open Workspace did not start the native server');
+      assert.deepEqual(opened,[],'default opening must stay inside the editor');
+      const tabs = ()=>vscode.window.tabGroups.all.flatMap(group=>group.tabs)
+        .filter(tab=>tab.input instanceof vscode.TabInputWebview && tab.input.viewType.includes('vizzi.workspace'));
+      async function waitTabs(count) {
+        const deadline = Date.now()+5000;
+        while (tabs().length !== count && Date.now()<deadline) await new Promise(resolve=>setTimeout(resolve,20));
+        assert.equal(tabs().length,count,JSON.stringify(vscode.window.tabGroups.all.flatMap(group=>group.tabs).map(tab=>({label:tab.label,type:tab.input?.viewType}))));
+      }
+      await waitTabs(1);
+      assert.equal((await fetch(openedWorkspace.url+'api/status')).status,200);
+      const again = await vscode.commands.executeCommand('vizzi.openWorkspace');
+      assert.equal(again.url,openedWorkspace.url,'reopening must retain the running workspace');
+      assert.equal(tabs().length,1,'reopening must reuse the editor tab');
+      async function waitInspection(suffix='') {
+        const deadline = Date.now()+45000;
+        let inspected;
+        while (!inspected) {
+          inspected = await fs.readFile(process.env.VIZZI_TEST_REPORT+'.webview'+suffix,'utf8').then(JSON.parse,error=>{
+            if (error.code !== 'ENOENT') throw error;
+          });
+          assert.ok(Date.now()<deadline,'webview rendering check did not complete');
+          if (!inspected) await new Promise(resolve=>setTimeout(resolve,100));
+        }
+        assert.ok(inspected.passed,inspected.error);
+      }
+      if (process.env.VIZZI_TEST_WEBVIEW) {
+        await fs.writeFile(process.env.VIZZI_TEST_REPORT+'.workspace',JSON.stringify({url:openedWorkspace.url}));
+        await waitInspection();
+      }
+      await vscode.window.showTextDocument(document);
+      await vscode.commands.executeCommand('vizzi.openWorkspace');
+      await vscode.commands.executeCommand('vizzi.openWorkspaceInBrowser');
+      assert.deepEqual(opened,[openedWorkspace.url]);
+      await vscode.window.tabGroups.close(tabs()[0]);
+      await waitTabs(0);
+      assert.equal((await fetch(openedWorkspace.url+'api/status')).status,200,'closing the tab must retain the server');
+      await vscode.commands.executeCommand('vizzi.openWorkspace');
+      await waitTabs(1);
+      if (process.env.VIZZI_TEST_WEBVIEW) {
+        await fs.writeFile(process.env.VIZZI_TEST_REPORT+'.reopened','{}');
+        await waitInspection('-reopened');
+      }
+      await vscode.commands.executeCommand('vizzi.stopWorkspace');
+      await waitTabs(0);
+      await assert.rejects(fetch(openedWorkspace.url));
+      const restarted = await vscode.commands.executeCommand('vizzi.openWorkspace');
+      assert.ok(restarted?.url,'restarting must configure the connection automatically');
+      assert.equal((await fetch(restarted.url+'api/status')).status,200);
+      assert.equal(await fs.readFile(path.join(root.fsPath,'vizzi.toml'),'utf8'),automaticConfig);
+      assert.equal((await stableDefinition()).state,'unique','the independently launched process must reconnect using its original connection path');
+    } finally {
+      vscode.env.openExternal = originalOpen;
+      await vscode.commands.executeCommand('vizzi.stopWorkspace');
+    }
     console.log('Vizzi extension host: native TOML launch, shared definitions/references, dirty-buffer rejection, disconnect and reconnect passed.');
   } finally {
     child?.kill();
+    await vscode.commands.executeCommand('vizzi.stopWorkspace');
     await vscode.commands.executeCommand('vizzi.stopSharing');
     for(const registration of registrations) registration.dispose();
     await fs.rm(storage,{recursive:true,force:true});

@@ -16,6 +16,23 @@ interface remains unchanged. The initial plugin supplies only shared analysis, l
 navigation/tasks and additional editor integrations to extend it later.
 The [versioned connection reference](BRIDGE.md) is the contract for other editor adapters.
 
+## Editor-owned Rust dependency captures
+
+The shared bridge and language router use the same bounded dependency catalog. External
+`.rs` definitions returned by VS Code are checked against disk, assigned native Cargo
+package provenance and captured independently of repository source. Excluded files within
+the selected root remain excluded. Subsequent dependency calls and references use distinct
+protocol methods and canonical paths obtained only from retained native captures; older
+adapters reject these methods instead of interpreting them as repository-relative paths.
+
+VS Code can return a function's document-symbol range and identifier with an external
+definition. If the native grammar misses the identifier, the catalog validates that
+range, content digest and identifier witness and retains a primary provider-range analysis.
+Raw syntax analysis and colours remain captured separately; missing raw call analysis is
+explicit. This admits current Rust `[const]` methods without rewriting their source or
+adding a compiler/server. Persisted references retain the optional checked range, and
+restoration still requires identical contents and analysis identities.
+
 ## Proposed changes
 
 - Move launch parsing into a binary-private `configuration` module. Deserialize a strict
@@ -53,6 +70,30 @@ The [versioned connection reference](BRIDGE.md) is the contract for other editor
   Non-file/external locations are counted as outside rather than retargeted by name.
 
 ## Testing and validation
+
+Installed launches use a small Node child-process adapter in `editors/vscode/launcher.cjs`.
+It starts the packaged executable without a shell, waits for its loopback launch URL,
+forwards diagnostics and owns shutdown. The extension passes the optional project-local
+config and explicit root/connection overrides. Default launches retain port 7474 so
+browser task storage keeps its existing address; a config file can choose another port.
+VSCE packages platform-specific VSIX files with `bin/vizzi` alongside the bridge modules.
+The local development host can select a native executable through a machine-level
+setting. Distribution does not require downloading or compiling a binary at runtime.
+
+`workspace-view.cjs` owns a single webview panel for the local UI. The panel embeds the
+loopback server with a restricted frame origin and retains the complex reading UI when
+hidden. Revealing an existing panel does not replace its HTML. Closing it keeps the native
+process available; Stop Workspace, a project change or native exit disposes the panel.
+An explicit browser command uses the same server. Remote workspaces remain unsupported.
+Native page CSP permits only `vscode-webview:` and `vscode-file:` frame ancestors, the
+desktop editor's frame chain. Ordinary HTTP/HTTPS parents remain excluded. An isolated
+VS Code test uses Playwright to render the real frame, follow a call and restore a saved
+task after closing and reopening the panel; Linux runs use a virtual display by default.
+
+Command tests cover invocation without a folder argument, missing folders, visible
+failure/cancellation and the browser-launch lifecycle. Adapter tests use real child
+processes; the real extension-host check also invokes sharing through its no-argument
+command path. Packaging checks verify the executable, documentation and license bytes.
 
 - Behaviour 1–5: CLI integration tests cover no-file defaults, explicit/relative files,
   paths, PATH executables, scalar overrides, source-rule append, strict parsing, missing

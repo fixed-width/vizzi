@@ -38,6 +38,12 @@ already exist on disk. Macro-generated declarations, conditional configurations 
 unsupported project/syntax forms can remain unavailable. Static resolution is not a
 runtime call trace.
 
+With the VS Code extension, editor-resolved Rust dependency and standard-library source
+can also open as captured bubbles. A provider-reported function range can admit methods
+using newer syntax such as `[const]` bounds when native parsing misses them. The original
+text is retained, while raw call analysis inside that function can remain unavailable.
+External source in other languages still requires a Vizzi-managed provider.
+
 ## Ruby
 
 Basic browsing does not need Ruby or a project build. The syntax adapter preserves class,
@@ -99,4 +105,4 @@ platform guarantee for every repository.
 The Python/Ruby/C-family semantic mirror currently admits up to 8 MiB per source file and
 128 MiB of source per provider workspace. Exceeding these bounds makes semantic lookup
 unavailable; ordinary captured-source browsing has separate limits. Local dependency
-captures retain at most 2 MiB per file, 32 MiB total and 32 files.
+captures retain at most 2 MiB per file, 32 MiB total and 32 retained captures.

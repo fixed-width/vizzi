@@ -41,6 +41,9 @@ test('a local connection authenticates queries, preserves results and expires wh
   assert.equal(result.locations[0].text, '😀');
   assert.equal(result.epoch, 3);
   assert.equal(calls, 1);
+  for (const method of ['dependency-definition','dependency-references']) {
+    assert.equal((await request(manifest.port,{...query,method,path:'/captured/dependency.rs'})).status,'ok');
+  }
   await bridge.dispose();
   assert.equal(JSON.parse(await fs.readFile(file,'utf8')).port,manifest.port);
   await assert.rejects(request(manifest.port,query), {code:'ECONNREFUSED'});

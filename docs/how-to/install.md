@@ -82,5 +82,6 @@ To inspect existing code, [run Vizzi on your project](run-workspace.md).
 
 Language servers are optional for basic browsing. [Configure semantic navigation](configure-language-servers.md)
 for Python, Rust, Ruby or C/C++ project-aware definitions, references and local dependency source. VS Code is
-only needed for the editor handoff. The [troubleshooting guide](troubleshoot.md) covers
+optional, for editor handoff or [shared language analysis](../../editors/vscode/INSTALL.md).
+The [troubleshooting guide](troubleshoot.md) covers
 build tools, startup and missing results.

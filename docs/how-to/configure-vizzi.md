@@ -7,22 +7,24 @@ shell. Select the file explicitly:
 vizzi --config /path/to/vizzi.toml
 ```
 
-For example, save this beside your project directory:
+For example, save this as `vizzi.toml` in your project directory:
 
 ```toml
-root = "./my-project"
+root = "."
 workers = 1
 port = 7474
 exclude-source = [".venv", "vendor"]
 
 [language-servers]
 pyright = "pyright-langserver"
-python-path = "./my-project/.venv/bin/python"
+python-path = "./.venv/bin/python"
 ```
 
 Paths in the file are relative to its directory. Source scopes such as `.venv` are
 relative to `root`; bare executable names use PATH. Omit `cache` to use the usual
 platform cache. An explicit cache or investigation file must remain outside the source.
+The TOML settings file itself can stay inside the project. From that directory, launch
+with `vizzi --config vizzi.toml`.
 
 Override a setting for one run with its normal command-line option:
 
@@ -31,14 +33,22 @@ vizzi --config /path/to/vizzi.toml --workers 2 --port 8000
 ```
 
 CLI source-selection rules append to file rules. Changes to the file take effect on
-the next launch. Vizzi does not automatically discover project or user config files.
+the next launch. Native CLI launches do not automatically discover project or user config files.
 See the [configuration reference](../reference/configuration.md) for all accepted keys.
 
 ## Reuse VS Code's language providers
 
-Install the [Vizzi preview extension](../../editors/vscode/INSTALL.md) in your existing
-VS Code window. Run **Vizzi: Share Language Providers**, select your folder, and
-copy the settings shown in the **Vizzi** Output channel into your TOML file:
+For a first connection, follow [Use Vizzi with VS Code](../../editors/vscode/INSTALL.md).
+The bundled extension opens an editor tab with **Vizzi: Open Workspace** and
+reads an optional `vizzi.toml` from your project root. Default launches need no settings file.
+It supplies the current editor connection on every launch, including after VS Code restarts.
+You do not need a `vscode-connection` entry; an existing file value is overridden by the
+connection selected for that launch.
+Rust calls can enter locally installed dependency and standard-library source using the
+same editor provider. Files are captured only when reached; no second Rust server starts.
+
+To run the native executable independently, use **Vizzi: Share Language Providers (Advanced)**,
+then copy the settings shown in the **Vizzi** Output channel into your TOML file:
 
 ```toml
 root = "/path/to/my-project"
@@ -61,7 +71,7 @@ credential private. Stop sharing with **Vizzi: Stop Sharing Language Providers**
 Sharing again restores the connection on Vizzi's next query. Vizzi reports unavailable
 semantic analysis while disconnected and retains its labelled name candidates.
 
-This first plugin slice supports local repository source. Save modified buffers and
-refresh Vizzi when its capture differs from disk. For older captured source or local
-dependency-source navigation, use [Vizzi-managed servers](configure-language-servers.md).
+Shared analysis supports repository source and local Rust dependency source. Save modified
+buffers and refresh Vizzi when its capture differs from disk. For older captured source
+or external source in other languages, use [Vizzi-managed servers](configure-language-servers.md).
 Remote VS Code workspaces and other editor plugins are not available yet.

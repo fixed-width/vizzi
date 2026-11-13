@@ -79,8 +79,11 @@ impl Servers {
         let sources = Arc::new(Catalog::new(cache.join("dependency-references.json")));
         let mut providers: BTreeMap<&'static str, Arc<dyn Provider>> = BTreeMap::new();
         if let Some(connection) = configuration.vscode_connection {
-            let provider: Arc<dyn Provider> =
-                Arc::new(crate::editor_bridge::Bridge::new(root, connection));
+            let provider: Arc<dyn Provider> = Arc::new(crate::editor_bridge::Bridge::new(
+                root,
+                connection,
+                sources.clone(),
+            ));
             for language in ["rust", "python", "ruby", "c", "cpp"] {
                 providers.insert(language, provider.clone());
             }

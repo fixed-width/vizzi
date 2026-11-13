@@ -7,6 +7,8 @@ from pathlib import Path
 import re
 import tarfile
 import tomllib
+import zipfile
+from xml.etree import ElementTree
 
 ROOT = Path(__file__).resolve().parents[2]
 TARGETS = (
@@ -15,6 +17,11 @@ TARGETS = (
     'x86_64-apple-darwin',
     'aarch64-apple-darwin',
 )
+VSIX_TARGETS = dict(zip(('linux-x64', 'linux-arm64', 'darwin-x64', 'darwin-arm64'), TARGETS))
+
+
+def extension_version(root):
+    return json.loads((root / 'editors/vscode/package.json').read_text())['version']
 
 
 def validate(tag, root=ROOT):
@@ -84,7 +91,11 @@ def package(tag, target, binary, output, root=ROOT):
 def bundle(tag, directory, root=ROOT):
     validate(tag, root)
     licenses = project_licenses(root)
-    names = {f'vizzi-{tag}-{target}.tar.gz' for target in TARGETS}
+    archives = {f'vizzi-{tag}-{target}.tar.gz' for target in TARGETS}
+    version = extension_version(root)
+    extensions = {f'vizzi-vscode-{version}-{platform}.vsix': (platform, target)
+                  for platform, target in VSIX_TARGETS.items()}
+    names = archives | extensions.keys()
     expected = names | {name + '.sha256' for name in names}
     actual = {path.name for path in directory.iterdir()}
     if actual - {'SHA256SUMS'} != expected:
@@ -95,15 +106,33 @@ def bundle(tag, directory, root=ROOT):
         expected_line = f'{digest(path)}  {name}\n'
         if (directory / (name + '.sha256')).read_text() != expected_line:
             raise ValueError(f'Checksum mismatch: {name}')
-        prefix = name.removesuffix('.tar.gz')
-        with tarfile.open(path) as contents:
-            members = {member.name: member for member in contents.getmembers()}
-            for license in licenses:
-                member = members.get(prefix + '/' + license.name)
-                expected_license = license.read_bytes()
-                if (member is None or not member.isfile()
-                        or contents.extractfile(member).read(len(expected_license) + 1) != expected_license):
-                    raise ValueError(f'Archive project license missing or changed: {name}/{license.name}')
+        if name in extensions:
+            with zipfile.ZipFile(path) as contents:
+                identity = ElementTree.fromstring(contents.read('extension.vsixmanifest')).find('.//{*}Identity')
+                if (identity is None or identity.get('TargetPlatform') != extensions[name][0]
+                        or identity.get('Version') != version):
+                    raise ValueError(f'Extension platform/version differs: {name}')
+                manifest = json.loads(contents.read('extension/package.json'))
+                if manifest.get('version') != version or manifest.get('name') != 'vizzi':
+                    raise ValueError(f'Extension manifest differs: {name}')
+                for license in licenses:
+                    if contents.read('extension/' + license.name) != license.read_bytes():
+                        raise ValueError(f'Extension project license missing or changed: {name}/{license.name}')
+                prefix = f'vizzi-{tag}-{extensions[name][1]}'
+                with tarfile.open(directory / (prefix + '.tar.gz')) as native:
+                    binary = native.extractfile(prefix + '/vizzi').read()
+                if contents.read('extension/bin/vizzi') != binary:
+                    raise ValueError(f'Extension executable differs from native archive: {name}')
+        else:
+            prefix = name.removesuffix('.tar.gz')
+            with tarfile.open(path) as contents:
+                members = {member.name: member for member in contents.getmembers()}
+                for license in licenses:
+                    member = members.get(prefix + '/' + license.name)
+                    expected_license = license.read_bytes()
+                    if (member is None or not member.isfile()
+                            or contents.extractfile(member).read(len(expected_license) + 1) != expected_license):
+                        raise ValueError(f'Archive project license missing or changed: {name}/{license.name}')
         lines.append(expected_line)
     manifest = directory / 'SHA256SUMS'
     contents = ''.join(lines)

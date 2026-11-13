@@ -12,7 +12,10 @@ use std::{
 use vizzi_core::{
     analysis::{Analyzer, Languages},
     comparison::{EntryKind, ReviewPath},
-    model::{CapturePolicyId, Document, Snapshot, WorkspaceId},
+    model::{
+        Analysis, CapturePolicyId, ContentId, Context, ContextId, Coverage, Document, Fact,
+        Snapshot, WorkspaceId,
+    },
     policy::{Classification, Provenance},
     structure::{SourceOrigin, Structure, Symbol},
 };
@@ -37,6 +40,46 @@ pub struct Input {
     pub version: Option<String>,
     /// Provider project configuration that admitted the source.
     pub configuration: String,
+}
+
+/// A provider-reported function range bound to exact saved source bytes.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Declaration {
+    /// Exact contents to which the provider range applies.
+    pub content: ContentId,
+    /// Identifier text, verified against the captured source.
+    pub name: String,
+    /// Complete function range in UTF-8 bytes.
+    pub span: std::ops::Range<usize>,
+    /// Exact identifier range in UTF-8 bytes.
+    pub identifier: std::ops::Range<usize>,
+}
+impl Declaration {
+    fn analysis(&self, syntax: &Analysis) -> Result<Analysis, String> {
+        if !label(&self.name, 256) {
+            return Err("Invalid provider declaration name".into());
+        }
+        // Document::capture checks the content digest, ranges and identifier witness.
+        let descriptor = serde_json::to_vec(self).map_err(|e| e.to_string())?;
+        Ok(Analysis {
+            content: self.content.clone(),
+            context: Context {
+                language: syntax.context.language.clone(),
+                description: "Provider function range; raw call analysis unavailable".into(),
+                id: ContextId::derive(&[b"provider-function-range-v1", include_bytes!("dependency_sources.rs"), syntax.context.id.as_str().as_bytes(), &descriptor]),
+            },
+            coverage: Coverage::Partial,
+            facts: vec![Fact {
+                name_span: Some(self.identifier.clone()), parent: None,
+                key: format!("provider-function:{}:{}", self.identifier.start, self.name),
+                name: self.name.clone(), kind: "function".into(), span: self.span.clone(), unique: true,
+            }],
+            calls: None,
+            coloring: syntax.coloring.clone(),
+            diagnostics: vec!["Function range supplied by the editor; native syntax and call coverage remain limited".into()],
+        })
+    }
 }
 fn opaque(s: &str) -> bool {
     s.len() == 64
@@ -80,6 +123,7 @@ pub struct Capture {
     /// Native source input retained for verification, never serialized to the viewer.
     pub input: Input,
     document: Arc<Document>,
+    declaration: Option<Declaration>,
 }
 impl Capture {
     /// Written calls whose same-file candidates retain dependency provenance.
@@ -120,7 +164,7 @@ impl Capture {
     }
 }
 thread_local! {static ANALYZERS: RefCell<BTreeMap<String, Box<dyn Analyzer>>> = RefCell::new(BTreeMap::new());}
-fn capture(input: Input) -> Result<Arc<Capture>, String> {
+fn capture(input: Input, declaration: Option<Declaration>) -> Result<Arc<Capture>, String> {
     if !input.root.is_absolute()
         || fs::canonicalize(&input.root).map_err(|e| e.to_string())? != input.root
     {
@@ -143,6 +187,14 @@ fn capture(input: Input) -> Result<Arc<Capture>, String> {
             .analyze(&bytes)
             .map_err(|e| e.to_string())
     })?;
+    let additional = declaration
+        .as_ref()
+        .map(|d| d.analysis(&analysis))
+        .transpose()?;
+    let analyses = match additional {
+        Some(provider) => vec![provider, analysis],
+        None => vec![analysis],
+    };
     let root = input.root.to_str().ok_or("Dependency path is not UTF-8")?;
     let scope = WorkspaceId::derive(&[
         b"dependency-scope-v1",
@@ -156,7 +208,7 @@ fn capture(input: Input) -> Result<Arc<Capture>, String> {
             scope.clone(),
             input.path.clone(),
             &bytes,
-            vec![analysis],
+            analyses,
             Classification::Assigned {
                 language: input.language.clone(),
                 provenance: Provenance::ExplicitScope { scope: ".".into() },
@@ -189,6 +241,7 @@ fn capture(input: Input) -> Result<Arc<Capture>, String> {
         origin,
         input,
         document: doc,
+        declaration,
     }))
 }
 #[derive(Serialize, Deserialize)]
@@ -196,6 +249,8 @@ fn capture(input: Input) -> Result<Arc<Capture>, String> {
 struct Reference {
     capture: String,
     input: Input,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    declaration: Option<Declaration>,
 }
 #[derive(Default)]
 struct State {
@@ -240,7 +295,7 @@ impl Catalog {
                 if !opaque(&r.capture) {
                     return Err("Invalid dependency capture reference".into());
                 }
-                if let Ok(source) = capture(r.input)
+                if let Ok(source) = capture(r.input, r.declaration)
                     && source.origin.capture == r.capture
                 {
                     admit(state, source);
@@ -262,6 +317,7 @@ impl Catalog {
             .map(|s| Reference {
                 capture: s.origin.capture.clone(),
                 input: s.input.clone(),
+                declaration: s.declaration.clone(),
             })
             .collect::<Vec<_>>();
         let mut file = tempfile::NamedTempFile::new_in(parent).map_err(|e| e.to_string())?;
@@ -272,6 +328,21 @@ impl Catalog {
     }
     /// Captures one provider-admitted file; existing captured bytes are never mutated.
     pub fn capture(&self, input: Input) -> Result<Arc<Capture>, String> {
+        self.capture_inner(input, None)
+    }
+    /// Captures source with a checked provider range when raw syntax cannot identify a function.
+    pub fn capture_with_declaration(
+        &self,
+        input: Input,
+        declaration: Declaration,
+    ) -> Result<Arc<Capture>, String> {
+        self.capture_inner(input, Some(declaration))
+    }
+    fn capture_inner(
+        &self,
+        input: Input,
+        declaration: Option<Declaration>,
+    ) -> Result<Arc<Capture>, String> {
         let mut state = self
             .state
             .lock()
@@ -280,13 +351,13 @@ impl Catalog {
         if let Some(n) = state
             .sources
             .iter()
-            .rposition(|s| s.input == input && s.verify().is_ok())
+            .rposition(|s| s.input == input && s.declaration == declaration && s.verify().is_ok())
         {
             let source = state.sources.remove(n);
             state.sources.push(source.clone());
             return Ok(source);
         }
-        let source = capture(input)?;
+        let source = capture(input, declaration)?;
         admit(&mut state, source.clone());
         self.persist(&state)?;
         Ok(source)

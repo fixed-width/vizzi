@@ -43,6 +43,12 @@ and declines dirty/disk-divergent workspace buffers or concurrent changes.
 The VS Code adapter uses bounded file reads and limits open workspace inputs to 8192
 files and 128 MiB in aggregate.
 
+The optional Rust dependency extension adds `dependency-definition` and
+`dependency-references`. For these methods only, `path` is the canonical absolute file
+path held by a native dependency capture. The query text must match that saved Rust file.
+Older adapters reject these distinct methods rather than treating a dependency-relative
+filename as repository source. Root authentication and all byte/position checks still apply.
+
 ## Responses
 
 ```json
@@ -51,7 +57,7 @@ files and 128 MiB in aggregate.
 
 `session` changes on bridge restart and has 1–128 UTF-8 bytes. `epoch` is a nonnegative
 integer advanced by editor document/configuration/filesystem events. It stays unchanged
-through a query. Native context identity hashes session, epoch and snapshot identity
+through a query. Native context identity hashes session, epoch, snapshot and query-document version
 using `ContextId`; it never includes the token.
 
 Responses have at most 256 locations and 65536 outside results. Each target document is
@@ -59,11 +65,19 @@ limited to 4 MiB, with an 8 MiB aggregate text limit in the VS Code adapter. Pos
 identify exact identifiers; LSP LocationLink selection ranges are supported. References
 exclude the queried declaration. The adapter removes duplicate locations.
 
-Only repository-local captured targets are admitted. The editor counts non-file and
-external locations as `outside`; Vizzi also counts local paths absent from capture.
+Repository-local captured targets and bounded local Rust dependency files are admitted.
+The editor counts non-file locations as `outside`; Vizzi also counts excluded repository
+paths and unsupported external languages. External Rust target text must match disk.
+An optional target `declaration` contains a function `range`, identifier `selection`
+(both with UTF-16 `start`/`end` positions), and its exact source `name`, supplied by the
+editor's document-symbol provider. Native admission validates all ranges and the content
+witness before adding a separate provider-range analysis to a captured dependency file.
 Returned text/positions must match captured documents. Native verification checks all
 captured files against disk before and after the request, with bounds of 8192 files,
 4 MiB per file and 128 MiB total. Older captures never receive substituted live answers.
+Dependency admission additionally uses the catalog's 2 MiB file, 32 MiB total and 32-capture
+limits. External query and result buffers must be clean and match disk before and after
+the editor request. Function-range lookup visits at most 8192 editor document symbols.
 
 An unavailable query returns:
 

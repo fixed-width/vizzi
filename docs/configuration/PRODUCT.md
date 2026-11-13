@@ -30,7 +30,7 @@ providers so Vizzi does not need a second language-server process.
 6. `--vscode-connection FILE` or `language-servers.vscode-connection` selects editor
    analysis instead of Vizzi-managed servers. Combining the two ownership modes is an
    error. No connection attempt or server process is needed for `--once` capture.
-7. The VS Code plugin offers an explicit **Vizzi: Share Language Providers** command,
+7. The VS Code plugin offers an explicit **Vizzi: Share Language Providers (Advanced)** command,
    selects one local workspace folder, and displays its connection file and launch
    command. It requires a trusted local workspace. Different roots get independent
    connection files. Sharing the same root from another window selects the most recent
@@ -51,12 +51,64 @@ providers so Vizzi does not need a second language-server process.
     response. Returned source positions must match captured target text. Pinned or
     older source that differs from disk receives unavailable analysis, never a result
     from substituted live bytes. The plugin never saves, reloads or edits user buffers.
-11. The first bridge admits repository-local results only. External/non-file targets
-    remain explicitly outside capture. Existing Vizzi-managed adapters retain their
-    independent dependency-source support. Editor context can include dependencies
-    outside capture; shared results do not claim frozen whole-project analysis.
+11. The bridge admits captured repository results and locally available Rust dependency
+    source reached through editor definitions. Dependency files use independent bounded
+    captures, never enlarge the repository scope and retain package provenance. Other
+    external languages and non-file targets remain outside capture. Shared results do
+    not claim frozen whole-project editor analysis.
 12. The connection file contains a session credential and stays outside the inspected
     source. Stopping sharing or deactivating the extension closes the bridge without
     stopping the editor's language servers. The last endpoint file remains for stable
     configuration paths; its credential cannot authenticate to a stopped bridge. No browser
     request may choose an executable, connection address or connection file.
+
+## Installed VS Code workflow
+
+The VSIX includes the matching native executable for its operating system and processor.
+After installation, **Vizzi: Open Workspace** selects the open project, shares its editor
+providers, starts that executable and opens the visual workspace in an editor tab. A
+status-bar entry makes this command discoverable. No TOML file or separate terminal is
+required for the default launch.
+
+- With one workspace folder, use it directly. With several, ask which folder to open.
+  With none, show an actionable error. Starting, cancellation and errors are recorded
+  in the Vizzi Output channel, which opens as soon as a command starts.
+- Automatic launches configure the editor connection internally on every run and never
+  prompt the user to copy connection paths into TOML. Optional external-launch settings
+  are shown only by **Share Language Providers (Advanced)**, which points to Open Workspace
+  as the automatic setup path. A project's connection path stays stable within a profile;
+  its session credentials are refreshed when sharing restarts.
+- An optional `vizzi.toml` in the selected project root supplies launch settings when
+  the user invokes Open Workspace. The selected root and shared editor connection take
+  precedence. Native CLI launches still select configuration explicitly with `--config`.
+- Reopening the same project reuses the extension-owned native process. Changing projects,
+  stopping the workspace or deactivating the extension closes the owned process.
+  Stopping sharing alone retains the existing native process and its source views.
+- Startup errors include the native diagnostic. Browser-opening errors retain the
+  running workspace and display its address. Existing manual provider-sharing commands
+  remain available for independently launched Vizzi processes.
+- Project-local TOML files are supported. Only the generated session credential and
+  runtime storage require locations outside the inspected source.
+
+**Open Workspace** presents the local UI in a Vizzi editor tab by default. Reopening
+reveals the existing tab without reloading its reading state, and hiding it retains
+the live workspace. Closing the tab leaves the native process available until Stop
+Workspace or window shutdown; reopening creates a new tab at the same local address.
+Stopping the workspace or changing projects disposes the old tab. The separate
+**Vizzi: Open Workspace in Browser** command opens the same running server externally.
+Saved tasks in an external browser and the VS Code tab belong to their respective
+browser storage profiles.
+
+## Shared Rust dependency source
+
+Following an editor-resolved Rust call can open a locally installed dependency or standard
+library method beside its caller. No additional language server, download or build is
+started. Captured dependency source remains immutable; saved bytes must still match for
+another semantic query. Existing dependency limits, persistence and editor handoff apply.
+
+When native syntax recovery misses the returned function, the editor may supply its
+function range and exact identifier. Both are checked against saved source and retained
+with that capture. This supports standard-library methods using newer syntax such as
+`[const]` bounds without guessing a same-name declaration or rewriting source. Such
+function ranges do not manufacture raw call analysis; missing syntax analysis remains
+explicit. Dependency queries use paths from retained native captures, never browser paths.

@@ -374,6 +374,239 @@ fn uncaptured_targets_stay_outside_instead_of_becoming_local_name_matches() {
 }
 
 #[test]
+fn editor_rust_dependencies_are_captured_and_can_query_the_next_call() {
+    let fixture = Fixture::new();
+    let package = fixture
+        .directory
+        .path()
+        .canonicalize()
+        .unwrap()
+        .join("helper");
+    fs::create_dir_all(package.join("src")).unwrap();
+    fs::write(
+        package.join("Cargo.toml"),
+        "[package]\nname='helper'\nversion='1.2.3'\n",
+    )
+    .unwrap();
+    let target = package.join("src/lib.rs");
+    let text = "pub fn leaf() { inner(); }\npub fn inner() {}\n";
+    fs::write(&target, text).unwrap();
+    let provider = fixture.provider();
+    let mut response = fixture.answer();
+    response["locations"] =
+        json!([{"path":target,"position":{"line":0,"character":7},"text":text}]);
+    let reply = response.clone();
+    let peer = Peer::start(&fixture, move |_| frame(reply));
+    let answer = provider
+        .resolve(fixture.snapshot.clone(), &fixture.call())
+        .unwrap();
+    peer.finish();
+    assert_eq!(answer.locations.len(), 1);
+    let capture = provider
+        .dependencies()
+        .unwrap()
+        .get(answer.locations[0].capture.as_deref().unwrap())
+        .unwrap()
+        .unwrap();
+    assert_eq!(capture.origin.label, "helper");
+    assert_eq!(capture.origin.version.as_deref(), Some("1.2.3"));
+    assert_eq!(capture.doc().resident_source(), Some(text));
+    assert_eq!(fixture.snapshot.documents().len(), 1);
+    let leaf = capture.index.definition(capture.doc().path(), 7).unwrap();
+    let references = fixture.answer();
+    let expected = target.clone();
+    let peer = Peer::start(&fixture, move |request| {
+        assert_eq!(request["method"], "dependency-references");
+        assert_eq!(request["path"], expected.to_str().unwrap());
+        frame(references)
+    });
+    let references = provider
+        .references(fixture.snapshot.clone(), &capture.symbol(leaf.clone()), 7)
+        .unwrap();
+    peer.finish();
+    assert_eq!(references.locations[0].path, "a.py");
+    let site = capture
+        .index
+        .outgoing(&leaf.id, capture.doc().path(), 0)
+        .unwrap()
+        .items
+        .remove(0);
+    let call = capture.index.call(&site.id).unwrap();
+    response["locations"][0]["position"] = json!({"line":1,"character":7});
+    let expected = target.clone();
+    let peer = Peer::start(&fixture, move |request| {
+        assert_eq!(request["method"], "dependency-definition");
+        assert_eq!(request["path"], expected.to_str().unwrap());
+        assert_eq!(request["text"], text);
+        frame(response)
+    });
+    let answer = provider.resolve(fixture.snapshot.clone(), &call).unwrap();
+    peer.finish();
+    assert_eq!(answer.locations[0].position.line, 1);
+    assert_eq!(
+        answer.locations[0].capture.as_deref(),
+        Some(capture.origin.capture.as_str())
+    );
+    fs::write(target, "pub fn changed() {}\n").unwrap();
+    assert!(
+        provider
+            .resolve(fixture.snapshot.clone(), &call)
+            .unwrap_err()
+            .contains("changed")
+    );
+}
+
+#[test]
+fn editor_standard_library_ranges_are_captured_without_parsing_const_bounds() {
+    for damage in ["valid", "name", "selection", "range"] {
+        let fixture = Fixture::new();
+        let directory = fixture
+            .directory
+            .path()
+            .canonicalize()
+            .unwrap()
+            .join("core");
+        fs::create_dir(&directory).unwrap();
+        fs::write(
+            directory.join("Cargo.toml"),
+            "[package]\nname='core'\nversion='0.0.0'\n",
+        )
+        .unwrap();
+        let text = "impl<T> Option<T> { pub const fn ok_or_else<E, F>(self, err: F) -> Result<T, E> where F: [const] FnOnce() -> E + [const] Destruct { match self { Some(v) => Ok(v), None => Err(err()), } } }";
+        let target = directory.join("option.rs");
+        fs::write(&target, text).unwrap();
+        let start = text.find("ok_or_else").unwrap();
+        let position = vizzi::definitions::position(text, start).unwrap();
+        let mut declaration = json!({"name":"ok_or_else", "range":{"start":vizzi::definitions::position(text,text.find("pub const").unwrap()).unwrap(),"end":vizzi::definitions::position(text,text.len()-2).unwrap()},
+            "selection":{"start":position,"end":vizzi::definitions::position(text,start+10).unwrap()}});
+        match damage {
+            "name" => declaration["name"] = json!("unrelated"),
+            "selection" => declaration["selection"]["end"]["character"] = json!(99999),
+            "range" => declaration["range"]["end"] = declaration["range"]["start"].clone(),
+            _ => {}
+        }
+        let mut response = fixture.answer();
+        response["locations"] =
+            json!([{"path":target,"position":position,"text":text,"declaration":declaration}]);
+        let peer = Peer::start(&fixture, move |_| frame(response));
+        let provider = fixture.provider();
+        let answer = provider.resolve(fixture.snapshot.clone(), &fixture.call());
+        peer.finish();
+        if damage != "valid" {
+            assert!(answer.is_err(), "{damage}");
+            continue;
+        }
+        let answer = answer.unwrap();
+        let captured = provider
+            .dependencies()
+            .unwrap()
+            .get(answer.locations[0].capture.as_deref().unwrap())
+            .unwrap()
+            .unwrap();
+        let method = captured
+            .index
+            .definition(captured.doc().path(), start)
+            .unwrap();
+        assert_eq!(method.name, "ok_or_else");
+        assert_eq!(captured.origin.label, "core");
+        assert_eq!(captured.doc().resident_source(), Some(text));
+        assert!(
+            fixture
+                .provider()
+                .dependencies()
+                .unwrap()
+                .get(&captured.origin.capture)
+                .unwrap()
+                .is_some()
+        );
+    }
+}
+
+#[test]
+fn editor_dependency_witnesses_and_excluded_repository_source_remain_checked() {
+    for excluded in [false, true] {
+        let fixture = Fixture::new();
+        let text = "pub fn missing() {}\n";
+        let path = if excluded {
+            fixture.root.join("excluded.rs")
+        } else {
+            fixture
+                .directory
+                .path()
+                .canonicalize()
+                .unwrap()
+                .join("outside.rs")
+        };
+        fs::write(&path, text).unwrap();
+        let mut response = fixture.answer();
+        response["locations"] = json!([{"path":path,"position":{"line":0,"character":7},"text":if excluded {text} else {"different"}}]);
+        let peer = Peer::start(&fixture, move |_| frame(response));
+        let answer = fixture
+            .provider()
+            .resolve(fixture.snapshot.clone(), &fixture.call());
+        peer.finish();
+        if excluded {
+            let answer = answer.unwrap();
+            assert!(answer.locations.is_empty());
+            assert_eq!(answer.outside, 1);
+        } else {
+            assert!(answer.unwrap_err().contains("differs"));
+        }
+    }
+}
+
+#[test]
+fn editor_external_rust_capture_accepts_its_exact_byte_limit_and_rejects_other_languages() {
+    let fixture = Fixture::new();
+    let header = "pub fn leaf() {}\n/*";
+    let text = format!(
+        "{header}{}*/",
+        " ".repeat(2 * 1024 * 1024 - header.len() - 2)
+    );
+    let target = fixture
+        .directory
+        .path()
+        .canonicalize()
+        .unwrap()
+        .join("large.rs");
+    fs::write(&target, &text).unwrap();
+    let mut response = fixture.answer();
+    response["locations"] =
+        json!([{"path":target,"position":{"line":0,"character":7},"text":text}]);
+    let peer = Peer::start(&fixture, move |_| frame(response));
+    let provider = fixture.provider();
+    let answer = provider
+        .resolve(fixture.snapshot.clone(), &fixture.call())
+        .unwrap();
+    peer.finish();
+    assert_eq!(answer.locations.len(), 1);
+    let captured = provider
+        .dependencies()
+        .unwrap()
+        .get(answer.locations[0].capture.as_deref().unwrap())
+        .unwrap()
+        .unwrap();
+    assert_eq!(captured.doc().captured().len(), 2 * 1024 * 1024);
+    let target = fixture
+        .directory
+        .path()
+        .canonicalize()
+        .unwrap()
+        .join("not-rust.py");
+    fs::write(&target, "pub fn leaf() {}\n").unwrap();
+    let mut response = fixture.answer();
+    response["locations"] =
+        json!([{"path":target,"position":{"line":0,"character":7},"text":"pub fn leaf() {}\n"}]);
+    let peer = Peer::start(&fixture, move |_| frame(response));
+    let answer = provider
+        .resolve(fixture.snapshot.clone(), &fixture.call())
+        .unwrap();
+    peer.finish();
+    assert!(answer.locations.is_empty());
+    assert_eq!(answer.outside, 1);
+}
+
+#[test]
 fn replacing_the_editor_session_during_lookup_rejects_the_old_reply() {
     let fixture = Fixture::new();
     let response = fixture.answer();

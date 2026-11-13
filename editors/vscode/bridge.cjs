@@ -42,7 +42,7 @@ async function startBridge({root, connectionFile, query}) {
             || request.token.length !== 64 || !crypto.timingSafeEqual(Buffer.from(request.token), Buffer.from(token))) {
           throw new Error('Invalid editor connection credentials, root or protocol version');
         }
-        if (!['definition','references'].includes(request.method)) throw new Error('Unsupported editor operation');
+        if (!['definition','references','dependency-definition','dependency-references'].includes(request.method)) throw new Error('Unsupported editor operation');
         if (busy || stopped) throw new Error('Editor analysis is busy; retry navigation');
         busy = true;
         ownsQuery = true;

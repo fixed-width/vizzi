@@ -3,8 +3,10 @@
 For users looking up persisted native launch settings. Setup examples are in
 [save launch settings](../how-to/configure-vizzi.md).
 
-`--config FILE` selects one TOML file. There is no implicit project/user discovery or
-environment-variable settings layer. The file is read once at startup and is limited
+`--config FILE` selects one TOML file, which may be inside the inspected project.
+Native CLI launches have no implicit project/user discovery or environment-variable
+settings layer. The VS Code extension's explicit **Open Workspace** command selects
+`vizzi.toml` at the project root when present. The file is read once at startup and is limited
 to 1 MiB. Unknown keys, duplicate keys, incorrect types and invalid effective settings
 are errors. `--help` skips config loading. A second `--config` is an error.
 
@@ -62,7 +64,8 @@ combined with managed-server, interpreter or compilation-database options. A dis
 editor never triggers a managed fallback server. Each query rereads the connection file.
 
 The bridge uses VS Code's saved project context. Dirty or changed buffers and mismatched
-captured source make results unavailable. External/non-file targets remain outside capture.
+captured source make results unavailable. External Rust files returned by the editor can enter bounded dependency captures;
+other external languages and non-file targets remain outside capture.
 It does not freeze the editor's full dependency/configuration environment or supply
 semantic results for older captured bytes that differ from disk. Managed servers retain
 their private captured-source mirrors and dependency-source support.

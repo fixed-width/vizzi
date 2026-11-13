@@ -25,12 +25,16 @@ jobs:
         include:
           - os: ubuntu-24.04
             target: x86_64-unknown-linux-musl
+            vscode-target: linux-x64
           - os: ubuntu-24.04-arm
             target: aarch64-unknown-linux-musl
+            vscode-target: linux-arm64
           - os: macos-26-intel
             target: x86_64-apple-darwin
+            vscode-target: darwin-x64
           - os: macos-26
             target: aarch64-apple-darwin
+            vscode-target: darwin-arm64
     runs-on: ${{ matrix.os }}
     timeout-minutes: 50
     env:
@@ -72,6 +76,13 @@ jobs:
           "target/$RELEASE_TARGET/release/vizzi" --once --workers 1 --root docs/tutorials/first-call-trail-ruby --cache "$RUNNER_TEMP/release-smoke-cache"
       - name: Create archive and checksum
         run: python3 scripts/release/package.py package "$RELEASE_TAG" "$RELEASE_TARGET" "target/$RELEASE_TARGET/release/vizzi" dist
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: '26'
+      - name: Package bundled VS Code extension
+        env:
+          VSIX_TARGET: ${{ matrix.vscode-target }}
+        run: python3 editors/vscode/package.py --binary "target/$RELEASE_TARGET/release/vizzi" --target "$VSIX_TARGET"
       - uses: actions/upload-artifact@v7.0.2
         with:
           name: release-${{ matrix.target }}
@@ -107,6 +118,7 @@ jobs:
       - run: npm ci
       - run: node_modules/.bin/playwright install --with-deps chromium
       - run: cargo build --locked --release -p vizzi
+      - run: npm run test:editor
       - run: npm test -- --no-build
       - run: node_modules/node/bin/node experiments/browser/documentation.test.mjs --no-build
       - name: Release helper checks

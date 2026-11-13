@@ -6,10 +6,27 @@ from pathlib import Path
 import tarfile
 import tempfile
 import unittest
+import zipfile
 
 spec = importlib.util.spec_from_file_location('release_package', Path(__file__).with_name('package.py'))
 release = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(release)
+
+
+def extension_fixtures(root, output):
+    manifest = root / 'editors/vscode/package.json'
+    manifest.parent.mkdir(parents=True, exist_ok=True)
+    manifest.write_text('{"name":"vizzi","version":"0.2.0"}')
+    for platform in release.VSIX_TARGETS:
+        archive = output / f'vizzi-vscode-0.2.0-{platform}.vsix'
+        with zipfile.ZipFile(archive, 'w') as contents:
+            contents.writestr('extension.vsixmanifest',
+                             f'<PackageManifest><Metadata><Identity Version="0.2.0" TargetPlatform="{platform}"/></Metadata></PackageManifest>')
+            contents.write(manifest, 'extension/package.json')
+            contents.write(root / 'LICENSE-APACHE', 'extension/LICENSE-APACHE')
+            binary = root / 'built-vizzi' if (root / 'built-vizzi').exists() else root / 'binary'
+            contents.write(binary, 'extension/bin/vizzi')
+        Path(str(archive) + '.sha256').write_text(f'{release.digest(archive)}  {archive.name}\n')
 
 
 class PackageTests(unittest.TestCase):
@@ -24,6 +41,8 @@ class PackageTests(unittest.TestCase):
         self.binary = self.root / 'built-vizzi'
         self.binary.write_bytes(b'fixture executable')
         self.output = self.root / 'dist'
+        self.output.mkdir()
+        extension_fixtures(self.root, self.output)
 
     def test_tags_must_be_safe_and_match_the_package_version(self):
         self.assertEqual(release.validate('v0.1.0', self.root), '0.1.0')
@@ -63,14 +82,14 @@ class PackageTests(unittest.TestCase):
         (self.root / 'LICENSE-APACHE').unlink()
         with self.assertRaisesRegex(ValueError, 'project license'):
             release.package('v0.1.0', release.TARGETS[0], self.binary, self.output, self.root)
-        self.assertFalse(self.output.exists())
+        self.assertFalse(list(self.output.glob('*.tar.gz')))
 
     def test_complete_bundle_is_required_and_tampering_is_rejected(self):
         archives = []
         for target in release.TARGETS:
             archives.append(release.package('v0.1.0', target, self.binary, self.output, self.root))
         sums = release.bundle('v0.1.0', self.output, self.root)
-        self.assertEqual(len(sums.read_text().splitlines()), 4)
+        self.assertEqual(len(sums.read_text().splitlines()), 8)
         archives[0].write_bytes(b'tampered')
         with self.assertRaises(ValueError):
             release.bundle('v0.1.0', self.output, self.root)
@@ -81,6 +100,7 @@ class PackageTests(unittest.TestCase):
                 output = self.root / damage
                 archives = [release.package('v0.1.0', target, self.binary, output, self.root)
                             for target in release.TARGETS]
+                extension_fixtures(self.root, output)
                 archive = archives[0]
                 members = []
                 with tarfile.open(archive) as contents:
@@ -100,11 +120,43 @@ class PackageTests(unittest.TestCase):
                     release.bundle('v0.1.0', output, self.root)
 
     def test_missing_targets_and_unknown_targets_are_rejected(self):
-        self.output.mkdir()
         with self.assertRaises(ValueError):
             release.bundle('v0.1.0', self.output, self.root)
         with self.assertRaises(ValueError):
             release.package('v0.1.0', '../../bad', self.binary, self.output, self.root)
+
+    def test_bundle_requires_all_extensions_and_matching_native_executables(self):
+        for target in release.TARGETS:
+            release.package('v0.1.0', target, self.binary, self.output, self.root)
+        extension = next(self.output.glob('*.vsix'))
+        original = extension.read_bytes()
+        extension.unlink()
+        with self.assertRaisesRegex(ValueError, 'Incomplete'):
+            release.bundle('v0.1.0', self.output, self.root)
+        extension.write_bytes(original)
+        with zipfile.ZipFile(extension) as contents:
+            entries = {name: contents.read(name) for name in contents.namelist()}
+        entries['extension/bin/vizzi'] = b'wrong executable'
+        with zipfile.ZipFile(extension, 'w') as contents:
+            for name, data in entries.items():
+                contents.writestr(name, data)
+        Path(str(extension) + '.sha256').write_text(f'{release.digest(extension)}  {extension.name}\n')
+        with self.assertRaisesRegex(ValueError, 'executable differs'):
+            release.bundle('v0.1.0', self.output, self.root)
+
+    def test_extension_platform_metadata_must_match_the_release_asset(self):
+        for target in release.TARGETS:
+            release.package('v0.1.0', target, self.binary, self.output, self.root)
+        extension = next(self.output.glob('*.vsix'))
+        with zipfile.ZipFile(extension) as contents:
+            entries = {name: contents.read(name) for name in contents.namelist()}
+        entries['extension.vsixmanifest'] = b'<PackageManifest><Metadata><Identity Version="0.2.0" TargetPlatform="wrong"/></Metadata></PackageManifest>'
+        with zipfile.ZipFile(extension, 'w') as contents:
+            for name, data in entries.items():
+                contents.writestr(name, data)
+        Path(str(extension) + '.sha256').write_text(f'{release.digest(extension)}  {extension.name}\n')
+        with self.assertRaisesRegex(ValueError, 'platform/version differs'):
+            release.bundle('v0.1.0', self.output, self.root)
 
 
 if __name__ == '__main__':

@@ -6,14 +6,33 @@ remains in Git and the project documentation.
 
 ## Unreleased
 
+### Changed
+
+- VS Code setup starts from the status bar or **Vizzi: Open Workspace**, with optional
+  project-local `vizzi.toml` settings and no manual connection-file setup.
+- Plugin activation opens Vizzi in a reusable editor tab. **Vizzi: Open Workspace in
+  Browser** remains available for an external browser.
+
 ### Added
 
+- Shared VS Code analysis can open local Rust dependency and standard-library functions,
+  including `ok_or_else`. Checked editor function ranges support newer Rust syntax without
+  rewriting captured source or launching another language server.
+- Platform-specific VSIX packages include the native Vizzi executable. **Open Workspace**
+  starts it and opens an editor tab; **Stop Workspace** closes the process it owns.
 - TOML launch settings through `--config FILE`, with command-line overrides, explicit
   path rules and strict validation.
-- A development VS Code plugin and `--vscode-connection` option to share editor definition
+- A VS Code plugin and `--vscode-connection` option to share editor definition
   and reference providers without launching duplicate Vizzi-managed language servers.
   Shared analysis checks saved/captured source and reports unavailable analysis on
   dirty buffers or disconnect; managed-server fallback is never automatic.
+
+### Fixed
+
+- Automatic VS Code launches no longer print obsolete instructions to copy connection
+  paths into TOML. Optional external-launch settings appear only in advanced sharing.
+- VS Code sharing opens Output before folder selection, uses a sole open folder directly,
+  and reports missing folders, cancellation and startup errors instead of returning silently.
 
 ## 0.1.1 - 2026-11-11
 

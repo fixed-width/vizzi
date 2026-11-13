@@ -155,7 +155,7 @@ pub fn router(application: Arc<Application>) -> Router {
         .route("/app.css", get(|| async { asset("text/css; charset=utf-8", include_str!("../web/app.css")) }))
         .layer(axum::middleware::map_response(|mut response: Response| async move {
             response.headers_mut().insert(header::CACHE_CONTROL, header::HeaderValue::from_static("no-store"));
-            response.headers_mut().insert(header::CONTENT_SECURITY_POLICY, header::HeaderValue::from_static("default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; object-src 'none'; frame-ancestors 'none'"));
+            response.headers_mut().insert(header::CONTENT_SECURITY_POLICY, header::HeaderValue::from_static("default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; object-src 'none'; frame-ancestors vscode-webview: vscode-file:"));
             response.headers_mut().insert(header::X_CONTENT_TYPE_OPTIONS, header::HeaderValue::from_static("nosniff"));
             response
         }))
@@ -381,6 +381,36 @@ pub async fn diagnostic_request(
 mod tests {
     use super::*;
     use crate::{cache::Cache, engine::Engine, source::Directory};
+
+    #[tokio::test]
+    async fn pages_allow_editor_frames_and_exclude_web_page_ancestors() {
+        use tower::ServiceExt;
+        let app = router(Arc::new(Application::new("fixture".into()).unwrap()));
+        for path in ["/", "/workspace", "/review", "/explore", "/investigate"] {
+            let response = app
+                .clone()
+                .oneshot(
+                    axum::http::Request::builder()
+                        .uri(path)
+                        .body(Body::empty())
+                        .unwrap(),
+                )
+                .await
+                .unwrap();
+            let policy = response.headers()[header::CONTENT_SECURITY_POLICY]
+                .to_str()
+                .unwrap();
+            let ancestors: Vec<_> = policy
+                .split(';')
+                .map(str::trim)
+                .find(|directive| directive.starts_with("frame-ancestors "))
+                .unwrap()
+                .split_whitespace()
+                .skip(1)
+                .collect();
+            assert_eq!(ancestors, ["vscode-webview:", "vscode-file:"], "{path}");
+        }
+    }
 
     #[tokio::test]
     async fn launch_url_serves_the_call_workspace_and_direct_modes_remain_available() {

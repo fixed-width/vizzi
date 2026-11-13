@@ -10,6 +10,86 @@ fn input(root: &std::path::Path) -> Input {
         configuration: "a".repeat(64),
     }
 }
+
+#[test]
+fn provider_function_ranges_preserve_current_rust_syntax_and_restore_exact_source() {
+    use vizzi::dependency_sources::Declaration;
+    use vizzi_core::model::ContentId;
+    let root = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    std::fs::create_dir(root.path().join("src")).unwrap();
+    let text = "impl<T> Option<T> { pub const fn ok_or_else<E, F>(self, err: F) -> Result<T, E> where F: [const] FnOnce() -> E + [const] Destruct { match self { Some(v) => Ok(v), None => Err(err()), } } }";
+    std::fs::write(root.path().join("src/lib.rs"), text).unwrap();
+    let catalog = Catalog::new(cache.path().join("refs.json"));
+    let start = text.find("ok_or_else").unwrap();
+    let descriptor = Declaration {
+        content: ContentId::derive(&[text.as_bytes()]),
+        name: "ok_or_else".into(),
+        span: text.find("pub const fn").unwrap()..text.rfind('}').unwrap() - 1,
+        identifier: start..start + "ok_or_else".len(),
+    };
+    let raw = catalog.capture(input(root.path())).unwrap();
+    assert!(raw.index.definition(raw.doc().path(), start).is_none());
+    let captured = catalog
+        .capture_with_declaration(input(root.path()), descriptor.clone())
+        .unwrap();
+    let target = captured
+        .index
+        .definition(captured.doc().path(), start)
+        .unwrap();
+    assert_eq!(target.name, "ok_or_else");
+    assert_eq!(captured.doc().resident_source(), Some(text));
+    assert!(captured.calls(&target.id, 0).unwrap().items.is_empty());
+    let restored = Catalog::new(cache.path().join("refs.json"))
+        .get(&captured.origin.capture)
+        .unwrap()
+        .unwrap();
+    assert_eq!(restored.doc().version(), captured.doc().version());
+    for bad in [
+        Declaration {
+            content: ContentId::derive(&[b"different"]),
+            ..descriptor.clone()
+        },
+        Declaration {
+            identifier: start..text.len() + 1,
+            ..descriptor.clone()
+        },
+        Declaration {
+            name: "unrelated".into(),
+            ..descriptor
+        },
+    ] {
+        assert!(
+            catalog
+                .capture_with_declaration(input(root.path()), bad)
+                .is_err()
+        );
+    }
+}
+
+#[test]
+fn provider_function_names_have_bounded_single_line_metadata() {
+    use vizzi::dependency_sources::Declaration;
+    use vizzi_core::model::ContentId;
+    for name in ["n".repeat(257), "name\n".into(), "name\0".into()] {
+        let root = tempfile::tempdir().unwrap();
+        let cache = tempfile::tempdir().unwrap();
+        std::fs::create_dir(root.path().join("src")).unwrap();
+        let text = format!("pub fn {name}() {{}}\n");
+        std::fs::write(root.path().join("src/lib.rs"), &text).unwrap();
+        let declaration = Declaration {
+            content: ContentId::derive(&[text.as_bytes()]),
+            name: name.clone(),
+            span: 0..text.len(),
+            identifier: 7..7 + name.len(),
+        };
+        assert!(
+            Catalog::new(cache.path().join("refs.json"))
+                .capture_with_declaration(input(root.path()), declaration)
+                .is_err()
+        );
+    }
+}
 #[cfg(unix)]
 #[test]
 fn dependency_roots_require_canonical_native_identity() {

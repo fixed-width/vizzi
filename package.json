@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "test": "node experiments/browser/run.mjs",
-    "test:editor": "node --test editors/vscode/bridge.test.cjs editors/vscode/providers.test.cjs"
+    "test:editor": "node --test editors/vscode/*.test.cjs"
   },
   "devDependencies": {
     "@stryker-mutator/core": "10.1.1",
