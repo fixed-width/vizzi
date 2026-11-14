@@ -43,8 +43,8 @@ counts of cards or clicks. Stop early if the workflow is getting in your way.
 The structural view searches literal names/areas, not whole natural-language questions.
 **Area inventory** clears the current name filter. Call destinations are same-name
 candidates; unsupported/partial/omitted analysis is shown. **Inspect call → Keep this location**
-starts a finite saved window at the invocation. **Open in VS Code** verifies the working
-file before issuing the CLI handoff; it cannot check an unsaved editor buffer. No editor
+starts a finite saved window at the invocation. In this standalone trial, **Open in
+VS Code** verifies the working file before issuing the CLI handoff; it cannot check an unsaved editor buffer. No editor
 opens from browsing alone. The ordinary overview is available at the same host's `/`.
 
 Repeating the editor-only task with Vizzi teaches the answer, so a faster second attempt

@@ -184,6 +184,7 @@ fn vscode_uses_literal_arguments_without_shell_interpretation() {
     let target = EditorLocation {
         path: "/tmp/a file;$(echo nope).rs".into(),
         line: 12,
+        source: vizzi::editor::SourceWitness::from_bytes(b""),
     };
     let args = VsCode::arguments(&target);
     assert_eq!(
@@ -241,6 +242,7 @@ fn vscode_adapter_reports_recorded_acknowledgement_refusal_and_missing_executabl
     let target = EditorLocation {
         path: temp.path().join("a file;$(nope).rs"),
         line: 7,
+        source: vizzi::editor::SourceWitness::from_bytes(b""),
     };
     std::fs::write(
         &executable,
@@ -367,7 +369,7 @@ fn line_boundaries_are_exact_and_imported_anchors_cannot_bypass_verification() {
 
 #[test]
 fn editor_handoff_verifies_complete_large_working_files() {
-    let text = format!("//{}\n", "x".repeat(1_100_000));
+    let text = format!("//{}\n", "x".repeat(4 * 1024 * 1024 + 1));
     let (_root, _cache, host) = setup_with(&text);
     let editor = Arc::new(Recording(Mutex::new(vec![])));
     let app = Companion::new(host, None, editor.clone()).unwrap();
@@ -383,7 +385,12 @@ fn editor_handoff_verifies_complete_large_working_files() {
         })
         .unwrap();
     app.open(id).unwrap();
-    assert_eq!(editor.0.lock().unwrap().len(), 1);
+    let opened = editor.0.lock().unwrap();
+    assert_eq!(opened.len(), 1);
+    assert_eq!(
+        opened[0].source,
+        vizzi::editor::SourceWitness::from_bytes(text.as_bytes())
+    );
 }
 
 #[test]

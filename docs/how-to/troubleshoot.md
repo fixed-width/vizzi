@@ -78,10 +78,14 @@ storage-save error before relying on reload to retain an unsaved arrangement.
 
 ## Editor handoff fails
 
-Check `command -v code`, or configure an executable with `--editor-code /path/to/code`.
-Vizzi must run on the desktop where the editor should open. Changed or unverifiable
-working bytes can refuse the handoff; it cannot open a historical or unsaved editor
-buffer. [The editor guide](investigate-with-vscode.md) covers the supported workflow.
+For plugin launches, save the target file and wait for its current capture. Return
+navigation uses the window that launched Vizzi; if that origin is unavailable, reopen
+Vizzi from it. Stop Sharing and closing the Vizzi tab do not change this association.
+
+For standalone launches, check `command -v code`, or configure an executable with
+`--editor-code /path/to/code`. Vizzi must run on the desktop where the editor should
+open. Changed or unverifiable working bytes can refuse either handoff; historical or
+unsaved bytes are never substituted. [The editor guide](investigate-with-vscode.md) covers the supported workflow.
 
 ## A review revision cannot be resolved
 

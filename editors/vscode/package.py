@@ -12,7 +12,7 @@ import zipfile
 VSCE_VERSION = "4.1.0"
 SOURCE = Path(__file__).resolve().parent
 REPOSITORY = SOURCE.parents[1]
-PAYLOAD = ("package.json", "extension.cjs", "bridge.cjs", "providers.cjs", "launcher.cjs", "workspace-view.cjs", "editor-source.cjs", "comparison.cjs", "handoff.cjs")
+PAYLOAD = ("package.json", "extension.cjs", "bridge.cjs", "providers.cjs", "launcher.cjs", "workspace-view.cjs", "editor-source.cjs", "comparison.cjs", "handoff.cjs", "origin-connection.cjs", "editor-navigation.cjs")
 TARGETS = ("linux-x64", "linux-arm64", "darwin-x64", "darwin-arm64")
 
 

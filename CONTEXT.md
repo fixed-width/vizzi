@@ -33,6 +33,11 @@ An editor-initiated request to open a Vizzi view at a location verified against 
 editor's original saved source and a captured observation. It preserves source identity
 without transferring buffer ownership or authorising edits.
 
+**Originating editor**:
+The editor window that launched a Vizzi session and receives navigation back from that
+session. Opening the same source workspace in another window does not change this
+association.
+
 **Source relationship**:
 A relationship supported by analysis and source provenance, with its kind and uncertainty
 retained. A candidate call and a resolved call have different meanings.

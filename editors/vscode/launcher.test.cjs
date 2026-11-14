@@ -74,3 +74,20 @@ test('stopping during startup cancels and reaps the pending child', {skip:proces
   await rejected;
   assert.throws(()=>process.kill(Number(pid),0),{code:'ESRCH'});
 });
+
+test('origin resources close on failed startup and cancellation before spawning',async t=>{
+  const f=await fixture(t);let disposed=0;
+  const createOrigin=async()=>({file:path.join(f.directory,'origin.json'),dispose:async()=>{disposed++;}});
+  await assert.rejects(startWorkspace({...f,binary:path.join(f.directory,'missing'),createOrigin}),/ENOENT/);assert.equal(disposed,1);
+  const controller=new AbortController();
+  await assert.rejects(startWorkspace({...f,binary:path.join(f.directory,'missing'),signal:controller.signal,createOrigin:async()=>{controller.abort();return createOrigin();}}),/cancelled/);
+  assert.equal(disposed,2);
+});
+
+test('native exit releases its origin callback independently of a workspace tab',{skip:process.platform==='win32'},async t=>{
+  const f=await fixture(t),binary=path.join(f.directory,'brief-workspace');
+  await fs.writeFile(binary,`#!${process.execPath}\nprocess.stderr.write('Vizzi: http://127.0.0.1:12345\\n');setTimeout(()=>process.exit(0),100);\n`,{mode:0o755});
+  let released;const closed=new Promise(resolve=>{released=resolve;});let count=0;
+  const workspace=await startWorkspace({...f,binary,createOrigin:async()=>({file:path.join(f.directory,'origin.json'),dispose:async()=>{count++;released();}})});
+  await closed;assert.equal(count,1);await workspace.dispose();assert.equal(count,1);
+});

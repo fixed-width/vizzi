@@ -1,14 +1,19 @@
 const {spawn} = require('node:child_process');
 
-async function startWorkspace({binary,root,connectionFile,configFile,output,onExit=()=>{},timeout=15000,signal}) {
+async function startWorkspace({binary,root,connectionFile,configFile,output,onExit=()=>{},timeout=15000,signal,createOrigin}) {
+  const origin = await createOrigin?.();
+  if (signal?.aborted) {await origin?.dispose();throw new Error('Vizzi startup cancelled.');}
   const args = configFile ? ['--config',configFile] : [];
   args.push('--root',root,'--vscode-connection',connectionFile,'--workers','1');
+  if (origin) args.push('--editor-connection',origin.file);
   output.appendLine(`Starting Vizzi for ${root}`);
-  const child = spawn(binary,args,{cwd:root,stdio:['ignore','ignore','pipe'],windowsHide:true});
+  let child;
+  try {child = spawn(binary,args,{cwd:root,stdio:['ignore','ignore','pipe'],windowsHide:true});}
+  catch(error) {await origin?.dispose();throw error;}
   let stopped = false;
   let exited = false;
   let diagnostic = '';
-  const closed = new Promise(resolve=>child.once('close',()=>{exited=true;resolve();}));
+  const closed = new Promise(resolve=>child.once('close',()=>{exited=true;resolve();})).then(()=>origin?.dispose());
   async function dispose() {
     if (stopped) return closed;
     stopped = true;
@@ -16,7 +21,7 @@ async function startWorkspace({binary,root,connectionFile,configFile,output,onEx
       child.kill('SIGINT');
       const timer = setTimeout(()=>child.kill('SIGKILL'),2000);
       try {await closed;} finally {clearTimeout(timer);}
-    }
+    } else await closed;
   }
   try {
     const url = await new Promise((resolve,reject)=>{

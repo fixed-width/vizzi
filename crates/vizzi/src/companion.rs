@@ -469,21 +469,22 @@ impl Companion {
         let entry = input
             .read(&path, 16 * 1024 * 1024, &|| false)
             .map_err(|e| CompanionError::Unavailable(e.to_string()))?;
-        match entry {
+        let bytes = match entry {
             ReadEntry::Present {
                 kind: EntryKind::Regular { .. },
                 bytes,
-            } if ContentId::derive(&[&bytes]) == *doc.content() => {}
+            } if ContentId::derive(&[&bytes]) == *doc.content() => bytes,
             _ => {
                 return Err(CompanionError::Conflict(
                     "Working source differs or cannot be verified; the location was not opened"
                         .into(),
                 ));
             }
-        }
+        };
         self.editor.open(&EditorLocation {
             path: self.host.root().join(doc.path()),
             line,
+            source: crate::editor::SourceWitness::from_bytes(&bytes),
         })?;
         Ok(())
     }

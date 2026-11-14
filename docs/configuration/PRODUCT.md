@@ -99,6 +99,27 @@ Stopping the workspace or changing projects disposes the old tab. The separate
 Saved tasks in an external browser and the VS Code tab belong to their respective
 browser storage profiles.
 
+## Return to the originating editor
+
+Plugin-launched **Editor** actions target the exact VS Code window that launched the
+native workspace. Sharing the same root in another window does not change this return
+target. An unavailable origin reports an actionable error without choosing another
+window or falling back to a CLI launcher. Standalone sessions retain their configured
+editor adapter.
+
+The native source host verifies the captured identity, saved bytes and line before
+handoff. The target window then refuses dirty or divergent target buffers, including
+aliases, while unrelated dirty files do not block navigation. It checks again after
+asynchronous document presentation and selects the captured line only while the request
+remains current and unexpired. No buffer is saved, reloaded or edited automatically.
+
+Return navigation remains available after Stop Sharing, closing the Vizzi tab and
+opening the same native workspace in an external browser. It has a separate per-launch
+connection from semantic provider sharing and captured-source handoff ordering. Native
+exit, Stop Workspace and extension shutdown dispose that connection. Editor names come
+from the selected adapter throughout the source views and saved locations. See the
+[originating-editor contract](ORIGIN_EDITOR.md).
+
 ## Open a file in the source browser
 
 **Vizzi: Open in Source Browser** appears in the file editor and editor-tab context

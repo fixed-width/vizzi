@@ -426,3 +426,68 @@ The installed package passed source/tab menus and browsing history, real rust-an
 call exploration/repeated navigation, normal shared-provider launch/reuse/task restoration,
 and Source Control comparisons. One initial Rust-analyzer preflight timed out resolving
 `ok_or_else` through VS Code before any Vizzi action ran; its isolated retry passed.
+
+
+## Originating-editor navigation (2026-11-13)
+
+Plugin launches now bind return navigation to their exact editor window through a
+separate per-launch callback. Native source admission and standalone CLI behavior remain
+covered by the existing tests. SHA-256 uses sha2 0.11.1, verified as the current stable
+release before adding it; Node uses built-in crypto with no runtime npm dependency.
+
+- Native baseline: formatting, all-feature workspace tests and doctests passed
+  (793 passed, 15 explicitly ignored), followed by warning-free Clippy. Final focused
+  checks cover eight origin-adapter tests and twenty companion tests, including a
+  project file larger than the semantic provider allowance.
+- All 98 Node editor tests passed. Cases include independent same-root windows,
+  descriptor replacement, lost origin, authentication and frame limits, target-only
+  dirty checks, aliases, edits during asynchronous presentation/reads, BOM handling,
+  external files, expiration, disconnect cancellation and process-owned cleanup.
+- The complete browser regression suite and Python/Rust/Ruby/C++ documentation
+  walkthroughs passed. Browser cases verify adapter-supplied names in bubbles and
+  saved locations, plus generic labels when investigation metadata is unavailable.
+- VSCE 4.1.0 produced `dist/vizzi-vscode-0.8.0-linux-x64.vsix`. Runtime source,
+  native executable, documentation and license bytes were checked against the package;
+  its SHA-256 sidecar passed verification. Official VS Code CLI installation used only
+  a temporary profile. The executable retained its executable mode.
+- Installed VS Code checks passed on Linux, including an aliased workspace, the real
+  embedded workspace, tab closure, Stop Sharing, explicit external-browser handoff,
+  dirty-target refusal, and rust-analyzer `ok_or_else` exploration followed by return
+  to the captured standard-library line. The external-browser launch itself is
+  intercepted in the isolated host; HTTP callback delivery and Chromium rendering
+  are checked separately.
+
+Cold rust-analyzer startup intermittently failed to resolve the fixture before Vizzi
+launched; successful runs exercised the complete installed workflow. The harness now
+selects the known installed analyzer binary, explicitly starts it, limits its threads,
+and reports analyzer state on failure. Same-root window isolation is qualified with
+deterministic TCP peers rather than two simultaneous VS Code GUI instances. These
+checks do not qualify other operating systems or every installed language extension.
+
+### Origin adapter mutation evidence
+
+All passes used `nice -n 10`, `CARGO_BUILD_JOBS=1`, `RUST_TEST_THREADS=1`,
+`-j 1 --jobserver-tasks 1`, and a passing unmodified baseline. Scope covers the whole
+new native origin adapter and `SourceWitness::from_bytes`, rather than changed lines.
+
+| Pass | Completion | Caught by failing tests | Survived | Unviable | Timeouts |
+| --- | --- | --- | --- | --- | --- |
+| Initial adapter pass | Interrupted after 10 of 91 candidates | 7 | 0 | 1 | 2 |
+| Bounded-peer continuation | All 84 remaining candidates; iteration excluded 8 earlier caught/unviable outcomes | 77 | 4 | 3 | 0 |
+| Strengthened-test rerun | Both behavior-changing survivors | 2 | 0 | 0 | 0 |
+
+The initial timeouts came from a test peer waiting for a connection that a mutated
+request rejected before connecting. Bounding peer acceptance converted both into
+ordinary failing-test evidence on the continuation. Survivors prompted regular-file
+refusal diagnostics and invalid oversized fields on otherwise successful replies.
+Across the passes, 92 distinct candidates produced 86 caught, four unviable and two
+reviewed equivalent outcomes. Compiler failures and earlier timeouts are not counted
+as tests catching mutations.
+
+The two narrow equivalent cases change the serialized request frame preflight in
+`OriginEditor::open` from `> FRAME` to `== FRAME` or `>= FRAME`. A validated descriptor
+is at most 4096 bytes and the destination path at most 4096 bytes; even maximal JSON
+escaping keeps this fixed-shape request below 32 KiB. Neither equality can be reached
+at the 64 KiB frame limit. The defensive check remains. No function-wide mutation
+exclusion was added. Mutation evidence does not prove correctness or cover all Rust
+and JavaScript paths.

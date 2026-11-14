@@ -5,6 +5,8 @@ const crypto = require('node:crypto');
 const {startBridge} = require('./bridge.cjs');
 const {createProvider} = require('./providers.cjs');
 const {startWorkspace} = require('./launcher.cjs');
+const {startOriginEditor} = require('./origin-connection.cjs');
+const {createEditorNavigator} = require('./editor-navigation.cjs');
 const {createWorkspaceView} = require('./workspace-view.cjs');
 const {captureEditorCall,captureSourceFile,verifySource} = require('./editor-source.cjs');
 const {createHandoffClient} = require('./handoff.cjs');
@@ -93,7 +95,11 @@ function activate(context) {
       let current;
       launchAbort = new AbortController();
       launchTask = vscode.window.withProgress({location:vscode.ProgressLocation.Notification,title:'Starting Vizzi'},
-        ()=>startWorkspace({binary,...connection,configFile,output,onExit:()=>{
+        ()=>startWorkspace({binary,...connection,configFile,output,
+          createOrigin:()=>startOriginEditor({root:connection.root,
+            storage:path.join(context.globalStorageUri.fsPath,'origin-connections'),name:'VS Code',
+            open:createEditorNavigator(vscode,{root:connection.root,editorRoot:connection.editorRoot})}),
+          onExit:()=>{
           if (workspace === current) {workspace=undefined;workspaceView.dispose();}
         },signal:launchAbort.signal}));
       try {current = await launchTask;} finally {launchTask=undefined;launchAbort=undefined;}
@@ -166,7 +172,7 @@ function activate(context) {
       if (!externalSettings && reused?.root===root && await reused.bridge.isCurrent()) {
         if (invocation!==generation || active!==reused) return;
         output.appendLine('Using the current editor connection.');
-        return {root,connectionFile:reused.connectionFile};
+        return {root,editorRoot,connectionFile:reused.connectionFile};
       }
       await stop();
       invocation = generation;
@@ -176,7 +182,7 @@ function activate(context) {
       provider = createProvider(vscode,root,editorRoot);
       const bridge = await startBridge({root,connectionFile,query:provider.query});
       if (invocation !== generation) {provider.dispose(); await bridge.dispose(); return;}
-      active = {bridge,provider,root,connectionFile};
+      active = {bridge,provider,root,editorRoot,connectionFile};
       output.clear();
       output.appendLine(`Sharing language providers for ${root}`);
       if (externalSettings) {
@@ -187,7 +193,7 @@ function activate(context) {
       } else output.appendLine('Editor connection configured automatically for this launch.');
       output.appendLine('\nVS Code keeps ownership of its language servers. Save buffers before querying from Vizzi.');
       output.show(true);
-      return {root,connectionFile};
+      return {root,editorRoot,connectionFile};
     } catch (error) {
       if (provider && active?.provider !== provider) provider.dispose();
       throw error;

@@ -22,6 +22,8 @@ pub(super) struct Options {
     pub source_spool_mib: usize,
     pub investigation_file: Option<PathBuf>,
     pub editor_code: PathBuf,
+    #[serde(skip)]
+    pub editor_connection: Option<PathBuf>,
     pub language_servers: Configuration,
     c_family_root: Vec<String>,
     exclude_source: Vec<String>,
@@ -43,6 +45,7 @@ impl Default for Options {
             source_spool_mib: 0,
             investigation_file: None,
             editor_code: "code".into(),
+            editor_connection: None,
             language_servers: Configuration::default(),
             c_family_root: vec![],
             exclude_source: vec![],
@@ -162,6 +165,7 @@ pub(super) fn load(arguments: impl Iterator<Item = String>) -> Result<Option<Opt
                 | "--source-spool-mib"
                 | "--investigation-file"
                 | "--editor-code"
+                | "--editor-connection"
                 | "--rust-analyzer"
                 | "--pyright"
                 | "--ruby-lsp"
@@ -204,6 +208,7 @@ pub(super) fn load(arguments: impl Iterator<Item = String>) -> Result<Option<Opt
             "--source-spool-mib" => options.source_spool_mib = value.parse().map_err(invalid)?,
             "--investigation-file" => options.investigation_file = Some(value.into()),
             "--editor-code" => options.editor_code = value.into(),
+            "--editor-connection" => options.editor_connection = Some(value.into()),
             "--rust-analyzer" => options.language_servers.rust_analyzer = Some(value.into()),
             "--pyright" => options.language_servers.pyright = Some(value.into()),
             "--ruby-lsp" => options.language_servers.ruby_lsp = Some(value.into()),
@@ -250,6 +255,23 @@ mod tests {
         load(arguments.iter().map(|arg| (*arg).to_owned()))
             .unwrap()
             .unwrap()
+    }
+
+    #[test]
+    fn origin_connection_is_a_launch_only_choice() {
+        let options = load_args(&[
+            "--editor-connection",
+            "/private/origin.json",
+            "--editor-code",
+            "unusable",
+        ]);
+        assert_eq!(
+            options.editor_connection,
+            Some("/private/origin.json".into())
+        );
+        assert_eq!(options.editor_code, PathBuf::from("unusable"));
+        assert!(load(["--editor-connection".to_owned()].into_iter()).is_err());
+        assert!(toml::from_str::<Options>("editor-connection = '/private/origin.json'").is_err());
     }
 
     #[test]

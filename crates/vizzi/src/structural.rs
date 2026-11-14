@@ -164,9 +164,16 @@ impl StructureHost {
             ));
         }
         source.verify().map_err(CompanionError::Conflict)?;
+        let text = source
+            .doc()
+            .captured()
+            .read_text(2 * 1024 * 1024)
+            .map_err(|e| CompanionError::Unavailable(e.to_string()))?
+            .ok_or_else(|| CompanionError::Invalid("Dependency source is not UTF-8".into()))?;
         Ok(crate::editor::EditorLocation {
             path: source.path(),
             line: request.line,
+            source: crate::editor::SourceWitness::from_bytes(text.as_bytes()),
         })
     }
     /// Creates an idle projection adapter without source reads or parsing.

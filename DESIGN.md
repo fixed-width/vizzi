@@ -73,6 +73,10 @@ connection. The first VS Code plugin supplies shared definitions/references; fur
 editor plugins can extend the same editor-neutral provider seam. Shared editor analysis
 requires matching saved source and does not claim a frozen editor environment. See
 [configuration and editor sharing](docs/configuration/TECH.md).
+Plugin-launched return navigation binds the native editor-neutral `Editor` seam to the
+exact originating window. Source verification stays native; each editor adapter checks
+its target buffers and presents the verified line. This association is independent of
+semantic provider sharing and tab lifetime; see [originating-editor navigation](docs/configuration/ORIGIN_EDITOR.md).
 Local dependency source uses independent, bounded captures admitted by language providers.
 Discovery stays language-specific; repository snapshots and watchers retain their scope.
 See [dependency source](docs/visual/DEPENDENCIES_TECH.md).

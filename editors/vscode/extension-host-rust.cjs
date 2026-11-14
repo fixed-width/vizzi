@@ -13,12 +13,13 @@ async function verify() {
   const analyzer = vscode.extensions.getExtension('rust-lang.rust-analyzer');
   assert.ok(analyzer,'the isolated Rust extension is missing');
   await analyzer.activate();
+  await vscode.commands.executeCommand('rust-analyzer.startServer');
   const position = new vscode.Position(1,12);
   let definitions;
   const deadline = Date.now()+60000;
   while (!definitions?.length) {
     definitions = await vscode.commands.executeCommand('vscode.executeDefinitionProvider',file,position).catch(()=>[]);
-    assert.ok(Date.now()<deadline,'rust-analyzer did not resolve ok_or_else');
+    assert.ok(Date.now()<deadline,`rust-analyzer did not resolve ok_or_else (client state ${analyzer.exports?.client?.state}, server ${analyzer.exports?.serverVersion})`);
     if (!definitions?.length) await new Promise(resolve=>setTimeout(resolve,200));
   }
   const targetUri = definitions[0].targetUri || definitions[0].uri;
@@ -108,6 +109,10 @@ async function verify() {
       await writeSignal(process.env.VIZZI_TEST_REPORT+'.reopened',{});
       await inspect('-reopened');
     }
+    await vscode.commands.executeCommand('vizzi.stopSharing');
+    await post('api/dependency/editor',{snapshot:target.origin.capture,file:target.source.file,version:target.source.version,line:target.source.line});
+    assert.equal(await fs.realpath(vscode.window.activeTextEditor.document.uri.fsPath),await fs.realpath(targetUri.fsPath));
+    assert.equal(vscode.window.activeTextEditor.selection.active.line,target.source.line-1);
     console.log('Real VS Code rust-analyzer resolved ok_or_else into a captured core source bubble.');
   } finally {
     await vscode.commands.executeCommand('vizzi.stopWorkspace');

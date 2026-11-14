@@ -14,6 +14,12 @@ Editor observations remain in `editor-source.cjs`; `handoff.cjs` handles finite 
 results for both actions. Other editors can implement the same contract in their own
 runtime.
 
+Return navigation uses the native `Editor` seam and a separate
+[originating-editor connection](../../docs/configuration/ORIGIN_EDITOR.md).
+`origin-connection.cjs` owns its authenticated listener; `editor-navigation.cjs` checks
+target buffers and presents verified locations through public VS Code APIs. The native
+workspace owns this connection independently of semantic sharing and the webview.
+
 The plugin has no npm runtime dependencies. Its minimum VS Code version is 1.100;
 it uses public Git and workspace/provider APIs rather than editor-private LSP access.
 Remote and virtual workspaces are not supported in this slice.

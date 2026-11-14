@@ -23,6 +23,7 @@ and launch examples without starting the server or creating cache data.
 | `--workers N` | `4` | Shared analysis worker count, from 1 to 32. User guides use 1. |
 | `--port N` | `7474` | Local HTTP port. `0` requests an available port; its address can change between runs. |
 | `--investigation-file FILE` | None | Persist saved locations, notes and reader connections. Must be outside both root and cache. Does not persist visual task layouts or review captures. |
+| `--editor-connection FILE` | Plugin-managed | Bind return navigation to the exact launching window; overrides the standalone editor without fallback. Command-line only. |
 | `--editor-code EXECUTABLE` | `code` | VS Code launcher path/name. This accepts an executable, not an executable plus shell arguments. |
 | `--rust-analyzer EXECUTABLE` | Disabled | Optional Rust definition/reference provider. Dependencies and toolchains must already be available locally. |
 | `--vscode-connection FILE` | Disabled | Reuse providers through the Vizzi VS Code plugin. Cannot be combined with managed-server/project options; no managed fallback on disconnect. |

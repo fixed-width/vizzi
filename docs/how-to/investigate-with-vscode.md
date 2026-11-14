@@ -38,21 +38,21 @@ For normal persistence, keep using the same configured state file.
 
 ## Open source in VS Code
 
-Vizzi uses `code` from `PATH`. To choose another executable, add:
+Use **Editor** on a current bubble or **Open in VS Code** on a saved location. With
+the plugin, this returns to the captured line in the exact VS Code window that launched
+Vizzi. It works from an external browser and after closing the Vizzi tab or stopping
+provider sharing. If that window is unavailable, reopen Vizzi from it.
 
-```sh
---editor-code /path/to/code
-```
+Save changes in the target file first. The plugin refuses dirty target buffers and
+checks saved source against the capture before selecting the line; other dirty files
+do not block it. Vizzi never saves, reloads or edits buffers for you. Changed, missing
+or unverifiable source can be refused while saved excerpts and notes remain available.
+Refresh the capture or save a current location before retrying changed source.
 
-Use **Editor** on a current bubble or **Open in VS Code** on a saved location. The
-launcher requests the existing VS Code window when available. Run Vizzi on the desktop
-where you want the editor to open; a browser connection is not a remote-editor bridge.
-No editor is launched merely by opening a bubble.
-
-Vizzi verifies the current working-file content against the source location before
-handoff. Changed, missing or unverifiable files can be refused while the saved excerpt
-and notes remain available. Save the current location again when that is what you intend
-to work on. This opens a disk file, not an unsaved or historical editor buffer.
+Standalone launches use `code` from `PATH`; choose another executable with
+`--editor-code /path/to/code`. This CLI adapter requests reuse of an available window
+and cannot confirm its unsaved buffers. Run it on the desktop where you want the editor
+to open. No editor opens merely from browsing a bubble.
 
 Dependency bubbles can use editor handoff when their bytes still match, but saving a
 location from dependency source is not supported in this slice. Other editor integrations

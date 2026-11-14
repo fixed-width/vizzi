@@ -28,6 +28,8 @@ async function main() {
     await fs.access(path.join(source,'core/src/option.rs'));
     await fs.mkdir(path.join(directory,'user/User'),{recursive:true});
     await fs.writeFile(path.join(directory,'user/User/settings.json'),JSON.stringify({
+      'rust-analyzer.numThreads':1,
+      'rust-analyzer.server.path':path.join(extension,'server/rust-analyzer'),
       'rust-analyzer.checkOnSave':false,'rust-analyzer.cargo.buildScripts.enable':false,'rust-analyzer.procMacro.enable':false,
       'rust-analyzer.cargo.sysroot':sysroot,'rust-analyzer.cargo.sysrootSrc':source,
       'rust-analyzer.server.extraEnv':{CARGO_NET_OFFLINE:'true',CARGO_BUILD_JOBS:'1',RUSTUP_AUTO_INSTALL:'0'},

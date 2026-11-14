@@ -8,16 +8,16 @@ a `vscode-connection` path into project settings.
 
 ## Install the bundled preview
 
-Use the 0.7.1 VSIX for your operating system and processor:
+Use the 0.8.0 VSIX for your operating system and processor:
 
 Requires VS Code 1.100 or later.
 
 | System | Processor | VSIX filename |
 | --- | --- | --- |
-| Linux | x86-64 | `vizzi-vscode-0.7.1-linux-x64.vsix` |
-| Linux | ARM64 | `vizzi-vscode-0.7.1-linux-arm64.vsix` |
-| macOS | Intel | `vizzi-vscode-0.7.1-darwin-x64.vsix` |
-| macOS | Apple Silicon | `vizzi-vscode-0.7.1-darwin-arm64.vsix` |
+| Linux | x86-64 | `vizzi-vscode-0.8.0-linux-x64.vsix` |
+| Linux | ARM64 | `vizzi-vscode-0.8.0-linux-arm64.vsix` |
+| macOS | Intel | `vizzi-vscode-0.8.0-darwin-x64.vsix` |
+| macOS | Apple Silicon | `vizzi-vscode-0.8.0-darwin-arm64.vsix` |
 
 In VS Code's Extensions view, open **⋯ → Install from VSIX…** and select the file.
 If VS Code offers to reload extensions after updating, accept it. The VSIX includes
@@ -25,7 +25,7 @@ Vizzi's native executable and browser interface. Rust, Node.js and a separate na
 installation are not required to use the bundled preview.
 
 The earlier 0.1.0 extension only shares language providers. Update to the bundled
-0.7.1 preview to use the launch command. The release workflow builds these VSIX files
+0.8.0 preview to use the launch command. The release workflow builds these VSIX files
 alongside native archives; local source builds are described below.
 
 ## Open your project
@@ -48,6 +48,17 @@ window also stops the process it launched.
 
 Use **Vizzi: Open Workspace in Browser** for an external browser. Saved tasks in that
 browser use separate storage from the VS Code tab.
+
+## Return to your editor
+
+Use **Editor** in a code bubble or **Open in VS Code** on a saved location to return
+to the captured line in the same VS Code window that launched Vizzi. This also works
+from an external browser, after closing the Vizzi tab, or after **Stop Sharing**.
+
+Save changes in the target file before returning. Vizzi refuses dirty or changed target
+source and never saves or reloads a buffer for you. Unsaved changes in other files do
+not block the return. If the original window is unavailable, reopen Vizzi from that
+window; return navigation never chooses a different window automatically.
 
 ## Explore a call from your editor
 
@@ -130,7 +141,7 @@ JSON, which contains a session credential, in VS Code's extension storage.
 Open **View → Output** and select **Vizzi** for startup details. Errors also appear as
 VS Code notifications.
 
-- **Open Workspace is missing:** check that the bundled 0.7.1 extension is installed
+- **Open Workspace is missing:** check that the bundled 0.8.0 extension is installed
   and enabled in this window, and reload extensions if VS Code requests it.
 - **No folder is open:** use **File → Open Folder…** and try again. This preview requires
   a trusted local folder; remote and virtual workspaces are unsupported.

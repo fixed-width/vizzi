@@ -2,11 +2,11 @@ const fs=require('node:fs/promises');
 const {constants}=require('node:fs');
 const path=require('node:path');
 
-async function savedSource(file) {
+async function savedSource(file,maxBytes=4*1024*1024) {
   const handle=await fs.open(file,constants.O_RDONLY | (constants.O_NONBLOCK || 0));
   try {
     const info=await handle.stat();
-    if(!info.isFile() || info.size>4*1024*1024)throw new Error('Editor source exceeds allowance or is not a regular file');
+    if(!info.isFile() || info.size>maxBytes)throw new Error('Editor source exceeds allowance or is not a regular file');
     const buffer=Buffer.alloc(info.size+1);let length=0;
     while(length<buffer.length){const {bytesRead}=await handle.read(buffer,length,buffer.length-length,null);if(!bytesRead)break;length+=bytesRead;}
     if(length>info.size)throw new Error('Saved source changed during analysis; retry navigation');

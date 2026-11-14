@@ -31,6 +31,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         source_spool_mib,
         investigation_file,
         editor_code,
+        editor_connection,
         language_servers,
         ..
     } = options;
@@ -73,6 +74,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             language_servers,
         )?) as Arc<dyn vizzi::definitions::Provider>)
     };
+    let editor: Arc<dyn vizzi::editor::Editor> = match editor_connection {
+        Some(file) => Arc::new(vizzi::editor::OriginEditor::from_file(
+            directory.root(),
+            &file,
+        )?),
+        None => Arc::new(vizzi::editor::VsCode::new(editor_code)),
+    };
     let mut engine = Engine::new(directory, Cache::new(cache), workers)?;
     if analysis_input_mib != 0 {
         let bytes = analysis_input_mib
@@ -106,7 +114,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let investigation = Arc::new(vizzi::companion::Companion::new(
         host.clone(),
         investigation_file,
-        Arc::new(vizzi::editor::VsCode::new(editor_code)),
+        editor,
     )?);
     let router = vizzi::server::router_with_definitions(
         host.clone(),

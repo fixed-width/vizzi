@@ -111,7 +111,7 @@ export function installDiscovery({transport, keep, openEditor, showError, browse
       if (browseEnabled && next.snapshot && lastSnapshot !== next.snapshot) {lastSnapshot = next.snapshot;void load();}
       if (next.error && !next.snapshot) el('discovery-summary').textContent = 'Source indexing failed. Retry to build the overview.';
     },
-    saved(view) {board = view.board;syncSaved();},
+    saved(view) {el('preview-editor').textContent = `Open in ${view.editor}`;board = view.board;syncSaved();},
     closePreview() {el('close-preview').click();},
   };
 }

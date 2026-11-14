@@ -8,6 +8,10 @@ remains in Git and the project documentation.
 
 ### Changed
 
+- Plugin-launched Editor actions return to the exact originating VS Code window,
+  including from external browsers. Dirty or changed target files are refused without
+  saving buffers; unavailable origins report an error without opening another window.
+
 - Editor call and source-browser actions share native captured-source handoff logic.
   Both wait for matching saved source for up to 30 seconds; newer requests in the same
   editor window silently replace waiting requests without stopping shared capture.

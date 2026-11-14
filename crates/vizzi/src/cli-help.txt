@@ -58,6 +58,9 @@ Saved locations and editor:
       Persist saved locations, notes and reader connections to this file.
       Must be outside both root and cache [default: session memory only].
       Visual task layouts are saved separately in browser storage.
+  --editor-connection FILE
+      Bind return navigation to the launching editor window (plugin-managed).
+      Command-line only; overrides --editor-code without a fallback.
   --editor-code EXECUTABLE
       VS Code launcher used by the Editor action [default: code].
       Supply an executable name/path, without shell arguments.

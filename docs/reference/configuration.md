@@ -40,7 +40,9 @@ current directory. No `~`, shell-command or environment-variable expansion is pe
 | `syntax-language` | Array of `"SCOPE=c"`/`"SCOPE=cpp"` strings | Repeated `--syntax-language`; empty |
 
 Resource controls retain their [CLI meanings and limits](cli.md#resource-controls).
-`once`, `stdio`, `help` and `config` are command-line-only and are rejected as file keys.
+`once`, `stdio`, `help`, `config` and `editor-connection` are command-line-only and are rejected as file keys.
+`--editor-connection FILE` is supplied automatically by editor plugins and binds return
+navigation to the launching window, overriding `editor-code` without fallback.
 The config file holds launch settings; [browser preferences and saved state](storage.md)
 have separate storage.
 

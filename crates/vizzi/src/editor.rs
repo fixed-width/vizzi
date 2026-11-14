@@ -1,25 +1,53 @@
 //! Local editor adapters consume verified locations, never arbitrary RPC commands.
+use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 use std::{
     ffi::OsString,
     path::PathBuf,
     process::{Command, Stdio},
     time::{Duration, Instant},
 };
+mod origin;
+pub use origin::OriginEditor;
+
+/// Portable witness over the exact saved bytes already verified by the source host.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct SourceWitness {
+    /// Exact UTF-8 byte count.
+    pub bytes: usize,
+    /// Lowercase SHA-256 digest; native content identities remain unchanged.
+    pub sha256: String,
+}
+impl SourceWitness {
+    /// Derives an editor-portable witness without retaining source text.
+    pub fn from_bytes(bytes: &[u8]) -> Self {
+        Self {
+            bytes: bytes.len(),
+            sha256: Sha256::digest(bytes)
+                .iter()
+                .map(|byte| format!("{byte:02x}"))
+                .collect(),
+        }
+    }
+}
 /// A local location verified against captured source immediately before handoff.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct EditorLocation {
-    /// Absolute path within the configured workspace.
+    /// Canonical path of verified project or admitted dependency source.
     pub path: PathBuf,
     /// One-based captured line, using column one.
     pub line: usize,
+    /// Saved content expected in the target editor buffer.
+    pub source: SourceWitness,
 }
 /// Refused or failed editor command.
 #[derive(Debug, thiserror::Error)]
 #[error("{0}")]
 pub struct EditorError(pub String);
-/// Native editor seam; validation belongs to the source host, not the editor.
+/// The source host verifies captures; editor adapters verify their presentation.
 pub trait Editor: Send + Sync {
-    /// Requests display of a verified location. Editor buffer confirmation is not implied.
+    /// Requests display of a verified location; the adapter defines presentation confirmation.
     fn open(&self, location: &EditorLocation) -> Result<(), EditorError>;
     /// User-facing adapter name.
     fn name(&self) -> &str;

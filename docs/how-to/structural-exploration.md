@@ -40,7 +40,8 @@ The order of written sites is syntax order, not execution order.
 at the invocation's source line and retain a finite window; they do not save an entire
 function or infer a relationship. Saved locations remain available beside optional notes
 and reader-authored connections. **Open in VS Code** is explicit and verifies the working
-file; it cannot inspect an unsaved editor buffer. Automated checks use a recording adapter.
+file. Standalone CLI launches cannot inspect an unsaved editor buffer; plugin launches
+refuse dirty target buffers. Automated checks use a recording adapter.
 
 After a source publication, find the area again before using stale results. Existing
 saved locations retain their old bytes. Stop the host with Ctrl-C after the trial.

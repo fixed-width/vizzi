@@ -140,6 +140,16 @@ async function verify() {
       await vscode.window.tabGroups.close(tabs()[0]);
       await waitTabs(0);
       assert.equal((await fetch(openedWorkspace.url+'api/status')).status,200,'closing the tab must retain the server');
+      await vscode.commands.executeCommand('vizzi.stopSharing');
+      const saved=await fetch(openedWorkspace.url+'api/investigation/lookup?path=a.py').then(r=>r.json());
+      const returnToEditor=()=>fetch(openedWorkspace.url+'api/editor/open',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({snapshot:saved.snapshot,file:saved.file,version:saved.version,line:2})});
+      let returned=await returnToEditor();assert.equal(returned.status,200,await returned.clone().text());
+      assert.equal(vscode.window.activeTextEditor.document,document);assert.equal(vscode.window.activeTextEditor.selection.active.line,1);
+      const dirty=new vscode.WorkspaceEdit();dirty.insert(file,new vscode.Position(0,0),'# unsaved\n');await vscode.workspace.applyEdit(dirty);
+      returned=await returnToEditor();assert.equal(returned.status,502);assert.match(await returned.text(),/unsaved changes/);assert.ok(document.isDirty);
+      const undo=new vscode.WorkspaceEdit();undo.delete(file,new vscode.Range(0,0,1,0));await vscode.workspace.applyEdit(undo);await document.save();
+      returned=await returnToEditor();assert.equal(returned.status,200,await returned.clone().text());
+
       await vscode.commands.executeCommand('vizzi.openWorkspace');
       await waitTabs(1);
       if (process.env.VIZZI_TEST_WEBVIEW) {

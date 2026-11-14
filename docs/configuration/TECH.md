@@ -55,6 +55,18 @@ source commands apply their current-intent check before displaying errors. A que
 open still proceeds when an earlier open fails. The webview delivery step revalidates
 source after readiness, then rechecks cancellation and panel identity before posting.
 
+## Originating-editor return
+
+The native `Editor` seam now carries a SHA-256 saved-byte witness alongside a verified
+absolute path and captured line. Source admission remains in the native source host.
+Plugin launches select `OriginEditor` through a private, command-line-only descriptor;
+standalone launches retain their configured CLI adapter. The native adapter reads and
+pins the launch connection once, independently of the semantic bridge's root-wide alias.
+The launcher owns the callback through tab closure, external-browser use and Stop Sharing.
+The VS Code navigator checks only target buffers, then revalidates after asynchronous
+presentation before synchronously selecting the captured line. Other editor plugins can
+implement the same [originating-editor contract](ORIGIN_EDITOR.md).
+
 ## Launch configuration and editor connection
 
 - Move launch parsing into a binary-private `configuration` module. Deserialize a strict

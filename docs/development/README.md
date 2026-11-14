@@ -16,7 +16,8 @@ For people extending Vizzi or investigating its implementation. The
 - [Language-server integration](../visual/LANGUAGE_SERVERS_TECH.md) and
   [detailed Rust call-resolution rules](call-resolution.md)
 - [Launch configuration and editor sharing behaviour](../configuration/PRODUCT.md),
-  [implementation](../configuration/TECH.md) and [VS Code plugin](../../editors/vscode/README.md)
+  [implementation](../configuration/TECH.md),
+  [originating-editor navigation](../configuration/ORIGIN_EDITOR.md) and [VS Code plugin](../../editors/vscode/README.md)
 - [Captured-source handoff contract](../configuration/HANDOFF.md)
 - [Native host architecture](../prototype/TECH.md), [API](../prototype/API.md),
   [source policy](../prototype/SOURCE_POLICY.md), [comparison architecture](../prototype/COMPARISON_TECH.md)
