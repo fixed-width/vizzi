@@ -345,3 +345,84 @@ on its own.
 Files must be saved local project files admitted by the current capture. No dependency
 download, buffer save, new language server or arbitrary browser path selection is added.
 Other platforms, minimum-version editor execution and performance remain unqualified.
+
+## Native captured-source handoff, 2026-11-13
+
+The 0.7.0 preview moves call-trail and source-browser entry behind one native module.
+The [handoff contract](../configuration/HANDOFF.md) covers the three finite exchanges,
+window ordering, resource bounds and refusal states. Editor-specific observations stay
+in `editor-source.cjs`; `handoff.cjs` supplies one generic result loop. The two previous
+per-action capture/status/source-response implementations and their mocked resolution
+tests were removed. Saved bytes are checked at observation and before presentation;
+pending exchanges check the original buffer without repeatedly rereading large files.
+
+- Formatting, workspace tests/doctests and Clippy passed: 785 tests passed and 15
+  optional integrations were ignored. Tokio's test-only clock feature supports exact
+  expiry tests; no runtime dependency was added.
+- All 62 editor tests passed, including real HTTP/stdio equivalence without VS Code,
+  late-result rejection, native cancellation, expired-scope reattachment, outdated
+  executable errors and overlapping editor actions during native launch.
+- Native behaviour tests cover original-text matching, maximum-size saved source,
+  scoped refresh coalescing for newly saved files, out-of-scope admission, fixed
+  deadlines, sequence boundaries, unknown continuations, cancellation, owner shutdown,
+  capture failures and a publication change while binding waits for compute capacity.
+- The native handoff uses one Tokio time source for lease/deadline checks and waits.
+  Paused-clock regressions first failed for exact scope and worker-start expiry under
+  the original mixed-clock implementation, then passed after the correction.
+- The complete browser suite passed against the new interface before the final clock
+  and admission refinements; it was rerun against the final packaged native build.
+  Release-helper tests passed (13 tests), and VSIX payload/guide/executable bytes and
+  SHA-256 checksum were verified.
+
+Mutation checks used `nice -n 10`, `CARGO_BUILD_JOBS=1`, `RUST_TEST_THREADS=1`,
+`-j 1 --jobserver-tasks 1` and passing unmodified baselines. The initial run was
+interrupted after exposing two missed source-size mutations and one test timeout;
+that incomplete run is not a completed qualification. A complete handoff-module pass
+then tested 97 mutants: 62 caught, 12 missed, 23 unviable builds and no timeouts.
+The missed cases prompted stronger sequence, cancellation, path, owner-lifetime and
+publication-race tests. The redundant byte-length predicate was removed because native
+content identity already binds the length. Exact expiry received deterministic clock
+coverage. The follow-up tested all surviving mutation classes and related conditions:
+24 mutants, 21 caught, no survivors or timeouts and 3 unviable builds. Those three
+replacements create unsupported `||` let-chain conditions. No mutation exclusions were
+added. Counts overlap; the follow-up is targeted, and these runs do not establish
+whole-codebase mutation coverage.
+
+Real source-browser menus/cursor/history, real rust-analyzer standard-library call
+exploration/repeat navigation and Source Control comparisons passed during development.
+The 0.7.0 Linux x86-64 VSIX includes the matching native executable and installs through
+the official editor CLI with executable mode 0755. Editor checks use temporary profiles
+and virtual displays. Other editor runtimes, other platforms and performance remain
+unqualified; the portable contract is exercised through both existing native transports.
+
+The installed 0.7.0 payload passed all four checks: source/tab context menus with cursor
+and Back/Forward retention; actual rust-analyzer `ok_or_else` exploration and repeated
+navigation; ordinary shared definitions/references, reconnect, browser handoff and task
+restoration; and Source Control working/revision comparisons. The UI harness paints text
+focus before right-clicking and retries only stale menu opening/input. Comparison retry
+checks inspect native capture or picker state first, avoiding duplicate actions. The
+final native build also passed the complete browser suite and 62 editor tests.
+
+## Presentation and startup review fixes, 2026-11-13
+
+The 0.7.1 preview fixes both editor races found in review. Deterministic regressions
+first reproduced edits to buffers and saved files after native resolution while webview
+readiness was delayed, plus a buffer edit during the saved-source read itself. Delivery
+now validates after readiness and immediately before posting, rechecking cancellation
+and panel identity after that asynchronous validation. Buffer checks bracket the read.
+
+Startup/provider-sharing failures propagate to the owning command. Source commands
+report only for their current intent; a queued newer open proceeds after an older
+failure. Shared failures are reported once for ordinary coalesced opens. Tests cover
+obsolete failing startup followed by successful newer navigation, an active failure,
+same-startup source intents and normal shared-failure reporting.
+
+All 72 editor tests and 13 release-helper tests passed. The 0.7.1 VSIX was packaged
+with the unchanged verified native binary, installed through VS Code's CLI in temporary
+directories, and its checksum was verified. These fixes change editor glue only;
+no additional Rust, native mutation or standalone browser qualification is claimed.
+
+The installed package passed source/tab menus and browsing history, real rust-analyzer
+call exploration/repeated navigation, normal shared-provider launch/reuse/task restoration,
+and Source Control comparisons. One initial Rust-analyzer preflight timed out resolving
+`ok_or_else` through VS Code before any Vizzi action ran; its isolated retry passed.

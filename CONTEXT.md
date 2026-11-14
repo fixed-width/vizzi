@@ -28,6 +28,11 @@ _Avoid_: unqualified working set alongside memory/admission discussions.
 A reader-selected route through call sites and candidate destinations. A visual call
 trail preserves earlier steps without claiming resolved calls or runtime execution order.
 
+**Captured-source handoff**:
+An editor-initiated request to open a Vizzi view at a location verified against the
+editor's original saved source and a captured observation. It preserves source identity
+without transferring buffer ownership or authorising edits.
+
 **Source relationship**:
 A relationship supported by analysis and source provenance, with its kind and uncertainty
 retained. A candidate call and a resolved call have different meanings.

@@ -8,6 +8,9 @@ remains in Git and the project documentation.
 
 ### Changed
 
+- Editor call and source-browser actions share native captured-source handoff logic.
+  Both wait for matching saved source for up to 30 seconds; newer requests in the same
+  editor window silently replace waiting requests without stopping shared capture.
 - Successful editor handoffs are silent in the call workspace and saved locations;
   failures still show an error.
 - VS Code setup starts from the status bar or **Vizzi: Open Workspace**, with optional
@@ -37,6 +40,10 @@ remains in Git and the project documentation.
 
 ### Fixed
 
+- Editor handoffs revalidate saved source after the Vizzi tab becomes ready, preventing
+  navigation after edits made while the tab loads.
+- Superseded source actions no longer display startup errors. Queued newer actions
+  can retry startup; current failures remain visible.
 - Automatic VS Code launches no longer print obsolete instructions to copy connection
   paths into TOML. Optional external-launch settings appear only in advanced sharing.
 - VS Code sharing opens Output before folder selection, uses a sole open folder directly,

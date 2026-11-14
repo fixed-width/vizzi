@@ -1,24 +1,8 @@
 const fs = require('node:fs/promises');
-const {constants} = require('node:fs');
 const path = require('node:path');
+const {savedSource} = require('./editor-source.cjs');
 
 const FILE_BYTES = 4 * 1024 * 1024;
-async function savedSource(file) {
-  const handle = await fs.open(file,constants.O_RDONLY | (constants.O_NONBLOCK || 0));
-  try {
-    const info = await handle.stat();
-    if (!info.isFile() || info.size > FILE_BYTES) throw new Error('Editor source exceeds allowance or is not a regular file');
-    const buffer = Buffer.alloc(info.size+1);
-    let length = 0;
-    while (length < buffer.length) {
-      const {bytesRead} = await handle.read(buffer,length,buffer.length-length,null);
-      if (!bytesRead) break;
-      length += bytesRead;
-    }
-    if (length > info.size) throw new Error('Saved source changed during analysis; retry navigation');
-    return buffer.subarray(0,length);
-  } finally {await handle.close();}
-}
 function within(root, file) {
   const relative = path.relative(root,file);
   return relative !== '' && !relative.startsWith(`..${path.sep}`) && relative !== '..' && !path.isAbsolute(relative);

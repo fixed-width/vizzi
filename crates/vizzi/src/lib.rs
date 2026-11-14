@@ -9,6 +9,7 @@ pub mod companion;
 pub mod editor;
 mod editor_bridge;
 pub mod engine;
+pub mod handoff;
 pub mod host;
 mod invalidation;
 mod maintenance;

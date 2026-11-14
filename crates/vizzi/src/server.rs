@@ -22,6 +22,7 @@ use vizzi_core::{
 
 type ApiError = (StatusCode, String);
 mod companion;
+mod handoff;
 mod review;
 
 /// Serves deferred HTTP exploration and review through one native host.
@@ -76,7 +77,10 @@ pub fn router_with_definitions(
         }
         None => crate::structural::StructureHost::new(host.clone()),
     });
-    router_with_host(host, reviews).merge(companion::router(investigation, search, structure))
+    let handoffs = handoff::router(host.clone(), structure.clone());
+    router_with_host(host, reviews)
+        .merge(companion::router(investigation, search, structure))
+        .merge(handoffs)
 }
 
 /// Adds comparison operations to the live workspace router without sharing status schemas.

@@ -426,6 +426,22 @@ impl Host {
         pending(&self.queue).invalidate(&self.application, scope);
         let _ = self.signal.try_send(());
     }
+    pub(crate) fn handoff_path_admitted(&self, path: &str) -> bool {
+        self.engine
+            .directory()
+            .source_path(std::path::Path::new(path))
+    }
+    pub(crate) fn refresh_handoff_if_idle(&self, path: &str) -> Option<u64> {
+        let mut queue = pending(&self.queue);
+        if self.application.status().pending {
+            return None;
+        }
+        queue.invalidate(&self.application, CaptureScope::Paths([path.into()].into()));
+        let ticket = self.application.desired();
+        drop(queue);
+        let _ = self.signal.try_send(());
+        Some(ticket)
+    }
     /// Returns the same application used by browser and diagnostic hosts.
     pub fn application(&self) -> Arc<Application> {
         self.application.clone()

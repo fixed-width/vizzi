@@ -2,7 +2,8 @@
 use super::{Cached, StructureHost};
 use crate::{companion::CompanionError, definitions::Position};
 use serde::{Deserialize, Serialize};
-use std::sync::TryLockError;
+use std::sync::{Arc, TryLockError};
+use vizzi_core::model::Snapshot;
 use vizzi_core::structure::{Invocation, Symbol};
 
 /// A handoff bound to the current repository observation.
@@ -43,6 +44,10 @@ pub struct Handoff {
     /// Exact selected invocation, with existing candidate/binding semantics.
     pub invocation: Invocation,
 }
+enum Selection<'a> {
+    Position(&'a str, usize),
+    Invocation(&'a str),
+}
 impl StructureHost {
     /// Maps exact saved editor source to a call without performing name-based lookup.
     pub fn editor_call(&self, request: &Request) -> Result<Handoff, CompanionError> {
@@ -57,7 +62,7 @@ impl StructureHost {
                 "Source changed; retry from the editor".into(),
             ));
         }
-        let position = if let Query::Position {
+        let selection = if let Query::Position {
             path,
             text,
             position,
@@ -78,10 +83,32 @@ impl StructureHost {
                     "Saved editor source has not been captured yet; wait for source refresh".into(),
                 ));
             }
-            Some(crate::definitions::byte_offset(&captured, *position).map_err(|e| invalid(&e))?)
+            Selection::Position(
+                path,
+                crate::definitions::byte_offset(&captured, *position).map_err(|e| invalid(&e))?,
+            )
         } else {
-            None
+            let Query::Invocation { call } = &request.query else {
+                return Err(invalid("Invalid editor selection"));
+            };
+            Selection::Invocation(call)
         };
+        self.resolve_editor_call(&snapshot, selection)
+    }
+    pub(crate) fn editor_call_at(
+        &self,
+        snapshot: &Arc<Snapshot>,
+        path: &str,
+        byte: usize,
+    ) -> Result<Handoff, CompanionError> {
+        self.resolve_editor_call(snapshot, Selection::Position(path, byte))
+    }
+    fn resolve_editor_call(
+        &self,
+        snapshot: &Arc<Snapshot>,
+        selection: Selection<'_>,
+    ) -> Result<Handoff, CompanionError> {
+        let invalid = |message: &str| CompanionError::Invalid(message.into());
         let mut cache = match self.cache.try_lock() {
             Ok(cache) => cache,
             Err(TryLockError::Poisoned(error)) => error.into_inner(),
@@ -93,23 +120,20 @@ impl StructureHost {
         };
         if cache
             .as_ref()
-            .is_none_or(|cache| cache.snapshot != request.snapshot)
+            .is_none_or(|cache| cache.snapshot != snapshot.id().as_str())
         {
             let previous = cache.take();
-            *cache = Some(Cached::rebuild(&snapshot, previous));
+            *cache = Some(Cached::rebuild(snapshot, previous));
         }
         let index = &cache
             .as_ref()
             .ok_or_else(|| invalid("Captured structure is unavailable"))?
             .index;
-        let call = match &request.query {
-            Query::Position { path, .. } => index
-                .call_at(
-                    path,
-                    position.ok_or_else(|| invalid("Editor position is unavailable"))?,
-                )
+        let call = match selection {
+            Selection::Position(path, byte) => index
+                .call_at(path, byte)
                 .ok_or_else(|| invalid("Place the cursor on a captured call name"))?,
-            Query::Invocation { call } => index
+            Selection::Invocation(call) => index
                 .call(call)
                 .ok_or_else(|| invalid("The selected call is absent from this observation"))?,
         };
@@ -131,7 +155,7 @@ impl StructureHost {
             ));
         }
         Ok(Handoff {
-            snapshot: request.snapshot.clone(),
+            snapshot: snapshot.id().as_str().into(),
             caller,
             invocation: call.invocation,
         })

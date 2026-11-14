@@ -53,17 +53,23 @@ api.postMessage({type:'vizzi.ready'});
 </script></body></html>`;
     } catch (error) {dispose();throw error;}
   }
-  async function send(type,handoff={}) {
+  async function send(type,handoff={}, {signal,validate=async()=>{}}={}) {
     const view=current;
     if (!view) throw new Error('Open the Vizzi workspace before navigating');
-    let timer;
+    let timer,onAbort;
     try {
-      const ready=await Promise.race([view.loaded,new Promise(resolve=>{timer=setTimeout(()=>resolve(false),10000);})]);
+      if(signal?.aborted)throw new DOMException('Editor handoff cancelled','AbortError');
+      const cancelled=signal?new Promise((_resolve,reject)=>{onAbort=()=>reject(new DOMException('Editor handoff cancelled','AbortError'));signal.addEventListener('abort',onAbort,{once:true});}):new Promise(()=>{});
+      const ready=await Promise.race([view.loaded,cancelled,new Promise(resolve=>{timer=setTimeout(()=>resolve(false),10000);})]);
+      if(signal?.aborted)throw new DOMException('Editor handoff cancelled','AbortError');
       if (!ready || current!==view) throw new Error('The Vizzi tab closed or did not become ready; retry the command');
+      await validate();
+      if(signal?.aborted)throw new DOMException('Editor handoff cancelled','AbortError');
+      if(current!==view)throw new Error('The Vizzi tab closed while verifying source; retry the command');
       if (!await view.panel.webview.postMessage({...handoff,type,nonce:view.nonce})) throw new Error('The Vizzi tab is unavailable; retry the command');
-    } finally {clearTimeout(timer);}
+    } finally {clearTimeout(timer);if(onAbort)signal.removeEventListener('abort',onAbort);}
   }
-  return {show,dispose,explore:handoff=>send('vizzi.explore',handoff),browse:handoff=>send('vizzi.browse',handoff)};
+  return {show,dispose,explore:(handoff,options)=>send('vizzi.explore',handoff,options),browse:(handoff,options)=>send('vizzi.browse',handoff,options)};
 }
 
 module.exports = {createWorkspaceView};

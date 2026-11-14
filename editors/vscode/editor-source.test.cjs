@@ -3,7 +3,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs/promises');
 const os=require('node:os');
 const path=require('node:path');
-const {captureSourceFile,resolveSourceFile}=require('./source-browser.cjs');
+const {captureSourceFile,captureEditorCall,verifySource}=require('./editor-source.cjs');
 
 const id=n=>String(n).repeat(64);
 const uri=fsPath=>({scheme:'file',fsPath,toString(){return this.fsPath;}});
@@ -52,45 +52,27 @@ test('workspace root aliases are supported while source-file aliases remain outs
   await assert.rejects(captureSourceFile(f.vscode,f.document.uri),/alias/i);
 });
 
-function peer(f,{captured=f.text,lookup={snapshot:id(1),file:id(2),version:id(3),path:'a #%.py',lines:132},onSource=()=>{}}={}) {
-  return async(url,options)=>{
-    const request=new URL(url);
-    if(request.pathname==='/api/workspace/start')return {ok:true,json:async()=>({})};
-    if(request.pathname==='/api/status')return {ok:true,json:async()=>({snapshot:id(1),pending:false})};
-    if(request.pathname==='/api/investigation/lookup'){
-      assert.equal(request.searchParams.get('path'),'a #%.py');
-      return {ok:true,json:async()=>lookup};
-    }
-    assert.equal(request.pathname,'/api/source');assert.equal(request.searchParams.get('snapshot'),id(1));
-    assert.equal(request.searchParams.get('file'),id(2));onSource();
-    return {ok:true,json:async()=>({schema:2,snapshot:id(1),file:id(2),version:id(3),path:'a #%.py',text:captured})};
+test('call observations retain the original word point and require the active resource',async t=>{
+  const f=await fixture(t);f.document.getWordRangeAtPosition=()=>({start:{line:130,character:0}});
+  const selected=await captureEditorCall(f.vscode,f.resource);
+  assert.deepEqual(selected.position,{line:130,character:0});
+  await assert.rejects(captureEditorCall(f.vscode,uri(path.join(f.root,'other.py'))),/source editor/);
+});
+test('buffer or saved-byte changes invalidate the original editor observation',async t=>{
+  const f=await fixture(t),selected=await captureSourceFile(f.vscode,f.resource);
+  f.document.isDirty=true;await assert.rejects(verifySource(selected),/Source changed/);
+  f.document.isDirty=false;f.document.getText=()=>f.text+'changed';await assert.rejects(verifySource(selected),/Source changed/);
+  f.document.getText=()=>f.text;await fs.writeFile(f.file,'changed');await assert.rejects(verifySource(selected),/saved source/);
+});
+
+test('buffer edits while the saved bytes are being read invalidate presentation',async t=>{
+  const f=await fixture(t),selected=await captureSourceFile(f.vscode,f.resource),originalOpen=fs.open;
+  let release,notify;const reading=new Promise(resolve=>{notify=resolve;}),gate=new Promise(resolve=>{release=resolve;});
+  fs.open=async(...args)=>{
+    const handle=await originalOpen(...args);if(args[0]!==f.file)return handle;
+    return {stat:()=>handle.stat(),close:()=>handle.close(),read:async(...args)=>{notify();await gate;return handle.read(...args);}};
   };
-}
-
-test('saved text must match pinned captured bytes before the opaque handoff is returned',async t=>{
-  const f=await fixture(t),selection=await captureSourceFile(f.vscode);
-  assert.deepEqual(await resolveSourceFile(f.session,selection,{fetch:peer(f)}),{snapshot:id(1),file:id(2),version:id(3),line:131});
-  await assert.rejects(resolveSourceFile(f.session,selection,{fetch:peer(f,{captured:'older capture'})}),/captur.*saved|saved.*captur/i);
-  await assert.rejects(resolveSourceFile({...f.session,root:'/other'},selection,{fetch:peer(f)}),/project changed/i);
-});
-
-test('source changes during capture and missing captured files refuse navigation',async t=>{
-  const f=await fixture(t),selection=await captureSourceFile(f.vscode);
-  await assert.rejects(resolveSourceFile(f.session,selection,{fetch:peer(f,{onSource:()=>{f.document.isDirty=true;}})}),/changed|Save/);
-  f.document.isDirty=false;
-  const fetch=async(url,options)=>new URL(url).pathname==='/api/investigation/lookup'
-    ?{ok:false,status:422,text:async()=>JSON.stringify({message:'Path is not in the current source index'})}:peer(f)(url,options);
-  await assert.rejects(resolveSourceFile(f.session,selection,{fetch}),/source index/);
-});
-
-test('captured source metadata cannot substitute another file/version; native read diagnostics are retained',async t=>{
-  const f=await fixture(t),selection=await captureSourceFile(f.vscode),base=peer(f);
-  for(const changed of [{schema:1},{snapshot:id(4)},{file:id(4)},{version:id(4)},{path:'other.py'}]) {
-    const fetch=async(url,options)=>{
-      const response=await base(url,options);
-      return new URL(url).pathname==='/api/source'?{ok:true,json:async()=>({...await response.json(),...changed})}:response;
-    };
-    await assert.rejects(resolveSourceFile(f.session,selection,{fetch}),/different captured source binding/);
-  }
-  await assert.rejects(resolveSourceFile(f.session,selection,{fetch:async(url,options)=>new URL(url).pathname==='/api/source'?{ok:false,status:413,text:async()=> 'Source exceeds the bulk read allowance'}:base(url,options)}),/bulk read allowance/);
+  t.after(()=>{fs.open=originalOpen;release();});
+  const checked=verifySource(selected);await reading;f.document.isDirty=true;release();
+  await assert.rejects(checked,/Source changed/);
 });

@@ -116,6 +116,13 @@ line to the tab. Changes during handoff refuse navigation rather than substituti
 Repeated actions reuse the tab and its source-browser document, retaining normal
 Back/Forward navigation. Successful handoffs are silent.
 
+Both source-browser and call-trail entry use the native
+[captured-source handoff module](HANDOFF.md). They wait up to 30 seconds for the original
+saved text to match capture. A newer request in the same editor window silently replaces
+its predecessor; other windows remain independent. Buffer changes stop the handoff,
+and cancellation leaves shared capture running. Presentation starts after a verified
+destination is available.
+
 ## Compare revisions from VS Code
 
 **Vizzi: Compare Revisions…** is available in the Command Palette and Git Source

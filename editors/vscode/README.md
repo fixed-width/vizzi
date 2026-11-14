@@ -9,6 +9,11 @@ right-click a file or its tab and choose **Vizzi: Open in Source Browser**, or c
 The [installed-extension guide](INSTALL.md) covers installation, optional project-local
 settings and troubleshooting. The workflow below is for extension development and testing.
 
+Captured-source handoff is implemented in the native [handoff module](../../docs/configuration/HANDOFF.md).
+Editor observations remain in `editor-source.cjs`; `handoff.cjs` handles finite native
+results for both actions. Other editors can implement the same contract in their own
+runtime.
+
 The plugin has no npm runtime dependencies. Its minimum VS Code version is 1.100;
 it uses public Git and workspace/provider APIs rather than editor-private LSP access.
 Remote and virtual workspaces are not supported in this slice.

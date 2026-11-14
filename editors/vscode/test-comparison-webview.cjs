@@ -30,12 +30,22 @@ exports.verifyComparisonWebview=async({port,report})=>{
     await frame.locator('#review-file-list button').filter({hasText:'a.py'}).click();
     await frame.locator('#working-source').getByText('def working(): return 3',{exact:false}).waitFor();
     async function menu(command) {
-      await page.locator('.tabs-container .tab').filter({hasText:'a.py'}).first().click();
-      const header=page.locator('.part.sidebar .pane-header').first();
-      await header.hover();
-      await header.getByRole('button',{name:'More Actions...',exact:true}).click();
-      const item=page.getByRole('menuitem',{name:command,exact:false});
-      await item.waitFor();await page.screenshot({path:report+'.menu.png'});await item.locator('.action-label').click();
+      const before=await fetch(workspace.url+'api/comparisons/status').then(r=>r.json());let last;
+      for(let attempt=0;attempt<3;attempt++) {
+        await page.locator('.tabs-container .tab').filter({hasText:'a.py'}).first().click();
+        const header=page.locator('.part.sidebar .pane-header').first();await header.hover();
+        await page.screenshot({path:report+'.focused.png'});
+        await header.getByRole('button',{name:'More Actions...',exact:true}).click();
+        const item=page.getByRole('menuitem',{name:command,exact:false});
+        try{await item.waitFor({timeout:2000});await page.screenshot({path:report+'.menu.png'});await item.locator('.action-label').click({timeout:2000});return;}
+        catch(error){
+          last=error;
+          const after=await fetch(workspace.url+'api/comparisons/status').then(r=>r.json());
+          if(after.active?.token!==before.active?.token || after.pending&&after.ticket!==before.ticket || await page.locator('.quick-input-title').filter({hasText:'Vizzi: Compare Revisions'}).isVisible())return;
+          await page.keyboard.press('Escape');
+        }
+      }
+      throw last;
     }
     await menu('Vizzi: Compare Working Changes with HEAD');
     frame=await review();

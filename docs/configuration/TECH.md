@@ -12,8 +12,8 @@ initialization, request IDs, document synchronization and shutdown.
 
 VS Code already exposes definition/reference provider commands. A plugin can use those
 without assuming a particular language-server transport. The editor-neutral Provider
-interface remains unchanged. The initial plugin supplies only shared analysis, leaving
-navigation/tasks and additional editor integrations to extend it later.
+interface remains unchanged. Editor-owned provider invocation remains separate from captured-source handoff and
+presentation, so another editor adapter can reuse native behaviour in its own runtime.
 The [versioned connection reference](BRIDGE.md) is the contract for other editor adapters.
 
 ## Editor-owned Rust dependency captures
@@ -35,33 +35,27 @@ restoration still requires identical contents and analysis identities.
 
 ## Editor call handoff
 
-The editor captures its file, saved text and UTF-16 word position before opening the tab.
-`POST /api/editor/call` checks an explicitly selected snapshot and saved-source witness,
-then uses the existing exact call-position index and native enclosing declaration. Its
-invocation query accepts only the resulting call ID. The route has a separate 16 MiB
-message limit; source text is bounded to 4 MiB and paths stay repository-relative.
+Editor entry now uses the native [captured-source handoff module](HANDOFF.md).
+`handoff.rs` owns window-scoped ordering, compact saved-source identities, fixed deadlines,
+capture catch-up and bounded projection work. Its finite HTTP and stdio adapter has no
+readiness wait under investigation work admission. `editor-source.cjs` owns VS Code
+observations; `handoff.cjs` supplies one generic finite-result loop for both actions.
+Native source matching and retry classification are no longer duplicated in the plugin.
+The existing `/api/editor/call` binding/retrieval route remains for browser call following
+and earlier native clients, sharing the exact call-position implementation.
 
-The webview shell becomes ready independently of the inner UI. A nonce-bound host message
-sets an opaque snapshot/call fragment on the local iframe. Fragment-only navigation keeps
-an existing Call workspace document alive; another mode navigates back to its root. The
-frontend consumes the fragment, waits for coherent source, adds or reveals the caller,
-and uses ordinary call following and destination choices. Neither a second definition
-resolver nor an editor-specific call graph is maintained. Repeated launches reuse the
-current sharing session while its manifest still belongs to that window; another window's
-replacement is detected before reuse.
+The editor captures its resource and saved text before focus changes. The native window
+scope orders handoffs independently of provider connection ownership. A successful result
+contains only captured identities and a reading position. The webview shell forwards those
+through its nonce-bound existing call/file fragments, retaining call-trail geometry and
+source-browser Back/Forward behaviour. Presentation checks the editor's current intent;
+obsolete startup or native replies do not open another view or show an error.
+Startup and provider-sharing failures propagate to the command that owns reporting;
+source commands apply their current-intent check before displaying errors. A queued
+open still proceeds when an earlier open fails. The webview delivery step revalidates
+source after readiness, then rechecks cancellation and panel identity before posting.
 
-## Proposed changes
-
-Source-browser handoff uses stable `editor/context` and `editor/title/context` menu
-contributions. `source-browser.cjs` captures the explicit resource (or palette's active
-editor), checks saved text and resolves it through `/api/investigation/lookup` and
-the pinned `/api/source` endpoint. Existing workspace startup/capture is reused.
-The webview delivers only snapshot/file/version IDs and a one-based line through a
-nonce-bound message and `/explore` fragment. No absolute source path enters the browser.
-The source browser consumes that fragment, validates its expected binding through
-ordinary navigation, and asks its inspector to reveal the requested line. Fragment
-navigation keeps the source-browser document alive; accepted visits replace the
-fragment's temporary history entry so Back/Forward preserves the browsing trail.
+## Launch configuration and editor connection
 
 - Move launch parsing into a binary-private `configuration` module. Deserialize a strict
   optional TOML layer, resolve its paths against its directory, then apply existing CLI
