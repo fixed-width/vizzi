@@ -4,6 +4,14 @@ Start Vizzi [on the Git repository](run-workspace.md), then choose **Review chan
 To review before live exploration starts, open the printed server address with `/review`
 appended. The review captures only the repository path you select.
 
+With the VS Code extension, open Source Control (**Ctrl+Shift+G**), hover over the
+**Changes** header above the commit-message box, then click its **⋯** menu.
+Choose **Vizzi: Compare Revisions…** and pick the base and target revisions, or
+choose **Vizzi: Compare Working Changes
+with HEAD** for saved local edits. Both actions start Vizzi and open its review tab.
+They are also in the Command Palette. See the
+[extension guide](../../editors/vscode/INSTALL.md#compare-revisions-or-working-changes).
+
 ## Compare working changes
 
 Choose **Working tree**, enter a **Base revision** and a **Repository path**, then select

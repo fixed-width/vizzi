@@ -1,11 +1,11 @@
 {
   "name": "vizzi",
   "displayName": "Vizzi",
-  "description": "Share VS Code language providers with the Vizzi visual workspace.",
-  "version": "0.4.1",
+  "description": "Explore calls and compare Git revisions in the Vizzi visual workspace.",
+  "version": "0.5.0",
   "publisher": "vizzi",
   "license": "Apache-2.0",
-  "engines": { "vscode": "^1.85.0" },
+  "engines": { "vscode": "^1.100.0" },
   "categories": ["Other"],
   "main": "./extension.cjs",
   "extensionKind": ["workspace"],
@@ -14,6 +14,8 @@
   "contributes": {
     "commands": [
       { "command": "vizzi.exploreCall", "title": "Vizzi: Explore Call" },
+      { "command": "vizzi.compareRevisions", "title": "Vizzi: Compare Revisions…" },
+      { "command": "vizzi.compareWorkingChanges", "title": "Vizzi: Compare Working Changes with HEAD" },
       { "command": "vizzi.openWorkspace", "title": "Vizzi: Open Workspace" },
       { "command": "vizzi.openWorkspaceInBrowser", "title": "Vizzi: Open Workspace in Browser" },
       { "command": "vizzi.stopWorkspace", "title": "Vizzi: Stop Workspace" },
@@ -21,7 +23,11 @@
       { "command": "vizzi.stopSharing", "title": "Vizzi: Stop Sharing Language Providers" }
     ],
     "menus": {
-      "editor/context": [{"command":"vizzi.exploreCall","when":"resourceScheme == file && isWorkspaceTrusted && editorLangId =~ /^(rust|python|ruby|c|cpp)$/","group":"navigation@20"}]
+      "editor/context": [{"command":"vizzi.exploreCall","when":"resourceScheme == file && isWorkspaceTrusted && editorLangId =~ /^(rust|python|ruby|c|cpp)$/","group":"navigation@20"}],
+      "scm/title": [
+        {"command":"vizzi.compareWorkingChanges","when":"scmProvider == git && isWorkspaceTrusted","group":"4_vizzi@1"},
+        {"command":"vizzi.compareRevisions","when":"scmProvider == git && isWorkspaceTrusted","group":"4_vizzi@2"}
+      ]
     },
     "configuration": {
       "title": "Vizzi",

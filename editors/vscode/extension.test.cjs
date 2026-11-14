@@ -13,7 +13,7 @@ async function fixture(t, folders = 1) {
   await fs.writeFile(binary,'fixture executable');
   t.after(()=>fs.rm(directory,{recursive:true,force:true}));
   const folder = {uri:{scheme:'file',fsPath:root}};
-  const commands = new Map(), lines = [], errors = [], opened = [], launches = [], panels = [], connections = [], editorCalls = [];
+  const commands = new Map(), lines = [], errors = [], opened = [], launches = [], panels = [], connections = [], editorCalls = [], comparisons=[];
   let shown = 0, picks = 0, disposed = 0;
   const output = {clear(){lines.length=0;},appendLine:line=>lines.push(line),
     append:line=>lines.push(line),show(){shown++;},dispose(){}};
@@ -58,13 +58,17 @@ async function fixture(t, folders = 1) {
       captureEditorCall:(...args)=>require('./editor-call.cjs').captureEditorCall(...args),
       resolveEditorCall:async(session,selection)=>{editorCalls.push({session,selection});return {snapshot:'a'.repeat(64),call:'b'.repeat(64)};},
     },
+    './comparison.cjs':{
+      selectComparison:async()=>({rootUri:folder.uri,folderUri:folder.uri,revision:'a'.repeat(40)}),
+      createComparison:async(session,selection)=>{comparisons.push({session,selection});return {schema:1,ticket:'test'};},
+    },
   };
   const source = await fs.readFile(path.join(__dirname,'extension.cjs'),'utf8');
   vm.compileFunction(source,['require','module'],{filename:'extension.cjs'})(
     name=>dependencies[name] || require(name),module);
   module.exports.activate(context);
   t.after(()=>module.exports.deactivate());
-  return {directory,root,folder,vscode,context,commands,lines,errors,opened,launches,panels,connections,editorCalls,
+  return {directory,root,folder,vscode,context,commands,lines,errors,opened,launches,panels,connections,editorCalls,comparisons,dependencies,
     shown:()=>shown,picks:()=>picks,disposed:()=>disposed,setStart:callback=>{start=callback;}};
 }
 
@@ -256,4 +260,36 @@ test('explore call asks for saved source before launching or changing the task',
   assert.match(f.errors.join('\n'),/Save/);
   assert.equal(f.launches.length,0);
   assert.equal(f.panels.length,0);
+});
+
+test('comparison commands open review directly and reuse its editor tab',async t=>{
+  const f=await fixture(t);
+  await f.commands.get('vizzi.compareWorkingChanges')();
+  assert.equal(f.comparisons.length,1);
+  assert.match(f.panels[0].webview.html,/<iframe[^>]+src="http:\/\/127\.0\.0\.1:7474\/review"/);
+  await f.commands.get('vizzi.compareRevisions')();
+  assert.equal(f.comparisons.length,2);assert.equal(f.launches.length,1);assert.equal(f.panels.length,1);
+  assert.equal(f.panels[0].messages[0].type,'vizzi.review');assert.equal(f.opened.length,0);
+});
+
+test('cancelling comparison picks does not launch or navigate',async t=>{
+  const f=await fixture(t);
+  f.dependencies['./comparison.cjs'].selectComparison=async()=>undefined;
+  await f.commands.get('vizzi.compareRevisions')();
+  assert.equal(f.launches.length,0);assert.equal(f.comparisons.length,0);
+});
+
+test('review launches at the Git root when the workspace is a subfolder',async t=>{
+  const f=await fixture(t),sub=path.join(f.root,'sub');await fs.mkdir(sub);
+  f.folder.uri={scheme:'file',fsPath:sub};
+  f.dependencies['./comparison.cjs'].selectComparison=async()=>({rootUri:{scheme:'file',fsPath:f.root},folderUri:f.folder.uri,revision:'a'.repeat(40)});
+  await f.commands.get('vizzi.compareWorkingChanges')();
+  assert.equal(f.launches[0].root,f.root);assert.equal(f.connections[0].root,f.root);
+});
+
+test('a comparison requested during normal startup still navigates to review',async t=>{
+  const f=await fixture(t);
+  await Promise.all([f.commands.get('vizzi.openWorkspace')(),f.commands.get('vizzi.compareWorkingChanges')()]);
+  assert.equal(f.launches.length,1);assert.equal(f.comparisons.length,1);
+  assert.equal(f.panels[0].messages.at(-1).type,'vizzi.review');
 });

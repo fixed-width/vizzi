@@ -8,8 +8,8 @@ or click **Vizzi** in the status bar to open an empty workspace.
 The [installed-extension guide](INSTALL.md) covers installation, optional project-local
 settings and troubleshooting. The workflow below is for extension development and testing.
 
-The plugin has no npm runtime dependencies. Its minimum VS Code version is 1.85;
-it uses established workspace/provider commands rather than editor-private LSP access.
+The plugin has no npm runtime dependencies. Its minimum VS Code version is 1.100;
+it uses public Git and workspace/provider APIs rather than editor-private LSP access.
 Remote and virtual workspaces are not supported in this slice.
 
 ## Use the development extension
@@ -71,6 +71,10 @@ to render the real editor tab, follow a call and check saved reading state throu
 Playwright (`npm ci` supplies it).
 Set `VIZZI_TEST_EXTENSION_PATH` to an installed extension directory to test packaged
 payload files instead of the source directory.
+
+Add `--compare --webview` to check the real Git API, Source Control comparison menu,
+base/target Quick Picks and embedded review panes. This uses a temporary repository
+with two commits plus staged, unstaged and untracked changes; Git must be on PATH.
 
 The check registers deterministic VS Code providers and queries them through the real
 native host. It verifies the editor command interface and protocol integration; it does

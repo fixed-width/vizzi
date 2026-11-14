@@ -99,6 +99,28 @@ Stopping the workspace or changing projects disposes the old tab. The separate
 Saved tasks in an external browser and the VS Code tab belong to their respective
 browser storage profiles.
 
+## Compare revisions from VS Code
+
+**Vizzi: Compare Revisions…** is available in the Command Palette and Git Source
+Control's overflow menu. Choose a repository when needed, then choose the base (left)
+and target (right) in successive VS Code Quick Picks. Offer local branches, tags,
+recent commits, further history pages and an explicit revision input. Resolve each
+selection to a commit before launching Vizzi; cancelling either step leaves the current
+workspace untouched. This compares the two selected trees directly, without a merge base.
+
+**Vizzi: Compare Working Changes with HEAD** lives beside it in Source Control's
+overflow menu and the Command Palette. It captures the repository's saved working tree
+against HEAD, including staged, unstaged and non-ignored untracked paths. Unsaved editor
+buffers are excluded and are never saved automatically. Refresh working retains the
+pinned HEAD baseline.
+
+Both commands start or reuse Vizzi and open **Review changes** in its editor tab.
+Review covers the selected Git repository, including when VS Code opened a subfolder.
+Existing capture/status/error behaviour applies; no Git checkout, fetch, index or
+working-file modification is performed. Missing Git, an unborn HEAD and invalid
+revisions produce actionable errors. Commit graph context menus require VS Code's
+proposed extension APIs, so this slice uses stable Source Control menus and Quick Picks.
+
 ## Shared Rust dependency source
 
 Following an editor-resolved Rust call can open a locally installed dependency or standard

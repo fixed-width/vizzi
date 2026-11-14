@@ -88,6 +88,28 @@ replacement is detected before reuse.
 
 ## Testing and validation
 
+`comparison.cjs` uses the built-in `vscode.git` extension's public API v1 for local
+repository discovery, bounded history pages and commit resolution. Source Control
+arguments select their own repository; ambiguous palette invocations ask the user.
+The selected repository must intersect an open local workspace folder. Canonical
+repository roots override the ordinary folder launch root, including subfolder opens.
+Selections become immutable hashes before launch. POST `/api/comparisons` starts the
+existing native capture; `/review` consumes its ordinary status/event stream. The
+webview accepts only a nonce-bound fixed review-navigation message, without arbitrary
+paths or browser-provided Git operations. No new native comparison API is needed.
+
+Stable API constraint checked against VS Code's
+[menu declarations](https://github.com/microsoft/vscode/blob/main/src/vs/workbench/services/actions/common/menusExtensionPoint.ts):
+`scm/historyItem/context` still requires `contribSourceControlHistoryItemMenu`.
+The [public Git API](https://github.com/microsoft/vscode/blob/main/extensions/git/src/api/git.d.ts)
+supports the read operations used here. Picker/command tests cover pinning, direction,
+cancellation, repository context, failures and review-tab reuse; an isolated editor
+host verifies the actual Git API and embedded review UI.
+
+The extension requires VS Code 1.100 or later: paged history uses `LogOptions.skip`,
+which is present in that release's public Git API and absent in the previous 1.85
+minimum. No proposed APIs or additional runtime dependencies are used.
+
 Installed launches use a small Node child-process adapter in `editors/vscode/launcher.cjs`.
 It starts the packaged executable without a shell, waits for its loopback launch URL,
 forwards diagnostics and owns shutdown. The extension passes the optional project-local

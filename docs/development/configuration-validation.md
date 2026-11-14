@@ -259,3 +259,45 @@ failed on the visible success banner. After removal, the direct-editor and compa
 browser checks passed, verifying silent success, literal recorded arguments, unchanged
 saved evidence and visible stale-source refusal. Formatting and diff checks passed.
 No Rust implementation changed; no additional mutation coverage is claimed.
+
+## VS Code revision comparisons, 2026-11-13
+
+The 0.5.0 preview adds Source Control overflow and Command Palette actions for two
+local revisions and saved working changes against HEAD. Selections are resolved to
+immutable commits before launch. The existing native comparison service and review
+event stream supply capture, errors, file inventory and source panes. The review form
+now follows the displayed capture's base, target and scope.
+
+- Native baseline: formatting, workspace tests/doctests and Clippy passed; 766 tests
+  passed and 15 optional integrations were ignored. No Rust implementation changed.
+- Extension suite: 49 tests passed, including picker direction/pinning/cancellation,
+  Git discovery, detached repository wrapper identity, subfolder launch roots, working
+  files without buffer saves and comparison navigation during ordinary startup.
+- Full browser suite: `npm test -- --no-build --no-desktop-bus` passed, including
+  review, refresh and call workspace checks. Four older editor-handoff tests still
+  waited for the success notice removed in 0.4.1; they now check the HTTP result and
+  recorded editor arguments, with silent success or retention of an earlier save notice.
+- Release-helper suite: 13 tests passed. The Linux x86-64 VSIX was built with the
+  matching release executable and installed successfully with VS Code's installer
+  into temporary user and extension directories; the executable retained mode 0755.
+- Real VS Code 1.146.0: the installed package's Source Control menu opened both
+  comparison workflows. Two Quick Picks selected the first and second fixture commits;
+  native metadata, the two-commit form, captured target source and changed-file inventory
+  matched those selections. Working review included staged, unstaged and non-ignored
+  untracked paths. A review-only launch did not start live call indexing.
+- The installed package also passed ordinary shared definitions/references, reconnect,
+  explicit browser handoff, editor-tab reuse, call following, task restoration and shutdown.
+
+Real UI checks use temporary profiles and virtual displays. The menu test activates
+actions while a source tab is visible, avoiding Chromium input routing through the
+embedded webview. The built-in Git API returns fresh repository wrappers, so repository
+matching uses their root rather than JavaScript object identity. A failing regression
+first reproduced that discrepancy; another reproduced comparison navigation lost to
+an overlapping ordinary launch. Initial manual ZIP extraction did not restore Unix
+executable bits; package qualification uses the editor's actual installer.
+
+VS Code's graph context menus still require proposed APIs. The supported menu and Git
+API approach needs no additional runtime dependencies; the minimum editor version is
+1.100 because its public Git log options support pagination. That minimum was checked
+against the published API source, but only the installed 1.146.0 host was run locally.
+No new Rust mutation, other-platform or performance qualification is claimed.

@@ -40,8 +40,10 @@ try {
   await page.getByRole('button', {name:'Save location', exact:true}).click();
   await page.waitForFunction(() => document.querySelector('#show-saved').textContent.includes('1'));
   assert.equal((await (await fetch(host.url+'/api/investigation')).json()).board.evidence[0].title, 'SourceReader');
+  const handoff=page.waitForResponse(r=>/\/api\/investigation\/evidence\/\d+\/open$/.test(new URL(r.url()).pathname));
   await page.getByRole('button', {name:'Open in VS Code', exact:true}).filter({visible:true}).click();
-  await page.waitForFunction(() => !document.querySelector('#investigation-notice').hidden);
+  assert.equal((await handoff).status(),200);
+  assert.equal(await page.locator('#investigation-notice').isVisible(),false);
   assert.match(await readFile(editor+'.args','utf8'), /--goto\n.*input\.rs:1:1\n/);
   await page.getByRole('button', {name:'Close source preview', exact:true}).click();
   await page.getByRole('button', {name:'Repository', exact:true}).click();

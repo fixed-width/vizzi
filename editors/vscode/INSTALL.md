@@ -8,14 +8,16 @@ a `vscode-connection` path into project settings.
 
 ## Install the bundled preview
 
-Use the 0.4.1 VSIX for your operating system and processor:
+Use the 0.5.0 VSIX for your operating system and processor:
+
+Requires VS Code 1.100 or later.
 
 | System | Processor | VSIX filename |
 | --- | --- | --- |
-| Linux | x86-64 | `vizzi-vscode-0.4.1-linux-x64.vsix` |
-| Linux | ARM64 | `vizzi-vscode-0.4.1-linux-arm64.vsix` |
-| macOS | Intel | `vizzi-vscode-0.4.1-darwin-x64.vsix` |
-| macOS | Apple Silicon | `vizzi-vscode-0.4.1-darwin-arm64.vsix` |
+| Linux | x86-64 | `vizzi-vscode-0.5.0-linux-x64.vsix` |
+| Linux | ARM64 | `vizzi-vscode-0.5.0-linux-arm64.vsix` |
+| macOS | Intel | `vizzi-vscode-0.5.0-darwin-x64.vsix` |
+| macOS | Apple Silicon | `vizzi-vscode-0.5.0-darwin-arm64.vsix` |
 
 In VS Code's Extensions view, open **⋯ → Install from VSIX…** and select the file.
 If VS Code offers to reload extensions after updating, accept it. The VSIX includes
@@ -23,7 +25,7 @@ Vizzi's native executable and browser interface. Rust, Node.js and a separate na
 installation are not required to use the bundled preview.
 
 The earlier 0.1.0 extension only shares language providers. Update to the bundled
-0.4.1 preview to use the launch command. The release workflow builds these VSIX files
+0.5.0 preview to use the launch command. The release workflow builds these VSIX files
 alongside native archives; local source builds are described below.
 
 ## Open your project
@@ -61,6 +63,26 @@ syntax, excluded source and positions without a captured call report an error ra
 than selecting a different same-name function. Rust calls can lead into locally available
 dependency and standard-library source as described below.
 
+## Compare revisions or working changes
+
+Press **Ctrl+Shift+G** to open Source Control. Hover over **Changes** (the repository
+header above the commit-message box), then click the **⋯** that appears on its right.
+Choose **Vizzi: Compare Revisions…**. Select the base revision (left), then the target
+revision (right) in the picker at the top of
+the window. Choose a branch, tag or commit, use **More commits…** to browse further
+back, or **Enter a revision…** for a local revision such as `HEAD~1`. Vizzi opens
+**Review changes** in its editor tab with the two selected trees. Escape cancels.
+
+For local edits, choose **Vizzi: Compare Working Changes with HEAD** from the same
+menu. This compares saved files with the current commit, including staged, unstaged
+and non-ignored untracked files. Unsaved editor buffers are excluded. Use **Refresh
+working** in Vizzi to capture more saved edits against the same pinned baseline.
+
+Both commands are also in the Command Palette. If several repositories are open,
+select one. Comparisons cover the whole selected repository, including when your
+workspace is a subfolder. Commit graph context menus currently require experimental
+VS Code extension APIs; use the Source Control menu or Command Palette for Vizzi.
+
 ## Optional project settings
 
 For source scopes, exclusions or a different port, save `vizzi.toml` **inside your
@@ -91,7 +113,7 @@ JSON, which contains a session credential, in VS Code's extension storage.
 Open **View → Output** and select **Vizzi** for startup details. Errors also appear as
 VS Code notifications.
 
-- **Open Workspace is missing:** check that the bundled 0.4.1 extension is installed
+- **Open Workspace is missing:** check that the bundled 0.5.0 extension is installed
   and enabled in this window, and reload extensions if VS Code requests it.
 - **No folder is open:** use **File → Open Folder…** and try again. This preview requires
   a trusted local folder; remote and virtual workspaces are unsupported.

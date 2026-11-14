@@ -17,6 +17,8 @@ remains in Git and the project documentation.
 
 ### Added
 
+- VS Code Source Control and Command Palette actions compare two selected local Git
+  revisions, or saved working changes with HEAD, in the embedded review workspace.
 - **Vizzi: Explore Call** in the VS Code editor context menu opens the saved call's
   caller and definition in the current visual task, with ordinary ambiguity handling.
 - Shared VS Code analysis can open local Rust dependency and standard-library functions,

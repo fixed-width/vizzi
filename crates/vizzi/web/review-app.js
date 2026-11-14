@@ -75,7 +75,15 @@ function evidence(entry,body,side) {
 function render(next) {
   const fileFocus=document.activeElement.closest?.("#review-file-list button")?.dataset.file;
   const hunkFocus=document.activeElement.closest?.("#review-hunks button")?.dataset.hunk;
+  const changed=next && next.metadata.origin!==view?.metadata.origin;
   view=next;
+  if(changed) {
+    element("comparison-mode").value=next.metadata.target?"commits":"working";
+    element("baseline").value=next.metadata.revision;
+    element("target-revision").value=next.metadata.target?.revision ?? "HEAD";
+    element("scope").value=next.metadata.scope;
+    comparisonMode();
+  }
   const workspace=element("review-workspace");workspace.dataset.token=next?.metadata.token ?? "";workspace.dataset.comparison=next?.metadata.comparison ?? "";
   const files=element("review-file-list"),hunks=element("review-hunks");files.replaceChildren();hunks.replaceChildren();
   if(!next) {

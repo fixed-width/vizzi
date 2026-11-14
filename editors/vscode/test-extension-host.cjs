@@ -14,6 +14,7 @@ async function main() {
   const report = path.join(directory,'result.json');
   await fs.mkdir(project);
   const rust = process.argv.includes('--rust');
+  const comparison = process.argv.includes('--compare');
   if (rust) {
     await fs.writeFile(path.join(project,'Cargo.toml'),'[package]\nname="vizzi_editor_std_test"\nversion="0.1.0"\nedition="2024"\n[lib]\npath="a.rs"\n');
     await fs.writeFile(path.join(project,'a.rs'),'pub fn convert(value: Option<u8>) -> Result<u8, &\'static str> {\n    value.ok_or_else(|| "missing")\n}\n');
@@ -30,12 +31,23 @@ async function main() {
       'rust-analyzer.server.extraEnv':{CARGO_NET_OFFLINE:'true',CARGO_BUILD_JOBS:'1',RUSTUP_AUTO_INSTALL:'0'},
     }));
   } else await fs.writeFile(path.join(project,'a.py'),'# fixture\ndef leaf(): pass\ndef run(): leaf()\n');
+  if (comparison) {
+    const git=(...args)=>execFileSync('git',['-c','user.name=Vizzi Test','-c','user.email=vizzi@example.invalid',...args],{cwd:project,encoding:'utf8'}).trim();
+    git('init','--initial-branch=main');
+    git('add','a.py');git('commit','-m','First version');
+    await fs.appendFile(path.join(project,'a.py'),'def added(): return 2\n');
+    git('add','a.py');git('commit','-m','Second version');
+    await fs.appendFile(path.join(project,'a.py'),'def working(): return 3\n');
+    await fs.writeFile(path.join(project,'staged.py'),'def staged(): pass\n');
+    git('add','staged.py');
+    await fs.writeFile(path.join(project,'untracked.py'),'def untracked(): pass\n');
+  }
   const workspace = process.argv.includes('--alias') ? path.join(directory,'alias') : project;
   if (workspace !== project) await fs.symlink(project,workspace,'dir');
   const log = await fs.open(path.join(directory,'launch.log'),'w');
   const code = process.env.VIZZI_VSCODE_EXECUTABLE || 'code';
   let extension = process.env.VIZZI_TEST_EXTENSION_PATH || __dirname;
-  const testName = rust?'extension-host-rust.cjs':'extension-host.cjs';
+  const testName = comparison?'extension-host-comparison.cjs':rust?'extension-host-rust.cjs':'extension-host.cjs';
   let testHost = path.join(__dirname,testName);
   if (process.env.VIZZI_TEST_EXTENSION_PATH) {
     await fs.cp(extension,path.join(directory,'extension'),{recursive:true});
@@ -66,7 +78,7 @@ async function main() {
     env:{...process.env,XDG_CACHE_HOME:path.join(directory,'cache'),XDG_CONFIG_HOME:path.join(directory,'config'),
       VIZZI_TEST_BINARY:binary,VIZZI_TEST_REPORT:report,VIZZI_TEST_WEBVIEW:inspect?'1':'',VIZZI_TEST_EDITOR_CALL:editorCall?'menu':editorCommand?'command':''},
   });
-  const inspection = inspect ? require('./test-webview.cjs').verifyWebview({port,report,editorCall})
+  const inspection = inspect ? (comparison?require('./test-comparison-webview.cjs').verifyComparisonWebview({port,report}):require('./test-webview.cjs').verifyWebview({port,report,editorCall}))
     .catch(async error=>{
       const result = {passed:false,error:error.stack};
       await writeSignal(report+'.webview',result);
@@ -83,7 +95,7 @@ async function main() {
     throw new Error(`${error.message}\nVS Code integration artifacts: ${directory}`);
   } finally {clearTimeout(timer);await log.close();}
   await fs.rm(directory,{recursive:true,force:true});
-  console.log((rust?'Real VS Code rust-analyzer: standard-library source capture passed.':'VS Code extension host: sharing, definitions/references, reconnect, editor tab, explicit browser handoff, reuse and shutdown passed.')+(inspect?' Webview rendered, followed a call and restored its saved task.':''));
+  console.log(comparison?'Real VS Code Git API: working changes, revision pickers, Source Control menu and embedded review passed.':(rust?'Real VS Code rust-analyzer: standard-library source capture passed.':'VS Code extension host: sharing, definitions/references, reconnect, editor tab, explicit browser handoff, reuse and shutdown passed.')+(inspect?' Webview rendered, followed a call and restored its saved task.':''));
 }
 
 main().catch(error=>{console.error(error.message);process.exitCode=1;});
