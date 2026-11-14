@@ -14,6 +14,7 @@ import { describeSource } from "/source-description.js";
 import { createInspector } from "/inspector.js";
 import { createNavigation } from "/navigation.js";
 import { createStartup } from "/startup.js";
+import { installEditorFileLinks } from "/editor-file-links.js";
 
 installAppHeader(document.querySelector('body > header'));
 const element = id => document.getElementById(id);
@@ -58,7 +59,7 @@ const navigation = createNavigation({
   capture: () => ({ file:view?.selection.file ?? null,entity:view?.selection.entity ?? null,
     path:view?.source?.path ?? null,version:view?.source?.version ?? null,snapshot:view?.snapshot ?? null,
     filter:viewFilter,position:{inspector:inspector.position(),camera:{...camera},layoutRevision:mapModel?.revision,fitMode,mapSize} }),
-  load: (query,intent) => controller.load(query,{intent,rollbackOnFailure:Boolean(intent.returning)}),
+  load: (query,intent) => controller.load(query,{intent,rollbackOnFailure:Boolean(intent.returning || intent.anchor)}),
   history: {push:state=>history.pushState(state,""),replace:state=>history.replaceState(state,""),go:delta=>history.go(delta)},
   onState: state => {element("nav-back").disabled=!state.canBack;element("nav-forward").disabled=!state.canForward;element("navigation").setAttribute("aria-busy",String(state.pending));},
   onNotice: notice => messages["navigation-notice"].show(notice),
@@ -70,17 +71,17 @@ const controller = createController({
   transport: async (uri, options) => {
     const next=await fetchJSON(`${uri}&projection=summary`,options);
     const restore=navigation.restoration(next,options.intent);
-    return inspector.prepare(next,{...options,restore:restore?.position.inspector,reveal:Boolean(options.intent?.returning && !restore)});
+    return inspector.prepare(next,{...options,restore:restore?.position.inspector,line:options.intent?.anchor?.line,reveal:Boolean(options.intent?.anchor || options.intent?.returning && !restore)});
   },
   onView: (next,info) => {
     const previousSelection=view?.selection.file;
     const first = !view, changedFilter=viewFilter!==(info.query.filter ?? "");
     view = next;keepEvidence.disabled=!next.source;
     viewFilter=info.query.filter ?? "";
-    if(info.intent?.returning)element("filter").value=viewFilter;
+    if(info.intent?.returning || info.intent?.anchor)element("filter").value=viewFilter;
     if(mapWorkspace!==next.workspace){let preferences={};try{const saved=localStorage.getItem(`vizzi.map.v1.${next.workspace}`);if(saved && saved.length<=65536 && new TextEncoder().encode(saved).length<=65536)preferences=JSON.parse(saved);}catch{}mapModel=createMapModel(next.files,preferences);mapWorkspace=next.workspace;}
     else mapModel.setFiles(next.files);
-    if(!first && previousSelection!==next.selection.file)mapModel.reveal(next.selection.file);
+    if(!first && previousSelection!==next.selection.file || info.intent?.anchor)mapModel.reveal(next.selection.file);
     refreshScene();
     element("empty").hidden = next.files.length > 0;
     element("file-title").textContent = next.source?.path ?? "Choose a file";
@@ -95,7 +96,8 @@ const controller = createController({
     if(sameScene){camera={...restore.position.camera};fitMode=restore.position.fitMode ?? null;const old=restore.position.mapSize;if(old)camera=jumpCamera(camera,{x:(old.width/2-camera.x)/camera.scale,y:(old.height/2-camera.y)/camera.scale},canvas.clientWidth,canvas.clientHeight);invalidate();}
     else if(first || changedFilter || info.intent?.returning)fit(true);else invalidate();
     if(!first && previousSelection!==next.selection.file && !info.intent?.returning){const file=scene.files.find(f=>f.id===next.selection.file);if(file){const x=camera.x+(file.rect.x+file.rect.width/2)*camera.scale,y=camera.y+(file.rect.y+file.rect.height/2)*camera.scale;if(x<12 || y<12 || x>canvas.clientWidth-12 || y>canvas.clientHeight-12){camera=jumpCamera(camera,{x:file.rect.x+file.rect.width/2,y:file.rect.y+file.rect.height/2},canvas.clientWidth,canvas.clientHeight);fitMode=null;invalidate();}}}
-    navigation.observe(info.intent);
+    if(info.intent || !editorFiles.pending())navigation.observe(info.intent);
+    void editorFiles.resume();
   },
   onStatus: (status,info) => {
     startup.receive(status,info.stream);
@@ -109,6 +111,9 @@ const controller = createController({
   onError: showError,
   onResync: () => updates?.restart(),
 });
+const editorFiles=installEditorFileLinks({ready:()=>Boolean(view && canvas.clientWidth>0 && source.clientHeight>0),
+  open:anchor=>{clearTimeout(filterTimer);return navigation.navigate({file:anchor.file,entity:null,filter:''},anchor);},
+  failed:showError});
 function showError(error) { messages.error.show(`${error.message || error} · ${view?"Keeping the last captured view; retrying.":"No source observation is available. Retry indexing."}`); }
 
 function renderFileList() {
@@ -229,6 +234,7 @@ const viewportObserver = new ResizeObserver(()=>{
     else camera=jumpCamera(camera,{x:(mapSize.width/2-camera.x)/camera.scale,y:(mapSize.height/2-camera.y)/camera.scale},next.width,next.height);
   }
   mapSize=next;invalidate();
+  void editorFiles.resume();
 });
 viewportObserver.observe(canvas);
 viewportObserver.observe(source);

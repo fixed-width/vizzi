@@ -3,6 +3,11 @@
 Choose **Source browser** in the header after [starting Vizzi](run-workspace.md).
 This view is useful when you know an area or file rather than a function name.
 
+With the VS Code extension, right-click inside a saved project file or on its editor
+tab and choose **Vizzi: Open in Source Browser**. The command starts Vizzi if needed,
+opens that file and reveals the cursor line when its editor is visible. It is also in
+the Command Palette. Unsaved buffers are never saved automatically; save the file first.
+
 ## Select a file and read its structure
 
 Select a file in the repository map. Its source and declaration outline open together.

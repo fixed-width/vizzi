@@ -30,12 +30,13 @@ export function createNavigation({ capture, load, history, onState = () => {}, o
         } else if (current.version !== intent.target.version) {
           onNotice("This location changed since your visit. Showing current source.");
         } else onNotice(null);
-      } else if (entries[cursor].key !== shown || current.file !== intent.before.file || current.entity !== intent.before.entity) {
+      } else if (intent.anchor || entries[cursor].key !== shown || current.file !== intent.before.file || current.entity !== intent.before.entity) {
         entries = entries.slice(0, cursor + 1);
         const key = crypto.randomUUID();
         entries.push({ key, location: current });
         if (entries.length > 50) entries.shift();
-        cursor = entries.length - 1; shown = key; history.push(marker(key));
+        cursor = entries.length - 1; shown = key;
+        if(intent.anchor)history.replace(marker(key));else history.push(marker(key));
       }
       intent.committed = true; intent.pending = false;
     } else if (!entries.length && !active?.pending) seed();
@@ -52,10 +53,10 @@ export function createNavigation({ capture, load, history, onState = () => {}, o
       notify();
     }
   }
-  function navigate(patch) {
+  function navigate(patch,anchor) {
     saveShown();
     const before = copy(capture());
-    return request({ before, pending: true }, { ...query(before), ...patch });
+    return request({ before, pending: true, ...(anchor?{anchor:copy(anchor)}:{}) }, { ...query(before), ...patch });
   }
   function traverse(state) {
     const token = state?.vizziNavigation;
@@ -73,6 +74,9 @@ export function createNavigation({ capture, load, history, onState = () => {}, o
   function allow(next, intent) {
     if (!intent) return true;
     if (intent !== active) return false;
+    if(intent.anchor && (next.snapshot!==intent.anchor.snapshot || next.selection.file!==intent.anchor.file || next.source?.id!==intent.anchor.file || next.source?.version!==intent.anchor.version)) {
+      onNotice('Requested source changed. The current view is kept; retry the editor action.');return false;
+    }
     if (intent.returning && next.selection.file !== intent.target.file) {
       intent.unavailable = true;
       onNotice(`Cannot restore ${intent.target.path ?? "this location"}. The current view is kept; use Back or Forward to continue.`);

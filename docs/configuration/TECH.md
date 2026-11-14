@@ -52,6 +52,17 @@ replacement is detected before reuse.
 
 ## Proposed changes
 
+Source-browser handoff uses stable `editor/context` and `editor/title/context` menu
+contributions. `source-browser.cjs` captures the explicit resource (or palette's active
+editor), checks saved text and resolves it through `/api/investigation/lookup` and
+the pinned `/api/source` endpoint. Existing workspace startup/capture is reused.
+The webview delivers only snapshot/file/version IDs and a one-based line through a
+nonce-bound message and `/explore` fragment. No absolute source path enters the browser.
+The source browser consumes that fragment, validates its expected binding through
+ordinary navigation, and asks its inspector to reveal the requested line. Fragment
+navigation keeps the source-browser document alive; accepted visits replace the
+fragment's temporary history entry so Back/Forward preserves the browsing trail.
+
 - Move launch parsing into a binary-private `configuration` module. Deserialize a strict
   optional TOML layer, resolve its paths against its directory, then apply existing CLI
   flags. Keep diagnostic flags out of persisted settings. Bound config input to 1 MiB.

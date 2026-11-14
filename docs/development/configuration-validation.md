@@ -301,3 +301,47 @@ API approach needs no additional runtime dependencies; the minimum editor versio
 1.100 because its public Git log options support pagination. That minimum was checked
 against the published API source, but only the installed 1.146.0 host was run locally.
 No new Rust mutation, other-platform or performance qualification is claimed.
+
+## Open editor files in the source browser, 2026-11-13
+
+The 0.6.0 preview adds **Vizzi: Open in Source Browser** to the editor and editor-tab
+context menus and Command Palette. The action captures the selected URI and available
+cursor line before focus changes. It checks saved bytes, resolves the existing captured
+file, and checks the pinned source response's snapshot, file, version, path and text.
+The tab receives opaque identities and a line, then uses ordinary source navigation
+and the inspector's windowed line reveal. The initial link does not record an unrelated
+default file; later links retain the document and Back/Forward reading positions.
+
+- Formatting, native workspace tests/doctests and Clippy passed: 766 tests passed and
+  15 optional integrations were ignored. The only Rust change serves a static JS asset;
+  there is no new native source-resolution API or additional Rust mutation qualification.
+- All 58 extension tests and 20 focused browser link/navigation tests passed. Cases
+  cover inactive-tab resources, visible cursor positions, dirty/divergent source,
+  workspace aliases, rejected file aliases, encoded path characters, mismatched captured
+  metadata/text, retained native diagnostics and source changes during navigation.
+- The full browser suite, `npm test -- --no-build --no-desktop-bus`, passed after the
+  final initial-link/history changes. Release-helper tests also passed (13 tests).
+- Real VS Code 1.146.0 checks passed for the editor context menu at a comment outside
+  any function, the inactive file-tab menu, cursor-line reveal, retained inner document,
+  Back/Forward viewport restoration and reopening from the Call workspace. The editor
+  test focuses the source text before right-clicking so Chromium routes native input
+  and menu contexts to that editor.
+
+The first integration exposed an incorrect raw-byte assumption about `/api/source`;
+the adapter now consumes and checks its existing schema-2 JSON response. A corrected
+peer fixture first reproduced the failure. History tests cover replacing the fragment's
+browser entry with the accepted visit and rejecting changed anchors before publishing
+a view. The 0.6.0 Linux x86-64 VSIX includes the matching native executable, guide and
+new adapter, and installs through the official editor CLI with executable mode 0755.
+Installation and UI checks use temporary profiles and virtual displays.
+
+The installed VSIX passed the same source-browser menu/cursor/history workflow and
+ordinary shared definitions/references, reconnect, explicit browser handoff, call
+following and saved-task restoration. Parallel editor UI runs intermittently missed
+menu input; the installed source-browser qualification passed when run on its own.
+The installed revision-comparison menu/picker/review regression also passed when run
+on its own.
+
+Files must be saved local project files admitted by the current capture. No dependency
+download, buffer save, new language server or arbitrary browser path selection is added.
+Other platforms, minimum-version editor execution and performance remain unqualified.

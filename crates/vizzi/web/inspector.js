@@ -131,7 +131,7 @@ export function createInspector({ source, space, outline, transport, select, onE
       const active=next.source.summary.active;
       const restore=options.restore;
       const reveal=Boolean(options.reveal);
-      const desiredSourceTop=restore?restore.sourceTop:active && (changedSelection || reveal)?Math.max(0,(active.start_line-4)*SOURCE_ROW):changedFile || reveal?0:source.scrollTop;
+      const desiredSourceTop=options.line!==undefined?Math.max(0,(options.line-4)*SOURCE_ROW):restore?restore.sourceTop:active && (changedSelection || reveal)?Math.max(0,(active.start_line-4)*SOURCE_ROW):changedFile || reveal?0:source.scrollTop;
       const sourceTop=Math.max(0,Math.min(desiredSourceTop,next.source.summary.lines*SOURCE_ROW-source.clientHeight));
       let outlineTop=restore?restore.outlineTop:changedFile || reveal?0:outline.scrollTop;
       if(!restore && (changedSelection || reveal) && active)outlineTop=Math.max(0,active.index*OUTLINE_ROW-outline.clientHeight/2);

@@ -8,7 +8,7 @@ function createWorkspaceView(vscode) {
     previous?.ready(false);
     previous?.panel.dispose();
   }
-  async function show(url,name,{review=false}={}) {
+  async function show(url,name,{review=false,sourceBrowser=false}={}) {
     if (current?.url === url) {current.panel.reveal();if(review)await send('vizzi.review');return;}
     const address = new URL(url);
     if (address.protocol !== 'http:' || address.hostname !== '127.0.0.1') {
@@ -35,13 +35,17 @@ function createWorkspaceView(vscode) {
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; frame-src ${address.origin}; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}'; base-uri 'none';">
 <title>Vizzi</title>
 <style nonce="${nonce}">html,body,iframe{width:100%;height:100%;margin:0;padding:0;border:0;display:block;overflow:hidden}</style>
-</head><body><iframe id="workspace" title="Vizzi visual workspace" src="${address.origin}/${review?'review':''}" sandbox="allow-scripts allow-same-origin allow-forms allow-downloads"></iframe>
+</head><body><iframe id="workspace" title="Vizzi visual workspace" src="${address.origin}/${review?'review':sourceBrowser?'explore':''}" sandbox="allow-scripts allow-same-origin allow-forms allow-downloads"></iframe>
 <script nonce="${nonce}">
 const api=acquireVsCodeApi();
 window.addEventListener('message',event=>{
   const data=event.data;if(data?.nonce!=='${nonce}')return;
   const location=document.getElementById('workspace').contentWindow.location;
   if(data.type==='vizzi.review'){location.href='${address.origin}/review';return;}
+  if(data.type==='vizzi.browse'){
+    if(![data.snapshot,data.file,data.version].every(value=>typeof value==='string'&&/^[0-9a-f]{64}$/.test(value))||!Number.isSafeInteger(data.line)||data.line<1)return;
+    location.href='${address.origin}/explore#editor-file='+data.file+'&snapshot='+data.snapshot+'&version='+data.version+'&line='+data.line;return;
+  }
   if(data.type!=='vizzi.explore'||!/^[0-9a-f]{64}$/.test(data.snapshot)||!/^[0-9a-f]{64}$/.test(data.call))return;
   location.href='${address.origin}/#editor-call='+data.call+'&snapshot='+data.snapshot;
 });
@@ -59,7 +63,7 @@ api.postMessage({type:'vizzi.ready'});
       if (!await view.panel.webview.postMessage({...handoff,type,nonce:view.nonce})) throw new Error('The Vizzi tab is unavailable; retry the command');
     } finally {clearTimeout(timer);}
   }
-  return {show,dispose,explore:handoff=>send('vizzi.explore',handoff)};
+  return {show,dispose,explore:handoff=>send('vizzi.explore',handoff),browse:handoff=>send('vizzi.browse',handoff)};
 }
 
 module.exports = {createWorkspaceView};

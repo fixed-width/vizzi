@@ -4,7 +4,8 @@ This extension opens Vizzi in an editor tab using VS Code's definition and refer
 providers. Platform-specific VSIX files include the native executable.
 
 Already installed? Right-click a saved call name and choose **Vizzi: Explore Call**,
-or click **Vizzi** in the status bar to open an empty workspace.
+right-click a file or its tab and choose **Vizzi: Open in Source Browser**, or click
+**Vizzi** in the status bar to open an empty workspace.
 The [installed-extension guide](INSTALL.md) covers installation, optional project-local
 settings and troubleshooting. The workflow below is for extension development and testing.
 
@@ -75,6 +76,10 @@ payload files instead of the source directory.
 Add `--compare --webview` to check the real Git API, Source Control comparison menu,
 base/target Quick Picks and embedded review panes. This uses a temporary repository
 with two commits plus staged, unstaged and untracked changes; Git must be on PATH.
+
+Use `--source-browser --webview` to check the editor and inactive-tab context menus,
+cursor-line reveal, source-browser document retention, Back/Forward reading positions
+and navigation from the Call workspace. It uses an isolated two-file Python fixture.
 
 The check registers deterministic VS Code providers and queries them through the real
 native host. It verifies the editor command interface and protocol integration; it does

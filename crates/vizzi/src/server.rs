@@ -106,6 +106,7 @@ pub fn router(application: Arc<Application>) -> Router {
         .route("/read-retry.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/read-retry.js")) }))
         .route("/source-origin.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/source-origin.js")) }))
         .route("/editor-call-links.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/editor-call-links.js")) }))
+        .route("/editor-file-links.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/editor-file-links.js")) }))
         .route("/module-identity.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/module-identity.js")) }))
         .route("/module-outlines.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/module-outlines.js")) }))
         .route("/module-contours.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/module-contours.js")) }))

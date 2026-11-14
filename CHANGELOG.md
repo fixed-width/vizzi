@@ -17,6 +17,8 @@ remains in Git and the project documentation.
 
 ### Added
 
+- **Vizzi: Open in Source Browser** in VS Code's editor and file-tab context menus
+  opens saved project files and reveals the editor's cursor line when available.
 - VS Code Source Control and Command Palette actions compare two selected local Git
   revisions, or saved working changes with HEAD, in the embedded review workspace.
 - **Vizzi: Explore Call** in the VS Code editor context menu opens the saved call's

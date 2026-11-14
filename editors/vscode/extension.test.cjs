@@ -13,7 +13,7 @@ async function fixture(t, folders = 1) {
   await fs.writeFile(binary,'fixture executable');
   t.after(()=>fs.rm(directory,{recursive:true,force:true}));
   const folder = {uri:{scheme:'file',fsPath:root}};
-  const commands = new Map(), lines = [], errors = [], opened = [], launches = [], panels = [], connections = [], editorCalls = [], comparisons=[];
+  const commands = new Map(), lines = [], errors = [], opened = [], launches = [], panels = [], connections = [], editorCalls = [], comparisons=[], browsed=[];
   let shown = 0, picks = 0, disposed = 0;
   const output = {clear(){lines.length=0;},appendLine:line=>lines.push(line),
     append:line=>lines.push(line),show(){shown++;},dispose(){}};
@@ -62,13 +62,17 @@ async function fixture(t, folders = 1) {
       selectComparison:async()=>({rootUri:folder.uri,folderUri:folder.uri,revision:'a'.repeat(40)}),
       createComparison:async(session,selection)=>{comparisons.push({session,selection});return {schema:1,ticket:'test'};},
     },
+    './source-browser.cjs':{
+      captureSourceFile:(...args)=>require('./source-browser.cjs').captureSourceFile(...args),
+      resolveSourceFile:async(session,selection)=>{browsed.push({session,selection});return {snapshot:'a'.repeat(64),file:'b'.repeat(64),version:'c'.repeat(64),line:selection.line};},
+    },
   };
   const source = await fs.readFile(path.join(__dirname,'extension.cjs'),'utf8');
   vm.compileFunction(source,['require','module'],{filename:'extension.cjs'})(
     name=>dependencies[name] || require(name),module);
   module.exports.activate(context);
   t.after(()=>module.exports.deactivate());
-  return {directory,root,folder,vscode,context,commands,lines,errors,opened,launches,panels,connections,editorCalls,comparisons,dependencies,
+  return {directory,root,folder,vscode,context,commands,lines,errors,opened,launches,panels,connections,editorCalls,comparisons,browsed,dependencies,
     shown:()=>shown,picks:()=>picks,disposed:()=>disposed,setStart:callback=>{start=callback;}};
 }
 
@@ -292,4 +296,30 @@ test('a comparison requested during normal startup still navigates to review',as
   await Promise.all([f.commands.get('vizzi.openWorkspace')(),f.commands.get('vizzi.compareWorkingChanges')()]);
   assert.equal(f.launches.length,1);assert.equal(f.comparisons.length,1);
   assert.equal(f.panels[0].messages.at(-1).type,'vizzi.review');
+});
+
+test('source-browser action captures before focus changes and reuses its editor tab',async t=>{
+  const f=await fixture(t),source=await sourceEditor(f);
+  let starts=0;
+  f.vscode.workspace.openTextDocument=async()=>source.document;
+  f.setStart(async()=>{starts++;f.vscode.window.activeTextEditor=undefined;return {url:'http://127.0.0.1:7474/',dispose:async()=>{}};});
+  await f.commands.get('vizzi.openSourceBrowser')(source.uri);
+  assert.equal(f.browsed[0].selection.line,1);
+  assert.match(f.panels[0].webview.html,/<iframe[^>]+src="http:\/\/127\.0\.0\.1:7474\/explore"/);
+  await f.commands.get('vizzi.openSourceBrowser')(source.uri);
+  assert.equal(f.panels.length,1);assert.equal(starts,1);assert.equal(f.browsed.length,2);
+  assert.equal(f.panels[0].messages.at(-1).type,'vizzi.browse');assert.equal(f.opened.length,0);
+});
+
+test('tab action opens its resource even with a different active file; dirty tabs fail before launch',async t=>{
+  const f=await fixture(t),source=await sourceEditor(f),other=path.join(f.root,'other.py');
+  await fs.writeFile(other,'other = 3\n');
+  const uri={scheme:'file',fsPath:other,toString(){return this.fsPath;}};
+  const document={uri,isDirty:false,getText:()=> 'other = 3\n'};
+  f.vscode.workspace.openTextDocument=async target=>target.fsPath===other?document:source.document;
+  await f.commands.get('vizzi.openSourceBrowser')(uri);
+  assert.equal(f.browsed[0].selection.path,'other.py');assert.equal(f.browsed[0].selection.line,1);
+  source.document.isDirty=true;
+  await f.commands.get('vizzi.openSourceBrowser')(source.uri);
+  assert.equal(f.browsed.length,1);assert.match(f.errors.at(-1),/Save/);
 });

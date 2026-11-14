@@ -44,6 +44,28 @@ test("accepted visits preserve the previous position, filter changes do not add 
   assert.equal(f.state().count, 2);
 });
 
+test('editor anchors reject changed snapshots/files/versions before replacing the displayed visit',async()=>{
+  const f=fixture(),anchor={snapshot:'expected',file:'b',version:'v2',line:131};
+  await f.navigation.navigate({file:'b',entity:null,filter:''},anchor);
+  const intent=f.loads.at(-1).intent;
+  const next={snapshot:'expected',source:{id:'b',version:'v2'},selection:{file:'b',entity:null}};
+  assert.equal(f.navigation.allow(next,intent),true);
+  for(const changed of [{...next,snapshot:'new'},{...next,source:{id:'other',version:'v2'}},{...next,source:{id:'b',version:'new'}},{...next,selection:{file:'a',entity:null}}]) {
+    assert.equal(f.navigation.allow(changed,intent),false);
+  }
+  assert.equal(f.state().count,1);assert.equal(f.current().file,'a');assert.match(f.notices.at(-1),/source changed/i);
+});
+
+test('editor fragment visits replace their browser entry and preserve the preceding reading position',async()=>{
+  const f=fixture(),first=f.replacements[0],anchor={snapshot:'snapshot',file:'b',version:'v1',line:131};
+  await f.navigation.navigate({file:'b',entity:null,filter:''},anchor);
+  f.show(location('b'),f.loads.at(-1).intent);
+  assert.equal(f.pushes.length,0);assert.equal(f.replacements.length,2);assert.equal(f.state().count,2);
+  await f.navigation.traverse(first);
+  const returning=f.loads.at(-1).intent;
+  assert.equal(f.navigation.restoration({source:{id:'a',version:'v1'},selection:{entity:null}},returning).position.inspector.sourceTop,123);
+});
+
 test("history bounds expire old markers, ignores foreign states and never moves outside known ends", async () => {
   const f=fixture(),old=f.replacements[0];
   f.navigation.move(-1);f.navigation.move(1);f.navigation.move(0);f.navigation.move(2);

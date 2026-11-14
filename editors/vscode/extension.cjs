@@ -8,6 +8,7 @@ const {startWorkspace} = require('./launcher.cjs');
 const {createWorkspaceView} = require('./workspace-view.cjs');
 const {captureEditorCall,resolveEditorCall} = require('./editor-call.cjs');
 const comparison = require('./comparison.cjs');
+const {captureSourceFile,resolveSourceFile} = require('./source-browser.cjs');
 
 let active;
 let workspace;
@@ -101,7 +102,7 @@ function activate(context) {
     } catch (error) {await report(error);}
   }
   function open(folderUri,external=false,options={}) {
-    const key=JSON.stringify([folderUri?.fsPath,external,options.rootUri?.fsPath,Boolean(options.review)]);
+    const key=JSON.stringify([folderUri?.fsPath,external,options.rootUri?.fsPath,Boolean(options.review),Boolean(options.sourceBrowser)]);
     if (opening) return opening.key===key ? opening.task : opening.task.then(()=>open(folderUri,external,options));
     const task=openWorkspace(folderUri,external,options).finally(()=>{if(opening?.task===task)opening=undefined;});
     opening={key,task};
@@ -131,6 +132,16 @@ function activate(context) {
       await workspaceView.explore(handoff);
       return handoff;
     } catch (error) {await report(error);}
+  }
+  async function openSourceBrowser(resource) {
+    try {
+      const selection=await captureSourceFile(vscode,resource);
+      const session=await open(selection.uri,false,{sourceBrowser:true});
+      if(!session)return;
+      const handoff=await resolveSourceFile(session,selection);
+      await workspaceView.browse(handoff);
+      return handoff;
+    } catch(error){await report(error);}
   }
   async function shareLanguageProviders(folderUri,externalSettings=false,rootUri) {
     output.show(true);
@@ -180,6 +191,7 @@ function activate(context) {
     vscode.commands.registerCommand('vizzi.openWorkspace',folderUri=>open(folderUri)),
     vscode.commands.registerCommand('vizzi.openWorkspaceInBrowser',folderUri=>open(folderUri,true)),
     vscode.commands.registerCommand('vizzi.exploreCall',exploreCall),
+    vscode.commands.registerCommand('vizzi.openSourceBrowser',openSourceBrowser),
     vscode.commands.registerCommand('vizzi.compareRevisions',resource=>compare('commits',resource)),
     vscode.commands.registerCommand('vizzi.compareWorkingChanges',resource=>compare('working',resource)),
     vscode.commands.registerCommand('vizzi.stopWorkspace',deactivate),

@@ -99,6 +99,23 @@ Stopping the workspace or changing projects disposes the old tab. The separate
 Saved tasks in an external browser and the VS Code tab belong to their respective
 browser storage profiles.
 
+## Open a file in the source browser
+
+**Vizzi: Open in Source Browser** appears in the file editor and editor-tab context
+menus, and in the Command Palette. It starts or reuses Vizzi and opens the selected
+saved project file with its declaration outline. An editor invocation reveals the
+cursor line; an inactive tab opens its own file, using a visible editor's cursor when
+available and otherwise the start of the file. No call or enclosing declaration is
+required, and source-only files remain browsable.
+
+Capture the URI and reading position before changing focus. Unsaved buffers, non-file
+resources, files outside the open workspace, source-file aliases and files absent from
+the native capture produce actionable errors. Never save buffers automatically. Verify
+the saved bytes against the captured file before sending opaque source identities and a
+line to the tab. Changes during handoff refuse navigation rather than substituting source.
+Repeated actions reuse the tab and its source-browser document, retaining normal
+Back/Forward navigation. Successful handoffs are silent.
+
 ## Compare revisions from VS Code
 
 **Vizzi: Compare Revisions…** is available in the Command Palette and Git Source
