@@ -80,6 +80,10 @@ semantic provider sharing and tab lifetime; see [originating-editor navigation](
 Each editor window has one source-workspace lifetime owner. Semantic sharing, the
 native process and visual presentation retain separate lifetimes behind that module's
 small interface; other editor hosts follow the same [ownership contract](docs/configuration/WORKSPACE_LIFETIME.md).
+Visual-workspace delivery prepares captured destinations before the editor's final
+saved-source check, then confirms a bounded UI application. Its shared module owns
+routing and cancellation while mode adapters preserve working-set and history semantics;
+see [confirmed delivery](docs/configuration/DELIVERY.md).
 Local dependency source uses independent, bounded captures admitted by language providers.
 Discovery stays language-specific; repository snapshots and watchers retain their scope.
 See [dependency source](docs/visual/DEPENDENCIES_TECH.md).

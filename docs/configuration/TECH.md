@@ -151,6 +151,14 @@ VSCE packages platform-specific VSIX files with `bin/vizzi` alongside the bridge
 The local development host can select a native executable through a machine-level
 setting. Distribution does not require downloading or compiling a binary at runtime.
 
+The shared browser/host [delivery module](DELIVERY.md) owns action routing, readiness,
+source-bound preparation, cancellation and explicit outcomes. The editor rechecks saved
+source after preparation and before a document-bound commit. Native pages use fresh
+MessagePorts established from the exact iframe and loopback origin; the outer-shell
+nonce remains private to the editor/outer shell. Mode changes carry only an opaque
+continuation identity, with the active action retained in the parent. No server broker
+or persisted request queue is added. Legacy fragments enter the same controller.
+
 `workspace-view.cjs` owns a single webview panel for the local UI. The panel embeds the
 loopback server with a restricted frame origin and retains the complex reading UI when
 hidden. Revealing an existing panel does not replace its HTML. Closing it keeps the native

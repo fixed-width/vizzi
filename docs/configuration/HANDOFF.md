@@ -16,7 +16,8 @@ adapter owns its buffers, selection and presentation.
   block a handoff to otherwise verified source.
 - Cancellation retires the handoff, leaving shared source-workspace capture running.
   After the target view becomes ready, the editor checks its original buffer, saved
-  bytes and latest request immediately before presentation. Buffer checks bracket
+  bytes and latest request immediately before presentation. [Confirmed delivery](DELIVERY.md) prepares browser
+  source first, then performs that final editor check before its UI commit. Buffer checks bracket
   asynchronous saved-source reads.
 - Native capture waiting holds neither a structural lock nor a compute permit.
   Blocking source/projection work is separately bounded; obsolete computation cannot

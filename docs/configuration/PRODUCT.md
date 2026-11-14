@@ -114,6 +114,20 @@ Open cannot restore sharing after it is stopped; a later explicit Open can. Unex
 native exit closes its tab and origin, retaining sharing; the next explicit command
 can start a fresh process. See [source-workspace lifetime](WORKSPACE_LIFETIME.md).
 
+## Confirmed view delivery
+
+Editor call/file actions finish only after the requested captured source is readable
+or the normal call destination chooser is displayed. The browser prepares data first;
+the editor then rechecks its original buffer and saved bytes before final application.
+Current refusals return to the editor command; successful and cancelled actions stay silent.
+
+A newer editor request or manual file/function/history/task/mode navigation cancels
+pending delivery. Scrolling, panning and resizing remain reading/layout actions.
+Already applied effects are retained. A browser-stage 60-second deadline is separate
+from capture's 30 seconds; unconfirmed application is never automatically replayed.
+Call-trail geometry and source-browser history remain with their existing adapters.
+See [confirmed delivery](DELIVERY.md).
+
 ## Return to the originating editor
 
 Plugin-launched **Editor** actions target the exact VS Code window that launched the

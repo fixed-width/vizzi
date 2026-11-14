@@ -25,42 +25,67 @@ export function createController({ transport, onView = () => {}, onStatus = () =
     if (!dirty) completedViewRequest = viewRequest;
     activeFetch?.abort(); activeFetch = undefined;
   }
-  async function load(patch = {}, options) {
+  function begin(patch, options) {
     if (options !== undefined || Object.keys(patch).length) requestedOptions = options;
     const requestOptions = requestedOptions ?? {};
     query = { ...query, ...patch };
-    if (latestStatus && latestStatus.snapshot === null) return false;
+    if (latestStatus && latestStatus.snapshot === null) return null;
     const request = viewRequest = {}, previous = activeFetch;
     const fetch = activeFetch = new AbortController(); previous?.abort();
-    const target = latestStatus?.snapshot;
-    const parameters = new URLSearchParams(Object.entries({ ...query, snapshot: target }).filter(([, value]) => value != null));
-    let accepted = false, rejected = false;
+    const signal=requestOptions.signal?AbortSignal.any([fetch.signal,requestOptions.signal]):fetch.signal;
+    const target=latestStatus?.snapshot;
+    const info={...requestOptions,query:{...query}};
+    return {request,fetch,signal,target,info,requestOptions,committed:false};
+  }
+  function rollback(record) {
+    if(record.request!==viewRequest || record.committed)return;
+    query={...acceptedQuery};requestedOptions=undefined;completedViewRequest=record.request;
+    if(activeFetch===record.fetch)activeFetch=undefined;
+  }
+  function followPublication(record) {
+    if(record.request===viewRequest && latestStatus?.snapshot && latestStatus.snapshot!==record.target && latestStatus.snapshot!==displayedSnapshot && !activeFetch)void load();
+  }
+  async function read(record) {
+    if(!record)throw new Error('No source observation is available');
+    const {request,signal,target,info}=record;
+    const parameters=new URLSearchParams(Object.entries({...info.query,snapshot:target}).filter(([,value])=>value!=null));
     try {
-      const info = { ...requestOptions, query: { ...query } };
-      const next = await transport(`/api/view?${parameters}`, { signal: fetch.signal, ...info });
-      if (request !== viewRequest) return false;
-      if (!next || next.schema !== viewSchema || typeof next.snapshot !== "string" || !next.selection || (target && next.snapshot !== target)) throw new Error("Invalid or mismatched pinned view response");
-      if (target && latestStatus.snapshot !== target) return load({}, requestOptions);
-      if (!acceptView(next, info)) {
-        rejected = true;
-        query = { ...acceptedQuery }; requestedOptions = undefined; completedViewRequest = request;
-        return false;
-      }
-      query = { ...query, file: next.selection.file, entity: next.selection.entity };
-      acceptedQuery = { ...query }; requestedOptions = undefined;
-      displayedSnapshot = next.snapshot; onView(next, { ...info, query: { ...query } }); completedViewRequest = request;
-      accepted = true; return true;
-    } catch (error) {
-      if (request === viewRequest) {
-        if (requestOptions.rollbackOnFailure) { query = { ...acceptedQuery }; requestedOptions = undefined; completedViewRequest = request; }
-        onError(error); onResync(error);
-      }
+      const next=await transport(`/api/view?${parameters}`,{...info,signal});
+      if(request!==viewRequest || signal.aborted)throw new DOMException('View request cancelled','AbortError');
+      if(!next || next.schema!==viewSchema || typeof next.snapshot!=='string' || !next.selection || target&&next.snapshot!==target)throw new Error('Invalid or mismatched pinned view response');
+      const current=()=>request===viewRequest && !signal.aborted && !record.committed && (!target || latestStatus?.snapshot===target);
+      return {view:next,info,current,
+        commit() {
+          if(!current())return false;
+          if(!acceptView(next,info)){record.rejected=true;rollback(record);return false;}
+          query={...info.query,file:next.selection.file,entity:next.selection.entity};
+          acceptedQuery={...query};requestedOptions=undefined;displayedSnapshot=next.snapshot;
+          record.committed=true;completedViewRequest=request;
+          onView(next,{...info,query:{...query}});
+          if(activeFetch===record.fetch)activeFetch=undefined;
+          return true;
+        },
+        cancel(){if(!record.committed){rollback(record);record.fetch.abort();followPublication(record);}}
+      };
+    } catch(error) {
+      if(request===viewRequest){if(record.requestOptions.rollbackOnFailure)rollback(record);if(activeFetch===record.fetch)activeFetch=undefined;}
+      if(record.preparing)followPublication(record);
+      throw error;
+    }
+  }
+  async function prepare(patch={},options) {const record=begin(patch,options);if(record)record.preparing=true;return read(record);}
+  async function load(patch={},options) {
+    const record=begin(patch,options);if(!record)return false;
+    try {
+      const prepared=await read(record);
+      if(record.request===viewRequest && record.target && latestStatus?.snapshot!==record.target)return load({},record.requestOptions);
+      return prepared.commit();
+    } catch(error) {
+      if(record.request===viewRequest){onError(error);onResync(error);}
       return false;
     } finally {
-      if (request === viewRequest) {
-        activeFetch = undefined;
-        if ((accepted || rejected) && latestStatus?.snapshot && latestStatus.snapshot !== displayedSnapshot) void load();
-      }
+      if(record.request===viewRequest && activeFetch===record.fetch)activeFetch=undefined;
+      if(record.request===viewRequest && (record.committed || record.rejected) && latestStatus?.snapshot && latestStatus.snapshot!==displayedSnapshot)void load();
     }
   }
   function updates() {
@@ -85,5 +110,5 @@ export function createController({ transport, onView = () => {}, onStatus = () =
       },
     };
   }
-  return { load, updates };
+  return { load, prepare, updates };
 }

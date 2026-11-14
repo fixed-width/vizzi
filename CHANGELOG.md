@@ -8,6 +8,10 @@ remains in Git and the project documentation.
 
 ### Changed
 
+- Editor navigation waits for confirmed browser application. Newer editor requests or
+  manual navigation cancel waiting actions silently, with source rechecked before UI
+  application. Unconfirmed results report an error without automatic replay.
+
 - Stop Workspace cancels older pending commands; fresh actions wait for cleanup and
   start normally. The latest selected project wins during concurrent startup, while
   Stop Sharing leaves native startup and return navigation available.
@@ -48,6 +52,10 @@ remains in Git and the project documentation.
   dirty buffers or disconnect; managed-server fallback is never automatic.
 
 ### Fixed
+
+- Newer editor requests survive an ongoing workspace-mode switch. Manual navigation
+  cancels routed requests before they resume, and Review waits for comparison status
+  to catch up before rejecting a requested capture.
 
 - Editor handoffs revalidate saved source after the Vizzi tab becomes ready, preventing
   navigation after edits made while the tab loads.

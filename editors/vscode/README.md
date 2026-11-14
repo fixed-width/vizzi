@@ -25,6 +25,14 @@ Workspace ownership is concentrated in `source-workspace.cjs`, through
 `workspace-runtime.cjs` constructs editor-owned resources; commands no longer manage
 process generations, sharing replacement or shutdown ordering.
 
+Confirmed view delivery uses the shared native-browser module
+`crates/vizzi/web/workspace-delivery.mjs`. The extension's `.mjs` entry is a source
+symlink; packaging copies the canonical contents into a regular bundled file. The
+[presentation contract](../../docs/configuration/DELIVERY.md) covers prepare/verify/commit,
+request/document identities, cancellation and unconfirmed outcomes. The VS Code shell
+only establishes trusted MessagePorts and relays generic frames; mode routing belongs
+to the native browser module.
+
 The plugin has no npm runtime dependencies. Its minimum VS Code version is 1.100;
 it uses public Git and workspace/provider APIs rather than editor-private LSP access.
 Remote and virtual workspaces are not supported in this slice.
@@ -130,3 +138,13 @@ nice -n 10 node_modules/node/bin/node node_modules/@stryker-mutator/core/bin/str
 
 The mutation report goes to the ignored local browser-results directory. Its threshold
 is diagnostic; inspect survivors and timeouts rather than treating the score as a gate.
+
+Run confirmed-delivery and navigation checks through the shared interface:
+
+```sh
+node crates/vizzi/web/delivery-tests.mjs
+nice -n 10 node_modules/node/bin/node node_modules/@stryker-mutator/core/bin/stryker.js run experiments/browser/delivery-stryker.config.json
+```
+
+See [delivery validation](../../docs/development/delivery-validation.md) for mutation
+survivors, timeouts and installed-editor qualification limits.

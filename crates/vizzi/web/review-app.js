@@ -1,3 +1,5 @@
+import {installWorkspaceDelivery} from '/editor-delivery.js';
+import {createReviewPreparation} from '/review-delivery.js';
 import {installAppHeader} from '/app-header.js';
 import {reviewLabel} from "/view-status.js";
 import {createMessage,textRow} from "/messages.js";
@@ -13,7 +15,8 @@ installAppHeader(document.querySelector('body > header'));
 const element=id=>document.getElementById(id);
 const node=(tag,text)=>{const value=document.createElement(tag);value.textContent=text;return value;};
 const sides=["base","working"],inspectors={};
-let view,updates,filterTimer;
+let view,updates,filterTimer,deliveryStatus,editorDelivery;
+const deliveryStatusWatchers=new Set();
 installAppearance(element("theme"));
 const dismissible=new Set(["comparison-error","review-notice"]);
 const messages=Object.fromEntries([["review-status","review status"],["comparison-error","comparison error"],["comparison-labels","comparison details"],["review-notice","review notice"],["file-change","file status"],["diff-note","diff note"],["base-evidence","base availability"],["working-evidence","working availability"]].map(([id,label])=>[id,dismissible.has(id)?createMessage(element(id),{label:`Dismiss ${label}`,...(id==="review-notice"?{content:element(id).querySelector("span")}:{})}):textRow(element(id))]));
@@ -45,6 +48,7 @@ for(const side of sides) {
 const capture=()=>Object.fromEntries(sides.map(side=>[side,inspectors[side].position()]));
 const controller=createReviewController({transport,capture,onView:render,onNotice:notice,onError:error=>captureError(error.message),
   onStatus:status=>{
+    deliveryStatus=status;for(const watch of [...deliveryStatusWatchers])watch();void editorDelivery?.resume();
     captureError(status.error?.message,status.ticket);
     messages["review-status"].show(reviewLabel(status));
     element("review-workspace").setAttribute("aria-busy",String(status.pending));
@@ -54,6 +58,13 @@ const controller=createReviewController({transport,capture,onView:render,onNotic
   onHistory:state=>{element("review-back").disabled=!state.canBack;element("review-forward").disabled=!state.canForward;element("review-navigation").setAttribute("aria-busy",String(state.pending));},
   history:{push:state=>history.pushState(state,""),replace:state=>history.replaceState(state,""),go:delta=>history.go(delta)},
 });
+editorDelivery=installWorkspaceDelivery({mode:'review',
+ ready:action=>Boolean(document.querySelector('body > header').clientWidth && (action.kind==='reveal'||deliveryStatus)),
+ prepare:createReviewPreparation({current:()=>deliveryStatus,
+  subscribe:watch=>{deliveryStatusWatchers.add(watch);return()=>deliveryStatusWatchers.delete(watch);},
+  status:signal=>transport('/api/comparisons/status',{signal})})
+ });
+document.addEventListener('click',event=>{if(event.target.closest?.('#review-file-list button,#review-hunks button,#review-navigation button,#close-comparison,#refresh-working,#open-current,[data-declaration]'))editorDelivery.manual();},true);
 function rangeLabel(range) {const count=range.end-range.start;return `${count?range.start+1:range.start},${count}`;}
 function header(hunk) {return `@@ -${rangeLabel(hunk.base.lines)} +${rangeLabel(hunk.working.lines)} @@`;}
 function pager(previous,next,start,following,action) {
@@ -142,7 +153,7 @@ element("review-filter").addEventListener("input",()=>{cancelFilter();filterTime
 element("include-unchanged").addEventListener("change",()=>{cancelFilter();void controller.navigate({filter:element("review-filter").value,unchanged:element("include-unchanged").checked,offset:0});});
 element("review-back").addEventListener("click",()=>{cancelFilter();controller.move(-1);});
 element("review-forward").addEventListener("click",()=>{cancelFilter();controller.move(1);});
-window.addEventListener("popstate",event=>{cancelFilter();void controller.traverse(event.state);});
+window.addEventListener("popstate",event=>{editorDelivery.manual();cancelFilter();void controller.traverse(event.state);});
 element("open-current").addEventListener("click",()=>{cancelFilter();void controller.openCurrent();});
 element("retry-review").addEventListener("click",()=>controller.navigate());
 element("reconnect-review").addEventListener("click",()=>updates.restart());

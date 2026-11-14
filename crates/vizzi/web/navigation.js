@@ -1,4 +1,4 @@
-export function createNavigation({ capture, load, history, onState = () => {}, onNotice = () => {} }) {
+export function createNavigation({ capture, load, prepare:prepareView, history, onState = () => {}, onNotice = () => {} }) {
   const session = crypto.randomUUID();
   let entries = [], cursor = 0, shown, active;
   const query = entry => ({ file: entry.file, entity: entry.entity, filter: entry.filter });
@@ -36,7 +36,7 @@ export function createNavigation({ capture, load, history, onState = () => {}, o
         entries.push({ key, location: current });
         if (entries.length > 50) entries.shift();
         cursor = entries.length - 1; shown = key;
-        if(intent.anchor)history.replace(marker(key));else history.push(marker(key));
+        if(intent.anchor && intent.replaceHistory!==false)history.replace(marker(key));else history.push(marker(key));
       }
       intent.committed = true; intent.pending = false;
     } else if (!entries.length && !active?.pending) seed();
@@ -58,6 +58,23 @@ export function createNavigation({ capture, load, history, onState = () => {}, o
     const before = copy(capture());
     return request({ before, pending: true, ...(anchor?{anchor:copy(anchor)}:{}) }, { ...query(before), ...patch });
   }
+  async function prepare(patch,anchor,{signal,replaceHistory=false}={}) {
+    saveShown();
+    const before=copy(capture()),intent={before,pending:true,anchor:copy(anchor),replaceHistory,editor:true};
+    active=intent;onNotice(null);notify();let prepared,committed=false;
+    try {
+      prepared=await prepareView({...query(before),...patch},intent,signal);
+      if(signal?.aborted || active!==intent)throw new DOMException('Editor navigation cancelled','AbortError');
+      if(!allow(prepared.view,intent))throw new Error('Requested source changed. Retry the editor action.');
+    } catch(error) {prepared?.cancel();intent.pending=false;if(active===intent)active=undefined;notify();throw error;}
+    return {
+      commit(){
+        if(committed || signal?.aborted || active!==intent)return false;
+        const accepted=prepared.commit();committed=accepted;intent.pending=false;notify();return accepted;
+      },
+      dispose(){if(!committed){prepared.cancel();intent.pending=false;if(active===intent)active=undefined;notify();}}
+    };
+  }
   function traverse(state) {
     const token = state?.vizziNavigation;
     if (!token) return Promise.resolve(false);
@@ -75,7 +92,7 @@ export function createNavigation({ capture, load, history, onState = () => {}, o
     if (!intent) return true;
     if (intent !== active) return false;
     if(intent.anchor && (next.snapshot!==intent.anchor.snapshot || next.selection.file!==intent.anchor.file || next.source?.id!==intent.anchor.file || next.source?.version!==intent.anchor.version)) {
-      onNotice('Requested source changed. The current view is kept; retry the editor action.');return false;
+      if(!intent.editor)onNotice('Requested source changed. The current view is kept; retry the editor action.');return false;
     }
     if (intent.returning && next.selection.file !== intent.target.file) {
       intent.unavailable = true;
@@ -90,7 +107,7 @@ export function createNavigation({ capture, load, history, onState = () => {}, o
     return copy(intent.target);
   }
   return {
-    observe, navigate, traverse, allow, restoration,
+    observe, navigate, prepare, traverse, allow, restoration,
     move(delta) {
       if ((delta === -1 || delta === 1) && cursor + delta >= 0 && cursor + delta < entries.length) history.go(delta);
     },

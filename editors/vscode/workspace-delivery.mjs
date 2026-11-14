@@ -1,0 +1,1 @@
+../../crates/vizzi/web/workspace-delivery.mjs

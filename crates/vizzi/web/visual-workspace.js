@@ -17,7 +17,8 @@ import {renderCallText,createCallMenu,retargetCalls} from '/call-actions.js';
 import {installAppearance} from '/appearance.js';
 import {createMessage} from '/messages.js';
 import {followChanges} from '/updates.js';
-import {installEditorCallLinks} from '/editor-call-links.js';
+import {installWorkspaceDelivery} from '/editor-delivery.js';
+import {createCallPreparation,resolveCallChoice,directDestination} from '/call-delivery.js';
 installAppHeader(document.querySelector('body > header'));
 const el=id=>document.getElementById(id),node=(tag,text='')=>{const n=document.createElement(tag);n.textContent=text;return n;},svg=(tag,attrs={})=>{const n=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const[k,v]of Object.entries(attrs))n.setAttribute(k,String(v));return n;};
 const error=createMessage(el('visual-error'),{label:'Dismiss workspace error'}),notice=createMessage(el('visual-notice'),{label:'Dismiss workspace notice'});
@@ -29,7 +30,7 @@ const outlines=installModuleOutlines(el('module-outlines'),()=>model?model.visib
 let showModuleOutlines=false;try{showModuleOutlines=localStorage.getItem('vizzi.visual.module-outlines')==='true';}catch{}
 el('module-outlines-setting').checked=showModuleOutlines;outlines.setEnabled(showModuleOutlines);el('module-outlines-setting').onchange=()=>{showModuleOutlines=el('module-outlines-setting').checked;outlines.setEnabled(showModuleOutlines);try{localStorage.setItem('vizzi.visual.module-outlines',String(showModuleOutlines));}catch{notice.show('The module outline preference could not be saved.');}};
 const callMenu=createCallMenu(el('call-action-menu'));
-function inlineAction(id,action,element,direct,keyboard){if(!model.usable(id))return;callMenu.hide();const open=()=>{if(mounted.has(id)&&model.usable(id))void chooseCall(id,{...action,lookup:true});};if(direct)open();else callMenu.show(element,action.name,[{label:'Open definition',hint:'Ctrl/⌘-click',run:open}],keyboard);}
+function inlineAction(id,action,element,direct,keyboard){if(!model.usable(id))return;editorCalls.manual();callMenu.hide();const open=()=>{if(mounted.has(id)&&model.usable(id))void chooseCall(id,{...action,lookup:true});};if(direct)open();else callMenu.show(element,action.name,[{label:'Open definition',hint:'Ctrl/⌘-click',run:open}],keyboard);}
 function inlineAvailability(code,id){for(const name of code.querySelectorAll('.code-call')){name.setAttribute('aria-disabled',String(!model.usable(id)));name.tabIndex=model.usable(id)?0:-1;}}
 installAppearance(el('theme'));
 let smartReflow=true;try{smartReflow=localStorage.getItem('vizzi.visual.code-layout')!=='original';}catch{}
@@ -66,15 +67,22 @@ function applyLive(data){
 }
 const live=new LiveUpdates({capture:refreshCapture,request:(body,signal)=>post('/api/visual/refresh',body,signal),apply:applyLive,blocked:()=>busy||[...mounted.values()].some(r=>r.loading||r.sourcePane.selected()),pending:snapshot=>{if(model){clearTimeout(livePendingTimer);model.markSnapshot(snapshot);geometry();if(model.stale)livePendingTimer=setTimeout(()=>{for(const r of mounted.values()){r.awaitingLive=model.stale;updateFragmentStatus(r);}},150);}},failed:e=>{if(e.status!==409)notice.show('Live refresh is waiting. Earlier source is retained.');}});
 function refreshLive(){if(model&&currentSnapshot)live.changed(currentSnapshot,true);}
-const editorCalls=installEditorCallLinks({ready:()=>Boolean(model&&!model.stale&&size().w>=1&&size().h>=1),failed:fail,
- queued:()=>{callMenu.hide();hideDestinations();window.getSelection()?.removeAllRanges();live.resume();},
- open:async request=>{
-  if(model.snapshot!==request.snapshot)throw new Error('Source changed since editor navigation; retry Explore Call.');
-  const data=await post('/api/editor/call',{snapshot:request.snapshot,query:{kind:'invocation',call:request.call}});
-  if(model.stale||model.snapshot!==request.snapshot||data.snapshot!==request.snapshot||data.invocation?.id!==request.call||data.invocation.owner!==data.caller?.id)throw new Error('Editor call differs from current source; retry Explore Call.');
-  const symbol=data.caller,id=model.openRoot(symbol,symbol.source.path.split('/').slice(0,-1).join('/')||symbol.source.path);
-  mount(id);focus([id]);save();await chooseCall(id,{...data.invocation,lookup:true});
+const prepareEditorCall=createCallPreparation({read:()=>model,
+ bind:(action,signal)=>post('/api/editor/call',{snapshot:action.snapshot,query:{kind:'invocation',call:action.call}},signal),
+ resolve:async(site,signal,snapshot)=>{await definitionCapabilities;return resolveCallChoice(site,{snapshot,provider:definitionProvider,warmup:()=>definitionWarmup.wait(),request:(snapshot,call,signal)=>post('/api/call-definition',{snapshot,call},signal),signal});},
+ source:prepareFragmentSource,
+ apply:({caller,target,choice,sources})=>{
+  geometry();mount(caller,sources.get(model.view(caller).symbol.id));
+  if(target)mount(target,sources.get(model.view(target).symbol.id));
+  if(target){hideDestinations();highlightCall(caller,choice.site);focus([caller,target]);}
+  else {focus([caller]);showDestinations(caller,choice);}
+  save();
  }});
+const editorCalls=installWorkspaceDelivery({mode:'call',
+ ready:action=>Boolean(size().w>=1&&size().h>=1&&(action.kind==='reveal'||model&&!model.stale)),
+ prepare:(action,context)=>action.kind==='reveal'?Promise.resolve({commit(){}}):prepareEditorCall(action,context),failed:fail,
+ changed:pending=>{if(pending){callMenu.hide();hideDestinations();window.getSelection()?.removeAllRanges();for(const r of mounted.values()){r.navigation=(r.navigation??0)+1;r.resolving=false;updateFragmentStatus(r);}live.resume();}}
+});
 document.addEventListener('selectionchange',()=>live.resume());
 function updateFragmentStatus(r){r.state.textContent=r.resolving?'Finding definition…':r.warming?'Preparing type navigation…':r.awaitingLive&&model.view(r.id).mode==='live'?'Update pending':(model?.view(r.id).state==='unresolved'?'Function unavailable — earlier version':model?.view(r.id).mode==='pinned'?'Pinned version':r.sourceStatus??'Live');}
 function sourceStatus(r,text){r.sourceStatus=model?.view(r.id).symbol.origin&&text.startsWith('Live')?text.replace('Live','Captured dependency'):text;updateFragmentStatus(r);}
@@ -121,17 +129,42 @@ function bindDrag(handle,id,resizing=false){handle.addEventListener('pointerdown
  const end=()=>{handle.removeEventListener('pointermove',move);handle.removeEventListener('pointerup',end);handle.removeEventListener('pointercancel',end);save();};handle.addEventListener('pointermove',move);handle.addEventListener('pointerup',end);handle.addEventListener('pointercancel',end);});}
 function bindLayoutKeys(handle,id,resizing=false){handle.tabIndex=0;handle.addEventListener('keydown',e=>{if(e.target!==handle)return;const delta={ArrowLeft:[-16,0],ArrowRight:[16,0],ArrowUp:[0,-16],ArrowDown:[0,16]}[e.key];if(!delta)return;e.preventDefault();try{const v=model.view(id);if(resizing)model.resize(id,Math.max(320,Math.min(BUBBLE_SIZE.maxWidth,v.w+delta[0])),Math.max(200,Math.min(BUBBLE_SIZE.maxHeight,v.h+delta[1])));else model.move(id,v.x+delta[0],v.y+delta[1]);model.selected=id;geometry();save();}catch(e){fail(e);}});}
 function fitCode(id,axis){const r=mounted.get(id),v=model.view(id),content=r.sourcePane.contentSize();if(!content)return;const extent=Math.ceil(axis==='width'?v.w-r.code.clientWidth+content.width:v.h-r.code.clientHeight+content.height);model.fitSize(id,axis,extent);geometry();save();if(extent>(axis==='width'?BUBBLE_SIZE.maxWidth:BUBBLE_SIZE.maxHeight))notice.show('Some code still needs scrolling at this size.');}
-function mount(id){
- if(mounted.has(id))return;const v=model.view(id),element=node('section');element.className='fragment';element.dataset.view=id;element.dataset.name=v.symbol.name;element.setAttribute('aria-label',`${v.symbol.name} bubble`);
+function mount(id,prepared){
+ if(mounted.has(id)){if(prepared&&!mounted.get(id).code.querySelector('.code-line'))applyPreparedSource(id,prepared);return;}const v=model.view(id),element=node('section');element.className='fragment';element.dataset.view=id;element.dataset.name=v.symbol.name;element.setAttribute('aria-label',`${v.symbol.name} bubble`);
  const header=node('div');header.className='fragment-header';header.setAttribute('aria-label','Move bubble with arrow keys');bindLayoutKeys(header,id);const heading=node('div');heading.className='fragment-heading';const context=node('div');context.className='fragment-context';const moduleTag=node('span');moduleTag.className='module-tag';moduleTag.tabIndex=0;moduleTag.hidden=true;context.append(moduleTag,node('small',`${v.symbol.origin?originLabel(v.symbol.origin)+' · ':''}${v.symbol.source.path}:${v.symbol.source.line}`));heading.append(node('strong',[...v.symbol.parents,v.symbol.name].join('::')),context);
- const collapse=button('▴','Collapse bubble',()=>{callMenu.hide();model.collapse(id);geometry();save();}),close=button('×','Close bubble',()=>{callMenu.hide();const r=mounted.get(id);r.controller.abort();r.sourcePane.dispose();element.remove();mounted.delete(id);model.close(id);hideDestinations();geometry();save();});const pin=button('Pin version','Pin version',()=>{model.pin(id,model.view(id).mode!=='pinned');geometry();save();refreshLive();});const fitHeight=button('↕','Fit height',()=>fitCode(id,'height')),fitWidth=button('↔','Fit width',()=>fitCode(id,'width'));for(const b of [fitHeight,fitWidth]){b.className='bubble-fit';b.title=b.getAttribute('aria-label')+' to this code section';}heading.title=[...v.symbol.parents,v.symbol.name].join('::');const referenceActions=button('⋯',`Actions for ${v.symbol.name} bubble`,()=>callMenu.show(referenceActions,v.symbol.name,[{label:'Find callers',run:()=>openReferences(id,'callers')},{label:'Find references',run:()=>openReferences(id,'references')},{label:'Task group',run:()=>taskControls.showGroups(model.groupFor(id)?.id??'')}],false));header.append(heading,referenceActions,fitHeight,fitWidth,collapse,close);element.append(header);bindDrag(header,id);
+ const collapse=button('▴','Collapse bubble',()=>{callMenu.hide();model.collapse(id);geometry();save();}),close=button('×','Close bubble',()=>{editorCalls.manual();callMenu.hide();const r=mounted.get(id);r.controller.abort();r.sourcePane.dispose();element.remove();mounted.delete(id);model.close(id);hideDestinations();geometry();save();});const pin=button('Pin version','Pin version',()=>{model.pin(id,model.view(id).mode!=='pinned');geometry();save();refreshLive();});const fitHeight=button('↕','Fit height',()=>fitCode(id,'height')),fitWidth=button('↔','Fit width',()=>fitCode(id,'width'));for(const b of [fitHeight,fitWidth]){b.className='bubble-fit';b.title=b.getAttribute('aria-label')+' to this code section';}heading.title=[...v.symbol.parents,v.symbol.name].join('::');const referenceActions=button('⋯',`Actions for ${v.symbol.name} bubble`,()=>callMenu.show(referenceActions,v.symbol.name,[{label:'Find callers',run:()=>openReferences(id,'callers')},{label:'Find references',run:()=>openReferences(id,'references')},{label:'Task group',run:()=>taskControls.showGroups(model.groupFor(id)?.id??'')}],false));header.append(heading,referenceActions,fitHeight,fitWidth,collapse,close);element.append(header);bindDrag(header,id);
  const body=node('div');body.className='fragment-body';const section=node('div');section.className='source-section';const sectionLabel=node('span','Loading captured source…');const prev=button('Previous section',null,()=>{const v=model.view(id);void loadSource(id,Math.max(v.symbol.source.line,v.reading.section-96));}),next=button('Next section',null,()=>{const v=model.view(id);void loadSource(id,Math.min(v.symbol.source.end_line,v.reading.section+96));});prev.hidden=true;next.hidden=true;section.append(sectionLabel,prev,next);
  const code=node('div');code.className='code-pane';code.tabIndex=0;code.setAttribute('aria-label',`${v.symbol.name} captured code`);code.append(node('p','Loading source…'));const footer=node('div');footer.className='fragment-footer';const callsButton=button('Calls','Calls',()=>toggleCalls(id)),state=node('span','Captured source');const keep=button('Save','Save location',()=>void keepLocation(id)),editor=button('Editor',`Open in ${editorName}`,()=>void openEditor(id));editor.disabled=true;footer.append(callsButton,state,pin,keep,editor);
  const popup=node('div');popup.className='calls-popover';popup.hidden=true;body.append(section,code,popup,footer);const resize=button('','Resize bubble',()=>{});resize.title='Drag or use arrow keys to resize';resize.className='resize-handle';body.append(resize);bindDrag(resize,id,true);bindLayoutKeys(resize,id,true);element.append(body);el('fragment-layer').append(element);
  const kept=board?.evidence.find(e=>e.source.file===v.symbol.source.file&&e.source.version===v.symbol.source.version&&e.source.line===v.symbol.source.line)?.id??null;
  const record={id,referenceActions,moduleTag,pin,fitHeight,fitWidth,loading:true,element,body,code,collapse,sectionLabel,prev,next,callsButton,popup,state,keep,editor,sites:[],nextCalls:0,matching:0,callsReady:false,controller:new AbortController(),kept};record.actions=[];record.sourcePane=new SourcePane(code,(text,line,plan,margin)=>{renderCallText(text,line,record.actions,(action,button,direct,keyboard)=>inlineAction(id,action,button,direct,keyboard),plan,margin);inlineAvailability(text,id);});record.sourcePane.setReflow(smartReflow);mounted.set(id,record);
  element.addEventListener('pointerdown',()=>{model.selected=id;geometry();});code.addEventListener('scroll',()=>{callMenu.hide();if(mounted.get(id)!==record)return;const v=model.view(id);model.read(id,{section:v.reading.section,...record.sourcePane.reading()});save();});
- jobs=jobs.then(async()=>{if(mounted.get(id)!==record)return;await loadSource(id,v.reading.section);if(model.usable(id))await loadCalls(id,0);}).catch(fail);geometry();
+ jobs=jobs.then(async()=>{if(mounted.get(id)!==record)return;if(!record.code.querySelector('.code-line'))await loadSource(id,v.reading.section);if(model.usable(id))await loadCalls(id,0);}).catch(fail);geometry();if(prepared)applyPreparedSource(id,prepared);
+}
+async function prepareFragmentSource(symbol,reading,signal,snapshot) {
+ const s=symbol.source,start=reading.section,expected=captureFor(symbol,snapshot),endpoint=symbol.origin?'/api/dependency/window':'/api/window';
+ const count=Math.min(96,s.end_line-start+1),query=new URLSearchParams({snapshot:expected,file:s.file,version:s.version,line_start:String(start),line_count:String(count),outline_count:'1',reflow:'true'});
+ const header=start===s.line?Promise.resolve(null):transport(endpoint+'?'+new URLSearchParams({snapshot:expected,file:s.file,version:s.version,line_start:String(s.line),line_count:'1',outline_count:'1'}),{signal});
+ const [data,origin,actions]=await Promise.all([transport(endpoint+'?'+query,{signal}),header,requestActions(symbol,start,count,snapshot,signal)]);
+ if(data.snapshot!==expected||data.file!==s.file||data.version!==s.version||!Array.isArray(data.lines)||!data.lines.length||data.lines.length>96)throw new Error('Captured source for the requested function is unavailable');
+ if(origin&&(origin.snapshot!==expected||origin.file!==s.file||origin.version!==s.version||origin.lines?.length!==1||origin.lines[0].number!==s.line||origin.lines[0].left||origin.lines[0].column!==0))throw new Error('Fragment indentation source differs');
+ return {data,actions,start,margin:functionIndent(origin?.lines[0]??data.lines.find(line=>line.number===s.line))};
+}
+function applyPreparedSource(id,prepared) {
+ const r=mounted.get(id),v=model.view(id),s=v.symbol.source,{data,actions,start,margin}=prepared;
+ if(data.file!==s.file||data.version!==s.version)throw new Error('Prepared source differs from the requested fragment');
+ r.sourceTicket=(r.sourceTicket??0)+1;r.loading=false;r.margin=margin;r.lines=data.lines.filter(line=>line.number<=s.end_line);r.actions=actions;
+ r.sourcePane.set(r.lines,{...v.reading},margin);inlineAvailability(r.code,id);
+ const last=Math.min(s.end_line,data.lines.at(-1)?.number??start);r.sectionLabel.textContent=`Lines ${start}–${last} · ${s.end_line-s.line+1}-line function`;r.prev.hidden=start<=s.line;r.next.hidden=last>=s.end_line;
+ sourceStatus(r,data.coloring==='ready'?'Live':'Styling '+data.coloring);model.read(id,{section:start,...r.sourcePane.reading()});geometry();
+}
+async function requestActions(symbol,start,count,snapshot,signal) {
+ const actions=[];let offset=0;
+ try{for(let page=0;page<16;page++){
+  const data=await post('/api/structure',{snapshot,query:{kind:'actions',symbol:symbol.id,line_start:start,line_count:count,offset}},signal);
+  if(data.snapshot!==snapshot||!Array.isArray(data.items)||data.items.length>256||!Number.isSafeInteger(data.matching)||data.matching>4096)throw new Error('Invalid captured call actions');
+  actions.push(...data.items);if(data.next===null)return actions;if(!Number.isSafeInteger(data.next)||data.next<=offset)throw new Error('Invalid call-action continuation');offset=data.next;
+ }throw new Error('Call-action allowance exceeded');}catch(error){if(signal?.aborted)throw error;return [];}
 }
 async function loadSource(id,start){
  callMenu.hide();const r=mounted.get(id);if(!r)return;const ticket=r.sourceTicket=(r.sourceTicket??0)+1,v=model.view(id),s=v.symbol.source;const expected=captureFor(v.symbol,v.snapshot),sourceEndpoint=v.symbol.origin?'/api/dependency/window':'/api/window';const saved={...v.reading};r.loading=true;
@@ -156,37 +189,37 @@ async function loadCalls(id,offset){
  const r=mounted.get(id);if(!r||!model.usable(id))return;const v=model.view(id);try{const data=await post('/api/structure',{snapshot:model.snapshot,query:{kind:'calls',symbol:v.symbol.id,area:v.area||v.symbol.source.path,offset}},r.controller.signal);if(mounted.get(id)!==r||!model.usable(id))return;if(data.snapshot!==model.snapshot||!Array.isArray(data.items)||data.items.length>8)throw new Error('Call response differs');r.sites=offset===0?data.items:[...r.sites,...data.items];r.nextCalls=data.next;r.matching=data.matching;r.callsReady=true;renderCalls(id);void prepareDefinitions(id);}catch(e){if(e.name!=='AbortError'){r.callsReady=true;r.popup.replaceChildren(node('p',e.message));}}
 }
 function renderCalls(id){const r=mounted.get(id);if(!r)return;r.popup.replaceChildren(node('p',`${r.sites.length} of ${r.matching} written calls.`));for(const site of r.sites)r.popup.append(button(`${site.name??'Dynamic call'} · line ${site.source.line}`,null,()=>chooseCall(id,site)));if(r.nextCalls!==null&&r.nextCalls!==undefined&&r.sites.length<64)r.popup.append(button('More written calls',null,()=>void loadCalls(id,r.nextCalls)));if(!r.matching)r.popup.append(node('p','No attributed calls recorded. This does not prove no runtime calls.'));}
-function toggleCalls(id){const r=mounted.get(id);if(!r||!model.usable(id))return;hideDestinations();for(const[other,x]of mounted)if(other!==id)x.popup.hidden=true;r.popup.hidden=!r.popup.hidden;if(!r.callsReady)r.popup.replaceChildren(node('p','Loading written calls…'));else renderCalls(id);}
+function toggleCalls(id){editorCalls.manual();const r=mounted.get(id);if(!r||!model.usable(id))return;hideDestinations();for(const[other,x]of mounted)if(other!==id)x.popup.hidden=true;r.popup.hidden=!r.popup.hidden;if(!r.callsReady)r.popup.replaceChildren(node('p','Loading written calls…'));else renderCalls(id);}
 function hideDestinations(){el('destination-stack').hidden=true;}
 async function chooseCall(id,site){
- const record=mounted.get(id);if(!record||!model.usable(id))return;const ticket=record.navigation=(record.navigation??0)+1,expected=model.snapshot;let attempted=false,note='',semantic=false;
+ editorCalls.manual();const record=mounted.get(id);if(!record||!model.usable(id))return;
+ site={...site,owner:model.view(id).symbol.id};
+ const ticket=record.navigation=(record.navigation??0)+1,expected=model.snapshot;
+ const verify=()=>{if(mounted.get(id)!==record||record.navigation!==ticket||model.snapshot!==expected||!model.usable(id))throw new DOMException('Call navigation superseded','AbortError');};
  await definitionCapabilities;
- if((site.lookup||definitionProvider)&&(!site.binding||site.lookup)&&site.id){
-  attempted=definitionProvider&&!site.binding;record.popup.hidden=true;const pending=setTimeout(()=>{if(mounted.get(id)===record&&record.navigation===ticket){record.resolving=true;updateFragmentStatus(record);}},150);
-  try{if(!site.binding)await definitionWarmup.wait();if(mounted.get(id)!==record||record.navigation!==ticket||model.snapshot!==expected||!model.usable(id))return;const response=await post('/api/call-definition',{snapshot:expected,call:site.id},record.controller.signal);
-   if(mounted.get(id)!==record||record.navigation!==ticket||model.snapshot!==expected||!model.usable(id))return;
-   if(response.snapshot!==expected||response.invocation?.id!==site.id)throw new Error('Definition response differs from the selected call');
-   note=response.detail??'';
-   if(site.lookup||['unique','ambiguous','outside'].includes(response.state)){site=response.invocation;semantic=site.binding==='language_server_definition';}
-  }catch(e){if(e.name==='AbortError')return;if(e.status===409||site.lookup){fail(e);return;}note=e.message;}
-  finally{clearTimeout(pending);if(mounted.get(id)===record&&record.navigation===ticket){record.resolving=false;updateFragmentStatus(record);}}
- }
- if(mounted.get(id)!==record||record.navigation!==ticket||model.snapshot!==expected)return;
-
- if(!model.usable(id))return;const r=mounted.get(id);r.popup.hidden=true;for(const n of r.code.querySelectorAll('.is-call'))n.classList.remove('is-call');const line=r.code.querySelector(`[data-line="${site.source.line}"]`);line?.classList.add('is-call');
- const candidates=site.candidates;if(candidates.length===1&&site.candidate_count===1&&(!attempted||semantic||site.binding==='rust_self_receiver')){follow(id,site,candidates[0]);return;}
- const stack=el('destination-stack'),v=model.view(id);stack.replaceChildren(node('h2',site.spelling),node('p',candidates.length?`Choose among ${site.candidate_count} ${semantic?'definition locations':'terminal-name matches'}. ${candidates.length} captured destinations are shown.${note?' '+note:''}`:note||'No indexed destination. Dynamic or external calls remain unresolved.'));stack.append(button('Close choices',null,hideDestinations));
+ let choice={site,attempted:definitionProvider&&!site.binding,note:'',semantic:false};
+ record.popup.hidden=true;const pending=setTimeout(()=>{if(mounted.get(id)===record&&record.navigation===ticket){record.resolving=true;updateFragmentStatus(record);}},150);
+ try {choice=await resolveCallChoice(site,{snapshot:expected,provider:definitionProvider,warmup:()=>definitionWarmup.wait(),request:(snapshot,call,signal)=>post('/api/call-definition',{snapshot,call},signal),signal:record.controller.signal,verify});}
+ catch(error){if(error.name==='AbortError')return;if(error.status===409||site.lookup){fail(error);return;}choice.note=error.message;}
+ finally{clearTimeout(pending);if(mounted.get(id)===record&&record.navigation===ticket){record.resolving=false;updateFragmentStatus(record);}}
+ try{verify();}catch{return;}
+ highlightCall(id,choice.site);const target=directDestination(choice);if(target){follow(id,choice.site,target);return;}showDestinations(id,choice);
+}
+function highlightCall(id,site){const r=mounted.get(id);r.popup.hidden=true;for(const line of r.code.querySelectorAll('.is-call'))line.classList.remove('is-call');r.code.querySelector(`[data-line="${site.source.line}"]`)?.classList.add('is-call');}
+function showDestinations(id,{site,note,semantic}) {
+ highlightCall(id,site);const candidates=site.candidates,stack=el('destination-stack'),v=model.view(id);
+ stack.replaceChildren(node('h2',site.spelling),node('p',candidates.length?`Choose among ${site.candidate_count} ${semantic?'definition locations':'terminal-name matches'}. ${candidates.length} captured destinations are shown.${note?' '+note:''}`:note||'No indexed destination. Dynamic or external calls remain unresolved.'));stack.append(button('Close choices',null,hideDestinations));
  for(const candidate of candidates){const b=button([...candidate.parents,candidate.name].join('::'),null,()=>follow(id,site,candidate));b.dataset.candidate=candidate.id;b.dataset.path=candidate.source.path;b.append(node('small',`${candidate.origin?originLabel(candidate.origin)+' · ':''}${candidate.source.path}:${candidate.source.line}`));stack.append(b);}Object.assign(stack.style,{left:v.x+v.w+24+'px',top:v.y+'px'});stack.hidden=false;
 }
-function follow(parent,site,target){try{const id=model.follow(parent,site,target);hideDestinations();const record=mounted.get(id);mount(id);if(target.origin&&record&&(record.element.classList.contains('is-stale')||!record.lines?.length)){void loadSource(id,model.view(id).reading.section);record.callsReady=false;void loadCalls(id,0);}focus([parent,id]);save();}catch(e){fail(e);}}
+function follow(parent,site,target){editorCalls.manual();try{const id=model.follow(parent,site,target);hideDestinations();const record=mounted.get(id);mount(id);if(target.origin&&record&&(record.element.classList.contains('is-stale')||!record.lines?.length)){void loadSource(id,model.view(id).reading.section);record.callsReady=false;void loadCalls(id,0);}focus([parent,id]);save();}catch(e){fail(e);}}
 async function keepLocation(id){
  const r=mounted.get(id),v=model.view(id);if(!r||!board||busy||!model.usable(id))return null;const existing=board.evidence.find(e=>e.source.file===v.symbol.source.file&&e.source.version===v.symbol.source.version&&e.source.line===v.symbol.source.line);if(existing){r.kept=existing.id;geometry();return existing.id;}
  busy=true;geometry();try{const s=v.symbol.source,result=await post('/api/search/evidence',{revision:board.revision,snapshot:model.snapshot,file:s.file,version:s.version,line:s.line,title:v.symbol.name});board=result.view.board;r.kept=result.id;notice.show('Location saved.');return r.kept;}catch(e){fail(e);return null;}finally{busy=false;geometry();live.resume();}
 }
 async function openEditor(id){const r=mounted.get(id);if(!r||busy||!model.usable(id))return;const s=model.view(id).symbol.source;busy=true;geometry();try{await post(model.view(id).symbol.origin?'/api/dependency/editor':'/api/editor/open',{snapshot:model.view(id).symbol.origin?.capture??model.snapshot,file:s.file,version:s.version,line:s.line});}catch(e){fail(e);}finally{busy=false;geometry();live.resume();}}
-function openReferences(id,query){try{if(!model.usable(id))throw new Error('Open a current function before finding references.');const stack=model.addReferences(model.view(id).symbol,query,id);geometry();focus([id,stack]);save();}catch(e){fail(e);}}
+function openReferences(id,query){editorCalls.manual();try{if(!model.usable(id))throw new Error('Open a current function before finding references.');const stack=model.addReferences(model.view(id).symbol,query,id);geometry();focus([id,stack]);save();}catch(e){fail(e);}}
 function replaceTask(next){
- callMenu.hide();hideDestinations();clearTimeout(livePendingTimer);
+ editorCalls.manual();callMenu.hide();hideDestinations();clearTimeout(livePendingTimer);
  for(const r of mounted.values()){r.controller.abort();r.sourcePane.dispose();r.element.remove();}
  mounted.clear();referenceStacks.reset();jobs=Promise.resolve();model=next;
  for(const v of model.views)mount(v.id);
@@ -204,14 +237,14 @@ function receive(status){
  void editorCalls.resume();
 }
 async function findFragments(offset=0){const id=++paletteTicket;try{if(!model||model.stale)throw new Error('Wait for current source or start a new workspace.');const data=await post('/api/structure',{snapshot:model.snapshot,query:{kind:'inventory',area:'',search:el('fragment-search').value.trim(),offset,functions_only:true}});if(id!==paletteTicket)return;el('fragment-results').replaceChildren();el('fragment-search-status').textContent=`${data.matching} matching functions; choose a function.`;
- for(const entry of data.items){const s=entry.symbol;if(s.kind!=='function')continue;const b=button([...s.parents,s.name].join('::'),null,()=>{const id=model.openRoot(s,s.source.path.split('/').slice(0,-1).join('/')||s.source.path);mount(id);focus([id]);save();el('fragment-dialog').close();});b.dataset.addSymbol=s.id;b.dataset.name=s.name;b.append(node('small',`${s.source.path}:${s.source.line}`));el('fragment-results').append(b);}el('more-fragment-results').hidden=data.next===null;el('more-fragment-results').dataset.offset=String(data.next??0);
+ for(const entry of data.items){const s=entry.symbol;if(s.kind!=='function')continue;const b=button([...s.parents,s.name].join('::'),null,()=>{editorCalls.manual();const id=model.openRoot(s,s.source.path.split('/').slice(0,-1).join('/')||s.source.path);mount(id);focus([id]);save();el('fragment-dialog').close();});b.dataset.addSymbol=s.id;b.dataset.name=s.name;b.append(node('small',`${s.source.path}:${s.source.line}`));el('fragment-results').append(b);}el('more-fragment-results').hidden=data.next===null;el('more-fragment-results').dataset.offset=String(data.next??0);
  }catch(e){fail(e);}}
 async function openMinitosis(){try{if(!model||model.stale)throw new Error('Wait for current source.');const data=await post('/api/structure',{snapshot:model.snapshot,query:{kind:'inventory',area:'minitosis/src/lib.rs',search:'process',offset:0}});const s=data.items.map(i=>i.symbol).find(s=>s.name==='process'&&s.kind==='function');if(!s)throw new Error('Minitosis example is not in this source workspace. Use Add bubble.');const id=model.openRoot(s,'minitosis/src');mount(id);focus([id]);save();}catch(e){fail(e);}}
-const openDialog=()=>{el('fragment-dialog').showModal();el('fragment-search').focus();};el('add-fragment').onclick=openDialog;el('empty-add').onclick=openDialog;el('close-fragment-dialog').onclick=()=>el('fragment-dialog').close();el('fragment-form').onsubmit=e=>{e.preventDefault();void findFragments();};el('more-fragment-results').onclick=()=>void findFragments(Number(el('more-fragment-results').dataset.offset));
+const openDialog=()=>{editorCalls.manual();el('fragment-dialog').showModal();el('fragment-search').focus();};el('add-fragment').onclick=openDialog;el('empty-add').onclick=openDialog;el('close-fragment-dialog').onclick=()=>el('fragment-dialog').close();el('fragment-form').onsubmit=e=>{e.preventDefault();void findFragments();};el('more-fragment-results').onclick=()=>void findFragments(Number(el('more-fragment-results').dataset.offset));
 el('fit-workspace').onclick=()=>{if(!model)return;const s=size();model.fit(s.w,s.h);geometry();save();};for(const[id,factor]of[['zoom-in',1.2],['zoom-out',1/1.2]])el(id).onclick=()=>{if(!model)return;const s=size();model.zoomAt(model.camera.scale*factor,{x:s.w/2,y:s.h/2});geometry();save();};
 const canvas=el('workspace-canvas');canvas.addEventListener('pointerdown',e=>{if(e.button!==0||e.target.closest('.fragment,.reference-stack,.task-group-header,#destination-stack,#workspace-overview,#visual-empty,[data-link-id]'))return;if(!model)return;e.preventDefault();canvas.setPointerCapture(e.pointerId);let last={x:e.clientX,y:e.clientY};const move=event=>{model.pan(event.clientX-last.x,event.clientY-last.y);last={x:event.clientX,y:event.clientY};geometry();};const end=()=>{canvas.removeEventListener('pointermove',move);canvas.removeEventListener('pointerup',end);canvas.removeEventListener('pointercancel',end);save();};canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',end);canvas.addEventListener('pointercancel',end);});
 canvas.addEventListener('wheel',e=>{callMenu.hide();if(!model||e.target.closest('.code-pane,.reference-body,.calls-popover,#destination-stack'))return;e.preventDefault();if(e.ctrlKey||e.metaKey){const rect=canvas.getBoundingClientRect();model.zoomAt(model.camera.scale*Math.exp(-e.deltaY/500),{x:e.clientX-rect.left,y:e.clientY-rect.top});}else model.pan(-e.deltaX,-e.deltaY);geometry();save();},{passive:false});canvas.addEventListener('keydown',e=>{if(e.target!==canvas||!model)return;const moves={ArrowLeft:[70,0],ArrowRight:[-70,0],ArrowUp:[0,70],ArrowDown:[0,-70]};if(moves[e.key]){e.preventDefault();model.pan(...moves[e.key]);geometry();save();}if(e.key==='Escape')hideDestinations();});new ResizeObserver(()=>{geometry();void editorCalls.resume();}).observe(canvas);
-const referenceStacks=installReferenceStacks(el('reference-layer'),{read:()=>model,post,transport,changed:()=>{geometry();save();},failed:fail,open:(id,row,data)=>{try{if(data.snapshot!==model.snapshot||model.stale)throw new Error('Source changed. Refresh references.');const opened=model.openReference(id,row,data.target);for(const v of model.views)mount(v.id);focus([...(opened.destination?[opened.destination]:[]),opened.caller]);save();}catch(e){fail(e);}}});
+const referenceStacks=installReferenceStacks(el('reference-layer'),{read:()=>model,post,transport,changed:()=>{geometry();save();},failed:fail,open:(id,row,data)=>{editorCalls.manual();try{if(data.snapshot!==model.snapshot||model.stale)throw new Error('Source changed. Refresh references.');const opened=model.openReference(id,row,data.target);for(const v of model.views)mount(v.id);focus([...(opened.destination?[opened.destination]:[]),opened.caller]);save();}catch(e){fail(e);}}});
 const taskGroups=installTaskGroups(el('task-group-layer'),{read:()=>model,changed:()=>{geometry();save();},edit:id=>taskControls.showGroups(id),failed:fail});
 taskControls=installTaskControls({read:()=>model,replace:replaceTask,snapshot:()=>currentSnapshot,changed:()=>{geometry();save();},failed:fail});
 if (location.pathname === '/' && location.hash === '#saved') {

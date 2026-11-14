@@ -25,13 +25,16 @@ async function fixture(t, folders = 1, {automaticReady=true,onCapture=()=>{}}={}
     env:{openExternal:async uri=>{opened.push(uri);return true;}},
     window:{createOutputChannel:()=>output,
       createWebviewPanel:(type,title,column,options)=>{
-        const callbacks = [];
-        const messages = [];
-        const panel = {type,title,column,options,messages,webview:{html:'',
-          onDidReceiveMessage:callback=>{panel.becomeReady=()=>callback({type:'vizzi.ready'});if(automaticReady)queueMicrotask(panel.becomeReady);return {dispose(){}};},
-          postMessage:async value=>{messages.push(value);return true;}},revealed:0,closed:false,
-          reveal(){this.revealed++;},onDidDispose:callback=>{callbacks.push(callback);},
-          dispose(){this.closed=true;for (const callback of callbacks) callback();}};
+        const callbacks=[],messages=[],rawMessages=[],pending=new Map();let receive,nonce;
+        const reply=frame=>receive({type:'vizzi.delivery',nonce,frame:{protocol:'vizzi-delivery',version:1,...frame}});
+        const panel={type,title,column,options,messages,rawMessages,webview:{html:'',
+          onDidReceiveMessage:callback=>{receive=callback;panel.becomeReady=()=>{nonce=JSON.parse(panel.webview.html.match(/const nonce=("[^"]+")/)[1]);reply({type:'connected',document:'d'.repeat(32),mode:'call',transition:null});};if(automaticReady)queueMicrotask(panel.becomeReady);return {dispose(){}};},
+          postMessage:async value=>{rawMessages.push(value);const frame=value.frame;
+            if(frame.type==='prepare'){pending.set(frame.id,frame.action);queueMicrotask(()=>reply({type:'prepared',id:frame.id,document:frame.document,ticket:'e'.repeat(32)}));}
+            if(frame.type==='commit'){messages.push(pending.get(frame.id));queueMicrotask(()=>reply({type:'applied',id:frame.id,document:frame.document,ticket:frame.ticket}));}
+            return true;
+          }},revealed:0,closed:false,reveal(){this.revealed++;},onDidDispose:callback=>callbacks.push(callback),
+          dispose(){this.closed=true;for(const callback of callbacks)callback();}};
         panels.push(panel);
         panelCreated(panel);
         return panel;
@@ -123,7 +126,7 @@ test('open workspace launches once, uses project-local settings and stops its ow
   assert.equal(f.opened.length,0);
   assert.equal(f.panels.length,1);
   assert.equal(f.panels[0].revealed,1);
-  assert.match(f.panels[0].webview.html,/<iframe[^>]+src="http:\/\/127\.0\.0\.1:7474\/"/);
+  assert.match(f.panels[0].webview.html,/<iframe[^>]+src="http:\/\/127\.0\.0\.1:7474\/present"/);
   await f.commands.get('vizzi.stopWorkspace')();
   assert.equal(f.disposed(),1);
   assert.equal(f.panels[0].closed,true);
@@ -262,10 +265,10 @@ test('comparison commands open review directly and reuse its editor tab',async t
   const f=await fixture(t);
   await f.commands.get('vizzi.compareWorkingChanges')();
   assert.equal(f.comparisons.length,1);
-  assert.match(f.panels[0].webview.html,/<iframe[^>]+src="http:\/\/127\.0\.0\.1:7474\/review"/);
+  assert.match(f.panels[0].webview.html,/<iframe[^>]+src="http:\/\/127\.0\.0\.1:7474\/present"/);
   await f.commands.get('vizzi.compareRevisions')();
   assert.equal(f.comparisons.length,2);assert.equal(f.launches.length,1);assert.equal(f.panels.length,1);
-  assert.equal(f.panels[0].messages[0].type,'vizzi.review');assert.equal(f.opened.length,0);
+  assert.equal(f.panels[0].messages[0].kind,'review');assert.equal(f.opened.length,0);
 });
 
 test('cancelling comparison picks does not launch or navigate',async t=>{
@@ -287,7 +290,7 @@ test('a comparison requested during normal startup still navigates to review',as
   const f=await fixture(t);
   await Promise.all([f.commands.get('vizzi.openWorkspace')(),f.commands.get('vizzi.compareWorkingChanges')()]);
   assert.equal(f.launches.length,1);assert.equal(f.comparisons.length,1);
-  assert.equal(f.panels[0].messages.at(-1).type,'vizzi.review');
+  assert.equal(f.panels[0].messages.at(-1).kind,'review');
 });
 
 test('source-browser action captures before focus changes and reuses its editor tab',async t=>{
@@ -297,10 +300,10 @@ test('source-browser action captures before focus changes and reuses its editor 
   f.setStart(async()=>{starts++;f.vscode.window.activeTextEditor=undefined;return {url:'http://127.0.0.1:7474/',dispose:async()=>{}};});
   await f.commands.get('vizzi.openSourceBrowser')(source.uri);
   assert.equal(f.browsed[0].selection.line,1);
-  assert.match(f.panels[0].webview.html,/<iframe[^>]+src="http:\/\/127\.0\.0\.1:7474\/explore"/);
+  assert.match(f.panels[0].webview.html,/<iframe[^>]+src="http:\/\/127\.0\.0\.1:7474\/present"/);
   await f.commands.get('vizzi.openSourceBrowser')(source.uri);
   assert.equal(f.panels.length,1);assert.equal(starts,1);assert.equal(f.browsed.length,2);
-  assert.equal(f.panels[0].messages.at(-1).type,'vizzi.browse');assert.equal(f.opened.length,0);
+  assert.equal(f.panels[0].messages.at(-1).kind,'file');assert.equal(f.opened.length,0);
 });
 
 test('tab action opens its resource even with a different active file; dirty tabs fail before launch',async t=>{
@@ -337,7 +340,7 @@ for(const command of ['vizzi.exploreCall','vizzi.openSourceBrowser']) {
     if(change==='buffer'){source.document.isDirty=true;source.document.getText=()=>source.text+'# edited\n';}
     else await fs.writeFile(source.uri.fsPath,source.text+'# saved externally\n');
     panel.becomeReady();await opening;
-    assert.equal(panel.messages.length,0,'changed source must never be posted');
+    assert.equal(panel.messages.length,0,'changed source must never be applied');
     assert.equal(f.errors.length,1);assert.match(f.errors[0],/Source changed|saved source/);
   });
 }
@@ -361,7 +364,7 @@ test('a failed superseded startup stays silent and a queued newer source action 
   const newer=f.commands.get('vizzi.openSourceBrowser')(uri);await observed;await new Promise(setImmediate);
   fail();await Promise.all([old,newer]);
   assert.equal(starts,2);assert.equal(f.errors.length,0);assert.equal(f.editorCalls.length,0);assert.equal(f.browsed.length,1);
-  assert.equal(f.panels[0].messages[0].type,'vizzi.browse');
+  assert.equal(f.panels[0].messages[0].kind,'file');
 });
 
 test('a current source startup failure is reported once',async t=>{
@@ -383,5 +386,6 @@ test('stopping while source delivery awaits webview readiness cancels it without
   const opening=f.commands.get('vizzi.exploreCall')(source.uri),panel=await f.nextPanel;
   await f.commands.get('vizzi.stopWorkspace')();panel.becomeReady();await opening;
   assert.equal(panel.messages.length,0);assert.deepEqual(f.errors,[]);assert.equal(f.disposed(),1);
+  const create=f.vscode.window.createWebviewPanel;f.vscode.window.createWebviewPanel=(...args)=>{const panel=create(...args);queueMicrotask(panel.becomeReady);return panel;};
   await f.commands.get('vizzi.openWorkspace')();assert.equal(f.launches.length,2);
 });

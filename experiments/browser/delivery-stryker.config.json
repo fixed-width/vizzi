@@ -1,0 +1,44 @@
+{
+  "$schema": "../../node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "mutate": [
+    "crates/vizzi/web/workspace-delivery.mjs",
+    "crates/vizzi/web/editor-delivery.js",
+    "crates/vizzi/web/call-delivery.js",
+    "crates/vizzi/web/controller.js",
+    "crates/vizzi/web/navigation.js",
+    "crates/vizzi/web/review-delivery.js"
+  ],
+  "testRunner": "command",
+  "commandRunner": {
+    "command": "node crates/vizzi/web/delivery-tests.mjs"
+  },
+  "coverageAnalysis": "off",
+  "concurrency": 1,
+  "timeoutMS": 2000,
+  "reporters": [
+    "clear-text",
+    "json"
+  ],
+  "clearTextReporter": {
+    "reportMutants": false,
+    "logTests": false
+  },
+  "jsonReporter": {
+    "fileName": "experiments/browser/results/local/delivery-mutation.json"
+  },
+  "ignorePatterns": [
+    "target",
+    "dist",
+    "docs",
+    ".agents",
+    ".codex",
+    "crates/vizzi/src",
+    "crates/vizzi/tests",
+    "crates/vizzi-core",
+    "crates/vizzi-perf",
+    "crates/vizzi-search"
+  ],
+  "thresholds": {
+    "break": 0
+  }
+}

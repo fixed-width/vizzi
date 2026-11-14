@@ -14,7 +14,7 @@ import { describeSource } from "/source-description.js";
 import { createInspector } from "/inspector.js";
 import { createNavigation } from "/navigation.js";
 import { createStartup } from "/startup.js";
-import { installEditorFileLinks } from "/editor-file-links.js";
+import {installWorkspaceDelivery} from "/editor-delivery.js";
 
 installAppHeader(document.querySelector('body > header'));
 const element = id => document.getElementById(id);
@@ -60,11 +60,12 @@ const navigation = createNavigation({
     path:view?.source?.path ?? null,version:view?.source?.version ?? null,snapshot:view?.snapshot ?? null,
     filter:viewFilter,position:{inspector:inspector.position(),camera:{...camera},layoutRevision:mapModel?.revision,fitMode,mapSize} }),
   load: (query,intent) => controller.load(query,{intent,rollbackOnFailure:Boolean(intent.returning || intent.anchor)}),
+  prepare: (query,intent,signal) => controller.prepare(query,{intent,signal,rollbackOnFailure:true}),
   history: {push:state=>history.pushState(state,""),replace:state=>history.replaceState(state,""),go:delta=>history.go(delta)},
   onState: state => {element("nav-back").disabled=!state.canBack;element("nav-forward").disabled=!state.canForward;element("navigation").setAttribute("aria-busy",String(state.pending));},
   onNotice: notice => messages["navigation-notice"].show(notice),
 });
-function navigate(patch) { clearTimeout(filterTimer);return navigation.navigate({filter:element("filter").value,...patch}); }
+function navigate(patch) { editorFiles.manual();clearTimeout(filterTimer);return navigation.navigate({filter:element("filter").value,...patch}); }
 const controller = createController({
   viewSchema: 3,
   acceptView: (next,info) => navigation.allow(next,info.intent),
@@ -111,9 +112,13 @@ const controller = createController({
   onError: showError,
   onResync: () => updates?.restart(),
 });
-const editorFiles=installEditorFileLinks({ready:()=>Boolean(view && canvas.clientWidth>0 && source.clientHeight>0),
-  open:anchor=>{clearTimeout(filterTimer);return navigation.navigate({file:anchor.file,entity:null,filter:''},anchor);},
-  failed:showError});
+const editorFiles=installWorkspaceDelivery({mode:'file',
+  ready:action=>Boolean(canvas.clientWidth>0 && source.clientHeight>0 && (action.kind==='reveal' || view)),
+  prepare:async(action,{signal,replaceHistory})=>{
+    if(action.kind==='reveal')return {commit(){}};
+    clearTimeout(filterTimer);
+    return navigation.prepare({file:action.file,entity:null,filter:''},action,{signal,replaceHistory});
+  },failed:showError,changed:pending=>{if(!pending && view)navigation.observe();}});
 function showError(error) { messages.error.show(`${error.message || error} · ${view?"Keeping the last captured view; retrying.":"No source observation is available. Retry indexing."}`); }
 
 function renderFileList() {
@@ -222,10 +227,10 @@ canvas.addEventListener("wheel", event => {
 }, { passive: false });
 canvas.addEventListener("keydown", event => { const direction = { ArrowLeft: [40, 0], ArrowRight: [-40, 0], ArrowUp: [0, 40], ArrowDown: [0, -40] }[event.key]; if (direction) { event.preventDefault();fitMode=null; camera.x += direction[0]; camera.y += direction[1]; invalidate(); } else if (event.key === "Home") { event.preventDefault(); fit(); } });
 element("fit").addEventListener("click", () => fit());
-element("filter").addEventListener("input", event => { clearTimeout(filterTimer); filterTimer = setTimeout(() => navigate({ filter: event.target.value }), 160); });
-element("nav-back").addEventListener("click",()=>{clearTimeout(filterTimer);navigation.move(-1);});
-element("nav-forward").addEventListener("click",()=>{clearTimeout(filterTimer);navigation.move(1);});
-window.addEventListener("popstate",event=>{clearTimeout(filterTimer);void navigation.traverse(event.state);});
+element("filter").addEventListener("input", event => { editorFiles.manual();clearTimeout(filterTimer); filterTimer = setTimeout(() => navigate({ filter: event.target.value }), 160); });
+element("nav-back").addEventListener("click",()=>{editorFiles.manual();clearTimeout(filterTimer);navigation.move(-1);});
+element("nav-forward").addEventListener("click",()=>{editorFiles.manual();clearTimeout(filterTimer);navigation.move(1);});
+window.addEventListener("popstate",event=>{editorFiles.manual();clearTimeout(filterTimer);void navigation.traverse(event.state);});
 element("file-list").closest("details").addEventListener("toggle", renderFileList);
 const viewportObserver = new ResizeObserver(()=>{
   const next={width:canvas.clientWidth,height:canvas.clientHeight};

@@ -1,5 +1,4 @@
 const vscode = require('vscode');
-const path = require('node:path');
 const {
   createWorkspaceRuntime
 } = require('./workspace-runtime.cjs');
@@ -35,10 +34,8 @@ function activate(context) {
     signal
   }) => {
     output.appendLine(`Open workspace: ${session.url}`);
-    await view.show(session.url, path.basename(session.root), {
-      signal
-    });
-    return session;
+    const outcome = await view.present(session, {kind:'reveal'}, {signal});
+    return outcome.state === 'applied' ? session : undefined;
   };
   lifetime = createSourceWorkspaceLifetime({
     ...createWorkspaceRuntime(vscode, context, output),
@@ -127,10 +124,8 @@ function activate(context) {
           prepared,
           signal
         }) => {
-          await view.show(session.url, path.basename(session.root), {
-            review: true,
-            signal
-          });
+          const outcome = await view.present(session, {kind:'review',ticket:prepared.ticket}, {signal});
+          if (outcome.state !== 'applied') return;
           return {
             ...session,
             ...prepared
@@ -187,14 +182,10 @@ function activate(context) {
           prepared,
           signal
         }) => {
-          await view.show(session.url, path.basename(session.root), {
-            sourceBrowser: kind === 'file',
-            signal
+          const outcome = await view.present(session, {kind,...prepared}, {
+            signal,validate:()=>verifySource(source)
           });
-          await (kind === 'call' ? view.explore : view.browse)(prepared, {
-            signal,
-            validate: () => verifySource(source)
-          });
+          if (outcome.state !== 'applied') return;
           return prepared;
         }
       });

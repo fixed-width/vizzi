@@ -8,16 +8,16 @@ a `vscode-connection` path into project settings.
 
 ## Install the bundled preview
 
-Use the 0.8.1 VSIX for your operating system and processor:
+Use the 0.9.0 VSIX for your operating system and processor:
 
 Requires VS Code 1.100 or later.
 
 | System | Processor | VSIX filename |
 | --- | --- | --- |
-| Linux | x86-64 | `vizzi-vscode-0.8.1-linux-x64.vsix` |
-| Linux | ARM64 | `vizzi-vscode-0.8.1-linux-arm64.vsix` |
-| macOS | Intel | `vizzi-vscode-0.8.1-darwin-x64.vsix` |
-| macOS | Apple Silicon | `vizzi-vscode-0.8.1-darwin-arm64.vsix` |
+| Linux | x86-64 | `vizzi-vscode-0.9.0-linux-x64.vsix` |
+| Linux | ARM64 | `vizzi-vscode-0.9.0-linux-arm64.vsix` |
+| macOS | Intel | `vizzi-vscode-0.9.0-darwin-x64.vsix` |
+| macOS | Apple Silicon | `vizzi-vscode-0.9.0-darwin-arm64.vsix` |
 
 In VS Code's Extensions view, open **⋯ → Install from VSIX…** and select the file.
 If VS Code offers to reload extensions after updating, accept it. The VSIX includes
@@ -25,7 +25,7 @@ Vizzi's native executable and browser interface. Rust, Node.js and a separate na
 installation are not required to use the bundled preview.
 
 The earlier 0.1.0 extension only shares language providers. Update to the bundled
-0.8.1 preview to use the launch command. The release workflow builds these VSIX files
+0.9.0 preview to use the launch command. The release workflow builds these VSIX files
 alongside native archives; local source builds are described below.
 
 ## Open your project
@@ -92,6 +92,12 @@ source and never saves buffers automatically. Files excluded from Vizzi's captur
 source-file aliases and files outside the project report an error. Repeated actions
 reuse the source browser, including its Back/Forward reading trail.
 
+Editor actions now wait for Vizzi to confirm that the requested source is displayed
+or the normal call destination chooser is ready. Successful actions stay silent.
+Choosing another file, function, task or view mode in Vizzi cancels a waiting action;
+scrolling, panning and resizing do not. The browser stage has a fixed 60-second limit.
+An unconfirmed result reports an error and is never automatically replayed.
+
 Both source-browser and call actions wait up to 30 seconds for the original saved file
 to be captured. Requesting another file or call replaces an older waiting request in this
 editor window. Save changes before retrying a source-change or timeout error.
@@ -146,7 +152,7 @@ JSON, which contains a session credential, in VS Code's extension storage.
 Open **View → Output** and select **Vizzi** for startup details. Errors also appear as
 VS Code notifications.
 
-- **Open Workspace is missing:** check that the bundled 0.8.1 extension is installed
+- **Open Workspace is missing:** check that the bundled 0.9.0 extension is installed
   and enabled in this window, and reload extensions if VS Code requests it.
 - **No folder is open:** use **File → Open Folder…** and try again. This preview requires
   a trusted local folder; remote and virtual workspaces are unsupported.
