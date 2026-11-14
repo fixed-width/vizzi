@@ -8,16 +8,16 @@ a `vscode-connection` path into project settings.
 
 ## Install the bundled preview
 
-Use the 0.8.0 VSIX for your operating system and processor:
+Use the 0.8.1 VSIX for your operating system and processor:
 
 Requires VS Code 1.100 or later.
 
 | System | Processor | VSIX filename |
 | --- | --- | --- |
-| Linux | x86-64 | `vizzi-vscode-0.8.0-linux-x64.vsix` |
-| Linux | ARM64 | `vizzi-vscode-0.8.0-linux-arm64.vsix` |
-| macOS | Intel | `vizzi-vscode-0.8.0-darwin-x64.vsix` |
-| macOS | Apple Silicon | `vizzi-vscode-0.8.0-darwin-arm64.vsix` |
+| Linux | x86-64 | `vizzi-vscode-0.8.1-linux-x64.vsix` |
+| Linux | ARM64 | `vizzi-vscode-0.8.1-linux-arm64.vsix` |
+| macOS | Intel | `vizzi-vscode-0.8.1-darwin-x64.vsix` |
+| macOS | Apple Silicon | `vizzi-vscode-0.8.1-darwin-arm64.vsix` |
 
 In VS Code's Extensions view, open **⋯ → Install from VSIX…** and select the file.
 If VS Code offers to reload extensions after updating, accept it. The VSIX includes
@@ -25,7 +25,7 @@ Vizzi's native executable and browser interface. Rust, Node.js and a separate na
 installation are not required to use the bundled preview.
 
 The earlier 0.1.0 extension only shares language providers. Update to the bundled
-0.8.0 preview to use the launch command. The release workflow builds these VSIX files
+0.8.1 preview to use the launch command. The release workflow builds these VSIX files
 alongside native archives; local source builds are described below.
 
 ## Open your project
@@ -45,6 +45,11 @@ running Vizzi process and reveals its tab. You can move the tab into another edi
 group to read it beside your source. Closing the tab leaves the server running;
 **Vizzi: Stop Workspace** closes the tab, process and sharing. Closing the VS Code
 window also stops the process it launched.
+
+**Stop Workspace** cancels earlier pending commands. A fresh action waits for cleanup
+and starts normally. If you select another project during startup, the latest selection
+wins. **Stop Sharing** leaves native startup, source views and return navigation available;
+run **Open Workspace** again when you want to restore sharing.
 
 Use **Vizzi: Open Workspace in Browser** for an external browser. Saved tasks in that
 browser use separate storage from the VS Code tab.
@@ -141,7 +146,7 @@ JSON, which contains a session credential, in VS Code's extension storage.
 Open **View → Output** and select **Vizzi** for startup details. Errors also appear as
 VS Code notifications.
 
-- **Open Workspace is missing:** check that the bundled 0.8.0 extension is installed
+- **Open Workspace is missing:** check that the bundled 0.8.1 extension is installed
   and enabled in this window, and reload extensions if VS Code requests it.
 - **No folder is open:** use **File → Open Folder…** and try again. This preview requires
   a trusted local folder; remote and virtual workspaces are unsupported.

@@ -91,3 +91,9 @@ test('native exit releases its origin callback independently of a workspace tab'
   const workspace=await startWorkspace({...f,binary,createOrigin:async()=>({file:path.join(f.directory,'origin.json'),dispose:async()=>{count++;released();}})});
   await closed;assert.equal(count,1);await workspace.dispose();assert.equal(count,1);
 });
+
+test('an already cancelled launch never creates an originating-editor connection',async t=>{
+  const f=await fixture(t),controller=new AbortController();controller.abort();let created=0;
+  await assert.rejects(startWorkspace({...f,binary:path.join(f.directory,'missing'),signal:controller.signal,createOrigin:async()=>{created++;}}),/cancelled/);
+  assert.equal(created,0);
+});

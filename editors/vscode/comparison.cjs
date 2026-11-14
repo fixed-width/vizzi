@@ -79,9 +79,9 @@ async function selectComparison(vscode,mode,context) {
   return {rootUri:repo.rootUri,folderUri:folderFor(repo).uri,revision,...(target?{target_revision:target}:{})};
 }
 
-async function createComparison(session,selection,{fetch=globalThis.fetch}={}) {
+async function createComparison(session,selection,{fetch=globalThis.fetch,signal}={}) {
   const response=await fetch(new URL('api/comparisons',session.url).href,{method:'POST',
-    headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),
+    headers:{'Content-Type':'application/json'},signal:signal?AbortSignal.any([signal,AbortSignal.timeout(15000)]):AbortSignal.timeout(15000),
     body:JSON.stringify({provider:'git',revision:selection.revision,...(selection.target_revision?{target_revision:selection.target_revision}:{}),scope:'.'})});
   if(!response.ok) {
     let message=await response.text();try{message=JSON.parse(message).message || message;}catch{}

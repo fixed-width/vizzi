@@ -8,8 +8,9 @@ function createWorkspaceView(vscode) {
     previous?.ready(false);
     previous?.panel.dispose();
   }
-  async function show(url,name,{review=false,sourceBrowser=false}={}) {
-    if (current?.url === url) {current.panel.reveal();if(review)await send('vizzi.review');return;}
+  async function show(url,name,{review=false,sourceBrowser=false,signal}={}) {
+    if(signal?.aborted)throw new DOMException('Editor handoff cancelled','AbortError');
+    if (current?.url === url) {current.panel.reveal();if(review)await send('vizzi.review',{}, {signal});return;}
     const address = new URL(url);
     if (address.protocol !== 'http:' || address.hostname !== '127.0.0.1') {
       throw new Error('The Vizzi editor tab requires a local workspace address');

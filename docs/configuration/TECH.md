@@ -51,9 +51,24 @@ through its nonce-bound existing call/file fragments, retaining call-trail geome
 source-browser Back/Forward behaviour. Presentation checks the editor's current intent;
 obsolete startup or native replies do not open another view or show an error.
 Startup and provider-sharing failures propagate to the command that owns reporting;
-source commands apply their current-intent check before displaying errors. A queued
-open still proceeds when an earlier open fails. The webview delivery step revalidates
-source after readiness, then rechecks cancellation and panel identity before posting.
+source commands apply their current-intent check before displaying errors. A new eligible
+open can proceed after an earlier failure; operations sharing an in-flight launch
+observe the same original failure, and a subsequent explicit open can retry. A same-root
+operation captures and joins that launch before refreshing sharing for the ready session.
+The webview delivery step revalidates source after readiness, then rechecks cancellation
+and panel identity before posting.
+
+## Source-workspace lifetime
+
+`source-workspace.cjs` owns native and semantic-sharing lifetimes behind `use`, `stop`
+and `dispose`. Separate ownership records and cancellation scopes hide startup reuse,
+root replacement, stale exits and cleanup ordering from commands. Operations register
+before selection, then prepare and present only while current. The
+[workspace lifetime contract](WORKSPACE_LIFETIME.md) specifies Stop/latest-project rules.
+`workspace-runtime.cjs` constructs the VS Code resources; `launcher.cjs` and
+`workspace-view.cjs` keep their concrete process and presentation responsibilities.
+Tests exercise the lifetime interface directly with deferred factories, retaining
+command-wiring checks and real child/socket/installed-editor validation.
 
 ## Originating-editor return
 

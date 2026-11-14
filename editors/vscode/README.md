@@ -20,6 +20,11 @@ Return navigation uses the native `Editor` seam and a separate
 target buffers and presents verified locations through public VS Code APIs. The native
 workspace owns this connection independently of semantic sharing and the webview.
 
+Workspace ownership is concentrated in `source-workspace.cjs`, through
+[selection, preparation and presentation](../../docs/configuration/WORKSPACE_LIFETIME.md).
+`workspace-runtime.cjs` constructs editor-owned resources; commands no longer manage
+process generations, sharing replacement or shutdown ordering.
+
 The plugin has no npm runtime dependencies. Its minimum VS Code version is 1.100;
 it uses public Git and workspace/provider APIs rather than editor-private LSP access.
 Remote and virtual workspaces are not supported in this slice.
@@ -64,6 +69,7 @@ using Node.js 18 or later:
 
 ```sh
 npm run test:editor
+node --expose-gc --test editors/vscode/*.test.cjs
 ```
 
 Launcher tests require a built `target/release/vizzi` (override with `VIZZI_TEST_BINARY`).
@@ -111,3 +117,16 @@ VS Code provider, opens the captured `core` function and restores its saved task
 
 Add `--editor-call` to the real Rust `--rust --webview` check to activate Explore Call
 from the actual editor context menu, then verify repeated navigation and layout retention.
+
+The `--expose-gc` run includes two focused retention checks that the ordinary suite
+skips. Exercise lifetime ordering and failure behavior directly through
+`source-workspace.test.cjs`; retain the installed-editor checks for command and webview
+integration. Run the serial whole-module mutation check with the existing development
+Node and Stryker installation:
+
+```sh
+nice -n 10 node_modules/node/bin/node node_modules/@stryker-mutator/core/bin/stryker.js run editors/vscode/lifetime-stryker.config.json
+```
+
+The mutation report goes to the ignored local browser-results directory. Its threshold
+is diagnostic; inspect survivors and timeouts rather than treating the score as a gate.

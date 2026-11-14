@@ -36,19 +36,20 @@ function createHandoffClient({fetch=globalThis.fetch,pause:delay=pause}={}) {
     const controller=new AbortController(),intent={sequence:++sequence,controller,signal:controller.signal,current:()=>latest===intent && !controller.signal.aborted};
     latest=intent;return intent;
   }
-  async function resolve(session,source,target,intent,{check=async()=>{}}={}) {
+  async function resolve(session,source,target,intent,{check=async()=>{},signal:parentSignal}={}) {
+    const signal=parentSignal?AbortSignal.any([intent.signal,parentSignal]):intent.signal;
     if(session.root!==source.root)throw new Error('The selected source workspace changed; retry from the editor');
-    const verify=async(final=false)=>{if(!intent.current())throw aborted();await check({final});if(!intent.current())throw aborted();};
+    const verify=async(final=false)=>{if(signal.aborted || !intent.current())throw aborted();await check({final});if(signal.aborted || !intent.current())throw aborted();};
     let attached,completed=false;
     const cancel=async()=>{if(attached)await request(session,'/cancel',{scope:attached.scope,sequence:intent.sequence}).catch(()=>{});};
     const onAbort=()=>{void cancel();};
-    intent.signal.addEventListener('abort',onAbort,{once:true});
+    signal.addEventListener('abort',onAbort,{once:true});
     try {
       await verify();attached=await attach(session);await verify();
       let action={kind:'start',path:source.path,text:source.text,target},reattached=false;
       for(;;) {
-        const result=await request(session,'',{scope:attached.scope,sequence:intent.sequence,action},intent.signal);
-        if(!intent.current())throw aborted();
+        const result=await request(session,'',{scope:attached.scope,sequence:intent.sequence,action},signal);
+        if(signal.aborted || !intent.current())throw aborted();
         if(result.sequence!==intent.sequence)throw new Error('Invalid native handoff sequence');
         if(result.state==='ready') {
           const d=result.destination;
@@ -58,7 +59,7 @@ function createHandoffClient({fetch=globalThis.fetch,pause:delay=pause}={}) {
         }
         if(result.state==='pending') {
           if(!opaque(result.handle) || !Number.isInteger(result.retry_after_ms) || result.retry_after_ms<1 || result.retry_after_ms>1000)throw new Error('Invalid native handoff continuation');
-          action={kind:'continue',handle:result.handle};await delay(result.retry_after_ms,intent.signal);await verify();continue;
+          action={kind:'continue',handle:result.handle};await delay(result.retry_after_ms,signal);await verify();continue;
         }
         if(result.state==='superseded' || result.state==='cancelled')throw aborted();
         if(result.state==='refused' && result.code==='scope_expired' && action.kind==='start' && !reattached){scopes.delete(attached.key);attached=await attach(session);await verify();reattached=true;continue;}
@@ -66,7 +67,7 @@ function createHandoffClient({fetch=globalThis.fetch,pause:delay=pause}={}) {
         if(result.state==='refused')throw Object.assign(new Error(result.message || 'Vizzi refused this editor handoff'),{code:result.code});
         throw new Error('Invalid native handoff state');
       }
-    } finally {intent.signal.removeEventListener('abort',onAbort);if(!completed)await cancel();}
+    } finally {signal.removeEventListener('abort',onAbort);if(!completed)await cancel();}
   }
   return {begin,resolve,dispose(){latest?.controller.abort();scopes.clear();}};
 }

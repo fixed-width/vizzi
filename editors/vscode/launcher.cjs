@@ -1,6 +1,7 @@
 const {spawn} = require('node:child_process');
 
 async function startWorkspace({binary,root,connectionFile,configFile,output,onExit=()=>{},timeout=15000,signal,createOrigin}) {
+  if (signal?.aborted) throw new Error('Vizzi startup cancelled.');
   const origin = await createOrigin?.();
   if (signal?.aborted) {await origin?.dispose();throw new Error('Vizzi startup cancelled.');}
   const args = configFile ? ['--config',configFile] : [];

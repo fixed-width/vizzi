@@ -1,74 +1,83 @@
 const vscode = require('vscode');
-const fs = require('node:fs/promises');
 const path = require('node:path');
-const crypto = require('node:crypto');
-const {startBridge} = require('./bridge.cjs');
-const {createProvider} = require('./providers.cjs');
-const {startWorkspace} = require('./launcher.cjs');
-const {startOriginEditor} = require('./origin-connection.cjs');
-const {createEditorNavigator} = require('./editor-navigation.cjs');
-const {createWorkspaceView} = require('./workspace-view.cjs');
-const {captureEditorCall,captureSourceFile,verifySource} = require('./editor-source.cjs');
-const {createHandoffClient} = require('./handoff.cjs');
+const {
+  createWorkspaceRuntime
+} = require('./workspace-runtime.cjs');
+const {
+  createSourceWorkspaceLifetime
+} = require('./source-workspace.cjs');
+const {
+  createWorkspaceView
+} = require('./workspace-view.cjs');
+const {
+  captureEditorCall,
+  captureSourceFile,
+  verifySource
+} = require('./editor-source.cjs');
+const {
+  createHandoffClient
+} = require('./handoff.cjs');
 const comparison = require('./comparison.cjs');
-
-let active;
-let workspace;
-let workspaceView;
-let launchAbort;
-let launchTask;
-let generation = 0;
+let lifetime;
 let editorHandoffs;
-async function stop() {
-  generation++;
-  const current = active;
-  active = undefined;
-  if (current) {current.provider.dispose(); await current.bridge.dispose();}
-}
-
-async function stopWorkspace() {
-  workspaceView?.dispose();
-  launchAbort?.abort();
-  if (launchTask) await launchTask.catch(()=>{});
-  const current = workspace;
-  workspace = undefined;
-  if (current) await current.dispose();
-}
-
 async function deactivate() {
   editorHandoffs?.dispose();
-  generation++;
-  await stopWorkspace();
-  await stop();
+  await lifetime?.dispose();
 }
-
 function activate(context) {
-  editorHandoffs=createHandoffClient();
+  editorHandoffs = createHandoffClient();
   const output = vscode.window.createOutputChannel('Vizzi');
-  workspaceView = createWorkspaceView(vscode);
+  const view = createWorkspaceView(vscode);
+  let comparing;
+  const reportedErrors = new WeakSet();
+  const showTab = async ({
+    session,
+    signal
+  }) => {
+    output.appendLine(`Open workspace: ${session.url}`);
+    await view.show(session.url, path.basename(session.root), {
+      signal
+    });
+    return session;
+  };
+  lifetime = createSourceWorkspaceLifetime({
+    ...createWorkspaceRuntime(vscode, context, output),
+    present: showTab,
+    retirePresentation: () => {
+      try {view.dispose();} catch (error) {
+        output.appendLine(`Could not close the Vizzi tab: ${error.message}`);
+        throw error;
+      }
+    }
+  });
   const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
   status.text = '$(preview) Vizzi';
   status.tooltip = 'Open the Vizzi visual workspace';
   status.command = 'vizzi.openWorkspace';
   status.show();
-  let starting = false;
-  let opening;
-  let comparing = false;
-  const reportedErrors=new WeakSet();
+  function announce() {
+    output.show(true);
+    output.appendLine('Starting Vizzi language-provider sharing…');
+  }
   async function selectFolder(folderUri) {
     if (!vscode.workspace.isTrusted) throw new Error('Trust this workspace in VS Code before sharing language providers');
     if (vscode.env.remoteName) throw new Error('Shared language providers currently require a local VS Code workspace');
     const folders = vscode.workspace.workspaceFolders || [];
     if (!folders.length) throw new Error('Open a project folder with File → Open Folder before starting Vizzi');
-    const folder = folderUri ? vscode.workspace.getWorkspaceFolder(folderUri)
-      : folders.length === 1 ? folders[0]
-      : await vscode.window.showWorkspaceFolderPick({placeHolder:'Select the workspace to share with Vizzi'});
-    if (!folder) {output.appendLine('Vizzi cancelled: no workspace folder selected.');return;}
+    const folder = folderUri ? vscode.workspace.getWorkspaceFolder(folderUri) : folders.length === 1 ? folders[0] : await vscode.window.showWorkspaceFolderPick({
+      placeHolder: 'Select the workspace to share with Vizzi'
+    });
+    if (!folder) {
+      output.appendLine('Vizzi cancelled: no workspace folder selected.');
+      return;
+    }
     if (folder.uri.scheme !== 'file') throw new Error('Select a local file workspace');
-    return folder;
+    return {
+      folderUri: folder.uri
+    };
   }
   async function report(error) {
-    if(reportedErrors.has(error))return;
+    if (reportedErrors.has(error)) return;
     reportedErrors.add(error);
     const message = `Vizzi: ${error.message}`;
     output.appendLine(message);
@@ -76,139 +85,151 @@ function activate(context) {
     await vscode.window.showErrorMessage(message);
   }
   async function run(action) {
-    try{return await action();}catch(error){await report(error);}
+    try {
+      return await action();
+    } catch (error) {
+      await report(error);
+    }
   }
-  async function openWorkspace(folderUri,external,options={}) {
-    const connection = await shareLanguageProviders(folderUri,false,options.rootUri);
-    if (!connection) return;
-    const invocation = generation;
-    if (workspace?.root !== connection.root) await stopWorkspace();
-    if (!workspace) {
-      const override = vscode.workspace.getConfiguration('vizzi').get('executablePath');
-      const binary = override || path.join(context.extensionPath,'bin',process.platform === 'win32' ? 'vizzi.exe' : 'vizzi');
-      await fs.access(binary).catch(()=>{throw new Error('The Vizzi executable is missing. Install a bundled VSIX for your platform, or set Vizzi: Executable Path for development.');});
-      const config = path.join(connection.root,'vizzi.toml');
-      const configFile = await fs.stat(config).then(()=>config,error=>{
-        if (error.code !== 'ENOENT') throw error;
+  function open(folderUri, external = false) {
+    announce();
+    return lifetime.use(() => selectFolder(folderUri), {
+      present: external ? async ({
+        session,
+        signal
+      }) => {
+        signal.throwIfAborted();
+        output.appendLine(`Open workspace: ${session.url}`);
+        if (!(await vscode.env.openExternal(vscode.Uri.parse(session.url)))) throw new Error(`Open ${session.url} in your browser; Vizzi is running.`);
+        return session;
+      } : showTab
+    });
+  }
+  async function compare(mode, resource) {
+    if (comparing && !comparing.signal?.aborted) return;
+    const request = {};
+    comparing = request;
+    announce();
+    try {
+      return await lifetime.use(signal => {
+        request.signal = signal;
+        return comparison.selectComparison(vscode, mode, resource);
+      }, {
+        prepare: ({
+          session,
+          selection,
+          signal
+        }) => comparison.createComparison(session, selection, {
+          signal
+        }),
+        present: async ({
+          session,
+          prepared,
+          signal
+        }) => {
+          await view.show(session.url, path.basename(session.root), {
+            review: true,
+            signal
+          });
+          return {
+            ...session,
+            ...prepared
+          };
+        }
       });
-      if (invocation !== generation) return;
-      let current;
-      launchAbort = new AbortController();
-      launchTask = vscode.window.withProgress({location:vscode.ProgressLocation.Notification,title:'Starting Vizzi'},
-        ()=>startWorkspace({binary,...connection,configFile,output,
-          createOrigin:()=>startOriginEditor({root:connection.root,
-            storage:path.join(context.globalStorageUri.fsPath,'origin-connections'),name:'VS Code',
-            open:createEditorNavigator(vscode,{root:connection.root,editorRoot:connection.editorRoot})}),
-          onExit:()=>{
-          if (workspace === current) {workspace=undefined;workspaceView.dispose();}
-        },signal:launchAbort.signal}));
-      try {current = await launchTask;} finally {launchTask=undefined;launchAbort=undefined;}
-      if (invocation !== generation) {await current.dispose();return;}
-      workspace = current;
-      workspace.root = connection.root;
+    } catch (error) {
+      await report(error);
+    } finally {
+      if (comparing === request) comparing = undefined;
     }
-    output.appendLine(`Open workspace: ${workspace.url}`);
-    if (!external && !options.deferView) await workspaceView.show(workspace.url,path.basename(workspace.root),options);
-    else if (external && !await vscode.env.openExternal(vscode.Uri.parse(workspace.url))) {
-      throw new Error(`Open ${workspace.url} in your browser; Vizzi is running.`);
+  }
+  async function enterSource(kind, resource) {
+    const intent = editorHandoffs.begin();
+    announce();
+    try {
+      return await lifetime.use(async () => {
+        const source = await (kind === 'call' ? captureEditorCall : captureSourceFile)(vscode, resource);
+        const project = await selectFolder(source.uri);
+        return project && {
+          ...project,
+          source
+        };
+      }, {
+        signal: intent.signal,
+        prepare: ({
+          session,
+          selection: {
+            source
+          },
+          signal
+        }) => {
+          const target = kind === 'call' ? {
+            kind,
+            position: source.position
+          } : {
+            kind,
+            line: source.line
+          };
+          return editorHandoffs.resolve(session, source, target, intent, {
+            signal,
+            check: ({
+              final
+            }) => verifySource(source, {
+              saved: final
+            })
+          });
+        },
+        present: async ({
+          session,
+          selection: {
+            source
+          },
+          prepared,
+          signal
+        }) => {
+          await view.show(session.url, path.basename(session.root), {
+            sourceBrowser: kind === 'file',
+            signal
+          });
+          await (kind === 'call' ? view.explore : view.browse)(prepared, {
+            signal,
+            validate: () => verifySource(source)
+          });
+          return prepared;
+        }
+      });
+    } catch (error) {
+      if (intent.current()) await report(error);
     }
-    return {root:workspace.root,url:workspace.url};
   }
-  function open(folderUri,external=false,options={}) {
-    const key=JSON.stringify([folderUri?.fsPath,external,options.rootUri?.fsPath,Boolean(options.review),Boolean(options.sourceBrowser),Boolean(options.deferView)]);
-    if (opening) {
-      if(opening.key===key)return opening.task;
-      const next=()=>open(folderUri,external,options);
-      return opening.task.then(next,next);
-    }
-    const task=openWorkspace(folderUri,external,options).finally(()=>{if(opening?.task===task)opening=undefined;});
-    opening={key,task};
-    return task;
-  }
-  async function compare(mode,resource) {
-    if (comparing) return;
-    comparing = true;
-    try {
-      const selection = await comparison.selectComparison(vscode,mode,resource);
-      if (!selection) return;
-      const session = await open(selection.folderUri,false,{rootUri:selection.rootUri,review:true});
-      if (!session) return;
-      if (session.root !== await fs.realpath(selection.rootUri.fsPath)) throw new Error('The active Vizzi project changed; retry the comparison');
-      const accepted = await comparison.createComparison(session,selection);
-      return {...session,...accepted};
-    } catch (error) {await report(error);}
-    finally {comparing = false;}
-  }
-  async function enterSource(kind,resource) {
-    const intent=editorHandoffs.begin();
-    try {
-      const selection=await (kind==='call'?captureEditorCall: captureSourceFile)(vscode,resource);
-      if(!intent.current())return;
-      const session=await open(selection.uri,false,{deferView:true});
-      if(!session || !intent.current())return;
-      const target=kind==='call'?{kind,position:selection.position}:{kind,line:selection.line};
-      const handoff=await editorHandoffs.resolve(session,selection,target,intent,{check:({final})=>verifySource(selection,{saved:final})});
-      if(!intent.current())return;
-      await workspaceView.show(session.url,path.basename(session.root),{sourceBrowser:kind==='file'});
-      if(!intent.current())return;
-      await (kind==='call'?workspaceView.explore:workspaceView.browse)(handoff,{signal:intent.signal,validate:()=>verifySource(selection)});
-      return handoff;
-    } catch(error){if(intent.current() && error.name!=='AbortError')await report(error);}
-  }
-  async function shareLanguageProviders(folderUri,externalSettings=false,rootUri) {
-    output.show(true);
-    if (starting) {output.appendLine('Vizzi sharing is already starting.');return;}
-    starting = true;
-    output.appendLine('Starting Vizzi language-provider sharing…');
-    let invocation = ++generation;
-    let provider;
-    try {
-      const folder = await selectFolder(folderUri);
-      if (!folder) return;
-      const editorRoot = rootUri?.fsPath || folder.uri.fsPath;
-      const root = await fs.realpath(editorRoot);
-      if (invocation !== generation) return;
-      const reused=active;
-      if (!externalSettings && reused?.root===root && await reused.bridge.isCurrent()) {
-        if (invocation!==generation || active!==reused) return;
-        output.appendLine('Using the current editor connection.');
-        return {root,editorRoot,connectionFile:reused.connectionFile};
-      }
-      await stop();
-      invocation = generation;
-      const key = crypto.createHash('sha256').update(root).digest('hex');
-      const connectionFile = path.join(context.globalStorageUri.fsPath,`connections/${key}.json`);
-      if (!path.relative(root,connectionFile).startsWith(`..${path.sep}`)) throw new Error('Vizzi connection storage must be outside the inspected workspace');
-      provider = createProvider(vscode,root,editorRoot);
-      const bridge = await startBridge({root,connectionFile,query:provider.query});
-      if (invocation !== generation) {provider.dispose(); await bridge.dispose(); return;}
-      active = {bridge,provider,root,editorRoot,connectionFile};
-      output.clear();
-      output.appendLine(`Sharing language providers for ${root}`);
-      if (externalSettings) {
+  function share(folderUri) {
+    announce();
+    return lifetime.use(() => selectFolder(folderUri), {
+      resources: 'sharing',
+      refresh: true,
+      present: ({
+        project
+      }) => {
         output.appendLine('For automatic setup, run Vizzi: Open Workspace. No connection settings are needed.');
         output.appendLine('Optional settings for an external Vizzi launch:');
-        output.appendLine(`root = ${JSON.stringify(root)}\n\n[language-servers]\nvscode-connection = ${JSON.stringify(connectionFile)}`);
+        output.appendLine(`root = ${JSON.stringify(project.root)}\n\n[language-servers]\nvscode-connection = ${JSON.stringify(project.connectionFile)}`);
         output.appendLine('This connection path is stable for this project. Sharing again refreshes its session credentials.');
-      } else output.appendLine('Editor connection configured automatically for this launch.');
-      output.appendLine('\nVS Code keeps ownership of its language servers. Save buffers before querying from Vizzi.');
-      output.show(true);
-      return {root,editorRoot,connectionFile};
-    } catch (error) {
-      if (provider && active?.provider !== provider) provider.dispose();
-      throw error;
-    } finally {starting = false;}
+        return project;
+      }
+    });
   }
-  context.subscriptions.push(output,status,workspaceView,
-    vscode.commands.registerCommand('vizzi.openWorkspace',folderUri=>run(()=>open(folderUri))),
-    vscode.commands.registerCommand('vizzi.openWorkspaceInBrowser',folderUri=>run(()=>open(folderUri,true))),
-    vscode.commands.registerCommand('vizzi.exploreCall',resource=>enterSource('call',resource)),
-    vscode.commands.registerCommand('vizzi.openSourceBrowser',resource=>enterSource('file',resource)),
-    vscode.commands.registerCommand('vizzi.compareRevisions',resource=>compare('commits',resource)),
-    vscode.commands.registerCommand('vizzi.compareWorkingChanges',resource=>compare('working',resource)),
-    vscode.commands.registerCommand('vizzi.stopWorkspace',deactivate),
-    vscode.commands.registerCommand('vizzi.stopSharing',stop),
-    vscode.commands.registerCommand('vizzi.shareLanguageProviders',folderUri=>run(()=>shareLanguageProviders(folderUri,true))));
+  context.subscriptions.push(output, status, view,
+    vscode.commands.registerCommand('vizzi.openWorkspace', folderUri => run(() => open(folderUri))),
+    vscode.commands.registerCommand('vizzi.openWorkspaceInBrowser', folderUri => run(() => open(folderUri, true))),
+    vscode.commands.registerCommand('vizzi.exploreCall', resource => enterSource('call', resource)),
+    vscode.commands.registerCommand('vizzi.openSourceBrowser', resource => enterSource('file', resource)),
+    vscode.commands.registerCommand('vizzi.compareRevisions', resource => compare('commits', resource)),
+    vscode.commands.registerCommand('vizzi.compareWorkingChanges', resource => compare('working', resource)),
+    vscode.commands.registerCommand('vizzi.stopWorkspace', () => run(() => lifetime.stop())),
+    vscode.commands.registerCommand('vizzi.stopSharing', () => run(() => lifetime.stop('sharing'))),
+    vscode.commands.registerCommand('vizzi.shareLanguageProviders', folderUri => run(() => share(folderUri))));
 }
-
-module.exports = {activate,deactivate};
+module.exports = {
+  activate,
+  deactivate
+};

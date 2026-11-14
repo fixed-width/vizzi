@@ -77,6 +77,9 @@ Plugin-launched return navigation binds the native editor-neutral `Editor` seam 
 exact originating window. Source verification stays native; each editor adapter checks
 its target buffers and presents the verified line. This association is independent of
 semantic provider sharing and tab lifetime; see [originating-editor navigation](docs/configuration/ORIGIN_EDITOR.md).
+Each editor window has one source-workspace lifetime owner. Semantic sharing, the
+native process and visual presentation retain separate lifetimes behind that module's
+small interface; other editor hosts follow the same [ownership contract](docs/configuration/WORKSPACE_LIFETIME.md).
 Local dependency source uses independent, bounded captures admitted by language providers.
 Discovery stays language-specific; repository snapshots and watchers retain their scope.
 See [dependency source](docs/visual/DEPENDENCIES_TECH.md).

@@ -71,6 +71,11 @@ async function fixture(t, folders = 1, {automaticReady=true,onCapture=()=>{}}={}
       createComparison:async(session,selection)=>{comparisons.push({session,selection});return {schema:1,ticket:'test'};},
     },
   };
+  const runtimeModule={exports:{}};
+  const runtime=await fs.readFile(path.join(__dirname,'workspace-runtime.cjs'),'utf8');
+  vm.compileFunction(runtime,['require','module'],{filename:'workspace-runtime.cjs'})(
+    name=>dependencies[name] || require(name),runtimeModule);
+  dependencies['./workspace-runtime.cjs']=runtimeModule.exports;
   const source = await fs.readFile(path.join(__dirname,'extension.cjs'),'utf8');
   vm.compileFunction(source,['require','module'],{filename:'extension.cjs'})(
     name=>dependencies[name] || require(name),module);
@@ -155,23 +160,6 @@ test('bundled installations launch their included executable without a TOML file
   assert.equal(f.launches.length,1);
   assert.equal(f.launches[0].binary,binary);
   assert.equal(f.launches[0].configFile,undefined);
-});
-
-test('stopping a launch that becomes ready concurrently disposes it without opening the browser',async t=>{
-  const f = await fixture(t);
-  let ready, notify, disposed = 0;
-  const started = new Promise(resolve=>{notify=resolve;});
-  f.setStart(()=>{notify();return new Promise(resolve=>{ready=()=>resolve({
-    url:'http://127.0.0.1:7474/',dispose:async()=>{disposed++;},
-  });});});
-  const opening = f.commands.get('vizzi.openWorkspace')();
-  await started;
-  const stopping = f.commands.get('vizzi.stopWorkspace')();
-  ready();
-  await Promise.all([opening,stopping]);
-  assert.equal(disposed,1);
-  assert.equal(f.opened.length,0);
-  assert.equal(f.panels.length,0);
 });
 
 test('closing and reopening the editor tab reuses the server, and browser opening is explicit',async t=>{
@@ -382,19 +370,18 @@ test('a current source startup failure is reported once',async t=>{
   assert.deepEqual(f.errors,['Vizzi: Current launch failed']);
 });
 
-test('coalesced source requests report a shared startup failure only for the current intent',async t=>{
-  let captured;const observed=new Promise(resolve=>{captured=resolve;});
-  const f=await fixture(t,1,{onCapture:()=>captured()}),source=await sourceEditor(f);f.vscode.workspace.openTextDocument=async()=>source.document;
-  let fail,notify;const started=new Promise(resolve=>{notify=resolve;});
-  f.setStart(()=>{notify();return new Promise((_resolve,reject)=>{fail=()=>reject(new Error('Shared launch failed'));});});
-  const old=f.commands.get('vizzi.exploreCall')(source.uri);await started;
-  const newer=f.commands.get('vizzi.openSourceBrowser')(source.uri);await observed;await new Promise(setImmediate);
-  fail();await Promise.all([old,newer]);assert.deepEqual(f.errors,['Vizzi: Shared launch failed']);assert.equal(f.panels.length,0);
-});
-
-test('coalesced normal open commands report one startup failure',async t=>{
+test('concurrent normal open commands report a shared startup error once',async t=>{
   const f=await fixture(t);let fail,notify;const started=new Promise(resolve=>{notify=resolve;});
-  f.setStart(()=>{notify();return new Promise((_resolve,reject)=>{fail=()=>reject(new Error('Shared launch failed'));});});
+  const failure=new Error('Shared launch failed');let attempts=0;
+  f.setStart(()=>{if(++attempts>1)return Promise.reject(failure);notify();return new Promise((_resolve,reject)=>{fail=()=>reject(failure);});});
   const one=f.commands.get('vizzi.openWorkspace')(),two=f.commands.get('vizzi.openWorkspace')();await started;fail();await Promise.all([one,two]);
   assert.deepEqual(f.errors,['Vizzi: Shared launch failed']);
+});
+
+test('stopping while source delivery awaits webview readiness cancels it without an error',async t=>{
+  const f=await fixture(t,1,{automaticReady:false}),source=await sourceEditor(f);
+  const opening=f.commands.get('vizzi.exploreCall')(source.uri),panel=await f.nextPanel;
+  await f.commands.get('vizzi.stopWorkspace')();panel.becomeReady();await opening;
+  assert.equal(panel.messages.length,0);assert.deepEqual(f.errors,[]);assert.equal(f.disposed(),1);
+  await f.commands.get('vizzi.openWorkspace')();assert.equal(f.launches.length,2);
 });

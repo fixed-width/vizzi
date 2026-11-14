@@ -8,6 +8,11 @@ remains in Git and the project documentation.
 
 ### Changed
 
+- Stop Workspace cancels older pending commands; fresh actions wait for cleanup and
+  start normally. The latest selected project wins during concurrent startup, while
+  Stop Sharing leaves native startup and return navigation available.
+  Same-project concurrent opens wait for shared startup and preserve its original failure.
+
 - Plugin-launched Editor actions return to the exact originating VS Code window,
   including from external browsers. Dirty or changed target files are refused without
   saving buffers; unavailable origins report an error without opening another window.

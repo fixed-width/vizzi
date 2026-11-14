@@ -1,0 +1,14 @@
+{
+  "$schema": "../../node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "mutate": ["editors/vscode/source-workspace.cjs"],
+  "testRunner": "command",
+  "commandRunner": { "command": "node --expose-gc editors/vscode/source-workspace.test.cjs" },
+  "coverageAnalysis": "off",
+  "concurrency": 1,
+  "timeoutMS": 2000,
+  "reporters": ["clear-text", "json"],
+  "clearTextReporter": { "reportMutants": false, "logTests": false },
+  "jsonReporter": { "fileName": "experiments/browser/results/local/lifetime-mutation.json" },
+  "ignorePatterns": ["target", "dist", "experiments", "docs", "crates", ".agents", ".codex"],
+  "thresholds": { "break": 0 }
+}

@@ -99,6 +99,21 @@ Stopping the workspace or changing projects disposes the old tab. The separate
 Saved tasks in an external browser and the VS Code tab belong to their respective
 browser storage profiles.
 
+## Concurrent workspace commands
+
+**Stop Workspace** cancels all earlier pending opens, comparisons and source actions,
+including unresolved selections. None may restart Vizzi or present an obsolete result
+after Stop. A fresh action invoked after Stop waits for cleanup and starts normally.
+If another project is selected while a launch is pending, the latest selected project
+wins. Same-project commands share startup and the running process while retaining their
+own presentation modes. Old failures and process exits cannot affect the replacement.
+
+**Stop Sharing** is independent of native startup: it stops semantic sharing without
+stopping the native process or its originating-editor connection. An earlier pending
+Open cannot restore sharing after it is stopped; a later explicit Open can. Unexpected
+native exit closes its tab and origin, retaining sharing; the next explicit command
+can start a fresh process. See [source-workspace lifetime](WORKSPACE_LIFETIME.md).
+
 ## Return to the originating editor
 
 Plugin-launched **Editor** actions target the exact VS Code window that launched the
