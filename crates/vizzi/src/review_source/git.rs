@@ -69,6 +69,54 @@ impl GitRepository {
     pub fn workspace(&self) -> &WorkspaceId {
         &self.workspace
     }
+    pub(crate) fn file_history(
+        &self,
+        path: &str,
+    ) -> Result<(String, Vec<String>, bool), CaptureError> {
+        let tip = oid(&self
+            .run(&["rev-parse", "--verify", "HEAD^{commit}"], 1024, &|| false)
+            .map_err(|_| {
+                CaptureError::Git("No local HEAD commit is available for function history".into())
+            })?)?;
+        let output = self.run(
+            &[
+                "--literal-pathspecs",
+                "rev-list",
+                "--first-parent",
+                "-n",
+                "65",
+                &tip,
+                "--",
+                path,
+            ],
+            8192,
+            &|| false,
+        )?;
+        let commits = output
+            .split(|b| *b == b'\n')
+            .filter(|s| !s.is_empty())
+            .map(oid)
+            .collect::<Result<Vec<_>, _>>()?;
+        let shallow =
+            self.run(&["rev-parse", "--is-shallow-repository"], 1024, &|| false)? == b"true\n";
+        Ok((tip, commits, shallow))
+    }
+    pub(crate) fn pin_file(&self, commit: &str, path: &str) -> Result<GitRevision, CaptureError> {
+        let entries = parse_tree(
+            &self.run(
+                &["--literal-pathspecs", "ls-tree", "-z", commit, "--", path],
+                8192,
+                &|| false,
+            )?,
+            1,
+        )?;
+        Ok(GitRevision {
+            repository: self.clone(),
+            resolved: commit.into(),
+            entries: Arc::new(entries),
+            batch: None,
+        })
+    }
     /// Resolves a revision once and freezes its complete raw tree inventory.
     pub fn pin(
         &self,

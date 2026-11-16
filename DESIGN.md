@@ -53,7 +53,9 @@ fragment view references a particular source observation/version/range; it is no
 to the short excerpt stored by the existing investigation model. This seam also permits
 several representations of the same source and per-view revision context for reviews.
 Working-tree views follow saved changes through explicit declaration tracking and coherent
-source/relationship refreshes. Individual views can pin a captured version. Ambiguous or
+source/relationship refreshes. Individual views can pin a captured version or step through
+local Git function history independently; see [function history](docs/visual/HISTORY_PRODUCT.md).
+Ambiguous or
 missing declarations retain earlier context rather than adopting a guessed target; see
 the [live view contract](docs/visual/LIVE_PRODUCT.md).
 

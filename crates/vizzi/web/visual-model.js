@@ -11,6 +11,8 @@ const require=(value,message)=>{if(!value)throw new Error(message);};
 const clone=value=>structuredClone(value);
 function source(s){return s&&typeof s.path==='string'&&bytes(s.path)<=4096&&!s.path.includes('\\')&&!s.path.split('/').some(p=>!p||p==='.'||p==='..')&&opaque(s.file)&&opaque(s.version)&&opaque(s.context)&&integer(s.line,1,1e8)&&integer(s.end_line,s.line,1e8);}
 function symbol(s){return s&&validOrigin(s.origin)&&validModule(s.module)&&(s.tracking==null||opaque(s.tracking))&&opaque(s.id)&&typeof s.name==='string'&&bytes(s.name)>0&&bytes(s.name)<=128&&typeof s.kind==='string'&&bytes(s.kind)<=128&&Array.isArray(s.parents)&&s.parents.length<=16&&s.parents.every(p=>typeof p==='string'&&bytes(p)<=128)&&source(s.source);}
+const commit=s=>typeof s==='string'&&/^(?:[0-9a-f]{40}|[0-9a-f]{64})$/.test(s);
+function history(h){return h&&opaque(h.token)&&commit(h.tip)&&commit(h.commit)&&integer(h.index,0,63)&&(h.returning==null||typeof h.returning==='boolean')&&h.base&&!Object.hasOwn(h.base,'history')&&opaque(h.base.snapshot)&&symbol(h.base.symbol)&&!h.base.symbol.origin&&reading(h.base.reading,h.base.symbol.source);}
 function geometry(v){return finite(v.x,-1e5,1e5)&&finite(v.y,-1e5,1e5)&&finite(v.w,320,BUBBLE_SIZE.maxWidth)&&finite(v.h,200,BUBBLE_SIZE.maxHeight);}
 function reading(r,s){return r&&finite(r.top,0,1e7)&&finite(r.left,0,1e7)&&integer(r.section,s.line,s.end_line)&&(r.anchor==null||(integer(r.anchor.line,r.section,Math.min(s.end_line,r.section+95))&&integer(r.anchor.byte,0,32768)&&finite(r.anchor.offset,-1024,1024)));}
 function camera(c){return c&&finite(c.x,-1e5,1e5)&&finite(c.y,-1e5,1e5)&&finite(c.scale,MIN_SCALE,MAX_SCALE);}
@@ -51,15 +53,27 @@ export class Workspace {
   const exact=this.links.findIndex(l=>l.id===key);if(exact>=0){if(this.links[exact].state!=null&&this.links[exact].state!=='current')this.links[exact]={...fresh,state:'current'};}else if(previous.length===1)this.links[this.links.indexOf(previous[0])]={...fresh,state:'current'};else this.links.push(fresh);
   return to;
  }
- usable(id){const v=this.view(id);return !this.stale&&v.snapshot===this.snapshot&&v.state==='current';}
- pin(id,pinned){const v=this.view(id);v.mode=pinned?'pinned':'live';}
+ usable(id){const v=this.view(id);return !v.history&&!this.stale&&v.snapshot===this.snapshot&&v.state==='current';}
+ pin(id,pinned){const v=this.view(id);if(v.history&&!pinned)this.returnLive(id);else v.mode=pinned?'pinned':'live';}
+ showHistory(id,revision){
+  const v=this.view(id),base=v.history?.base??{snapshot:v.snapshot,symbol:clone(v.symbol),reading:clone(v.reading)};
+  const h={token:revision.token,tip:revision.tip,commit:revision.commit,index:revision.index,base};
+  require(history(h)&&opaque(revision.snapshot)&&symbol(revision.symbol)&&!revision.symbol.origin&&revision.symbol.source.file===base.symbol.source.file&&revision.symbol.tracking===base.symbol.tracking,'Invalid function revision');
+  const offset=v.reading.section-v.symbol.source.line,s=revision.symbol.source;
+  v.history=clone(h);v.snapshot=revision.snapshot;v.symbol=clone(revision.symbol);v.mode='pinned';v.state='current';v.reading={section:Math.min(s.end_line,s.line+offset),top:0,left:v.reading.left};
+  for(const link of this.links)if(link.from===id||link.to===id)link.state='unverified';
+ }
+ returnLive(id){
+  const v=this.view(id);require(history(v.history),'Function history is absent');
+  v.history.returning=true;v.mode='live';v.state='unresolved';
+ }
  refresh(snapshot,updates,checks){
   require(opaque(snapshot)&&Array.isArray(updates)&&Array.isArray(checks),'Invalid live refresh');const byId=new Map();
   for(const update of updates){require(update&&typeof update.id==='string'&&!byId.has(update.id),'Duplicate live view');byId.set(update.id,update);}
   const live=this.views.filter(v=>v.mode==='live');require(byId.size===live.length&&live.every(v=>byId.has(v.id)),'Live working set differs');
   const views=this.views.map(v=>{if(v.mode==='pinned')return clone(v);const update=byId.get(v.id);require(['current','unresolved'].includes(update.state),'Invalid live state');if(update.state==='unresolved')return {...clone(v),state:'unresolved'};
    require(symbol(update.symbol),'Invalid current declaration');const p=update.position,s=update.symbol.source;require(p&&integer(p.section,s.line,s.end_line)&&typeof p.reset==='boolean'&&(p.line===null||integer(p.line,p.section,Math.min(s.end_line,p.section+95)))&&integer(p.byte,0,32768),'Invalid live reading position');
-   return {...clone(v),snapshot,symbol:clone(update.symbol),state:'current',reading:{section:p.section,top:v.symbol.source.version===s.version?v.reading.top:0,left:v.reading.left,anchor:p.line===null?null:{line:p.line,byte:p.byte,offset:v.reading.anchor?.offset??0}}};});
+   const next={...clone(v),snapshot,symbol:clone(update.symbol),state:'current',reading:{section:p.section,top:v.symbol.source.version===s.version?v.reading.top:0,left:v.reading.left,anchor:p.line===null?null:{line:p.line,byte:p.byte,offset:v.reading.anchor?.offset??0}}};delete next.history;return next;});
   const refreshed=new Map(checks.map(c=>[c.id,c.check]));require(checks.length===this.links.length&&refreshed.size===checks.length&&this.links.every(l=>refreshed.has(l.id)),'Live relationships differ');const links=[],ids=new Set();
   for(const old of this.links){const check=refreshed.get(old.id);let link={...clone(old),state:check?.state==='removed'?'removed':'unverified'};if(check?.state==='current'){
    const from=views.find(v=>v.id===old.from),to=views.find(v=>v.id===old.to);require(from&&to&&from.snapshot===snapshot&&to.snapshot===snapshot&&from.state==='current'&&to.state==='current'&&within(check.source,from.symbol.source)&&['self','candidate'].includes(check.kind),'Invalid refreshed relationship');
@@ -91,7 +105,7 @@ export class Workspace {
  static restore(raw,currentSnapshot){
   require(typeof raw==='string'&&bytes(raw)<=524288,'Invalid visual workspace size');let data;try{data=JSON.parse(raw);}catch{throw new Error('Invalid visual workspace JSON');}
   require(data&&data.schema===1&&opaque(data.snapshot)&&integer(data.next,1,1e6)&&Array.isArray(data.views)&&data.views.length<=LIMIT&&Array.isArray(data.links)&&data.links.length<=96&&camera(data.camera),'Invalid visual workspace document');
-  const ids=new Set();for(const v of data.views){if(v){v.snapshot??=data.snapshot;v.mode??='live';v.state??='current';}require(v&&opaque(v.snapshot)&&['live','pinned'].includes(v.mode)&&['current','unresolved'].includes(v.state)&&typeof v.id==='string'&&/^v[1-9][0-9]{0,5}$/.test(v.id)&&!ids.has(v.id)&&v.kind==='source'&&symbol(v.symbol)&&typeof v.area==='string'&&bytes(v.area)<=4096&&geometry(v)&&typeof v.collapsed==='boolean'&&reading(v.reading,v.symbol.source),'Invalid restored fragment');ids.add(v.id);require(Number(v.id.slice(1))<data.next,'Invalid next view identity');}
+  const ids=new Set();for(const v of data.views){if(v){v.snapshot??=data.snapshot;v.mode??='live';v.state??='current';}require(v&&opaque(v.snapshot)&&['live','pinned'].includes(v.mode)&&['current','unresolved'].includes(v.state)&&typeof v.id==='string'&&/^v[1-9][0-9]{0,5}$/.test(v.id)&&!ids.has(v.id)&&v.kind==='source'&&symbol(v.symbol)&&typeof v.area==='string'&&bytes(v.area)<=4096&&geometry(v)&&typeof v.collapsed==='boolean'&&reading(v.reading,v.symbol.source)&&(v.history==null||history(v.history)&&(v.mode==='pinned'&&!v.history.returning||v.mode==='live'&&v.history.returning===true&&v.state==='unresolved')&&!v.symbol.origin&&v.symbol.source.file===v.history.base.symbol.source.file),'Invalid restored fragment');ids.add(v.id);require(Number(v.id.slice(1))<data.next,'Invalid next view identity');}
   require(data.selected===null||ids.has(data.selected),'Invalid selected fragment');const linkIds=new Set();for(const l of data.links)require(l&&typeof l.id==='string'&&!linkIds.has(l.id)&&ids.has(l.from)&&ids.has(l.to)&&(((l.kind==='candidate'||l.kind==='self')&&l.semantic_context==null)||(l.kind==='definition'&&opaque(l.semantic_context)))&&typeof l.spelling==='string'&&bytes(l.spelling)>0&&bytes(l.spelling)<=256&&(l.state==null||['current','removed','unverified'].includes(l.state))&&(l.state==null||l.state==='current'?within(l.source,data.views.find(v=>v.id===l.from).symbol.source):source(l.source)&&l.source.file===data.views.find(v=>v.id===l.from).symbol.source.file&&l.source.path===data.views.find(v=>v.id===l.from).symbol.source.path)&&l.id===linkKey(l.from,l.to,l.source,l.spelling,l.kind==='definition'?l.semantic_context:null)&&(linkIds.add(l.id),true),'Invalid restored link');
   const model=new Workspace(data.snapshot);model.views=data.views;model.links=data.links;model.camera=data.camera;model.next=data.next;model.selected=data.selected;model.markSnapshot(currentSnapshot);return model;
  }

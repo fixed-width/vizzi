@@ -21,6 +21,7 @@ branches together, with shared module labels.
 - [Follow calls, callers and references](how-to/follow-a-call-trail.md)
 - [Arrange bubbles, groups and saved tasks](how-to/manage-tasks.md)
 - [Follow saved changes or pin a view](how-to/follow-live-changes.md)
+- [Read a function's Git history](how-to/read-function-history.md)
 - [Configure language servers and local dependencies](how-to/configure-language-servers.md)
 - [Explore an editor call with the VS Code extension](../editors/vscode/INSTALL.md)
 - [Save launch settings](how-to/configure-vizzi.md)

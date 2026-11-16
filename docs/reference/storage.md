@@ -9,6 +9,7 @@ For users checking what will remain after navigation, reload or a server restart
 | Saved locations, notes and reader connections | Server memory, or `--investigation-file` | Session-only without a file; persisted with a configured file |
 | Captured source and pinned views | Native retained source/session data | Older captures can expire; pinning is not permanent storage |
 | Active review comparison | Running server | Not persisted across server restart |
+| Function-history captures | Running server | Up to 24 sessions and 32 MiB of selected source; older sessions expire |
 | Analysis cache and semantic working data | Platform workspace cache, or `--cache` override | Derived data, separate from saved-location state |
 | VS Code bridge connection | VS Code extension global storage | Local session credential and endpoint; sharing republishes it and stopping closes the connection |
 
@@ -54,6 +55,12 @@ Storage byte limits and browser quotas also apply. A failed task save/switch ret
 working layout and reports an error; the intended persistent write has not succeeded.
 Visual tasks currently have no export/import interface and do not synchronise between
 devices. [Managing tasks](../how-to/manage-tasks.md) describes the controls.
+
+Function history considers up to 64 file revisions per session, with a 2-MiB file limit.
+Only the selected analysed file is retained for each session; revisiting a version reads
+its immutable Git objects again. These are logical source-byte bounds, excluding analysis
+metadata and parser memory. Reload can restore a retained history session; restarting the
+server expires it. **Return to live** remains available when a historical capture expires.
 
 ## What a saved layout contains
 
