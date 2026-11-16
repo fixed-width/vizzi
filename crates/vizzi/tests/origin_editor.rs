@@ -296,14 +296,12 @@ fn descriptors_cannot_live_in_source_or_exceed_the_private_regular_file_allowanc
     #[cfg(unix)]
     {
         let fifo = temp.path().join("fifo");
-        rustix::fs::mknodat(
-            rustix::fs::CWD,
-            &fifo,
-            rustix::fs::FileType::Fifo,
-            rustix::fs::Mode::RUSR | rustix::fs::Mode::WUSR,
-            0,
-        )
-        .unwrap();
+        let created = std::process::Command::new("mkfifo")
+            .args(["-m", "600"])
+            .arg(&fifo)
+            .output()
+            .unwrap();
+        assert!(created.status.success(), "mkfifo failed: {created:?}");
         assert!(
             OriginEditor::from_file(&root, &fifo)
                 .err()
