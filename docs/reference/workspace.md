@@ -33,12 +33,23 @@ structural view remains a contributor prototype, not the main reading workflow.
 | Fit workspace | Frame the current working set |
 | Overview box | Return to a bubble; hover for its name/location |
 | Pin version / Follow live | Hold captured source / resume saved-file updates |
+| Previous change / Next change | Step through changes to this function in local first-parent Git history |
+| Return to live | Leave a historical, comparison or captured-call view and resume saved-source updates |
+| Compare | Open pinned Before/After views of adjacent function versions |
+| Previous edit / Next edit | Reveal corresponding changes in visible comparison bubbles |
+| History in a comparison | Resume reading earlier committed versions in that bubble |
+| Open in captured file | Follow a call using only the historical/comparison file's declarations |
 | Save | Keep a repository source location separately from the visual layout |
 | Editor | Verify and hand off a current source location to VS Code |
 
 Function lookup accepts names and supported qualified forms, including `Type::method`,
 `Type.method`, `Type#method`, `Type method` and `Type/method`. It ignores case.
 Exact function names rank before partial matches; qualified names and paths narrow the results.
+
+Function history freezes local HEAD when first opened and considers up to 64 file revisions.
+It skips unchanged declarations, stops at missing or ambiguous matches, and does not infer
+renames or moves. Historical bubbles disable current-source actions. See
+[reading function history](../how-to/read-function-history.md).
 
 Settings contains Theme everywhere. Code layout and Module outlines are call-workspace
 settings. Source reflow preserves source line numbers; copying fully captured rows

@@ -78,8 +78,9 @@ pub fn router_with_definitions(
         None => crate::structural::StructureHost::new(host.clone()),
     });
     let handoffs = handoff::router(host.clone(), structure.clone());
+    let history = Arc::new(crate::function_history::FunctionHistory::new(host.clone()));
     router_with_host(host, reviews)
-        .merge(companion::router(investigation, search, structure))
+        .merge(companion::router(investigation, search, structure, history))
         .merge(handoffs)
 }
 

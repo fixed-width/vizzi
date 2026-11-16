@@ -72,6 +72,15 @@ impl Host {
     pub fn root(&self) -> &std::path::Path {
         self.engine.directory().root()
     }
+    pub(crate) fn analyze_history(
+        &self,
+        source: &vizzi_core::model::Snapshot,
+    ) -> Result<Arc<vizzi_core::model::Snapshot>, EngineError> {
+        self.engine
+            .analyze_review(source, &|| self.stop.load(Ordering::Acquire))?
+            .map(|r| r.snapshot)
+            .ok_or_else(|| EngineError::Configuration("Function history analysis cancelled".into()))
+    }
     /// Analyses a private admitted review through this host's exact engine and budget.
     /// Callers run this blocking operation outside publication/transport locks.
     pub fn analyze_review(

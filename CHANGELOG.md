@@ -33,6 +33,16 @@ remains in Git and the project documentation.
 
 ### Added
 
+- Follow calls from historical and comparison bubbles within their exact captured file,
+  with revision-labelled destinations, explicit name choices and retained call trails.
+
+- Compare adjacent function versions in pinned Before/After bubbles, with full-declaration
+  change highlights, coordinated edit navigation and original source line numbers/copying.
+
+- Function bubbles can step backward and forward through local Git changes while
+  retaining their layout, then return to live source. Unchanged function versions are
+  skipped; historical code is labelled and keeps current-source actions disabled.
+
 - **Vizzi: Open in Source Browser** in VS Code's editor and file-tab context menus
   opens saved project files and reveals the editor's cursor line when available.
 - VS Code Source Control and Command Palette actions compare two selected local Git
@@ -52,6 +62,13 @@ remains in Git and the project documentation.
   dirty buffers or disconnect; managed-server fallback is never automatic.
 
 ### Fixed
+
+- Superseded function comparisons and edit navigation stay silent after newer editor
+  navigation, Return to live or closing a bubble; delayed responses cannot replace newer
+  source, change focus or display obsolete errors.
+
+- Historical bubbles recover from temporary busy source reads when restoring later
+  sections, keeping their captured revision and reading position.
 
 - Newer editor requests survive an ongoing workspace-mode switch. Manual navigation
   cancels routed requests before they resume, and Review waits for comparison status

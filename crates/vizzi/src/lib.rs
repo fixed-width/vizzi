@@ -45,6 +45,8 @@ pub mod idle_probe;
 pub mod definitions;
 /// Captured dependency source, independent of repository snapshots.
 pub mod dependency_sources;
+/// Bounded per-function Git history independent of live and review publication.
+pub mod function_history;
 /// Configured language servers selected by captured source language.
 pub mod language_servers;
 mod lsp;

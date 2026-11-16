@@ -36,7 +36,13 @@ pub(super) fn router(
     app: Arc<Companion>,
     search: Arc<crate::question_search::QuestionSearch>,
     structure: Arc<crate::structural::StructureHost>,
+    history: Arc<crate::function_history::FunctionHistory>,
 ) -> Router {
+    let history_start = history.clone();
+    let history_step = history.clone();
+    let comparison_start = history.clone();
+    let comparison_windows = history.clone();
+    let captured_calls = history.clone();
     let refresh = structure.clone();
     let definitions = structure.clone();
     let references = structure.clone();
@@ -46,6 +52,12 @@ pub(super) fn router(
     let dependency_editor = app.clone();
     let editor_calls = structure.clone();
     Router::new()
+        .route("/api/captured-functions",post(move |Json(request):Json<crate::function_history::CapturedRequest>|{let history=captured_calls.clone();async move{work(move||history.captured_query(&request)).await}}))
+        .route("/api/function-comparisons",post(move |Json(request):Json<crate::function_history::CompareRequest>|{let history=comparison_start.clone();async move{work(move||history.compare(&request)).await}}))
+        .route("/api/function-comparisons/window",get(move |Query(binding):Query<crate::function_history::ComparisonWindow>,Query(query):Query<vizzi_core::projection::WindowQuery>|{let history=comparison_windows.clone();async move{work(move||history.comparison_window(&binding,&query)).await}}))
+        .route("/api/function-history",post(move |Json(request):Json<crate::function_history::Request>|{let history=history_start.clone();async move{work(move||history.start(&request)).await}}))
+        .route("/api/function-history/step",post(move |Json(request):Json<crate::function_history::Step>|{let history=history_step.clone();async move{work(move||history.step(&request)).await}}))
+        .route("/api/function-history/window",get(move |Query(binding):Query<HistoryWindow>,Query(query):Query<vizzi_core::projection::WindowQuery>|{let history=history.clone();async move{work(move||history.window(&binding.token,&binding.snapshot,&binding.file,&binding.version,&query)).await}}))
         .route("/api/editor/call",post(move|Json(request):Json<crate::structural::editor::Request>|{let structure=editor_calls.clone();async move{work(move||structure.editor_call(&request)).await}}).layer(DefaultBodyLimit::max(16*1024*1024)))
         .route("/api/dependency/window",get(move |Query(binding):Query<DependencyWindow>,Query(query):Query<vizzi_core::projection::WindowQuery>|{let app=dependency_windows.clone();async move{dependency_read(move||app.dependency_window(&binding.snapshot,&binding.file,&binding.version,&query)).await}}))
         .route("/api/dependency/editor",post(move |Json(request):Json<OpenSource>|{let structure=dependency_locations.clone();let app=dependency_editor.clone();async move{editor_handoff(move||app.open_verified_location(&structure.dependency_location(&request)?)).await}}))
@@ -90,6 +102,13 @@ pub(super) fn router(
 }
 #[derive(Deserialize)]
 struct DependencyWindow {
+    snapshot: String,
+    file: String,
+    version: String,
+}
+#[derive(Deserialize)]
+struct HistoryWindow {
+    token: String,
     snapshot: String,
     file: String,
     version: String,

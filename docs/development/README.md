@@ -13,6 +13,12 @@ For people extending Vizzi or investigating its implementation. The
   [dependency source](../visual/DEPENDENCIES_TECH.md), [modules](../visual/MODULES_TECH.md),
   [task working sets](../visual/WORKING_SETS_TECH.md) and [shared header](../visual/HEADER_PRODUCT.md)
 - [Ruby analysis and navigation](../prototype/RUBY.md)
+- [Function-history behaviour](../visual/HISTORY_PRODUCT.md) and
+  [implementation and validation](../visual/HISTORY_TECH.md)
+- [Function comparison behaviour](../visual/FUNCTION_COMPARISON_PRODUCT.md) and
+  [architecture and validation](../visual/FUNCTION_COMPARISON_TECH.md)
+- [Captured-call behaviour](../visual/CAPTURED_CALLS_PRODUCT.md) and
+  [architecture and validation](../visual/CAPTURED_CALLS_TECH.md)
 - [Language-server integration](../visual/LANGUAGE_SERVERS_TECH.md) and
   [detailed Rust call-resolution rules](call-resolution.md)
 - [Launch configuration and editor sharing behaviour](../configuration/PRODUCT.md),
