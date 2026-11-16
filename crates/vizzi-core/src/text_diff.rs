@@ -51,6 +51,9 @@ pub enum DiffLimit {
 /// Textual diff failure, distinct from a verified unchanged file.
 #[derive(Clone, Debug, PartialEq, Eq, thiserror::Error)]
 pub enum DiffError {
+    /// A selected range is outside its document or splits a UTF-8 character.
+    #[error("{0:?} source range is invalid")]
+    InvalidRange(Side),
     /// Neither observation contains the requested path.
     #[error("path is absent on both comparison sides")]
     UnknownPath,
@@ -106,6 +109,104 @@ pub struct TextEdit {
     pub base: DiffRange,
     /// Inserted/replacement working bytes and lines.
     pub working: DiffRange,
+}
+
+/// One immutable, UTF-8-aligned source range to compare.
+pub struct DiffInput<'a> {
+    /// Document owning the exact original source bytes.
+    pub document: &'a Document,
+    /// Exclusive document-relative byte range, including an optional empty anchor.
+    pub span: Range<usize>,
+}
+
+/// Compares complete source ranges and returns absolute original-file coordinates.
+/// For this projection, max_hunks bounds the number of changed runs. Exhaustion and
+/// cancellation return errors, never partial or apparently unchanged results.
+pub fn compare_ranges(
+    base: DiffInput<'_>,
+    working: DiffInput<'_>,
+    limits: DiffLimits,
+    cancelled: &dyn Fn() -> bool,
+) -> Result<Vec<TextEdit>, DiffError> {
+    let mut budget = Budget {
+        remaining: limits.max_work,
+        cancelled,
+    };
+    budget.check()?;
+    for (input, side) in [(&base, Side::Base), (&working, Side::Working)] {
+        if input.span.start > input.span.end || input.span.end > input.document.bytes() {
+            return Err(DiffError::InvalidRange(side));
+        }
+    }
+    if base
+        .span
+        .len()
+        .checked_add(working.span.len())
+        .is_none_or(|n| n > limits.max_bytes)
+    {
+        return Err(DiffError::Limit(DiffLimit::Bytes));
+    }
+    let load = |input: &DiffInput<'_>, side| -> Result<Vec<u8>, DiffError> {
+        budget.check()?;
+        if input.document.encoding() != SourceEncoding::Utf8 {
+            return Err(DiffError::UnsupportedEncoding(side));
+        }
+        let mut reader = input.document.captured().reader();
+        for at in [input.span.start, input.span.end] {
+            if at < input.document.bytes()
+                && reader
+                    .read(at..at + 1, 1)
+                    .map_err(|source| DiffError::Read { side, source })?[0]
+                    & 0xc0
+                    == 0x80
+            {
+                return Err(DiffError::InvalidRange(side));
+            }
+        }
+        let bytes = reader
+            .read(input.span.clone(), limits.max_bytes)
+            .map_err(|source| DiffError::Read { side, source })?
+            .into_owned();
+        if bytes.contains(&0) {
+            return Err(DiffError::Binary(side));
+        }
+        Ok(bytes)
+    };
+    let before = load(&base, Side::Base)?;
+    let after = load(&working, Side::Working)?;
+    let mut remaining = limits.max_lines;
+    let before = Lines::index(
+        std::str::from_utf8(&before).map_err(|_| DiffError::InvalidRange(Side::Base))?,
+        &mut remaining,
+        &budget,
+    )?;
+    let after = Lines::index(
+        std::str::from_utf8(&after).map_err(|_| DiffError::InvalidRange(Side::Working))?,
+        &mut remaining,
+        &budget,
+    )?;
+    let mut result = edits(&before, &after, &mut budget)?;
+    if result.len() > limits.max_hunks {
+        return Err(DiffError::Limit(DiffLimit::Hunks));
+    }
+    let base_line = base.document.lines(&base.span).start.saturating_sub(1);
+    let working_line = working
+        .document
+        .lines(&working.span)
+        .start
+        .saturating_sub(1);
+    for edit in &mut result {
+        budget.spend(1)?;
+        edit.base.lines = edit.base.lines.start + base_line..edit.base.lines.end + base_line;
+        edit.base.bytes =
+            edit.base.bytes.start + base.span.start..edit.base.bytes.end + base.span.start;
+        edit.working.lines =
+            edit.working.lines.start + working_line..edit.working.lines.end + working_line;
+        edit.working.bytes = edit.working.bytes.start + working.span.start
+            ..edit.working.bytes.end + working.span.start;
+    }
+    budget.check()?;
+    Ok(result)
 }
 
 /// A group of edits with up to three unchanged context lines on each side.

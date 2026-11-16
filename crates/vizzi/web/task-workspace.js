@@ -86,6 +86,17 @@ export class TaskWorkspace extends Workspace {
   return id;
  }
 
+ openComparison(id,pair) {
+  const opened=super.openComparison(id,pair),group=this.groupFor(id);
+  if(group)group.members.push(opened.older);
+  return opened;
+ }
+ followCaptured(id,site,frame) {
+  const before=new Set(this.views.map(view=>view.id)),opened=super.followCaptured(id,site,frame),group=this.groupFor(id);
+  if(group&&!before.has(opened))group.members.push(opened);
+  return opened;
+ }
+
  openReference(id, row, target) {
   this.fresh();
   require(row?.symbol, 'This reference has no admitted declaration');

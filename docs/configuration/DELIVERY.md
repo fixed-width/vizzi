@@ -13,6 +13,10 @@ It is separate from semantic sharing, originating-editor return and native lifet
 - A newer editor action replaces a waiting action. Manual file, declaration, call, task,
   history or mode navigation cancels pending editor delivery. Reading, scrolling, panning
   and resizing do not. Cancelled/superseded results and successful delivery are silent.
+- Starting editor delivery also supersedes pending per-bubble history/comparison source
+  preparation. The call-workspace adapter invalidates its result tickets and clears owned
+  loading state as well as aborting transport, so a late response cannot override the
+  delivered call trail or focus.
 - Prepare captured data and readable source without changing the working set or history.
   Once prepared, recheck original editor buffer, saved bytes and current intent, then
   commit synchronously in the browser after final identity, snapshot and expiry checks.

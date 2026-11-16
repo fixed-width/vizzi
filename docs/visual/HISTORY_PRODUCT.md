@@ -22,9 +22,10 @@ mock was supplied.
    and other bubbles. A reading section retains its relative position where possible;
    changed text resets scrolling within that section. Source and revision labels change
    together, only after successful preparation.
-4. Historical bubbles are read-only. Current-source calls, callers, references, Save and
-   Editor actions remain unavailable. Existing arrows become historical; returning live
-   revalidates them using the normal live refresh.
+4. Historical bubbles are read-only. Calls follow declarations in the exact captured file
+   through [captured call exploration](CAPTURED_CALLS_PRODUCT.md). Callers, references, Save
+   and Editor remain current-source actions. Existing arrows become historical; captured
+   links retain their own revision/evidence rather than adopting working-tree facts.
 5. Matching requires an unambiguous declaration in the same file and lexical scope.
    Missing, renamed, moved or ambiguous declarations stop traversal explicitly; the last
    readable source remains. No name similarity guesses are made.

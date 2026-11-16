@@ -21,9 +21,10 @@ or retry Return to live. If the original declaration reappears while live tracki
 active, its bubble updates automatically. This retained state also survives reload while
 the history session remains available.
 
-Historical bubbles support reading and copying. Calls, callers, references, Save and Editor
-actions require current source and are disabled there. Existing connections remain visible
-with historical styling. Return to live revalidates them through the normal refresh.
+Historical bubbles support reading, copying and [calls within the captured file](follow-captured-calls.md).
+Callers, references, Save and Editor require current source. Existing connections remain
+visible with historical styling; newly followed captured calls retain their own revision
+and evidence. Returning live does not silently turn captured links into current facts.
 
 History follows the first parent of merges on the frozen local HEAD ancestry. It considers
 up to 64 file revisions and does not switch branches, check out files, fetch objects or

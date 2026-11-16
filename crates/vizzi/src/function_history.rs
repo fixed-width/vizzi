@@ -20,6 +20,10 @@ use vizzi_core::{
 const FILE_BYTES: usize = 2 * 1024 * 1024;
 const TOTAL_BYTES: usize = 32 * 1024 * 1024;
 const SESSIONS: usize = 24;
+mod captured_calls;
+mod comparison;
+pub use captured_calls::{CapturedOwner, CapturedQuery, CapturedRequest, FrozenSource};
+pub use comparison::{CompareRequest, ComparisonWindow, HistoryBinding};
 
 /// Exact current-source binding from which history starts.
 #[derive(Deserialize, Serialize)]
@@ -43,9 +47,11 @@ pub struct Step {
     /// Zero-based version, ordered from newer to older.
     pub index: usize,
 }
+#[derive(Clone)]
 struct Capture {
     snapshot: Arc<Snapshot>,
     symbol: Symbol,
+    span: std::ops::Range<usize>,
 }
 struct Version {
     candidate: usize,
@@ -87,6 +93,7 @@ fn opaque(s: &str) -> bool {
 pub struct FunctionHistory {
     host: Arc<Host>,
     sessions: Mutex<VecDeque<Session>>,
+    comparisons: Mutex<VecDeque<comparison::Pair>>,
 }
 impl FunctionHistory {
     /// Shares the host's source identity, analysis policy and worker budget.
@@ -94,6 +101,7 @@ impl FunctionHistory {
         Self {
             host,
             sessions: Mutex::new(VecDeque::new()),
+            comparisons: Mutex::new(VecDeque::new()),
         }
     }
     fn lock(&self) -> Result<MutexGuard<'_, VecDeque<Session>>, CompanionError> {
@@ -335,7 +343,15 @@ impl FunctionHistory {
             .resolve(Some(doc.entity_id(analysis, fact).as_str()), "")
             .cloned()
             .ok_or_else(|| unavailable("Historical function has no readable source binding"))?;
-        Ok((Capture { snapshot, symbol }, digest))
+        let span = fact.span.clone();
+        Ok((
+            Capture {
+                snapshot,
+                symbol,
+                span,
+            },
+            digest,
+        ))
     }
     fn advance(&self, session: &mut Session) -> Result<(), CompanionError> {
         if session.stopped {
