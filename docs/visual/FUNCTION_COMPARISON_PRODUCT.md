@@ -25,7 +25,7 @@ Use the existing bubble design and theme; no separate mock is needed.
    section. Ignore unrelated declarations and line movement elsewhere in the file. Open
    at the first edit, with a little preceding context. **Previous edit** and **Next edit**
    reveal corresponding locations in the pair; insertion/deletion anchors remain valid
-   when one side has no changed lines. Long functions retain normal section paging.
+   when one side has no changed lines. Each side scrolls through its own captured function.
 6. Each bubble can close independently. Remaining highlights still refer to the labelled
    frozen pair. **Return to live** resumes that bubble's declaration tracking, retaining
    its actual comparison capture if the current declaration is missing. Normal history

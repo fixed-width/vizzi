@@ -82,7 +82,13 @@ Use the existing theme tokens and styled-text renderer. Keep existing view DOM n
 when another opens so scroll/selection state survives. Place only the new view into free
 space beside its parent; avoid reflowing older nodes. A camera changes presentation transforms,
 not view geometry. Load up to 96 captured lines per section and at most 24 source views;
-page long declarations and call lists explicitly. Handle per-view fetch cancellation and
+  page call lists explicitly. Keep at most four contiguous source sections in each function
+  pane. Load adjacent sections near the scroll edge using the same pinned routes and native
+  bounds. Add and remove rows around the visible source anchor. Keep existing nodes while
+  a selection is active, and defer eviction until it clears. Persist the containing section
+  and line/byte anchor in the existing reading state. A new capture or section jump resets
+  the loaded range. A same-version live refresh retargets current call metadata for the
+  loaded sections before publishing the refresh. Handle per-view fetch cancellation and
 late replies without replacing/duplicating another view's source. The
 [live refresh transaction](LIVE_TECH.md) advances working-tree bindings coherently while
 preserving pinned/uncertain earlier views. Expired backing remains explicit.

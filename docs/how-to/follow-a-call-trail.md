@@ -31,8 +31,8 @@ Hover a destination bubble to highlight its source call lines; hovering the line
 highlights opened destinations and arrows.
 
 **Calls** lists written calls when their names cannot be decorated in the current source
-section. Long functions have Previous/Next section controls. Scroll inside a bubble
-and use [layout controls](manage-tasks.md) to make room.
+section. Scroll inside a bubble to continue reading a long function. Use **Previous section**
+or **Next section** to jump, or use [layout controls](manage-tasks.md) to make room.
 
 ## Find callers or other references
 

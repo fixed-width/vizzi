@@ -26,6 +26,7 @@ let definitionProvider=false;const definitionCapabilities=transport('/api/struct
 let model,currentSnapshot,taskControls,board,editorName='editor',busy=false,saveTimer,paletteTicket=0,jobs=Promise.resolve(),demoOpened=false,livePendingTimer;
 const mounted=new Map();
 const returnPending=r=>r.liveReturn==='pending';
+const SECTION_ROWS=96,SECTION_LIMIT=4,SECTION_EDGE=240;
 const highlights=installLinkHighlights(el('workspace-canvas'),()=>({views:model?.views??[],links:model?.links??[]}));
 const outlines=installModuleOutlines(el('module-outlines'),()=>model?model.visibleItems():[],{failed:()=>notice.show('Module outlines are unavailable for this layout.')});
 let showModuleOutlines=false;try{showModuleOutlines=localStorage.getItem('vizzi.visual.module-outlines')==='true';}catch{}
@@ -44,6 +45,21 @@ function refreshCapture(){
  const views=model.views.filter(v=>v.mode==='live');const key=JSON.stringify([views.map(v=>[v.id,v.symbol.id,v.mode,mounted.get(v.id)?.sourceTicket,v.reading]),model.links.map(l=>[l.id,l.state])]);
  return {key,body:{views:views.map(v=>{const r=mounted.get(v.id),context=r?.sourcePane.readingContext(),reading=v.reading,a=reading.anchor;return {id:v.id,tracking:v.symbol.tracking??null,symbol:v.symbol.id,file:v.symbol.source.file,context:v.symbol.source.context,capture:v.symbol.origin?.capture??null,version:r?.lines?.length?v.symbol.source.version:'0'.repeat(64),area:v.area,section_offset:reading.section-v.symbol.source.line,anchor:a?{offset:a.line-v.symbol.source.line,byte:a.byte,text:context?.reading.anchor?.line===a.line?context.text:''}:null};}),links:model.links.map(l=>({id:l.id,from:l.from,to:l.to,spelling:l.spelling,kind:l.kind}))}};
 }
+async function requestLiveRefresh(body,signal){
+ const data=await post('/api/visual/refresh',body,signal);
+ if(!Array.isArray(data.views)||data.views.length>24)throw new Error('Invalid live source updates');
+ const neighbouringActions=new Map();
+ for(const update of data.views??[]){
+  if(update.state!=='current'||update.window)continue;
+  const sections=mounted.get(update.id)?.sections??[];
+  const actions=new Map([[update.position.section,update.actions]]);
+  for(const section of sections){
+   if(!actions.has(section.start))actions.set(section.start,await requestActions(update.symbol,section.start,section.lines.length,data.snapshot,signal));
+  }
+  neighbouringActions.set(update.id,actions);
+ }
+ return {...data,neighbouringActions};
+}
 function applyLive(data){
  if(data.snapshot!==currentSnapshot||!Array.isArray(data.views)||data.views.length>24||!Array.isArray(data.links)||data.links.length>96)throw new Error('Live observation differs');
  let focusAfterReturn;
@@ -58,14 +74,19 @@ function applyLive(data){
  for(const update of data.views){const r=mounted.get(update.id),v=model.view(update.id);
   r.navigation=(r.navigation??0)+1;r.resolving=false;r.warming=false;r.awaitingLive=false;r.liveReturn=null;r.sourceTicket=(r.sourceTicket??0)+1;
   if(update.state!=='current'){r.popup.hidden=true;updateFragmentStatus(r);continue;}
-  const preserve=!update.window&&retargetCalls(r.code,r.actions,update.actions);r.actions=update.actions;
-  if(update.window){r.lines=update.window.lines.filter(l=>l.number<=v.symbol.source.end_line);r.margin=functionIndent(update.origin);}
-  if(!preserve)r.sourcePane.set(r.lines,{...v.reading},r.margin??0);
-  const p=update.position,last=r.lines.at(-1)?.number??p.section;
-  r.sectionLabel.textContent=`Lines ${p.section}–${last} · ${v.symbol.source.end_line-v.symbol.source.line+1}-line function`;r.prev.hidden=p.section<=v.symbol.source.line;r.next.hidden=last>=v.symbol.source.end_line;
+  r.adjacent?.abort();r.adjacent=null;
+  const p=update.position;
+  if(update.window){
+   resetSource(r,v,update.window.lines,update.actions,v.reading,functionIndent(update.origin));
+  }else{
+   const before=r.actions,fresh=data.neighbouringActions.get(update.id);
+   setSections(r,r.sections.map(section=>({...section,actions:fresh.get(section.start)??[]})));
+   if(!retargetCalls(r.code,before,r.actions))r.sourcePane.rerender();
+  }
   const callsChanged=JSON.stringify(r.sites)!==JSON.stringify(update.calls.items);r.sites=update.calls.items;r.nextCalls=update.calls.next;r.matching=update.calls.matching;r.callsReady=true;if(publicationChanged||update.window)r.popup.hidden=true;if(callsChanged)renderCalls(v.id);
   r.element.dataset.name=v.symbol.name;r.element.setAttribute('aria-label',`${v.symbol.name} bubble`);r.element.querySelector('.fragment-heading strong').textContent=[...v.symbol.parents,v.symbol.name].join('::');r.element.querySelector('.fragment-heading small').textContent=`${v.symbol.origin?originLabel(v.symbol.origin)+' · ':''}${v.symbol.source.path}:${v.symbol.source.line}`;
-  sourceStatus(r,p.reset?'Live · reading reset':'Live');model.read(v.id,{section:v.reading.section,...r.sourcePane.reading()});void prepareDefinitions(v.id);
+  sourceStatus(r,p.reset?'Live · reading reset':'Live');recordReading(r);void prepareDefinitions(v.id);
+  if(r.restoreAnchor)void extendSource(r,false);
  }
  geometry();
  if(focusAfterReturn){
@@ -85,7 +106,7 @@ function liveRefreshFailed(error){
  if(changed)geometry();
  if(error.status!==409)notice.show('Live refresh is waiting. Earlier source is retained.');
 }
-const live=new LiveUpdates({capture:refreshCapture,request:(body,signal)=>post('/api/visual/refresh',body,signal),apply:applyLive,blocked:()=>busy||[...mounted.values()].some(r=>r.loading||r.sourcePane.selected()),pending:snapshot=>{if(model){clearTimeout(livePendingTimer);model.markSnapshot(snapshot);geometry();if(model.stale)livePendingTimer=setTimeout(()=>{for(const r of mounted.values()){r.awaitingLive=model.stale;updateFragmentStatus(r);}},150);}},failed:liveRefreshFailed});
+const live=new LiveUpdates({capture:refreshCapture,request:requestLiveRefresh,apply:applyLive,blocked:()=>busy||[...mounted.values()].some(r=>r.loading||r.sourcePane.selected()),pending:snapshot=>{if(model){clearTimeout(livePendingTimer);model.markSnapshot(snapshot);geometry();if(model.stale)livePendingTimer=setTimeout(()=>{for(const r of mounted.values()){r.awaitingLive=model.stale;updateFragmentStatus(r);}},150);}},failed:liveRefreshFailed});
 function refreshLive(){if(model&&currentSnapshot)live.changed(currentSnapshot,true);}
 const prepareEditorCall=createCallPreparation({read:()=>model,
  bind:(action,signal)=>post('/api/editor/call',{snapshot:action.snapshot,query:{kind:'invocation',call:action.call}},signal),
@@ -195,9 +216,10 @@ function comparisonControls(r,v){
  const c=v.comparison;r.compareButton.hidden=Boolean(v.symbol.origin)||Boolean(c&&!v.history);r.compareButton.textContent=c?'History':'Compare';r.compareButton.setAttribute('aria-label',c?'Continue function history':'Compare with previous version');r.compareButton.disabled=r.loading||returnPending(r)||model.views.length>=24&&!c||!v.history&&!model.usable(v.id);
  r.editPrevious.hidden=r.editNext.hidden=!c;r.editPrevious.disabled=r.loading||!c||c.returning||c.cursor===0;r.editNext.disabled=r.loading||!c||c.returning||c.cursor>=c.changes.length-1;
  r.historyPrevious.hidden=Boolean(c||v.captured);if(v.captured){r.historyNext.hidden=true;r.compareButton.hidden=true;r.historyLabel.textContent=shortRevision(v.captured.label);r.historyLabel.title=`Captured file · ${v.captured.label}`;}if(c){r.historyNext.hidden=true;r.historyLabel.textContent=`${comparisonTitle(c)} · ${c.changes.length?c.cursor+1:0}/${c.changes.length}`;r.historyLabel.title=`${c.label}; compared with ${c.other_label}`;r.element.dataset.comparisonSide=c.side;r.element.dataset.comparisonToken=c.token;}else{delete r.element.dataset.comparisonSide;delete r.element.dataset.comparisonToken;}
- const key=c?`${c.token}:${c.side}`:'';if(r.comparisonKey===key&&r.comparisonFirst===r.code.firstElementChild)return;
+ const key=c?`${c.token}:${c.side}`:'';
+ if(r.comparisonKey===key&&r.comparisonFirst===r.code.firstElementChild&&r.comparisonLast===r.code.lastElementChild)return;
  for(const row of r.code.querySelectorAll('.code-line')){const number=Number(row.dataset.line),changed=Boolean(c&&c.changes.some(([start,end])=>number>=start&&number<end));row.classList.toggle('comparison-removed',changed&&c.side==='older');row.classList.toggle('comparison-added',changed&&c.side==='newer');if(changed)row.title=`${c.side==='older'?'Removed or replaced':'Added or replaced'} line ${number} · ${shortRevision(c.label)}`;else row.removeAttribute('title');}
- r.comparisonKey=key;r.comparisonFirst=r.code.firstElementChild;
+ r.comparisonKey=key;r.comparisonFirst=r.code.firstElementChild;r.comparisonLast=r.code.lastElementChild;
 }
 function preparedComparison(v,frame){
  const s=v.symbol.source,data=frame.window,start=v.reading.section,origin=frame.origin;
@@ -280,62 +302,177 @@ function bindDrag(handle,id,resizing=false){handle.addEventListener('pointerdown
  const move=e=>{const dx=(e.clientX-start.x)/start.scale,dy=(e.clientY-start.y)/start.scale;try{if(resizing)model.resize(id,Math.max(320,Math.min(BUBBLE_SIZE.maxWidth,start.w+dx)),Math.max(200,Math.min(BUBBLE_SIZE.maxHeight,start.h+dy)));else model.move(id,start.vx+dx,start.vy+dy);geometry();}catch(e){fail(e);}};
  const end=()=>{handle.removeEventListener('pointermove',move);handle.removeEventListener('pointerup',end);handle.removeEventListener('pointercancel',end);save();};handle.addEventListener('pointermove',move);handle.addEventListener('pointerup',end);handle.addEventListener('pointercancel',end);});}
 function bindLayoutKeys(handle,id,resizing=false){handle.tabIndex=0;handle.addEventListener('keydown',e=>{if(e.target!==handle)return;const delta={ArrowLeft:[-16,0],ArrowRight:[16,0],ArrowUp:[0,-16],ArrowDown:[0,16]}[e.key];if(!delta)return;e.preventDefault();try{const v=model.view(id);if(resizing)model.resize(id,Math.max(320,Math.min(BUBBLE_SIZE.maxWidth,v.w+delta[0])),Math.max(200,Math.min(BUBBLE_SIZE.maxHeight,v.h+delta[1])));else model.move(id,v.x+delta[0],v.y+delta[1]);model.selected=id;geometry();save();}catch(e){fail(e);}});}
-function fitCode(id,axis){const r=mounted.get(id),v=model.view(id),content=r.sourcePane.contentSize();if(!content)return;const extent=Math.ceil(axis==='width'?v.w-r.code.clientWidth+content.width:v.h-r.code.clientHeight+content.height);model.fitSize(id,axis,extent);geometry();save();if(extent>(axis==='width'?BUBBLE_SIZE.maxWidth:BUBBLE_SIZE.maxHeight))notice.show('Some code still needs scrolling at this size.');}
+function fitCode(id,axis){const r=mounted.get(id),v=model.view(id),section=r.sections.find(part=>part.start===v.reading.section),content=r.sourcePane.contentSize(section?.start,section?.lines.length);if(!content)return;const extent=Math.ceil(axis==='width'?v.w-r.code.clientWidth+content.width:v.h-r.code.clientHeight+content.height);model.fitSize(id,axis,extent);geometry();save();if(extent>(axis==='width'?BUBBLE_SIZE.maxWidth:BUBBLE_SIZE.maxHeight))notice.show('Some code still needs scrolling at this size.');}
 function mount(id,prepared){
  if(mounted.has(id)){if(prepared&&!mounted.get(id).code.querySelector('.code-line'))applyPreparedSource(id,prepared);return;}const v=model.view(id),element=node('section');element.className='fragment';element.dataset.view=id;element.dataset.name=v.symbol.name;element.setAttribute('aria-label',`${v.symbol.name} bubble`);
  const header=node('div');header.className='fragment-header';header.setAttribute('aria-label','Move bubble with arrow keys');bindLayoutKeys(header,id);const heading=node('div');heading.className='fragment-heading';const context=node('div');context.className='fragment-context';const moduleTag=node('span');moduleTag.className='module-tag';moduleTag.tabIndex=0;moduleTag.hidden=true;context.append(moduleTag,node('small',`${v.symbol.origin?originLabel(v.symbol.origin)+' · ':''}${v.symbol.source.path}:${v.symbol.source.line}`));heading.append(node('strong',[...v.symbol.parents,v.symbol.name].join('::')),context);
  const collapse=button('▴','Collapse bubble',()=>{callMenu.hide();model.collapse(id);geometry();save();}),close=button('×','Close bubble',()=>{editorCalls.manual();callMenu.hide();const r=mounted.get(id);r.controller.abort();r.historyController?.abort();r.sourcePane.dispose();element.remove();mounted.delete(id);model.close(id);hideDestinations();geometry();save();});const pin=button('Pin version','Pin version',()=>{if(model.view(id).history||model.view(id).comparison||model.view(id).captured){returnHistoryLive(id);return;}model.pin(id,model.view(id).mode!=='pinned');geometry();save();refreshLive();});const fitHeight=button('↕','Fit height',()=>fitCode(id,'height')),fitWidth=button('↔','Fit width',()=>fitCode(id,'width'));for(const b of [fitHeight,fitWidth]){b.className='bubble-fit';b.title=b.getAttribute('aria-label')+' to this code section';}heading.title=[...v.symbol.parents,v.symbol.name].join('::');const referenceActions=button('⋯',`Actions for ${v.symbol.name} bubble`,()=>callMenu.show(referenceActions,v.symbol.name,[{label:'Find callers',run:()=>openReferences(id,'callers')},{label:'Find references',run:()=>openReferences(id,'references')},{label:'Task group',run:()=>taskControls.showGroups(model.groupFor(id)?.id??'')}],false));header.append(heading,referenceActions,fitHeight,fitWidth,collapse,close);element.append(header);bindDrag(header,id);
- const body=node('div');body.className='fragment-body';const historyRow=node('div');historyRow.className='fragment-history';const historyPrevious=button('Previous change','Previous function change',()=>void changeHistory(id,1)),historyNext=button('Next change','Next function change',()=>{if(newestHistory(model.view(id)))returnHistoryLive(id);else void changeHistory(id,-1);}),historyLabel=node('span');historyLabel.setAttribute('aria-live','polite');const compareButton=button('Compare','Compare with previous version',()=>model.view(id).comparison?void changeHistory(id,1):void compareFunction(id)),editPrevious=button('◂ edit','Previous comparison edit',()=>void comparisonEdit(id,-1)),editNext=button('edit ▸','Next comparison edit',()=>void comparisonEdit(id,1));historyRow.append(historyPrevious,editPrevious,historyLabel,historyNext,editNext,compareButton);const section=node('div');section.className='source-section';const sectionLabel=node('span','Loading captured source…');const prev=button('Previous section',null,()=>{const v=model.view(id);void loadSource(id,Math.max(v.symbol.source.line,v.reading.section-96));}),next=button('Next section',null,()=>{const v=model.view(id);void loadSource(id,Math.min(v.symbol.source.end_line,v.reading.section+96));});prev.hidden=true;next.hidden=true;section.append(sectionLabel,prev,next);
+ const body=node('div');body.className='fragment-body';const historyRow=node('div');historyRow.className='fragment-history';const historyPrevious=button('Previous change','Previous function change',()=>void changeHistory(id,1)),historyNext=button('Next change','Next function change',()=>{if(newestHistory(model.view(id)))returnHistoryLive(id);else void changeHistory(id,-1);}),historyLabel=node('span');historyLabel.setAttribute('aria-live','polite');const compareButton=button('Compare','Compare with previous version',()=>model.view(id).comparison?void changeHistory(id,1):void compareFunction(id)),editPrevious=button('◂ edit','Previous comparison edit',()=>void comparisonEdit(id,-1)),editNext=button('edit ▸','Next comparison edit',()=>void comparisonEdit(id,1));historyRow.append(historyPrevious,editPrevious,historyLabel,historyNext,editNext,compareButton);const section=node('div');section.className='source-section';const sectionLabel=node('span','Loading captured source…');const prev=button('Previous section',null,()=>jumpSource(id,true)),next=button('Next section',null,()=>jumpSource(id,false));prev.hidden=true;next.hidden=true;section.append(sectionLabel,prev,next);
  const code=node('div');code.className='code-pane';code.tabIndex=0;code.setAttribute('aria-label',`${v.symbol.name} captured code`);code.append(node('p','Loading source…'));const footer=node('div');footer.className='fragment-footer';const callsButton=button('Calls','Calls',()=>toggleCalls(id)),state=node('span','Captured source');state.setAttribute('role','status');const keep=button('Save','Save location',()=>void keepLocation(id)),editor=button('Editor',`Open in ${editorName}`,()=>void openEditor(id));editor.disabled=true;footer.append(callsButton,state,pin,keep,editor);
  const popup=node('div');popup.className='calls-popover';popup.hidden=true;body.append(historyRow,section,code,popup,footer);const resize=button('','Resize bubble',()=>{});resize.title='Drag or use arrow keys to resize';resize.className='resize-handle';body.append(resize);bindDrag(resize,id,true);bindLayoutKeys(resize,id,true);element.append(body);el('fragment-layer').append(element);
  const kept=board?.evidence.find(e=>e.source.file===v.symbol.source.file&&e.source.version===v.symbol.source.version&&e.source.line===v.symbol.source.line)?.id??null;
- const record={id,compareButton,editPrevious,editNext,historyRow,historyPrevious,historyNext,historyLabel,referenceActions,moduleTag,pin,fitHeight,fitWidth,loading:true,liveReturn:(v.captured??v.comparison??v.history)?.returning?'waiting':null,element,body,code,collapse,sectionLabel,prev,next,callsButton,popup,state,keep,editor,sites:[],nextCalls:0,matching:0,callsReady:false,controller:new AbortController(),kept};record.actions=[];record.sourcePane=new SourcePane(code,(text,line,plan,margin)=>{renderCallText(text,line,record.actions,(action,button,direct,keyboard)=>inlineAction(id,action,button,direct,keyboard),plan,margin);inlineAvailability(text,id);});record.sourcePane.setReflow(smartReflow);mounted.set(id,record);
- element.addEventListener('pointerdown',()=>{model.selected=id;geometry();});code.addEventListener('scroll',()=>{callMenu.hide();if(mounted.get(id)!==record)return;const v=model.view(id);model.read(id,{section:v.reading.section,...record.sourcePane.reading()});save();});
+ const record={id,compareButton,editPrevious,editNext,historyRow,historyPrevious,historyNext,historyLabel,referenceActions,moduleTag,pin,fitHeight,fitWidth,loading:true,liveReturn:(v.captured??v.comparison??v.history)?.returning?'waiting':null,element,body,code,collapse,sectionLabel,prev,next,callsButton,popup,state,keep,editor,sites:[],nextCalls:0,matching:0,callsReady:false,controller:new AbortController(),kept};setSections(record,[]);record.sourcePane=new SourcePane(code,(text,line,plan,margin)=>{renderCallText(text,line,record.actionsByLine.get(line.number)??[],(action,button,direct,keyboard)=>inlineAction(id,action,button,direct,keyboard),plan,margin);inlineAvailability(text,id);});record.sourcePane.setReflow(smartReflow);mounted.set(id,record);
+ element.addEventListener('pointerdown',()=>{model.selected=id;geometry();});code.addEventListener('scroll',()=>{
+  callMenu.hide();if(mounted.get(id)!==record)return;
+  const before=code.scrollTop<record.scrollTop,moved=code.scrollTop!==record.scrollTop;
+  if(moved)record.restoreAnchor=null;
+  record.scrollTop=code.scrollTop;recordReading(record);save();
+  if(moved)void extendSource(record,before);
+ });
+ code.addEventListener('wheel',event=>{if(event.deltaY)void extendSource(record,event.deltaY<0);},{passive:true});
+ let touchStart;
+ code.addEventListener('touchstart',event=>{touchStart=event.touches.length===1?event.touches[0]:null;},{passive:true});
+ code.addEventListener('touchmove',event=>{
+  if(!touchStart||event.touches.length!==1)return;
+  const point=event.touches[0],dy=point.clientY-touchStart.clientY;
+  if(Math.abs(dy)<12||Math.abs(dy)<=Math.abs(point.clientX-touchStart.clientX))return;
+  touchStart=null;
+  void extendSource(record,dy>0);
+ },{passive:true});
+ code.addEventListener('keydown',event=>{
+  if(event.target!==code)return;
+  if(['ArrowUp','PageUp'].includes(event.key))void extendSource(record,true);
+  if(['ArrowDown','PageDown'].includes(event.key))void extendSource(record,false);
+ });
  jobs=jobs.then(async()=>{if(mounted.get(id)!==record)return;if(!record.code.querySelector('.code-line'))await loadSource(id,v.reading.section);if(model.navigable(id))await loadCalls(id,0);}).catch(fail);geometry();if(prepared)applyPreparedSource(id,prepared);
 }
 async function prepareFragmentSource(symbol,reading,signal,snapshot) {
  const s=symbol.source,start=reading.section,expected=captureFor(symbol,snapshot),endpoint=symbol.origin?'/api/dependency/window':'/api/window';
  const count=Math.min(96,s.end_line-start+1),query=new URLSearchParams({snapshot:expected,file:s.file,version:s.version,line_start:String(start),line_count:String(count),outline_count:'1',reflow:'true'});
  const header=start===s.line?Promise.resolve(null):transport(endpoint+'?'+new URLSearchParams({snapshot:expected,file:s.file,version:s.version,line_start:String(s.line),line_count:'1',outline_count:'1'}),{signal});
- const [data,origin,actions]=await Promise.all([transport(endpoint+'?'+query,{signal}),header,requestActions(symbol,start,count,snapshot,signal)]);
+ const [data,origin,actions]=await Promise.all([transport(endpoint+'?'+query,{signal}),header,optionalActions(symbol,start,count,snapshot,signal)]);
  if(data.snapshot!==expected||data.file!==s.file||data.version!==s.version||!Array.isArray(data.lines)||!data.lines.length||data.lines.length>96)throw new Error('Captured source for the requested function is unavailable');
  if(origin&&(origin.snapshot!==expected||origin.file!==s.file||origin.version!==s.version||origin.lines?.length!==1||origin.lines[0].number!==s.line||origin.lines[0].left||origin.lines[0].column!==0))throw new Error('Fragment indentation source differs');
  return {data,actions,start,margin:functionIndent(origin?.lines[0]??data.lines.find(line=>line.number===s.line))};
 }
+function setSections(r,sections){
+ r.sections=sections;
+ r.lines=sections.flatMap(section=>section.lines);
+ r.actions=sections.flatMap(section=>section.actions.filter(action=>action.position?.line>=section.start&&action.position.line<section.start+section.lines.length));
+ r.actionsByLine=new Map();
+ for(const action of r.actions){
+  const line=action.position?.line;
+  if(!r.actionsByLine.has(line))r.actionsByLine.set(line,[]);
+  r.actionsByLine.get(line).push(action);
+ }
+}
+function resetSource(r,v,lines,actions,reading,margin){
+ r.adjacent?.abort();r.adjacent=null;
+ r.margin=margin;
+ setSections(r,[{start:reading.section,lines:lines.filter(line=>line.number<=v.symbol.source.end_line),actions}]);
+ const restored=r.sourcePane.set(r.lines,reading,margin);
+ r.restoreAnchor=!restored&&r.lines.at(-1)?.number<v.symbol.source.end_line?reading.anchor:null;
+ r.scrollTop=r.code.scrollTop;
+}
+function recordReading(r){
+ const v=model.view(r.id),reading=r.sourcePane.reading(),line=(r.restoreAnchor??reading.anchor)?.line;
+ const section=r.sections.find(part=>line>=part.start&&line<=part.lines.at(-1)?.number)??r.sections.find(part=>part.start===v.reading.section)??r.sections[0];
+ if(!section)return;
+ const row=r.code.querySelector(`[data-line="${section.start}"]`);
+ if(row)reading.top=Math.max(0,reading.top-row.offsetTop+r.code.firstElementChild.offsetTop);
+ if(!r.restoreAnchor)model.read(r.id,{section:section.start,...reading});
+ const s=v.symbol.source,last=section.lines.at(-1)?.number??section.start;
+ r.sectionLabel.textContent=`Lines ${section.start}–${last} · ${s.end_line-s.line+1}-line function`;
+ r.prev.hidden=section.start<=s.line;
+ r.next.hidden=last>=s.end_line;
+}
+function jumpSource(id,before){
+ const r=mounted.get(id),v=model.view(id),s=v.symbol.source;
+ const section=r?.sections.find(part=>part.start===v.reading.section);
+ if(!section?.lines.length)return;
+ const start=before?Math.max(s.line,section.start-SECTION_ROWS):section.lines.at(-1).number+1;
+ if(start<=s.end_line)void loadSource(id,start);
+}
+function nearSourceEdge(r,before){
+ const code=r.code;
+ return before?code.scrollTop<=SECTION_EDGE:code.scrollHeight-code.scrollTop-code.clientHeight<=SECTION_EDGE;
+}
+async function extendSource(r,before){
+ if(!r.sections.length||r.loading||r.adjacent||!r.code.clientHeight||!nearSourceEdge(r,before))return;
+ const v=model.view(r.id),s=v.symbol.source;
+ if(model.stale&&v.mode==='live'&&!frozenSource(v))return;
+ const first=r.sections[0].start,last=r.sections.at(-1).lines.at(-1)?.number;
+ if(!last||(before?first<=s.line:last>=s.end_line))return;
+ const trimming=r.sections.length>=SECTION_LIMIT;
+ if(trimming&&r.sourcePane.selected()){
+  r.sectionLabel.textContent='Clear the selection to load more source.';
+  return;
+ }
+ const start=before?Math.max(s.line,first-SECTION_ROWS):last+1;
+ const count=before?first-start:Math.min(SECTION_ROWS,s.end_line-start+1);
+ const request=new AbortController(),signal=AbortSignal.any([r.controller.signal,request.signal]);
+ const ticket=r.sourceTicket,expected=captureFor(v.symbol,v.snapshot);
+ const valid=()=>mounted.get(r.id)===r&&r.sourceTicket===ticket&&!signal.aborted;
+ r.adjacent=request;
+ let added=false;
+ try{
+  const query=new URLSearchParams({...sourceBinding(v),snapshot:expected,file:s.file,version:s.version,line_start:String(start),line_count:String(count),outline_count:'1',reflow:'true'});
+  const source=transport(sourceEndpointForView(v)+'?'+query,{signal});
+  const actions=frozenSource(v)?capturedActions(v,start,count,signal):model.usable(r.id)?optionalActions(v.symbol,start,count,v.snapshot,signal):[];
+  const [data,inline]=await Promise.all([source,actions]);
+  if(!valid()||r.loading||!r.code.clientHeight||!nearSourceEdge(r,before))return;
+  if(data.snapshot!==expected||data.file!==s.file||data.version!==s.version||!Array.isArray(data.lines)||data.lines.length!==count||data.lines.some((line,index)=>line.number!==start+index))throw new Error('Adjacent source differs from the requested section');
+  if(trimming&&r.sourcePane.selected()){
+   r.sectionLabel.textContent='Clear the selection to load more source.';
+   return;
+  }
+  const section={start,lines:data.lines,actions:inline},sections=[...r.sections];
+  const removed=trimming?(before?sections.pop():sections.shift()):null;
+  if(before)sections.unshift(section);else sections.push(section);
+  r.sourceTicket++;
+  setSections(r,sections);
+  r.sourcePane.extend(section.lines,before,removed?.lines.length??0,r.margin??0);
+  if(r.restoreAnchor&&(r.sourcePane.restore(r.restoreAnchor)||r.lines.at(-1).number>=s.end_line))r.restoreAnchor=null;
+  r.scrollTop=r.code.scrollTop;
+  recordReading(r);geometry();save();
+  added=true;
+ }catch(error){
+  if(valid()){
+   r.restoreAnchor=null;recordReading(r);
+   r.sectionLabel.textContent='Could not load adjacent source. Scroll again to retry.';
+  }
+ }finally{
+  if(r.adjacent===request)r.adjacent=null;
+  if(added&&r.restoreAnchor)void extendSource(r,false);
+ }
+}
 function applyPreparedSource(id,prepared) {
  const r=mounted.get(id),v=model.view(id),s=v.symbol.source,{data,actions,start,margin}=prepared;
  if(data.file!==s.file||data.version!==s.version)throw new Error('Prepared source differs from the requested fragment');
- r.sourceTicket=(r.sourceTicket??0)+1;r.loading=false;r.margin=margin;r.lines=data.lines.filter(line=>line.number<=s.end_line);r.actions=actions;
- r.sourcePane.set(r.lines,{...v.reading},margin);inlineAvailability(r.code,id);
- const last=Math.min(s.end_line,data.lines.at(-1)?.number??start);r.sectionLabel.textContent=`Lines ${start}–${last} · ${s.end_line-s.line+1}-line function`;r.prev.hidden=start<=s.line;r.next.hidden=last>=s.end_line;
- sourceStatus(r,data.coloring==='ready'?'Live':'Styling '+data.coloring);model.read(id,{section:start,...r.sourcePane.reading()});geometry();
+ r.sourceTicket=(r.sourceTicket??0)+1;r.loading=false;
+ resetSource(r,v,data.lines,actions,{...v.reading,section:start},margin);
+ sourceStatus(r,data.coloring==='ready'?'Live':'Styling '+data.coloring);recordReading(r);geometry();
+ if(r.restoreAnchor)void extendSource(r,false);
 }
 async function requestActions(symbol,start,count,snapshot,signal) {
  const actions=[];let offset=0;
- try{for(let page=0;page<16;page++){
+ for(let page=0;page<16;page++){
   const data=await post('/api/structure',{snapshot,query:{kind:'actions',symbol:symbol.id,line_start:start,line_count:count,offset}},signal);
   if(data.snapshot!==snapshot||!Array.isArray(data.items)||data.items.length>256||!Number.isSafeInteger(data.matching)||data.matching>4096)throw new Error('Invalid captured call actions');
   actions.push(...data.items);if(data.next===null)return actions;if(!Number.isSafeInteger(data.next)||data.next<=offset)throw new Error('Invalid call-action continuation');offset=data.next;
- }throw new Error('Call-action allowance exceeded');}catch(error){if(signal?.aborted)throw error;return [];}
+ }
+ throw new Error('Call-action allowance exceeded');
+}
+async function optionalActions(symbol,start,count,snapshot,signal){
+ try{return await requestActions(symbol,start,count,snapshot,signal);}
+ catch(error){if(signal?.aborted)throw error;return [];}
 }
 async function loadSource(id,start){
- callMenu.hide();const r=mounted.get(id);if(!r)return;const ticket=r.sourceTicket=(r.sourceTicket??0)+1,v=model.view(id),s=v.symbol.source;const expected=captureFor(v.symbol,v.snapshot),sourceEndpoint=sourceEndpointForView(v);const saved={...v.reading};r.loading=true;
+ callMenu.hide();const r=mounted.get(id);if(!r)return;const ticket=r.sourceTicket=(r.sourceTicket??0)+1,v=model.view(id),s=v.symbol.source;const expected=captureFor(v.symbol,v.snapshot),sourceEndpoint=sourceEndpointForView(v);const saved={...v.reading};r.adjacent?.abort();r.loading=true;
  try{const query=new URLSearchParams({...sourceBinding(v),snapshot:expected,file:s.file,version:s.version,line_start:String(start),line_count:String(Math.min(96,s.end_line-start+1)),outline_count:'1',reflow:'true'});const header=r.margin===undefined&&start!==s.line?transport(sourceEndpoint+'?'+new URLSearchParams({...sourceBinding(v),snapshot:expected,file:s.file,version:s.version,line_start:String(s.line),line_count:'1',outline_count:'1'}),{signal:r.controller.signal}):Promise.resolve(null);const [data,actions,origin]=await Promise.all([transport(sourceEndpoint+'?'+query,{signal:r.controller.signal}),frozenSource(v)?capturedActions(v,start,Math.min(96,s.end_line-start+1),r.controller.signal):!model.usable(id)?Promise.resolve([]):loadActions(id,start,Math.min(96,s.end_line-start+1),model.snapshot,r),header]);if(mounted.get(id)!==r||r.sourceTicket!==ticket)return;
   if(data.snapshot!==expected||data.file!==s.file||data.version!==s.version||!Array.isArray(data.lines)||data.lines.length>96)throw new Error('Captured source version differs');r.code.replaceChildren();
   if(origin&&(origin.snapshot!==expected||origin.file!==s.file||origin.version!==s.version||origin.lines?.length!==1||origin.lines[0].number!==s.line||origin.lines[0].left||origin.lines[0].column!==0))throw new Error('Fragment indentation source differs');
   if(r.margin===undefined)r.margin=functionIndent(origin?.lines[0]??data.lines.find(line=>line.number===s.line));
-  r.lines=data.lines.filter(line=>line.number<=s.end_line);r.actions=actions;r.sourcePane.set(data.lines.filter(line=>line.number<=s.end_line),{top:start===saved.section?saved.top:0,left:saved.left,anchor:start===saved.section?saved.anchor:null},r.margin);
-  inlineAvailability(r.code,v.id);const last=Math.min(s.end_line,data.lines.at(-1)?.number??start);r.sectionLabel.textContent=`Lines ${start}–${last} · ${s.end_line-s.line+1}-line function`;r.prev.hidden=start<=s.line;r.next.hidden=last>=s.end_line;sourceStatus(r,data.coloring==='ready'?'Live':'Styling '+data.coloring);
-  model.read(id,{section:start,...r.sourcePane.reading()});save();
- }catch(e){if(e.name==='AbortError')return;if(mounted.get(id)===r&&r.sourceTicket===ticket){if(v.history||v.comparison||v.captured){notice.show(e.message);if(r.lines?.length)return;}r.sourcePane.set([]);r.code.replaceChildren(node('p','Source for this bubble is unavailable.'));r.sectionLabel.textContent='Source unavailable';sourceStatus(r,e.message);}}finally{r.loading=false;geometry();live.resume();}
+  resetSource(r,v,data.lines,actions,{section:start,top:start===saved.section?saved.top:0,left:saved.left,anchor:start===saved.section?saved.anchor:null},r.margin);
+  sourceStatus(r,data.coloring==='ready'?'Live':'Styling '+data.coloring);recordReading(r);save();
+ }catch(e){if(e.name==='AbortError')return;if(mounted.get(id)===r&&r.sourceTicket===ticket){if(v.history||v.comparison||v.captured){notice.show(e.message);if(r.lines?.length)return;}setSections(r,[]);r.sourcePane.set([]);r.code.replaceChildren(node('p','Source for this bubble is unavailable.'));r.sectionLabel.textContent='Source unavailable';sourceStatus(r,e.message);}}finally{if(mounted.get(id)===r&&r.sourceTicket===ticket){r.loading=false;geometry();live.resume();if(r.restoreAnchor)void extendSource(r,false);}}
 }
 async function loadActions(id,start,count,snapshot,record){
- const actions=[];let offset=0;
- try{for(let page=0;page<16;page++){
-  const data=await post('/api/structure',{snapshot,query:{kind:'actions',symbol:model.view(id).symbol.id,line_start:start,line_count:count,offset}},record.controller.signal);
-  if(data.snapshot!==snapshot||!Array.isArray(data.items)||data.items.length>256||!Number.isSafeInteger(data.matching)||data.matching>4096)throw new Error('Invalid captured call actions');
-  actions.push(...data.items);if(data.next===null)return actions;if(!Number.isSafeInteger(data.next)||data.next<=offset)throw new Error('Invalid call-action continuation');offset=data.next;
- }throw new Error('Call-action allowance exceeded');}catch(e){if(e.name!=='AbortError'&&e.status!==409&&mounted.get(id)===record)notice.show('Inline call actions are unavailable for this section. Calls remains available.');return [];}
+ try{return await requestActions(model.view(id).symbol,start,count,snapshot,record.controller.signal);}
+ catch(error){
+  if(error.name!=='AbortError'&&error.status!==409&&mounted.get(id)===record)notice.show('Inline call actions are unavailable for this section. Calls remains available.');
+  return [];
+ }
 }
 async function loadCalls(id,offset){
  const r=mounted.get(id);if(!r||!model.navigable(id))return;const v=model.view(id),source=frozenSource(v),expected=source?.snapshot??model.snapshot,binding=JSON.stringify([v.snapshot,v.symbol.id,source]);

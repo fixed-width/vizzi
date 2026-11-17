@@ -58,7 +58,15 @@ still exceeds these bounds remains scrollable. Manual resizing and section pagin
   view and link instead of recursively creating an unbounded graph.
 - Fragment headers support moving, resizing, collapsing and closing. Closing removes that
   view's presentation links, not source facts. Code remains syntax-coloured and readable;
-  long functions use explicit bounded sections instead of silent short excerpt replacement.
+  scroll through long functions in either direction, including across an internal source
+  boundary. Adjacent sections keep their original line numbers, indentation and call
+  actions. Previous/Next section remain shortcuts for moving by a section.
+- Loading an adjacent section keeps the visible source line in place. The pane keeps a
+  bounded run of neighbouring sections and can reuse space after the reader scrolls away
+  from it. Text selection and copying work across loaded sections. At the retention limit,
+  clear an active selection to load further source. A failed adjacent read keeps the
+  loaded text available for reading and retry. Live and frozen bubbles keep their own
+  source binding, including each side of a comparison.
 - Smart reflow fits long code lines to their pane using ranked, language-aware break hints
   and bounded hanging indentation. It is enabled by default; **Settings → Code layout** can
   restore original lines. Resizing recomputes display breaks locally, without source reads

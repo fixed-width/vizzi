@@ -12,7 +12,7 @@ Open a repository function in the call workspace, either at saved current source
    source text and whitespace without adding diff signs.
 3. Use **Previous edit** or **Next edit** in either bubble to reveal corresponding changes
    in both visible sides. The first edit opens automatically, even when it is beyond the
-   initially loaded 96-line section. Normal section paging remains available.
+   initially loaded section. Scroll inside either bubble to read the surrounding code.
 4. Close either bubble independently. Remaining highlights still describe the original
    frozen pair. Choose **Return to live** to resume saved-source tracking in that bubble.
    **History**, when available on a committed side, resumes reading older function versions

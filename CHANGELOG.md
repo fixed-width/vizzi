@@ -8,6 +8,9 @@ remains in Git and the project documentation.
 
 ### Changed
 
+- Scroll through long functions inside a bubble. Adjacent source loads as you read,
+  with line numbers, call actions and selection across loaded sections.
+
 - Editor navigation waits for confirmed browser application. Newer editor requests or
   manual navigation cancel waiting actions silently, with source rechecked before UI
   application. Unconfirmed results report an error without automatic replay.
