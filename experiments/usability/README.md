@@ -7,6 +7,10 @@ The first maintainer trial produced [interaction findings](FINDINGS.md), with
 [the implementation and validation response](FEEDBACK_RESULTS.md). Retest those
 interactions with the updated viewer; unfamiliar-user acceptance stays open.
 
+For per-function history, adjacent Before/After comparison and captured same-file calls,
+use the [function-history reading trial](function-history/README.md). It supplies a
+real pinned change and separate participant/facilitator material for issue #6.
+
 ## Prepare disposable inputs
 
 Run from the Vizzi checkout with Python 3.12+, Git, a built Vizzi binary and a local

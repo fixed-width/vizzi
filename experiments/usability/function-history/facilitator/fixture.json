@@ -1,0 +1,78 @@
+{
+  "frozen_at_utc": "2026-11-17T17:19:03.121881+00:00",
+  "classification": "source-informed facilitator oracle; no participant outcome",
+  "repository": "lpc-rs",
+  "source_path": "src/interpreter/task/mod.rs",
+  "declaration": "Task::run_entry",
+  "versions": {
+    "target": {
+      "commit": "457446c870ca3144c315ebcae9c78b7bc2b76514",
+      "file_blob": "48e62583b3606c0d5b867cf16d6b420fcb8b47f6",
+      "file_sha256": "09d4d9ef859e546f3bff959ac034ea2d62dc738459e0777ec4228d743121cf4a",
+      "run_entry": {
+        "start_line": 442,
+        "end_line": 641,
+        "sha256": "a6258707cb0ebd66618c1a6677f5b59da2b7d2361502937edffd3b781577342d"
+      }
+    },
+    "review_base": {
+      "commit": "2a6a23ad1be7e7892ce527fa77aab8eea8203353",
+      "file_blob": "dfc598ba9ed793eb5538ec0ceb4f70682dd7b4f1",
+      "file_sha256": "e3f6169c57b66136eea8004f62547f9233afa6d78768aa917cc8b8243dfde55a",
+      "run_entry": {
+        "start_line": 440,
+        "end_line": 630,
+        "sha256": "a34a685f530fad0f2ec323227b966f676e829bb6351944be0b0278c25238ec4d"
+      }
+    },
+    "previous_function_version": {
+      "commit": "873e71114814a3a00dde7d41b835635aff95a7d1",
+      "file_blob": "dfc598ba9ed793eb5538ec0ceb4f70682dd7b4f1",
+      "file_sha256": "e3f6169c57b66136eea8004f62547f9233afa6d78768aa917cc8b8243dfde55a",
+      "run_entry": {
+        "start_line": 440,
+        "end_line": 630,
+        "sha256": "a34a685f530fad0f2ec323227b966f676e829bb6351944be0b0278c25238ec4d"
+      }
+    },
+    "next_older_function_version": {
+      "commit": "39e934d7c5eec524b65c026f2db29cd0eaf80501",
+      "file_blob": "0af032c80e9bd6dc39423b8145354baf9ce3d49d",
+      "file_sha256": "2b9d9cb894f760fc13c2bcf2b3d4d2b8c59d5332f0dde719da3dff9936268418",
+      "run_entry": {
+        "start_line": 432,
+        "end_line": 608,
+        "sha256": "0a70710119dd293972e68ea19b71c5490a4c0260d4168fc7d1b7ed99e6d1df36"
+      }
+    }
+  },
+  "target_same_file_helpers": {
+    "runtime_error": {
+      "start_line": 903,
+      "end_line": 905,
+      "sha256": "66f3e2d22a52849b413551de8a35aeaa976c575fae713f2d18888ddbc513d1f2"
+    },
+    "build_call_frame": {
+      "start_line": 151,
+      "end_line": 206,
+      "sha256": "b06822f556082721749b85be282cbae8c4239b49363c0c5a421cef225003da10"
+    },
+    "arg_values": {
+      "start_line": 209,
+      "end_line": 214,
+      "sha256": "44b99675950542ed81a09ba917b796d2fb6cc1acfad2f068a23cfb9c5531c5cb"
+    },
+    "value_of": {
+      "start_line": 216,
+      "end_line": 223,
+      "sha256": "84c4400a150b2d41cbc70e7420802f04f3e0f569fc13f3c663dc7e991d27d377"
+    },
+    "open_attempt": {
+      "start_line": 376,
+      "end_line": 437,
+      "sha256": "2cd2d425650c26cad6136a5366495a947fa0d8d48ea26a569f50be115268ae60"
+    }
+  },
+  "review_base_declaration_equals_previous_function_version": true,
+  "project_built_or_executed": false
+}
