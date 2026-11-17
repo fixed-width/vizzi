@@ -59,6 +59,9 @@ from correctness and describe its repository/workload limitations.
 
 ## Observed validation, 2026-11-16
 
+The later [complete browser qualification](../development/function-history-validation.md)
+records final-PR and merge-commit CI separately from the focused checks below.
+
 Linux checks passed formatting, workspace tests/doctests (769 tests, including 21 native
 history/comparison tests and four range-diff tests), Clippy with warnings denied, all 268
 browser model tests and nine packaged Chromium workflows. The new workflow verifies two

@@ -55,6 +55,9 @@ optimized timing observations separate from correctness and state their workload
 
 ## Observed validation, 2026-11-16
 
+The later [complete browser qualification](../development/function-history-validation.md)
+records final-PR and merge-commit CI separately from the focused checks below.
+
 Final Linux checks passed formatting, workspace tests/doctests (774 passed, with 15
 opt-in integration checks ignored) and Clippy with warnings denied. The packaged release
 was rebuilt and captured calls, history, comparisons and comparison/editor cancellation
