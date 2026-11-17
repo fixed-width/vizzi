@@ -1,0 +1,68 @@
+{
+  "recorded_at_utc": "2026-11-17T17:20:51.102940+00:00",
+  "classification": "preparation and guided source-informed readiness only",
+  "participant_validation": "incomplete; no answers or interaction observations collected",
+  "vizzi_revision": "55c878651159ef7064eed816eecbc25f8d6664c5",
+  "binary_sha256": "2d630cad1b97d5cd129084c0bb0ad5245f152f3ff0ee58aa439f118d2b5f0bb3",
+  "editor": {
+    "version": "1.146.0",
+    "extension_version": "0.9.0",
+    "condition": "isolated profile with extensionDevelopmentPath; plugin interaction pending participant",
+    "automatic_rust_checks_build_scripts_proc_macros": false
+  },
+  "source": {
+    "target": "457446c870ca3144c315ebcae9c78b7bc2b76514",
+    "complete_history": true,
+    "original_before": {
+      "head": "f92dd9826537d3d503c9d08586df37c9a3e1275e",
+      "status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "refs_sha256": "f60abb38981d245c2374d015976ef4798bcca97bde0ad77e5eebe5974cbac6c3",
+      "index_sha256": "02c7276fbd9654f9c1e5e681225fa47e3906985c85d733911e219f6ce591bb6c"
+    },
+    "original_after": {
+      "head": "f92dd9826537d3d503c9d08586df37c9a3e1275e",
+      "status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "refs_sha256": "f60abb38981d245c2374d015976ef4798bcca97bde0ad77e5eebe5974cbac6c3",
+      "index_sha256": "02c7276fbd9654f9c1e5e681225fa47e3906985c85d733911e219f6ce591bb6c"
+    },
+    "original_preserved": true,
+    "added_configuration": "vizzi.toml; one worker, ephemeral port, cache outside source",
+    "inspected_project_built_or_executed": false
+  },
+  "material_sha256": {
+    "experiments/usability/function-history/participant/controls.md": "5b667d8cea22fe33ebdf8ce7deda0ad3cff31bb03fb981ee97fced6ad937d545",
+    "experiments/usability/function-history/participant/task.md": "44b8a310b2484f9eeb217501c9b2b70560fc9e9a90fd38985f68de73c5a39708",
+    "experiments/usability/function-history/facilitator/fixture.json": "38381b79832a3a7cdb39f54dc5e35f02397d8d440497e9aa22b9cf045c2b967a",
+    "experiments/usability/function-history/facilitator/scoring.md": "05c06bc8cd7a9640e3cadaa558c26bab72e3788f236d154cf50b89c00ba12118",
+    "experiments/usability/function-history/facilitator/session.md": "159d56a1f988d4cc767e4b5ad96e854e90744ecbf56a79d5ece516a096b20940"
+  },
+  "checks": {
+    "release_build": "passed; locked/offline",
+    "format": "passed",
+    "workspace_tests": {
+      "suites": 98,
+      "passed": 774,
+      "failed": 0,
+      "ignored": 15,
+      "includes_doctests": true
+    },
+    "clippy": "passed; workspace all-targets, deny warnings",
+    "chromium": {
+      "status": "passed",
+      "checks": [
+        "Previous twice / Next revisits accepted version and preserves bubble rectangle",
+        "Before / After changes appear; first sections match independent Git bytes",
+        "Captured same-file runtime_error helper opens with a captured revision label",
+        "Earlier root remains available after opening helper",
+        "Return to live leaves Before and helper readable; no page errors"
+      ],
+      "separate_process_cache_and_browser_context": true
+    },
+    "mutation_testing": "not rerun; production code unchanged",
+    "performance": "not measured"
+  },
+  "preparation_failures": {
+    "restricted_socket_run": "host binding and editor-bridge socket tests denied; rerun with loopback access passed",
+    "readiness_harness": "corrected async search/return waits, unique comparison selector and paged call lookup; no product changes"
+  }
+}
