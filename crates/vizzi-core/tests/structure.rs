@@ -591,10 +591,12 @@ fn qualified_generic_trait_impl_search_survives_a_long_trait_label() {
 fn qualified_function_search_accepts_wrapped_impl_targets() {
     let index = Structure::new(&snapshot(&[(
         "targets.rs",
-        "trait Handler<T> {} trait Process { fn process(); } struct Task<T>(T); \
+        "trait Handler<T> {} trait Process { fn process(); } trait Pair { fn pair(); } \
+         struct Task<T>(T); \
          impl dyn Handler<u8> { fn run() {} } \
          impl dyn Handler<u8> + Send { fn run_send() {} } \
-         impl<T> Process for &Task<T> { fn process() {} }",
+         impl<T> Process for &Task<T> { fn process() {} } \
+         impl Pair for (Task<u8>, Task<u16>) { fn pair() {} }",
     )]));
     for (short, literal) in [
         ("dyn Handler::run", "dyn Handler<u8>::run"),
@@ -603,6 +605,7 @@ fn qualified_function_search_accepts_wrapped_impl_targets() {
             "dyn Handler<u8> + Send::run_send",
         ),
         ("&Task::process", "Process for &Task<T>::process"),
+        ("(Task, Task)::pair", "Pair for (Task<u8>, Task<u16>)::pair"),
     ] {
         let full = index.functions("", literal, 0).unwrap();
         assert_eq!(full.matching, 1, "{literal}");
