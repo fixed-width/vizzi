@@ -45,6 +45,7 @@ experiments; use DESIGN.md and the current user guides to determine the active s
 
 - [Ruby validation](../../experiments/languages/RUBY_RESULTS.md)
 - [Browser validation](../../experiments/browser/README.md)
+- [Complete function-history browser qualification](function-history-validation.md)
 - [Python/C-family language-server validation](../../experiments/visual/LANGUAGE_SERVER_RESULTS.md)
 - [Configuration, VS Code sharing and VSIX validation](configuration-validation.md)
 - [Reference-repository qualification](../../experiments/qualification/README.md)

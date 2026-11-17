@@ -44,6 +44,11 @@ removed after each run.
 The standalone outline tests use real Chromium without the native host; an integration
 fixture also checks 50,000 declarations through the actual HTTP/source-selection path.
 
+The default runner includes function history, adjacent function comparison, captured
+calls, comparison delivery and comparison-edit cancellation. Their complete-suite CI
+and local evidence, exact revisions and runtime versions are recorded separately in
+[function-history qualification](../../docs/development/function-history-validation.md).
+
 Run `node experiments/browser/documentation.test.mjs --no-build` after rebuilding Vizzi
 to check the Python, Rust, Ruby and C/C++ tutorial workflows. This contributor check uses
 `python3`, `rustc`, `ruby`, `cc` and `c++` to verify the included programs, then follows calls,

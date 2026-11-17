@@ -72,6 +72,9 @@ latency budget from fixture results.
 
 ## Observed validation, 2026-11-16
 
+The later [complete browser qualification](../development/function-history-validation.md)
+records final-PR and merge-commit CI separately from the focused checks below.
+
 Linux verification passed formatting, workspace tests/doctests (758 passing tests,
 including 14 native history tests), Clippy with warnings denied, 263 browser model tests,
 and eight packaged Chromium workflows: function history, live workspace, visual workspace,
