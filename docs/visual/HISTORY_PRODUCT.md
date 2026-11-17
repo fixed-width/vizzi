@@ -14,10 +14,14 @@ mock was supplied.
    Uncommitted saved changes can therefore step back to HEAD. Unsaved buffers are outside
    this history.
 2. A historical bubble shows its commit, **Previous change**, **Next change** and
-   **Return to live**. Next change retraces accepted versions; at the newest historical
-   version it is disabled. Return to live resumes current saved-source tracking.
-   If the function is missing, retain the actual displayed revision and its source
-   binding with an unavailable message; later publications can resolve it again.
+   **Return to live**. Next change retraces accepted versions. At the newest historical
+   version, **Return to live** takes its place in the history row and resumes current
+   saved-source tracking. The bubble shows a pending status while retaining the capture.
+   If the refresh fails, the reader can keep stepping through the retained history or
+   retry **Return to live**. If the lookup cannot identify the current function, show
+   the unavailable message and retain the displayed revision and its source binding.
+   Later publications can resolve it again. When a successful refresh removes the
+   focused history-row return control, move focus to **Compare** or **Previous change**.
 3. Changing revision preserves the bubble identity, rectangle, task membership, camera
    and other bubbles. A reading section retains its relative position where possible;
    changed text resets scrolling within that section. Source and revision labels change

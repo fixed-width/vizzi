@@ -25,7 +25,23 @@ try{
  const busy=new Set();await page.route('**/api/function-comparisons/window?*',async route=>{const q=new URL(route.request().url()).searchParams,key=q.get('side')+':'+q.get('line_start');if(!busy.has(key)){busy.add(key);await route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({message:'Comparison read busy; retry'})});}else await route.continue();});await page.reload();await newerView.locator('.comparison-added').first().waitFor();await olderView.locator('.comparison-removed').first().waitFor();assert.match(await newerView.locator('.comparison-added').textContent(),/new_last/);assert.match(await olderView.locator('.comparison-removed').textContent(),/old_last/);assert.ok(busy.size>=4);await page.unroute('**/api/function-comparisons/window?*');
  const future=source('future_first','future_last','live_later','// moved\n\n');await commit(future);await page.waitForFunction(()=>document.querySelector('[data-name="other"] .code-pane').textContent.includes('live_later'));assert.match(await newerView.locator('.comparison-added').textContent(),/new_last/);assert.match(await olderView.locator('.comparison-removed').textContent(),/old_last/);
  await paint(page);await page.screenshot({path:'/tmp/vizzi-function-comparison.png'});
- await olderView.getByRole('button',{name:'Close bubble',exact:true}).click();await newerView.getByRole('button',{name:'Previous comparison edit',exact:true}).click();await page.waitForFunction(()=>document.querySelector('[data-comparison-side="newer"] .comparison-added')?.textContent.includes('new_first'));await newerView.getByRole('button',{name:'Return to live',exact:true}).click();await page.waitForFunction(()=>document.querySelector('[data-name="target"] .code-pane').textContent.includes('future_first')&&!document.querySelector('[data-name="target"] button[aria-label="Open in VS Code"]').disabled);assert.equal(await page.locator('[data-comparison-side]').count(),0);
+ await olderView.getByRole('button',{name:'Close bubble',exact:true}).click();await newerView.getByRole('button',{name:'Previous comparison edit',exact:true}).click();await page.waitForFunction(()=>document.querySelector('[data-comparison-side="newer"] .comparison-added')?.textContent.includes('new_first'));
+ let releaseLive;
+ const liveGate=new Promise(resolve=>releaseLive=resolve);
+ await page.route('**/api/visual/refresh',async route=>{
+  const response=await route.fetch();await liveGate;await route.fulfill({response}).catch(()=>{});
+ });
+ try{
+  const liveRequested=page.waitForRequest(request=>new URL(request.url()).pathname==='/api/visual/refresh');
+  await newerView.getByRole('button',{name:'Return to live',exact:true}).click();await liveRequested;
+  await newerView.getByText('Returning to live…',{exact:true}).waitFor();
+  assert.equal(await newerView.getByRole('button',{name:'Return to live',exact:true}).isDisabled(),true);
+  assert.equal(await page.locator('#visual-stale').isVisible(),false,'an in-flight return does not report unavailable source');
+  assert.match(await newerView.locator('.comparison-added').textContent(),/new_first/);
+ }finally{releaseLive();}
+ await page.waitForFunction(()=>document.querySelector('[data-name="target"] .code-pane').textContent.includes('future_first')&&!document.querySelector('[data-name="target"] button[aria-label="Open in VS Code"]').disabled);
+ assert.equal(await page.locator('[data-comparison-side]').count(),0);assert.equal(await page.locator('#visual-stale').isVisible(),false);
+ await page.unroute('**/api/visual/refresh');
  await root.getByRole('button',{name:'Previous function change',exact:true}).click();await root.getByRole('button',{name:'Compare with previous version',exact:true}).click();await olderView.locator('.comparison-removed').first().waitFor();assert.match(await newerView.locator('.fragment-history').textContent(),new RegExp(newer.slice(0,8)));assert.match(await olderView.locator('.fragment-history').textContent(),new RegExp(old.slice(0,8)));
  const grip=newerView.getByRole('button',{name:'Resize bubble',exact:true});for(let i=0;i<13;i++)await grip.press('ArrowUp');const outer=await newerView.boundingBox(),returning=await newerView.getByRole('button',{name:'Return to live',exact:true}).boundingBox();assert.ok(returning.y+returning.height<=outer.y+outer.height+1);
  await olderView.getByRole('button',{name:'Close bubble',exact:true}).click();await newerView.getByRole('button',{name:'Return to live',exact:true}).click();await page.waitForFunction(()=>!document.querySelector('[data-name="target"] button[aria-label="Open in VS Code"]').disabled);

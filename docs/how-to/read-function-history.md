@@ -9,17 +9,19 @@ call workspace.
    A saved, uncommitted function can first step back to its HEAD version.
 2. Continue with **Previous change**, or use **Next change** to retrace accepted versions.
    The bubble shows the selected commit's short ID. Hover over it for the full commit
-   and the frozen history tip. Next change is disabled at the newest historical version.
+   and the frozen history tip. At the newest historical version, **Return to live**
+   takes the place of **Next change** in the history row.
 3. Page long functions with **Previous section** and **Next section** as usual. Other
    bubbles retain their positions and can continue following saved edits.
 4. Choose **Return to live** to resolve the original function against current saved files.
-   Its bubble keeps its position, size and task membership.
+   Its bubble keeps its position, size and task membership. Choose **Compare** once live
+   source is ready to review it alongside the previous version.
 
 If that function has been renamed or deleted in current source, Vizzi keeps the actual
 historical version with an unavailable message. You can continue browsing its history
-or retry Return to live. If the original declaration reappears while live tracking is
-active, its bubble updates automatically. This retained state also survives reload while
-the history session remains available.
+or retry **Return to live** while Vizzi waits for a successful refresh. If the original
+declaration reappears while live tracking is active, its bubble updates automatically.
+This retained state also survives reload while the history session remains available.
 
 Historical bubbles support reading, copying and [calls within the captured file](follow-captured-calls.md).
 Callers, references, Save and Editor require current source. Existing connections remain
