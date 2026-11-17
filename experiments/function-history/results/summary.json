@@ -1,0 +1,1410 @@
+{
+  "linux": {
+    "workloads": {
+      "mm/mmap.c::do_mmap": {
+        "inventory/coverage": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 378.2269599614665,
+          "max_ms": 382.78645707760006
+        },
+        "history/first": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 168.3971299789846,
+          "max_ms": 220.2852249611169
+        },
+        "revisit/first": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 11.140240007080138,
+          "max_ms": 11.849564965814352
+        },
+        "history_window/first": {
+          "successes": 9,
+          "refusals": {},
+          "median_ms": 1.2449320638552308,
+          "max_ms": 2.857422921806574
+        },
+        "actions/first": {
+          "successes": 9,
+          "refusals": {},
+          "median_ms": 1.759581035003066,
+          "max_ms": 3.573369001969695
+        },
+        "calls/first": {
+          "successes": 57,
+          "refusals": {},
+          "median_ms": 1.4990780036896467,
+          "max_ms": 2.8144350508227944
+        },
+        "definition/first": {
+          "successes": 21,
+          "refusals": {},
+          "median_ms": 1.5214220620691776,
+          "max_ms": 1.9370430381968617
+        },
+        "open/first": {
+          "successes": 9,
+          "refusals": {},
+          "median_ms": 1.4890559250488877,
+          "max_ms": 1.9916188903152943
+        },
+        "compare/first": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 184.1941160382703,
+          "max_ms": 208.56517390348017
+        },
+        "comparison_window/first": {
+          "successes": 6,
+          "refusals": {},
+          "median_ms": 1.495099044404924,
+          "max_ms": 2.127711079083383
+        },
+        "history/warm": {
+          "successes": 12,
+          "refusals": {},
+          "median_ms": 158.152304997202,
+          "max_ms": 179.9627150176093
+        },
+        "revisit/warm": {
+          "successes": 12,
+          "refusals": {},
+          "median_ms": 10.212855064310133,
+          "max_ms": 13.030505971983075
+        },
+        "history_window/warm": {
+          "successes": 36,
+          "refusals": {},
+          "median_ms": 1.1317070457153022,
+          "max_ms": 2.807089942507446
+        },
+        "actions/warm": {
+          "successes": 36,
+          "refusals": {},
+          "median_ms": 1.6844060155563056,
+          "max_ms": 3.449477022513747
+        },
+        "calls/warm": {
+          "successes": 228,
+          "refusals": {},
+          "median_ms": 1.4950740151107311,
+          "max_ms": 3.8682250306010246
+        },
+        "definition/warm": {
+          "successes": 84,
+          "refusals": {},
+          "median_ms": 1.3508045230992138,
+          "max_ms": 2.9487989377230406
+        },
+        "open/warm": {
+          "successes": 36,
+          "refusals": {},
+          "median_ms": 1.4780274941585958,
+          "max_ms": 2.4399569956585765
+        },
+        "compare/warm": {
+          "successes": 12,
+          "refusals": {},
+          "median_ms": 176.80547502823174,
+          "max_ms": 209.6826198976487
+        },
+        "comparison_window/warm": {
+          "successes": 24,
+          "refusals": {},
+          "median_ms": 1.482764957472682,
+          "max_ms": 2.5718919932842255
+        },
+        "deeper_history/discovery": {
+          "successes": 15,
+          "refusals": {
+            "503": 3
+          },
+          "median_ms": 17.026697052642703,
+          "max_ms": 98.98301993962377
+        },
+        "revisit/after_discovery": {
+          "successes": 6,
+          "refusals": {},
+          "median_ms": 8.048316987697035,
+          "max_ms": 9.548970963805914
+        },
+        "history_window/reacquire": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 8.15700797829777,
+          "max_ms": 8.370858035050333
+        },
+        "history/admission": {
+          "successes": 25,
+          "refusals": {},
+          "median_ms": 172.00437397696078,
+          "max_ms": 191.9863480143249
+        },
+        "history_window/expired": {
+          "successes": 0,
+          "refusals": {
+            "409": 1
+          },
+          "median_ms": null,
+          "max_ms": null
+        },
+        "actions/expired": {
+          "successes": 0,
+          "refusals": {
+            "409": 1
+          },
+          "median_ms": null,
+          "max_ms": null
+        },
+        "calls/expired": {
+          "successes": 0,
+          "refusals": {
+            "409": 2
+          },
+          "median_ms": null,
+          "max_ms": null
+        },
+        "compare/admission": {
+          "successes": 13,
+          "refusals": {},
+          "median_ms": 187.03506502788514,
+          "max_ms": 197.92344607412815
+        },
+        "comparison_window/expired": {
+          "successes": 0,
+          "refusals": {
+            "409": 1
+          },
+          "median_ms": null,
+          "max_ms": null
+        }
+      },
+      "kernel/sched/core.c::__schedule": {
+        "inventory/coverage": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 1.1616030242294073,
+          "max_ms": 2.5710819754749537
+        },
+        "history/first": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 425.0305599998683,
+          "max_ms": 1728.7515959469602
+        },
+        "revisit/first": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 20.767998998053372,
+          "max_ms": 24.6240469859913
+        },
+        "history_window/first": {
+          "successes": 9,
+          "refusals": {},
+          "median_ms": 1.1034709168598056,
+          "max_ms": 1.4683650806546211
+        },
+        "actions/first": {
+          "successes": 9,
+          "refusals": {},
+          "median_ms": 7.446835981681943,
+          "max_ms": 10.603183065541089
+        },
+        "calls/first": {
+          "successes": 60,
+          "refusals": {},
+          "median_ms": 7.627439976204187,
+          "max_ms": 14.34422202873975
+        },
+        "definition/first": {
+          "successes": 27,
+          "refusals": {},
+          "median_ms": 7.396016968414187,
+          "max_ms": 11.756541091017425
+        },
+        "open/first": {
+          "successes": 12,
+          "refusals": {},
+          "median_ms": 7.571091002319008,
+          "max_ms": 10.474620037712157
+        },
+        "compare/first": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 565.8091739751399,
+          "max_ms": 592.3435920849442
+        },
+        "comparison_window/first": {
+          "successes": 6,
+          "refusals": {},
+          "median_ms": 2.004862471949309,
+          "max_ms": 2.4781699758023024
+        },
+        "history/warm": {
+          "successes": 12,
+          "refusals": {},
+          "median_ms": 508.4396570455283,
+          "max_ms": 550.0130440341309
+        },
+        "revisit/warm": {
+          "successes": 12,
+          "refusals": {},
+          "median_ms": 23.72168900910765,
+          "max_ms": 28.83679897058755
+        },
+        "history_window/warm": {
+          "successes": 36,
+          "refusals": {},
+          "median_ms": 1.3822189648635685,
+          "max_ms": 2.1780020324513316
+        },
+        "actions/warm": {
+          "successes": 36,
+          "refusals": {},
+          "median_ms": 7.585735467728227,
+          "max_ms": 13.130742008797824
+        },
+        "calls/warm": {
+          "successes": 240,
+          "refusals": {},
+          "median_ms": 7.713764964137226,
+          "max_ms": 14.354169019497931
+        },
+        "definition/warm": {
+          "successes": 108,
+          "refusals": {},
+          "median_ms": 7.5648759957402945,
+          "max_ms": 13.196152984164655
+        },
+        "open/warm": {
+          "successes": 48,
+          "refusals": {},
+          "median_ms": 8.100932987872511,
+          "max_ms": 13.060117023997009
+        },
+        "compare/warm": {
+          "successes": 12,
+          "refusals": {},
+          "median_ms": 523.1998504605144,
+          "max_ms": 563.1240230286494
+        },
+        "comparison_window/warm": {
+          "successes": 24,
+          "refusals": {},
+          "median_ms": 2.189086051657796,
+          "max_ms": 5.161534994840622
+        },
+        "deeper_history/discovery": {
+          "successes": 27,
+          "refusals": {
+            "503": 3
+          },
+          "median_ms": 115.98627304192632,
+          "max_ms": 985.2000300306827
+        },
+        "revisit/after_discovery": {
+          "successes": 6,
+          "refusals": {},
+          "median_ms": 21.484591474290937,
+          "max_ms": 26.842745020985603
+        },
+        "history_window/reacquire": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 21.717710071243346,
+          "max_ms": 23.179902927950025
+        }
+      }
+    },
+    "resources": [
+      {
+        "input": "experiments/function-history/results/linux.json.gz",
+        "run": 0,
+        "initial_index_s": 7.194162781001069,
+        "process_peak_rss_kib": 4525872,
+        "lifetime_hwm_kib": 4525872,
+        "post_index_peak_rss_kib": 4525872,
+        "live_responsiveness": {
+          "/api/status/coexistence": {
+            "successes": 206,
+            "refusals": {},
+            "median_ms": 0.752923428080976,
+            "max_ms": 1.8729600124061108
+          },
+          "/api/window/coexistence": {
+            "successes": 206,
+            "refusals": {},
+            "median_ms": 3.9834255003370345,
+            "max_ms": 8.469547959975898
+          }
+        },
+        "changed_live_pins": 0
+      },
+      {
+        "input": "experiments/function-history/results/linux.json.gz",
+        "run": 1,
+        "initial_index_s": 7.987957443925552,
+        "process_peak_rss_kib": 4542672,
+        "lifetime_hwm_kib": 4542672,
+        "post_index_peak_rss_kib": 4542672,
+        "live_responsiveness": {
+          "/api/status/coexistence": {
+            "successes": 101,
+            "refusals": {},
+            "median_ms": 0.6484360201284289,
+            "max_ms": 1.5818169340491295
+          },
+          "/api/window/coexistence": {
+            "successes": 101,
+            "refusals": {},
+            "median_ms": 4.220693022944033,
+            "max_ms": 7.5012530433014035
+          }
+        },
+        "changed_live_pins": 0
+      },
+      {
+        "input": "experiments/function-history/results/linux.json.gz",
+        "run": 2,
+        "initial_index_s": 7.8869991259416565,
+        "process_peak_rss_kib": 4529224,
+        "lifetime_hwm_kib": 4529224,
+        "post_index_peak_rss_kib": 4529224,
+        "live_responsiveness": {
+          "/api/status/coexistence": {
+            "successes": 106,
+            "refusals": {},
+            "median_ms": 0.6778189563192427,
+            "max_ms": 2.5763290468603373
+          },
+          "/api/window/coexistence": {
+            "successes": 106,
+            "refusals": {},
+            "median_ms": 4.0175095200538635,
+            "max_ms": 8.866485091857612
+          }
+        },
+        "changed_live_pins": 0
+      }
+    ]
+  },
+  "pytorch": {
+    "workloads": {
+      "torch/_dynamo/convert_frame.py::_compile": {
+        "inventory/coverage": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 485.9650239814073,
+          "max_ms": 503.8509010337293
+        },
+        "history/first": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 259.7717720782384,
+          "max_ms": 393.4189770370722
+        },
+        "revisit/first": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 7.952042040415108,
+          "max_ms": 9.347875020466745
+        },
+        "history_window/first": {
+          "successes": 9,
+          "refusals": {},
+          "median_ms": 0.7490799762308598,
+          "max_ms": 1.2930060038343072
+        },
+        "actions/first": {
+          "successes": 9,
+          "refusals": {},
+          "median_ms": 1.9229979952797294,
+          "max_ms": 2.8000129386782646
+        },
+        "calls/first": {
+          "successes": 108,
+          "refusals": {},
+          "median_ms": 2.028026501648128,
+          "max_ms": 4.894942976534367
+        },
+        "definition/first": {
+          "successes": 18,
+          "refusals": {},
+          "median_ms": 1.9790460355579853,
+          "max_ms": 4.77337499614805
+        },
+        "open/first": {
+          "successes": 9,
+          "refusals": {},
+          "median_ms": 1.951433951035142,
+          "max_ms": 2.918195095844567
+        },
+        "compare/first": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 263.7172850081697,
+          "max_ms": 301.12353700678796
+        },
+        "comparison_window/first": {
+          "successes": 6,
+          "refusals": {},
+          "median_ms": 1.5098494477570057,
+          "max_ms": 1.9377470016479492
+        },
+        "history/warm": {
+          "successes": 12,
+          "refusals": {},
+          "median_ms": 276.6419615363702,
+          "max_ms": 315.232023014687
+        },
+        "revisit/warm": {
+          "successes": 12,
+          "refusals": {},
+          "median_ms": 8.952556003350765,
+          "max_ms": 10.727002052590251
+        },
+        "history_window/warm": {
+          "successes": 36,
+          "refusals": {},
+          "median_ms": 0.9978684829548001,
+          "max_ms": 2.857675892300904
+        },
+        "actions/warm": {
+          "successes": 36,
+          "refusals": {},
+          "median_ms": 2.089211018756032,
+          "max_ms": 3.792117931880057
+        },
+        "calls/warm": {
+          "successes": 432,
+          "refusals": {},
+          "median_ms": 1.985705050174147,
+          "max_ms": 6.068676942959428
+        },
+        "definition/warm": {
+          "successes": 72,
+          "refusals": {},
+          "median_ms": 1.9795864936895669,
+          "max_ms": 3.1907010124996305
+        },
+        "open/warm": {
+          "successes": 36,
+          "refusals": {},
+          "median_ms": 2.0182140287943184,
+          "max_ms": 3.50759900175035
+        },
+        "compare/warm": {
+          "successes": 12,
+          "refusals": {},
+          "median_ms": 294.99491606839,
+          "max_ms": 302.06282809376717
+        },
+        "comparison_window/warm": {
+          "successes": 24,
+          "refusals": {},
+          "median_ms": 1.4258944429457188,
+          "max_ms": 2.0768250105902553
+        },
+        "deeper_history/discovery": {
+          "successes": 33,
+          "refusals": {
+            "503": 3
+          },
+          "median_ms": 31.14598209504038,
+          "max_ms": 261.99357106816024
+        },
+        "revisit/after_discovery": {
+          "successes": 6,
+          "refusals": {},
+          "median_ms": 10.643671033903956,
+          "max_ms": 11.802900000475347
+        },
+        "history_window/reacquire": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 10.674520977772772,
+          "max_ms": 11.28374901600182
+        },
+        "history/admission": {
+          "successes": 25,
+          "refusals": {},
+          "median_ms": 270.96700202673674,
+          "max_ms": 304.1877819923684
+        },
+        "history_window/expired": {
+          "successes": 0,
+          "refusals": {
+            "409": 1
+          },
+          "median_ms": null,
+          "max_ms": null
+        },
+        "actions/expired": {
+          "successes": 0,
+          "refusals": {
+            "409": 1
+          },
+          "median_ms": null,
+          "max_ms": null
+        },
+        "calls/expired": {
+          "successes": 0,
+          "refusals": {
+            "409": 2
+          },
+          "median_ms": null,
+          "max_ms": null
+        },
+        "compare/admission": {
+          "successes": 13,
+          "refusals": {},
+          "median_ms": 262.75390293449163,
+          "max_ms": 295.11556099168956
+        },
+        "comparison_window/expired": {
+          "successes": 0,
+          "refusals": {
+            "409": 1
+          },
+          "median_ms": null,
+          "max_ms": null
+        }
+      },
+      "torch/nn/modules/module.py::_call_impl": {
+        "inventory/coverage": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 2.0827680127695203,
+          "max_ms": 2.811519894748926
+        },
+        "history/first": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 271.68048394378275,
+          "max_ms": 275.11970803607255
+        },
+        "revisit/first": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 8.670862996950746,
+          "max_ms": 9.033369016833603
+        },
+        "history_window/first": {
+          "successes": 9,
+          "refusals": {},
+          "median_ms": 1.159889972768724,
+          "max_ms": 2.2385880583897233
+        },
+        "actions/first": {
+          "successes": 9,
+          "refusals": {},
+          "median_ms": 1.9792610546573997,
+          "max_ms": 2.5914120487868786
+        },
+        "calls/first": {
+          "successes": 33,
+          "refusals": {},
+          "median_ms": 1.965197967365384,
+          "max_ms": 3.312291926704347
+        },
+        "definition/first": {
+          "successes": 27,
+          "refusals": {},
+          "median_ms": 1.9187720026820898,
+          "max_ms": 2.749079023487866
+        },
+        "open/first": {
+          "successes": 12,
+          "refusals": {},
+          "median_ms": 2.7047809562645853,
+          "max_ms": 3.965890035033226
+        },
+        "compare/first": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 277.80119399540126,
+          "max_ms": 305.30778504908085
+        },
+        "comparison_window/first": {
+          "successes": 6,
+          "refusals": {},
+          "median_ms": 1.5802135458216071,
+          "max_ms": 2.146309008821845
+        },
+        "history/warm": {
+          "successes": 12,
+          "refusals": {},
+          "median_ms": 267.8789645433426,
+          "max_ms": 302.29452706407756
+        },
+        "revisit/warm": {
+          "successes": 12,
+          "refusals": {},
+          "median_ms": 8.263923460617661,
+          "max_ms": 10.088099050335586
+        },
+        "history_window/warm": {
+          "successes": 36,
+          "refusals": {},
+          "median_ms": 1.1092249769717455,
+          "max_ms": 2.023271983489394
+        },
+        "actions/warm": {
+          "successes": 36,
+          "refusals": {},
+          "median_ms": 2.0808030385524035,
+          "max_ms": 3.2618489349260926
+        },
+        "calls/warm": {
+          "successes": 132,
+          "refusals": {},
+          "median_ms": 2.017224964220077,
+          "max_ms": 4.8656800063326955
+        },
+        "definition/warm": {
+          "successes": 108,
+          "refusals": {},
+          "median_ms": 1.8719040090218186,
+          "max_ms": 3.47266998142004
+        },
+        "open/warm": {
+          "successes": 48,
+          "refusals": {},
+          "median_ms": 2.361450984608382,
+          "max_ms": 5.959675996564329
+        },
+        "compare/warm": {
+          "successes": 12,
+          "refusals": {},
+          "median_ms": 272.11612852988765,
+          "max_ms": 321.9278190517798
+        },
+        "comparison_window/warm": {
+          "successes": 24,
+          "refusals": {},
+          "median_ms": 1.5428775222972035,
+          "max_ms": 2.194012049585581
+        },
+        "deeper_history/discovery": {
+          "successes": 6,
+          "refusals": {
+            "503": 3
+          },
+          "median_ms": 52.540823991876096,
+          "max_ms": 251.6540139913559
+        },
+        "revisit/after_discovery": {
+          "successes": 6,
+          "refusals": {},
+          "median_ms": 10.731394460890442,
+          "max_ms": 11.972547974437475
+        },
+        "history_window/reacquire": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 11.019530007615685,
+          "max_ms": 12.45687110349536
+        }
+      },
+      "torch/csrc/autograd/engine.cpp::Engine::evaluate_function": {
+        "inventory/coverage": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 2.3007580311968923,
+          "max_ms": 3.277125069871545
+        },
+        "history/first": {
+          "successes": 0,
+          "refusals": {
+            "503": 3
+          },
+          "median_ms": null,
+          "max_ms": null
+        },
+        "compare/first": {
+          "successes": 0,
+          "refusals": {
+            "503": 3
+          },
+          "median_ms": null,
+          "max_ms": null
+        },
+        "history/warm": {
+          "successes": 0,
+          "refusals": {
+            "503": 12
+          },
+          "median_ms": null,
+          "max_ms": null
+        },
+        "compare/warm": {
+          "successes": 0,
+          "refusals": {
+            "503": 12
+          },
+          "median_ms": null,
+          "max_ms": null
+        }
+      },
+      "torch/csrc/autograd/engine.cpp::Engine::execute": {
+        "inventory/coverage": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 534.5431769965217,
+          "max_ms": 584.2198940226808
+        },
+        "history/first": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 337.4006359372288,
+          "max_ms": 873.4087019693106
+        },
+        "revisit/first": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 10.044498019851744,
+          "max_ms": 14.005652978084981
+        },
+        "history_window/first": {
+          "successes": 9,
+          "refusals": {},
+          "median_ms": 1.2226320104673505,
+          "max_ms": 1.6665839357301593
+        },
+        "actions/first": {
+          "successes": 9,
+          "refusals": {},
+          "median_ms": 2.0025750854983926,
+          "max_ms": 3.919176058843732
+        },
+        "calls/first": {
+          "successes": 93,
+          "refusals": {},
+          "median_ms": 1.9373309332877398,
+          "max_ms": 5.907153012230992
+        },
+        "definition/first": {
+          "successes": 27,
+          "refusals": {},
+          "median_ms": 1.8530850065872073,
+          "max_ms": 3.504257067106664
+        },
+        "open/first": {
+          "successes": 15,
+          "refusals": {},
+          "median_ms": 2.20713100861758,
+          "max_ms": 3.6967439809814095
+        },
+        "compare/first": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 377.8570939321071,
+          "max_ms": 394.01054102927446
+        },
+        "comparison_window/first": {
+          "successes": 6,
+          "refusals": {},
+          "median_ms": 1.5016260440461338,
+          "max_ms": 2.7338049840182066
+        },
+        "history/warm": {
+          "successes": 12,
+          "refusals": {},
+          "median_ms": 388.72385647846386,
+          "max_ms": 422.83042101189494
+        },
+        "revisit/warm": {
+          "successes": 12,
+          "refusals": {},
+          "median_ms": 9.931092499755323,
+          "max_ms": 13.317542965523899
+        },
+        "history_window/warm": {
+          "successes": 36,
+          "refusals": {},
+          "median_ms": 1.4741585473529994,
+          "max_ms": 3.3553799148648977
+        },
+        "actions/warm": {
+          "successes": 36,
+          "refusals": {},
+          "median_ms": 2.4188425741158426,
+          "max_ms": 3.6471179919317365
+        },
+        "calls/warm": {
+          "successes": 372,
+          "refusals": {},
+          "median_ms": 2.1027149632573128,
+          "max_ms": 5.299802985973656
+        },
+        "definition/warm": {
+          "successes": 108,
+          "refusals": {},
+          "median_ms": 2.0096085499972105,
+          "max_ms": 6.021564011462033
+        },
+        "open/warm": {
+          "successes": 60,
+          "refusals": {},
+          "median_ms": 2.3347954847849905,
+          "max_ms": 4.265532013960183
+        },
+        "compare/warm": {
+          "successes": 12,
+          "refusals": {},
+          "median_ms": 397.7837020647712,
+          "max_ms": 427.00969194993377
+        },
+        "comparison_window/warm": {
+          "successes": 24,
+          "refusals": {},
+          "median_ms": 1.742326479870826,
+          "max_ms": 2.6445750845596194
+        },
+        "deeper_history/discovery": {
+          "successes": 0,
+          "refusals": {
+            "503": 3
+          },
+          "median_ms": null,
+          "max_ms": null
+        },
+        "revisit/after_discovery": {
+          "successes": 3,
+          "refusals": {
+            "503": 3
+          },
+          "median_ms": 8.903551031835377,
+          "max_ms": 9.591222973540425
+        },
+        "history_window/reacquire": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 1.250765984877944,
+          "max_ms": 1.5477719716727734
+        }
+      }
+    },
+    "resources": [
+      {
+        "input": "experiments/function-history/results/pytorch.json.gz",
+        "run": 0,
+        "initial_index_s": 17.697452738997526,
+        "process_peak_rss_kib": 1105044,
+        "lifetime_hwm_kib": 1105044,
+        "post_index_peak_rss_kib": 1105044,
+        "live_responsiveness": {
+          "/api/status/coexistence": {
+            "successes": 235,
+            "refusals": {},
+            "median_ms": 0.6484820041805506,
+            "max_ms": 2.6496649952605367
+          },
+          "/api/window/coexistence": {
+            "successes": 235,
+            "refusals": {},
+            "median_ms": 1.0514239547774196,
+            "max_ms": 2.8262250125408173
+          }
+        },
+        "changed_live_pins": 0
+      },
+      {
+        "input": "experiments/function-history/results/pytorch.json.gz",
+        "run": 1,
+        "initial_index_s": 1.4150788659462705,
+        "process_peak_rss_kib": 1037104,
+        "lifetime_hwm_kib": 1037104,
+        "post_index_peak_rss_kib": 1037104,
+        "live_responsiveness": {
+          "/api/status/coexistence": {
+            "successes": 116,
+            "refusals": {},
+            "median_ms": 0.6258684443309903,
+            "max_ms": 1.9883110653609037
+          },
+          "/api/window/coexistence": {
+            "successes": 116,
+            "refusals": {},
+            "median_ms": 1.0079354397021234,
+            "max_ms": 2.118543954566121
+          }
+        },
+        "changed_live_pins": 0
+      },
+      {
+        "input": "experiments/function-history/results/pytorch.json.gz",
+        "run": 2,
+        "initial_index_s": 1.3141172579489648,
+        "process_peak_rss_kib": 1045980,
+        "lifetime_hwm_kib": 1045980,
+        "post_index_peak_rss_kib": 1045980,
+        "live_responsiveness": {
+          "/api/status/coexistence": {
+            "successes": 120,
+            "refusals": {},
+            "median_ms": 0.6610019481740892,
+            "max_ms": 1.9010260002687573
+          },
+          "/api/window/coexistence": {
+            "successes": 120,
+            "refusals": {},
+            "median_ms": 1.0672565549612045,
+            "max_ms": 3.131992998532951
+          }
+        },
+        "changed_live_pins": 0
+      },
+      {
+        "input": "experiments/function-history/results/pytorch-cpp.json.gz",
+        "run": 0,
+        "initial_index_s": 18.531672916957177,
+        "process_peak_rss_kib": 1091564,
+        "lifetime_hwm_kib": 1091564,
+        "post_index_peak_rss_kib": 1091564,
+        "live_responsiveness": {
+          "/api/status/coexistence": {
+            "successes": 60,
+            "refusals": {},
+            "median_ms": 0.6600389606319368,
+            "max_ms": 1.5588989481329918
+          },
+          "/api/window/coexistence": {
+            "successes": 60,
+            "refusals": {},
+            "median_ms": 1.0190175380557775,
+            "max_ms": 2.619431004859507
+          }
+        },
+        "changed_live_pins": 0
+      },
+      {
+        "input": "experiments/function-history/results/pytorch-cpp.json.gz",
+        "run": 1,
+        "initial_index_s": 1.4181944229640067,
+        "process_peak_rss_kib": 1029180,
+        "lifetime_hwm_kib": 1029180,
+        "post_index_peak_rss_kib": 1029180,
+        "live_responsiveness": {
+          "/api/status/coexistence": {
+            "successes": 54,
+            "refusals": {},
+            "median_ms": 0.6729989545419812,
+            "max_ms": 1.3492089929059148
+          },
+          "/api/window/coexistence": {
+            "successes": 54,
+            "refusals": {},
+            "median_ms": 1.1571955401450396,
+            "max_ms": 3.038397990167141
+          }
+        },
+        "changed_live_pins": 0
+      },
+      {
+        "input": "experiments/function-history/results/pytorch-cpp.json.gz",
+        "run": 2,
+        "initial_index_s": 1.5167730449466035,
+        "process_peak_rss_kib": 1029304,
+        "lifetime_hwm_kib": 1029304,
+        "post_index_peak_rss_kib": 1029304,
+        "live_responsiveness": {
+          "/api/status/coexistence": {
+            "successes": 51,
+            "refusals": {},
+            "median_ms": 0.6519759772345424,
+            "max_ms": 2.36513908021152
+          },
+          "/api/window/coexistence": {
+            "successes": 51,
+            "refusals": {},
+            "median_ms": 1.0644219582900405,
+            "max_ms": 2.8798229759559035
+          }
+        },
+        "changed_live_pins": 0
+      }
+    ]
+  },
+  "lpc-rs": {
+    "workloads": {
+      "src/interpreter/task/mod.rs::run_entry": {
+        "inventory/coverage": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 1067.4575601005927,
+          "max_ms": 1148.2634129934013
+        },
+        "history/first": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 53.6838339176029,
+          "max_ms": 159.89288792479783
+        },
+        "revisit/first": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 10.490535059943795,
+          "max_ms": 11.782924993894994
+        },
+        "history_window/first": {
+          "successes": 9,
+          "refusals": {},
+          "median_ms": 1.0593240149319172,
+          "max_ms": 1.4612479135394096
+        },
+        "actions/first": {
+          "successes": 9,
+          "refusals": {},
+          "median_ms": 2.215286949649453,
+          "max_ms": 3.35415406152606
+        },
+        "calls/first": {
+          "successes": 129,
+          "refusals": {},
+          "median_ms": 2.207761979661882,
+          "max_ms": 7.564243045635521
+        },
+        "definition/first": {
+          "successes": 21,
+          "refusals": {},
+          "median_ms": 2.1616859594359994,
+          "max_ms": 4.3529910035431385
+        },
+        "open/first": {
+          "successes": 12,
+          "refusals": {},
+          "median_ms": 1.9825169583782554,
+          "max_ms": 3.4188999561592937
+        },
+        "compare/first": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 68.19980102591217,
+          "max_ms": 68.30327201168984
+        },
+        "comparison_window/first": {
+          "successes": 6,
+          "refusals": {},
+          "median_ms": 1.5607009991072118,
+          "max_ms": 2.8462109621614218
+        },
+        "history/warm": {
+          "successes": 12,
+          "refusals": {},
+          "median_ms": 53.2415269408375,
+          "max_ms": 62.71951401140541
+        },
+        "revisit/warm": {
+          "successes": 12,
+          "refusals": {},
+          "median_ms": 9.512257995083928,
+          "max_ms": 13.102907105349004
+        },
+        "history_window/warm": {
+          "successes": 36,
+          "refusals": {},
+          "median_ms": 1.257158990483731,
+          "max_ms": 2.8784030582755804
+        },
+        "actions/warm": {
+          "successes": 36,
+          "refusals": {},
+          "median_ms": 2.4082870222628117,
+          "max_ms": 5.471594980917871
+        },
+        "calls/warm": {
+          "successes": 516,
+          "refusals": {},
+          "median_ms": 2.294708974659443,
+          "max_ms": 7.113236002624035
+        },
+        "definition/warm": {
+          "successes": 84,
+          "refusals": {},
+          "median_ms": 2.0166889880783856,
+          "max_ms": 5.092167994007468
+        },
+        "open/warm": {
+          "successes": 48,
+          "refusals": {},
+          "median_ms": 2.2119625355117023,
+          "max_ms": 4.013333003968
+        },
+        "compare/warm": {
+          "successes": 12,
+          "refusals": {},
+          "median_ms": 62.292760994751006,
+          "max_ms": 81.58061699941754
+        },
+        "comparison_window/warm": {
+          "successes": 24,
+          "refusals": {},
+          "median_ms": 1.5148609527386725,
+          "max_ms": 2.4628560058772564
+        },
+        "deeper_history/discovery": {
+          "successes": 21,
+          "refusals": {
+            "503": 3
+          },
+          "median_ms": 27.227489976212382,
+          "max_ms": 380.94141602050513
+        },
+        "revisit/after_discovery": {
+          "successes": 6,
+          "refusals": {},
+          "median_ms": 10.486209997907281,
+          "max_ms": 14.374780934303999
+        },
+        "history_window/reacquire": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 10.647136019542813,
+          "max_ms": 11.563609004952013
+        },
+        "history/admission": {
+          "successes": 25,
+          "refusals": {},
+          "median_ms": 55.911023053340614,
+          "max_ms": 63.7802550336346
+        },
+        "history_window/expired": {
+          "successes": 0,
+          "refusals": {
+            "409": 1
+          },
+          "median_ms": null,
+          "max_ms": null
+        },
+        "actions/expired": {
+          "successes": 0,
+          "refusals": {
+            "409": 1
+          },
+          "median_ms": null,
+          "max_ms": null
+        },
+        "calls/expired": {
+          "successes": 0,
+          "refusals": {
+            "409": 2
+          },
+          "median_ms": null,
+          "max_ms": null
+        },
+        "compare/admission": {
+          "successes": 13,
+          "refusals": {},
+          "median_ms": 73.06487602181733,
+          "max_ms": 79.98408703133464
+        },
+        "comparison_window/expired": {
+          "successes": 0,
+          "refusals": {
+            "409": 1
+          },
+          "median_ms": null,
+          "max_ms": null
+        }
+      },
+      "src/interpreter/program.rs::lookup_function": {
+        "inventory/coverage": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 1.3989040162414312,
+          "max_ms": 1.7331700073555112
+        },
+        "history/first": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 95.91838996857405,
+          "max_ms": 447.07814091816545
+        },
+        "revisit/first": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 6.3930199248716235,
+          "max_ms": 9.01519600301981
+        },
+        "history_window/first": {
+          "successes": 6,
+          "refusals": {},
+          "median_ms": 1.293584005907178,
+          "max_ms": 1.6096249455586076
+        },
+        "actions/first": {
+          "successes": 9,
+          "refusals": {},
+          "median_ms": 1.5641290228813887,
+          "max_ms": 2.4686610559001565
+        },
+        "calls/first": {
+          "successes": 9,
+          "refusals": {},
+          "median_ms": 1.4949670294299722,
+          "max_ms": 1.8084750045090914
+        },
+        "definition/first": {
+          "successes": 9,
+          "refusals": {},
+          "median_ms": 1.1210510274395347,
+          "max_ms": 1.5186580130830407
+        },
+        "compare/first": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 99.4164029834792,
+          "max_ms": 121.91946408711374
+        },
+        "comparison_window/first": {
+          "successes": 6,
+          "refusals": {},
+          "median_ms": 1.5123359044082463,
+          "max_ms": 3.465761081315577
+        },
+        "history/warm": {
+          "successes": 12,
+          "refusals": {},
+          "median_ms": 96.42541699577123,
+          "max_ms": 110.84194900467992
+        },
+        "revisit/warm": {
+          "successes": 12,
+          "refusals": {},
+          "median_ms": 6.680740043520927,
+          "max_ms": 8.948607952333987
+        },
+        "history_window/warm": {
+          "successes": 24,
+          "refusals": {},
+          "median_ms": 1.4097540406510234,
+          "max_ms": 2.525893971323967
+        },
+        "actions/warm": {
+          "successes": 36,
+          "refusals": {},
+          "median_ms": 1.1575519456528127,
+          "max_ms": 3.006224986165762
+        },
+        "calls/warm": {
+          "successes": 36,
+          "refusals": {},
+          "median_ms": 1.2581784976646304,
+          "max_ms": 2.9387109680101275
+        },
+        "definition/warm": {
+          "successes": 36,
+          "refusals": {},
+          "median_ms": 0.9913435205817223,
+          "max_ms": 1.8399069085717201
+        },
+        "compare/warm": {
+          "successes": 12,
+          "refusals": {},
+          "median_ms": 110.27937545441091,
+          "max_ms": 121.7509990092367
+        },
+        "comparison_window/warm": {
+          "successes": 24,
+          "refusals": {},
+          "median_ms": 1.3667050516232848,
+          "max_ms": 4.027754999697208
+        },
+        "deeper_history/discovery": {
+          "successes": 15,
+          "refusals": {
+            "503": 3
+          },
+          "median_ms": 93.29846606124192,
+          "max_ms": 790.6512260669842
+        },
+        "revisit/after_discovery": {
+          "successes": 6,
+          "refusals": {},
+          "median_ms": 6.693606963381171,
+          "max_ms": 8.614466991275549
+        },
+        "history_window/reacquire": {
+          "successes": 3,
+          "refusals": {},
+          "median_ms": 6.532285013236105,
+          "max_ms": 7.277094991877675
+        }
+      }
+    },
+    "resources": [
+      {
+        "input": "experiments/function-history/results/lpc-rs.json.gz",
+        "run": 0,
+        "initial_index_s": 0.9298658469924703,
+        "process_peak_rss_kib": 166804,
+        "lifetime_hwm_kib": 166804,
+        "post_index_peak_rss_kib": 166804,
+        "live_responsiveness": {
+          "/api/status/coexistence": {
+            "successes": 91,
+            "refusals": {},
+            "median_ms": 0.6705271080136299,
+            "max_ms": 1.485044020228088
+          },
+          "/api/window/coexistence": {
+            "successes": 91,
+            "refusals": {},
+            "median_ms": 0.7182059343904257,
+            "max_ms": 2.002315013669431
+          }
+        },
+        "changed_live_pins": 0
+      },
+      {
+        "input": "experiments/function-history/results/lpc-rs.json.gz",
+        "run": 1,
+        "initial_index_s": 0.10194264200981706,
+        "process_peak_rss_kib": 152668,
+        "lifetime_hwm_kib": 152668,
+        "post_index_peak_rss_kib": 152668,
+        "live_responsiveness": {
+          "/api/status/coexistence": {
+            "successes": 45,
+            "refusals": {},
+            "median_ms": 0.6648160051554441,
+            "max_ms": 4.180399002507329
+          },
+          "/api/window/coexistence": {
+            "successes": 45,
+            "refusals": {},
+            "median_ms": 0.7428469834849238,
+            "max_ms": 2.038125996477902
+          }
+        },
+        "changed_live_pins": 0
+      },
+      {
+        "input": "experiments/function-history/results/lpc-rs.json.gz",
+        "run": 2,
+        "initial_index_s": 0.1029482310405001,
+        "process_peak_rss_kib": 152012,
+        "lifetime_hwm_kib": 152012,
+        "post_index_peak_rss_kib": 152012,
+        "live_responsiveness": {
+          "/api/status/coexistence": {
+            "successes": 45,
+            "refusals": {},
+            "median_ms": 0.788445002399385,
+            "max_ms": 3.4007300855591893
+          },
+          "/api/window/coexistence": {
+            "successes": 45,
+            "refusals": {},
+            "median_ms": 0.7457389729097486,
+            "max_ms": 1.7278860323131084
+          }
+        },
+        "changed_live_pins": 0
+      }
+    ]
+  }
+}

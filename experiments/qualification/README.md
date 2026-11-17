@@ -9,6 +9,9 @@ The [responsiveness follow-up](RESPONSIVENESS_RESULTS.md) measures bounded outli
 verified capture plans on the same profiles.
 The [cancellation follow-up](CANCELLATION_RESULTS.md) measures interruption within files
 and complete reparse throughput with the old observation retained.
+The [function-history qualification](../function-history/README.md) uses disposable Git
+checkouts at these same Linux/PyTorch revisions for history, adjacent comparisons and
+captured-file call trails, with initial indexing reported separately.
 
 ## Profiles
 

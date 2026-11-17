@@ -104,3 +104,10 @@ CARGO_BUILD_JOBS=1 and RUST_TEST_THREADS=1, with passing unmodified baselines. T
 for the native adapter and the targeted model transition, not complete browser-controller
 mutation coverage. No new large-repository latency qualification or optimized captured-call
 timing was collected.
+
+### Reference-repository performance follow-up
+
+The [Linux/PyTorch/lpc-rs qualification](../../experiments/function-history/RESULTS.md)
+now records repeated captured actions, calls pages, definitions and destination opens from
+history and both comparison sides. It retains unresolved/ambiguous evidence and source
+coverage, and distinguishes endpoint timings from browser interaction latency.

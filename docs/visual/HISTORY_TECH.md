@@ -125,3 +125,10 @@ failing tests and ten hit the three-second process timeout. Timeout variants rem
 promise completion or retry termination; they are reported separately, not counted as
 caught. No survivors, runner/build failures or equivalent exclusions remained. This
 follow-up changed JavaScript behavior only; native mutation checks above were not repeated.
+
+### Reference-repository performance follow-up
+
+The [Linux/PyTorch/lpc-rs qualification](../../experiments/function-history/RESULTS.md)
+records repeated optimized history, revisit and paging observations, initial indexing,
+native memory and boundary/expiry checks separately from these correctness results.
+It also records the full-corpus inventory limitation and the different measurement hardware.

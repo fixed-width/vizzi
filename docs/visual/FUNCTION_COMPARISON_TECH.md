@@ -138,3 +138,10 @@ workflows passed. Large-repository qualification and the complete browser suite 
 repeated for this correction.
 The final workspace baseline passed 774 tests/doctests, with 15 opt-in checks ignored;
 formatting and Clippy with warnings denied also passed.
+
+### Reference-repository performance follow-up
+
+The [Linux/PyTorch/lpc-rs qualification](../../experiments/function-history/RESULTS.md)
+records repeated optimized adjacent comparisons, owned-source reads, native memory and
+admission/expiry observations. It separates initial indexing and unsupported/boundary
+responses from successful timings and does not establish a 16 GiB laptop latency budget.
