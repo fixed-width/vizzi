@@ -11,7 +11,7 @@ const git=(...args)=>{const out=spawnSync('git',['-C',input.root,...args],{encod
 async function commit(text){await writeFile(join(input.root,'lib.rs'),text);git('add','lib.rs');git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-qm','fixture');return git('rev-parse','HEAD');}
 try{
  git('init','-q');const old=await commit(before),newer=await commit(after);
- host=await startHost(input,1);chromium=await browser({desktopBus:false});const page=await chromium.newPage({viewport:{width:1500,height:1100}}),errors=[];page.on('pageerror',error=>errors.push(error.message));await page.goto(host.url+'/workspace');await page.waitForFunction(()=>document.querySelector('#visual-source-status').textContent.includes('ready'));
+ host=await startHost(input,1);chromium=await browser({desktopBus:false});const page=await chromium.newPage({viewport:{width:1500,height:1100},hasTouch:true}),errors=[];page.on('pageerror',error=>errors.push(error.message));await page.goto(host.url+'/workspace');await page.waitForFunction(()=>document.querySelector('#visual-source-status').textContent.includes('ready'));
  await page.getByRole('button',{name:'Add bubble',exact:true}).click();await page.getByLabel('Find a function',{exact:true}).fill('target');await page.getByRole('button',{name:'Find functions',exact:true}).click();await page.locator('[data-add-symbol][data-name="target"]').click();const root=page.locator('[data-view][data-name="target"]');await root.locator('.code-line').first().waitFor();
  assert.equal(await root.getByRole('button',{name:'Compare with previous version',exact:true}).count(),1);
  await root.getByRole('button',{name:'Actions for other',exact:true}).click({modifiers:['Control']});const other=page.locator('[data-view][data-name="other"]');await other.locator('.code-line').first().waitFor();const otherNode=await other.locator('.code-text').elementHandle();
@@ -20,6 +20,12 @@ try{
  assert.match(await newerView.locator('.comparison-added').textContent(),/new_first/);assert.match(await olderView.locator('.comparison-removed').textContent(),/old_first/);assert.equal(await newerView.locator('.comparison-added').getAttribute('data-line'),String(after.split('\n').findIndex(line=>line.includes('new_first'))+1));assert.equal(await olderView.locator('.comparison-removed').getAttribute('data-line'),String(before.split('\n').findIndex(line=>line.includes('old_first'))+1));
  assert.equal(await olderView.locator('.fragment-history').textContent().then(text=>text.includes(old.slice(0,8))),true);assert.match(await newerView.locator('.fragment-history').textContent(),/After/);assert.deepEqual(await geometry(newerView),original);assert.deepEqual(await geometry(other),otherGeometry);assert.equal(await otherNode.evaluate(node=>node.isConnected),true);assert.equal(await newerView.locator('.code-call').count(),0);assert.equal(await newerView.getByRole('button',{name:'Calls',exact:true}).isDisabled(),false);
  const copied=await newerView.locator('.comparison-added .code-text').evaluate(node=>{const range=document.createRange();range.selectNodeContents(node);const selection=getSelection();selection.removeAllRanges();selection.addRange(range);const clipboardData=new DataTransfer();node.dispatchEvent(new ClipboardEvent('copy',{clipboardData,bubbles:true}));selection.removeAllRanges();return clipboardData.getData('text/plain');});assert.equal(copied,'    let new_first = 1;');
+ const firstEdit=await newerView.locator('.comparison-added').elementHandle();
+ const newerPane=newerView.locator('.code-pane'),newerRows=newerPane.locator('.code-line');
+ const secondEdit=newerView.locator('.comparison-added').filter({hasText:'new_last'});
+ await newerPane.evaluate(pane=>{pane.scrollTop=pane.scrollHeight-pane.clientHeight-10;});
+ await secondEdit.waitFor();
+ assert.equal(await firstEdit.evaluate(node=>node.isConnected),true,'loading surrounding comparison source keeps the first edit mounted');
  await newerView.getByRole('button',{name:'Next comparison edit',exact:true}).click();await page.waitForFunction(()=>document.querySelector('[data-comparison-side="newer"] .comparison-added')?.textContent.includes('new_last')&&document.querySelector('[data-comparison-side="older"] .comparison-removed')?.textContent.includes('old_last'));
  assert.equal(await newerView.getByRole('button',{name:'Next comparison edit',exact:true}).isDisabled(),true);
  const busy=new Set();await page.route('**/api/function-comparisons/window?*',async route=>{const q=new URL(route.request().url()).searchParams,key=q.get('side')+':'+q.get('line_start');if(!busy.has(key)){busy.add(key);await route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({message:'Comparison read busy; retry'})});}else await route.continue();});await page.reload();await newerView.locator('.comparison-added').first().waitFor();await olderView.locator('.comparison-removed').first().waitFor();assert.match(await newerView.locator('.comparison-added').textContent(),/new_last/);assert.match(await olderView.locator('.comparison-removed').textContent(),/old_last/);assert.ok(busy.size>=4);await page.unroute('**/api/function-comparisons/window?*');
@@ -43,6 +49,23 @@ try{
  assert.equal(await page.locator('[data-comparison-side]').count(),0);assert.equal(await page.locator('#visual-stale').isVisible(),false);
  await page.unroute('**/api/visual/refresh');
  await root.getByRole('button',{name:'Previous function change',exact:true}).click();await root.getByRole('button',{name:'Compare with previous version',exact:true}).click();await olderView.locator('.comparison-removed').first().waitFor();assert.match(await newerView.locator('.fragment-history').textContent(),new RegExp(newer.slice(0,8)));assert.match(await olderView.locator('.fragment-history').textContent(),new RegExp(old.slice(0,8)));
+ const firstLine=Number(await newerRows.first().getAttribute('data-line'));
+ assert.equal(await newerPane.evaluate(pane=>pane.scrollTop),0);
+ const touch=await page.context().newCDPSession(page);
+ const bounds=await newerPane.boundingBox(),x=Math.round(bounds.x+bounds.width/2),y=Math.round(bounds.y+40);
+ await touch.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});
+ await touch.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x,y:y+64}]});
+ await touch.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+ await newerPane.locator(`[data-line="${firstLine-1}"]`).waitFor({timeout:5000});
+ await touch.detach();
+ const earlierFirst=firstLine-96;
+ await newerPane.evaluate(pane=>{pane.scrollTop=0;pane.dispatchEvent(new WheelEvent('wheel',{deltaY:-30}));});
+ await newerPane.locator('.code-line[data-line="3"]').waitFor({timeout:5000});
+ await newerPane.evaluate(pane=>{pane.scrollTop=0;});
+ await newerView.getByText(new RegExp(`^Lines 3–${earlierFirst-1} ·`)).waitFor();
+ await newerView.getByRole('button',{name:'Next section',exact:true}).click();
+ await page.waitForFunction(()=>document.querySelector('[data-comparison-side="newer"] .code-line')?.dataset.line!=='3');
+ assert.equal(await newerRows.first().getAttribute('data-line'),String(earlierFirst),'Next section starts immediately after the shortened section');
  const grip=newerView.getByRole('button',{name:'Resize bubble',exact:true});for(let i=0;i<13;i++)await grip.press('ArrowUp');const outer=await newerView.boundingBox(),returning=await newerView.getByRole('button',{name:'Return to live',exact:true}).boundingBox();assert.ok(returning.y+returning.height<=outer.y+outer.height+1);
  await olderView.getByRole('button',{name:'Close bubble',exact:true}).click();await newerView.getByRole('button',{name:'Return to live',exact:true}).click();await page.waitForFunction(()=>!document.querySelector('[data-name="target"] button[aria-label="Open in VS Code"]').disabled);
  let release,arrived;const waiting=new Promise(resolve=>arrived=resolve),gate=new Promise(resolve=>release=resolve);await page.route('**/api/function-comparisons',async route=>{const response=await route.fetch();arrived();await gate;await route.fulfill({response}).catch(()=>{});});await root.getByRole('button',{name:'Compare with previous version',exact:true}).click();await waiting;await root.getByRole('button',{name:'Close bubble',exact:true}).click();release();await page.unroute('**/api/function-comparisons');assert.equal(await page.locator('[data-comparison-side]').count(),0);assert.equal(await page.locator('[data-view]').count(),1);assert.deepEqual(errors,[]);

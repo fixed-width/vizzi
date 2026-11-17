@@ -12,7 +12,7 @@ showing the source; closing it removes the bubble and its visual connections.
 **↕ Fit height** and **↔ Fit width** fit the currently loaded code section. They can grow
 or shrink a bubble. Growing moves nearby bubbles down or right to make room; shrinking
 leaves neighbours in place. They retain the bubble's position and the workspace zoom.
-Long functions still use section paging and scrolling.
+Scroll inside a bubble to keep reading a long function. The section buttons jump through it.
 
 **Settings → Code layout → Original lines** disables smart reflow. Reflow only changes
 display wrapping. Source locations and copied text retain their original meaning.

@@ -11,17 +11,35 @@ export class SourcePane {
         this.selection=()=>{if(this.pending&&!this.selected())this.schedule();};document.addEventListener('selectionchange',this.selection);
         this.copy=event=>this.copySelection(event);document.addEventListener('copy',this.copy);
     }
-    set(lines,reading={top:0,left:0},baseline=0) {
-        this.rows=lines.map(line=>{
+    makeRows(lines,baseline) {
+        return lines.map(line=>{
             const row=this.document.createElement('div');row.className='code-line';row.dataset.line=String(line.number);
             const number=this.document.createElement('span');number.className='line-number';number.textContent=String(line.number);
             const text=this.document.createElement('span');text.className='code-text';row.append(number,text);return {line,row,text,key:null,margin:sourceMargin(line,baseline)};
         });
+    }
+    set(lines,reading={top:0,left:0},baseline=0) {
+        this.rows=this.makeRows(lines,baseline);
         this.element.replaceChildren(...this.rows.map(r=>r.row));
         const legacy=this.rows.find(r=>r.row.offsetTop+r.row.offsetHeight>reading.top);
         const anchor=reading.anchor??(legacy?{line:legacy.line.number,byte:0,offset:reading.top-legacy.row.offsetTop}:null);
-        this.update(false,true);if(anchor)this.restore(anchor);else this.element.scrollTop=reading.top;this.element.scrollLeft=reading.left;
+        this.update(false,true);this.element.scrollLeft=reading.left;
+        if(anchor)return this.restore(anchor);
+        this.element.scrollTop=reading.top;return false;
     }
+    extend(lines,before,drop,baseline) {
+        const top=this.element.scrollTop;
+        const anchor=this.rows.find(r=>r.row.offsetTop+r.row.offsetHeight>top)?.row;
+        const offset=anchor?.offsetTop??0;
+        const added=this.makeRows(lines,baseline);
+        const removed=before?this.rows.splice(this.rows.length-drop,drop):this.rows.splice(0,drop);
+        for(const {row} of removed)row.remove();
+        if(before){this.rows.unshift(...added);this.element.prepend(...added.map(r=>r.row));}
+        else{this.rows.push(...added);this.element.append(...added.map(r=>r.row));}
+        this.renderRows(added);
+        if(anchor?.isConnected)this.element.scrollTop=top+anchor.offsetTop-offset;
+    }
+    rerender(){for(const row of this.rows)row.key=undefined;this.update(true);}
     setReflow(enabled){if(this.enabled===enabled)return;this.enabled=enabled;this.update(true);}
     selected(){const selection=this.document.getSelection();if(!selection||selection.isCollapsed)return false;for(let i=0;i<selection.rangeCount;i++)if(selection.getRangeAt(i).intersectsNode(this.element))return true;return false;}
     schedule(){if(this.closed||this.frame!==null)return;this.frame=this.view.requestAnimationFrame(()=>{this.frame=null;this.update(true);});}
@@ -33,26 +51,37 @@ export class SourcePane {
     }
     reading(){return {top:this.element.scrollTop,left:this.element.scrollLeft,anchor:this.anchor()};}
     readingContext(){const reading=this.reading(),row=this.rows.find(r=>r.line.number===reading.anchor?.line);return {reading,text:row&&!row.line.left&&!row.line.right&&new TextEncoder().encode(row.line.text).length<=1024?row.line.text:''};}
-    contentSize(){
-        if(!this.rows.length)return null;
+    contentSize(start,count){
+        const rows=start===undefined?this.rows:this.rows.filter(row=>row.line.number>=start&&row.line.number<start+count);
+        if(!rows.length)return null;
         const style=this.view.getComputedStyle(this.element),context=this.context;
         if(context){context.font=`${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;context.fontKerning='none';}
         const textWidth=text=>context?context.measureText(text).width:text.length*parseFloat(style.fontSize)*.6;
         const tab=textWidth('    '),measure=text=>{let width=0;const parts=text.split('\t');for(const [i,part]of parts.entries()){width+=textWidth(part);if(i<parts.length-1)width=(Math.floor(width/tab)+1)*tab;}return width;};
-        const width=Math.max(...this.rows.map(r=>measure(' '.repeat(r.margin.columns)+r.line.text.slice(r.margin.bytes))));
-        return {width:Math.ceil(width+67+this.element.offsetWidth-this.element.clientWidth),height:Math.max(parseFloat(style.minHeight)||0,this.rows.reduce((sum,r)=>sum+r.row.offsetHeight,0)+parseFloat(style.paddingTop)+parseFloat(style.paddingBottom))};
+        const width=Math.max(...rows.map(r=>measure(' '.repeat(r.margin.columns)+r.line.text.slice(r.margin.bytes))));
+        return {width:Math.ceil(width+67+this.element.offsetWidth-this.element.clientWidth),height:Math.max(parseFloat(style.minHeight)||0,rows.reduce((sum,r)=>sum+r.row.offsetHeight,0)+parseFloat(style.paddingTop)+parseFloat(style.paddingBottom))};
     }
-    restore(anchor){const row=this.rows.find(r=>r.line.number===anchor.line),segment=row&&[...row.text.querySelectorAll('.reflow-segment')].find(s=>Number(s.dataset.start)<=anchor.byte&&(anchor.byte<Number(s.dataset.end)||Number(s.dataset.start)===Number(s.dataset.end)));if(segment)this.element.scrollTop=row.row.offsetTop+segment.offsetTop+Math.min(anchor.offset,Math.max(0,segment.offsetHeight-1));}
+    restore(anchor){
+        const row=this.rows.find(r=>r.line.number===anchor.line),segment=row&&[...row.text.querySelectorAll('.reflow-segment')].find(s=>Number(s.dataset.start)<=anchor.byte&&(anchor.byte<Number(s.dataset.end)||Number(s.dataset.start)===Number(s.dataset.end)));
+        if(!segment)return false;
+        const top=Math.max(0,row.row.offsetTop+segment.offsetTop+Math.min(anchor.offset,Math.max(0,segment.offsetHeight-1)));
+        this.element.scrollTop=top;
+        return Math.abs(this.element.scrollTop-top)<=1;
+    }
     update(preserve,force=false){
         if(this.closed||!this.rows.length)return;
         if(!force&&this.selected()){this.pending=true;return;}this.pending=false;
-        const width=this.element.clientWidth-63;if(width<=0)return;
+        const anchor=preserve?this.anchor():null;
+        if(this.renderRows(this.rows)&&anchor)this.restore(anchor);
+    }
+    renderRows(rows){
+        const width=this.element.clientWidth-63;if(width<=0)return false;
         const style=this.view.getComputedStyle(this.element);if(this.context){
         this.context.font=`${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;this.context.fontKerning='none';}
         const measure=text=>{const parts=text.split('\t'),tab=this.context.measureText('    ').width;let result=0;for(const [i,part] of parts.entries()){result+=this.context.measureText(part).width;if(i<parts.length-1)result=(Math.floor(result/tab)+1)*tab;}return result;};
-        const anchor=preserve?this.anchor():null;let changed=false;
-        for(const row of this.rows){const plan=this.enabled&&this.context?planReflow(row.line,width,measure,row.margin):null,key=JSON.stringify(plan);if(key!==row.key){this.render(row.text,row.line,plan,row.margin);row.key=key;changed=true;}}
-        if(changed&&anchor)this.restore(anchor);
+        let changed=false;
+        for(const row of rows){const plan=this.enabled&&this.context?planReflow(row.line,width,measure,row.margin):null,key=JSON.stringify(plan);if(key!==row.key){this.render(row.text,row.line,plan,row.margin);row.key=key;changed=true;}}
+        return changed;
     }
     copySelection(event){
         const selection=this.document.getSelection();if(!event.clipboardData||!selection||selection.isCollapsed||selection.rangeCount!==1)return;

@@ -11,8 +11,8 @@ call workspace.
    The bubble shows the selected commit's short ID. Hover over it for the full commit
    and the frozen history tip. At the newest historical version, **Return to live**
    takes the place of **Next change** in the history row.
-3. Page long functions with **Previous section** and **Next section** as usual. Other
-   bubbles retain their positions and can continue following saved edits.
+3. Scroll through a long function inside the bubble, or use **Previous section** and
+   **Next section** to jump. Other bubbles keep their positions and can follow saved edits.
 4. Choose **Return to live** to resolve the original function against current saved files.
    Its bubble keeps its position, size and task membership. Choose **Compare** once live
    source is ready to review it alongside the previous version.
