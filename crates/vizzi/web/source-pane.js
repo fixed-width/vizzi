@@ -68,6 +68,14 @@ export class SourcePane {
         this.element.scrollTop=top;
         return Math.abs(this.element.scrollTop-top)<=1;
     }
+    revealLine(number){
+        const row=this.rows.find(item=>item.line.number===number)?.row;
+        const height=this.element.clientHeight;
+        if(!row||!row.offsetHeight||!height)return false;
+        const top=row.offsetTop,bottom=top+Math.min(row.offsetHeight,height);
+        this.element.scrollTop=Math.min(top,Math.max(this.element.scrollTop,bottom-height));
+        return this.element.scrollTop<=top&&bottom<=this.element.scrollTop+height+1;
+    }
     update(preserve,force=false){
         if(this.closed||!this.rows.length)return;
         if(!force&&this.selected()){this.pending=true;return;}this.pending=false;

@@ -66,3 +66,15 @@
 .fragment-body>.code-pane{min-height:0;overflow-anchor:none}.fragment-history,.source-section,.fragment-footer{flex-shrink:0}
 :is(.fragment-history,.fragment-footer) button[aria-disabled="true"]{opacity:.5;cursor:default}
 .code-line.comparison-removed{background:var(--removed-bg);box-shadow:inset 3px 0 var(--removed)}.code-line.comparison-added{background:var(--added-bg);box-shadow:inset 3px 0 var(--added)}.fragment-history span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fragment-history{flex-wrap:wrap}
+.fragment[data-comparison-side] .fragment-history{display:grid;grid-template-columns:minmax(0,1fr) auto;row-gap:4px;padding-block:3px}
+.fragment[data-comparison-side] .comparison-previous{grid-area:1/1;justify-self:start}
+.fragment[data-comparison-side] .comparison-next{grid-area:1/2;justify-self:end}
+.fragment[data-comparison-side] .comparison-revision{grid-area:2/2;justify-self:end}
+.fragment[data-comparison-side] .fragment-history span{grid-area:2/1/3/-1;overflow:visible;overflow-wrap:anywhere;white-space:normal;text-align:left}
+.fragment[data-comparison-side] .fragment-history:has(.comparison-revision:not([hidden])) span{grid-column-end:2}
+.fragment[data-comparison-side] :is(.source-section,.fragment-footer){padding-block:3px}
+.fragment[data-comparison-side] .fragment-footer{column-gap:6px}
+.fragment[data-comparison-side] .source-section span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fragment[data-comparison-side] .source-section:has([data-actionable]){flex-wrap:wrap;row-gap:3px}
+.fragment[data-comparison-side] .source-section span[data-actionable]{flex-basis:100%;overflow:visible;overflow-wrap:anywhere;white-space:normal}
+.fragment[data-comparison-side] .code-pane{padding-block:4px}

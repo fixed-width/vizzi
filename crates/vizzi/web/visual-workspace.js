@@ -131,7 +131,10 @@ function updateFragmentStatus(r){
  else if(r.liveReturn)r.state.textContent=returnPending(r)?'Returning to live…':'Waiting for live source…';
  else if(r.resolving&&r.resolvingCaptured)r.state.textContent='Finding captured destination…';
  else if(v.captured){const label=shortRevision(v.captured.label);r.state.textContent=v.captured.returning?`Function unavailable — captured ${label}`:`Captured · ${label}`;}
- else if(v.comparison){const label=comparisonTitle(v.comparison);r.state.textContent=v.comparison.returning?`Function unavailable — ${label}`:label;}
+ else if(v.comparison){
+  const label=comparisonTitle(v.comparison);
+  r.state.textContent=v.comparison.returning?`Function unavailable — ${label}`:r.openedAtFirstBlock?'At first change':'';
+ }
  else if(v.history){const label=v.history.commit.slice(0,8);r.state.textContent=v.history.returning?`Function unavailable — revision ${label}`:`Revision ${label}`;}
  else if(r.resolving)r.state.textContent='Finding definition…';
  else if(r.warming)r.state.textContent='Preparing type navigation…';
@@ -213,7 +216,12 @@ function historyControls(r,v){
 }
 function comparisonControls(r,v){
  if(v.captured)r.element.dataset.capturedFile='true';else delete r.element.dataset.capturedFile;
- const c=v.comparison;r.compareButton.hidden=Boolean(v.symbol.origin)||Boolean(c&&!v.history);r.compareButton.textContent=c?'History':'Compare';r.compareButton.setAttribute('aria-label',c?'Continue function history':'Compare with previous version');r.compareButton.disabled=r.loading||returnPending(r)||model.views.length>=24&&!c||!v.history&&!model.usable(v.id);
+ const c=v.comparison;
+ r.compareButton.hidden=Boolean(v.symbol.origin)||Boolean(c&&!v.history);
+ r.compareButton.textContent=c?'Older revision (exit diff)':'Compare';
+ r.compareButton.setAttribute('aria-label',c?'Older revision (exit diff)':'Compare with previous version');
+ r.compareButton.title=c?'Open an older revision and exit the diff in this bubble.':'Compare with the previous version and open at the first changed block.';
+ r.compareButton.disabled=r.loading||returnPending(r)||model.views.length>=24&&!c||!v.history&&!model.usable(v.id);
  r.editPrevious.hidden=r.editNext.hidden=!c;r.editPrevious.disabled=r.loading||!c||c.returning||c.cursor===0;r.editNext.disabled=r.loading||!c||c.returning||c.cursor>=c.changes.length-1;
  r.historyPrevious.hidden=Boolean(c||v.captured);if(v.captured){r.historyNext.hidden=true;r.compareButton.hidden=true;r.historyLabel.textContent=shortRevision(v.captured.label);r.historyLabel.title=`Captured file · ${v.captured.label}`;}if(c){r.historyNext.hidden=true;r.historyLabel.textContent=`${comparisonTitle(c)} · ${c.changes.length?c.cursor+1:0}/${c.changes.length}`;r.historyLabel.title=`${c.label}; compared with ${c.other_label}`;r.element.dataset.comparisonSide=c.side;r.element.dataset.comparisonToken=c.token;}else{delete r.element.dataset.comparisonSide;delete r.element.dataset.comparisonToken;}
  const key=c?`${c.token}:${c.side}`:'';
@@ -242,7 +250,8 @@ async function compareFunction(id){
   if(model!==workspace||mounted.get(id)!==r||r.historyTicket!==ticket||JSON.stringify([model.view(id).snapshot,model.view(id).symbol.id,model.view(id).history])!==binding)throw new DOMException('Comparison superseded','AbortError');
   if(r.sourcePane.selected())throw new DOMException('Comparison deferred for selection','AbortError');newer.actions=actionSets[0];older.actions=actionSets[1];
   const opened=model.openComparison(id,pair);r.historyLoading=r.loading=r.comparing=false;r.liveReturn=null;r.sites=[];r.actions=[];r.callsReady=false;r.element.querySelector('.fragment-heading small').textContent=`${model.view(id).symbol.source.path}:${model.view(id).symbol.source.line}`;
-  applyPreparedSource(id,newer);mount(opened.older,older);focus([id,opened.older]);save();
+  applyPreparedSource(id,{...newer,openedAtFirstBlock:pair.newer.changes.length>0});
+  mount(opened.older,older);focus([id,opened.older]);save();
  }catch(error){if(error.name!=='AbortError'&&model===workspace&&mounted.get(id)===r&&r.historyTicket===ticket)fail(error);}
  finally{if(mounted.get(id)===r&&r.historyTicket===ticket){r.comparing=r.historyLoading=r.loading=false;geometry();live.resume();}}
 }
@@ -307,7 +316,13 @@ function mount(id,prepared){
  if(mounted.has(id)){if(prepared&&!mounted.get(id).code.querySelector('.code-line'))applyPreparedSource(id,prepared);return;}const v=model.view(id),element=node('section');element.className='fragment';element.dataset.view=id;element.dataset.name=v.symbol.name;element.setAttribute('aria-label',`${v.symbol.name} bubble`);
  const header=node('div');header.className='fragment-header';header.setAttribute('aria-label','Move bubble with arrow keys');bindLayoutKeys(header,id);const heading=node('div');heading.className='fragment-heading';const context=node('div');context.className='fragment-context';const moduleTag=node('span');moduleTag.className='module-tag';moduleTag.tabIndex=0;moduleTag.hidden=true;context.append(moduleTag,node('small',`${v.symbol.origin?originLabel(v.symbol.origin)+' · ':''}${v.symbol.source.path}:${v.symbol.source.line}`));heading.append(node('strong',[...v.symbol.parents,v.symbol.name].join('::')),context);
  const collapse=button('▴','Collapse bubble',()=>{callMenu.hide();model.collapse(id);geometry();save();}),close=button('×','Close bubble',()=>{editorCalls.manual();callMenu.hide();const r=mounted.get(id);r.controller.abort();r.historyController?.abort();r.sourcePane.dispose();element.remove();mounted.delete(id);model.close(id);hideDestinations();geometry();save();});const pin=button('Pin version','Pin version',()=>{if(model.view(id).history||model.view(id).comparison||model.view(id).captured){returnHistoryLive(id);return;}model.pin(id,model.view(id).mode!=='pinned');geometry();save();refreshLive();});const fitHeight=button('↕','Fit height',()=>fitCode(id,'height')),fitWidth=button('↔','Fit width',()=>fitCode(id,'width'));for(const b of [fitHeight,fitWidth]){b.className='bubble-fit';b.title=b.getAttribute('aria-label')+' to this code section';}heading.title=[...v.symbol.parents,v.symbol.name].join('::');const referenceActions=button('⋯',`Actions for ${v.symbol.name} bubble`,()=>callMenu.show(referenceActions,v.symbol.name,[{label:'Find callers',run:()=>openReferences(id,'callers')},{label:'Find references',run:()=>openReferences(id,'references')},{label:'Task group',run:()=>taskControls.showGroups(model.groupFor(id)?.id??'')}],false));header.append(heading,referenceActions,fitHeight,fitWidth,collapse,close);element.append(header);bindDrag(header,id);
- const body=node('div');body.className='fragment-body';const historyRow=node('div');historyRow.className='fragment-history';const historyPrevious=button('Previous change','Previous function change',()=>void changeHistory(id,1)),historyNext=button('Next change','Next function change',()=>{if(newestHistory(model.view(id)))returnHistoryLive(id);else void changeHistory(id,-1);}),historyLabel=node('span');historyLabel.setAttribute('aria-live','polite');const compareButton=button('Compare','Compare with previous version',()=>model.view(id).comparison?void changeHistory(id,1):void compareFunction(id)),editPrevious=button('◂ edit','Previous comparison edit',()=>void comparisonEdit(id,-1)),editNext=button('edit ▸','Next comparison edit',()=>void comparisonEdit(id,1));historyRow.append(historyPrevious,editPrevious,historyLabel,historyNext,editNext,compareButton);const section=node('div');section.className='source-section';const sectionLabel=node('span','Loading captured source…');const prev=button('Previous section',null,()=>jumpSource(id,true)),next=button('Next section',null,()=>jumpSource(id,false));prev.hidden=true;next.hidden=true;section.append(sectionLabel,prev,next);
+ const body=node('div');body.className='fragment-body';const historyRow=node('div');historyRow.className='fragment-history';const historyPrevious=button('Previous change','Previous function change',()=>void changeHistory(id,1)),historyNext=button('Next change','Next function change',()=>{if(newestHistory(model.view(id)))returnHistoryLive(id);else void changeHistory(id,-1);}),historyLabel=node('span');historyLabel.setAttribute('aria-live','polite');const compareButton=button('Compare','Compare with previous version',()=>model.view(id).comparison?void changeHistory(id,1):void compareFunction(id)),editPrevious=button('Previous changed block',null,()=>void comparisonEdit(id,-1)),editNext=button('Next changed block',null,()=>void comparisonEdit(id,1));
+ editPrevious.title='Show the previous changed block in both visible comparison bubbles.';
+ editNext.title='Show the next changed block in both visible comparison bubbles.';
+ editPrevious.className='comparison-previous';
+ editNext.className='comparison-next';
+ compareButton.className='comparison-revision';
+ historyRow.append(historyPrevious,editPrevious,historyLabel,historyNext,editNext,compareButton);const section=node('div');section.className='source-section';const sectionLabel=node('span','Loading captured source…');const prev=button('Previous section',null,()=>jumpSource(id,true)),next=button('Next section',null,()=>jumpSource(id,false));prev.hidden=true;next.hidden=true;section.append(sectionLabel,prev,next);
  const code=node('div');code.className='code-pane';code.tabIndex=0;code.setAttribute('aria-label',`${v.symbol.name} captured code`);code.append(node('p','Loading source…'));const footer=node('div');footer.className='fragment-footer';const callsButton=button('Calls','Calls',()=>toggleCalls(id)),state=node('span','Captured source');state.setAttribute('role','status');const keep=button('Save','Save location',()=>void keepLocation(id)),editor=button('Editor',`Open in ${editorName}`,()=>void openEditor(id));editor.disabled=true;footer.append(callsButton,state,pin,keep,editor);
  const popup=node('div');popup.className='calls-popover';popup.hidden=true;body.append(historyRow,section,code,popup,footer);const resize=button('','Resize bubble',()=>{});resize.title='Drag or use arrow keys to resize';resize.className='resize-handle';body.append(resize);bindDrag(resize,id,true);bindLayoutKeys(resize,id,true);element.append(body);el('fragment-layer').append(element);
  const kept=board?.evidence.find(e=>e.source.file===v.symbol.source.file&&e.source.version===v.symbol.source.version&&e.source.line===v.symbol.source.line)?.id??null;
@@ -315,7 +330,10 @@ function mount(id,prepared){
  element.addEventListener('pointerdown',()=>{model.selected=id;geometry();});code.addEventListener('scroll',()=>{
   callMenu.hide();if(mounted.get(id)!==record)return;
   const before=code.scrollTop<record.scrollTop,moved=code.scrollTop!==record.scrollTop;
-  if(moved)record.restoreAnchor=null;
+  if(moved){
+   record.restoreAnchor=null;
+   if(record.openedAtFirstBlock){record.openedAtFirstBlock=false;updateFragmentStatus(record);}
+  }
   record.scrollTop=code.scrollTop;recordReading(record);save();
   if(moved)void extendSource(record,before);
  });
@@ -358,6 +376,7 @@ function setSections(r,sections){
 }
 function resetSource(r,v,lines,actions,reading,margin){
  r.adjacent?.abort();r.adjacent=null;
+ r.openedAtFirstBlock=false;
  r.margin=margin;
  setSections(r,[{start:reading.section,lines:lines.filter(line=>line.number<=v.symbol.source.end_line),actions}]);
  const restored=r.sourcePane.set(r.lines,reading,margin);
@@ -372,9 +391,14 @@ function recordReading(r){
  if(row)reading.top=Math.max(0,reading.top-row.offsetTop+r.code.firstElementChild.offsetTop);
  if(!r.restoreAnchor)model.read(r.id,{section:section.start,...reading});
  const s=v.symbol.source,last=section.lines.at(-1)?.number??section.start;
+ delete r.sectionLabel.dataset.actionable;
  r.sectionLabel.textContent=`Lines ${section.start}–${last} · ${s.end_line-s.line+1}-line function`;
  r.prev.hidden=section.start<=s.line;
  r.next.hidden=last>=s.end_line;
+}
+function sourcePagingNotice(r,text){
+ r.sectionLabel.dataset.actionable='';
+ r.sectionLabel.textContent=text;
 }
 function jumpSource(id,before){
  const r=mounted.get(id),v=model.view(id),s=v.symbol.source;
@@ -395,7 +419,7 @@ async function extendSource(r,before){
  if(!last||(before?first<=s.line:last>=s.end_line))return;
  const trimming=r.sections.length>=SECTION_LIMIT;
  if(trimming&&r.sourcePane.selected()){
-  r.sectionLabel.textContent='Clear the selection to load more source.';
+  sourcePagingNotice(r,'Clear the selection to load more source.');
   return;
  }
  const start=before?Math.max(s.line,first-SECTION_ROWS):last+1;
@@ -413,7 +437,7 @@ async function extendSource(r,before){
   if(!valid()||r.loading||!r.code.clientHeight||!nearSourceEdge(r,before))return;
   if(data.snapshot!==expected||data.file!==s.file||data.version!==s.version||!Array.isArray(data.lines)||data.lines.length!==count||data.lines.some((line,index)=>line.number!==start+index))throw new Error('Adjacent source differs from the requested section');
   if(trimming&&r.sourcePane.selected()){
-   r.sectionLabel.textContent='Clear the selection to load more source.';
+   sourcePagingNotice(r,'Clear the selection to load more source.');
    return;
   }
   const section={start,lines:data.lines,actions:inline},sections=[...r.sections];
@@ -429,7 +453,7 @@ async function extendSource(r,before){
  }catch(error){
   if(valid()){
    r.restoreAnchor=null;recordReading(r);
-   r.sectionLabel.textContent='Could not load adjacent source. Scroll again to retry.';
+   sourcePagingNotice(r,'Could not load adjacent source. Scroll again to retry.');
   }
  }finally{
   if(r.adjacent===request)r.adjacent=null;
@@ -437,11 +461,21 @@ async function extendSource(r,before){
  }
 }
 function applyPreparedSource(id,prepared) {
- const r=mounted.get(id),v=model.view(id),s=v.symbol.source,{data,actions,start,margin}=prepared;
+ const r=mounted.get(id),v=model.view(id),s=v.symbol.source,{data,actions,start,margin,openedAtFirstBlock=false}=prepared;
  if(data.file!==s.file||data.version!==s.version)throw new Error('Prepared source differs from the requested fragment');
  r.sourceTicket=(r.sourceTicket??0)+1;r.loading=false;
  resetSource(r,v,data.lines,actions,{...v.reading,section:start},margin);
  sourceStatus(r,data.coloring==='ready'?'Live':'Styling '+data.coloring);recordReading(r);geometry();
+ const block=v.comparison?.changes[v.comparison.cursor];
+ if(block){
+  const line=Math.min(block[0],s.end_line),revealed=r.sourcePane.revealLine(line);
+  if(openedAtFirstBlock&&revealed){
+   r.openedAtFirstBlock=true;updateFragmentStatus(r);
+   if(!r.sourcePane.revealLine(line)){r.openedAtFirstBlock=false;updateFragmentStatus(r);}
+  }
+  r.scrollTop=r.code.scrollTop;
+  recordReading(r);
+ }
  if(r.restoreAnchor)void extendSource(r,false);
 }
 async function requestActions(symbol,start,count,snapshot,signal) {

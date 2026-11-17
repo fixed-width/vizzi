@@ -35,9 +35,9 @@ structural view remains a contributor prototype, not the main reading workflow.
 | Pin version / Follow live | Hold captured source / resume saved-file updates |
 | Previous change / Next change | Step through changes to this function in local first-parent Git history |
 | Return to live | Leave a historical, comparison or captured-call view and resume saved-source updates |
-| Compare | Open pinned Before/After views of adjacent function versions |
-| Previous edit / Next edit | Reveal corresponding changes in visible comparison bubbles |
-| History in a comparison | Resume reading earlier committed versions in that bubble |
+| Compare | Open pinned Before/After views of adjacent function versions at the first changed block |
+| Previous changed block / Next changed block | Reveal corresponding changes in visible comparison bubbles |
+| Older revision (exit diff) | Step back through function history and exit the comparison in that bubble |
 | Open in captured file | Follow a call using only the historical/comparison file's declarations |
 | Save | Keep a repository source location separately from the visual layout |
 | Editor | Verify and hand off a current source location to VS Code |
