@@ -1,0 +1,31 @@
+[
+  {
+    "name": "linux",
+    "revision": "cbbddb6b08cc9900a87cccaa9b22bbe06aa4f50a",
+    "policy_profile": "experiments/qualification/profiles.json",
+    "history_depth": 128,
+    "workloads": [
+      {"path": "mm/mmap.c", "name": "do_mmap"},
+      {"path": "kernel/sched/core.c", "name": "__schedule"}
+    ]
+  },
+  {
+    "name": "pytorch",
+    "revision": "1f4d2d5e820dd870626dca4f9603e3a49879dbde",
+    "policy_profile": "experiments/qualification/profiles.json",
+    "history_depth": 8192,
+    "workloads": [
+      {"path": "torch/_dynamo/convert_frame.py", "name": "_compile"},
+      {"path": "torch/nn/modules/module.py", "name": "_call_impl", "scope": "Module"},
+      {"path": "torch/csrc/autograd/engine.cpp", "name": "Engine::evaluate_function"}
+    ]
+  },
+  {
+    "name": "lpc-rs",
+    "revision": "f92dd9826537d3d503c9d08586df37c9a3e1275e",
+    "workloads": [
+      {"path": "src/interpreter/task/mod.rs", "name": "run_entry"},
+      {"path": "src/interpreter/program.rs", "name": "lookup_function"}
+    ]
+  }
+]
