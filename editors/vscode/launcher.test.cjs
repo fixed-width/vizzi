@@ -11,7 +11,7 @@ async function fixture(t) {
   await fs.mkdir(root);
   t.after(()=>fs.rm(directory,{recursive:true,force:true}));
   const messages = [];
-  const output = {appendLine:value=>messages.push(value),append:value=>messages.push(value)};
+  const output = {appendLine:value=>messages.push(value+'\n'),append:value=>messages.push(value)};
   return {directory,root,output,messages,connectionFile:path.join(directory,'connection.json')};
 }
 
@@ -26,7 +26,7 @@ test('a project-local config launches the native workspace and shutdown closes i
   const response = await fetch(workspace.url+'api/status');
   assert.equal(response.status,200);
   assert.equal((await response.json()).name,path.basename(f.root));
-  assert.match(f.messages.join('\n'),/Vizzi: http:\/\/127\.0\.0\.1:/);
+  assert.match(f.messages.join(''),/Vizzi: http:\/\/127\.0\.0\.1:/);
   await workspace.dispose();
   await assert.rejects(fetch(workspace.url));
 });
@@ -37,7 +37,7 @@ test('native configuration errors reach the user and a failed start leaves no ru
   const configFile = path.join(f.root,'vizzi.toml');
   await fs.writeFile(configFile,'unknown-option = true\n');
   await assert.rejects(startWorkspace({...f,binary,configFile}),/unknown.*option/i);
-  assert.match(f.messages.join('\n'),/Cannot load config/);
+  assert.match(f.messages.join(''),/Cannot load config/);
 });
 
 test('a missing executable is a startup error',async t=>{

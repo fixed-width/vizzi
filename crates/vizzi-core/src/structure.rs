@@ -12,6 +12,7 @@ const ITEMS: usize = 65536;
 const AREAS: usize = 8192;
 const PAGE: usize = 24;
 const SITES: usize = 8;
+pub(crate) const NAME_BYTES: usize = 128;
 /// Exact native document/context location, independent of a display label.
 #[derive(Clone, Debug, Serialize)]
 pub struct Source {
@@ -240,7 +241,7 @@ fn source(doc: &Document, context: &str, span: &std::ops::Range<usize>) -> Sourc
     }
 }
 fn bounded(text: &str) -> String {
-    let mut end = text.len().min(128);
+    let mut end = text.len().min(NAME_BYTES);
     while !text.is_char_boundary(end) {
         end -= 1;
     }
@@ -254,6 +255,7 @@ impl Structure {
     /// Reuses bounded module metadata across source observations without source IO.
     pub fn with_module_cache(snapshot: &Snapshot, cache: &mut crate::modules::ModuleCache) -> Self {
         let modules = crate::modules::ModuleIndex::new(snapshot, cache);
+        let mut rust_impl_names = crate::structure_search::RustImplNames::default();
         let mut index = Self {
             tracking: BTreeMap::new(),
             search: vec![],
@@ -335,7 +337,7 @@ impl Structure {
             for (ordinal, fact) in analysis.facts.iter().enumerate() {
                 if index.symbols.len() == ITEMS
                     || fact.name.is_empty()
-                    || fact.name.len() > 128
+                    || fact.name.len() > NAME_BYTES
                     || fact.kind.len() > 128
                 {
                     index.coverage.omitted_symbols += 1;
@@ -386,9 +388,19 @@ impl Structure {
                     parents,
                     source: source(doc, analysis.context.id.as_str(), &fact.span),
                 };
+                let impl_aliases = if analysis.context.language == "rust" && fact.kind == "function"
+                {
+                    fact.parent
+                        .and_then(|n| analysis.facts.get(n))
+                        .filter(|p| p.kind == "implementation")
+                        .map(|p| rust_impl_names.without_arguments(&p.name))
+                        .unwrap_or_default()
+                } else {
+                    &[]
+                };
                 index
                     .search
-                    .push(crate::structure_search::Name::new(&symbol));
+                    .push(crate::structure_search::Name::new(&symbol, impl_aliases));
                 index
                     .tracking
                     .entry(symbol.tracking.clone())
