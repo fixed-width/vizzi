@@ -63,6 +63,10 @@ remains in Git and the project documentation.
 
 ### Fixed
 
+- At the newest function-history revision, **Return to live** appears in the history
+  controls. The bubble shows progress during a lookup and keeps the captured revision
+  readable. Readers can step through history or retry if the live refresh fails.
+
 - **Add bubble** finds Rust methods by qualified names such as `Task::run_entry`
   with the impl's generic arguments omitted. Results retain their full names.
 

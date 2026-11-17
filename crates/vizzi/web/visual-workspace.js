@@ -25,6 +25,7 @@ const error=createMessage(el('visual-error'),{label:'Dismiss workspace error'}),
 let definitionProvider=false;const definitionCapabilities=transport('/api/structure').then(c=>{definitionProvider=c.definition_provider===true;}).catch(()=>{});
 let model,currentSnapshot,taskControls,board,editorName='editor',busy=false,saveTimer,paletteTicket=0,jobs=Promise.resolve(),demoOpened=false,livePendingTimer;
 const mounted=new Map();
+const returnPending=r=>r.liveReturn==='pending';
 const highlights=installLinkHighlights(el('workspace-canvas'),()=>({views:model?.views??[],links:model?.links??[]}));
 const outlines=installModuleOutlines(el('module-outlines'),()=>model?model.visibleItems():[],{failed:()=>notice.show('Module outlines are unavailable for this layout.')});
 let showModuleOutlines=false;try{showModuleOutlines=localStorage.getItem('vizzi.visual.module-outlines')==='true';}catch{}
@@ -45,14 +46,17 @@ function refreshCapture(){
 }
 function applyLive(data){
  if(data.snapshot!==currentSnapshot||!Array.isArray(data.views)||data.views.length>24||!Array.isArray(data.links)||data.links.length>96)throw new Error('Live observation differs');
+ let focusAfterReturn;
  for(const update of data.views){const r=mounted.get(update.id);if(!r)throw new Error('Live view was closed');if(update.state!=='current')continue;
-  const s=update.symbol?.source,w=update.window;
+  const previous=model.view(update.id),s=update.symbol?.source,w=update.window;
+  if(document.activeElement===r.historyNext&&newestHistory(previous))focusAfterReturn=r;
   if(!s||!Array.isArray(update.actions)||update.actions.length>4096||!Array.isArray(update.calls?.items)||update.calls.items.length>8||update.calls.snapshot!==data.snapshot)throw new Error('Invalid live call metadata');
   if(w&&(w.file!==s.file||w.version!==s.version||!Array.isArray(w.lines)||w.lines.length>96||update.origin?.number!==s.line||update.origin.left||update.origin.column!==0))throw new Error('Invalid live source window');
-  if(!w&&(!r.lines?.length||model.view(update.id).symbol.source.version!==s.version))throw new Error('Live source window is missing');
+  if(!w&&(!r.lines?.length||previous.symbol.source.version!==s.version))throw new Error('Live source window is missing');
  }
  const publicationChanged=model.snapshot!==data.snapshot;clearTimeout(livePendingTimer);model.refresh(data.snapshot,data.views,data.links);callMenu.hide();hideDestinations();
- for(const update of data.views){const r=mounted.get(update.id),v=model.view(update.id);r.navigation=(r.navigation??0)+1;r.resolving=false;r.warming=false;r.awaitingLive=false;r.sourceTicket=(r.sourceTicket??0)+1;
+ for(const update of data.views){const r=mounted.get(update.id),v=model.view(update.id);
+  r.navigation=(r.navigation??0)+1;r.resolving=false;r.warming=false;r.awaitingLive=false;r.liveReturn=null;r.sourceTicket=(r.sourceTicket??0)+1;
   if(update.state!=='current'){r.popup.hidden=true;updateFragmentStatus(r);continue;}
   const preserve=!update.window&&retargetCalls(r.code,r.actions,update.actions);r.actions=update.actions;
   if(update.window){r.lines=update.window.lines.filter(l=>l.number<=v.symbol.source.end_line);r.margin=functionIndent(update.origin);}
@@ -63,9 +67,25 @@ function applyLive(data){
   r.element.dataset.name=v.symbol.name;r.element.setAttribute('aria-label',`${v.symbol.name} bubble`);r.element.querySelector('.fragment-heading strong').textContent=[...v.symbol.parents,v.symbol.name].join('::');r.element.querySelector('.fragment-heading small').textContent=`${v.symbol.origin?originLabel(v.symbol.origin)+' · ':''}${v.symbol.source.path}:${v.symbol.source.line}`;
   sourceStatus(r,p.reset?'Live · reading reset':'Live');model.read(v.id,{section:v.reading.section,...r.sourcePane.reading()});void prepareDefinitions(v.id);
  }
- geometry();save();void editorCalls.resume();
+ geometry();
+ if(focusAfterReturn){
+  const {compareButton,historyPrevious}=focusAfterReturn;
+  const destination=compareButton.disabled?historyPrevious:compareButton;
+  destination.focus({preventScroll:true});
+ }
+ save();void editorCalls.resume();
 }
-const live=new LiveUpdates({capture:refreshCapture,request:(body,signal)=>post('/api/visual/refresh',body,signal),apply:applyLive,blocked:()=>busy||[...mounted.values()].some(r=>r.loading||r.sourcePane.selected()),pending:snapshot=>{if(model){clearTimeout(livePendingTimer);model.markSnapshot(snapshot);geometry();if(model.stale)livePendingTimer=setTimeout(()=>{for(const r of mounted.values()){r.awaitingLive=model.stale;updateFragmentStatus(r);}},150);}},failed:e=>{if(e.status!==409)notice.show('Live refresh is waiting. Earlier source is retained.');}});
+function liveRefreshFailed(error){
+ let changed=false;
+ for(const r of mounted.values()){
+  if(!returnPending(r))continue;
+  r.liveReturn='waiting';
+  changed=true;
+ }
+ if(changed)geometry();
+ if(error.status!==409)notice.show('Live refresh is waiting. Earlier source is retained.');
+}
+const live=new LiveUpdates({capture:refreshCapture,request:(body,signal)=>post('/api/visual/refresh',body,signal),apply:applyLive,blocked:()=>busy||[...mounted.values()].some(r=>r.loading||r.sourcePane.selected()),pending:snapshot=>{if(model){clearTimeout(livePendingTimer);model.markSnapshot(snapshot);geometry();if(model.stale)livePendingTimer=setTimeout(()=>{for(const r of mounted.values()){r.awaitingLive=model.stale;updateFragmentStatus(r);}},150);}},failed:liveRefreshFailed});
 function refreshLive(){if(model&&currentSnapshot)live.changed(currentSnapshot,true);}
 const prepareEditorCall=createCallPreparation({read:()=>model,
  bind:(action,signal)=>post('/api/editor/call',{snapshot:action.snapshot,query:{kind:'invocation',call:action.call}},signal),
@@ -84,9 +104,21 @@ const editorCalls=installWorkspaceDelivery({mode:'call',
  changed:pending=>{if(pending){callMenu.hide();hideDestinations();window.getSelection()?.removeAllRanges();for(const r of mounted.values()){r.navigation=(r.navigation??0)+1;r.historyTicket=(r.historyTicket??0)+1;r.historyController?.abort();if(r.historyLoading)r.comparing=r.historyLoading=r.loading=false;r.resolving=false;updateFragmentStatus(r);}geometry();live.resume();}}
 });
 document.addEventListener('selectionchange',()=>live.resume());
-function updateFragmentStatus(r){const v=model.view(r.id);r.state.textContent=r.historyLoading?(r.comparing?'Loading comparison…':'Loading function history…'):r.resolving&&r.resolvingCaptured?'Finding captured destination…':v.captured?(v.captured.returning?(r.awaitingLive?'Returning to live…':`Function unavailable — captured ${shortRevision(v.captured.label)}`):`Captured · ${shortRevision(v.captured.label)}`):v.comparison?(v.comparison.returning?(r.awaitingLive?'Returning to live…':`Function unavailable — ${comparisonTitle(v.comparison)}`):comparisonTitle(v.comparison)):v.history?.returning?(r.awaitingLive?'Returning to live…':`Function unavailable — revision ${v.history.commit.slice(0,8)}`):v.history?`Revision ${v.history.commit.slice(0,8)}`:r.resolving?'Finding definition…':r.warming?'Preparing type navigation…':r.awaitingLive&&v.mode==='live'?'Update pending':(v.state==='unresolved'?'Function unavailable — earlier version':v.mode==='pinned'?'Pinned version':r.sourceStatus??'Live');}
+function updateFragmentStatus(r){
+ const v=model.view(r.id);
+ if(r.historyLoading)r.state.textContent=r.comparing?'Loading comparison…':'Loading function history…';
+ else if(r.liveReturn)r.state.textContent=returnPending(r)?'Returning to live…':'Waiting for live source…';
+ else if(r.resolving&&r.resolvingCaptured)r.state.textContent='Finding captured destination…';
+ else if(v.captured){const label=shortRevision(v.captured.label);r.state.textContent=v.captured.returning?`Function unavailable — captured ${label}`:`Captured · ${label}`;}
+ else if(v.comparison){const label=comparisonTitle(v.comparison);r.state.textContent=v.comparison.returning?`Function unavailable — ${label}`:label;}
+ else if(v.history){const label=v.history.commit.slice(0,8);r.state.textContent=v.history.returning?`Function unavailable — revision ${label}`:`Revision ${label}`;}
+ else if(r.resolving)r.state.textContent='Finding definition…';
+ else if(r.warming)r.state.textContent='Preparing type navigation…';
+ else if(r.awaitingLive&&v.mode==='live')r.state.textContent='Update pending';
+ else r.state.textContent=v.state==='unresolved'?'Function unavailable — earlier version':v.mode==='pinned'?'Pinned version':r.sourceStatus??'Live';
+}
 async function changeHistory(id,direction){
- const r=mounted.get(id),workspace=model,v=model.view(id);if(!r||r.loading||v.history?.returning&&r.awaitingLive||r.sourcePane.selected())return;
+ const r=mounted.get(id),workspace=model,v=model.view(id);if(!r||r.loading||returnPending(r)||r.sourcePane.selected())return;
  if(!v.history&&(!model.usable(id)||v.symbol.origin))return;
  editorCalls.manual();callMenu.hide();hideDestinations();r.popup.hidden=true;r.navigation=(r.navigation??0)+1;r.resolving=false;r.warming=false;
  const binding=JSON.stringify([v.snapshot,v.symbol.id,v.history]),ticket=r.historyTicket=(r.historyTicket??0)+1,controller=new AbortController();r.historyController=controller;r.historyLoading=true;r.loading=true;geometry();
@@ -97,16 +129,18 @@ async function changeHistory(id,direction){
   const query=new URLSearchParams({token:revision.token,snapshot:revision.snapshot,file:s.file,version:s.version,line_start:String(start),line_count:String(Math.min(96,s.end_line-start+1)),outline_count:'1',reflow:'true'});
   const [data,actions]=await Promise.all([start===s.line?revision.window:transport('/api/function-history/window?'+query,{signal:controller.signal}),capturedActions(next,start,Math.min(96,s.end_line-start+1),controller.signal)]);verify();
   if(data?.snapshot!==revision.snapshot||data.file!==s.file||data.version!==s.version||!Array.isArray(data.lines)||!data.lines.length||data.lines.length>96||data.lines[0].number!==start||revision.origin?.number!==s.line||revision.origin.left||revision.origin.column!==0)throw new Error('Historical source differs from the requested function');
-  r.sourceTicket=(r.sourceTicket??0)+1;model.showHistory(id,revision);r.historyLoading=false;r.loading=false;r.sites=[];r.callsReady=false;r.actions=[];
+  r.sourceTicket=(r.sourceTicket??0)+1;model.showHistory(id,revision);r.liveReturn=null;r.historyLoading=false;r.loading=false;r.sites=[];r.callsReady=false;r.actions=[];
   r.element.querySelector('.fragment-heading small').textContent=`${s.path}:${s.line}`;
   applyPreparedSource(id,{data,actions,start,margin:functionIndent(revision.origin)});save();
  }catch(e){if(e.name!=='AbortError'&&mounted.get(id)===r&&model===workspace&&r.historyTicket===ticket)fail(e);}
  finally{if(mounted.get(id)===r&&r.historyTicket===ticket){r.historyLoading=false;r.loading=false;geometry();live.resume();}}
 }
 function returnHistoryLive(id){
- const r=mounted.get(id);editorCalls.manual();callMenu.hide();hideDestinations();r.popup.hidden=true;r.historyController?.abort();r.historyTicket=(r.historyTicket??0)+1;r.sourceTicket=(r.sourceTicket??0)+1;r.navigation=(r.navigation??0)+1;
- model.returnLive(id);r.historyLoading=false;r.loading=false;r.resolving=false;r.actions=[];r.callsReady=false;r.awaitingLive=true;geometry();save();refreshLive();
+ const r=mounted.get(id);if(returnPending(r))return;
+ editorCalls.manual();callMenu.hide();hideDestinations();r.popup.hidden=true;r.historyController?.abort();r.historyTicket=(r.historyTicket??0)+1;r.sourceTicket=(r.sourceTicket??0)+1;r.navigation=(r.navigation??0)+1;
+ model.returnLive(id);r.historyLoading=false;r.loading=false;r.resolving=false;r.actions=[];r.callsReady=false;r.liveReturn='pending';geometry();save();refreshLive();
 }
+const newestHistory=v=>v.history?.index===0&&!v.comparison;
 function shortRevision(label){return /^(?:[0-9a-f]{40}|[0-9a-f]{64})$/.test(label)?label.slice(0,8):label;}
 function comparisonTitle(c){return `${c.side==='older'?'Before':'After'} · ${shortRevision(c.label)}`;}
 function sourceBinding(v){const owner=frozenSource(v)?.owner;return owner?.kind==='comparison'?{token:owner.token,side:owner.side}:owner?{token:owner.token}:{};}
@@ -139,9 +173,26 @@ async function chooseCapturedCall(id,action){
  }catch(error){if(error.name!=='AbortError'&&model===workspace&&mounted.get(id)===r&&r.navigation===epoch)fail(error);}
  finally{if(mounted.get(id)===r&&r.navigation===epoch){r.resolving=false;updateFragmentStatus(r);live.resume();}}
 }
+function historyControls(r,v){
+ const atNewest=newestHistory(v),pending=returnPending(r),hasCapture=v.history||v.comparison||v.captured;
+ r.historyRow.hidden=Boolean(v.symbol.origin);
+ r.historyPrevious.disabled=r.loading||pending||(!v.history&&!model.usable(v.id));
+ r.historyNext.hidden=!v.history;
+ r.historyNext.disabled=!atNewest&&(r.loading||pending||!v.history);
+ r.historyNext.textContent=atNewest?'Return to live':'Next change';
+ r.historyNext.setAttribute('aria-label',atNewest?'Return to live':'Next function change');
+ r.historyNext.setAttribute('aria-disabled',String(atNewest&&pending));
+ r.historyLabel.textContent=v.history?v.history.commit.slice(0,8):'';
+ r.historyLabel.title=v.history?`Commit ${v.history.commit}; first-parent history at ${v.history.tip}`:'';
+ r.pin.hidden=atNewest;
+ r.pin.disabled=r.historyLoading&&!hasCapture;
+ r.pin.textContent=hasCapture?'Return to live':v.mode==='pinned'?'Follow live':'Pin version';
+ r.pin.setAttribute('aria-label',hasCapture?'Return to live':v.mode==='pinned'?'Follow live changes':'Pin version');
+ r.pin.setAttribute('aria-disabled',String(pending));
+}
 function comparisonControls(r,v){
  if(v.captured)r.element.dataset.capturedFile='true';else delete r.element.dataset.capturedFile;
- const c=v.comparison;r.compareButton.hidden=Boolean(v.symbol.origin)||Boolean(c&&!v.history);r.compareButton.textContent=c?'History':'Compare';r.compareButton.setAttribute('aria-label',c?'Continue function history':'Compare with previous version');r.compareButton.disabled=r.loading||model.views.length>=24&&!c||Boolean(c?.returning&&r.awaitingLive)||!v.history&&!model.usable(v.id);
+ const c=v.comparison;r.compareButton.hidden=Boolean(v.symbol.origin)||Boolean(c&&!v.history);r.compareButton.textContent=c?'History':'Compare';r.compareButton.setAttribute('aria-label',c?'Continue function history':'Compare with previous version');r.compareButton.disabled=r.loading||returnPending(r)||model.views.length>=24&&!c||!v.history&&!model.usable(v.id);
  r.editPrevious.hidden=r.editNext.hidden=!c;r.editPrevious.disabled=r.loading||!c||c.returning||c.cursor===0;r.editNext.disabled=r.loading||!c||c.returning||c.cursor>=c.changes.length-1;
  r.historyPrevious.hidden=Boolean(c||v.captured);if(v.captured){r.historyNext.hidden=true;r.compareButton.hidden=true;r.historyLabel.textContent=shortRevision(v.captured.label);r.historyLabel.title=`Captured file · ${v.captured.label}`;}if(c){r.historyNext.hidden=true;r.historyLabel.textContent=`${comparisonTitle(c)} · ${c.changes.length?c.cursor+1:0}/${c.changes.length}`;r.historyLabel.title=`${c.label}; compared with ${c.other_label}`;r.element.dataset.comparisonSide=c.side;r.element.dataset.comparisonToken=c.token;}else{delete r.element.dataset.comparisonSide;delete r.element.dataset.comparisonToken;}
  const key=c?`${c.token}:${c.side}`:'';if(r.comparisonKey===key&&r.comparisonFirst===r.code.firstElementChild)return;
@@ -168,7 +219,7 @@ async function compareFunction(id){
   const actionSets=await Promise.all([id,preview.older].map(viewId=>{const view=planned.view(viewId);return capturedActions(view,view.reading.section,Math.min(96,view.symbol.source.end_line-view.reading.section+1),controller.signal);}));
   if(model!==workspace||mounted.get(id)!==r||r.historyTicket!==ticket||JSON.stringify([model.view(id).snapshot,model.view(id).symbol.id,model.view(id).history])!==binding)throw new DOMException('Comparison superseded','AbortError');
   if(r.sourcePane.selected())throw new DOMException('Comparison deferred for selection','AbortError');newer.actions=actionSets[0];older.actions=actionSets[1];
-  const opened=model.openComparison(id,pair);r.historyLoading=r.loading=r.comparing=false;r.sites=[];r.actions=[];r.callsReady=false;r.element.querySelector('.fragment-heading small').textContent=`${model.view(id).symbol.source.path}:${model.view(id).symbol.source.line}`;
+  const opened=model.openComparison(id,pair);r.historyLoading=r.loading=r.comparing=false;r.liveReturn=null;r.sites=[];r.actions=[];r.callsReady=false;r.element.querySelector('.fragment-heading small').textContent=`${model.view(id).symbol.source.path}:${model.view(id).symbol.source.line}`;
   applyPreparedSource(id,newer);mount(opened.older,older);focus([id,opened.older]);save();
  }catch(error){if(error.name!=='AbortError'&&model===workspace&&mounted.get(id)===r&&r.historyTicket===ticket)fail(error);}
  finally{if(mounted.get(id)===r&&r.historyTicket===ticket){r.comparing=r.historyLoading=r.loading=false;geometry();live.resume();}}
@@ -220,8 +271,8 @@ function links(){
  }
 }
 function geometry(){
- if(!model)return;for(const[id,r]of mounted)if(!model.views.some(v=>v.id===id)){r.controller.abort();r.historyController?.abort();r.sourcePane.dispose();r.element.remove();mounted.delete(id);}const c=model.camera;el('workspace-world').style.transform=`translate(${-c.x*c.scale}px,${-c.y*c.scale}px) scale(${c.scale})`;el('visual-zoom').textContent=Math.round(c.scale*100)+'%';el('visual-empty').hidden=model.items().length>0;el('visual-stale').hidden=!model.views.some(v=>v.state==='unresolved');
- for(const v of model.views){const r=mounted.get(v.id);if(!r)continue;r.element.hidden=!model.isVisible(v.id);Object.assign(r.element.style,{left:v.x+'px',top:v.y+'px',width:v.w+'px',height:(v.collapsed?54:v.h)+'px'});const membership=modulePresentation(v,model.views);r.element.classList.toggle('has-module',Boolean(membership));const moduleKey=JSON.stringify(membership);if(moduleKey!==r.moduleKey){r.moduleKey=moduleKey;r.moduleTag.hidden=!membership;if(membership){r.element.dataset.moduleId=membership.id;r.moduleTag.dataset.moduleId=membership.id;r.moduleTag.textContent=membership.label;r.moduleTag.title=membership.title;r.element.style.setProperty('--module-accent',`var(--module-${membership.colour})`);r.element.style.setProperty('--module-tint',`var(--module-tint-${membership.colour})`);}else{delete r.element.dataset.moduleId;delete r.moduleTag.dataset.moduleId;r.moduleTag.textContent='';r.element.style.removeProperty('--module-accent');r.element.style.removeProperty('--module-tint');}}r.body.hidden=v.collapsed;r.collapse.textContent=v.collapsed?'▾':'▴';r.collapse.setAttribute('aria-label',v.collapsed?'Expand bubble':'Collapse bubble');r.element.classList.toggle('is-selected',v.id===model.selected);r.element.classList.toggle('is-stale',!model.usable(v.id));r.prev.disabled=r.next.disabled=Boolean(r.historyLoading);r.callsButton.disabled=!model.navigable(v.id)||r.historyLoading;r.referenceActions.disabled=!model.usable(v.id)||r.historyLoading;r.historyPrevious.disabled=r.loading||v.history?.returning&&r.awaitingLive||(!v.history&&!model.usable(v.id));r.historyNext.hidden=!v.history;r.historyNext.disabled=r.loading||v.history?.returning&&r.awaitingLive||!v.history||v.history.index===0;r.historyRow.hidden=Boolean(v.symbol.origin);r.historyLabel.textContent=v.history?v.history.commit.slice(0,8):'';r.historyLabel.title=v.history?`Commit ${v.history.commit}; first-parent history at ${v.history.tip}`:'';r.fitHeight.disabled=r.fitWidth.disabled=r.loading||!r.lines?.length||v.collapsed;inlineAvailability(r.code,v.id);r.keep.disabled=Boolean(v.symbol.origin)||!model.usable(v.id)||r.historyLoading||!board||busy;r.keep.title=v.symbol.origin?'Dependency locations stay in this workspace.':'Save location';r.editor.disabled=!model.usable(v.id)||r.historyLoading||busy;r.pin.disabled=r.historyLoading&&!v.history&&!v.comparison&&!v.captured;r.pin.textContent=v.history||v.comparison||v.captured?'Return to live':v.mode==='pinned'?'Follow live':'Pin version';r.pin.setAttribute('aria-label',v.history||v.comparison||v.captured?'Return to live':v.mode==='pinned'?'Follow live changes':'Pin version');comparisonControls(r,v);updateFragmentStatus(r);}
+ if(!model)return;for(const[id,r]of mounted)if(!model.views.some(v=>v.id===id)){r.controller.abort();r.historyController?.abort();r.sourcePane.dispose();r.element.remove();mounted.delete(id);}const c=model.camera;el('workspace-world').style.transform=`translate(${-c.x*c.scale}px,${-c.y*c.scale}px) scale(${c.scale})`;el('visual-zoom').textContent=Math.round(c.scale*100)+'%';el('visual-empty').hidden=model.items().length>0;el('visual-stale').hidden=!model.views.some(v=>v.state==='unresolved'&&!mounted.get(v.id)?.liveReturn);
+ for(const v of model.views){const r=mounted.get(v.id);if(!r)continue;r.element.hidden=!model.isVisible(v.id);Object.assign(r.element.style,{left:v.x+'px',top:v.y+'px',width:v.w+'px',height:(v.collapsed?54:v.h)+'px'});const membership=modulePresentation(v,model.views);r.element.classList.toggle('has-module',Boolean(membership));const moduleKey=JSON.stringify(membership);if(moduleKey!==r.moduleKey){r.moduleKey=moduleKey;r.moduleTag.hidden=!membership;if(membership){r.element.dataset.moduleId=membership.id;r.moduleTag.dataset.moduleId=membership.id;r.moduleTag.textContent=membership.label;r.moduleTag.title=membership.title;r.element.style.setProperty('--module-accent',`var(--module-${membership.colour})`);r.element.style.setProperty('--module-tint',`var(--module-tint-${membership.colour})`);}else{delete r.element.dataset.moduleId;delete r.moduleTag.dataset.moduleId;r.moduleTag.textContent='';r.element.style.removeProperty('--module-accent');r.element.style.removeProperty('--module-tint');}}r.body.hidden=v.collapsed;r.collapse.textContent=v.collapsed?'▾':'▴';r.collapse.setAttribute('aria-label',v.collapsed?'Expand bubble':'Collapse bubble');r.element.classList.toggle('is-selected',v.id===model.selected);r.element.classList.toggle('is-stale',!model.usable(v.id));r.prev.disabled=r.next.disabled=Boolean(r.historyLoading);r.callsButton.disabled=!model.navigable(v.id)||r.historyLoading;r.referenceActions.disabled=!model.usable(v.id)||r.historyLoading;r.fitHeight.disabled=r.fitWidth.disabled=r.loading||!r.lines?.length||v.collapsed;inlineAvailability(r.code,v.id);r.keep.disabled=Boolean(v.symbol.origin)||!model.usable(v.id)||r.historyLoading||!board||busy;r.keep.title=v.symbol.origin?'Dependency locations stay in this workspace.':'Save location';r.editor.disabled=!model.usable(v.id)||r.historyLoading||busy;historyControls(r,v);comparisonControls(r,v);updateFragmentStatus(r);}
  if(model.stale)callMenu.hide();links();overview();outlines.refresh();highlights.refresh();taskGroups.refresh();referenceStacks.refresh();
 }
 function button(text,label,handler){const b=node('button',text);b.type='button';if(label)b.setAttribute('aria-label',label);b.onclick=()=>{try{handler();}catch(e){fail(e);}};return b;}
@@ -234,11 +285,11 @@ function mount(id,prepared){
  if(mounted.has(id)){if(prepared&&!mounted.get(id).code.querySelector('.code-line'))applyPreparedSource(id,prepared);return;}const v=model.view(id),element=node('section');element.className='fragment';element.dataset.view=id;element.dataset.name=v.symbol.name;element.setAttribute('aria-label',`${v.symbol.name} bubble`);
  const header=node('div');header.className='fragment-header';header.setAttribute('aria-label','Move bubble with arrow keys');bindLayoutKeys(header,id);const heading=node('div');heading.className='fragment-heading';const context=node('div');context.className='fragment-context';const moduleTag=node('span');moduleTag.className='module-tag';moduleTag.tabIndex=0;moduleTag.hidden=true;context.append(moduleTag,node('small',`${v.symbol.origin?originLabel(v.symbol.origin)+' · ':''}${v.symbol.source.path}:${v.symbol.source.line}`));heading.append(node('strong',[...v.symbol.parents,v.symbol.name].join('::')),context);
  const collapse=button('▴','Collapse bubble',()=>{callMenu.hide();model.collapse(id);geometry();save();}),close=button('×','Close bubble',()=>{editorCalls.manual();callMenu.hide();const r=mounted.get(id);r.controller.abort();r.historyController?.abort();r.sourcePane.dispose();element.remove();mounted.delete(id);model.close(id);hideDestinations();geometry();save();});const pin=button('Pin version','Pin version',()=>{if(model.view(id).history||model.view(id).comparison||model.view(id).captured){returnHistoryLive(id);return;}model.pin(id,model.view(id).mode!=='pinned');geometry();save();refreshLive();});const fitHeight=button('↕','Fit height',()=>fitCode(id,'height')),fitWidth=button('↔','Fit width',()=>fitCode(id,'width'));for(const b of [fitHeight,fitWidth]){b.className='bubble-fit';b.title=b.getAttribute('aria-label')+' to this code section';}heading.title=[...v.symbol.parents,v.symbol.name].join('::');const referenceActions=button('⋯',`Actions for ${v.symbol.name} bubble`,()=>callMenu.show(referenceActions,v.symbol.name,[{label:'Find callers',run:()=>openReferences(id,'callers')},{label:'Find references',run:()=>openReferences(id,'references')},{label:'Task group',run:()=>taskControls.showGroups(model.groupFor(id)?.id??'')}],false));header.append(heading,referenceActions,fitHeight,fitWidth,collapse,close);element.append(header);bindDrag(header,id);
- const body=node('div');body.className='fragment-body';const historyRow=node('div');historyRow.className='fragment-history';const historyPrevious=button('Previous change','Previous function change',()=>void changeHistory(id,1)),historyNext=button('Next change','Next function change',()=>void changeHistory(id,-1)),historyLabel=node('span');historyLabel.setAttribute('aria-live','polite');const compareButton=button('Compare','Compare with previous version',()=>model.view(id).comparison?void changeHistory(id,1):void compareFunction(id)),editPrevious=button('◂ edit','Previous comparison edit',()=>void comparisonEdit(id,-1)),editNext=button('edit ▸','Next comparison edit',()=>void comparisonEdit(id,1));historyRow.append(historyPrevious,editPrevious,historyLabel,historyNext,editNext,compareButton);const section=node('div');section.className='source-section';const sectionLabel=node('span','Loading captured source…');const prev=button('Previous section',null,()=>{const v=model.view(id);void loadSource(id,Math.max(v.symbol.source.line,v.reading.section-96));}),next=button('Next section',null,()=>{const v=model.view(id);void loadSource(id,Math.min(v.symbol.source.end_line,v.reading.section+96));});prev.hidden=true;next.hidden=true;section.append(sectionLabel,prev,next);
+ const body=node('div');body.className='fragment-body';const historyRow=node('div');historyRow.className='fragment-history';const historyPrevious=button('Previous change','Previous function change',()=>void changeHistory(id,1)),historyNext=button('Next change','Next function change',()=>{if(newestHistory(model.view(id)))returnHistoryLive(id);else void changeHistory(id,-1);}),historyLabel=node('span');historyLabel.setAttribute('aria-live','polite');const compareButton=button('Compare','Compare with previous version',()=>model.view(id).comparison?void changeHistory(id,1):void compareFunction(id)),editPrevious=button('◂ edit','Previous comparison edit',()=>void comparisonEdit(id,-1)),editNext=button('edit ▸','Next comparison edit',()=>void comparisonEdit(id,1));historyRow.append(historyPrevious,editPrevious,historyLabel,historyNext,editNext,compareButton);const section=node('div');section.className='source-section';const sectionLabel=node('span','Loading captured source…');const prev=button('Previous section',null,()=>{const v=model.view(id);void loadSource(id,Math.max(v.symbol.source.line,v.reading.section-96));}),next=button('Next section',null,()=>{const v=model.view(id);void loadSource(id,Math.min(v.symbol.source.end_line,v.reading.section+96));});prev.hidden=true;next.hidden=true;section.append(sectionLabel,prev,next);
  const code=node('div');code.className='code-pane';code.tabIndex=0;code.setAttribute('aria-label',`${v.symbol.name} captured code`);code.append(node('p','Loading source…'));const footer=node('div');footer.className='fragment-footer';const callsButton=button('Calls','Calls',()=>toggleCalls(id)),state=node('span','Captured source');state.setAttribute('role','status');const keep=button('Save','Save location',()=>void keepLocation(id)),editor=button('Editor',`Open in ${editorName}`,()=>void openEditor(id));editor.disabled=true;footer.append(callsButton,state,pin,keep,editor);
  const popup=node('div');popup.className='calls-popover';popup.hidden=true;body.append(historyRow,section,code,popup,footer);const resize=button('','Resize bubble',()=>{});resize.title='Drag or use arrow keys to resize';resize.className='resize-handle';body.append(resize);bindDrag(resize,id,true);bindLayoutKeys(resize,id,true);element.append(body);el('fragment-layer').append(element);
  const kept=board?.evidence.find(e=>e.source.file===v.symbol.source.file&&e.source.version===v.symbol.source.version&&e.source.line===v.symbol.source.line)?.id??null;
- const record={id,compareButton,editPrevious,editNext,historyRow,historyPrevious,historyNext,historyLabel,referenceActions,moduleTag,pin,fitHeight,fitWidth,loading:true,element,body,code,collapse,sectionLabel,prev,next,callsButton,popup,state,keep,editor,sites:[],nextCalls:0,matching:0,callsReady:false,controller:new AbortController(),kept};record.actions=[];record.sourcePane=new SourcePane(code,(text,line,plan,margin)=>{renderCallText(text,line,record.actions,(action,button,direct,keyboard)=>inlineAction(id,action,button,direct,keyboard),plan,margin);inlineAvailability(text,id);});record.sourcePane.setReflow(smartReflow);mounted.set(id,record);
+ const record={id,compareButton,editPrevious,editNext,historyRow,historyPrevious,historyNext,historyLabel,referenceActions,moduleTag,pin,fitHeight,fitWidth,loading:true,liveReturn:(v.captured??v.comparison??v.history)?.returning?'waiting':null,element,body,code,collapse,sectionLabel,prev,next,callsButton,popup,state,keep,editor,sites:[],nextCalls:0,matching:0,callsReady:false,controller:new AbortController(),kept};record.actions=[];record.sourcePane=new SourcePane(code,(text,line,plan,margin)=>{renderCallText(text,line,record.actions,(action,button,direct,keyboard)=>inlineAction(id,action,button,direct,keyboard),plan,margin);inlineAvailability(text,id);});record.sourcePane.setReflow(smartReflow);mounted.set(id,record);
  element.addEventListener('pointerdown',()=>{model.selected=id;geometry();});code.addEventListener('scroll',()=>{callMenu.hide();if(mounted.get(id)!==record)return;const v=model.view(id);model.read(id,{section:v.reading.section,...record.sourcePane.reading()});save();});
  jobs=jobs.then(async()=>{if(mounted.get(id)!==record)return;if(!record.code.querySelector('.code-line'))await loadSource(id,v.reading.section);if(model.navigable(id))await loadCalls(id,0);}).catch(fail);geometry();if(prepared)applyPreparedSource(id,prepared);
 }
