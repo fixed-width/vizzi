@@ -9,6 +9,16 @@ const before=source('old_first','old_last','unrelated_before'),after=source('new
 const input=await workspace({files:{'lib.rs':before}});let host,chromium;
 const git=(...args)=>{const out=spawnSync('git',['-C',input.root,...args],{encoding:'utf8'});assert.equal(out.status,0,out.stderr);return out.stdout.trim();};
 async function commit(text){await writeFile(join(input.root,'lib.rs'),text);git('add','lib.rs');git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-qm','fixture');return git('rev-parse','HEAD');}
+const fitsText=label=>label.evaluate(element=>element.scrollWidth<=element.clientWidth+1&&element.scrollHeight<=element.clientHeight+1);
+const lineRevealed=line=>line.evaluate(row=>{
+ const pane=row.closest('.code-pane');
+ return pane.clientHeight>0&&pane.scrollTop<=row.offsetTop&&pane.scrollTop+pane.clientHeight>=row.offsetTop+Math.min(row.offsetHeight,pane.clientHeight)-1;
+});
+async function shrink(view){
+ const grip=view.getByRole('button',{name:'Resize bubble',exact:true});
+ for(let i=0;i<13;i++)await grip.press('ArrowUp');
+ for(let i=0;i<8;i++)await grip.press('ArrowLeft');
+}
 try{
  git('init','-q');const old=await commit(before),newer=await commit(after);
  host=await startHost(input,1);chromium=await browser({desktopBus:false});const page=await chromium.newPage({viewport:{width:1500,height:1100},hasTouch:true}),errors=[];page.on('pageerror',error=>errors.push(error.message));await page.goto(host.url+'/workspace');await page.waitForFunction(()=>document.querySelector('#visual-source-status').textContent.includes('ready'));
@@ -16,7 +26,20 @@ try{
  assert.equal(await root.getByRole('button',{name:'Compare with previous version',exact:true}).count(),1);
  await root.getByRole('button',{name:'Actions for other',exact:true}).click({modifiers:['Control']});const other=page.locator('[data-view][data-name="other"]');await other.locator('.code-line').first().waitFor();const otherNode=await other.locator('.code-text').elementHandle();
  const geometry=view=>view.evaluate(node=>({id:node.dataset.view,x:node.style.left,y:node.style.top,w:node.style.width,h:node.style.height})),original=await geometry(root),otherGeometry=await geometry(other);
+ await root.locator('.code-pane').evaluate(pane=>{pane.scrollTop=125;});
+ assert.ok(await root.locator('.code-pane').evaluate(pane=>pane.scrollTop)>0);
  await root.getByRole('button',{name:'Compare with previous version',exact:true}).click();const newerView=page.locator('[data-comparison-side="newer"]'),olderView=page.locator('[data-comparison-side="older"]');await olderView.locator('.comparison-removed').first().waitFor();
+ const openingStatus=newerView.getByText('At first change',{exact:true});
+ assert.equal(await openingStatus.isVisible(),true,'the opening status explains the jump to the first changed block');
+ assert.equal(await openingStatus.getAttribute('role'),'status');
+ assert.equal(await newerView.locator('.code-pane').evaluate(pane=>pane.scrollTop),0);
+ const caption=newerView.locator('.fragment-history span');
+ assert.equal(await caption.textContent(),'After · Saved working tree (captured) · 1/2');
+ assert.equal(await fitsText(caption),true,'the full captured revision and block count fit beside the controls');
+ const previousBlock=newerView.getByRole('button',{name:'Previous changed block',exact:true});
+ const nextBlock=newerView.getByRole('button',{name:'Next changed block',exact:true});
+ assert.equal(await previousBlock.textContent(),'Previous changed block');
+ assert.equal(await nextBlock.textContent(),'Next changed block');
  assert.match(await newerView.locator('.comparison-added').textContent(),/new_first/);assert.match(await olderView.locator('.comparison-removed').textContent(),/old_first/);assert.equal(await newerView.locator('.comparison-added').getAttribute('data-line'),String(after.split('\n').findIndex(line=>line.includes('new_first'))+1));assert.equal(await olderView.locator('.comparison-removed').getAttribute('data-line'),String(before.split('\n').findIndex(line=>line.includes('old_first'))+1));
  assert.equal(await olderView.locator('.fragment-history').textContent().then(text=>text.includes(old.slice(0,8))),true);assert.match(await newerView.locator('.fragment-history').textContent(),/After/);assert.deepEqual(await geometry(newerView),original);assert.deepEqual(await geometry(other),otherGeometry);assert.equal(await otherNode.evaluate(node=>node.isConnected),true);assert.equal(await newerView.locator('.code-call').count(),0);assert.equal(await newerView.getByRole('button',{name:'Calls',exact:true}).isDisabled(),false);
  const copied=await newerView.locator('.comparison-added .code-text').evaluate(node=>{const range=document.createRange();range.selectNodeContents(node);const selection=getSelection();selection.removeAllRanges();selection.addRange(range);const clipboardData=new DataTransfer();node.dispatchEvent(new ClipboardEvent('copy',{clipboardData,bubbles:true}));selection.removeAllRanges();return clipboardData.getData('text/plain');});assert.equal(copied,'    let new_first = 1;');
@@ -25,13 +48,15 @@ try{
  const secondEdit=newerView.locator('.comparison-added').filter({hasText:'new_last'});
  await newerPane.evaluate(pane=>{pane.scrollTop=pane.scrollHeight-pane.clientHeight-10;});
  await secondEdit.waitFor();
+ assert.equal(await openingStatus.count(),0,'the opening status clears once the reader scrolls');
  assert.equal(await firstEdit.evaluate(node=>node.isConnected),true,'loading surrounding comparison source keeps the first edit mounted');
- await newerView.getByRole('button',{name:'Next comparison edit',exact:true}).click();await page.waitForFunction(()=>document.querySelector('[data-comparison-side="newer"] .comparison-added')?.textContent.includes('new_last')&&document.querySelector('[data-comparison-side="older"] .comparison-removed')?.textContent.includes('old_last'));
- assert.equal(await newerView.getByRole('button',{name:'Next comparison edit',exact:true}).isDisabled(),true);
+ await nextBlock.click();await page.waitForFunction(()=>document.querySelector('[data-comparison-side="newer"] .comparison-added')?.textContent.includes('new_last')&&document.querySelector('[data-comparison-side="older"] .comparison-removed')?.textContent.includes('old_last'));
+ assert.equal(await nextBlock.isDisabled(),true);
  const busy=new Set();await page.route('**/api/function-comparisons/window?*',async route=>{const q=new URL(route.request().url()).searchParams,key=q.get('side')+':'+q.get('line_start');if(!busy.has(key)){busy.add(key);await route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({message:'Comparison read busy; retry'})});}else await route.continue();});await page.reload();await newerView.locator('.comparison-added').first().waitFor();await olderView.locator('.comparison-removed').first().waitFor();assert.match(await newerView.locator('.comparison-added').textContent(),/new_last/);assert.match(await olderView.locator('.comparison-removed').textContent(),/old_last/);assert.ok(busy.size>=4);await page.unroute('**/api/function-comparisons/window?*');
  const future=source('future_first','future_last','live_later','// moved\n\n');await commit(future);await page.waitForFunction(()=>document.querySelector('[data-name="other"] .code-pane').textContent.includes('live_later'));assert.match(await newerView.locator('.comparison-added').textContent(),/new_last/);assert.match(await olderView.locator('.comparison-removed').textContent(),/old_last/);
  await paint(page);await page.screenshot({path:'/tmp/vizzi-function-comparison.png'});
- await olderView.getByRole('button',{name:'Close bubble',exact:true}).click();await newerView.getByRole('button',{name:'Previous comparison edit',exact:true}).click();await page.waitForFunction(()=>document.querySelector('[data-comparison-side="newer"] .comparison-added')?.textContent.includes('new_first'));
+ await olderView.getByRole('button',{name:'Close bubble',exact:true}).click();await previousBlock.click();await page.waitForFunction(()=>document.querySelector('[data-comparison-side="newer"] .comparison-added')?.textContent.includes('new_first'));
+ assert.equal(await openingStatus.count(),0,'returning to the first block is ordinary navigation');
  let releaseLive;
  const liveGate=new Promise(resolve=>releaseLive=resolve);
  await page.route('**/api/visual/refresh',async route=>{
@@ -66,8 +91,64 @@ try{
  await newerView.getByRole('button',{name:'Next section',exact:true}).click();
  await page.waitForFunction(()=>document.querySelector('[data-comparison-side="newer"] .code-line')?.dataset.line!=='3');
  assert.equal(await newerRows.first().getAttribute('data-line'),String(earlierFirst),'Next section starts immediately after the shortened section');
- const grip=newerView.getByRole('button',{name:'Resize bubble',exact:true});for(let i=0;i<13;i++)await grip.press('ArrowUp');const outer=await newerView.boundingBox(),returning=await newerView.getByRole('button',{name:'Return to live',exact:true}).boundingBox();assert.ok(returning.y+returning.height<=outer.y+outer.height+1);
- await olderView.getByRole('button',{name:'Close bubble',exact:true}).click();await newerView.getByRole('button',{name:'Return to live',exact:true}).click();await page.waitForFunction(()=>!document.querySelector('[data-name="target"] button[aria-label="Open in VS Code"]').disabled);
+ await shrink(newerView);
+ const olderRevision=newerView.getByRole('button',{name:'Older revision (exit diff)',exact:true});
+ assert.equal(await olderRevision.textContent(),'Older revision (exit diff)');
+ const outer=await newerView.boundingBox();
+ for(const control of [previousBlock,nextBlock,olderRevision,newerView.getByRole('button',{name:'Return to live',exact:true})]){
+  const box=await control.boundingBox();assert.ok(box.x+box.width<=outer.x+outer.width+1&&box.y+box.height<=outer.y+outer.height+1);
+ }
+ assert.equal(await fitsText(caption),true,'the revision and block count fit at minimum size');
+ const adjacentStart=Number(await newerRows.last().getAttribute('data-line'))+1;
+ const denyAdjacent=route=>{
+  const query=new URL(route.request().url()).searchParams;
+  if(query.get('side')!=='newer'||Number(query.get('line_start'))!==adjacentStart)return route.fallback();
+  return route.fulfill({status:500,contentType:'application/json',body:JSON.stringify({message:'fixture adjacent read failed'})});
+ };
+ await page.route('**/api/function-comparisons/window?*',denyAdjacent);
+ try{
+  await newerPane.evaluate(pane=>{pane.scrollTop=pane.scrollHeight-pane.clientHeight-10;});
+  const recovery=newerView.getByText('Could not load adjacent source. Scroll again to retry.',{exact:true});
+  await recovery.waitFor();
+  assert.equal(await fitsText(recovery),true,'the full retry instruction fits at minimum size');
+  const box=await recovery.boundingBox();assert.ok(box.y+box.height<=outer.y+outer.height+1,'the retry instruction is inside the bubble');
+  assert.equal(await newerPane.locator(`[data-line="${adjacentStart}"]`).count(),0);
+ }finally{await page.unroute('**/api/function-comparisons/window?*',denyAdjacent);}
+ await newerPane.evaluate(pane=>pane.dispatchEvent(new WheelEvent('wheel',{deltaY:30})));
+ await newerPane.locator(`[data-line="${adjacentStart}"]`).waitFor();
+ const historical=page.locator(`[data-view="${original.id}"]`);
+ await olderRevision.press('Enter');
+ await historical.locator('.fragment-history span').filter({hasText:new RegExp(`^${old.slice(0,8)}$`)}).waitFor();
+ assert.equal(await historical.getAttribute('data-comparison-side'),null);
+ assert.equal(await historical.locator('.comparison-added').count(),0);
+ assert.match(await olderView.locator('.comparison-removed').textContent(),/old_first/);
+ await olderView.getByRole('button',{name:'Close bubble',exact:true}).click();await historical.getByRole('button',{name:'Return to live',exact:true}).click();await page.waitForFunction(()=>!document.querySelector('[data-name="target"] button[aria-label="Open in VS Code"]').disabled);
+ await historical.getByRole('button',{name:'Compare with previous version',exact:true}).click();
+ await olderView.locator('.code-line').first().waitFor();
+ const minFrame=await historical.boundingBox(),minStatus=await openingStatus.boundingBox();
+ assert.ok(minStatus.y+minStatus.height<=minFrame.y+minFrame.height+1,'the opening status fits at minimum size');
+ assert.equal(await lineRevealed(newerView.locator('.comparison-added').first()),true,'the opening jump reveals the changed line at minimum size');
+ await olderView.getByRole('button',{name:'Close bubble',exact:true}).click();
+ await historical.getByRole('button',{name:'Return to live',exact:true}).click();
+ await page.waitForFunction(()=>!document.querySelector('[data-name="target"] button[aria-label="Open in VS Code"]').disabled);
  let release,arrived;const waiting=new Promise(resolve=>arrived=resolve),gate=new Promise(resolve=>release=resolve);await page.route('**/api/function-comparisons',async route=>{const response=await route.fetch();arrived();await gate;await route.fulfill({response}).catch(()=>{});});await root.getByRole('button',{name:'Compare with previous version',exact:true}).click();await waiting;await root.getByRole('button',{name:'Close bubble',exact:true}).click();release();await page.unroute('**/api/function-comparisons');assert.equal(await page.locator('[data-comparison-side]').count(),0);assert.equal(await page.locator('[data-view]').count(),1);assert.deepEqual(errors,[]);
+
+ const removed='    let deleted_line = 1;\n';
+ const deletionSource=`fn deletion_case() {\n${'    // context\n'.repeat(24)}${removed}    let retained_anchor = 2;\n}\n`;
+ await commit(future+deletionSource);
+ await commit(future.replace('live_later','deletion_ready')+deletionSource.replace(removed,''));
+ await page.waitForFunction(()=>document.querySelector('[data-name="other"] .code-pane').textContent.includes('deletion_ready'));
+ await page.getByRole('button',{name:'Add bubble',exact:true}).click();
+ await page.getByLabel('Find a function',{exact:true}).fill('deletion_case');
+ await page.getByRole('button',{name:'Find functions',exact:true}).click();
+ await page.locator('[data-add-symbol][data-name="deletion_case"]').click();
+ const deletion=page.locator('[data-view][data-name="deletion_case"]');
+ await deletion.locator('.code-line').first().waitFor();
+ await shrink(deletion);await deletion.getByRole('button',{name:'Compare with previous version',exact:true}).click();
+ await olderView.locator('.comparison-removed').filter({hasText:'deleted_line'}).waitFor();
+ assert.equal(await newerView.locator('.comparison-added').count(),0);
+ assert.equal(await openingStatus.isVisible(),true);
+ assert.equal(await lineRevealed(newerView.locator('.code-line').filter({hasText:'retained_anchor'})),true,'a deletion-only block reveals its anchor in After');
+ assert.deepEqual(errors,[]);
  console.log('function comparison: unpaged changes, original line numbers/copying, coordinated edits, independent frozen captures, retry/reload, historical adjacency, preserved layout, minimum size and cancellation');
 }finally{await chromium?.close();await host?.close();await input.close();}

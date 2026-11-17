@@ -8,6 +8,9 @@ remains in Git and the project documentation.
 
 ### Changed
 
+- Function comparisons identify the jump to the first changed block and label the
+  controls for moving between blocks or exiting the diff to read an older revision.
+
 - Scroll through long functions inside a bubble. Adjacent source loads as you read,
   with line numbers, call actions and selection across loaded sections.
 

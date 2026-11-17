@@ -23,13 +23,17 @@ Use the existing bubble design and theme; no separate mock is needed.
    do not establish a call relationship between the bubbles.
 5. Compute changes from complete captured declarations, including text outside the loaded
    section. Ignore unrelated declarations and line movement elsewhere in the file. Open
-   at the first edit, with a little preceding context. **Previous edit** and **Next edit**
-   reveal corresponding locations in the pair; insertion/deletion anchors remain valid
-   when one side has no changed lines. Each side scrolls through its own captured function.
+   at the first changed block. Keep as much preceding context as fits while revealing
+   the first changed line or its insertion/deletion anchor. Report the jump once the
+   target is visible in **After**. **Previous changed block** and **Next changed block**
+   reveal corresponding locations in both visible sides. Insertion and deletion anchors
+   remain valid when one side has no changed lines. Each side scrolls through its own
+   captured function.
 6. Each bubble can close independently. Remaining highlights still refer to the labelled
    frozen pair. **Return to live** resumes that bubble's declaration tracking, retaining
-   its actual comparison capture if the current declaration is missing. Normal history
-   navigation can resume from a committed side and ends its comparison presentation.
+   its actual comparison capture if the current declaration is missing. **Older revision
+   (exit diff)** steps back through function history on a committed side and ends its
+   comparison presentation. The other bubble keeps its comparison.
 7. Calls can follow declarations within the exact captured file on each comparison side;
    see [captured call exploration](CAPTURED_CALLS_PRODUCT.md). Callers, references, Save and
    Editor remain current-source actions. Existing call arrows become historical. Other

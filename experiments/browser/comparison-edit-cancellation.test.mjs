@@ -63,7 +63,7 @@ try{
     entered();await gate;
     try{await route.fulfill({status:500,contentType:'application/json',body:JSON.stringify({message:failure})});}finally{returned();}
    });
-   await newer.getByRole('button',{name:'Next comparison edit',exact:true}).click();await waiting;
+   await newer.getByRole('button',{name:'Next changed block',exact:true}).click();await waiting;
    if(scenario==='editor'){
     await page.evaluate(hash=>{location.hash=hash;},'#editor-call='+calls.items[0].id+'&snapshot='+status.snapshot);
     await page.locator('[data-view][data-name="leaf"] .code-line').first().waitFor();
@@ -84,7 +84,7 @@ try{
    if(scenario!=='close-origin'&&scenario!=='return-live')assert.equal(await original.locator('.comparison-added').getAttribute('data-line'),firstEdit);
    for(const view of [original,peer])if(await view.count()){
     assert.doesNotMatch(await view.locator('.fragment-footer').textContent(),/Loading comparison/);
-    if(await view.getAttribute('data-comparison-side'))assert.equal(await view.getByRole('button',{name:'Next comparison edit',exact:true}).isEnabled(),true,scenario);
+    if(await view.getAttribute('data-comparison-side'))assert.equal(await view.getByRole('button',{name:'Next changed block',exact:true}).isEnabled(),true,scenario);
    }
    assert.deepEqual(errors,[]);
    console.log('comparison edit '+scenario+' passed');

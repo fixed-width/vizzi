@@ -6,17 +6,18 @@ Open a repository function in the call workspace, either at saved current source
 
 1. Choose **Compare**. The existing bubble becomes **After** and a new **Before** bubble
    opens beside it. Existing bubbles keep their positions. Both comparison views are
-   pinned; a saved working-tree side is labelled as captured source.
+   pinned. A saved working-tree side is labelled as captured source. Compare opens both
+   sides at the first changed block and reports the jump in **After**.
 2. Read the highlighted lines: Before marks removed/replaced source and After marks added
    or replacement source. Line numbers refer to each original file. Copying preserves
    source text and whitespace without adding diff signs.
-3. Use **Previous edit** or **Next edit** in either bubble to reveal corresponding changes
-   in both visible sides. The first edit opens automatically, even when it is beyond the
-   initially loaded section. Scroll inside either bubble to read the surrounding code.
+3. Use **Previous changed block** or **Next changed block** in either bubble to reveal
+   the corresponding changes on both visible sides. Scroll inside either bubble to read
+   the surrounding code.
 4. Close either bubble independently. Remaining highlights still describe the original
    frozen pair. Choose **Return to live** to resume saved-source tracking in that bubble.
-   **History**, when available on a committed side, resumes reading older function versions
-   and removes its comparison highlights.
+   Choose **Older revision (exit diff)** on a committed side to step back through function
+   history in that bubble. The other side keeps its comparison highlights.
 
 Comparison uses complete captured declarations. Moving a function within its file or
 editing other functions does not create extra highlighted changes. The comparison follows
