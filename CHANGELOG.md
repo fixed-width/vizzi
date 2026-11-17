@@ -63,6 +63,9 @@ remains in Git and the project documentation.
 
 ### Fixed
 
+- **Add bubble** finds Rust methods by qualified names such as `Task::run_entry`
+  with the impl's generic arguments omitted. Results retain their full names.
+
 - Superseded function comparisons and edit navigation stay silent after newer editor
   navigation, Return to live or closing a bubble; delayed responses cannot replace newer
   source, change focus or display obsolete errors.

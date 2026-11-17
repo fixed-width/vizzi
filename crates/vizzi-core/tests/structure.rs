@@ -449,6 +449,170 @@ fn declaration_search_matches_qualified_names_and_partial_namespace_suffixes() {
 }
 
 #[test]
+fn qualified_function_search_accepts_omitted_rust_impl_arguments() {
+    let index = Structure::new(&snapshot(&[
+        (
+            "task.rs",
+            "struct Task<const STACKSIZE: usize>;\n\
+             impl<const STACKSIZE: usize> Task<STACKSIZE> {\n\
+                 const CAPACITY: usize = STACKSIZE;\n\
+                 fn run_entry() {}\n\
+             }",
+        ),
+        (
+            "nested.rs",
+            "mod nested { struct Task<T>(T); impl Task<Vec<Vec<u8>>> { fn run_entry() {} } }",
+        ),
+        ("unrelated.rs", "fn run_entry() {}"),
+    ]));
+
+    let short = index.functions("", "Task::run_entry", 0).unwrap();
+    assert_eq!(short.matching, 2);
+    for (entry, qualified, parents, path) in [
+        (
+            &short.items[0],
+            "Task<STACKSIZE>::run_entry",
+            vec!["Task<STACKSIZE>"],
+            "task.rs",
+        ),
+        (
+            &short.items[1],
+            "nested::Task<Vec<Vec<u8>>>::run_entry",
+            vec!["nested", "Task<Vec<Vec<u8>>>"],
+            "nested.rs",
+        ),
+    ] {
+        let full = index.functions("", qualified, 0).unwrap();
+        assert_eq!(full.matching, 1);
+        assert_eq!(entry.symbol.id, full.items[0].symbol.id);
+        assert_eq!(entry.symbol.parents, parents);
+        assert_eq!(entry.symbol.source.path, path);
+        assert_eq!(entry.same_name_definitions, 3);
+    }
+    assert_eq!(
+        index
+            .functions("", "nested.Task.run_entry", 0)
+            .unwrap()
+            .items[0]
+            .symbol
+            .id,
+        short.items[1].symbol.id
+    );
+    assert_eq!(
+        index
+            .functions("", "Task<u64>::run_entry", 0)
+            .unwrap()
+            .matching,
+        0
+    );
+    assert_eq!(
+        index
+            .inventory("", "Task<STACKSIZE>::CAPACITY", 0)
+            .unwrap()
+            .matching,
+        1
+    );
+    assert_eq!(
+        index.inventory("", "Task::CAPACITY", 0).unwrap().matching,
+        0
+    );
+}
+
+#[test]
+fn qualified_function_search_handles_generic_trait_impls_and_long_arguments() {
+    let argument = "Vec<".repeat(32) + "u8" + &">".repeat(32);
+    let text = format!(
+        "trait Plugin<T> {{ fn process(); }} struct Meter<T>(T); \
+         impl Plugin<u8> for Meter<{argument}> {{ fn process() {{}} }}"
+    );
+    let index = Structure::new(&snapshot(&[("plugin.rs", &text)]));
+    let full = index.functions("", "process", 0).unwrap();
+    assert_eq!(full.matching, 2);
+    let method = full
+        .items
+        .iter()
+        .find(|entry| entry.symbol.parents[0].starts_with("Plugin<u8> for Meter<"))
+        .unwrap();
+
+    for query in [
+        "Plugin<u8> for Meter::process",
+        "Meter::process",
+        "Meter::proc",
+    ] {
+        let result = index.functions("", query, 0).unwrap();
+        assert_eq!(result.matching, 1, "{query}");
+        assert_eq!(result.items[0].symbol.id, method.symbol.id, "{query}");
+    }
+}
+
+#[test]
+fn qualified_generic_trait_impl_search_ranks_exact_target_before_partials() {
+    let partials = (0..24)
+        .map(|n| format!("fn process_extra_{n}() {{}}"))
+        .collect::<String>();
+    let text = format!(
+        "trait Handler {{ fn process(); }} struct Meter<T>(T); \
+         impl Handler for Meter<u8> {{ fn process() {{}} }} \
+         impl Meter<u8> {{ {partials} }}"
+    );
+    let index = Structure::new(&snapshot(&[("meter.rs", &text)]));
+    let literal = index
+        .functions("", "Handler for Meter<u8>::process", 0)
+        .unwrap();
+    let short = index.functions("", "Meter::process", 0).unwrap();
+    assert_eq!(short.matching, 25);
+    assert_eq!(short.items[0].symbol.id, literal.items[0].symbol.id);
+    let qualified = index
+        .functions("", "Handler for Meter::process", 0)
+        .unwrap();
+    assert_eq!(qualified.items[0].symbol.id, literal.items[0].symbol.id);
+}
+
+#[test]
+fn qualified_generic_trait_impl_search_survives_a_long_trait_label() {
+    let trait_name = "LongTrait".repeat(16);
+    let text = format!(
+        "trait {trait_name} {{ fn process(); }}\nstruct Meter<T>(T);\n\
+         impl {trait_name} for Meter<u8> {{ fn process() {{}} }}"
+    );
+    let index = Structure::new(&snapshot(&[("meter.rs", &text)]));
+    let simple = index.functions("", "process", 0).unwrap();
+    let method = simple
+        .items
+        .iter()
+        .find(|entry| entry.symbol.source.line == 3)
+        .unwrap();
+    let short = index.functions("", "Meter::process", 0).unwrap();
+    assert_eq!(short.matching, 1);
+    assert_eq!(short.items[0].symbol.id, method.symbol.id);
+}
+
+#[test]
+fn qualified_function_search_accepts_wrapped_impl_targets() {
+    let index = Structure::new(&snapshot(&[(
+        "targets.rs",
+        "trait Handler<T> {} trait Process { fn process(); } struct Task<T>(T); \
+         impl dyn Handler<u8> { fn run() {} } \
+         impl dyn Handler<u8> + Send { fn run_send() {} } \
+         impl<T> Process for &Task<T> { fn process() {} }",
+    )]));
+    for (short, literal) in [
+        ("dyn Handler::run", "dyn Handler<u8>::run"),
+        (
+            "dyn Handler + Send::run_send",
+            "dyn Handler<u8> + Send::run_send",
+        ),
+        ("&Task::process", "Process for &Task<T>::process"),
+    ] {
+        let full = index.functions("", literal, 0).unwrap();
+        assert_eq!(full.matching, 1, "{literal}");
+        let omitted = index.functions("", short, 0).unwrap();
+        assert_eq!(omitted.matching, 1, "{short}");
+        assert_eq!(omitted.items[0].symbol.id, full.items[0].symbol.id);
+    }
+}
+
+#[test]
 fn exact_names_rank_before_prefixes_and_substrings_across_source_paths() {
     let index = Structure::new(&snapshot(&[
         (
