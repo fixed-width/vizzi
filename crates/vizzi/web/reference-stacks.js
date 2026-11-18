@@ -5,7 +5,7 @@ import {functionIndent} from './source-margin.js';
 
 const qualified = symbol => [...symbol.parents, symbol.name].join('::');
 
-export function installReferenceStacks(root, {read, post, transport, open, changed, failed}) {
+export function installReferenceStacks(root, {read, post, transport, open, comparisonTitle, revealComparison, changed, failed}) {
  const document = root.ownerDocument;
  const records = new Map();
  let queue = Promise.resolve();
@@ -51,8 +51,11 @@ export function installReferenceStacks(root, {read, post, transport, open, chang
  function paint(record) {
   const data = record.data;
   record.list.replaceChildren();
-  const stale = data.snapshot !== read().snapshot || read().stale;
+  const model = read();
+  const stale = data.snapshot !== model.snapshot || model.stale;
+  const callers = model.view(record.id).query === 'callers';
   record.stale = stale;
+  record.callerRows = [];
   for (const row of data.items) {
    const entry = element('div');
    entry.className = 'reference-entry';
@@ -64,6 +67,15 @@ export function installReferenceStacks(root, {read, post, transport, open, chang
    show.disabled = stale || !row.symbol;
    const location = element('small', `${row.origin ? originLabel(row.origin) + ' · ' : ''}${row.source.path}:${row.source.line}`);
    const snippet = element('code', row.snippet);
+   entry.append(show);
+   if (callers && row.symbol) {
+    const action = element('small', 'Open live source');
+    action.className = 'reference-live-action';
+    show.append(action);
+    const comparisons = element('div');
+    entry.append(comparisons);
+    record.callerRows.push({row, comparisons});
+   }
    show.append(location, snippet);
    show.onmouseenter = () => {
     clearTimeout(record.hoverTimer);
@@ -71,7 +83,6 @@ export function installReferenceStacks(root, {read, post, transport, open, chang
    };
    show.onmouseleave = () => clearTimeout(record.hoverTimer);
    show.onfocus = () => void preview(record, row);
-   entry.append(show);
    record.list.append(entry);
   }
   const shown = data.items.length ? `${record.offset + 1}–${record.offset + data.items.length} of ${data.matching}` : '0 results';
@@ -79,6 +90,32 @@ export function installReferenceStacks(root, {read, post, transport, open, chang
   record.status.title = data.detail ?? '';
   record.previous.disabled = stale || record.offset === 0;
   record.next.disabled = stale || data.next === null;
+ }
+
+ function updateComparisons(record, model) {
+  for (const entry of record.callerRows) {
+   const options = record.stale ? [] : model.comparisonsFor(entry.row.symbol);
+   const descriptions = options.map(({views}) => {
+    const revisions = views.map(view => comparisonTitle(view.comparison)).join(' / ');
+    const destination = views.at(-1);
+    const {section, anchor} = destination.reading;
+    return options.length === 1 ? revisions : `${revisions} · line ${anchor?.line ?? section} · bubble ${destination.id.slice(1)}`;
+   });
+   const key = JSON.stringify(options.map((option,index) => [option.token, descriptions[index]]));
+   if (key === entry.key) continue;
+   entry.key = key;
+   entry.comparisons.replaceChildren(...options.map((option,index) => {
+    const description = descriptions[index];
+    const action = button(options.length === 1 ? 'Show comparison' : `Show comparison · ${description}`, () => {
+     const workspace = read();
+     if (!current(record) || workspace.stale || record.data?.snapshot !== workspace.snapshot) return;
+     const comparison = workspace.comparisonsFor(entry.row.symbol).find(pair => pair.token === option.token);
+     if (comparison) revealComparison(comparison.views.map(view => view.id));
+    });
+    action.title = description;
+    return action;
+   }));
+  }
  }
 
  function request(record, offset = 0, cached = false) {
@@ -213,6 +250,7 @@ export function installReferenceStacks(root, {read, post, transport, open, chang
     record.refreshButton.disabled = model.stale;
     record.collapse.textContent = item.collapsed ? 'Expand' : 'Collapse';
     if (record.data && record.stale !== (record.data.snapshot !== model.snapshot || model.stale)) paint(record);
+    if (record.data) updateComparisons(record, model);
     if (record.pendingRefresh && !model.stale) { record.pendingRefresh = false; request(record); }
     if (!record.data && !record.controller && !model.stale) request(record);
    }

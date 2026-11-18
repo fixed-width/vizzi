@@ -41,6 +41,25 @@ test('caller expansion retains the call witness, group and existing layout witho
  assert.throws(()=>model.openReference(root,row,target));assert.throws(()=>model.openReference(stack,{},target));
  model.stale=true;assert.throws(()=>model.openReference(stack,row,target));
 });
+test('caller comparison choices match declaration tracking and retain only open sides',()=>{
+ const model=new TaskWorkspace(token(1)),caller={...symbol(3),tracking:token(110)};
+ const frame=(id,label)=>({snapshot:token(id+10),label,other_label:label==='before'?'after':'before',
+  symbol:{...caller,id:token(id),source:{...caller.source,version:token(id+20)}},changes:[[3,4]],window:{line_start:3}});
+ const first=model.openRoot(caller,'lib.rs');
+ const one=model.openComparison(first,{token:token(70),older:frame(71,'before'),newer:frame(72,'after')});
+ const second=model.openRoot(caller,'lib.rs');
+ const two=model.openComparison(second,{token:token(80),older:frame(81,'before'),newer:frame(82,'after')});
+ const saved=model.serialize(),restored=TaskWorkspace.restore(saved,token(1));
+ const sources={...caller,id:token(100),source:{...caller.source,version:token(101)}};
+ const choices=()=>restored.comparisonsFor(sources).map(({token,views})=>[token,views.map(view=>view.id)]);
+ assert.deepEqual(choices(),[[token(70),[one.older,one.newer]],[token(80),[two.older,two.newer]]]);
+ assert.deepEqual(restored.comparisonsFor({...sources,tracking:token(111)}),[]);
+ assert.deepEqual(restored.comparisonsFor({...sources,tracking:undefined}),[]);
+ assert.deepEqual(restored.comparisonsFor({...sources,source:{...sources.source,file:token(98)}}),[]);
+ assert.equal(restored.serialize(),saved);
+ restored.returnLive(two.newer);restored.close(one.older);
+ assert.deepEqual(choices(),[[token(70),[one.newer]],[token(80),[two.older]]]);
+});
 test('new items avoid occupied source and result rectangles and inherit an existing group',()=>{
  const model=new TaskWorkspace(token(1)),a=model.openRoot(symbol(2),'lib.rs'),g=model.saveGroup(null,'Trace',[a]),r=model.addReferences(symbol(2),'callers',a);
  assert.ok(model.group(g).members.includes(r));assert.ok(model.view(r).x>=model.view(a).x+model.view(a).w);

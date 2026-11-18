@@ -97,6 +97,33 @@ export class TaskWorkspace extends Workspace {
   return opened;
  }
 
+ comparisonsFor(symbol) {
+  if (!symbol?.tracking || symbol.origin) return [];
+  const pairs = new Map();
+  for (const view of this.views) {
+   const comparison = view.comparison;
+   if (!comparison || comparison.returning || view.state !== 'current'
+     || view.symbol.tracking !== symbol.tracking || view.symbol.source.file !== symbol.source.file) continue;
+   const pair = pairs.get(comparison.token) ?? {};
+   pair[comparison.side] = view;
+   pairs.set(comparison.token, pair);
+  }
+  return Array.from(pairs, ([token, {older, newer}]) => ({token, views: [older, newer].filter(Boolean)}));
+ }
+
+ revealComparison(ids, width, height) {
+  require(ids.length > 0, 'Comparison is absent');
+  const planned = TaskWorkspace.restore(this.serialize(), this.snapshot);
+  for (const id of ids) {
+   const view = planned.view(id);
+   require(view.comparison && !view.comparison.returning, 'Comparison is absent');
+   if (view.collapsed) planned.collapse(id);
+  }
+  planned.selected = ids.at(-1);
+  planned.reveal(ids, width, height);
+  Object.assign(this, planned);
+ }
+
  openReference(id, row, target) {
   this.fresh();
   require(row?.symbol, 'This reference has no admitted declaration');

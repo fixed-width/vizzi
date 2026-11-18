@@ -8,6 +8,9 @@ remains in Git and the project documentation.
 
 ### Changed
 
+- Caller results distinguish opening live source from showing an existing comparison
+  at its retained revisions and reading position.
+
 - Function comparisons identify the jump to the first changed block and label the
   controls for moving between blocks or exiting the diff to read an older revision.
 

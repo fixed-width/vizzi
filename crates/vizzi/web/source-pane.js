@@ -23,8 +23,12 @@ export class SourcePane {
         this.element.replaceChildren(...this.rows.map(r=>r.row));
         const legacy=this.rows.find(r=>r.row.offsetTop+r.row.offsetHeight>reading.top);
         const anchor=reading.anchor??(legacy?{line:legacy.line.number,byte:0,offset:reading.top-legacy.row.offsetTop}:null);
-        this.update(false,true);this.element.scrollLeft=reading.left;
-        if(anchor)return this.restore(anchor);
+        this.update(false,true);
+        return this.restoreReading({...reading,anchor});
+    }
+    restoreReading(reading){
+        this.element.scrollLeft=reading.left;
+        if(reading.anchor)return this.restore(reading.anchor);
         this.element.scrollTop=reading.top;return false;
     }
     extend(lines,before,drop,baseline) {
