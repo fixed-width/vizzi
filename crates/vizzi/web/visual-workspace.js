@@ -303,7 +303,7 @@ function links(){
 }
 function geometry(){
  if(!model)return;for(const[id,r]of mounted)if(!model.views.some(v=>v.id===id)){r.controller.abort();r.historyController?.abort();r.sourcePane.dispose();r.element.remove();mounted.delete(id);}const c=model.camera;el('workspace-world').style.transform=`translate(${-c.x*c.scale}px,${-c.y*c.scale}px) scale(${c.scale})`;el('visual-zoom').textContent=Math.round(c.scale*100)+'%';el('visual-empty').hidden=model.items().length>0;el('visual-stale').hidden=!model.views.some(v=>v.state==='unresolved'&&!mounted.get(v.id)?.liveReturn);
- for(const v of model.views){const r=mounted.get(v.id);if(!r)continue;r.element.hidden=!model.isVisible(v.id);Object.assign(r.element.style,{left:v.x+'px',top:v.y+'px',width:v.w+'px',height:(v.collapsed?54:v.h)+'px'});const membership=modulePresentation(v,model.views);r.element.classList.toggle('has-module',Boolean(membership));const moduleKey=JSON.stringify(membership);if(moduleKey!==r.moduleKey){r.moduleKey=moduleKey;r.moduleTag.hidden=!membership;if(membership){r.element.dataset.moduleId=membership.id;r.moduleTag.dataset.moduleId=membership.id;r.moduleTag.textContent=membership.label;r.moduleTag.title=membership.title;r.element.style.setProperty('--module-accent',`var(--module-${membership.colour})`);r.element.style.setProperty('--module-tint',`var(--module-tint-${membership.colour})`);}else{delete r.element.dataset.moduleId;delete r.moduleTag.dataset.moduleId;r.moduleTag.textContent='';r.element.style.removeProperty('--module-accent');r.element.style.removeProperty('--module-tint');}}r.body.hidden=v.collapsed;r.collapse.textContent=v.collapsed?'▾':'▴';r.collapse.setAttribute('aria-label',v.collapsed?'Expand bubble':'Collapse bubble');r.element.classList.toggle('is-selected',v.id===model.selected);r.element.classList.toggle('is-stale',!model.usable(v.id));r.prev.disabled=r.next.disabled=Boolean(r.historyLoading);r.callsButton.disabled=!model.navigable(v.id)||r.historyLoading;r.referenceActions.disabled=!model.usable(v.id)||r.historyLoading;r.fitHeight.disabled=r.fitWidth.disabled=r.loading||!r.lines?.length||v.collapsed;inlineAvailability(r.code,v.id);r.keep.disabled=Boolean(v.symbol.origin)||!model.usable(v.id)||r.historyLoading||!board||busy;r.keep.title=v.symbol.origin?'Dependency locations stay in this workspace.':'Save location';r.editor.disabled=!model.usable(v.id)||r.historyLoading||busy;historyControls(r,v);comparisonControls(r,v);updateFragmentStatus(r);}
+ for(const v of model.views){const r=mounted.get(v.id);if(!r)continue;r.element.hidden=!model.isVisible(v.id);Object.assign(r.element.style,{left:v.x+'px',top:v.y+'px',width:v.w+'px',height:(v.collapsed?54:v.h)+'px'});const membership=modulePresentation(v,model.views);r.element.classList.toggle('has-module',Boolean(membership));const moduleKey=JSON.stringify(membership);if(moduleKey!==r.moduleKey){r.moduleKey=moduleKey;r.moduleTag.hidden=!membership;if(membership){r.element.dataset.moduleId=membership.id;r.moduleTag.dataset.moduleId=membership.id;r.moduleTag.textContent=membership.label;r.moduleTag.title=membership.title;r.element.style.setProperty('--module-accent',`var(--module-${membership.colour})`);r.element.style.setProperty('--module-tint',`var(--module-tint-${membership.colour})`);}else{delete r.element.dataset.moduleId;delete r.moduleTag.dataset.moduleId;r.moduleTag.textContent='';r.element.style.removeProperty('--module-accent');r.element.style.removeProperty('--module-tint');}}r.body.hidden=v.collapsed;r.collapse.textContent=v.collapsed?'▾':'▴';r.collapse.setAttribute('aria-label',v.collapsed?'Expand bubble':'Collapse bubble');r.element.classList.toggle('is-selected',v.id===model.selected);r.element.classList.toggle('is-stale',!model.usable(v.id));r.prev.disabled=r.next.disabled=Boolean(r.historyLoading);r.callsButton.disabled=!model.navigable(v.id)||r.historyLoading;r.referenceActions.disabled=!model.usable(v.id)||r.historyLoading;r.fitHeight.disabled=r.fitWidth.disabled=r.loading||!r.lines?.length||v.collapsed;inlineAvailability(r.code,v.id);r.keep.disabled=Boolean(v.symbol.origin)||!model.usable(v.id)||r.historyLoading||!board||busy;r.keep.title=v.symbol.origin?'Dependency locations stay in this workspace.':'Save location';r.editor.disabled=!model.usable(v.id)||r.historyLoading||busy;historyControls(r,v);comparisonControls(r,v);updateFragmentStatus(r);restoreVisibleReading(r,v);}
  if(model.stale)callMenu.hide();links();overview();outlines.refresh();highlights.refresh();taskGroups.refresh();referenceStacks.refresh();
 }
 function button(text,label,handler){const b=node('button',text);b.type='button';if(label)b.setAttribute('aria-label',label);b.onclick=()=>{try{handler();}catch(e){fail(e);}};return b;}
@@ -328,7 +328,7 @@ function mount(id,prepared){
  const kept=board?.evidence.find(e=>e.source.file===v.symbol.source.file&&e.source.version===v.symbol.source.version&&e.source.line===v.symbol.source.line)?.id??null;
  const record={id,compareButton,editPrevious,editNext,historyRow,historyPrevious,historyNext,historyLabel,referenceActions,moduleTag,pin,fitHeight,fitWidth,loading:true,liveReturn:(v.captured??v.comparison??v.history)?.returning?'waiting':null,element,body,code,collapse,sectionLabel,prev,next,callsButton,popup,state,keep,editor,sites:[],nextCalls:0,matching:0,callsReady:false,controller:new AbortController(),kept};setSections(record,[]);record.sourcePane=new SourcePane(code,(text,line,plan,margin)=>{renderCallText(text,line,record.actionsByLine.get(line.number)??[],(action,button,direct,keyboard)=>inlineAction(id,action,button,direct,keyboard),plan,margin);inlineAvailability(text,id);});record.sourcePane.setReflow(smartReflow);mounted.set(id,record);
  element.addEventListener('pointerdown',()=>{model.selected=id;geometry();});code.addEventListener('scroll',()=>{
-  callMenu.hide();if(mounted.get(id)!==record)return;
+  callMenu.hide();if(mounted.get(id)!==record||!code.clientHeight)return;
   const before=code.scrollTop<record.scrollTop,moved=code.scrollTop!==record.scrollTop;
   if(moved){
    record.restoreAnchor=null;
@@ -380,15 +380,27 @@ function resetSource(r,v,lines,actions,reading,margin){
  r.margin=margin;
  setSections(r,[{start:reading.section,lines:lines.filter(line=>line.number<=v.symbol.source.end_line),actions}]);
  const restored=r.sourcePane.set(r.lines,reading,margin);
- r.restoreAnchor=!restored&&r.lines.at(-1)?.number<v.symbol.source.end_line?reading.anchor:null;
+ r.hiddenReading=r.code.clientWidth?null:reading;
+ r.restoreAnchor=!r.hiddenReading&&!restored&&r.lines.at(-1)?.number<v.symbol.source.end_line?reading.anchor:null;
  r.scrollTop=r.code.scrollTop;
 }
+function restoreVisibleReading(r,v){
+ if(!r.hiddenReading||!r.code.clientWidth)return;
+ const reading=r.hiddenReading;
+ r.hiddenReading=null;
+ r.sourcePane.update(false,true);
+ const restored=r.sourcePane.restoreReading(reading);
+ r.restoreAnchor=!restored&&r.lines.at(-1)?.number<v.symbol.source.end_line?reading.anchor:null;
+ r.scrollTop=r.code.scrollTop;
+ recordReading(r);
+ if(r.restoreAnchor)void extendSource(r,false);
+}
 function recordReading(r){
- const v=model.view(r.id),reading=r.sourcePane.reading(),line=(r.restoreAnchor??reading.anchor)?.line;
+ const v=model.view(r.id),reading=r.hiddenReading??r.sourcePane.reading(),line=(r.restoreAnchor??reading.anchor)?.line;
  const section=r.sections.find(part=>line>=part.start&&line<=part.lines.at(-1)?.number)??r.sections.find(part=>part.start===v.reading.section)??r.sections[0];
  if(!section)return;
  const row=r.code.querySelector(`[data-line="${section.start}"]`);
- if(row)reading.top=Math.max(0,reading.top-row.offsetTop+r.code.firstElementChild.offsetTop);
+ if(row&&!r.hiddenReading)reading.top=Math.max(0,reading.top-row.offsetTop+r.code.firstElementChild.offsetTop);
  if(!r.restoreAnchor)model.read(r.id,{section:section.start,...reading});
  const s=v.symbol.source,last=section.lines.at(-1)?.number??section.start;
  delete r.sectionLabel.dataset.actionable;
@@ -568,7 +580,19 @@ const openDialog=()=>{editorCalls.manual();el('fragment-dialog').showModal();el(
 el('fit-workspace').onclick=()=>{if(!model)return;const s=size();model.fit(s.w,s.h);geometry();save();};for(const[id,factor]of[['zoom-in',1.2],['zoom-out',1/1.2]])el(id).onclick=()=>{if(!model)return;const s=size();model.zoomAt(model.camera.scale*factor,{x:s.w/2,y:s.h/2});geometry();save();};
 const canvas=el('workspace-canvas');canvas.addEventListener('pointerdown',e=>{if(e.button!==0||e.target.closest('.fragment,.reference-stack,.task-group-header,#destination-stack,#workspace-overview,#visual-empty,[data-link-id]'))return;if(!model)return;e.preventDefault();canvas.setPointerCapture(e.pointerId);let last={x:e.clientX,y:e.clientY};const move=event=>{model.pan(event.clientX-last.x,event.clientY-last.y);last={x:event.clientX,y:event.clientY};geometry();};const end=()=>{canvas.removeEventListener('pointermove',move);canvas.removeEventListener('pointerup',end);canvas.removeEventListener('pointercancel',end);save();};canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',end);canvas.addEventListener('pointercancel',end);});
 canvas.addEventListener('wheel',e=>{callMenu.hide();if(!model||e.target.closest('.code-pane,.reference-body,.calls-popover,#destination-stack'))return;e.preventDefault();if(e.ctrlKey||e.metaKey){const rect=canvas.getBoundingClientRect();model.zoomAt(model.camera.scale*Math.exp(-e.deltaY/500),{x:e.clientX-rect.left,y:e.clientY-rect.top});}else model.pan(-e.deltaX,-e.deltaY);geometry();save();},{passive:false});canvas.addEventListener('keydown',e=>{if(e.target!==canvas||!model)return;const moves={ArrowLeft:[70,0],ArrowRight:[-70,0],ArrowUp:[0,70],ArrowDown:[0,-70]};if(moves[e.key]){e.preventDefault();model.pan(...moves[e.key]);geometry();save();}if(e.key==='Escape')hideDestinations();});new ResizeObserver(()=>{geometry();void editorCalls.resume();}).observe(canvas);
-const referenceStacks=installReferenceStacks(el('reference-layer'),{read:()=>model,post,transport,changed:()=>{geometry();save();},failed:fail,open:(id,row,data)=>{editorCalls.manual();try{if(data.snapshot!==model.snapshot||model.stale)throw new Error('Source changed. Refresh references.');const opened=model.openReference(id,row,data.target);for(const v of model.views)mount(v.id);focus([...(opened.destination?[opened.destination]:[]),opened.caller]);save();}catch(e){fail(e);}}});
+const referenceStacks=installReferenceStacks(el('reference-layer'),{
+ read:()=>model,post,transport,changed:()=>{geometry();save();},failed:fail,comparisonTitle,
+ open:(id,row,data)=>{editorCalls.manual();try{if(data.snapshot!==model.snapshot||model.stale)throw new Error('Source changed. Refresh references.');const opened=model.openReference(id,row,data.target);for(const v of model.views)mount(v.id);focus([...(opened.destination?[opened.destination]:[]),opened.caller]);save();}catch(e){fail(e);}},
+ revealComparison:ids=>{
+  editorCalls.manual();
+  try{
+   const viewport=size();
+   model.revealComparison(ids,viewport.w,viewport.h);
+   geometry();save();
+   mounted.get(model.selected)?.code.focus({preventScroll:true});
+  }catch(error){fail(error);}
+ },
+});
 const taskGroups=installTaskGroups(el('task-group-layer'),{read:()=>model,changed:()=>{geometry();save();},edit:id=>taskControls.showGroups(id),failed:fail});
 taskControls=installTaskControls({read:()=>model,replace:replaceTask,snapshot:()=>currentSnapshot,changed:()=>{geometry();save();},failed:fail});
 if (location.pathname === '/' && location.hash === '#saved') {

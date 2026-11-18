@@ -37,10 +37,14 @@ or **Next section** to jump, or use [layout controls](manage-tasks.md) to make r
 ## Find callers or other references
 
 Open a bubble's **⋯** menu and choose **Find callers** or **Find references**. A result
-stack opens alongside the source. Hover or focus an available row for a preview, then
-select it to open the containing declaration. A caller result adds its supported connection
-to the target; a non-call reference opens source without inventing a call. Locations outside
-an admitted declaration can be listed without an openable function bubble.
+stack opens alongside the source. Hover or focus an available row for a preview. Choose
+**Open live source** on a caller row to open the current declaration with its supported
+connection to the target. If that declaration has an open comparison, choose **Show
+comparison** to expand its bubbles and return to their revisions and reading positions.
+If several comparisons are open, the choices include their revision, line and destination
+bubble number. A non-call reference opens its containing declaration.
+Locations outside an admitted declaration
+can be listed without an openable function bubble.
 
 The stack identifies semantic language results or name-based candidates. Without a
 semantic provider, references fall back to written-call candidates and cannot enumerate

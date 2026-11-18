@@ -9,6 +9,12 @@ canvas stacks, preserving earlier bubbles. Rows show the enclosing declaration, 
 source line and location. Hover/focus previews source. Opening a caller adds its source
 bubble and the supported caller-to-target connection. Other references can open source
 without manufacturing a call. Language-supported results retain semantic evidence.
+Caller rows label their primary action **Open live source**. If declaration tracking
+matches an open comparison, **Show comparison** expands and reveals its remaining
+bubbles at their retained revisions and reading positions. When several comparisons are
+open, each choice identifies its destination bubble. Revealing a comparison creates no
+source bubble or call link. Opening live source can reuse an existing current bubble
+and attaches call evidence to current source.
 Name-only candidates are labelled explicitly. Counts expose omissions and unavailable
 analysis. Repository changes make earlier results stale until refreshed, even if the
 target's own file is unchanged: a different file can add or remove callers. Background

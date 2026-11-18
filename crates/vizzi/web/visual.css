@@ -51,6 +51,7 @@
 .reference-entry button{display:block;width:100%;text-align:left;margin-bottom:6px;overflow:hidden}
 .reference-entry small,.reference-entry code{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;margin-top:3px}
 .reference-entry code{font-family:var(--code-font,monospace);font-weight:400}
+.reference-entry .reference-live-action{font-weight:650}
 .reference-preview{margin-top:10px;border-top:1px solid var(--border);padding-top:8px}
 .reference-preview>.code-pane{height:220px;min-height:100px;margin-top:6px}
 .task-row{display:flex;align-items:center;gap:8px;margin:8px 0}.task-row>button:first-child{flex:1;text-align:left}.task-row [aria-current=true]{font-weight:700;border-color:var(--focus)}.task-row small{font-size:10px;color:var(--muted)}
