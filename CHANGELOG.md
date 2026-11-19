@@ -6,6 +6,8 @@ remains in Git and the project documentation.
 
 ## Unreleased
 
+## 0.2.0 - 2026-11-19
+
 ### Changed
 
 - Caller results distinguish opening live source from showing an existing comparison
