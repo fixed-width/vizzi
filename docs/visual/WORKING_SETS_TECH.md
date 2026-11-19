@@ -18,6 +18,10 @@ Native reference queries resolve the selected native declaration identity before
 the configured language provider. Rust uses standard LSP references over the captured
 private mirror. Positions must map to current captured documents and admitted declarations.
 Caller filtering additionally requires an exact captured call identifier at that position.
+Semantic results can recover evidence from an incomplete repository projection by
+projecting the verified location's file. A request can build up to sixteen such file
+projections, with the most recent projection reused across requests. Callers that cannot
+be verified within the allowances are counted as omitted.
 The response distinguishes semantic results from name candidates and reports locations
 outside admitted source. Query results have a finite cache and observation-bound paging.
 Opening a semantic caller uses its native call witness and target. Source changes reject
@@ -31,6 +35,8 @@ this feature does not scan dependency trees. Unknown locations are counted separ
 Without semantic reference support, the fallback offers written calls with the same
 terminal name, rather than claiming to find all non-call uses. These are candidates,
 including when only one candidate remains.
+When the file and repository projections contain the same written call, the file's
+binding determines whether that site is a candidate.
 
 Task layouts admit 24 source bubbles, four result stacks and eight groups. The shelf
 holds at most 12 tasks in a single 3 MiB browser-storage bundle; a layout is limited to

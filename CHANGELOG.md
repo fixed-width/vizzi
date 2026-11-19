@@ -72,6 +72,9 @@ remains in Git and the project documentation.
 
 ### Fixed
 
+- **Add bubble** can search an exact source file even when repository-wide function
+  search omits that file or its declarations.
+
 - At the newest function-history revision, **Return to live** appears in the history
   controls. The bubble shows progress during a lookup and keeps the captured revision
   readable. Readers can step through history or retry if the live refresh fails.

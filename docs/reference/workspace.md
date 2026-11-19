@@ -46,7 +46,9 @@ structural view remains a contributor prototype, not the main reading workflow.
 
 Function lookup accepts names and supported qualified forms, including `Type::method`,
 `Type.method`, `Type#method`, `Type method` and `Type/method`. It ignores case.
-Exact function names rank before partial matches; qualified names and paths narrow the results.
+Exact function names rank before partial matches. **Source file path (optional)** limits
+the lookup to one captured file, including files and declarations omitted by the bounded
+repository search. Use the exact workspace-relative path with forward slashes.
 
 Function history freezes local HEAD when first opened and considers up to 64 file revisions.
 It skips unchanged declarations, stops at missing or ambiguous matches, and does not infer

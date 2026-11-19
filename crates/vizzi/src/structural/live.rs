@@ -218,10 +218,9 @@ impl StructureHost {
             let previous = cache.take();
             *cache = Some(Cached::rebuild(&snapshot, previous));
         }
-        let index = &cache
-            .as_ref()
-            .ok_or_else(|| unavailable("Structure unavailable"))?
-            .index;
+        let cache = cache
+            .as_mut()
+            .ok_or_else(|| unavailable("Structure unavailable"))?;
         let mut resolved = BTreeMap::new();
         let mut views = Vec::new();
         for view in &request.views {
@@ -234,15 +233,27 @@ impl StructureHost {
                 views.push(json!({"id":view.id,"state":"unresolved"}));
                 continue;
             }
-            let view_index = external.as_ref().map_or(index, |s| &s.index);
+            let repository_doc = || snapshot.file(view.file.as_deref()?).map(AsRef::as_ref);
+            let scoped = if external.is_none() {
+                cache.for_tracking(
+                    &snapshot,
+                    view.tracking.as_deref(),
+                    &view.symbol,
+                    view.file.as_deref(),
+                )?
+            } else {
+                None
+            };
+            let view_index = external
+                .as_ref()
+                .map(|s| &s.index)
+                .or(scoped.as_deref())
+                .unwrap_or(&cache.index);
             let symbol = view_index
                 .resolve(view.tracking.as_deref(), &view.symbol)
                 .or_else(|| {
                     view_index.resolve_context(
-                        external
-                            .as_ref()
-                            .map(|s| s.doc())
-                            .or_else(|| snapshot.file(view.file.as_deref()?).map(AsRef::as_ref))?,
+                        external.as_ref().map(|s| s.doc()).or_else(repository_doc)?,
                         view.tracking.as_deref()?,
                         view.context.as_deref()?,
                     )
@@ -257,7 +268,11 @@ impl StructureHost {
             let doc = external
                 .as_ref()
                 .map(|s| s.doc())
-                .or_else(|| snapshot.file(&symbol.source.file).map(AsRef::as_ref))
+                .or_else(|| {
+                    snapshot
+                        .file_by_path(&symbol.source.path)
+                        .map(AsRef::as_ref)
+                })
                 .ok_or_else(|| unavailable("Tracked source unavailable"))?;
             let reading = position(doc, &symbol, view)?;
             let changed = view.version != symbol.source.version;
@@ -310,7 +325,7 @@ impl StructureHost {
                 }
             }
             let mut calls = view_index
-                .outgoing(
+                .outgoing_with_candidates(
                     &symbol.id,
                     if view.area.is_empty() {
                         &symbol.source.path
@@ -318,6 +333,7 @@ impl StructureHost {
                         &view.area
                     },
                     0,
+                    scoped.as_ref().map(|_| &cache.index),
                 )
                 .map_err(|e| invalid(&e.to_string()))?;
             if let Some(s) = &external {
@@ -340,11 +356,15 @@ impl StructureHost {
                         source: None,
                     })
                 }
-                (Some(from), Some(to)) => Some(
-                    index
-                        .check_link(&from.id, &to.id, &link.spelling, &link.kind)
-                        .map_err(unavailable)?,
-                ),
+                (Some(from), Some(to)) => {
+                    let scoped = cache.for_symbol(&snapshot, &from.id, Some(&from.source.path))?;
+                    let index = scoped.as_deref().unwrap_or(&cache.index);
+                    Some(
+                        index
+                            .check_link_to(&from.id, to, &link.spelling, &link.kind)
+                            .map_err(unavailable)?,
+                    )
+                }
                 _ => None,
             };
             links.push(json!({"id":link.id,"check":check}));

@@ -1,5 +1,5 @@
 //! Reference evidence mapped to immutable native source and exact written calls.
-use super::{Cached, StructureHost};
+use super::{Cached, SEMANTIC_FILE_PROJECTIONS, StructureHost};
 use crate::{companion::CompanionError, definitions, dependency_sources::Capture};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;
@@ -82,7 +82,7 @@ pub struct ReferencePage {
     pub matching: usize,
     /// Known references outside admitted source.
     pub outside: usize,
-    /// Results omitted by bounds.
+    /// Results omitted by bounds or incomplete call evidence.
     pub omitted: usize,
     /// Current finite rows.
     pub items: Vec<ReferenceRow>,
@@ -288,18 +288,30 @@ impl StructureHost {
                 let previous = cache.take();
                 *cache = Some(Cached::rebuild(&snapshot, previous));
             }
+            let cache = cache
+                .as_mut()
+                .ok_or_else(|| unavailable("Structure unavailable"))?;
+            let repository_doc = || snapshot.file(request.file.as_deref()?).map(AsRef::as_ref);
+            let scoped = if external.is_none() {
+                cache.for_tracking(
+                    &snapshot,
+                    request.tracking.as_deref(),
+                    &request.symbol,
+                    request.file.as_deref(),
+                )?
+            } else {
+                None
+            };
             let index = external
                 .as_ref()
                 .map(|s| &s.index)
-                .or_else(|| cache.as_ref().map(|c| &c.index))
-                .ok_or_else(|| unavailable("Structure unavailable"))?;
+                .or(scoped.as_deref())
+                .unwrap_or(&cache.index);
             let target = index
                 .resolve(request.tracking.as_deref(), &request.symbol)
                 .or_else(|| {
                     index.resolve_context(
-                        external.as_ref().map(|s| s.doc()).or_else(|| {
-                            snapshot.file(request.file.as_deref()?).map(AsRef::as_ref)
-                        })?,
+                        external.as_ref().map(|s| s.doc()).or_else(repository_doc)?,
                         request.tracking.as_deref()?,
                         request.context.as_deref()?,
                     )
@@ -339,15 +351,14 @@ impl StructureHost {
         let mut outside = 0;
         let mut omitted = 0;
         let mut seen = BTreeSet::new();
-        let cache = self
+        let mut projection = self
             .cache
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner);
-        let index = &cache
-            .as_ref()
+        let cache = projection
+            .as_mut()
             .filter(|c| c.snapshot == request.snapshot)
-            .ok_or_else(|| CompanionError::Conflict("Source changed during references".into()))?
-            .index;
+            .ok_or_else(|| CompanionError::Conflict("Source changed during references".into()))?;
         let precision = if let Some(answer) = answer {
             if !opaque(&answer.context)
                 || answer.locations.len().saturating_add(answer.outside) > 4096
@@ -355,6 +366,7 @@ impl StructureHost {
                 return Err(unavailable("Invalid reference provider response"));
             }
             outside = answer.outside;
+            let mut remaining = SEMANTIC_FILE_PROJECTIONS;
             for location in answer.locations {
                 let source = if let Some(capture) = &location.capture {
                     self.dependency(capture)?
@@ -382,26 +394,44 @@ impl StructureHost {
                 };
                 let byte =
                     definitions::byte_offset(text, location.position).map_err(unavailable)?;
-                let selected = source.as_ref().map_or(index, |s| &s.index);
-                if let Some(result) = row(
-                    selected,
-                    doc,
-                    byte,
-                    source.as_deref(),
-                    &target,
-                    Some(&answer.context),
-                    request.kind,
-                )? && seen.insert(result.id.clone())
-                {
-                    if rows.len() < 256 {
-                        rows.push(result);
-                    } else {
-                        omitted += 1;
+                let project = |index: &Structure| {
+                    row(
+                        index,
+                        doc,
+                        byte,
+                        source.as_deref(),
+                        &target,
+                        Some(&answer.context),
+                        request.kind,
+                    )
+                    .map(|result| (result, index.call_evidence_limited(doc)))
+                };
+                let result = match &source {
+                    Some(source) => Some(project(&source.index)?),
+                    None => cache
+                        .at_location(&snapshot, doc, &mut remaining, project)?
+                        .transpose()?,
+                };
+                match result {
+                    Some((Some(result), _)) if seen.insert(result.id.clone()) => {
+                        if rows.len() < 256 {
+                            rows.push(result);
+                        } else {
+                            omitted += 1;
+                        }
                     }
+                    None | Some((None, true)) => omitted += 1,
+                    _ => {}
                 }
             }
             "semantic"
         } else {
+            let scoped = if target.origin.is_none() {
+                cache.for_evidence(&snapshot, &target.source.path)?
+            } else {
+                None
+            };
+            let index = &cache.index;
             let captures = self
                 .definitions
                 .as_ref()
@@ -410,15 +440,21 @@ impl StructureHost {
                 .transpose()
                 .map_err(unavailable)?
                 .unwrap_or_default();
-            let indices = std::iter::once((index, None))
-                .chain(captures.iter().map(|s| (&s.index, Some(s.as_ref()))));
-            for (selected, source) in indices {
+            let indices = scoped
+                .iter()
+                .map(|s| (s.as_ref(), None, None))
+                .chain(std::iter::once((index, None, scoped.as_deref())))
+                .chain(captures.iter().map(|s| (&s.index, Some(s.as_ref()), None)));
+            for (selected, source, preferred) in indices {
                 let mut offset = 0;
                 loop {
                     let calls = selected
                         .name_uses(&target.name, offset)
                         .map_err(unavailable)?;
                     for site in calls.items {
+                        if preferred.is_some_and(|file| file.contains_call(&site.id)) {
+                            continue;
+                        }
                         let Some(lookup) = selected.call(&site.id) else {
                             continue;
                         };
@@ -498,7 +534,7 @@ impl StructureHost {
             rows,
         };
         let result = page(&set, 0);
-        drop(cache);
+        drop(projection);
         let mut sets = self
             .reference_sets
             .lock()

@@ -13,6 +13,10 @@ Choose the result using its name and source path. Qualified Rust names such as
 `Greeter::greet` are accepted; supported separator forms are in the
 [workspace reference](../reference/workspace.md).
 
+If repository search is limited, enter a workspace-relative path such as `src/lib.rs`
+in **Source file path (optional)**. Select **Find functions** with the name field empty
+to browse functions in that file.
+
 ## Open a call beside its caller
 
 Click a highlighted call name and choose **Open definition**. Ctrl-click or Cmd-click

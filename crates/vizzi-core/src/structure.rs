@@ -2,10 +2,11 @@
 use crate::{
     calls::TargetBasis,
     comparison::ReviewPath,
-    model::{Coverage, Document, Snapshot},
+    model::{Analysis, Coverage, Document, Snapshot},
 };
 use serde::Serialize;
 use std::collections::{BTreeMap, BTreeSet};
+use std::sync::Arc;
 
 const FILES: usize = 4096;
 const ITEMS: usize = 65536;
@@ -229,6 +230,11 @@ fn validate(area: &str, search: &str) -> Result<(), Error> {
     }
     Ok(())
 }
+fn syntax(doc: &Document) -> Option<&Analysis> {
+    doc.analyses()
+        .iter()
+        .find(|analysis| matches!(analysis.coverage, Coverage::Syntax | Coverage::Partial))
+}
 fn source(doc: &Document, context: &str, span: &std::ops::Range<usize>) -> Source {
     let lines = doc.lines(span);
     Source {
@@ -255,14 +261,41 @@ impl Structure {
     /// Reuses bounded module metadata across source observations without source IO.
     pub fn with_module_cache(snapshot: &Snapshot, cache: &mut crate::modules::ModuleCache) -> Self {
         let modules = crate::modules::ModuleIndex::new(snapshot, cache);
+        Self::with_modules(snapshot, &modules)
+    }
+    /// Builds the repository projection with the observation's existing module bindings.
+    pub fn with_modules(snapshot: &Snapshot, modules: &crate::modules::ModuleIndex) -> Self {
+        Self::build(snapshot.id().as_str(), snapshot.documents(), modules, false)
+    }
+    /// Projects an exact capture path with independent declaration and call allowances.
+    pub fn for_file(
+        snapshot: &Snapshot,
+        path: &str,
+        modules: &crate::modules::ModuleIndex,
+    ) -> Result<Option<Self>, Error> {
+        validate(path, "")?;
+        Ok(snapshot.file_by_path(path).map(|doc| {
+            Self::build(
+                snapshot.id().as_str(),
+                std::slice::from_ref(doc),
+                modules,
+                true,
+            )
+        }))
+    }
+    fn build(
+        snapshot: &str,
+        documents: &[Arc<Document>],
+        modules: &crate::modules::ModuleIndex,
+        file_scope: bool,
+    ) -> Self {
         let mut rust_impl_names = crate::structure_search::RustImplNames::default();
         let mut index = Self {
             tracking: BTreeMap::new(),
             search: vec![],
-            snapshot: snapshot.id().as_str().into(),
+            snapshot: snapshot.into(),
             coverage: CoverageInfo {
-                available_files: snapshot
-                    .documents()
+                available_files: documents
                     .iter()
                     .filter(|d| {
                         !matches!(
@@ -289,7 +322,7 @@ impl Structure {
             file_sites: BTreeMap::new(),
             call_ids: BTreeMap::new(),
         };
-        for doc in snapshot.documents() {
+        for doc in documents {
             if matches!(
                 doc.classification(),
                 crate::policy::Classification::SourceOnly {
@@ -324,17 +357,19 @@ impl Structure {
                 }
                 path = path.rsplit_once('/').map_or("", |(parent, _)| parent);
             }
-            let Some(analysis) = doc
-                .analyses()
-                .iter()
-                .find(|a| matches!(a.coverage, Coverage::Syntax | Coverage::Partial))
-            else {
+            let Some(analysis) = syntax(doc) else {
                 index.coverage.unavailable_call_files += 1;
                 continue;
             };
             index.coverage.partial_files += usize::from(analysis.coverage == Coverage::Partial);
             let mut mapping = BTreeMap::new();
-            for (ordinal, fact) in analysis.facts.iter().enumerate() {
+            let fact_limit = if file_scope {
+                ITEMS
+            } else {
+                analysis.facts.len()
+            };
+            index.coverage.omitted_symbols += analysis.facts.len().saturating_sub(fact_limit);
+            for (ordinal, fact) in analysis.facts.iter().take(fact_limit).enumerate() {
                 if index.symbols.len() == ITEMS
                     || fact.name.is_empty()
                     || fact.name.len() > NAME_BYTES
@@ -413,7 +448,9 @@ impl Structure {
                 continue;
             };
             index.coverage.omitted_calls += calls.omitted;
-            for call in &calls.sites {
+            let call_limit = if file_scope { ITEMS } else { calls.sites.len() };
+            index.coverage.omitted_calls += calls.sites.len().saturating_sub(call_limit);
+            for call in calls.sites.iter().take(call_limit) {
                 if index.sites.len() == ITEMS {
                     index.coverage.omitted_calls += 1;
                     continue;
@@ -502,6 +539,29 @@ impl Structure {
             next,
         }
     }
+    /// Reports allowances and omissions for this projection.
+    pub fn coverage(&self) -> &CoverageInfo {
+        &self.coverage
+    }
+    /// Whether this projection left out any of the document's captured declarations or call sites.
+    pub fn omits_file_facts(&self, doc: &Document) -> bool {
+        syntax(doc).is_some_and(|analysis| {
+            self.files.get(doc.path()).map_or(0, Vec::len) < analysis.facts.len()
+                || analysis.calls.as_ref().is_some_and(|calls| {
+                    self.file_sites.get(doc.path()).map_or(0, Vec::len) < calls.sites.len()
+                })
+        })
+    }
+    /// Whether a missing call witness could be due to unavailable or incomplete evidence.
+    pub fn call_evidence_limited(&self, doc: &Document) -> bool {
+        syntax(doc).is_none_or(|analysis| {
+            analysis.coverage == Coverage::Partial
+                || analysis.calls.as_ref().is_none_or(|calls| {
+                    calls.omitted > 0
+                        || self.file_sites.get(doc.path()).map_or(0, Vec::len) < calls.sites.len()
+                })
+        })
+    }
     /// Finds source areas by a case-insensitive literal substring; no intent interpretation.
     pub fn areas(&self, search: &str, offset: usize) -> Result<Page<Area>, Error> {
         validate("", search)?;
@@ -573,6 +633,14 @@ impl Structure {
             .ok_or_else(|| Error("Symbol is absent from this observation".into()))
     }
     fn invocation(&self, site: &Site, area: &str) -> Invocation {
+        self.invocation_with_candidates(site, area, None)
+    }
+    fn invocation_with_candidates(
+        &self,
+        site: &Site,
+        area: &str,
+        additional: Option<&Self>,
+    ) -> Invocation {
         if let Some((id, basis)) = &site.target
             && let Ok(target) = self.symbol(id)
         {
@@ -589,13 +657,20 @@ impl Structure {
                 outside_area: !within(&site.source.path, area),
             };
         }
-        let mut candidates = site
-            .name
-            .as_ref()
-            .and_then(|name| self.names.get(name))
+        let name = site.name.as_ref();
+        let local = name.and_then(|name| self.names.get(name));
+        let extra = additional.into_iter().flat_map(|index| {
+            name.and_then(|name| index.names.get(name))
+                .into_iter()
+                .flatten()
+                .map(|n| &index.symbols[*n])
+                .filter(|s| !self.ids.contains_key(&s.id))
+        });
+        let mut candidates = local
             .into_iter()
             .flatten()
             .map(|n| &self.symbols[*n])
+            .chain(extra)
             .filter(|s| {
                 matches!(
                     s.kind.as_str(),
@@ -627,9 +702,17 @@ impl Structure {
     }
     /// Retrieves a call by native identity without loading source or accepting a browser position.
     pub fn call(&self, id: &str) -> Option<CallLookup> {
+        self.call_with_candidates(id, None)
+    }
+    /// Whether this projection includes the exact captured call witness.
+    pub fn contains_call(&self, id: &str) -> bool {
+        self.call_ids.contains_key(id)
+    }
+    /// Looks up a captured call, including name candidates from another projection if supplied.
+    pub fn call_with_candidates(&self, id: &str, additional: Option<&Self>) -> Option<CallLookup> {
         let site = &self.sites[*self.call_ids.get(id)?];
         Some(CallLookup {
-            invocation: self.invocation(site, ""),
+            invocation: self.invocation_with_candidates(site, "", additional),
             identifier: site.identifier.clone(),
             language: site.language.clone(),
         })
@@ -706,12 +789,22 @@ impl Structure {
     }
     /// Lists invocations syntactically enclosed by a declaration, without automatic expansion.
     pub fn outgoing(&self, id: &str, area: &str, offset: usize) -> Result<Page<Invocation>, Error> {
+        self.outgoing_with_candidates(id, area, offset, None)
+    }
+    /// Lists a declaration's calls with name candidates from another projection if supplied.
+    pub fn outgoing_with_candidates(
+        &self,
+        id: &str,
+        area: &str,
+        offset: usize,
+        additional: Option<&Self>,
+    ) -> Result<Page<Invocation>, Error> {
         self.anchored(id, area)?;
         Ok(self.page(
             self.owners.get(id).into_iter().flatten(),
             offset,
             SITES,
-            |n| self.invocation(&self.sites[*n], area),
+            |n| self.invocation_with_candidates(&self.sites[*n], area, additional),
         ))
     }
     /// Returns identifier actions in a bounded visible section, without source IO or name expansion.
@@ -786,10 +879,7 @@ impl Structure {
         tracking: &str,
         context: &str,
     ) -> Option<&Symbol> {
-        let analysis = doc
-            .analyses()
-            .iter()
-            .find(|a| matches!(a.coverage, Coverage::Syntax | Coverage::Partial))?;
+        let analysis = syntax(doc)?;
         let mut found = None;
         for fact in analysis.facts.iter().filter(|f| f.unique) {
             let prior = crate::model::EntityId::derive(&[
@@ -815,8 +905,17 @@ impl Structure {
         spelling: &str,
         kind: &str,
     ) -> Result<LinkCheck, Error> {
+        self.check_link_to(from, self.symbol(to)?, spelling, kind)
+    }
+    /// Revalidates a written site against a target already resolved in the same observation.
+    pub fn check_link_to(
+        &self,
+        from: &str,
+        target: &Symbol,
+        spelling: &str,
+        kind: &str,
+    ) -> Result<LinkCheck, Error> {
         self.symbol(from)?;
-        let target = self.symbol(to)?;
         let mut sites = self
             .owners
             .get(from)
@@ -831,22 +930,21 @@ impl Structure {
                 source: None,
             });
         };
-        let evidence = if sites.next().is_some() {
-            None
-        } else if site
-            .target
-            .as_ref()
-            .is_some_and(|(id, basis)| id == to && *basis == TargetBasis::RustSelfReceiver)
-        {
-            Some("self")
-        } else if kind == "candidate"
-            && site.name.as_deref() == Some(target.name.as_str())
-            && site.target.is_none()
-        {
-            Some("candidate")
-        } else {
-            None
-        };
+        let evidence =
+            if sites.next().is_some() {
+                None
+            } else if site.target.as_ref().is_some_and(|(id, basis)| {
+                id == &target.id && *basis == TargetBasis::RustSelfReceiver
+            }) {
+                Some("self")
+            } else if kind == "candidate"
+                && site.name.as_deref() == Some(target.name.as_str())
+                && site.target.is_none()
+            {
+                Some("candidate")
+            } else {
+                None
+            };
         Ok(LinkCheck {
             state: if evidence.is_some() {
                 "current"

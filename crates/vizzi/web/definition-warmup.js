@@ -7,7 +7,7 @@ export class DefinitionWarmup {
         const call=sites.find(s=>s.id&&s.name&&!s.binding&&!this.attempted.has(s.id));
         if(!call)return false;
         this.attempted.add(call.id);
-        const job=Promise.resolve().then(()=>this.request(snapshot,call.id)).then(result=>{
+        const job=Promise.resolve().then(()=>this.request(snapshot,call.id,call.source?.path)).then(result=>{
             if(this.snapshot===snapshot&&result.snapshot===snapshot&&['unique','ambiguous','outside','unresolved'].includes(result.state))this.prepared=true;
         }).catch(()=>{}).finally(()=>{if(this.pending===job)this.pending=null;});
         this.pending=job;return true;

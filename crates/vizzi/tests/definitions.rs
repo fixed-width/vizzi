@@ -60,6 +60,7 @@ fn request(app: &StructureHost, host: &Host) -> DefinitionRequest {
     DefinitionRequest {
         snapshot,
         call: calls["items"][0]["id"].as_str().unwrap().into(),
+        path: None,
     }
 }
 fn answer(outside: usize) -> Answer {
@@ -172,6 +173,7 @@ fn dependency_source_windows_calls_refresh_and_editor_verification_keep_their_ow
         .definition(&DefinitionRequest {
             snapshot: req.snapshot.clone(),
             call: calls["items"][0]["id"].as_str().unwrap().into(),
+            path: None,
         })
         .unwrap();
     assert_eq!(nested.invocation.candidates[0].name, "leaf");
