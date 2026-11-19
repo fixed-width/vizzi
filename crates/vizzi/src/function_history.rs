@@ -3,6 +3,7 @@ use crate::{
     companion::CompanionError,
     host::Host,
     review_source::{GitRepository, ReadEntry, ReviewInput},
+    structural::StructureHost,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
@@ -12,7 +13,8 @@ use std::{
 };
 use vizzi_core::{
     comparison::{EntryKind, ReviewPath},
-    model::{CapturePolicyId, Coverage, Document, Snapshot},
+    model::{CapturePolicyId, Coverage, Document, EntityId, Snapshot},
+    modules::{ModuleCache, ModuleIndex},
     projection::WindowQuery,
     structure::{Structure, Symbol},
 };
@@ -22,6 +24,7 @@ const TOTAL_BYTES: usize = 32 * 1024 * 1024;
 const SESSIONS: usize = 24;
 mod captured_calls;
 mod comparison;
+mod module_context;
 pub use captured_calls::{CapturedOwner, CapturedQuery, CapturedRequest, FrozenSource};
 pub use comparison::{CompareRequest, ComparisonWindow, HistoryBinding};
 
@@ -52,10 +55,36 @@ struct Capture {
     snapshot: Arc<Snapshot>,
     symbol: Symbol,
     span: std::ops::Range<usize>,
+    modules: Arc<ModuleIndex>,
+}
+impl Capture {
+    fn structure(&self) -> Structure {
+        Structure::with_modules(&self.snapshot, &self.modules)
+    }
+}
+struct Declaration {
+    snapshot: Arc<Snapshot>,
+    tracking: EntityId,
+    span: std::ops::Range<usize>,
+}
+impl Declaration {
+    fn bind(self, modules: Arc<ModuleIndex>) -> Result<Capture, CompanionError> {
+        let symbol = Structure::with_modules(&self.snapshot, &modules)
+            .resolve(Some(self.tracking.as_str()), "")
+            .cloned()
+            .ok_or_else(|| unavailable("Captured function has no readable source binding"))?;
+        Ok(Capture {
+            snapshot: self.snapshot,
+            symbol,
+            span: self.span,
+            modules,
+        })
+    }
 }
 struct Version {
     candidate: usize,
     snapshot: String,
+    modules: Arc<ModuleIndex>,
 }
 struct Session {
     token: String,
@@ -92,14 +121,21 @@ fn opaque(s: &str) -> bool {
 /// Owns independently expiring function-history sessions and their selected files.
 pub struct FunctionHistory {
     host: Arc<Host>,
+    structure: Arc<StructureHost>,
     sessions: Mutex<VecDeque<Session>>,
     comparisons: Mutex<VecDeque<comparison::Pair>>,
 }
 impl FunctionHistory {
     /// Shares the host's source identity, analysis policy and worker budget.
     pub fn new(host: Arc<Host>) -> Self {
+        let structure = Arc::new(StructureHost::new(host.clone()));
+        Self::with_structure(host, structure)
+    }
+
+    pub(crate) fn with_structure(host: Arc<Host>, structure: Arc<StructureHost>) -> Self {
         Self {
             host,
+            structure,
             sessions: Mutex::new(VecDeque::new()),
             comparisons: Mutex::new(VecDeque::new()),
         }
@@ -228,8 +264,7 @@ impl FunctionHistory {
             if request.index == session.versions.len() {
                 self.advance(&mut session)?;
             } else {
-                let (capture, _) =
-                    self.capture(&session, session.versions[request.index].candidate)?;
+                let capture = self.restore(&session, request.index)?;
                 session.selected = Some(capture);
                 session.index = request.index;
             }
@@ -260,12 +295,12 @@ impl FunctionHistory {
         {
             capture
         } else {
-            let version = session
+            let index = session
                 .versions
                 .iter()
-                .find(|v| v.snapshot == snapshot)
+                .position(|v| v.snapshot == snapshot)
                 .ok_or_else(|| conflict("Function history source version differs"))?;
-            restored = self.capture(session, version.candidate)?.0;
+            restored = self.restore(session, index)?;
             &restored
         };
         let doc = capture
@@ -277,15 +312,32 @@ impl FunctionHistory {
             .ok_or_else(|| conflict("Function history source version differs"))?;
         window(&capture.snapshot, doc, query)
     }
-    fn capture(
+    fn restore(&self, session: &Session, index: usize) -> Result<Capture, CompanionError> {
+        if let Some(capture) = &session.selected
+            && session.index == index
+        {
+            return Ok(capture.clone());
+        }
+        let version = &session.versions[index];
+        let (declaration, _) = self.declaration(session, version.candidate)?;
+        if declaration.snapshot.id().as_str() != version.snapshot {
+            return Err(conflict(
+                "Historical source differs from the accepted capture",
+            ));
+        }
+        declaration.bind(version.modules.clone())
+    }
+
+    fn declaration(
         &self,
         session: &Session,
         index: usize,
-    ) -> Result<(Capture, blake3::Hash), CompanionError> {
+    ) -> Result<(Declaration, blake3::Hash), CompanionError> {
         let path = ReviewPath::parse(session.path.as_bytes().to_vec()).map_err(unavailable)?;
+        let commit = &session.commits[index];
         let mut input = session
             .repository
-            .pin_file(&session.commits[index], &session.path)
+            .pin_file(commit, &session.path)
             .map_err(unavailable)?;
         let ReadEntry::Present {
             kind: EntryKind::Regular { .. },
@@ -312,7 +364,19 @@ impl FunctionHistory {
             CapturePolicyId::derive(&[b"function-history-source-v1"]),
         )
         .map_err(unavailable)?;
-        let snapshot = self.host.analyze_history(&source).map_err(unavailable)?;
+        let analyzed = self.host.analyze_history(&source).map_err(unavailable)?;
+        let snapshot = Arc::new(
+            Snapshot::new(
+                analyzed.workspace().clone(),
+                analyzed.documents().to_vec(),
+                CapturePolicyId::derive(&[
+                    b"function-history-revision-v1",
+                    analyzed.policy().as_str().as_bytes(),
+                    commit.as_bytes(),
+                ]),
+            )
+            .map_err(unavailable)?,
+        );
         let doc = snapshot
             .file_by_path(&session.path)
             .ok_or_else(|| unavailable("Historical source is unavailable"))?;
@@ -339,15 +403,12 @@ impl FunctionHistory {
             return Err(invalid("Function is ambiguous at this revision"));
         }
         let digest = blake3::hash(&bytes[fact.span.clone()]);
-        let symbol = Structure::new(&snapshot)
-            .resolve(Some(doc.entity_id(analysis, fact).as_str()), "")
-            .cloned()
-            .ok_or_else(|| unavailable("Historical function has no readable source binding"))?;
+        let tracking = doc.entity_id(analysis, fact);
         let span = fact.span.clone();
         Ok((
-            Capture {
+            Declaration {
                 snapshot,
-                symbol,
+                tracking,
                 span,
             },
             digest,
@@ -358,9 +419,9 @@ impl FunctionHistory {
             return Err(unavailable(&session.boundary));
         }
         let mut cursor = session.cursor;
-        let mut chosen: Option<(usize, Capture, blake3::Hash)> = None;
+        let mut chosen: Option<(usize, Declaration, blake3::Hash)> = None;
         while cursor < session.commits.len() {
-            let (capture, digest) = match self.capture(session, cursor) {
+            let (declaration, digest) = match self.declaration(session, cursor) {
                 Ok(value) => value,
                 Err(CompanionError::Invalid(message)) => {
                     session.boundary = message;
@@ -377,15 +438,39 @@ impl FunctionHistory {
                 cursor += 1;
                 continue;
             }
-            chosen = Some((cursor, capture, digest));
+            chosen = Some((cursor, declaration, digest));
             cursor += 1;
         }
-        if let Some((candidate, capture, digest)) = chosen {
+        if let Some((candidate, declaration, digest)) = chosen {
+            let commit = &session.commits[candidate];
+            let policy = self.host.source_policy();
+            let modules = match session.language.as_str() {
+                "rust" => module_context::rust_modules(
+                    &session.repository,
+                    commit,
+                    policy,
+                    &declaration.snapshot.documents()[0],
+                ),
+                "python" => module_context::python_modules(
+                    &session.repository,
+                    commit,
+                    policy,
+                    &session.path,
+                ),
+                _ => Some(ModuleIndex::new(
+                    &declaration.snapshot,
+                    &mut ModuleCache::default(),
+                )),
+            }
+            .unwrap_or_else(|| ModuleIndex::empty(declaration.snapshot.workspace()));
+            let modules = Arc::new(modules);
+            let capture = declaration.bind(modules.clone())?;
             session.cursor = cursor;
             session.digest = digest;
             session.versions.push(Version {
                 candidate,
                 snapshot: capture.snapshot.id().as_str().into(),
+                modules,
             });
             session.index = session.versions.len() - 1;
             session.selected = Some(capture);

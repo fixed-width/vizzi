@@ -29,6 +29,19 @@ from files up to 1 MiB and an 8 MiB aggregate text budget, and manifests up to 1
 Only resident captured text is eligible. Reaching a limit yields neutral membership;
 this is a bounded visual capability, not whole-repository module coverage.
 
+Saved working-tree comparisons freeze the selected file's module bindings from the same
+source observation. Historical Rust captures resolve bindings for an accepted version using
+Cargo manifests and Rust declarations from its immutable Git tree. Discovery allows up to
+32,768 entries and 4 MiB of tree output. Context capture allows up to 8,192 eligible documents
+and 8 MiB of source, with up to 128 KiB per manifest and 1 MiB per Rust file. If acquisition
+fails or exceeds a limit, historical membership stays neutral and the function remains readable.
+Undecodable blobs count toward the inventory and byte limits and supply path evidence.
+The declaration parser skips their contents. Historical Python labels use regular
+`__init__.py` paths from the selected commit, with up to 64 ancestor paths and 256 KiB
+of Git metadata. Python package labels depend on initializer presence.
+Each history source observation is bound to its commit. History and comparison owners retain
+the selected file's module bindings for captured calls.
+
 Analysis-context upgrades can preserve a unique declaration's presentation identity by
 reconstructing its earlier tracking hash from the current native lexical key, earlier
 context reference and exact file identity. This never carries old facts or certainty into

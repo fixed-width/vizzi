@@ -72,6 +72,9 @@ remains in Git and the project documentation.
 
 ### Fixed
 
+- Rust and Python function history and comparisons retain verified module labels and outlines,
+  including when following calls within the captured file.
+
 - **Add bubble** can search an exact source file even when repository-wide function
   search omits that file or its declarations.
 

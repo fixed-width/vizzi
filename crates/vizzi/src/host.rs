@@ -72,6 +72,9 @@ impl Host {
     pub fn root(&self) -> &std::path::Path {
         self.engine.directory().root()
     }
+    pub(crate) fn source_policy(&self) -> &vizzi_core::policy::SourcePolicy {
+        self.engine.directory().policy()
+    }
     pub(crate) fn analyze_history(
         &self,
         source: &vizzi_core::model::Snapshot,

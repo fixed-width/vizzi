@@ -5,20 +5,29 @@ import {join,resolve} from 'node:path';
 import {buildHost,browser,startHost,workspace,paint} from './support.mjs';
 if(!process.argv.includes('--no-build'))buildHost();
 const source=(version,other='other_current')=>`fn target() {\n    other();\n    let ${version} = 1;\n${Array.from({length:110},(_,i)=>`    // retained line ${i}`).join('\n')}\n}\nfn other() { let ${other} = 1; }\n`;
-const input=await workspace({files:{'lib.rs':source('old_version')}});
+const input=await workspace({files:{'lib.rs':source('old_version'),'Cargo.toml':"[package]\nname='history_fixture'\n[lib]\npath='lib.rs'\n"}});
 if(process.argv.includes('--debug-host'))input.executable=resolve('target/debug/vizzi');
 const git=(...args)=>{const out=spawnSync('git',['-C',input.root,...args],{encoding:'utf8'});assert.equal(out.status,0,out.stderr);return out.stdout.trim();};
 async function commit(text){await writeFile(join(input.root,'lib.rs'),text);git('add','lib.rs');git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-qm','fixture');return git('rev-parse','HEAD');}
 let host,chromium;
 try{
- git('init','-q');const old=await commit(source('old_version'));const middle=await commit(source('middle_version'));await commit(source('middle_version','unrelated'));await commit(source('newest_version','unrelated'));
+ git('init','-q');git('add','Cargo.toml');const old=await commit(source('old_version'));const middle=await commit(source('middle_version'));await commit(source('middle_version','unrelated'));await commit(source('newest_version','unrelated'));
  host=await startHost(input,1);chromium=await browser({desktopBus:false});const page=await chromium.newPage({viewport:{width:1500,height:1000}}),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(host.url+'/workspace');await page.waitForFunction(()=>document.querySelector('#visual-source-status').textContent.includes('ready'));
  await page.getByRole('button',{name:'Add bubble',exact:true}).click();await page.getByLabel('Find a function',{exact:true}).fill('target');await page.getByRole('button',{name:'Find functions',exact:true}).click();await page.locator('[data-add-symbol][data-name="target"]').click();const root=page.locator('[data-view][data-name="target"]');await root.locator('.code-line').first().waitFor();
  await root.getByRole('button',{name:'Actions for other',exact:true}).click({modifiers:['Control']});const other=page.locator('[data-view][data-name="other"]');await other.locator('.code-line').first().waitFor();const otherNode=await other.locator('.code-text').elementHandle();
+ await page.locator('#workspace-settings > summary').click();
+ await page.getByLabel('Module outlines',{exact:true}).check();
+ await page.keyboard.press('Escape');
+ const outline=page.locator('#module-outlines .module-outline');
+ await outline.waitFor();
+ const moduleId=await other.getAttribute('data-module-id');
  const geometry=(view=root)=>view.evaluate(n=>({id:n.dataset.view,left:n.style.left,top:n.style.top,width:n.style.width,height:n.style.height}));const before=await geometry();
  await root.getByRole('button',{name:'Previous function change',exact:true}).click();await page.waitForFunction(()=>document.querySelector('[data-name="target"] .code-pane').textContent.includes('middle_version'));
  const historyRow=root.locator('.fragment-history'),historyReturn=historyRow.getByRole('button',{name:'Return to live',exact:true});
  assert.equal(await root.locator('.fragment-history span').textContent(),middle.slice(0,8));
+ assert.equal(await root.locator('.module-tag').textContent(),'history_fixture');
+ assert.equal(await root.getAttribute('data-module-id'),moduleId);
+ await outline.waitFor();
  assert.equal(await historyReturn.count(),1,'the history row offers a way to continue to live source');
  assert.equal(await historyReturn.isEnabled(),true);
  assert.equal(await root.getByRole('button',{name:'Return to live',exact:true}).count(),1,'only one return control is visible');
@@ -47,6 +56,11 @@ try{
  await beforeView.locator('.comparison-removed').first().waitFor();
  assert.match(await beforeView.locator('.code-pane').textContent(),/newest_version/);
  assert.match(await after.locator('.code-pane').textContent(),/saved_working_version/);
+ for(const side of [after,beforeView]){
+  assert.equal(await side.locator('.module-tag').textContent(),'history_fixture');
+  assert.equal(await side.getAttribute('data-module-id'),moduleId);
+ }
+ await outline.waitFor();
  assert.deepEqual(await geometry(after),before);
  await beforeView.getByRole('button',{name:'Close bubble',exact:true}).click();
  await after.getByRole('button',{name:'Return to live',exact:true}).click();

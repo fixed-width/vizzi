@@ -24,6 +24,10 @@ Pinned and unresolved views retain their captured module context. Old saved layo
 remain usable; live views without module fields are hydrated through native refresh.
 Legacy pinned views stay neutral until followed live; existing capture-expiry limits apply.
 
+Rust and Python function history and comparisons show module membership from each capture's source
+context. The saved working-tree side preserves the verified live membership, while historical
+sides use their selected Git commits. Calls opened from a capture use that same context.
+
 **Settings → Module outlines** enables an optional Bubble Sets overlay, off by default.
 It outlines same-module sets behind bubbles without changing their positions. Non-members
 are obstacles; blue call arrows and source always remain readable and interactive. Only

@@ -263,6 +263,219 @@ use vizzi_core::{projection::WindowQuery, structure::Structure};
 fn compare_current(request: &Request) -> CompareRequest {
     serde_json::from_value(json!({"kind":"current","source":request})).unwrap()
 }
+
+#[test]
+fn historical_rust_module_ignores_unrelated_non_utf8_source() {
+    let root = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    let repo = root.path();
+    git(repo, &["init", "-q"]);
+    std::fs::write(
+        repo.join("Cargo.toml"),
+        "[package]\nname = 'demo'\n[lib]\npath = 'lib.rs'\n",
+    )
+    .unwrap();
+    std::fs::write(repo.join("unrelated.rs"), [0xff, 0xfe, 0xfd]).unwrap();
+    git(repo, &["add", "--", "Cargo.toml", "unrelated.rs"]);
+    commit(repo, "fn target() { old(); }\n");
+    std::fs::write(repo.join("lib.rs"), "fn target() { working(); }\n").unwrap();
+
+    let host = history_host(repo, cache.path(), None);
+    let (request, module) = module_request(&host, "lib.rs");
+    assert_eq!(module["label"], "demo");
+    let pair = FunctionHistory::new(host)
+        .compare(&compare_current(&request))
+        .unwrap();
+    assert_eq!(pair["older"]["symbol"]["module"], module);
+}
+
+#[test]
+fn historical_python_module_uses_the_package_chain_at_each_revision() {
+    let root = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    let repo = root.path();
+    git(repo, &["init", "-q"]);
+    std::fs::create_dir_all(repo.join("pkg/sub")).unwrap();
+    std::fs::write(repo.join("pkg/sub/__init__.py"), "").unwrap();
+    let initializer = repo.join("pkg/__init__.py");
+    std::fs::create_dir(&initializer).unwrap();
+    std::fs::write(initializer.join("marker"), "").unwrap();
+    let worker = "pkg/sub/worker.py";
+    std::fs::write(repo.join(worker), "def target():\n    return 1\n").unwrap();
+    git(repo, &["add", "--", "pkg"]);
+    commit_staged(repo);
+    std::fs::remove_file(initializer.join("marker")).unwrap();
+    std::fs::remove_dir(&initializer).unwrap();
+    std::fs::write(initializer, "").unwrap();
+    std::fs::write(repo.join(worker), "def target():\n    return 2\n").unwrap();
+    git(repo, &["add", "--", "pkg"]);
+    commit_staged(repo);
+    std::fs::write(repo.join(worker), "def target():\n    return 3\n").unwrap();
+
+    let host = history_host(repo, cache.path(), None);
+    let (request, module) = module_request(&host, worker);
+    assert_eq!(module["label"], "pkg.sub.worker");
+    let history = FunctionHistory::new(host);
+    let pair = history.compare(&compare_current(&request)).unwrap();
+    for side in ["newer", "older"] {
+        assert_eq!(pair[side]["symbol"]["module"], module, "{side}");
+    }
+    let newer = history.start(&request).unwrap();
+    let older = history.step(&step(&newer["token"], 1)).unwrap();
+    assert_eq!(older["symbol"]["module"]["label"], "sub.worker");
+    assert_eq!(older["symbol"]["module"]["id"], module["id"]);
+}
+
+#[test]
+fn comparison_preserves_the_saved_module_and_the_verified_historical_peer() {
+    let (root, _cache, history, request, live_module) = module_fixture(
+        &[("task", &module_source("1"))],
+        "task",
+        &module_source("2"),
+    );
+    assert_eq!(live_module["label"], "demo::task");
+    let pair = history.compare(&compare_current(&request)).unwrap();
+    for side in ["newer", "older"] {
+        assert_eq!(pair[side]["symbol"]["module"], live_module, "{side}");
+    }
+
+    declare_module(root.path(), "changed_after_capture");
+    let source = captured_source(
+        &pair["newer"],
+        json!({"kind":"comparison","token":pair["token"],"side":"newer"}),
+    );
+    let helper = open_module_helper(&history, &source);
+    assert_eq!(helper["symbol"]["module"]["label"], "demo::task::nested");
+}
+
+#[test]
+fn history_recovers_module_bindings_from_each_commit_even_with_repeated_file_bytes() {
+    let repeated = module_source("1");
+    let (_root, _cache, history, request, _) = module_fixture(
+        &[
+            ("old", &repeated),
+            ("ambiguous", &module_source("2")),
+            ("new", &repeated),
+        ],
+        "live",
+        &module_source("3"),
+    );
+    let newer = history.start(&request).unwrap();
+    assert_eq!(newer["symbol"]["module"]["label"], "demo::new");
+    let pair = history.compare(&compare_current(&request)).unwrap();
+    assert_eq!(pair["older"]["symbol"]["module"], newer["symbol"]["module"]);
+    assert_eq!(pair["newer"]["symbol"]["module"]["label"], "demo::live");
+    let middle = history.step(&step(&newer["token"], 1)).unwrap();
+    assert!(middle["symbol"]["module"].is_null());
+    let older = history.step(&step(&newer["token"], 2)).unwrap();
+    assert_eq!(older["symbol"]["module"]["label"], "demo::old");
+    assert_eq!(
+        older["symbol"]["source"]["version"],
+        newer["symbol"]["source"]["version"]
+    );
+    assert_ne!(older["snapshot"], newer["snapshot"]);
+    let source = captured_source(
+        &newer,
+        json!({"kind":"history","token":newer["token"],"index":newer["index"]}),
+    );
+    let helper = open_module_helper(&history, &source);
+    assert_eq!(helper["symbol"]["module"]["label"], "demo::new::nested");
+}
+
+#[test]
+fn history_keeps_source_readable_when_module_context_exceeds_its_allowance() {
+    let pad = |value, bytes: usize| {
+        let mut source = module_source(value);
+        source.push_str(&" ".repeat(bytes - source.len()));
+        source
+    };
+    let (_root, _cache, history, request, _) = module_fixture(
+        &[
+            ("task", &pad("1", 1024 * 1024)),
+            ("task", &pad("2", 1024 * 1024 + 1)),
+        ],
+        "task",
+        &module_source("3"),
+    );
+    let newer = history.start(&request).unwrap();
+    assert!(newer["symbol"]["module"].is_null());
+    assert!(text(&newer).contains("helper(2)"));
+    let older = history.step(&step(&newer["token"], 1)).unwrap();
+    assert_eq!(older["symbol"]["module"]["label"], "demo::task");
+}
+
+fn open_module_helper(history: &FunctionHistory, source: &Value) -> Value {
+    let invocation = call_named(history, source, "helper");
+    let opened = captured_query(
+        history,
+        source,
+        json!({"kind":"open","call":invocation["id"],"target":invocation["candidates"][0]["id"]}),
+    )
+    .unwrap();
+    opened["frame"].clone()
+}
+
+fn declare_module(root: &std::path::Path, name: &str) {
+    let declaration = match name {
+        "ambiguous" => "#[path = \"lib.rs\"] mod left;\n#[path = \"lib.rs\"] mod right;\n".into(),
+        _ => format!("#[path = \"lib.rs\"] mod {name};\n"),
+    };
+    std::fs::write(root.join("root.rs"), declaration).unwrap();
+}
+
+fn module_source(value: &str) -> String {
+    format!("fn target() {{ helper({value}); }}\nmod nested {{ pub fn helper(_: u32) {{}} }}\n")
+}
+
+fn module_fixture(
+    versions: &[(&str, &str)],
+    working_name: &str,
+    working_source: &str,
+) -> (
+    tempfile::TempDir,
+    tempfile::TempDir,
+    FunctionHistory,
+    Request,
+    Value,
+) {
+    let root = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    git(root.path(), &["init", "-q"]);
+    std::fs::write(
+        root.path().join("Cargo.toml"),
+        "[package]\nname = \"demo\"\nedition = \"2024\"\n[lib]\npath = \"root.rs\"\n",
+    )
+    .unwrap();
+    for (name, source) in versions {
+        declare_module(root.path(), name);
+        git(root.path(), &["add", "--", "Cargo.toml", "root.rs"]);
+        commit(root.path(), source);
+    }
+    declare_module(root.path(), working_name);
+    std::fs::write(root.path().join("lib.rs"), working_source).unwrap();
+    let host = history_host(root.path(), cache.path(), None);
+    let (request, module) = module_request(&host, "lib.rs");
+    let history = FunctionHistory::new(host);
+    (root, cache, history, request, module)
+}
+
+fn module_request(host: &Host, path: &str) -> (Request, Value) {
+    let snapshot = host.application().snapshot().unwrap();
+    let symbol = Structure::new(&snapshot)
+        .functions(path, "target", 0)
+        .unwrap()
+        .items
+        .remove(0)
+        .symbol;
+    let request = Request {
+        snapshot: snapshot.id().as_str().into(),
+        file: symbol.source.file,
+        version: symbol.source.version,
+        tracking: symbol.tracking,
+    };
+    let module = serde_json::to_value(symbol.module).unwrap();
+    (request, module)
+}
 fn comparison_window(pair: &Value, side: &str) -> ComparisonWindow {
     let frame = &pair[side];
     let s = &frame["symbol"]["source"];
@@ -471,6 +684,10 @@ fn git(root: &std::path::Path, args: &[&str]) -> String {
 fn commit(root: &std::path::Path, text: &str) -> String {
     std::fs::write(root.join("lib.rs"), text).unwrap();
     git(root, &["add", "--", "lib.rs"]);
+    commit_staged(root)
+}
+
+fn commit_staged(root: &std::path::Path) -> String {
     git(
         root,
         &[
@@ -559,28 +776,7 @@ fn fixture_with_budget(working: &str, budget: Option<Arc<vizzi::admission::Admis
     if !working.is_empty() {
         std::fs::write(root.path().join("lib.rs"), working).unwrap();
     }
-    let engine = Engine::new(
-        Directory::open(root.path()).unwrap(),
-        Cache::new(cache.path().join("analysis")),
-        1,
-    )
-    .unwrap();
-    let engine = if let Some(budget) = budget {
-        engine.with_admission(budget)
-    } else {
-        engine
-    };
-    let host = Arc::new(
-        Host::start_with_options(
-            engine,
-            HostOptions {
-                watch: false,
-                reconcile_interval: std::time::Duration::from_secs(3600),
-                idle_maintenance: false,
-            },
-        )
-        .unwrap(),
-    );
+    let host = history_host(root.path(), cache.path(), budget);
     let snapshot = host.application().snapshot().unwrap();
     let symbol = Structure::new(&snapshot)
         .functions("", "target", 0)
@@ -591,6 +787,35 @@ fn fixture_with_budget(working: &str, budget: Option<Arc<vizzi::admission::Admis
     let request = serde_json::from_value(json!({"snapshot":snapshot.id().as_str(),"file":symbol.source.file,"version":symbol.source.version,"tracking":symbol.tracking})).unwrap();
     let history = FunctionHistory::new(host.clone());
     (root, cache, host, history, request, vec![a, b, c, d])
+}
+
+fn history_host(
+    root: &std::path::Path,
+    cache: &std::path::Path,
+    budget: Option<Arc<vizzi::admission::Admission>>,
+) -> Arc<Host> {
+    let engine = Engine::new(
+        Directory::open(root).unwrap(),
+        Cache::new(cache.join("analysis")),
+        1,
+    )
+    .unwrap();
+    let engine = if let Some(budget) = budget {
+        engine.with_admission(budget)
+    } else {
+        engine
+    };
+    Arc::new(
+        Host::start_with_options(
+            engine,
+            HostOptions {
+                watch: false,
+                reconcile_interval: std::time::Duration::from_secs(3600),
+                idle_maintenance: false,
+            },
+        )
+        .unwrap(),
+    )
 }
 
 #[test]
@@ -943,11 +1168,13 @@ fn saved_uncommitted_function_steps_to_head_and_window_pins_are_exact() {
 
 #[test]
 fn initial_history_window_contains_only_the_function_and_preserves_copy_endings() {
-    let (_root, _cache, _host, history, request, _) = fixture("");
+    let (_root, _cache, _host, history, request, _) =
+        fixture("fn target() { working(); }\nfn other() {}\n");
     let answer = history.start(&request).unwrap();
     let rows = answer["window"]["lines"].as_array().unwrap();
     assert_eq!(rows.len(), 1);
-    assert_eq!(rows[0]["text"], "fn target() { middle(); }");
+    assert_eq!(rows[0]["number"], 2);
+    assert_eq!(rows[0]["text"], "fn target() { newest(); }");
     assert_eq!(rows[0]["ending"], "\n");
     assert_eq!(answer["window"]["outline_total"], 2);
     assert_eq!(answer["window"]["outline"].as_array().unwrap().len(), 1);

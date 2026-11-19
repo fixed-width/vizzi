@@ -1,5 +1,5 @@
 //! Declared language-module identity over immutable captured inputs; no filesystem IO.
-use crate::model::{Analysis, Coverage, Document, Snapshot};
+use crate::model::{Analysis, Coverage, Document, Snapshot, WorkspaceId};
 use serde::Serialize;
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
 use tree_sitter::{Node, Parser};
@@ -84,6 +84,40 @@ fn identifier(value: &str) -> bool {
         .is_some_and(|v| v == '_' || v.is_ascii_alphabetic())
         && c.all(|v| v == '_' || v.is_ascii_alphanumeric())
         && value.len() <= 128
+}
+
+fn python_module(
+    workspace: &str,
+    path: &str,
+    has_initializer: impl Fn(&str) -> bool,
+) -> Option<Module> {
+    let file = path.rsplit('/').next()?;
+    let stem = file
+        .strip_suffix(".py")
+        .or_else(|| file.strip_suffix(".pyi"))?;
+    let mut names = Vec::new();
+    if stem != "__init__" {
+        names.push(stem);
+    }
+    let mut dir = parent(path);
+    while !dir.is_empty() && has_initializer(&format!("{dir}/__init__.py")) {
+        names.push(dir.rsplit('/').next()?);
+        dir = parent(dir);
+    }
+    if names.is_empty() || !names.iter().all(|n| identifier(n)) {
+        return None;
+    }
+    names.reverse();
+    let label = names.join(".");
+    (label.len() <= 512).then(|| Module {
+        id: blake3::hash(format!("{workspace}\0python\0{path}").as_bytes())
+            .to_hex()
+            .to_string(),
+        label,
+        language: "python",
+        root: path.into(),
+        basis: "python_module",
+    })
 }
 fn literal(value: &str) -> Option<String> {
     let value = value.trim();
@@ -374,6 +408,65 @@ fn root_targets(
 impl ModuleIndex {
     /// Builds only from captured resident text/metadata, reusing unchanged declaration edges.
     pub fn new(snapshot: &Snapshot, cache: &mut ModuleCache) -> Self {
+        Self::build(snapshot, cache, |doc| {
+            doc.analyses().iter().any(|a| a.context.language == "rust")
+        })
+    }
+
+    /// Resolves a file against captured Rust declarations selected by the source policy.
+    pub fn from_rust_context(snapshot: &Snapshot, path: &str) -> Self {
+        Self::build(snapshot, &mut ModuleCache::default(), |doc| {
+            doc.classification().assigned_language() == Some("rust")
+        })
+        .for_file(path)
+    }
+
+    /// Resolves a Python file against captured regular initializer paths.
+    pub fn from_python_context(
+        workspace: &WorkspaceId,
+        path: &str,
+        initializers: &BTreeSet<String>,
+    ) -> Self {
+        let mut index = Self::empty(workspace);
+        if let Some(module) = python_module(&index.workspace, path, |p| initializers.contains(p)) {
+            index.python.insert(path.into(), module);
+        }
+        index
+    }
+
+    /// Creates an index without file-level bindings.
+    pub fn empty(workspace: &WorkspaceId) -> Self {
+        Self {
+            workspace: workspace.as_str().into(),
+            rust: BTreeMap::new(),
+            python: BTreeMap::new(),
+        }
+    }
+
+    /// Retains the module bindings needed to project declarations in one captured file.
+    pub fn for_file(&self, path: &str) -> Self {
+        Self {
+            workspace: self.workspace.clone(),
+            rust: self
+                .rust
+                .get_key_value(path)
+                .map(|(k, v)| (k.clone(), v.clone()))
+                .into_iter()
+                .collect(),
+            python: self
+                .python
+                .get_key_value(path)
+                .map(|(k, v)| (k.clone(), v.clone()))
+                .into_iter()
+                .collect(),
+        }
+    }
+
+    fn build(
+        snapshot: &Snapshot,
+        cache: &mut ModuleCache,
+        is_rust: impl Fn(&Document) -> bool,
+    ) -> Self {
         let docs = snapshot
             .documents()
             .iter()
@@ -408,44 +501,11 @@ impl ModuleIndex {
                 .analyses()
                 .iter()
                 .any(|a| a.context.language == "python")
+                && let Some(module) = python_module(snapshot.workspace().as_str(), path, |p| {
+                    docs.contains_key(p)
+                })
             {
-                let file = path.rsplit('/').next().unwrap_or(path);
-                let Some(stem) = file
-                    .strip_suffix(".py")
-                    .or_else(|| file.strip_suffix(".pyi"))
-                else {
-                    continue;
-                };
-                let mut names = if stem == "__init__" {
-                    vec![]
-                } else {
-                    vec![stem.to_owned()]
-                };
-                let mut dir = parent(path);
-                while !dir.is_empty() && docs.contains_key(format!("{dir}/__init__.py").as_str()) {
-                    names.insert(0, dir.rsplit('/').next().unwrap_or(dir).to_owned());
-                    dir = parent(dir);
-                }
-                if !names.is_empty() && names.iter().all(|n| identifier(n)) {
-                    let label = names.join(".");
-                    if label.len() <= 512 {
-                        python.insert(
-                            (*path).into(),
-                            Module {
-                                id: blake3::hash(
-                                    format!("{}\0python\0{path}", snapshot.workspace().as_str())
-                                        .as_bytes(),
-                                )
-                                .to_hex()
-                                .to_string(),
-                                label,
-                                language: "python",
-                                root: (*path).into(),
-                                basis: "python_module",
-                            },
-                        );
-                    }
-                }
+                python.insert((*path).into(), module);
             }
         }
         let mut seen = BTreeSet::new();
@@ -457,10 +517,7 @@ impl ModuleIndex {
                 rust.clear();
                 break;
             }
-            let Some(doc) = docs
-                .get(file.as_str())
-                .filter(|d| d.analyses().iter().any(|a| a.context.language == "rust"))
-            else {
+            let Some(doc) = docs.get(file.as_str()).filter(|doc| is_rust(doc)) else {
                 continue;
             };
             rust.entry(file.clone())

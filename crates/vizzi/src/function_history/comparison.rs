@@ -206,10 +206,7 @@ impl FunctionHistory {
             .versions
             .get(index)
             .ok_or_else(|| invalid("Invalid comparison history position"))?;
-        let (capture, _) = self.capture(session, version.candidate)?;
-        if capture.snapshot.id().as_str() != version.snapshot {
-            return Err(conflict("Historical comparison source differs"));
-        }
+        let capture = self.restore(session, index)?;
         Ok((
             capture,
             json!({"token":session.token,"tip":session.tip,"commit":session.commits[version.candidate],"index":index}),
@@ -249,23 +246,24 @@ impl FunctionHistory {
         }
         let tracking = doc.entity_id(analysis, fact);
         let span = fact.span.clone();
+        let modules = self.structure.modules_for_file(&snapshot, doc.path());
         let frozen = Arc::new(
             Snapshot::new(
                 snapshot.workspace().clone(),
                 vec![doc.clone()],
-                CapturePolicyId::derive(&[b"function-comparison-current-v1"]),
+                CapturePolicyId::derive(&[
+                    b"function-comparison-current-v2",
+                    snapshot.id().as_str().as_bytes(),
+                ]),
             )
             .map_err(unavailable)?,
         );
-        let symbol = Structure::new(&frozen)
-            .resolve(Some(tracking.as_str()), "")
-            .cloned()
-            .ok_or_else(|| unavailable("Comparison declaration unavailable"))?;
-        Ok(Capture {
+        Declaration {
             snapshot: frozen,
-            symbol,
+            tracking,
             span,
-        })
+        }
+        .bind(Arc::new(modules))
     }
 }
 fn validate(
