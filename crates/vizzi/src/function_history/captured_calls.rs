@@ -87,7 +87,7 @@ impl FunctionHistory {
             return Err(invalid("Invalid captured declaration binding"));
         }
         let project = |capture: &Capture, label: &str| {
-            let index = Structure::new(&capture.snapshot);
+            let index = capture.structure();
             let caller = index
                 .resolve(None, &s.symbol)
                 .ok_or_else(|| conflict("Captured declaration differs from the requested file"))?;
@@ -199,7 +199,7 @@ impl FunctionHistory {
                 {
                     capture
                 } else {
-                    restored = self.capture(session, version.candidate)?.0;
+                    restored = self.restore(session, *index)?;
                     &restored
                 };
                 if capture.snapshot.id().as_str() != s.snapshot

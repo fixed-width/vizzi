@@ -288,6 +288,18 @@ impl StructureHost {
             definitions: None,
         }
     }
+    pub(crate) fn modules_for_file(&self, snapshot: &Snapshot, path: &str) -> ModuleIndex {
+        let cached = self
+            .cache
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
+            .as_ref()
+            .filter(|cached| cached.snapshot == snapshot.id().as_str())
+            .map(|cached| cached.modules.for_file(path));
+        cached.unwrap_or_else(|| {
+            ModuleIndex::new(snapshot, &mut ModuleCache::default()).for_file(path)
+        })
+    }
     /// Runs one bounded operation, refusing stale captures before returning results.
     pub fn query(&self, request: &Request) -> Result<Value, CompanionError> {
         let snapshot = self

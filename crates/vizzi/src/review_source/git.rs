@@ -117,6 +117,33 @@ impl GitRepository {
             batch: None,
         })
     }
+    pub(crate) fn regular_files_at(
+        &self,
+        commit: &str,
+        paths: &[String],
+        discovery_bytes: usize,
+    ) -> Result<BTreeSet<String>, CaptureError> {
+        let mut regular = BTreeSet::new();
+        if paths.is_empty() {
+            return Ok(regular);
+        }
+        let mut args = vec!["--literal-pathspecs", "ls-tree", "-z", commit, "--"];
+        args.extend(paths.iter().map(String::as_str));
+        let inventory = self.run(&args, discovery_bytes, &|| false)?;
+        for record in records(&inventory)? {
+            let (meta, path) = split_record(record)?;
+            let mut fields = meta.split(|byte| *byte == b' ');
+            let mode = fields.next().unwrap_or_default();
+            if matches!(kind(mode), Ok(EntryKind::Regular { .. })) && fields.next() == Some(b"blob")
+            {
+                let path = ReviewPath::parse(path.to_vec())?;
+                if let Some(name) = path.document_path() {
+                    regular.insert(name.to_owned());
+                }
+            }
+        }
+        Ok(regular)
+    }
     /// Resolves a revision once and freezes its complete raw tree inventory.
     pub fn pin(
         &self,
