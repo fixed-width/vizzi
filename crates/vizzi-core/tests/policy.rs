@@ -13,45 +13,115 @@ fn policy(config: PolicyConfig) -> SourcePolicy {
 }
 
 #[test]
-fn semantic_project_inputs_and_python_stubs_participate_in_source_capture() {
+fn default_source_files_keep_provenance_with_or_without_analyzers() {
+    let config = PolicyConfig {
+        exclusions: vec!["vendor".into()],
+        ..Default::default()
+    };
+    let full =
+        SourcePolicy::new(config.clone(), ["rust", "python", "ruby"].map(String::from)).unwrap();
+    let empty = SourcePolicy::new(config, []).unwrap();
+    for (path, language, suffix) in [
+        ("main.rs", "rust", Some("rs")),
+        ("app.py", "python", Some("py")),
+        ("package/api.pyi", "python", Some("pyi")),
+        ("app.rb", "ruby", Some("rb")),
+        ("tasks/build.rake", "ruby", Some("rake")),
+        ("project.gemspec", "ruby", Some("gemspec")),
+        ("config.ru", "ruby", Some("ru")),
+        ("tools/Gemfile", "ruby", None),
+        ("tasks/Rakefile", "ruby", None),
+    ] {
+        let provenance = match suffix {
+            Some(extension) => Provenance::Extension {
+                extension: extension.into(),
+            },
+            None => Provenance::ExplicitScope { scope: path.into() },
+        };
+        assert_eq!(
+            full.classify(path).unwrap(),
+            Some(Classification::Assigned {
+                language: language.into(),
+                provenance: provenance.clone(),
+            }),
+            "{path}"
+        );
+        assert_eq!(
+            empty.classify(path).unwrap(),
+            Some(Classification::SourceOnly {
+                language: Some(language.into()),
+                provenance,
+                reason: SourceOnlyReason::AnalyzerUnavailable,
+            }),
+            "{path}"
+        );
+    }
+    for path in [
+        "gemfile",
+        "tasks/rakefile",
+        "Rakefile.backup",
+        "vendor/Gemfile",
+        "vendor/api.pyi",
+        "package/.pyi",
+        "app.RB",
+    ] {
+        assert_eq!(full.classify(path).unwrap(), None, "{path}");
+    }
+}
+
+#[test]
+fn default_project_metadata_is_captured_without_analyzers() {
+    let empty = SourcePolicy::new(
+        PolicyConfig {
+            exclusions: vec!["vendor".into()],
+            ..Default::default()
+        },
+        [],
+    )
+    .unwrap();
+    for (path, language) in [
+        ("crate/Cargo.toml", "cargo"),
+        ("Cargo.lock", "cargo"),
+        ("pyrightconfig.json", "python-project"),
+        ("pyproject.toml", "python-project"),
+        ("tools/Gemfile.lock", "ruby-project"),
+        (".ruby-version", "ruby-project"),
+        (".tool-versions", "ruby-project"),
+    ] {
+        assert_eq!(
+            empty.classify(path).unwrap(),
+            Some(Classification::SourceOnly {
+                language: Some(language.into()),
+                provenance: Provenance::ExplicitScope { scope: path.into() },
+                reason: SourceOnlyReason::ProjectMetadata,
+            }),
+            "{path}"
+        );
+    }
+    for path in ["gemfile.lock", "pyproject.TOML", "vendor/.ruby-version"] {
+        assert_eq!(empty.classify(path).unwrap(), None, "{path}");
+    }
+}
+
+#[test]
+fn c_family_project_metadata_requires_an_enabled_scope() {
     let plain = policy(PolicyConfig::default());
     let c_family = policy(PolicyConfig {
         c_family_roots: vec!["src".into()],
         ..PolicyConfig::default()
     });
-    for path in ["Cargo.lock", "pyproject.toml", "pyrightconfig.json"] {
-        assert!(
-            matches!(
-                plain.classify(path).unwrap(),
-                Some(Classification::SourceOnly {
-                    reason: SourceOnlyReason::ProjectMetadata,
-                    ..
-                })
-            ),
-            "{path}"
-        );
-    }
     for path in ["compile_commands.json", "compile_flags.txt"] {
         assert!(plain.classify(path).unwrap().is_none());
-        assert!(
-            matches!(
-                c_family.classify(path).unwrap(),
-                Some(Classification::SourceOnly {
-                    reason: SourceOnlyReason::ProjectMetadata,
-                    ..
-                })
-            ),
+        assert_eq!(
+            c_family.classify(path).unwrap(),
+            Some(Classification::SourceOnly {
+                language: Some("c-project".into()),
+                provenance: Provenance::ExplicitScope { scope: path.into() },
+                reason: SourceOnlyReason::ProjectMetadata,
+            }),
             "{path}"
         );
     }
-    assert_eq!(
-        plain
-            .classify("package/api.pyi")
-            .unwrap()
-            .unwrap()
-            .assigned_language(),
-        Some("python")
-    );
 }
 
 #[test]
@@ -78,6 +148,7 @@ fn scopes_and_explicit_exclusions_preserve_unsupported_and_ambiguous_inputs() {
     for (path, language) in [
         ("a.rs", "rust"),
         ("a.py", "python"),
+        ("src/headers/api.pyi", "python"),
         ("src/a.c", "c"),
         ("src/a.C", "cpp"),
         ("src/a.c++", "cpp"),

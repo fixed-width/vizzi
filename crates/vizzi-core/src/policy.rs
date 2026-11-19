@@ -4,6 +4,37 @@ use crate::model::{CapturePolicyId, ModelError};
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 
+struct DefaultSourceRules {
+    language: &'static str,
+    suffixes: &'static [&'static str],
+    filenames: &'static [&'static str],
+    project_metadata: Option<(&'static str, &'static [&'static str])>,
+}
+
+const DEFAULT_SOURCE_RULES: &[DefaultSourceRules] = &[
+    DefaultSourceRules {
+        language: "rust",
+        suffixes: &["rs"],
+        filenames: &[],
+        project_metadata: Some(("cargo", &["Cargo.toml", "Cargo.lock"])),
+    },
+    DefaultSourceRules {
+        language: "python",
+        suffixes: &["py", "pyi"],
+        filenames: &[],
+        project_metadata: Some(("python-project", &["pyrightconfig.json", "pyproject.toml"])),
+    },
+    DefaultSourceRules {
+        language: "ruby",
+        suffixes: &["rb", "rake", "gemspec", "ru"],
+        filenames: &["Gemfile", "Rakefile"],
+        project_metadata: Some((
+            "ruby-project",
+            &["Gemfile.lock", ".ruby-version", ".tool-versions"],
+        )),
+    },
+];
+
 /// Requested raw C-family language; it does not select a compiler configuration.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -29,7 +60,7 @@ pub struct Assignment {
     /// Requested raw language for supported C-family candidates.
     pub language: FamilyLanguage,
 }
-/// Frozen source-selection configuration; Rust/Python are included by default.
+/// Frozen source-selection configuration; Rust, Python, and Ruby are included by default.
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct PolicyConfig {
     /// Explicitly enabled C-family candidate subtrees.
@@ -183,35 +214,28 @@ impl SourcePolicy {
             return Ok(None);
         }
         let filename = path.rsplit('/').next().unwrap_or(path);
-        let metadata = match filename {
-            "Cargo.toml" | "Cargo.lock" => Some("cargo"),
-            "pyrightconfig.json" | "pyproject.toml" => Some("python-project"),
-            "Gemfile.lock" | ".ruby-version" | ".tool-versions" => Some("ruby-project"),
-            "compile_commands.json" | "compile_flags.txt" if !self.roots.is_empty() => {
-                Some("c-project")
-            }
-            _ => None,
-        };
+        let filename_provenance = || Provenance::ExplicitScope { scope: path.into() };
+        let metadata = DEFAULT_SOURCE_RULES
+            .iter()
+            .filter_map(|rules| rules.project_metadata)
+            .find_map(|(label, names)| names.contains(&filename).then_some(label))
+            .or_else(|| {
+                (!self.roots.is_empty()
+                    && matches!(filename, "compile_commands.json" | "compile_flags.txt"))
+                .then_some("c-project")
+            });
         if let Some(language) = metadata {
             return Ok(Some(Classification::SourceOnly {
                 language: Some(language.into()),
-                provenance: Provenance::ExplicitScope { scope: path.into() },
+                provenance: filename_provenance(),
                 reason: SourceOnlyReason::ProjectMetadata,
             }));
         }
-        if matches!(filename, "Gemfile" | "Rakefile") {
-            return Ok(Some(if self.available.contains("ruby") {
-                Classification::Assigned {
-                    language: "ruby".into(),
-                    provenance: Provenance::ExplicitScope { scope: path.into() },
-                }
-            } else {
-                Classification::SourceOnly {
-                    language: Some("ruby".into()),
-                    provenance: Provenance::ExplicitScope { scope: path.into() },
-                    reason: SourceOnlyReason::AnalyzerUnavailable,
-                }
-            }));
+        if let Some(rules) = DEFAULT_SOURCE_RULES
+            .iter()
+            .find(|rules| rules.filenames.contains(&filename))
+        {
+            return Ok(Some(self.assignment(rules.language, filename_provenance())));
         }
         let Some((stem, extension)) = filename.rsplit_once('.') else {
             return Ok(None);
@@ -222,60 +246,58 @@ impl SourcePolicy {
         let provenance = Provenance::Extension {
             extension: extension.into(),
         };
-        let language = match extension {
-            "rs" => Some("rust"),
-            "py" | "pyi" => Some("python"),
-            "rb" | "rake" | "gemspec" | "ru" => Some("ruby"),
-            _ => {
-                if !self.roots.iter().any(|scope| within(path, scope)) {
-                    return Ok(None);
-                }
-                if matches!(extension, "cu" | "cuh") {
-                    return Ok(Some(Classification::SourceOnly {
-                        language: Some("cuda".into()),
-                        provenance,
-                        reason: SourceOnlyReason::DialectUnsupported,
-                    }));
-                }
-                let hint = match extension {
-                    "c" => Some("c"),
-                    "cc" | "cpp" | "cxx" | "C" | "c++" | "hh" | "hpp" | "hxx" | "h++" => {
-                        Some("cpp")
-                    }
-                    "h" | "H" | "inc" | "inl" | "ipp" | "tpp" => None,
-                    _ => return Ok(None),
-                };
-                if let Some((scope, language)) = self
-                    .assignments
-                    .iter()
-                    .filter(|(scope, _)| within(path, scope))
-                    .max_by_key(|(scope, _)| scope.len())
-                {
-                    return Ok(Some(self.assignment(
-                        language.name(),
-                        Provenance::ExplicitScope {
-                            scope: if scope.is_empty() {
-                                ".".into()
-                            } else {
-                                scope.clone()
-                            },
-                        },
-                    )));
-                }
-                if hint.is_none() {
-                    let reason = if matches!(extension, "h" | "H") {
-                        SourceOnlyReason::LanguageUnassigned
-                    } else {
-                        SourceOnlyReason::FragmentUnassigned
-                    };
-                    return Ok(Some(Classification::SourceOnly {
-                        language: None,
-                        provenance,
-                        reason,
-                    }));
-                }
-                hint
+        let language = if let Some(rules) = DEFAULT_SOURCE_RULES
+            .iter()
+            .find(|rules| rules.suffixes.contains(&extension))
+        {
+            Some(rules.language)
+        } else {
+            if !self.roots.iter().any(|scope| within(path, scope)) {
+                return Ok(None);
             }
+            if matches!(extension, "cu" | "cuh") {
+                return Ok(Some(Classification::SourceOnly {
+                    language: Some("cuda".into()),
+                    provenance,
+                    reason: SourceOnlyReason::DialectUnsupported,
+                }));
+            }
+            let hint = match extension {
+                "c" => Some("c"),
+                "cc" | "cpp" | "cxx" | "C" | "c++" | "hh" | "hpp" | "hxx" | "h++" => Some("cpp"),
+                "h" | "H" | "inc" | "inl" | "ipp" | "tpp" => None,
+                _ => return Ok(None),
+            };
+            if let Some((scope, language)) = self
+                .assignments
+                .iter()
+                .filter(|(scope, _)| within(path, scope))
+                .max_by_key(|(scope, _)| scope.len())
+            {
+                return Ok(Some(self.assignment(
+                    language.name(),
+                    Provenance::ExplicitScope {
+                        scope: if scope.is_empty() {
+                            ".".into()
+                        } else {
+                            scope.clone()
+                        },
+                    },
+                )));
+            }
+            if hint.is_none() {
+                let reason = if matches!(extension, "h" | "H") {
+                    SourceOnlyReason::LanguageUnassigned
+                } else {
+                    SourceOnlyReason::FragmentUnassigned
+                };
+                return Ok(Some(Classification::SourceOnly {
+                    language: None,
+                    provenance,
+                    reason,
+                }));
+            }
+            hint
         };
         Ok(language.map(|language| self.assignment(language, provenance)))
     }

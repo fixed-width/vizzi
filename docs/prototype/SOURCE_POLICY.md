@@ -7,15 +7,18 @@ apply the same frozen policy during discovery, hint verification, and event filt
 ## Configuration and classification
 
 `PolicyConfig` contains enabled `c_family_roots`, `exclusions`, and explicit C/C++
-`assignments`. Rust `.rs` and Python `.py` inputs are selected by default. Family scopes
+`assignments`. Rust, Python, and Ruby are selected by default through exact filenames
+and suffixes defined together in `vizzi_core::policy`. See the
+[language reference](../reference/languages.md) for the supported names. Family scopes
 add the candidate suffixes in [the C-family policy](C_FAMILY_POLICY.md), including
 `.c++` and `.h++`. Assigned C/C++ inputs receive [raw declaration extraction](C_FAMILY_SYNTAX.md).
 Ambiguous headers, unassigned fragments, and CUDA remain source-only. An unavailable
 factory in a custom registry still preserves source without fake analysis.
 
-`Cargo.toml` is also captured by default as immutable, source-only project metadata.
-It supplies [native module identity](../visual/MODULES_TECH.md) without an analyzer,
-Cargo execution or repository build. Exclusions still apply; unrelated TOML is omitted.
+Project metadata is captured by exact filename as immutable, source-only input.
+`Cargo.toml` supplies [native module identity](../visual/MODULES_TECH.md). Exclusions
+apply to project metadata, and C/C++ metadata requires at least one enabled family scope.
+Recognized project metadata takes precedence over source filename and suffix rules.
 
 `SourcePolicy::new(config, available_languages)` validates and freezes the configuration.
 `classify(path)` returns no capture for excluded/out-of-scope files, or one immutable
@@ -31,12 +34,13 @@ paths return errors rather than silently behaving like absent source.
 | `dialect_unsupported` | Recognized CUDA source/header without a supported analyzer |
 | `fragment_unassigned` | Textual fragment without an explicit language |
 | `analyzer_unavailable` | A language was requested but has no registered factory |
-| `project_metadata` | Captured Cargo manifest; no syntax analyzer requested |
+| `project_metadata` | Captured project input with no syntax analyzer assigned |
 
 Provenance is an exact suffix (`extension`) or normalized explicit rule scope
-(`explicit_scope`). Encoding is independent: `utf8` permits text preview; `unsupported`
-does not. A non-UTF-8 unassigned header retains both facts. Source-only documents have
-no analysis records; `Document::capture` rejects attempts to attach them.
+(`explicit_scope`). An exact filename match records the full relative path as its scope.
+The `utf8` encoding value permits text preview. A non-UTF-8 unassigned header retains
+both its encoding and its classification. `Document::capture` rejects attempts to
+attach analysis records to source-only documents.
 
 Rules match complete path components. Exclusions override assignments. CUDA cannot be
 reclassified by a general C++ assignment. More specific assignments override parent
@@ -61,7 +65,7 @@ policy. There is one registered raw adapter per language in this host.
 
 `Directory::with_policy(root, config, languages)` constructs policy and factories
 together so availability cannot drift. `open` uses default configuration and built-in
-Rust/Python/C/C++ factories; `with_languages` supplies a different factory registry with
+Rust/Python/Ruby/C/C++ factories. `with_languages` supplies a different factory registry with
 default capture rules. Removing a factory preserves selected bytes as source-only.
 
 Policies are immutable for a host's lifetime. The CLI exposes repeatable
