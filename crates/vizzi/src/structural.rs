@@ -9,13 +9,21 @@ use serde::Deserialize;
 pub mod editor;
 use serde_json::Value;
 use std::sync::{Arc, Mutex, TryLockError};
-use vizzi_core::structure::Structure;
+use vizzi_core::{
+    model::{Document, Snapshot},
+    modules::{ModuleCache, ModuleIndex},
+    structure::Structure,
+};
+const SEMANTIC_FILE_PROJECTIONS: usize = 16;
 /// One structural operation bound to the visible native observation.
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Request {
     /// Expected current observation.
     pub snapshot: String,
+    /// Exact captured path hint for a declaration outside the repository projection.
+    #[serde(default)]
+    pub path: Option<String>,
     /// Explicit operation; no natural-language intent is inferred.
     pub query: Operation,
 }
@@ -75,20 +83,115 @@ pub enum Operation {
 struct Cached {
     snapshot: String,
     index: Structure,
-    modules: vizzi_core::modules::ModuleCache,
+    modules: ModuleIndex,
+    module_cache: ModuleCache,
+    scoped: Option<(String, Arc<Structure>)>,
 }
 impl Cached {
-    fn rebuild(snapshot: &vizzi_core::model::Snapshot, previous: Option<Self>) -> Self {
-        let mut modules = previous.map(|c| c.modules).unwrap_or_default();
-        let index = Structure::with_module_cache(snapshot, &mut modules);
+    fn rebuild(snapshot: &Snapshot, previous: Option<Self>) -> Self {
+        let mut module_cache = previous.map(|c| c.module_cache).unwrap_or_default();
+        let modules = ModuleIndex::new(snapshot, &mut module_cache);
+        let index = Structure::with_modules(snapshot, &modules);
         Self {
             snapshot: snapshot.id().as_str().into(),
             index,
             modules,
+            module_cache,
+            scoped: None,
         }
     }
+    fn for_file(
+        &mut self,
+        snapshot: &Snapshot,
+        path: &str,
+    ) -> Result<Option<Arc<Structure>>, CompanionError> {
+        if let Some((cached_path, index)) = &self.scoped
+            && cached_path == path
+        {
+            return Ok(Some(index.clone()));
+        }
+        let scoped = Structure::for_file(snapshot, path, &self.modules)
+            .map_err(|e| CompanionError::Invalid(e.to_string()))?
+            .map(Arc::new);
+        if let Some(index) = &scoped {
+            self.scoped = Some((path.into(), index.clone()));
+        }
+        Ok(scoped)
+    }
+    fn for_tracking(
+        &mut self,
+        snapshot: &Snapshot,
+        tracking: Option<&str>,
+        symbol: &str,
+        file: Option<&str>,
+    ) -> Result<Option<Arc<Structure>>, CompanionError> {
+        if let Some(path) = self
+            .index
+            .resolve(tracking, symbol)
+            .map(|s| s.source.path.clone())
+        {
+            return Ok(self
+                .for_evidence(snapshot, &path)?
+                .filter(|index| index.resolve(tracking, symbol).is_some()));
+        }
+        match file.and_then(|id| snapshot.file(id)) {
+            Some(doc) => self.for_file(snapshot, doc.path()),
+            None => Ok(None),
+        }
+    }
+    fn for_evidence(
+        &mut self,
+        snapshot: &Snapshot,
+        path: &str,
+    ) -> Result<Option<Arc<Structure>>, CompanionError> {
+        if snapshot
+            .file_by_path(path)
+            .is_some_and(|doc| self.index.omits_file_facts(doc))
+        {
+            self.for_file(snapshot, path)
+        } else {
+            Ok(None)
+        }
+    }
+    fn for_symbol(
+        &mut self,
+        snapshot: &Snapshot,
+        id: &str,
+        path_hint: Option<&str>,
+    ) -> Result<Option<Arc<Structure>>, CompanionError> {
+        let known = self.index.resolve(None, id).map(|s| s.source.path.clone());
+        let scoped = match known.as_deref().or(path_hint) {
+            Some(path) => self.for_evidence(snapshot, path)?,
+            None => self.scoped.as_ref().map(|(_, index)| index.clone()),
+        };
+        Ok(scoped.filter(|index| index.resolve(None, id).is_some()))
+    }
+    fn at_location<T>(
+        &mut self,
+        snapshot: &Snapshot,
+        doc: &Document,
+        remaining: &mut usize,
+        project: impl FnOnce(&Structure) -> T,
+    ) -> Result<Option<T>, CompanionError> {
+        if !self.index.omits_file_facts(doc) {
+            return Ok(Some(project(&self.index)));
+        }
+        if self
+            .scoped
+            .as_ref()
+            .is_none_or(|(path, _)| path != doc.path())
+        {
+            let Some(next) = remaining.checked_sub(1) else {
+                return Ok(None);
+            };
+            *remaining = next;
+        }
+        Ok(self
+            .for_file(snapshot, doc.path())?
+            .map(|index| project(&index)))
+    }
 }
-/// One lazily constructed metadata projection; no retired snapshot is retained.
+/// Current repository metadata and one on-demand file projection.
 pub struct StructureHost {
     reference_sets: Mutex<Vec<references::ReferenceSet>>,
     host: Arc<Host>,
@@ -213,10 +316,25 @@ impl StructureHost {
             let previous = cache.take();
             *cache = Some(Cached::rebuild(&snapshot, previous));
         }
-        let index = &cache
-            .as_ref()
-            .ok_or_else(|| CompanionError::Unavailable("Structure is unavailable".into()))?
-            .index;
+        let cache = cache
+            .as_mut()
+            .ok_or_else(|| CompanionError::Unavailable("Structure is unavailable".into()))?;
+        let scoped = match &request.query {
+            Operation::Inventory {
+                area,
+                functions_only: true,
+                ..
+            } if !area.is_empty() => cache.for_file(&snapshot, area)?,
+            Operation::Actions { symbol, .. } => {
+                cache.for_symbol(&snapshot, symbol, request.path.as_deref())?
+            }
+            Operation::Uses { symbol, .. } if cache.index.resolve(None, symbol).is_some() => None,
+            Operation::Calls { symbol, area, .. } | Operation::Uses { symbol, area, .. } => {
+                cache.for_symbol(&snapshot, symbol, request.path.as_deref().or(Some(area)))?
+            }
+            _ => None,
+        };
+        let index = scoped.as_deref().unwrap_or(&cache.index);
         let foreign = match &request.query {
             Operation::Actions { symbol, .. }
             | Operation::Calls { symbol, .. }
@@ -249,14 +367,25 @@ impl StructureHost {
                 search,
                 offset,
                 functions_only,
-            } => serde_json::to_value(
-                (if *functions_only {
+            } => {
+                let mut page = (if *functions_only {
                     index.functions(area, search, *offset)
                 } else {
                     index.inventory(area, search, *offset)
                 })
-                .map_err(|e| CompanionError::Invalid(e.to_string()))?,
-            ),
+                .map_err(|e| CompanionError::Invalid(e.to_string()))?;
+                if scoped.is_some() {
+                    let scope = serde_json::to_value(&page.coverage)
+                        .map_err(|e| CompanionError::Unavailable(e.to_string()))?;
+                    page.coverage = cache.index.coverage().clone();
+                    serde_json::to_value(page).map(|mut value| {
+                        value["scope_coverage"] = scope;
+                        value
+                    })
+                } else {
+                    serde_json::to_value(page)
+                }
+            }
             Operation::Calls {
                 symbol,
                 area,
@@ -274,7 +403,12 @@ impl StructureHost {
                 offset,
             } => serde_json::to_value(
                 index
-                    .outgoing(symbol, area, *offset)
+                    .outgoing_with_candidates(
+                        symbol,
+                        area,
+                        *offset,
+                        scoped.as_ref().map(|_| &cache.index),
+                    )
                     .map_err(|e| CompanionError::Invalid(e.to_string()))?,
             ),
             Operation::Uses {
@@ -313,6 +447,9 @@ pub struct DefinitionRequest {
     pub snapshot: String,
     /// Call identity from the structured call page.
     pub call: String,
+    /// Exact captured path hint for a call outside the repository projection.
+    #[serde(default)]
+    pub path: Option<String>,
 }
 /// Definition result precision, including known destinations outside captured source.
 #[derive(serde::Serialize)]
@@ -390,7 +527,20 @@ impl StructureHost {
                 let previous = cache.take();
                 *cache = Some(Cached::rebuild(&snapshot, previous));
             }
-            let local = cache.as_ref().and_then(|c| c.index.call(&request.call));
+            let cache = cache
+                .as_mut()
+                .ok_or_else(|| CompanionError::Unavailable("Structure is unavailable".into()))?;
+            let local = cache.index.call(&request.call);
+            let path = local
+                .as_ref()
+                .map(|call| call.invocation.source.path.as_str());
+            let scoped = match path.or(request.path.as_deref()) {
+                Some(path) => cache.for_evidence(&snapshot, path)?,
+                None => cache.scoped.as_ref().map(|(_, index)| index.clone()),
+            };
+            let local = scoped
+                .and_then(|index| index.call_with_candidates(&request.call, Some(&cache.index)))
+                .or(local);
             let foreign = if local.is_none() {
                 self.external(&request.call)?
             } else {
@@ -443,18 +593,19 @@ impl StructureHost {
                     }
                     let mut candidates = vec![];
                     let mut outside = answer.outside;
-                    let cache = self
+                    let mut cache = self
                         .cache
                         .lock()
                         .unwrap_or_else(std::sync::PoisonError::into_inner);
-                    let index = cache
-                        .as_ref()
+                    let cache = cache
+                        .as_mut()
                         .filter(|c| c.snapshot == request.snapshot)
                         .ok_or_else(|| {
                             CompanionError::Conflict(
                                 "Source changed during definition lookup".into(),
                             )
                         })?;
+                    let mut remaining = SEMANTIC_FILE_PROJECTIONS;
                     for location in answer.locations {
                         let found = if let Some(capture) = &location.capture {
                             if let Some(source) = self.dependency(capture)? {
@@ -477,11 +628,7 @@ impl StructureHost {
                             } else {
                                 None
                             }
-                        } else if let Some(doc) = snapshot
-                            .documents()
-                            .iter()
-                            .find(|d| d.path() == location.path)
-                        {
+                        } else if let Some(doc) = snapshot.file_by_path(&location.path) {
                             let text = doc
                                 .captured()
                                 .read_text(8 * 1024 * 1024)
@@ -497,7 +644,11 @@ impl StructureHost {
                                 })?;
                             let byte = crate::definitions::byte_offset(&text, location.position)
                                 .map_err(CompanionError::Unavailable)?;
-                            index.index.definition(&location.path, byte)
+                            cache
+                                .at_location(&snapshot, doc, &mut remaining, |index| {
+                                    index.definition(doc.path(), byte)
+                                })?
+                                .flatten()
                         } else {
                             None
                         };
@@ -531,7 +682,7 @@ impl StructureHost {
                         invocation.candidates = candidates.into_iter().take(8).collect();
                         if outside > 0 {
                             detail = Some(format!(
-                                "{outside} definition(s) are outside captured declarations."
+                                "{outside} definition(s) could not be mapped to captured declarations."
                             ));
                         }
                     }

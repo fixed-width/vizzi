@@ -40,7 +40,7 @@ el('code-layout').value=smartReflow?'smart':'original';el('code-layout').onchang
 const fail=e=>error.show(e?.message??String(e));
 async function transport(path,options){const response=await fetchRead(path,options);if(!response.ok){let text=await response.text();try{text=JSON.parse(text).message??text;}catch{}const error=new Error(text);error.status=response.status;throw error;}return response.json();}
 const post=(path,body,signal)=>transport(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal});
-const definitionWarmup=new DefinitionWarmup((snapshot,call)=>post('/api/call-definition',{snapshot,call}));
+const definitionWarmup=new DefinitionWarmup((snapshot,call,path)=>post('/api/call-definition',{snapshot,call,path}));
 function refreshCapture(){
  const views=model.views.filter(v=>v.mode==='live');const key=JSON.stringify([views.map(v=>[v.id,v.symbol.id,v.mode,mounted.get(v.id)?.sourceTicket,v.reading]),model.links.map(l=>[l.id,l.state])]);
  return {key,body:{views:views.map(v=>{const r=mounted.get(v.id),context=r?.sourcePane.readingContext(),reading=v.reading,a=reading.anchor;return {id:v.id,tracking:v.symbol.tracking??null,symbol:v.symbol.id,file:v.symbol.source.file,context:v.symbol.source.context,capture:v.symbol.origin?.capture??null,version:r?.lines?.length?v.symbol.source.version:'0'.repeat(64),area:v.area,section_offset:reading.section-v.symbol.source.line,anchor:a?{offset:a.line-v.symbol.source.line,byte:a.byte,text:context?.reading.anchor?.line===a.line?context.text:''}:null};}),links:model.links.map(l=>({id:l.id,from:l.from,to:l.to,spelling:l.spelling,kind:l.kind}))}};
@@ -493,7 +493,7 @@ function applyPreparedSource(id,prepared) {
 async function requestActions(symbol,start,count,snapshot,signal) {
  const actions=[];let offset=0;
  for(let page=0;page<16;page++){
-  const data=await post('/api/structure',{snapshot,query:{kind:'actions',symbol:symbol.id,line_start:start,line_count:count,offset}},signal);
+  const data=await post('/api/structure',{snapshot,path:symbol.origin?undefined:symbol.source.path,query:{kind:'actions',symbol:symbol.id,line_start:start,line_count:count,offset}},signal);
   if(data.snapshot!==snapshot||!Array.isArray(data.items)||data.items.length>256||!Number.isSafeInteger(data.matching)||data.matching>4096)throw new Error('Invalid captured call actions');
   actions.push(...data.items);if(data.next===null)return actions;if(!Number.isSafeInteger(data.next)||data.next<=offset)throw new Error('Invalid call-action continuation');offset=data.next;
  }
@@ -522,20 +522,21 @@ async function loadActions(id,start,count,snapshot,record){
 }
 async function loadCalls(id,offset){
  const r=mounted.get(id);if(!r||!model.navigable(id))return;const v=model.view(id),source=frozenSource(v),expected=source?.snapshot??model.snapshot,binding=JSON.stringify([v.snapshot,v.symbol.id,source]);
- try{const data=source?await post('/api/captured-functions',{source,query:{kind:'calls',offset}},r.controller.signal):await post('/api/structure',{snapshot:expected,query:{kind:'calls',symbol:v.symbol.id,area:v.area||v.symbol.source.path,offset}},r.controller.signal);if(mounted.get(id)!==r||!model.navigable(id)||JSON.stringify([model.view(id).snapshot,model.view(id).symbol.id,frozenSource(model.view(id))])!==binding)return;if(data.snapshot!==expected||!Array.isArray(data.items)||data.items.length>8)throw new Error('Call response differs');r.sites=offset===0?data.items:[...r.sites,...data.items];r.nextCalls=data.next;r.matching=data.matching;r.callsReady=true;renderCalls(id);if(!source)void prepareDefinitions(id);}catch(error){if(error.name!=='AbortError'){r.callsReady=true;r.popup.replaceChildren(node('p',error.message));}}
+ try{const data=source?await post('/api/captured-functions',{source,query:{kind:'calls',offset}},r.controller.signal):await post('/api/structure',{snapshot:expected,path:v.symbol.origin?undefined:v.symbol.source.path,query:{kind:'calls',symbol:v.symbol.id,area:v.area||v.symbol.source.path,offset}},r.controller.signal);if(mounted.get(id)!==r||!model.navigable(id)||JSON.stringify([model.view(id).snapshot,model.view(id).symbol.id,frozenSource(model.view(id))])!==binding)return;if(data.snapshot!==expected||!Array.isArray(data.items)||data.items.length>8)throw new Error('Call response differs');r.sites=offset===0?data.items:[...r.sites,...data.items];r.nextCalls=data.next;r.matching=data.matching;r.callsReady=true;renderCalls(id);if(!source)void prepareDefinitions(id);}catch(error){if(error.name!=='AbortError'){r.callsReady=true;r.popup.replaceChildren(node('p',error.message));}}
 }
 function renderCalls(id){const r=mounted.get(id);if(!r)return;r.popup.replaceChildren(node('p',`${r.sites.length} of ${r.matching} written calls.`));for(const site of r.sites)r.popup.append(button(`${site.name??'Dynamic call'} · line ${site.source.line}`,null,()=>chooseCall(id,site)));if(r.nextCalls!==null&&r.nextCalls!==undefined&&r.sites.length<64)r.popup.append(button('More written calls',null,()=>void loadCalls(id,r.nextCalls)));if(!r.matching)r.popup.append(node('p','No attributed calls recorded. This does not prove no runtime calls.'));}
 function toggleCalls(id){editorCalls.manual();const r=mounted.get(id);if(!r||!model.navigable(id))return;hideDestinations();for(const[other,x]of mounted)if(other!==id)x.popup.hidden=true;r.popup.hidden=!r.popup.hidden;if(!r.callsReady){r.popup.replaceChildren(node('p','Loading written calls…'));void loadCalls(id,0);}else renderCalls(id);}
 function hideDestinations(){el('destination-stack').hidden=true;}
 async function chooseCall(id,site){
  editorCalls.manual();const record=mounted.get(id);if(!record||!model.navigable(id))return;if(frozenSource(model.view(id))){void chooseCapturedCall(id,site);return;}record.resolvingCaptured=false;
- site={...site,owner:model.view(id).symbol.id};
+ const symbol=model.view(id).symbol;
+ site={...site,owner:symbol.id};
  const ticket=record.navigation=(record.navigation??0)+1,expected=model.snapshot;
  const verify=()=>{if(mounted.get(id)!==record||record.navigation!==ticket||model.snapshot!==expected||!model.usable(id))throw new DOMException('Call navigation superseded','AbortError');};
  await definitionCapabilities;
  let choice={site,attempted:definitionProvider&&!site.binding,note:'',semantic:false};
  record.popup.hidden=true;const pending=setTimeout(()=>{if(mounted.get(id)===record&&record.navigation===ticket){record.resolving=true;updateFragmentStatus(record);}},150);
- try {choice=await resolveCallChoice(site,{snapshot:expected,provider:definitionProvider,warmup:()=>definitionWarmup.wait(),request:(snapshot,call,signal)=>post('/api/call-definition',{snapshot,call},signal),signal:record.controller.signal,verify});}
+ try {choice=await resolveCallChoice(site,{snapshot:expected,provider:definitionProvider,warmup:()=>definitionWarmup.wait(),request:(snapshot,call,signal)=>post('/api/call-definition',{snapshot,call,path:symbol.origin?undefined:symbol.source.path},signal),signal:record.controller.signal,verify});}
  catch(error){if(error.name==='AbortError')return;if(error.status===409||site.lookup){fail(error);return;}choice.note=error.message;}
  finally{clearTimeout(pending);if(mounted.get(id)===record&&record.navigation===ticket){record.resolving=false;updateFragmentStatus(record);}}
  try{verify();}catch{return;}
@@ -572,11 +573,44 @@ function receive(status){
  live.changed(currentSnapshot,model.views.some(v=>v.mode==='live'&&(!v.symbol.tracking||!Object.hasOwn(v.symbol,'module'))),!model.stale&&model.snapshot===currentSnapshot&&model.views.every(v=>v.mode==='pinned'||v.snapshot===currentSnapshot&&v.state==='current'&&v.symbol.tracking&&Object.hasOwn(v.symbol,'module')));
  void editorCalls.resume();
 }
-async function findFragments(offset=0){const id=++paletteTicket;try{if(!model||model.stale)throw new Error('Wait for current source or start a new workspace.');const data=await post('/api/structure',{snapshot:model.snapshot,query:{kind:'inventory',area:'',search:el('fragment-search').value.trim(),offset,functions_only:true}});if(id!==paletteTicket)return;el('fragment-results').replaceChildren();el('fragment-search-status').textContent=`${data.matching} matching functions; choose a function.`;
- for(const entry of data.items){const s=entry.symbol;if(s.kind!=='function')continue;const b=button([...s.parents,s.name].join('::'),null,()=>{editorCalls.manual();const id=model.openRoot(s,s.source.path.split('/').slice(0,-1).join('/')||s.source.path);mount(id);focus([id]);save();el('fragment-dialog').close();});b.dataset.addSymbol=s.id;b.dataset.name=s.name;b.append(node('small',`${s.source.path}:${s.source.line}`));el('fragment-results').append(b);}el('more-fragment-results').hidden=data.next===null;el('more-fragment-results').dataset.offset=String(data.next??0);
- }catch(e){fail(e);}}
+function resetFragmentResults(){
+ paletteTicket++;
+ el('fragment-results').replaceChildren();
+ el('fragment-search-status').textContent='';
+ el('more-fragment-results').hidden=true;
+}
+async function findFragments(offset=0){
+ resetFragmentResults();
+ const ticket=paletteTicket,snapshot=model?.snapshot;
+ const status=el('fragment-search-status'),area=el('fragment-path').value,search=el('fragment-search').value.trim();
+ try{
+  if(!snapshot||model.stale)throw new Error('Wait for current source or start a new workspace.');
+  const data=await post('/api/structure',{snapshot,query:{kind:'inventory',area,search,offset,functions_only:true}});
+  if(ticket!==paletteTicket)return;
+  if(model.stale||model.snapshot!==snapshot||data.snapshot!==snapshot)throw new Error('Source changed. Search again.');
+  if(area&&!data.scope_coverage){status.textContent='No captured file at this path.';return;}
+  const coverage=data.scope_coverage??data.coverage;
+  const detail=area?(coverage.omitted_symbols||coverage.partial_files?' File search has partial coverage.':'')
+   :(coverage.omitted_files||coverage.omitted_symbols?' Repository search is limited. Enter a source file path to search that file.':'');
+  status.textContent=`${data.matching} matching functions.${detail}`;
+  for(const {symbol} of data.items){
+   if(symbol.kind!=='function')continue;
+   const b=button([...symbol.parents,symbol.name].join('::'),null,()=>{
+    if(model.stale||model.snapshot!==snapshot){resetFragmentResults();status.textContent='Source changed. Search again.';return;}
+    editorCalls.manual();
+    const path=symbol.source.path, id=model.openRoot(symbol,path.split('/').slice(0,-1).join('/')||path);
+    mount(id);focus([id]);save();el('fragment-dialog').close();
+   });
+   b.dataset.addSymbol=symbol.id;b.dataset.name=symbol.name;
+   b.append(node('small',`${symbol.source.path}:${symbol.source.line}`));el('fragment-results').append(b);
+  }
+  const more=el('more-fragment-results');more.hidden=data.next===null;more.dataset.offset=String(data.next??0);
+ }catch(e){if(ticket===paletteTicket)status.textContent=e.message;}
+}
 async function openMinitosis(){try{if(!model||model.stale)throw new Error('Wait for current source.');const data=await post('/api/structure',{snapshot:model.snapshot,query:{kind:'inventory',area:'minitosis/src/lib.rs',search:'process',offset:0}});const s=data.items.map(i=>i.symbol).find(s=>s.name==='process'&&s.kind==='function');if(!s)throw new Error('Minitosis example is not in this source workspace. Use Add bubble.');const id=model.openRoot(s,'minitosis/src');mount(id);focus([id]);save();}catch(e){fail(e);}}
 const openDialog=()=>{editorCalls.manual();el('fragment-dialog').showModal();el('fragment-search').focus();};el('add-fragment').onclick=openDialog;el('empty-add').onclick=openDialog;el('close-fragment-dialog').onclick=()=>el('fragment-dialog').close();el('fragment-form').onsubmit=e=>{e.preventDefault();void findFragments();};el('more-fragment-results').onclick=()=>void findFragments(Number(el('more-fragment-results').dataset.offset));
+el('fragment-form').addEventListener('input',resetFragmentResults);
+el('fragment-dialog').addEventListener('close',resetFragmentResults);
 el('fit-workspace').onclick=()=>{if(!model)return;const s=size();model.fit(s.w,s.h);geometry();save();};for(const[id,factor]of[['zoom-in',1.2],['zoom-out',1/1.2]])el(id).onclick=()=>{if(!model)return;const s=size();model.zoomAt(model.camera.scale*factor,{x:s.w/2,y:s.h/2});geometry();save();};
 const canvas=el('workspace-canvas');canvas.addEventListener('pointerdown',e=>{if(e.button!==0||e.target.closest('.fragment,.reference-stack,.task-group-header,#destination-stack,#workspace-overview,#visual-empty,[data-link-id]'))return;if(!model)return;e.preventDefault();canvas.setPointerCapture(e.pointerId);let last={x:e.clientX,y:e.clientY};const move=event=>{model.pan(event.clientX-last.x,event.clientY-last.y);last={x:event.clientX,y:event.clientY};geometry();};const end=()=>{canvas.removeEventListener('pointermove',move);canvas.removeEventListener('pointerup',end);canvas.removeEventListener('pointercancel',end);save();};canvas.addEventListener('pointermove',move);canvas.addEventListener('pointerup',end);canvas.addEventListener('pointercancel',end);});
 canvas.addEventListener('wheel',e=>{callMenu.hide();if(!model||e.target.closest('.code-pane,.reference-body,.calls-popover,#destination-stack'))return;e.preventDefault();if(e.ctrlKey||e.metaKey){const rect=canvas.getBoundingClientRect();model.zoomAt(model.camera.scale*Math.exp(-e.deltaY/500),{x:e.clientX-rect.left,y:e.clientY-rect.top});}else model.pan(-e.deltaX,-e.deltaY);geometry();save();},{passive:false});canvas.addEventListener('keydown',e=>{if(e.target!==canvas||!model)return;const moves={ArrowLeft:[70,0],ArrowRight:[-70,0],ArrowUp:[0,70],ArrowDown:[0,-70]};if(moves[e.key]){e.preventDefault();model.pan(...moves[e.key]);geometry();save();}if(e.key==='Escape')hideDestinations();});new ResizeObserver(()=>{geometry();void editorCalls.resume();}).observe(canvas);
