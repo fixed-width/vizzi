@@ -1,6 +1,7 @@
 //! Ruby written calls with bounded, position-aware lexical local-variable tracking.
 use crate::{
     calls::{self, CallFacts},
+    model::Coverage,
     syntax::Checkpoints,
 };
 use std::collections::BTreeMap;
@@ -184,9 +185,11 @@ impl Bindings {
 pub(crate) fn collect(
     root: Node<'_>,
     text: &str,
+    _: &Coverage,
     owners: &BTreeMap<usize, usize>,
+    output: &mut CallFacts,
     cancelled: &dyn Fn() -> bool,
-) -> Option<CallFacts> {
+) -> bool {
     let mut bindings = Bindings::default();
     if !walk(root, cancelled, |node| {
         if node.kind() == "identifier" && binding(node) {
@@ -202,10 +205,9 @@ pub(crate) fn collect(
             bindings.add(node, name.trim_end_matches(':'));
         }
     }) {
-        return None;
+        return false;
     }
-    let mut output = CallFacts::default();
-    if !walk(root, cancelled, |node| {
+    walk(root, cancelled, |node| {
         if node.kind() == "call" {
             let terminal = node.child_by_field_name("method");
             let Some(end) = terminal.or_else(|| node.child_by_field_name("operator")) else {
@@ -223,7 +225,7 @@ pub(crate) fn collect(
                 name,
                 text,
                 owners,
-                &mut output,
+                output,
             );
         } else if node.kind() == "identifier" && !binding(node) && !declaration_name(node) {
             let Some(name) = text.get(node.byte_range()).filter(|s| s.len() <= 128) else {
@@ -243,11 +245,8 @@ pub(crate) fn collect(
                 Some((name.into(), node.byte_range())),
                 text,
                 owners,
-                &mut output,
+                output,
             );
         }
-    }) {
-        return None;
-    }
-    Some(output)
+    })
 }

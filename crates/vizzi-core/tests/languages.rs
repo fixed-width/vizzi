@@ -67,8 +67,17 @@ fn registration_rejects_duplicate_languages_and_contexts_and_empty_names() {
     })])
     .unwrap();
     assert_eq!(languages.names().collect::<Vec<_>>(), ["fixture"]);
+    assert!(languages.call_languages().is_empty());
     assert!(languages.select("fixture").unwrap().create().is_err());
     assert!(Languages::new(vec![]).unwrap().select("rust").is_none());
+}
+
+#[test]
+fn builtins_advertise_written_calls_in_registration_order() {
+    assert_eq!(
+        Languages::builtin().unwrap().call_languages(),
+        ["rust", "python", "ruby", "c", "cpp"]
+    );
 }
 
 #[test]

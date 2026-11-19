@@ -75,6 +75,9 @@ impl Host {
     pub(crate) fn source_policy(&self) -> &vizzi_core::policy::SourcePolicy {
         self.engine.directory().policy()
     }
+    pub(crate) fn call_languages(&self) -> &[String] {
+        self.engine.directory().call_languages()
+    }
     pub(crate) fn analyze_history(
         &self,
         source: &vizzi_core::model::Snapshot,

@@ -2,9 +2,14 @@
 use crate::{
     analysis::{Analyzer, LanguageAdapter},
     model::{Context, ContextId, ModelError},
-    syntax::{Declaration, SyntaxAnalyzer},
+    syntax::{CallRules, Declaration, SyntaxAnalyzer},
 };
 use tree_sitter::Node;
+
+const CALLS: CallRules = CallRules {
+    expressions: None,
+    finish: Some(crate::ruby_calls::collect),
+};
 
 /// Registers raw Ruby syntax independently of a runtime or language server.
 pub struct RubyAdapter;
@@ -36,7 +41,11 @@ impl LanguageAdapter for RubyAdapter {
             self.context(),
             collect,
             scope,
+            CALLS,
         )?))
+    }
+    fn supports_written_calls(&self) -> bool {
+        CALLS.supported()
     }
 }
 fn declaration(node: Node<'_>, text: &str) -> Option<(&'static str, String)> {

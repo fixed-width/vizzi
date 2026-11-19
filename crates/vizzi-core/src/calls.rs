@@ -50,61 +50,55 @@ pub struct CallFacts {
     /// Calls outside count/spelling allowances; not evidence that no calls exist.
     pub omitted: usize,
 }
-pub(crate) fn supported(language: &str) -> bool {
-    matches!(language, "rust" | "python" | "ruby" | "c" | "cpp")
+pub(crate) struct CallExpression {
+    pub kind: &'static str,
+    pub callee_field: &'static str,
+    pub name_kinds: &'static [&'static str],
+    pub name_fields: &'static [(&'static str, &'static str)],
 }
-fn name(mut node: Node<'_>, text: &str) -> Option<(String, Range<usize>)> {
-    for _ in 0..8 {
-        if matches!(
-            node.kind(),
-            "identifier" | "field_identifier" | "type_identifier"
-        ) {
-            return text
-                .get(node.byte_range())
-                .filter(|s| !s.is_empty() && s.len() <= 128)
-                .map(|name| (name.to_owned(), node.byte_range()));
+
+impl CallExpression {
+    fn name(&self, mut node: Node<'_>, text: &str) -> Option<(String, Range<usize>)> {
+        for _ in 0..8 {
+            let kind = node.kind();
+            if self.name_kinds.contains(&kind) {
+                return text
+                    .get(node.byte_range())
+                    .filter(|s| !s.is_empty() && s.len() <= 128)
+                    .map(|name| (name.to_owned(), node.byte_range()));
+            }
+            let (_, field) = self
+                .name_fields
+                .iter()
+                .find(|(parent, _)| *parent == kind)?;
+            node = node.child_by_field_name(field)?;
         }
-        node = match node.kind() {
-            "scoped_identifier"
-            | "scoped_type_identifier"
-            | "qualified_identifier"
-            | "template_function"
-            | "template_method" => node.child_by_field_name("name"),
-            "generic_function" => node.child_by_field_name("function"),
-            "field_expression" => node.child_by_field_name("field"),
-            "attribute" => node.child_by_field_name("attribute"),
-            _ => None,
-        }?;
+        None
     }
-    None
-}
-pub(crate) fn collect(
-    language: &str,
-    node: Node<'_>,
-    text: &str,
-    owners: &BTreeMap<usize, usize>,
-    output: &mut CallFacts,
-) {
-    let is_call = match language {
-        "rust" | "c" | "cpp" => node.kind() == "call_expression",
-        "python" => node.kind() == "call",
-        _ => false,
-    };
-    if !is_call {
-        return;
+
+    pub(crate) fn collect(
+        &self,
+        node: Node<'_>,
+        text: &str,
+        owners: &BTreeMap<usize, usize>,
+        output: &mut CallFacts,
+    ) {
+        if node.kind() != self.kind {
+            return;
+        }
+        let Some(callee) = node.child_by_field_name(self.callee_field) else {
+            output.omitted += 1;
+            return;
+        };
+        record(
+            node,
+            callee.byte_range(),
+            self.name(callee, text),
+            text,
+            owners,
+            output,
+        );
     }
-    let Some(callee) = node.child_by_field_name("function") else {
-        output.omitted += 1;
-        return;
-    };
-    record(
-        node,
-        callee.byte_range(),
-        name(callee, text),
-        text,
-        owners,
-        output,
-    );
 }
 pub(crate) fn record(
     node: Node<'_>,

@@ -2,8 +2,19 @@
 
 use crate::{
     analysis::{Analyzer, LanguageAdapter},
+    calls::CallExpression,
     model::{Context, ContextId, ModelError},
-    syntax::{Declaration, SyntaxAnalyzer},
+    syntax::{CallRules, Declaration, SyntaxAnalyzer},
+};
+
+const CALLS: CallRules = CallRules {
+    expressions: Some(&CallExpression {
+        kind: "call",
+        callee_field: "function",
+        name_kinds: &["identifier"],
+        name_fields: &[("attribute", "attribute")],
+    }),
+    finish: None,
 };
 
 /// Registers raw Python syntax; imports and annotations are not resolved.
@@ -34,7 +45,11 @@ impl LanguageAdapter for PythonAdapter {
             self.context(),
             collect,
             declaration,
+            CALLS,
         )?))
+    }
+    fn supports_written_calls(&self) -> bool {
+        CALLS.supported()
     }
 }
 fn collect(node: tree_sitter::Node<'_>, text: &str, output: &mut Vec<Declaration>) {
