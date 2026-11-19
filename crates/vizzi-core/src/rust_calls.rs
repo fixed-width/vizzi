@@ -1,7 +1,7 @@
 //! Conservative source-local Rust `self` bindings; no import or general type inference.
 use crate::{
-    calls::{CallTarget, TargetBasis},
-    model::{Analysis, Coverage},
+    calls::{CallFacts, CallTarget, TargetBasis},
+    model::Coverage,
     syntax::Checkpoints,
 };
 use std::collections::{BTreeMap, BTreeSet};
@@ -104,16 +104,14 @@ fn direct_self(mut callee: Node<'_>) -> bool {
 pub(crate) fn bind(
     root: Node<'_>,
     text: &str,
-    analysis: &mut Analysis,
+    coverage: &Coverage,
     declarations: &BTreeMap<usize, usize>,
+    calls: &mut CallFacts,
     cancelled: &dyn Fn() -> bool,
 ) -> bool {
-    if analysis.coverage != Coverage::Syntax {
+    if *coverage != Coverage::Syntax {
         return true;
     }
-    let Some(calls) = &mut analysis.calls else {
-        return true;
-    };
     let captured = calls
         .sites
         .iter()

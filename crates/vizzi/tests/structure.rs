@@ -103,6 +103,7 @@ async fn structural_http_caps_schema_and_source_conflicts_are_bounded() {
         review_source::CaptureLimits,
         server::{diagnostic, diagnostic_request, router_with_companion},
     };
+    use vizzi_core::{analysis::Languages, python::PythonAdapter, rust::RustAdapter};
     let root = tempfile::tempdir().unwrap();
     let cache = tempfile::tempdir().unwrap();
     std::fs::write(
@@ -113,7 +114,14 @@ async fn structural_http_caps_schema_and_source_conflicts_are_bounded() {
     let host = Arc::new(
         Host::start_with_options(
             Engine::new(
-                Directory::open(root.path()).unwrap(),
+                Directory::with_languages(
+                    root.path(),
+                    Arc::new(
+                        Languages::new(vec![Arc::new(RustAdapter), Arc::new(PythonAdapter)])
+                            .unwrap(),
+                    ),
+                )
+                .unwrap(),
                 Cache::new(cache.path().join("analysis")),
                 1,
             )
@@ -149,6 +157,8 @@ async fn structural_http_caps_schema_and_source_conflicts_are_bounded() {
         .unwrap();
     assert_eq!(caps.status, 200);
     assert!(caps.body.contains("candidate_only"));
+    let capabilities: Value = serde_json::from_str(&caps.body).unwrap();
+    assert_eq!(capabilities["call_languages"], json!(["rust", "python"]));
     for (body, status) in [
         (
             json!({"snapshot":snapshot,"query":{"kind":"areas","search":"","offset":0}}),

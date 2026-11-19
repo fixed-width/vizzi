@@ -54,6 +54,10 @@ pub trait Analyzer {
 pub trait LanguageAdapter: Send + Sync {
     /// Identifies language, configuration, grammar, and implementation; stable per registration.
     fn context(&self) -> Context;
+    /// Reports whether the analyzer can produce raw written-call facts.
+    fn supports_written_calls(&self) -> bool {
+        false
+    }
     /// Creates one analyzer owned exclusively by its calling worker.
     fn create(&self) -> Result<Box<dyn Analyzer>, ModelError>;
 }
@@ -77,11 +81,13 @@ impl Language {
 /// Registered analyzer factories, independent of source selection.
 pub struct Languages {
     languages: BTreeMap<String, Arc<Language>>,
+    call_languages: Vec<String>,
 }
 impl Languages {
     /// Registers adapters, rejecting empty/duplicate language names and context identities.
     pub fn new(adapters: Vec<Arc<dyn LanguageAdapter>>) -> Result<Self, ModelError> {
         let mut languages = BTreeMap::new();
+        let mut call_languages = Vec::new();
         let mut contexts = std::collections::BTreeSet::new();
         for adapter in adapters {
             let context = adapter.context();
@@ -91,12 +97,18 @@ impl Languages {
                 ));
             }
             let key = context.language.clone();
+            if adapter.supports_written_calls() {
+                call_languages.push(key.clone());
+            }
             let language = Arc::new(Language { context, adapter });
             if languages.insert(key, language).is_some() {
                 return Err(ModelError("duplicate analyzer language".into()));
             }
         }
-        Ok(Self { languages })
+        Ok(Self {
+            languages,
+            call_languages,
+        })
     }
     /// Registers raw Rust, Python, Ruby, C, and C++ factories; policy selects inputs.
     pub fn builtin() -> Result<Self, ModelError> {
@@ -115,5 +127,9 @@ impl Languages {
     /// Lists registered language identifiers for source-policy construction.
     pub fn names(&self) -> impl Iterator<Item = &str> {
         self.languages.keys().map(String::as_str)
+    }
+    /// Lists analyzers with raw written-call support in registration order.
+    pub fn call_languages(&self) -> &[String] {
+        &self.call_languages
     }
 }

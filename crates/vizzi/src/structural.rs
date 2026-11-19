@@ -507,6 +507,9 @@ impl StructureHost {
     pub fn definitions_available(&self) -> bool {
         self.definitions.is_some()
     }
+    pub(crate) fn call_languages(&self) -> &[String] {
+        self.host.call_languages()
+    }
     /// Resolves only the captured call, rejecting source changes before returning an action.
     pub fn definition(
         &self,

@@ -2,8 +2,24 @@
 
 use crate::{
     analysis::{AnalysisResult, Analyzer, LanguageAdapter, SyntaxState},
+    calls::CallExpression,
     model::{Analysis, Context, ContextId, ModelError},
-    syntax::{Declaration, SyntaxAnalyzer},
+    syntax::{CallRules, Declaration, SyntaxAnalyzer},
+};
+
+const CALLS: CallRules = CallRules {
+    expressions: Some(&CallExpression {
+        kind: "call_expression",
+        callee_field: "function",
+        name_kinds: &["identifier", "field_identifier", "type_identifier"],
+        name_fields: &[
+            ("scoped_identifier", "name"),
+            ("scoped_type_identifier", "name"),
+            ("generic_function", "function"),
+            ("field_expression", "field"),
+        ],
+    }),
+    finish: Some(crate::rust_calls::bind),
 };
 
 /// Registers the Rust raw-syntax adapter.
@@ -14,6 +30,9 @@ impl LanguageAdapter for RustAdapter {
     }
     fn create(&self) -> Result<Box<dyn Analyzer>, ModelError> {
         Ok(Box::new(RustAnalyzer::new()?))
+    }
+    fn supports_written_calls(&self) -> bool {
+        CALLS.supported()
     }
 }
 
@@ -31,6 +50,7 @@ impl RustAnalyzer {
                 Self::context(),
                 collect,
                 declaration,
+                CALLS,
             )?,
         })
     }

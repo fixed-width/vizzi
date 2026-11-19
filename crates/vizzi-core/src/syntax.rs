@@ -2,6 +2,7 @@
 
 use crate::{
     analysis::{AnalysisResult, Analyzer, SyntaxState},
+    calls::{CallExpression, CallFacts},
     coloring::{Coloring, INDEX_BYTES, Style},
     model::{Analysis, ContentId, Context, Coverage, Fact, ModelError},
     syntax_state::edit_between,
@@ -49,6 +50,26 @@ impl Declaration {
 
 type Collector = fn(tree_sitter::Node<'_>, &str, &mut Vec<Declaration>);
 type Scope = fn(tree_sitter::Node<'_>, &str) -> Option<(&'static str, String)>;
+type FinishCalls = fn(
+    tree_sitter::Node<'_>,
+    &str,
+    &Coverage,
+    &BTreeMap<usize, usize>,
+    &mut CallFacts,
+    &dyn Fn() -> bool,
+) -> bool;
+
+#[derive(Clone, Copy, Default)]
+pub(crate) struct CallRules {
+    pub expressions: Option<&'static CallExpression>,
+    pub finish: Option<FinishCalls>,
+}
+
+impl CallRules {
+    pub(crate) const fn supported(&self) -> bool {
+        self.expressions.is_some() || self.finish.is_some()
+    }
+}
 
 pub(crate) struct SyntaxAnalyzer {
     parser: tree_sitter::Parser,
@@ -56,6 +77,7 @@ pub(crate) struct SyntaxAnalyzer {
     context: Context,
     declarations: Collector,
     scope: Scope,
+    calls: CallRules,
 }
 impl SyntaxAnalyzer {
     pub(crate) fn new(
@@ -64,6 +86,7 @@ impl SyntaxAnalyzer {
         context: Context,
         declarations: Collector,
         scope: Scope,
+        calls: CallRules,
     ) -> Result<Self, ModelError> {
         let mut parser = tree_sitter::Parser::new();
         parser
@@ -76,6 +99,7 @@ impl SyntaxAnalyzer {
             context,
             declarations,
             scope,
+            calls,
         })
     }
 }
@@ -175,7 +199,7 @@ impl SyntaxAnalyzer {
             return Ok(None);
         }
         let mut analysis = Analysis {
-            calls: crate::calls::supported(&self.context.language).then(Default::default),
+            calls: None,
             coloring: None,
             content: ContentId::derive(&[bytes]),
             context: self.context.clone(),
@@ -184,7 +208,6 @@ impl SyntaxAnalyzer {
             diagnostics: Vec::new(),
         };
         let Ok(text) = std::str::from_utf8(bytes) else {
-            analysis.calls = None;
             analysis.coverage = Coverage::Unavailable;
             analysis
                 .diagnostics
@@ -241,6 +264,10 @@ impl SyntaxAnalyzer {
         }
         let mut cursor = tree.walk();
         let mut declarations = Vec::new();
+        let mut calls = self
+            .calls
+            .expressions
+            .map(|expressions| (expressions, Default::default()));
         let mut scope_facts = BTreeMap::<usize, usize>::new();
         let mut checkpoints = Checkpoints {
             cancelled,
@@ -298,8 +325,8 @@ impl SyntaxAnalyzer {
                     });
                 }
             }
-            if let Some(calls) = &mut analysis.calls {
-                crate::calls::collect(&self.context.language, node, text, &scope_facts, calls);
+            if let Some((expressions, facts)) = &mut calls {
+                expressions.collect(node, text, &scope_facts, facts);
             }
             if cursor.goto_first_child() {
                 continue;
@@ -334,24 +361,15 @@ impl SyntaxAnalyzer {
                     if cancelled() {
                         return Ok(None);
                     }
-                    if self.context.language == "ruby" {
-                        let Some(calls) = crate::ruby_calls::collect(
-                            tree.root_node(),
-                            text,
-                            &scope_facts,
-                            cancelled,
-                        ) else {
-                            return Ok(None);
-                        };
-                        analysis.calls = Some(calls);
-                    }
                     drop(cursor);
-                    if self.context.language == "rust"
-                        && !crate::rust_calls::bind(
+                    analysis.calls = calls.map(|(_, facts)| facts);
+                    if let Some(finish) = self.calls.finish
+                        && !finish(
                             tree.root_node(),
                             text,
-                            &mut analysis,
+                            &analysis.coverage,
                             &scope_facts,
+                            analysis.calls.get_or_insert_with(CallFacts::default),
                             cancelled,
                         )
                     {
@@ -394,6 +412,111 @@ mod tests {
     }
 
     #[test]
+    fn registered_syntax_can_extract_written_calls_under_a_new_language_name() {
+        use crate::analysis::{LanguageAdapter, Languages};
+        use std::sync::Arc;
+
+        const CALLS: CallRules = CallRules {
+            expressions: Some(&CallExpression {
+                kind: "call",
+                callee_field: "function",
+                name_kinds: &["identifier"],
+                name_fields: &[("attribute", "attribute")],
+            }),
+            finish: None,
+        };
+
+        struct FixtureAdapter {
+            name: &'static str,
+            calls: CallRules,
+        }
+
+        impl LanguageAdapter for FixtureAdapter {
+            fn context(&self) -> Context {
+                Context {
+                    language: self.name.into(),
+                    description: "Test syntax adapter".into(),
+                    id: crate::model::ContextId::derive(&[self.name.as_bytes()]),
+                }
+            }
+
+            fn create(&self) -> Result<Box<dyn Analyzer>, ModelError> {
+                Ok(Box::new(SyntaxAnalyzer::new(
+                    tree_sitter_python::LANGUAGE.into(),
+                    tree_sitter_python::HIGHLIGHTS_QUERY,
+                    self.context(),
+                    |_, _, _| {},
+                    no_scope,
+                    self.calls,
+                )?))
+            }
+
+            fn supports_written_calls(&self) -> bool {
+                self.calls.supported()
+            }
+        }
+
+        let languages = Languages::new(vec![
+            Arc::new(FixtureAdapter {
+                name: "outline",
+                calls: CallRules::default(),
+            }),
+            Arc::new(FixtureAdapter {
+                name: "fixture",
+                calls: CALLS,
+            }),
+        ])
+        .unwrap();
+        assert_eq!(languages.call_languages(), ["fixture"]);
+        let analyze = |language| {
+            languages
+                .select(language)
+                .unwrap()
+                .create()
+                .unwrap()
+                .analyze(b"receiver.run()")
+                .unwrap()
+        };
+        assert!(analyze("outline").calls.is_none());
+        let calls = analyze("fixture")
+            .calls
+            .expect("fixture supports written calls");
+        assert_eq!(calls.sites.len(), 1);
+        assert_eq!(calls.sites[0].name.as_deref(), Some("run"));
+    }
+
+    #[test]
+    fn an_expression_missing_the_adapters_callee_field_counts_as_omitted() {
+        use crate::analysis::LanguageAdapter;
+
+        let mut analyzer = SyntaxAnalyzer::new(
+            tree_sitter_ruby::LANGUAGE.into(),
+            include_str!("ruby-highlights.scm"),
+            crate::ruby::RubyAdapter.context(),
+            |_, _, _| {},
+            no_scope,
+            CallRules {
+                expressions: Some(&CallExpression {
+                    kind: "call",
+                    callee_field: "method",
+                    name_kinds: &["identifier"],
+                    name_fields: &[],
+                }),
+                finish: None,
+            },
+        )
+        .unwrap();
+        let written_calls = analyzer.analyze(b"receiver.()").unwrap().calls.unwrap();
+        assert_eq!(
+            written_calls,
+            CallFacts {
+                sites: Vec::new(),
+                omitted: 1,
+            }
+        );
+    }
+
+    #[test]
     fn parser_progress_interrupts_before_declaration_collection() {
         let mut analyzer = SyntaxAnalyzer::new(
             tree_sitter_rust::LANGUAGE.into(),
@@ -401,6 +524,7 @@ mod tests {
             crate::rust::RustAnalyzer::context(),
             counting,
             no_scope,
+            CallRules::default(),
         )
         .unwrap();
         VISITED.set(0);
@@ -430,6 +554,7 @@ mod tests {
             crate::rust::RustAnalyzer::context(),
             counting,
             no_scope,
+            CallRules::default(),
         )
         .unwrap();
         VISITED.set(0);
@@ -460,6 +585,7 @@ mod tests {
             crate::rust::RustAnalyzer::context(),
             counting,
             no_scope,
+            CallRules::default(),
         )
         .unwrap();
         VISITED.set(0);

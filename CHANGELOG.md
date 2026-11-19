@@ -6,6 +6,10 @@ remains in Git and the project documentation.
 
 ## Unreleased
 
+### Fixed
+
+- Structural capabilities report written-call support from the host's registered analyzers.
+
 ## 0.2.0 - 2026-11-19
 
 ### Changed

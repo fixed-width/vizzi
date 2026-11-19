@@ -2,10 +2,26 @@
 
 use crate::{
     analysis::{Analyzer, LanguageAdapter},
+    calls::CallExpression,
     model::{Context, ContextId, ModelError},
-    syntax::{Declaration, SyntaxAnalyzer},
+    syntax::{CallRules, Declaration, SyntaxAnalyzer},
 };
 use tree_sitter::Node;
+
+const CALLS: CallRules = CallRules {
+    expressions: Some(&CallExpression {
+        kind: "call_expression",
+        callee_field: "function",
+        name_kinds: &["identifier", "field_identifier", "type_identifier"],
+        name_fields: &[
+            ("field_expression", "field"),
+            ("qualified_identifier", "name"),
+            ("template_function", "name"),
+            ("template_method", "name"),
+        ],
+    }),
+    finish: None,
+};
 
 /// Registers raw C syntax for explicitly selected C inputs.
 pub struct CAdapter;
@@ -23,7 +39,11 @@ impl LanguageAdapter for CAdapter {
             self.context(),
             collect,
             scope,
+            CALLS,
         )?))
+    }
+    fn supports_written_calls(&self) -> bool {
+        CALLS.supported()
     }
 }
 /// Registers raw C++ syntax for explicitly selected C++ inputs.
@@ -46,7 +66,11 @@ impl LanguageAdapter for CppAdapter {
             self.context(),
             collect,
             scope,
+            CALLS,
         )?))
+    }
+    fn supports_written_calls(&self) -> bool {
+        CALLS.supported()
     }
 }
 fn context(language: &str, description: &str) -> Context {

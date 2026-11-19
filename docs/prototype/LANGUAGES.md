@@ -21,6 +21,13 @@ does not select source extensions; the [portable source policy](SOURCE_POLICY.md
 There is one configured raw context per assigned file in this host; the immutable
 document model also permits multiple analyses.
 
+The built-in syntax adapters specify written-call extraction when constructing their
+worker-local parser. Simple call expressions are collected during declaration traversal.
+An adapter can also analyze the completed tree, as Ruby does for lexical locals and
+Rust does for source-local bindings. The shared call recorder owns source ranges and
+limits. The structural capabilities response lists the registered analyzers that declare
+written-call support. Individual files still report their own analysis coverage.
+
 `Languages::builtin` registers:
 
 | Language | Selected inputs | Extracted declarations | Limits |

@@ -353,6 +353,9 @@ impl Directory {
     pub(crate) fn language(&self, classification: &Classification) -> Option<&Language> {
         self.languages.select(classification.assigned_language()?)
     }
+    pub(crate) fn call_languages(&self) -> &[String] {
+        self.languages.call_languages()
+    }
     pub(crate) fn relative_key(&self, path: &Path) -> io::Result<Option<String>> {
         let mut parts = Vec::new();
         for component in path.components() {
