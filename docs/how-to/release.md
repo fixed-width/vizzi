@@ -34,9 +34,11 @@ and macOS Intel/Apple Silicon. Each archive contains `vizzi`, a short README, bu
 version/target metadata and the existing third-party notice. Linux uses musl; macOS
 uses ad-hoc signing, not Developer ID notarization.
 
-After all four builds pass, the publication job creates a draft with four archives
-and `SHA256SUMS`, verifies the uploaded bytes, then publishes it. Check that the release
-is marked immutable. GitHub also generates source archives and release attestations.
+Each build also packages the executable in a VS Code extension for its platform.
+After the platform builds and browser checks pass, the publication job creates a draft
+with four archives, four VSIX files and `SHA256SUMS`. It verifies the uploaded bytes
+before publishing. Check that the release is marked immutable. GitHub also generates
+source archives and release attestations.
 You can verify an available release using `gh release verify TAG` and verify downloaded
 archive checksums with `sha256sum --check SHA256SUMS` (Linux) or
 `shasum -a 256 --check SHA256SUMS` (macOS).
