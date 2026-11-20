@@ -138,6 +138,8 @@ fn dependency_source_windows_calls_refresh_and_editor_verification_keep_their_ow
             package: "helper".into(),
             version: Some("1.2.3".into()),
             configuration: "a".repeat(64),
+            mirror_path: None,
+            installation: None,
         })
         .unwrap();
     let app = StructureHost::with_definitions(

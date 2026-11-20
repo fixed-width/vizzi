@@ -14,11 +14,15 @@ remains in Git and the project documentation.
   and references. Bubbles show captured package names, including in function history.
 - Enable standalone JavaScript and TypeScript definitions and references with
   `--typescript-server` and the native language server in TypeScript 7 or newer.
+- Follow definitions into installed JavaScript and TypeScript packages with managed
+  TypeScript or VS Code sharing. Dependency bubbles retain package names and versions.
 - JavaScript and TypeScript outlines show variable-bound object methods, anonymous
   argument callbacks, and named TypeScript signatures.
 
 ### Fixed
 
+- Refresh installed JavaScript and TypeScript resolutions after package manifest edits.
+  Restore package references after restart and preserve VS Code package aliases.
 - Managed TypeScript preserves alias precedence, scopes config errors to affected
   projects, and handles BOM-marked configs and lookups in large source files.
 

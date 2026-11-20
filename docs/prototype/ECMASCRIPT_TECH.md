@@ -70,7 +70,8 @@ selected project with a bounded response before navigation proceeds. The semanti
 configuration digest covers relevant captured paths and content, so a changed
 source or project input starts a fresh server on the next query. This covers
 cross-file re-resolution without waiting for asynchronous filesystem events.
-External locations remain outside the capture.
+Installed package files are admitted through the dependency catalog after
+rechecking returned locations. [Dependency sources](../visual/DEPENDENCIES_TECH.md)
 [Native server command](https://github.com/microsoft/TypeScript/blob/main/tsc/cmd/tsc/lsp.go) ·
 [Native server initialization and settings](https://github.com/microsoft/TypeScript/blob/main/tsc/internal/lsp/server.go)
 

@@ -6,6 +6,7 @@ pub mod application;
 pub mod cache;
 pub mod changes;
 pub mod companion;
+mod ecmascript_dependencies;
 pub mod editor;
 mod editor_bridge;
 pub mod engine;

@@ -40,7 +40,7 @@ async function main() {
     await fs.mkdir(javascript);
     const files = {
       'tsconfig.json': JSON.stringify({
-        compilerOptions: { module: 'ESNext', moduleResolution: 'Bundler', allowJs: true,
+        compilerOptions: { module: 'ESNext', moduleResolution: 'Bundler', allowJs: true, preserveSymlinks: true,
           jsx: 'preserve', paths: { '@project/*': ['./*'] } },
         typeAcquisition: { enable: false },
       }),
@@ -48,8 +48,16 @@ async function main() {
       'service.ts': 'export class Service { "run"() { return 1; } }\nexport class Other { run() { return 2; } }\n',
       'start.ts': 'import { executeJob as launch } from "@project/worker.mjs";\nimport type { Service } from "@project/service";\nexport function start(service: Service) { return launch() + service.run(); }\n',
       'view.tsx': 'import { Service } from "@project/service";\nimport { start } from "@project/start";\nexport const Card = () => <span>{start(new Service())}</span>;\n',
+      'consumer.ts': 'import { installedWork } from "fixture-pkg";\nexport function readPackage() { return installedWork(); }\n',
     };
     for (const [name, source] of Object.entries(files)) await fs.writeFile(path.join(javascript, name), source);
+    const alias = path.join(javascript, 'node_modules', 'fixture-pkg');
+    const installed = process.platform === 'win32' ? alias :
+      path.join(javascript,'node_modules','.pnpm','fixture-pkg@2.4.0','node_modules','fixture-pkg');
+    await fs.mkdir(installed, {recursive:true});
+    await fs.writeFile(path.join(installed, 'package.json'), '{"name":"fixture-pkg","version":"2.4.0","exports":"./index.ts"}');
+    await fs.writeFile(path.join(installed, 'index.ts'), 'export function installedWork() { return localHelper(); }\nfunction localHelper() { return 9; }\n');
+    if (installed !== alias) await fs.symlink(installed, alias, 'dir');
   }
   if(sourceBrowser) {
     await fs.writeFile(path.join(project,'a.py'),'def leaf(): pass\n'+Array.from({length:180},(_,i)=>'# source marker '+i+'\n').join('')+'VALUE = 42\n');

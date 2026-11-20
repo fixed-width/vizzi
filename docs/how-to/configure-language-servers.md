@@ -31,9 +31,12 @@ project that includes both JavaScript and TypeScript.
 
 The managed provider disables automatic type acquisition and compiler plugins.
 It reopens its captured project after a relevant source or config change.
-Definitions outside the captured project appear as outside results. If the
-server or project settings are unavailable, the call workspace retains
-written-name evidence.
+Definitions in installed packages can open dependency bubbles from local
+`node_modules`. TypeScript may supply a declaration file. Whether it includes
+untyped JavaScript package implementations follows the project's `allowJs` and
+`maxNodeModuleJsDepth` settings. The default project includes JavaScript at depth
+one. Other outside targets remain outside. If the server or project settings
+are unavailable, the call workspace retains written-name evidence.
 
 ## JavaScript and TypeScript with VS Code
 
@@ -46,8 +49,8 @@ The editor's active project configuration determines its imports, types and alia
 [VS Code TypeScript navigation](https://code.visualstudio.com/docs/typescript/typescript-editing#_code-navigation)
 
 Save workspace buffers before looking up definitions or references. Vizzi verifies
-locations against captured source. Installed dependencies outside captured scope
-appear as outside results.
+locations against captured source and can open provider-reached source from the
+workspace's installed packages.
 
 ## Python with Pyright
 

@@ -263,6 +263,263 @@ fn managed_typescript_resolves_captured_aliases_references_and_cross_file_edits(
 }
 
 #[test]
+#[cfg(unix)]
+fn managed_typescript_rechecks_reached_package_exports_when_the_manifest_changes() {
+    let Some(fixture) = TypeScriptFixture::new(&[
+        (
+            "app.ts",
+            "import { work } from 'edited-pkg';\nexport function launch() { return work(); }",
+        ),
+        (
+            "node_modules/edited-pkg/package.json",
+            r#"{"name":"edited-pkg","version":"1.0.0","exports":"./old.ts"}"#,
+        ),
+        (
+            "node_modules/edited-pkg/old.ts",
+            "export function work() { return 1; }",
+        ),
+        (
+            "node_modules/edited-pkg/new.ts",
+            "export function work() { return 2; }",
+        ),
+    ]) else {
+        return;
+    };
+    let before = fixture.call("app.ts").unwrap();
+    assert_eq!(before.locations[0].path, "old.ts");
+    let before_id = before.locations[0].capture.as_deref().unwrap();
+    let package = fixture
+        .directory
+        .path()
+        .join("project/node_modules/edited-pkg");
+    std::fs::write(
+        package.join("package.json"),
+        r#"{"name":"edited-pkg","version":"2.0.0","exports":"./new.ts"}"#,
+    )
+    .unwrap();
+    let after = fixture.call("app.ts").unwrap();
+    assert_eq!(after.locations[0].path, "new.ts");
+    let catalog = fixture.provider.dependencies().unwrap();
+    let old = catalog.get(before_id).unwrap().unwrap();
+    let new = catalog
+        .get(after.locations[0].capture.as_deref().unwrap())
+        .unwrap()
+        .unwrap();
+    assert_eq!(old.origin.version.as_deref(), Some("1.0.0"));
+    assert_eq!(new.origin.version.as_deref(), Some("2.0.0"));
+    std::fs::write(
+        package.join("package.json"),
+        r#"{"name":"edited-pkg","version":"2.0.0","exports":"./old.ts"}"#,
+    )
+    .unwrap();
+    let same_version_edit = fixture.call("app.ts").unwrap();
+    assert_eq!(same_version_edit.locations[0].path, "old.ts");
+    assert_ne!(
+        same_version_edit.locations[0].capture.as_deref(),
+        Some(before_id)
+    );
+}
+
+#[test]
+#[cfg(unix)]
+fn managed_typescript_restores_the_importing_project_for_package_references() {
+    let Some(fixture) = TypeScriptFixture::new(&[
+        (
+            "app.ts",
+            "import { work } from 'restored-pkg';\nexport function launch() { return work(); }",
+        ),
+        (
+            "node_modules/restored-pkg/package.json",
+            r#"{"name":"restored-pkg","exports":"./entry.ts"}"#,
+        ),
+        (
+            "node_modules/restored-pkg/entry.ts",
+            "export function work() { return 7; }",
+        ),
+    ]) else {
+        return;
+    };
+    let definition = fixture.call("app.ts").unwrap();
+    let id = definition.locations[0].capture.as_deref().unwrap();
+    let fresh = Servers::new(
+        fixture.directory.path().join("project"),
+        fixture.directory.path().join("semantic"),
+        Configuration {
+            typescript_server: std::env::var_os("VIZZI_TYPESCRIPT_SERVER").map(Into::into),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let restored = fresh.dependencies().unwrap().get(id).unwrap().unwrap();
+    let target = restored
+        .index
+        .functions("", "work", 0)
+        .unwrap()
+        .items
+        .remove(0)
+        .symbol;
+    let target = restored.symbol(target);
+    let identifier = restored.index.identifier(&target.id).unwrap();
+    let answer = fresh
+        .references(fixture.snapshot.clone(), &target, identifier)
+        .unwrap();
+    assert!(
+        answer
+            .locations
+            .iter()
+            .any(|location| location.path == "app.ts" && location.position.line == 1),
+        "{answer:?}"
+    );
+}
+
+#[test]
+#[cfg(unix)]
+fn managed_typescript_follows_installed_packages_and_retains_the_resolution_path() {
+    let Some(fixture) = TypeScriptFixture::new(&[
+        (
+            "tsconfig.json",
+            r#"{"compilerOptions":{"allowJs":true,"maxNodeModuleJsDepth":1,"module":"ESNext","moduleResolution":"Bundler","preserveSymlinks":true}}"#,
+        ),
+        (
+            "apps/client/app.ts",
+            "import { work } from '@demo/router';\nexport function launch() { return work(); }",
+        ),
+        (
+            "apps/client/node_modules/@demo/router/package.json",
+            r#"{"name":"@demo/router","version":"1.2.3","exports":"./entry.mjs"}"#,
+        ),
+        (
+            "apps/client/node_modules/@demo/router/entry.mjs",
+            "import { downstream } from 'worker-pkg';\nexport function work() { return downstream(); }",
+        ),
+        (
+            "node_modules/worker-pkg/package.json",
+            r#"{"name":"worker-pkg","version":"4.5.6","exports":"./entry.ts"}"#,
+        ),
+        (
+            "node_modules/worker-pkg/entry.ts",
+            "export function downstream() { return 7; }",
+        ),
+    ]) else {
+        return;
+    };
+    assert_eq!(fixture.snapshot.documents().len(), 2);
+    let answer = fixture.call("apps/client/app.ts").unwrap();
+    assert_eq!(answer.locations.len(), 1, "{answer:?}");
+    assert!(answer.locations[0].capture.is_some(), "{answer:?}");
+    let catalog = fixture.provider.dependencies().unwrap();
+    let open = |location: &vizzi::definitions::Location| {
+        let capture = catalog
+            .get(location.capture.as_deref().unwrap())
+            .unwrap()
+            .unwrap();
+        let at = vizzi::definitions::byte_offset(
+            capture.doc().resident_source().unwrap(),
+            location.position,
+        )
+        .unwrap();
+        let symbol = capture.index.definition(capture.doc().path(), at).unwrap();
+        let symbol = capture.symbol(symbol);
+        (capture, symbol)
+    };
+    let (router, work) = open(&answer.locations[0]);
+    assert_eq!(router.origin.label, "@demo/router");
+    assert_eq!(router.origin.version.as_deref(), Some("1.2.3"));
+    assert_eq!(
+        router.input.mirror_path.as_deref(),
+        Some("apps/client/node_modules/@demo/router/entry.mjs")
+    );
+    assert_eq!(work.name, "work");
+    let site = router.calls(&work.id, 0).unwrap().items.remove(0);
+    let next = fixture
+        .provider
+        .resolve(
+            fixture.snapshot.clone(),
+            &router.index.call(&site.id).unwrap(),
+        )
+        .unwrap();
+    assert_eq!(next.locations.len(), 1, "{next:?}");
+    assert!(next.locations[0].capture.is_some(), "{next:?}");
+    let (worker, downstream) = open(&next.locations[0]);
+    assert_eq!(worker.origin.label, "worker-pkg");
+    assert_eq!(worker.origin.version.as_deref(), Some("4.5.6"));
+    assert_eq!(downstream.name, "downstream");
+    let references = fixture
+        .provider
+        .references(
+            fixture.snapshot.clone(),
+            &downstream,
+            worker.index.identifier(&downstream.id).unwrap(),
+        )
+        .unwrap();
+    assert!(
+        references
+            .locations
+            .iter()
+            .any(|location| location.capture.as_deref() == Some(router.origin.capture.as_str())),
+        "{references:?}"
+    );
+    std::fs::write(
+        router.path(),
+        "// moved\nexport function work() { return 8; }",
+    )
+    .unwrap();
+    assert!(router.verify().is_err());
+    assert!(
+        router
+            .doc()
+            .resident_source()
+            .unwrap()
+            .contains("downstream()")
+    );
+    let refreshed = fixture.call("apps/client/app.ts").unwrap();
+    assert_eq!(refreshed.locations.len(), 1, "{refreshed:?}");
+    let (new, updated) = open(&refreshed.locations[0]);
+    assert_ne!(new.origin.capture, router.origin.capture);
+    assert_eq!(updated.source.line, 2);
+}
+
+#[test]
+#[cfg(unix)]
+fn managed_typescript_admits_installed_declarations_using_local_package_exports() {
+    let Some(fixture) = TypeScriptFixture::new(&[
+        (
+            "app.ts",
+            "import { work } from 'typed-pkg';\nexport function launch() { return work(); }",
+        ),
+        (
+            "node_modules/typed-pkg/package.json",
+            r#"{"name":"typed-pkg","version":"1.0.0","exports":{"types":"./entry.d.ts","default":"./entry.js"}}"#,
+        ),
+        (
+            "node_modules/typed-pkg/entry.d.ts",
+            "export function work(): number;",
+        ),
+        (
+            "node_modules/typed-pkg/entry.js",
+            "export function work() { return 3; }",
+        ),
+    ]) else {
+        return;
+    };
+    let answer = fixture.call("app.ts").unwrap();
+    assert_eq!(answer.locations.len(), 1, "{answer:?}");
+    let target = &answer.locations[0];
+    let catalog = fixture.provider.dependencies().unwrap();
+    let capture = catalog
+        .get(target.capture.as_deref().unwrap())
+        .unwrap()
+        .unwrap();
+    assert_eq!(capture.doc().path(), "entry.d.ts");
+    let at =
+        vizzi::definitions::byte_offset(capture.doc().resident_source().unwrap(), target.position)
+            .unwrap();
+    let symbol = capture.index.definition(capture.doc().path(), at).unwrap();
+    assert_eq!(symbol.name, "work");
+    assert_eq!(symbol.kind, "signature");
+}
+
+#[test]
 fn managed_typescript_keeps_equal_prefix_path_mappings_in_captured_order() {
     let Some(fixture) = TypeScriptFixture::new(&[
         (
@@ -381,7 +638,7 @@ fn managed_typescript_resolves_a_call_without_requesting_a_large_outline() {
 struct TypeScriptFixture {
     provider: Servers,
     snapshot: Arc<Snapshot>,
-    _directory: tempfile::TempDir,
+    directory: tempfile::TempDir,
 }
 
 impl TypeScriptFixture {
@@ -414,7 +671,7 @@ impl TypeScriptFixture {
         Some(Self {
             provider,
             snapshot,
-            _directory: directory,
+            directory,
         })
     }
 
@@ -460,6 +717,8 @@ fn managed_servers_expose_the_shared_catalog_for_admitted_dependency_source() {
             package: "fixture".into(),
             version: None,
             configuration: "a".repeat(64),
+            mirror_path: None,
+            installation: None,
         })
         .unwrap();
     let retained = servers

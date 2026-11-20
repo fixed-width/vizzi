@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
+const {pathToFileURL} = require('node:url');
 const {createProvider} = require('./providers.cjs');
 
 async function fixture(t) {
@@ -94,7 +95,48 @@ test('dependency queries use their captured canonical Rust path and reject stale
   });
   assert.equal((await f.provider.query({...request,method:'dependency-references'})).locations[0].path,f.uri.fsPath);
   await assert.rejects(f.provider.query({...request,text:'older bytes'}),/captured/);
-  await assert.rejects(f.provider.query({...request,path:f.uri.fsPath}),/external Rust/);
+  await assert.rejects(f.provider.query({...request,path:f.uri.fsPath}),/captured Rust or installed package/);
+});
+
+test('package aliases retain the provider URI while escaping links count as outside', {skip:process.platform==='win32'}, async t=>{
+  const f = await fixture(t);
+  const physical = path.join(f.root,'node_modules','.pnpm','fixture@1','node_modules','fixture');
+  const link = path.join(f.root,'node_modules','fixture');
+  const workspacePackage = path.join(f.root,'packages','local');
+  const escaping = path.join(f.root,'node_modules','local');
+  const text = 'export function work() {}\n';
+  for (const folder of [physical,workspacePackage]) {
+    await fs.mkdir(folder,{recursive:true});
+    await fs.writeFile(path.join(folder,'entry.ts'),text);
+  }
+  await fs.symlink(physical,link,'dir');
+  await fs.symlink(workspacePackage,escaping,'dir');
+  const file = path.join(physical,'entry.ts');
+  const uri = candidate => ({scheme:'file',fsPath:candidate,toString:()=>pathToFileURL(candidate).href});
+  const alias = uri(path.join(link,'entry.ts'));
+  const selection = {start:{line:0,character:16}};
+  f.vscode.workspace.openTextDocument = async target=>target.fsPath===alias.fsPath
+    ? {uri:alias,isDirty:false,getText:()=>text,lineCount:2,lineAt:()=>({text})}
+    : f.doc;
+  f.vscode.Uri.parse = value=>{assert.equal(value,alias.toString());return alias;};
+  f.setExecute(async()=>[
+    {uri:uri(path.join(escaping,'entry.ts')),range:selection},
+    {uri:alias,range:selection},
+  ]);
+  const result = await f.provider.query(f.request);
+  assert.equal(result.outside,1);
+  assert.equal(result.locations[0].path,file);
+  assert.equal(result.locations[0].providerUri,alias.toString());
+  f.setExecute(async(command,target)=>{
+    assert.equal(command,'vscode.executeReferenceProvider');
+    assert.equal(target.fsPath,alias.fsPath);
+    return [{uri:f.uri,range:{start:{line:2,character:11}}}];
+  });
+  const follow = {...f.request,method:'dependency-references',path:file,providerUri:alias.toString(),text,position:selection.start};
+  assert.equal((await f.provider.query(follow)).locations[0].path,f.uri.fsPath);
+  await fs.unlink(link);
+  await fs.symlink(workspacePackage,link,'dir');
+  await assert.rejects(f.provider.query(follow),/resolution path|alias/i);
 });
 
 test('dependency text changing while function ranges are queried is rejected',async t=>{

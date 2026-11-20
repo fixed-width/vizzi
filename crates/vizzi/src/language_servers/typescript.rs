@@ -2,9 +2,13 @@
 
 use super::{
     inputs::{InputFiles, Inputs, PreparedInputs, absolute, save},
-    project::{ExternalSource, Profile},
+    project::Profile,
 };
-use crate::lsp::{Client, DocumentSync, Setup, uri};
+use crate::{
+    dependency_sources::Input,
+    ecmascript_dependencies::{self, Installations},
+    lsp::{Client, DocumentSync, Setup, uri},
+};
 use jsonc_parser::cst::{CstInputValue, CstRootNode};
 use serde_json::{Map, Value, json};
 use std::{
@@ -37,9 +41,10 @@ impl Profile for TypeScript {
         }
     }
 
-    fn inputs<'a>(&'a self, _: &'a Path, snapshot: &'a Snapshot) -> Result<Inputs<'a>, String> {
+    fn inputs<'a>(&'a self, root: &'a Path, snapshot: &'a Snapshot) -> Result<Inputs<'a>, String> {
         let mut captured = blake3::Hasher::new();
         let mut metadata = Vec::new();
+        let mut search_paths = Vec::new();
         let mut bytes = 0;
         for doc in snapshot.documents() {
             if is_project_input(doc) {
@@ -62,16 +67,32 @@ impl Profile for TypeScript {
             captured.update(&(doc.path().len() as u64).to_le_bytes());
             captured.update(doc.path().as_bytes());
             captured.update(doc.content().as_str().as_bytes());
+            search_paths.push(doc.path());
         }
+        let installed = Installations::discover(root, search_paths)?;
+        installed.fingerprint(&mut captured);
         Ok(InputFiles::default().freeze(
             &format!("typescript:{}", captured.finalize().to_hex()),
-            &[include_bytes!("typescript.rs")],
-            move |mirror| prepare(mirror, &metadata),
+            &[
+                include_bytes!("typescript.rs"),
+                include_bytes!("../ecmascript_dependencies.rs"),
+            ],
+            move |mirror| {
+                let prepared = prepare(mirror, &metadata)?;
+                installed.link(mirror)?;
+                Ok(prepared)
+            },
         ))
     }
 
-    fn external_source<'a>(&self, _: &'a Path, _: &'a str) -> Option<ExternalSource<'a>> {
-        None
+    fn dependency_input(
+        &self,
+        root: &Path,
+        path: &Path,
+        configuration: &str,
+        _: &str,
+    ) -> Result<Input, String> {
+        ecmascript_dependencies::input(root, path, configuration)
     }
 
     fn project_error(
@@ -184,7 +205,8 @@ fn save_placeholder(path: &Path, mirror: &Path, original: Option<&Value>) -> Res
     let mut config = json!({
         "compilerOptions": {
             "allowJs": true, "jsx": "preserve", "noEmit": true,
-            "module": "esnext", "moduleResolution": "bundler", "types": []
+            "module": "esnext", "moduleResolution": "bundler", "types": [],
+            "maxNodeModuleJsDepth": 1
         },
         "typeAcquisition": {"enable": false}
     });

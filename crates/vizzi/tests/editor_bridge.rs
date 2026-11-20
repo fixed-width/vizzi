@@ -192,6 +192,67 @@ fn editor_definitions_and_references_reuse_the_connection_with_captured_position
 }
 
 #[test]
+#[cfg(unix)]
+fn editor_package_references_use_the_original_provider_uri() {
+    let fixture = Fixture::new();
+    let package = fixture
+        .root
+        .join("node_modules/.pnpm/linked@1/node_modules/linked");
+    let alias = fixture.root.join("node_modules/linked");
+    fs::create_dir_all(&package).unwrap();
+    fs::write(
+        package.join("package.json"),
+        r#"{"name":"linked","version":"1.0.0"}"#,
+    )
+    .unwrap();
+    let text = "export function work() {}\n";
+    let file = package.join("entry.ts");
+    fs::write(&file, text).unwrap();
+    std::os::unix::fs::symlink(&package, &alias).unwrap();
+    let provider_uri = url::Url::from_file_path(alias.join("entry.ts"))
+        .unwrap()
+        .to_string();
+    let response = json!({"version":1,"status":"ok","session":"session","epoch":1,"outside":0,
+        "locations":[{"path":file,"providerUri":provider_uri,"position":{"line":0,"character":16},"text":text}]});
+    let peer = Peer::start(&fixture, move |_| frame(response));
+    let provider = fixture.provider();
+    let answer = provider
+        .resolve(fixture.snapshot.clone(), &fixture.call())
+        .unwrap();
+    peer.finish();
+    let capture = provider
+        .dependencies()
+        .unwrap()
+        .get(answer.locations[0].capture.as_deref().unwrap())
+        .unwrap()
+        .unwrap();
+    let target = capture
+        .index
+        .functions("", "work", 0)
+        .unwrap()
+        .items
+        .remove(0)
+        .symbol;
+    let target = capture.symbol(target);
+    let identifier = capture.index.identifier(&target.id).unwrap();
+    let response = fixture.answer();
+    let peer = Peer::start(&fixture, move |_| frame(response));
+    let references = provider
+        .references(fixture.snapshot.clone(), &target, identifier)
+        .unwrap();
+    assert_eq!(references.locations[0].path, "a.py");
+    let request = peer.finish();
+    assert_eq!(request["method"], "dependency-references");
+    assert_eq!(request["path"], json!(file));
+    assert_eq!(request["providerUri"], provider_uri);
+    fs::remove_file(&alias).unwrap();
+    let error = provider
+        .references(fixture.snapshot.clone(), &target, identifier)
+        .unwrap_err();
+    assert!(error.contains("resolution path changed"), "{error}");
+}
+
+#[test]
 fn live_source_changes_and_other_workspace_inputs_invalidate_editor_analysis() {
     let fixture = Fixture::new();
     fs::write(fixture.root.join("a.py"), "def different(): pass\n").unwrap();

@@ -52,6 +52,8 @@ pub(crate) fn input(path: &Path, configuration: &str) -> Result<Input, String> {
                         .and_then(toml::Value::as_str)
                         .map(str::to_owned),
                     configuration: configuration.into(),
+                    mirror_path: None,
+                    installation: None,
                 });
             }
         }
@@ -71,6 +73,8 @@ pub(crate) fn input(path: &Path, configuration: &str) -> Result<Input, String> {
         package: "Rust source".into(),
         version: None,
         configuration: configuration.into(),
+        mirror_path: None,
+        installation: None,
     })
 }
 fn normalize(path: &Path) -> PathBuf {

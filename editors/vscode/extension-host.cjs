@@ -119,6 +119,15 @@ async function verify() {
     assert.ok(typedReferences.items.some(item => item.source.path === 'js/start.ts' && item.site?.name === 'run'));
     assert.equal((await editorDefinition('js/worker.mjs', 'executeJob', 'helper')).target.name, 'helper');
     assert.equal((await editorDefinition('js/view.tsx', 'Card', 'start')).target.name, 'start');
+    const installed = await editorDefinition('js/consumer.ts', 'readPackage', 'installedWork');
+    assert.equal(installed.target.origin.label, 'fixture-pkg');
+    assert.equal(installed.target.origin.version, '2.4.0');
+    assert.equal(installed.target.source.path, 'index.ts');
+    const installedRefs = await request('/api/references', {
+      snapshot, symbol: installed.target.id, capture: installed.target.origin.capture, kind: 'references',
+    });
+    assert.equal(installedRefs.precision, 'semantic', JSON.stringify(installedRefs));
+    assert.ok(installedRefs.items.some(item => item.source.path === 'js/consumer.ts'));
 
     const edit = new vscode.WorkspaceEdit();
     edit.insert(file,new vscode.Position(0,0),'# unsaved\n');

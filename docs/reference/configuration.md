@@ -67,8 +67,9 @@ combined with managed-server or project options. A disconnected
 editor never triggers a managed fallback server. Each query rereads the connection file.
 
 The bridge uses VS Code's saved project context. Dirty or changed buffers and mismatched
-captured source make results unavailable. External Rust files returned by the editor can enter bounded dependency captures;
-other external languages and non-file targets remain outside capture.
+captured source make results unavailable. Returned Rust dependency files and
+installed JavaScript and TypeScript package files can enter bounded dependency captures.
+Other external languages and non-file targets remain outside capture.
 It does not freeze the editor's full dependency/configuration environment or supply
 semantic results for older captured bytes that differ from disk. Managed servers retain
 their private captured-source mirrors and dependency-source support.

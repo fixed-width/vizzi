@@ -25,6 +25,14 @@ them. Keep local Cargo path dependencies valid in the private mirror. No fetches
 repository builds, build scripts or procedural macros. Other languages need their own
 definition/discovery support; do not infer dependencies from arbitrary directories.
 
+Managed TypeScript and VS Code sharing can open source and declaration files from
+installed JavaScript and TypeScript packages when their provider supplies a definition.
+A reached file must resolve to a regular file in an installed package under the
+workspace's `node_modules` layout. The dependency bubble identifies the package and
+its version from local metadata. Calls and references can continue from that capture.
+An absent package or a link whose target leaves the installation scope appears as
+outside source. Dependency capture uses the shared catalog bounds.
+
 Validate exact source/location binding, dependency-to-dependency call steps, same-named
 files, stale replies/configuration, unavailable sources, bounded retention, reload and
 verified editor handoff with small fixtures and a real installed provider.

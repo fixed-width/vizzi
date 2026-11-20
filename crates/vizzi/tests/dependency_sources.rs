@@ -8,6 +8,8 @@ fn input(root: &std::path::Path) -> Input {
         package: "helper".into(),
         version: Some("1.2.3".into()),
         configuration: "a".repeat(64),
+        mirror_path: None,
+        installation: None,
     }
 }
 
@@ -109,6 +111,29 @@ fn dependency_roots_require_canonical_native_identity() {
         Some("Dependency root must be canonical")
     );
 }
+#[test]
+fn dependency_resolution_aliases_restore_as_distinct_captures() {
+    let root = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    std::fs::create_dir(root.path().join("src")).unwrap();
+    std::fs::write(root.path().join("src/lib.rs"), "fn entry() {}").unwrap();
+    let references = cache.path().join("refs.json");
+    let catalog = Catalog::new(references.clone());
+    let native = input(root.path());
+    let canonical = catalog.capture(native.clone()).unwrap();
+    let mut mirror = native;
+    mirror.mirror_path = Some("node_modules/helper/src/lib.rs".into());
+    let linked = catalog.capture(mirror.clone()).unwrap();
+    assert_eq!(canonical.origin.id, linked.origin.id);
+    assert_ne!(canonical.origin.capture, linked.origin.capture);
+    let restored = Catalog::new(references)
+        .get(&linked.origin.capture)
+        .unwrap()
+        .unwrap();
+    assert_eq!(restored.input, mirror);
+    assert_eq!(restored.doc().version(), canonical.doc().version());
+}
+
 #[test]
 fn dependency_captures_are_distinct_frozen_and_restorable_by_native_references() {
     let root = tempfile::tempdir().unwrap();

@@ -102,7 +102,8 @@ implement the same [originating-editor contract](ORIGIN_EDITOR.md).
   Requests use one bounded newline-delimited JSON frame per TCP connection. Native reads,
   writes and connection setup have deadlines. Neither side exposes arbitrary commands.
 - Protocol v1 requests carry the token, version, root, method (`definition` or
-  `references`), relative source path, captured query text and UTF-16 position. Replies
+  `references`), relative source path, captured query text and UTF-16 position.
+  Dependency queries use an absolute path rechecked against an admitted capture. Replies
   carry a stable session ID, editor change epoch, locations with absolute paths,
   UTF-16 positions and target text, an outside count, or an explicit error. Response
   bytes, source size, result count and concurrent requests are bounded.
@@ -116,7 +117,11 @@ implement the same [originating-editor contract](ORIGIN_EDITOR.md).
   it cannot freeze an editor's full transitive dependency/configuration universe.
 - Read the manifest for every lookup rather than caching its endpoint/token. Never send
   LSP initialization, synchronization, execution or lifecycle messages to editor providers.
-  Non-file/external locations are counted as outside rather than retargeted by name.
+  Native admission accepts reached Rust dependencies and supported JavaScript and
+  TypeScript source in canonical workspace installations. Other external and non-file
+  locations are counted as outside. An editor package location can supply its original
+  provider URI. The bridge retains it in the capture and verifies its canonical
+  destination on follow-up requests. [Dependency source contract](../visual/DEPENDENCIES_TECH.md)
 
 ## Testing and validation
 

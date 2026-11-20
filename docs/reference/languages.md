@@ -34,6 +34,10 @@ Package labels and accents use the closest captured `package.json` within the
 workspace. A missing or invalid name leaves the bubble neutral. Historical labels
 use the manifest from the selected Git commit.
 
+Managed TypeScript and VS Code sharing can open installed JavaScript or TypeScript
+package declarations in independent dependency bubbles. The selected provider
+determines whether a definition points to an implementation or a declaration file.
+
 ## Python
 
 Python does not need a runtime, virtual environment or language server for syntax browsing.
@@ -63,7 +67,7 @@ With the VS Code extension, editor-resolved Rust dependency and standard-library
 can also open as captured bubbles. A provider-reported function range can admit methods
 using newer syntax such as `[const]` bounds when native parsing misses them. The original
 text is retained, while raw call analysis inside that function can remain unavailable.
-External source in other languages still requires a Vizzi-managed provider.
+VS Code also supplies workspace-installed JavaScript and TypeScript package source.
 
 ## Ruby
 

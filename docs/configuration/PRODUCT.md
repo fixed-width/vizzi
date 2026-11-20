@@ -51,10 +51,11 @@ providers so Vizzi does not need a second language-server process.
     response. Returned source positions must match captured target text. Pinned or
     older source that differs from disk receives unavailable analysis, never a result
     from substituted live bytes. The plugin never saves, reloads or edits user buffers.
-11. The bridge admits captured repository results and locally available Rust dependency
-    source reached through editor definitions. Dependency files use independent bounded
-    captures, never enlarge the repository scope and retain package provenance. Other
-    external languages and non-file targets remain outside capture. Shared results do
+11. The bridge admits captured repository results, Rust dependency source, and
+    JavaScript and TypeScript source from workspace-installed packages reached
+    through editor definitions. Dependency files use independent bounded
+    captures and retain package provenance. Other external languages and non-file
+    targets remain outside capture. Shared results do
     not claim frozen whole-project editor analysis.
 12. The connection file contains a session credential and stays outside the inspected
     source. Stopping sharing or deactivating the extension closes the bridge without

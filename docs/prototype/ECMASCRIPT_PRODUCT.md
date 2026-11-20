@@ -52,6 +52,11 @@ the existing call workspace without installing project dependencies.
    include project-local inheritance, project references, and path mappings.
    Unsupported settings required to open the project report unavailable
    semantic analysis, and the existing written-name evidence remains available.
-   Definitions outside the capture appear as outside results. The server uses
+   The server uses
    captured source and settings across edits, and project plugins and automatic
    type acquisition are disabled.
+8. Managed and editor-owned definitions can open a reached file from a locally
+   installed JavaScript or TypeScript package. Package source follows the existing
+   dependency capture contract for provenance, retention, and source verification.
+   Dependency lookup uses the installed layout. Repository discovery continues to
+   exclude `node_modules`. [Dependency contract](../visual/DEPENDENCIES_PRODUCT.md)

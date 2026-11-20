@@ -10,6 +10,24 @@ Rust retains its Cargo adapter. Python/Pyright and C-family/clangd share the pro
 adapter described in [language-server integration](LANGUAGE_SERVERS_TECH.md). All providers
 use one bounded capture catalog, with language-specific configuration identities.
 
+Managed TypeScript exposes existing installation directories through directory
+links at the same relative locations in its private mirror. It probes only
+`node_modules` entries along captured source and config ancestors. The repository
+index stays unchanged. Managed resolution needs permission to create directory
+links. Both TypeScript and the editor bridge use the same native
+package admission rules. Canonical files within a workspace installation need a
+bounded package manifest and a supported source suffix. npm scopes and pnpm's
+workspace-local virtual store preserve their physical package identities. For
+an LSP result reported at a mirror alias, retain the path and recheck the alias
+against the captured physical file before accepting or continuing from it.
+Native sessions track content fingerprints of reached package manifests.
+A changed manifest rebuilds resolution before the next request. Restored native
+captures reopen the saved importing file to load its project. Editor-backed
+captures keep the provider's original URI alongside the canonical source path
+and recheck the alias before and after follow-up queries.
+[Node package lookup](https://nodejs.org/api/modules.html#loading-from-node_modules-folders) ·
+[pnpm installation layout](https://pnpm.io/symlinked-node-modules-structure)
+
 Each capture has its own source scope, snapshot, parsed document and structural projection.
 A public origin descriptor identifies package/language/version and the capture reference;
 absolute paths stay native. Source windows bind the dependency snapshot. Structural and
@@ -39,6 +57,19 @@ requires an identical capture; missing, modified or newly analysed captures can 
 Worker-local parsers reuse queries; unchanged capture inputs are content-verified and reused.
 The cache limits are not a process RSS cap. Dependency module membership can be unknown;
 package provenance must not be presented as a guessed language module.
+
+The TypeScript 7.0.2 fixtures exercise nested and scoped packages, package-to-package
+calls and references, declaration exports, and reopening a dependency after its
+source moves. Catalog tests restore distinct mirror aliases. The native suite,
+all 17 Chromium tests, the real VS Code fixture, and the existing Pyright dependency
+integration passed. The pnpm layout and escape checks use a local symlink fixture.
+
+Follow-up regressions cover in-place export changes, including edits with an
+unchanged version, and references from a fresh provider using restored captures.
+The VS Code fixture uses a pnpm-style alias with `preserveSymlinks` enabled.
+The editor peer test checks exact URI reuse and retargeting refusal. Workspace,
+Clippy, 17 Chromium tests, and real VS Code checks passed. Five focused manifest
+tracking mutations were caught after a passing baseline.
 
 `Symbol.origin` is optional for legacy/repository symbols. It carries opaque `id` and
 `capture` references, plus `label`, nullable `version` and `language`. Source paths remain

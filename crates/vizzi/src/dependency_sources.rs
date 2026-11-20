@@ -21,7 +21,7 @@ use vizzi_core::{
 };
 const FILE_BYTES: usize = 2 * 1024 * 1024;
 const TOTAL_BYTES: usize = 32 * 1024 * 1024;
-const FILES: usize = 32;
+pub(crate) const FILES: usize = 32;
 const SYMBOLS: usize = 32768;
 
 /// Native admission input; no transport accepts this type from a browser.
@@ -40,6 +40,26 @@ pub struct Input {
     pub version: Option<String>,
     /// Provider project configuration that admitted the source.
     pub configuration: String,
+    /// Relative path reported by a managed server for a mirror-backed package alias.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub mirror_path: Option<String>,
+    /// Installed package resolution evidence local to the native provider.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub installation: Option<PackageContext>,
+}
+
+/// Evidence needed to re-use an installed package capture in semantic navigation.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct PackageContext {
+    /// Fingerprint of the installed package manifest that supplied this context.
+    pub manifest: ContentId,
+    /// Captured repository-relative file whose project resolved this package.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub importer: Option<String>,
+    /// Original editor URI used by its provider, including a package alias if present.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub editor_uri: Option<String>,
 }
 
 /// A provider-reported function range bound to exact saved source bytes.
@@ -96,6 +116,23 @@ fn read(input: &Input) -> Result<Vec<u8>, String> {
         || !label(&input.language, 64)
         || input.version.as_deref().is_some_and(|v| !label(v, 128))
         || !opaque(&input.configuration)
+        || input.mirror_path.as_ref().is_some_and(|path| {
+            path.len() > 4096
+                || path.contains([':', '\\'])
+                || ReviewPath::parse(path.as_bytes().to_vec()).is_err()
+        })
+        || input.installation.as_ref().is_some_and(|package| {
+            !opaque(package.manifest.as_str())
+                || package.importer.as_ref().is_some_and(|path| {
+                    path.len() > 4096
+                        || path.contains([':', '\\'])
+                        || ReviewPath::parse(path.as_bytes().to_vec()).is_err()
+                })
+                || package
+                    .editor_uri
+                    .as_ref()
+                    .is_some_and(|uri| !label(uri, 16 * 1024))
+        })
     {
         return Err("Invalid dependency source descriptor".into());
     }
@@ -220,11 +257,24 @@ fn capture(input: Input, declaration: Option<Declaration>) -> Result<Arc<Capture
     if doc.declaration_count() > SYMBOLS {
         return Err("Dependency declaration allowance exceeded".into());
     }
+    let mut capture_policy = vec![
+        b"dependency-capture-v1".as_slice(),
+        input.configuration.as_bytes(),
+    ];
+    if let Some(path) = &input.mirror_path {
+        capture_policy.push(path.as_bytes());
+    }
+    if let Some(package) = &input.installation {
+        capture_policy.extend([b"installed-package", package.manifest.as_str().as_bytes()]);
+        if let Some(uri) = &package.editor_uri {
+            capture_policy.push(uri.as_bytes());
+        }
+    }
     let snapshot = Arc::new(
         Snapshot::new(
             scope.clone(),
             vec![doc.clone()],
-            CapturePolicyId::derive(&[b"dependency-capture-v1", input.configuration.as_bytes()]),
+            CapturePolicyId::derive(&capture_policy),
         )
         .map_err(|e| e.to_string())?,
     );

@@ -37,6 +37,8 @@ struct Request<'a> {
     path: &'a str,
     text: &'a str,
     position: Position,
+    #[serde(rename = "providerUri", skip_serializing_if = "Option::is_none")]
+    provider_uri: Option<&'a str>,
 }
 #[derive(Deserialize)]
 struct Response {
@@ -64,6 +66,8 @@ struct Target {
     text: String,
     #[serde(default)]
     declaration: Option<EditorDeclaration>,
+    #[serde(rename = "providerUri", default)]
+    provider_uri: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -124,15 +128,34 @@ impl Bridge {
         &self,
         target: &Target,
         configuration: &str,
+        editor_root: &Path,
     ) -> Result<Option<Arc<Capture>>, String> {
-        if target.path.extension().and_then(|s| s.to_str()) != Some("rs")
-            || target.path.canonicalize().ok().as_ref() != Some(&target.path)
-        {
+        if target.path.canonicalize().ok().as_ref() != Some(&target.path) {
             return Ok(None);
         }
-        let Ok(input) = crate::rust_dependencies::input(&target.path, configuration) else {
+        let rust = target
+            .path
+            .extension()
+            .and_then(|extension| extension.to_str())
+            == Some("rs")
+            && !target.path.starts_with(&self.root);
+        let input = if rust {
+            crate::rust_dependencies::input(&target.path, configuration)
+        } else {
+            crate::ecmascript_dependencies::input(&self.root, &target.path, configuration)
+        };
+        let Ok(mut input) = input else {
             return Ok(None);
         };
+        if let (Some(package), Some(uri)) = (&mut input.installation, &target.provider_uri) {
+            if self
+                .verify_package_uri(uri, &target.path, editor_root)
+                .is_err()
+            {
+                return Ok(None);
+            }
+            package.editor_uri = Some(uri.clone());
+        }
         let Ok(mut captured) = self.sources.capture(input.clone()) else {
             return Ok(None);
         };
@@ -140,10 +163,11 @@ impl Bridge {
             return Err("Editor dependency target differs from saved source".into());
         }
         let byte = definitions::byte_offset(&target.text, target.position)?;
-        if captured
-            .index
-            .definition(captured.doc().path(), byte)
-            .is_none()
+        if rust
+            && captured
+                .index
+                .definition(captured.doc().path(), byte)
+                .is_none()
             && let Some(range) = &target.declaration
         {
             let start = definitions::byte_offset(&target.text, range.range.start)?;
@@ -165,6 +189,33 @@ impl Bridge {
         }
         captured.verify()?;
         Ok(Some(captured))
+    }
+
+    fn verify_package_uri(&self, uri: &str, file: &Path, editor_root: &Path) -> Result<(), String> {
+        let path = url::Url::parse(uri)
+            .ok()
+            .and_then(|url| url.to_file_path().ok())
+            .ok_or("Editor package URI is not a local file")?;
+        if (!crate::ecmascript_dependencies::installed(&self.root, &path)
+            && !crate::ecmascript_dependencies::installed(editor_root, &path))
+            || path.canonicalize().ok().as_deref() != Some(file)
+        {
+            return Err("Editor package resolution path changed; reopen it from its caller".into());
+        }
+        Ok(())
+    }
+
+    fn verify_dependency(&self, capture: &Capture, editor_root: &Path) -> Result<(), String> {
+        capture.verify()?;
+        if let Some(uri) = capture
+            .input
+            .installation
+            .as_ref()
+            .and_then(|package| package.editor_uri.as_deref())
+        {
+            self.verify_package_uri(uri, &capture.path(), editor_root)?;
+        }
+        Ok(())
     }
     fn verify(&self, snapshot: &Snapshot) -> Result<(), String> {
         if snapshot.documents().len() > 8192 {
@@ -272,7 +323,7 @@ impl Bridge {
         }
         self.verify(snapshot)?;
         if let Some(source) = dependency {
-            source.verify()?;
+            self.verify_dependency(source, &connection.root)?;
         }
         let text = source(doc)?;
         let external_path = dependency.map(Capture::path);
@@ -296,6 +347,9 @@ impl Bridge {
                 path: query_path,
                 text: &text,
                 position: definitions::position(&text, byte)?,
+                provider_uri: dependency
+                    .and_then(|source| source.input.installation.as_ref())
+                    .and_then(|package| package.editor_uri.as_deref()),
             },
         )?;
         if response.version != 1 {
@@ -325,12 +379,24 @@ impl Bridge {
             if !target.path.is_absolute() {
                 return Err("Editor target must be an absolute file path".into());
             }
-            let Ok(relative) = target
+            let relative = target
                 .path
                 .strip_prefix(&connection.root)
                 .or_else(|_| target.path.strip_prefix(&self.root))
+                .ok()
+                .map(|path| {
+                    path.to_str()
+                        .map(|path| path.replace('\\', "/"))
+                        .ok_or("Editor target is not UTF-8")
+                })
+                .transpose()?;
+            let Some(doc) = relative
+                .as_deref()
+                .and_then(|path| snapshot.file_by_path(path))
             else {
-                if let Some(captured) = self.dependency_target(&target, configuration.as_str())? {
+                if let Some(captured) =
+                    self.dependency_target(&target, configuration.as_str(), &connection.root)?
+                {
                     locations.push(Location {
                         capture: Some(captured.origin.capture.clone()),
                         path: captured.doc().path().into(),
@@ -342,14 +408,6 @@ impl Bridge {
                 }
                 continue;
             };
-            let relative = relative
-                .to_str()
-                .ok_or("Editor target is not UTF-8")?
-                .replace('\\', "/");
-            let Some(doc) = snapshot.file_by_path(&relative) else {
-                outside += 1;
-                continue;
-            };
             let captured = source(doc)?;
             if target.text != captured {
                 return Err("Editor target differs from captured source".into());
@@ -357,16 +415,16 @@ impl Bridge {
             definitions::byte_offset(&captured, target.position)?;
             locations.push(Location {
                 capture: None,
-                path: relative,
+                path: doc.path().into(),
                 position: target.position,
             });
         }
         self.verify(snapshot)?;
         if let Some(source) = dependency {
-            source.verify()?;
+            self.verify_dependency(source, &connection.root)?;
         }
         for captured in captured_targets {
-            captured.verify()?;
+            self.verify_dependency(&captured, &connection.root)?;
         }
         let current: Connection = serde_json::from_slice(&read_file(&connection_path, 4096)?)
             .map_err(|e| format!("Invalid VS Code connection file: {e}"))?;
