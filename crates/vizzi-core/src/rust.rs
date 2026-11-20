@@ -8,9 +8,10 @@ use crate::{
 };
 
 const CALLS: CallRules = CallRules {
-    expressions: Some(&CallExpression {
+    expressions: &[CallExpression {
         kind: "call_expression",
         callee_field: "function",
+        unwrap_callee: None,
         name_kinds: &["identifier", "field_identifier", "type_identifier"],
         name_fields: &[
             ("scoped_identifier", "name"),
@@ -18,7 +19,7 @@ const CALLS: CallRules = CallRules {
             ("generic_function", "function"),
             ("field_expression", "field"),
         ],
-    }),
+    }],
     finish: Some(crate::rust_calls::bind),
 };
 

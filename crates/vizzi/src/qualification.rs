@@ -13,13 +13,9 @@ use std::{
 };
 use vizzi_core::{
     analysis::{Analyzer, LanguageAdapter, Languages},
-    c_family::{CAdapter, CppAdapter},
     model::{Analysis, Context, ContextId, ModelError, SnapshotId},
     policy::PolicyConfig,
-    python::PythonAdapter,
     query::{View, ViewQuery},
-    ruby::RubyAdapter,
-    rust::RustAdapter,
 };
 
 type Error = Box<dyn std::error::Error>;
@@ -81,6 +77,9 @@ impl LanguageAdapter for Factory {
             cancel_requested: self.cancel_requested.clone(),
             cancel_at: self.cancel_at.clone(),
         }))
+    }
+    fn supports_written_calls(&self) -> bool {
+        self.inner.supports_written_calls()
     }
 }
 struct Parser {
@@ -176,14 +175,7 @@ fn qualify(config: Config, emit: &mut impl FnMut(Value)) -> Result<Value, Error>
     } else {
         &config.context_revision
     };
-    let inner: Vec<Arc<dyn LanguageAdapter>> = vec![
-        Arc::new(RustAdapter),
-        Arc::new(PythonAdapter),
-        Arc::new(RubyAdapter),
-        Arc::new(CAdapter),
-        Arc::new(CppAdapter),
-    ];
-    let factories = inner
+    let factories = Languages::builtin_adapters()
         .into_iter()
         .map(|inner| {
             Arc::new(Factory {
@@ -347,6 +339,7 @@ pub fn run(configuration: &[u8], emit: &mut impl FnMut(Value)) -> Result<Value, 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use vizzi_core::rust::RustAdapter;
 
     #[test]
     fn cancellation_latency_excludes_poll_cadence_and_requires_ordered_timestamps() {
@@ -536,6 +529,7 @@ mod tests {
             let cache = tempfile::tempdir().unwrap();
             std::fs::write(root.path().join("a.rs"), "fn rust() {}").unwrap();
             std::fs::write(root.path().join("b.c"), "int c(void) { return 0; }").unwrap();
+            std::fs::write(root.path().join("c.tsx"), "const card = () => <Card />;").unwrap();
             let config = Config {
                 root: root.path().into(),
                 cache: cache.path().into(),
@@ -558,7 +552,7 @@ mod tests {
             .unwrap();
             assert_eq!(report["query_file"], "b.c");
             assert!(!report["queries"].as_array().unwrap().is_empty());
-            assert_eq!(report["baseline"]["measurements"]["files"], 2);
+            assert_eq!(report["baseline"]["measurements"]["files"], 3);
             assert_eq!(report["pinned_source_matches"], true);
             assert!(events.iter().any(|event| event["event"] == "phase_start"));
             match mode {
@@ -567,14 +561,14 @@ mod tests {
                     assert!(report["cancel_to_return_ms"].is_null());
                     assert!(report["worker_return_us"].as_u64().is_some());
                     assert_eq!(report["refresh"]["parsed"], 0);
-                    assert_eq!(report["refresh"]["reused"], 2);
+                    assert_eq!(report["refresh"]["reused"], 3);
                     assert_eq!(report["final"]["generation"], 1);
                     assert!(!events.iter().any(|event| event["event"] == "parse_started"));
                     assert_eq!(report["final"]["pending"], false);
                 }
                 Mode::Reparse => {
                     assert!(report["cancel_to_return_ms"].is_null());
-                    assert_eq!(report["refresh"]["parsed"], 2);
+                    assert_eq!(report["refresh"]["parsed"], 3);
                     assert_eq!(report["refresh"]["cache_hits"], 0);
                     assert_eq!(report["final"]["generation"], 2);
                     assert_eq!(report["final"]["pending"], false);

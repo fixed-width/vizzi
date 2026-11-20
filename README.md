@@ -55,7 +55,8 @@ integration is required for these lessons.
 - Browse source, compare Git revisions or working changes, and keep source locations and
   notes. Hand off a current location to VS Code when you want to work on it.
 
-Rust, Python and Ruby are selected by default. Raw C/C++ browsing uses explicit source scopes.
+Rust, Python, Ruby, JavaScript, and TypeScript are selected by default, including JSX and
+TSX. Raw C/C++ browsing uses explicit source scopes.
 Language support and call resolution have [important differences](docs/reference/languages.md);
 a candidate match is not proof of a runtime call.
 

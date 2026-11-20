@@ -13,6 +13,8 @@ For people extending Vizzi or investigating its implementation. The
   [dependency source](../visual/DEPENDENCIES_TECH.md), [modules](../visual/MODULES_TECH.md),
   [task working sets](../visual/WORKING_SETS_TECH.md) and [shared header](../visual/HEADER_PRODUCT.md)
 - [Ruby analysis and navigation](../prototype/RUBY.md)
+- [JavaScript and TypeScript browsing](../prototype/ECMASCRIPT_PRODUCT.md) and
+  [syntax adapters](../prototype/ECMASCRIPT_TECH.md)
 - [Function-history behaviour](../visual/HISTORY_PRODUCT.md) and
   [implementation and validation](../visual/HISTORY_TECH.md)
 - [Function comparison behaviour](../visual/FUNCTION_COMPARISON_PRODUCT.md) and

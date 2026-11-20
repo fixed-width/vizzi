@@ -7,7 +7,7 @@ use crate::{
 use tree_sitter::Node;
 
 const CALLS: CallRules = CallRules {
-    expressions: None,
+    expressions: &[],
     finish: Some(crate::ruby_calls::collect),
 };
 

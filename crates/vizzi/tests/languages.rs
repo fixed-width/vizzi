@@ -15,11 +15,90 @@ use vizzi::{
 use vizzi_core::{
     analysis::{Analyzer, LanguageAdapter, Languages},
     c_family::{CAdapter, CppAdapter},
-    model::{Analysis, Context, ContextId, ModelError},
+    model::{Analysis, Context, ContextId, Coverage, ModelError},
     policy::PolicyConfig,
     python::PythonAdapter,
     rust::RustAdapter,
 };
+
+#[test]
+fn jsx_dialects_keep_distinct_cache_entries_across_targeted_renames_and_edits() {
+    let temp = tempfile::tempdir().unwrap();
+    let root = temp.path();
+    let cache = tempfile::tempdir().unwrap();
+    let original_ts = "packages/ui/view.ts";
+    let renamed_jsx = "packages/ui/view.jsx";
+    let tsx = "packages/ui/card.tsx";
+    let dependency = "packages/ui/node_modules/addon/index.js";
+    let text = "export const view = () => <Card />;\n";
+    std::fs::create_dir_all(root.join("packages/ui/node_modules/addon")).unwrap();
+    for path in [original_ts, tsx, dependency] {
+        std::fs::write(root.join(path), text).unwrap();
+    }
+    let directory = Directory::open(root).unwrap();
+    assert!(directory.relevant(&directory.root().join(tsx)));
+    assert!(!directory.relevant(&directory.root().join(dependency)));
+    let engine = Engine::new(directory, Cache::new(cache.path().into()), 2).unwrap();
+    let cold = engine.refresh(None, &|| false).unwrap().unwrap();
+    assert_eq!(cold.snapshot.documents().len(), 2);
+    assert_eq!(cold.measurements.parsed, 2);
+    let ts_analysis = &cold.snapshot.file_by_path(original_ts).unwrap().analyses()[0];
+    let tsx_analysis = &cold.snapshot.file_by_path(tsx).unwrap().analyses()[0];
+    assert_eq!(ts_analysis.content, tsx_analysis.content);
+    assert_ne!(ts_analysis.context.id, tsx_analysis.context.id);
+    assert_eq!(ts_analysis.coverage, Coverage::Partial);
+    assert_eq!(tsx_analysis.coverage, Coverage::Syntax);
+    let warm = engine.refresh(None, &|| false).unwrap().unwrap();
+    assert_eq!(warm.measurements.cache_hits, 2);
+    assert_eq!(warm.snapshot.id(), cold.snapshot.id());
+
+    std::fs::rename(root.join(original_ts), root.join(renamed_jsx)).unwrap();
+    let renamed = engine
+        .refresh_scoped(
+            Some(&warm.snapshot),
+            &CaptureScope::Paths([original_ts.into(), renamed_jsx.into()].into()),
+            &|| false,
+        )
+        .unwrap()
+        .unwrap();
+    assert!(!renamed.measurements.reconciled);
+    assert_eq!(renamed.measurements.parsed, 1);
+    assert!(renamed.snapshot.file_by_path(original_ts).is_none());
+    let renamed_analysis = &renamed
+        .snapshot
+        .file_by_path(renamed_jsx)
+        .unwrap()
+        .analyses()[0];
+    assert_eq!(renamed_analysis.context.language, "javascript");
+    assert_eq!(renamed_analysis.coverage, Coverage::Syntax);
+
+    std::fs::write(root.join(renamed_jsx), format!("// Café\n{text}")).unwrap();
+    let edited = engine
+        .refresh_scoped(
+            Some(&renamed.snapshot),
+            &CaptureScope::Paths([renamed_jsx.into()].into()),
+            &|| false,
+        )
+        .unwrap()
+        .unwrap();
+    let edited_analysis = &edited
+        .snapshot
+        .file_by_path(renamed_jsx)
+        .unwrap()
+        .analyses()[0];
+    assert_eq!(edited_analysis.facts[0].key, renamed_analysis.facts[0].key);
+    let clean_cache = tempfile::tempdir().unwrap();
+    let clean = Engine::new(
+        Directory::open(root).unwrap(),
+        Cache::new(clean_cache.path().into()),
+        1,
+    )
+    .unwrap()
+    .refresh(None, &|| false)
+    .unwrap()
+    .unwrap();
+    assert_eq!(edited.snapshot.id(), clean.snapshot.id());
+}
 
 #[derive(Default)]
 struct Activity {

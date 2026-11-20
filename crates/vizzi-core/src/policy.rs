@@ -33,6 +33,24 @@ const DEFAULT_SOURCE_RULES: &[DefaultSourceRules] = &[
             &["Gemfile.lock", ".ruby-version", ".tool-versions"],
         )),
     },
+    DefaultSourceRules {
+        language: "javascript",
+        suffixes: &["js", "jsx", "mjs", "cjs"],
+        filenames: &[],
+        project_metadata: None,
+    },
+    DefaultSourceRules {
+        language: "typescript",
+        suffixes: &["ts", "mts", "cts"],
+        filenames: &[],
+        project_metadata: None,
+    },
+    DefaultSourceRules {
+        language: "tsx",
+        suffixes: &["tsx"],
+        filenames: &[],
+        project_metadata: None,
+    },
 ];
 
 /// Requested raw C-family language; it does not select a compiler configuration.
@@ -60,7 +78,7 @@ pub struct Assignment {
     /// Requested raw language for supported C-family candidates.
     pub language: FamilyLanguage,
 }
-/// Frozen source-selection configuration; Rust, Python, and Ruby are included by default.
+/// Frozen source-selection configuration, including default suffixes and opt-in C-family scopes.
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct PolicyConfig {
     /// Explicitly enabled C-family candidate subtrees.
@@ -203,9 +221,8 @@ impl SourcePolicy {
     /// Tests exclusions for a normalized relative file or directory path.
     pub fn excludes(&self, path: &str) -> Result<bool, ModelError> {
         validate_path(path)?;
-        Ok([".git", "target", "node_modules"]
-            .iter()
-            .any(|scope| within(path, scope))
+        Ok([".git", "target"].iter().any(|scope| within(path, scope))
+            || path.split('/').any(|component| component == "node_modules")
             || self.exclusions.iter().any(|scope| within(path, scope)))
     }
     /// Returns capture metadata or exclusion from this scope; performs no I/O.

@@ -6,6 +6,11 @@ remains in Git and the project documentation.
 
 ## Unreleased
 
+### Added
+
+- Browse JavaScript, JSX, TypeScript, and TSX with syntax colors, declaration
+  outlines, and written-call candidates. Capture skips nested `node_modules` trees.
+
 ### Fixed
 
 - Structural capabilities report written-call support from the host's registered analyzers.

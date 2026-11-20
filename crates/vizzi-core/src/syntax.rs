@@ -61,13 +61,13 @@ type FinishCalls = fn(
 
 #[derive(Clone, Copy, Default)]
 pub(crate) struct CallRules {
-    pub expressions: Option<&'static CallExpression>,
+    pub expressions: &'static [CallExpression],
     pub finish: Option<FinishCalls>,
 }
 
 impl CallRules {
     pub(crate) const fn supported(&self) -> bool {
-        self.expressions.is_some() || self.finish.is_some()
+        !self.expressions.is_empty() || self.finish.is_some()
     }
 }
 
@@ -264,10 +264,7 @@ impl SyntaxAnalyzer {
         }
         let mut cursor = tree.walk();
         let mut declarations = Vec::new();
-        let mut calls = self
-            .calls
-            .expressions
-            .map(|expressions| (expressions, Default::default()));
+        let mut calls = (!self.calls.expressions.is_empty()).then(CallFacts::default);
         let mut scope_facts = BTreeMap::<usize, usize>::new();
         let mut checkpoints = Checkpoints {
             cancelled,
@@ -325,8 +322,10 @@ impl SyntaxAnalyzer {
                     });
                 }
             }
-            if let Some((expressions, facts)) = &mut calls {
-                expressions.collect(node, text, &scope_facts, facts);
+            if let Some(facts) = &mut calls {
+                for expression in self.calls.expressions {
+                    expression.collect(node, text, &scope_facts, facts);
+                }
             }
             if cursor.goto_first_child() {
                 continue;
@@ -362,7 +361,7 @@ impl SyntaxAnalyzer {
                         return Ok(None);
                     }
                     drop(cursor);
-                    analysis.calls = calls.map(|(_, facts)| facts);
+                    analysis.calls = calls;
                     if let Some(finish) = self.calls.finish
                         && !finish(
                             tree.root_node(),
@@ -417,12 +416,13 @@ mod tests {
         use std::sync::Arc;
 
         const CALLS: CallRules = CallRules {
-            expressions: Some(&CallExpression {
+            expressions: &[CallExpression {
                 kind: "call",
                 callee_field: "function",
+                unwrap_callee: None,
                 name_kinds: &["identifier"],
                 name_fields: &[("attribute", "attribute")],
-            }),
+            }],
             finish: None,
         };
 
@@ -496,12 +496,13 @@ mod tests {
             |_, _, _| {},
             no_scope,
             CallRules {
-                expressions: Some(&CallExpression {
+                expressions: &[CallExpression {
                     kind: "call",
                     callee_field: "method",
+                    unwrap_callee: None,
                     name_kinds: &["identifier"],
                     name_fields: &[],
-                }),
+                }],
                 finish: None,
             },
         )

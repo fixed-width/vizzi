@@ -140,6 +140,9 @@ pub(crate) fn edit(
         "rust" => ("//", format!("fn {name}() {{}}\n")),
         "python" => ("#", format!("def {name}(): pass\n")),
         "ruby" => ("#", format!("def {name}; {sample}; end\n")),
+        "javascript" | "typescript" | "tsx" => {
+            ("//", format!("function {name}() {{ return {sample}; }}\n"))
+        }
         _ => ("//", format!("int {name}(void) {{ return {sample}; }}\n")),
     };
     let mut bytes = format!("{marker} foreground {probe} sample {sample}\n").into_bytes();
@@ -391,7 +394,7 @@ mod tests {
     #[test]
     fn generated_declarations_are_valid_in_every_supported_probe_language() {
         let languages = Languages::builtin().unwrap();
-        for language in ["rust", "python", "ruby", "c", "cpp"] {
+        for language in languages.names() {
             let (bytes, name) = edit(language, b"\n", "probe", 7);
             let fresh = languages
                 .select(language)

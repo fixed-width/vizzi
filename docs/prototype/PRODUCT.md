@@ -11,9 +11,8 @@ comparison semantics do not imply that review views are already available.
 ## Required behaviour
 
 - The root directory and cache directory are chosen when launching the native host.
-- Rust `.rs` and Python `.py` files share discovery, selection, and analysis scheduling,
-  without following symlinks or reading root `.git`,
-  `target`, or `node_modules` directories. LPC analysis remains out of scope.
+- Files share discovery, selection, and analysis scheduling. Capture skips symlinks,
+  root `.git` and `target`, and `node_modules` at any depth. LPC analysis remains out of scope.
 - Supported scope and declaration kinds follow the [language contract](LANGUAGES.md).
   The source inspector identifies each analysis language and coverage; overview counts
   describe selected source files. Other extensions remain outside capture scope.

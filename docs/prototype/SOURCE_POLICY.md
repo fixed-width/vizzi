@@ -7,8 +7,8 @@ apply the same frozen policy during discovery, hint verification, and event filt
 ## Configuration and classification
 
 `PolicyConfig` contains enabled `c_family_roots`, `exclusions`, and explicit C/C++
-`assignments`. Rust, Python, and Ruby are selected by default through exact filenames
-and suffixes defined together in `vizzi_core::policy`. See the
+`assignments`. Rust, Python, Ruby, JavaScript, and TypeScript (including TSX) are selected
+by default through exact filenames and suffixes defined in `vizzi_core::policy`. See the
 [language reference](../reference/languages.md) for the supported names. Family scopes
 add the candidate suffixes in [the C-family policy](C_FAMILY_POLICY.md), including
 `.c++` and `.h++`. Assigned C/C++ inputs receive [raw declaration extraction](C_FAMILY_SYNTAX.md).
@@ -45,8 +45,8 @@ attach analysis records to source-only documents.
 Rules match complete path components. Exclusions override assignments. CUDA cannot be
 reclassified by a general C++ assignment. More specific assignments override parent
 rules; conflicting rules at the same normalized scope fail construction. Assignments
-outside enabled family scopes fail. Root `.git`, `target`, and `node_modules` exclusions
-and symlink behavior remain; nested directories with those names are preserved.
+outside enabled family scopes fail. Capture excludes root `.git` and `target`.
+It excludes `node_modules` at every depth, including when workspaces contain several packages.
 Dotfiles such as `.rs` are not suffix matches, while `a.C` is distinct from `a.c`.
 
 Scopes use `.` for the root. They accept redundant separators, `.` components, and
@@ -64,8 +64,8 @@ and repeated context identities fail registration. Adapters no longer claim exte
 policy. There is one registered raw adapter per language in this host.
 
 `Directory::with_policy(root, config, languages)` constructs policy and factories
-together so availability cannot drift. `open` uses default configuration and built-in
-Rust/Python/Ruby/C/C++ factories. `with_languages` supplies a different factory registry with
+together so availability cannot drift. `open` uses default configuration and the built-in
+factories. `with_languages` supplies a different factory registry with
 default capture rules. Removing a factory preserves selected bytes as source-only.
 
 Policies are immutable for a host's lifetime. The CLI exposes repeatable

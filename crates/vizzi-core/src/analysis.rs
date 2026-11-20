@@ -3,6 +3,7 @@
 pub use crate::syntax_state::{AnalysisResult, SyntaxState};
 use crate::{
     c_family::{CAdapter, CppAdapter},
+    ecmascript::Dialect,
     model::{Analysis, Context, ModelError},
     python::PythonAdapter,
     ruby::RubyAdapter,
@@ -110,15 +111,22 @@ impl Languages {
             call_languages,
         })
     }
-    /// Registers raw Rust, Python, Ruby, C, and C++ factories; policy selects inputs.
+    /// Registers the built-in raw syntax factories. Source policy selects inputs.
     pub fn builtin() -> Result<Self, ModelError> {
-        Self::new(vec![
+        Self::new(Self::builtin_adapters())
+    }
+    /// Returns the built-in factories in registration order for hosts that wrap analysis.
+    pub fn builtin_adapters() -> Vec<Arc<dyn LanguageAdapter>> {
+        vec![
             Arc::new(RustAdapter),
             Arc::new(PythonAdapter),
             Arc::new(RubyAdapter),
             Arc::new(CAdapter),
             Arc::new(CppAdapter),
-        ])
+            Arc::new(Dialect::JavaScript),
+            Arc::new(Dialect::TypeScript),
+            Arc::new(Dialect::Tsx),
+        ]
     }
     /// Looks up a registered analyzer language.
     pub fn select(&self, language: &str) -> Option<&Language> {

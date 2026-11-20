@@ -13,6 +13,23 @@ are separate capabilities; recognising a declaration does not imply resolving it
 | Source outside the configured repository | Locally available Python/stub captures through Pyright | Local captures through rust-analyzer | Local Ruby source reached through Ruby LSP | Local C/C++ captures through clangd |
 | Language module/package cues | Recognised Python modules/packages | Captured Cargo target/module structure | Declared Ruby modules, including reopened namespaces | Not available |
 
+## JavaScript and TypeScript
+
+Default source capture includes `.js`, `.jsx`, `.mjs`, `.cjs`, `.ts`, `.mts`, `.cts` and
+`.tsx`. Vizzi uses separate TypeScript and TSX parsers and supports JSX in JavaScript.
+Browsing works without Node.js, a package install or a project build.
+
+Outlines include named functions, variable-bound arrow functions and function expressions,
+named classes and their identifier-named methods. TypeScript also shows interfaces, enums
+and type aliases. Function overloads appear through their implementation when present.
+Anonymous callbacks and object-literal methods can contain calls without appearing as
+separate function bubbles.
+
+Direct calls, dotted member calls and constructor expressions provide written-call
+candidates. Computed callees have no name to match, and JSX tags alone yield no call
+sites. **Find references** uses the same written-name evidence. Project-aware definitions,
+semantic references, and package labels are outside this first slice.
+
 ## Python
 
 Python does not need a runtime, virtual environment or language server for syntax browsing.
@@ -83,8 +100,8 @@ implementation bodies.
 
 ## Shared limits
 
-Vizzi uses its own source policy. At the inspected root, `.git`, `target` and
-`node_modules` are excluded. Other paths ignored by Git are not automatically excluded;
+Vizzi uses its own source policy. Capture excludes root `.git` and `target`, and
+`node_modules` at any depth. Other paths ignored by Git are not automatically excluded;
 use `--exclude-source` for virtual environments, generated source or vendor trees you
 do not want in the reading scope. Cargo lockfiles, Python project settings and enabled
 C-family compilation metadata participate in change detection. Ruby lockfiles and runtime

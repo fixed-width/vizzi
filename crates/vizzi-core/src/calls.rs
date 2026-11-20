@@ -53,6 +53,7 @@ pub struct CallFacts {
 pub(crate) struct CallExpression {
     pub kind: &'static str,
     pub callee_field: &'static str,
+    pub unwrap_callee: Option<fn(Node<'_>) -> Option<Node<'_>>>,
     pub name_kinds: &'static [&'static str],
     pub name_fields: &'static [(&'static str, &'static str)],
 }
@@ -90,14 +91,11 @@ impl CallExpression {
             output.omitted += 1;
             return;
         };
-        record(
-            node,
-            callee.byte_range(),
-            self.name(callee, text),
-            text,
-            owners,
-            output,
-        );
+        let name = self
+            .unwrap_callee
+            .map_or(Some(callee), |unwrap| unwrap(callee))
+            .and_then(|value| self.name(value, text));
+        record(node, callee.byte_range(), name, text, owners, output);
     }
 }
 pub(crate) fn record(

@@ -338,3 +338,53 @@ test("deferred files stay readable and resume outlines after an admitted edit", 
     assert.deepEqual(session.errors,[]);
   } finally {await session?.close();await live?.close();await fixture.close();}
 });
+
+test("JavaScript and TypeScript outlines and written calls work in the captured workspace", async () => {
+  const fixture = await workspace({
+    files: {
+      "start.ts": 'import { renderCard } from "./view";\nexport function start(value: number) { return renderCard!(value); }\n',
+      "view.tsx": 'import { formatCard } from "./format.mjs";\nexport const renderCard = ((value: number) => <Card title={(formatCard)(value)} />);\n',
+      "format.mjs": "export function formatCard(value) { return String(value); }\n",
+      "ui/node_modules/dep/fake.ts": "export function renderCard() {}\n",
+    },
+  });
+  let live, session;
+  try {
+    live = await startHost(fixture);
+    session = await openWorkspace(chromium, live);
+    const { page } = session;
+    await page.getByText("Accessible file list", { exact: true }).click();
+    await page.getByRole("button", { name: "view.tsx", exact: true }).click();
+    await page.locator("#outline button[data-declaration]").filter({ hasText: "renderCard" }).waitFor();
+    assert.match(await page.locator("#coverage").textContent(), /tsx: syntax parsed/);
+    assert.equal(await page.locator("#source .syntax-attribute").textContent(), "title");
+    assert.match(await page.locator("#counts").textContent(), /3 files/);
+
+    await page.goto(live.url);
+    await page.waitForFunction(() => document.querySelector("#visual-source-status").textContent.includes("ready"));
+    await page.getByRole("button", { name: "Add bubble", exact: true }).click();
+    await page.getByLabel("Find a function", { exact: true }).fill("start");
+    await page.getByRole("button", { name: "Find functions", exact: true }).click();
+    await page.locator('[data-add-symbol][data-name="start"]').click();
+    const start = page.locator('[data-view][data-name="start"]');
+    await start.getByRole("button", { name: "Calls", exact: true }).click();
+    await page.getByRole("button", { name: "renderCard · line 2", exact: true }).click();
+    const card = page.locator('[data-view][data-name="renderCard"]');
+    await card.locator(".code-line").first().waitFor();
+    await card.getByRole("button", { name: "Calls", exact: true }).click();
+    await page.getByRole("button", { name: "formatCard · line 2", exact: true }).click();
+    await page.locator('[data-view][data-name="formatCard"] .code-line').first().waitFor();
+    assert.equal(await page.locator("[data-view]").count(), 3);
+    const candidates = await page.locator('#workspace-links [data-kind="candidate"]').evaluateAll(
+      links => links.map(link => link.getAttribute("aria-label"))
+    );
+    assert.equal(candidates.length, 2);
+    assert.match(candidates[0], /renderCard! → renderCard/);
+    assert.match(candidates[1], /\(formatCard\) → formatCard/);
+    assert.deepEqual(session.errors, []);
+  } finally {
+    await session?.close();
+    await live?.close();
+    await fixture.close();
+  }
+});
