@@ -327,6 +327,42 @@ fn historical_python_module_uses_the_package_chain_at_each_revision() {
 }
 
 #[test]
+fn ruby_history_and_captured_calls_use_the_declared_namespace() {
+    let root = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    let repo = root.path();
+    git(repo, &["init", "-q"]);
+    let path = "reading.rb";
+    let source = |value| {
+        format!(
+            "module Audio\n  def self.target; helper({value}); end\n  def self.helper(value); value; end\nend\n"
+        )
+    };
+    std::fs::write(repo.join(path), source(1)).unwrap();
+    git(repo, &["add", "--", path]);
+    commit_staged(repo);
+    std::fs::write(repo.join(path), source(2)).unwrap();
+
+    let host = history_host(repo, cache.path(), None);
+    let (request, module) = module_request(&host, path);
+    assert_eq!(module["label"], "Audio");
+    assert_eq!(module["basis"], "ruby_declarations");
+    let history = FunctionHistory::new(host);
+    let pair = history.compare(&compare_current(&request)).unwrap();
+    for side in ["older", "newer"] {
+        assert_eq!(pair[side]["symbol"]["module"], module);
+    }
+    let source = captured_source(
+        &pair["older"],
+        json!({"kind":"comparison","token":pair["token"],"side":"older"}),
+    );
+    assert_eq!(
+        open_module_helper(&history, &source)["symbol"]["module"],
+        module
+    );
+}
+
+#[test]
 fn comparison_preserves_the_saved_module_and_the_verified_historical_peer() {
     let (root, _cache, history, request, live_module) = module_fixture(
         &[("task", &module_source("1"))],

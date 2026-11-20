@@ -85,6 +85,52 @@ fn module(index: &Structure, name: &str) -> vizzi_core::modules::Module {
         .module
         .expect(name)
 }
+
+#[test]
+fn native_module_catalog_describes_emitted_language_and_provenance_pairs() {
+    let source = snapshot(&[
+        (
+            "Cargo.toml",
+            "[package]\nname = 'demo'\n[lib]\npath = 'lib.rs'\n",
+        ),
+        ("lib.rs", "fn from_rust() {}"),
+        ("worker.py", "def from_python(): pass\n"),
+        ("worker.rb", "module Audio; def from_ruby; end; end\n"),
+    ]);
+    let index = Structure::new(&source);
+    let kinds = vizzi_core::modules::module_kinds()
+        .map(|kind| serde_json::to_value(kind).unwrap())
+        .collect::<Vec<_>>();
+    for (name, tooltip) in [
+        ("from_rust", "Rust module"),
+        ("from_python", "Python module"),
+        ("from_ruby", "Ruby module"),
+    ] {
+        let member = module(&index, name);
+        let kind = kinds
+            .iter()
+            .find(|kind| kind["language"] == member.language && kind["basis"] == member.basis)
+            .unwrap();
+        assert_eq!(kind["tooltip"], tooltip);
+    }
+}
+
+#[test]
+fn manifest_contents_in_a_source_file_do_not_create_rust_module_membership() {
+    let source = snapshot(&[
+        (
+            "metadata.py",
+            "[package]\nname = 'unrelated'\n[lib]\npath = 'lib.rs'\n",
+        ),
+        ("lib.rs", "fn target() {}"),
+    ]);
+    let function = Structure::new(&source)
+        .functions("lib.rs", "target", 0)
+        .unwrap()
+        .items
+        .remove(0);
+    assert!(function.symbol.module.is_none());
+}
 #[test]
 fn ruby_reopened_modules_share_identity_without_guessing_from_filenames_or_classes() {
     let source = snapshot(&[

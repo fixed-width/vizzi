@@ -1,6 +1,12 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {validModule,modulePresentation,modulePeers,moduleGeometryKey} from './module-identity.js';
+import {configureModuleKinds,validModule,modulePresentation,modulePeers,moduleGeometryKey} from './module-identity.js';
+const kinds = [
+ {language:'rust',basis:'rust_declarations',tooltip:'Rust module'},
+ {language:'python',basis:'python_module',tooltip:'Python module'},
+ {language:'ruby',basis:'ruby_declarations',tooltip:'Ruby module'},
+];
+configureModuleKinds(kinds);
 const id=n=>n.toString(16).padStart(64,'0');
 const module=(n,label='audio::engine',root='audio/src/lib.rs')=>({id:id(n),label,root,language:'rust',basis:'rust_declarations'});
 const view=(n,m)=>({id:'v'+n,x:n*500,y:100,w:440,h:400,collapsed:false,symbol:{module:m}});
@@ -43,4 +49,39 @@ test('persisted descriptors reject coercible values and labels retain language a
 });
 test('each provenance is accepted only with its supplying language',()=>{
  for(const language of ['rust','python','ruby','unknown'])for(const basis of ['rust_declarations','python_module','ruby_declarations'])assert.equal(validModule({...module(1),language,basis}),(language==='rust'&&basis==='rust_declarations')||(language==='python'&&basis==='python_module')||(language==='ruby'&&basis==='ruby_declarations'));
+});
+test('a supplied module kind controls validation and tooltip text for a saved descriptor', () => {
+ const descriptor = {...module(1, 'Audio.Engine', 'lib/engine.ex'), language: 'elixir', basis: 'elixir_declarations'};
+ assert.equal(validModule(descriptor), false);
+ configureModuleKinds([...kinds, {language:'elixir', basis:'elixir_declarations', tooltip:'Elixir module'}]);
+ try {
+  const saved = JSON.parse(JSON.stringify(view(1, descriptor)));
+  assert.equal(validModule(saved.symbol.module), true);
+  assert.equal(validModule({...descriptor, basis:'rust_declarations'}), false);
+  assert.match(modulePresentation(saved, [saved]).title, /Elixir module/);
+ } finally {
+  configureModuleKinds(kinds);
+ }
+});
+
+test('module validation fails closed before native kinds are configured', async () => {
+ const {validModule: validateUnconfigured} = await import('./module-identity.js?unconfigured');
+ const {id, label, root} = module(1);
+ assert.equal(validateUnconfigured({id, label, root}), false);
+ assert.equal(validateUnconfigured(module(1)), false);
+});
+
+test('layout views without source symbols stay outside module presentation', () => {
+ const source = view(1, module(1));
+ const group = {id:'g1',kind:'group',x:500,y:200,w:440,h:54};
+ const views = [group, source];
+ assert.equal(modulePresentation(group, views), null);
+ assert.deepEqual(modulePresentation(source, views), modulePresentation(source, [source]));
+ assert.deepEqual([...modulePeers(views, source.symbol.module.id)], ['v1']);
+ assert.equal(JSON.parse(moduleGeometryKey(views))[0][1], null);
+});
+
+test('palette collisions wrap to the next free slot', () => {
+ const views = [view(1, module(5)), view(2, module(11)), view(3, module(17))];
+ assert.deepEqual(views.map(view => modulePresentation(view, views).colour), [5, 0, 1]);
 });

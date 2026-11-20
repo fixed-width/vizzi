@@ -14,7 +14,7 @@ use std::{
 use vizzi_core::{
     comparison::{EntryKind, ReviewPath},
     model::{CapturePolicyId, Coverage, Document, EntityId, Snapshot},
-    modules::{ModuleCache, ModuleIndex},
+    modules::ModuleIndex,
     projection::WindowQuery,
     structure::{Structure, Symbol},
 };
@@ -443,27 +443,13 @@ impl FunctionHistory {
         }
         if let Some((candidate, declaration, digest)) = chosen {
             let commit = &session.commits[candidate];
-            let policy = self.host.source_policy();
-            let modules = match session.language.as_str() {
-                "rust" => module_context::rust_modules(
-                    &session.repository,
-                    commit,
-                    policy,
-                    &declaration.snapshot.documents()[0],
-                ),
-                "python" => module_context::python_modules(
-                    &session.repository,
-                    commit,
-                    policy,
-                    &session.path,
-                ),
-                _ => Some(ModuleIndex::new(
-                    &declaration.snapshot,
-                    &mut ModuleCache::default(),
-                )),
-            }
-            .unwrap_or_else(|| ModuleIndex::empty(declaration.snapshot.workspace()));
-            let modules = Arc::new(modules);
+            let modules = Arc::new(module_context::for_commit(
+                &session.repository,
+                commit,
+                self.host.source_policy(),
+                &declaration.snapshot.documents()[0],
+                &session.language,
+            ));
             let capture = declaration.bind(modules.clone())?;
             session.cursor = cursor;
             session.digest = digest;
