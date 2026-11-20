@@ -13,7 +13,7 @@ use axum::{
     routing::get,
 };
 use serde::Deserialize;
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 use vizzi_core::query::{View, ViewQuery};
 use vizzi_core::{
     model::SnapshotId,
@@ -113,7 +113,7 @@ pub fn router(application: Arc<Application>) -> Router {
         .route("/live-updates.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/live-updates.js")) }))
         .route("/read-retry.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/read-retry.js")) }))
         .route("/source-origin.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/source-origin.js")) }))
-        .route("/module-identity.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/module-identity.js")) }))
+        .route("/module-identity.js", get(module_identity))
         .route("/module-outlines.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/module-outlines.js")) }))
         .route("/module-contours.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/module-contours.js")) }))
         .route("/module-outlines.worker.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/module-outlines.worker.js")) }))
@@ -321,6 +321,18 @@ async fn source(
         Ok(serde_json::json!({ "schema": 2, "snapshot": snapshot.id(), "policy": snapshot.policy(), "file": file.id(), "version": file.version(), "path": file.path(), "text": text, "encoding": file.encoding(), "classification": file.classification() }))
     }).await?))
 }
+async fn module_identity() -> Response {
+    static SCRIPT: OnceLock<String> = OnceLock::new();
+    let script = SCRIPT.get_or_init(|| {
+        let kinds = serde_json::json!(vizzi_core::modules::module_kinds().collect::<Vec<_>>());
+        format!(
+            "{}\nconfigureModuleKinds({kinds});\n",
+            include_str!("../web/module-identity.js")
+        )
+    });
+    asset("text/javascript; charset=utf-8", script)
+}
+
 fn asset(content_type: &'static str, text: &'static str) -> Response {
     ([(header::CONTENT_TYPE, content_type)], text).into_response()
 }

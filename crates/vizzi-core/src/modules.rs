@@ -1,13 +1,102 @@
 //! Declared language-module identity over immutable captured inputs; no filesystem IO.
-use crate::model::{Analysis, Coverage, Document, Snapshot, WorkspaceId};
+use crate::{
+    model::{Analysis, Coverage, Document, Snapshot, WorkspaceId},
+    policy::Classification,
+};
 use serde::Serialize;
-use std::collections::{BTreeMap, BTreeSet, VecDeque};
+use std::{
+    collections::{BTreeMap, BTreeSet, VecDeque},
+    sync::Arc,
+};
 use tree_sitter::{Node, Parser};
 
 const DOCUMENTS: usize = 8192;
 const STATES: usize = 4096;
 const SOURCE_BYTES: usize = 1024 * 1024;
 const TOTAL_BYTES: usize = 8 * SOURCE_BYTES;
+const MANIFEST_BYTES: usize = 128 * 1024;
+
+/// Supported language and provenance pair with its presentation text.
+#[derive(Clone, Copy, Serialize)]
+pub struct ModuleKind {
+    language: &'static str,
+    basis: &'static str,
+    tooltip: &'static str,
+}
+impl ModuleKind {
+    fn describe(self, id: String, label: String, root: String) -> Module {
+        Module {
+            id,
+            label,
+            root,
+            language: self.language,
+            basis: self.basis,
+        }
+    }
+}
+
+/// Describes module kinds emitted by native resolution.
+pub fn module_kinds() -> impl Iterator<Item = ModuleKind> {
+    MODULE_RULES.iter().map(|rule| rule.kind)
+}
+
+/// Acquires bounded evidence from the same immutable revision as a selected document.
+pub trait ModuleEvidence {
+    /// Captures the selected document and the classified inputs admitted by the file limits.
+    fn captured_files(
+        &self,
+        selected: &Arc<Document>,
+        file_limit: fn(&str, &Classification) -> Option<usize>,
+    ) -> Option<Snapshot>;
+
+    /// Reports the requested paths that exist as regular files in the revision.
+    fn regular_paths(&self, paths: &mut dyn Iterator<Item = String>) -> Option<BTreeSet<String>>;
+}
+
+type FactResolver = fn(&ModuleIndex, &Document, &Analysis, usize) -> Option<Module>;
+type HistoryResolver = fn(&WorkspaceId, &Arc<Document>, &dyn ModuleEvidence) -> Option<ModuleIndex>;
+
+struct ModuleRule {
+    kind: ModuleKind,
+    fact: FactResolver,
+    history: Option<HistoryResolver>,
+}
+
+const RUST: ModuleRule = ModuleRule {
+    kind: ModuleKind {
+        language: "rust",
+        basis: "rust_declarations",
+        tooltip: "Rust module",
+    },
+    fact: ModuleIndex::rust_fact,
+    history: Some(ModuleIndex::rust_history),
+};
+const PYTHON: ModuleRule = ModuleRule {
+    kind: ModuleKind {
+        language: "python",
+        basis: "python_module",
+        tooltip: "Python module",
+    },
+    fact: |index, doc, _, _| index.python.get(doc.path()).cloned(),
+    history: Some(ModuleIndex::python_history),
+};
+const RUBY: ModuleRule = ModuleRule {
+    kind: ModuleKind {
+        language: "ruby",
+        basis: "ruby_declarations",
+        tooltip: "Ruby module",
+    },
+    fact: |index, _, analysis, ordinal| index.ruby_fact(analysis, ordinal),
+    history: None,
+};
+const MODULE_RULES: &[&ModuleRule] = &[&RUST, &PYTHON, &RUBY];
+
+fn module_rule(language: &str) -> Option<&'static ModuleRule> {
+    MODULE_RULES
+        .iter()
+        .copied()
+        .find(|rule| rule.kind.language == language)
+}
 
 /// Language-aware source identity, independent of source versions or presentation groups.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
@@ -86,6 +175,16 @@ fn identifier(value: &str) -> bool {
         && value.len() <= 128
 }
 
+fn python_ancestors(path: &str) -> impl Iterator<Item = &str> {
+    std::iter::successors(path.rsplit_once('/').map(|(dir, _)| dir), |dir| {
+        dir.rsplit_once('/').map(|(parent, _)| parent)
+    })
+}
+
+fn python_initializer(dir: &str) -> String {
+    format!("{dir}/__init__.py")
+}
+
 fn python_module(
     workspace: &str,
     path: &str,
@@ -99,25 +198,27 @@ fn python_module(
     if stem != "__init__" {
         names.push(stem);
     }
-    let mut dir = parent(path);
-    while !dir.is_empty() && has_initializer(&format!("{dir}/__init__.py")) {
+    for dir in python_ancestors(path).take_while(|dir| has_initializer(&python_initializer(dir))) {
         names.push(dir.rsplit('/').next()?);
-        dir = parent(dir);
     }
     if names.is_empty() || !names.iter().all(|n| identifier(n)) {
         return None;
     }
     names.reverse();
     let label = names.join(".");
-    (label.len() <= 512).then(|| Module {
-        id: blake3::hash(format!("{workspace}\0python\0{path}").as_bytes())
-            .to_hex()
-            .to_string(),
-        label,
-        language: "python",
-        root: path.into(),
-        basis: "python_module",
+    (label.len() <= 512).then(|| {
+        PYTHON.kind.describe(
+            blake3::hash(format!("{workspace}\0{}\0{path}", PYTHON.kind.language).as_bytes())
+                .to_hex()
+                .to_string(),
+            label,
+            path.into(),
+        )
     })
+}
+
+fn cargo_manifest(path: &str) -> bool {
+    path.rsplit('/').next() == Some("Cargo.toml")
 }
 fn literal(value: &str) -> Option<String> {
     let value = value.trim();
@@ -409,29 +510,59 @@ impl ModuleIndex {
     /// Builds only from captured resident text/metadata, reusing unchanged declaration edges.
     pub fn new(snapshot: &Snapshot, cache: &mut ModuleCache) -> Self {
         Self::build(snapshot, cache, |doc| {
-            doc.analyses().iter().any(|a| a.context.language == "rust")
+            doc.analyses()
+                .iter()
+                .any(|a| a.context.language == RUST.kind.language)
         })
     }
 
-    /// Resolves a file against captured Rust declarations selected by the source policy.
-    pub fn from_rust_context(snapshot: &Snapshot, path: &str) -> Self {
-        Self::build(snapshot, &mut ModuleCache::default(), |doc| {
-            doc.classification().assigned_language() == Some("rust")
-        })
-        .for_file(path)
-    }
-
-    /// Resolves a Python file against captured regular initializer paths.
-    pub fn from_python_context(
+    /// Resolves a historical file from its declarations and any required revision evidence.
+    pub fn for_history(
         workspace: &WorkspaceId,
-        path: &str,
-        initializers: &BTreeSet<String>,
+        selected: &Arc<Document>,
+        language: &str,
+        evidence: &dyn ModuleEvidence,
     ) -> Self {
+        module_rule(language)
+            .and_then(|rule| rule.history)
+            .and_then(|resolve| resolve(workspace, selected, evidence))
+            .unwrap_or_else(|| Self::empty(workspace))
+    }
+
+    fn rust_history(
+        _: &WorkspaceId,
+        selected: &Arc<Document>,
+        evidence: &dyn ModuleEvidence,
+    ) -> Option<Self> {
+        let snapshot = evidence.captured_files(selected, |path, classification| {
+            if cargo_manifest(path) {
+                Some(MANIFEST_BYTES)
+            } else {
+                (classification.assigned_language() == Some(RUST.kind.language))
+                    .then_some(SOURCE_BYTES)
+            }
+        })?;
+        Some(
+            Self::build(&snapshot, &mut ModuleCache::default(), |doc| {
+                doc.classification().assigned_language() == Some(RUST.kind.language)
+            })
+            .for_file(selected.path()),
+        )
+    }
+
+    fn python_history(
+        workspace: &WorkspaceId,
+        selected: &Arc<Document>,
+        evidence: &dyn ModuleEvidence,
+    ) -> Option<Self> {
         let mut index = Self::empty(workspace);
+        let path = selected.path();
+        let initializers =
+            evidence.regular_paths(&mut python_ancestors(path).map(python_initializer))?;
         if let Some(module) = python_module(&index.workspace, path, |p| initializers.contains(p)) {
             index.python.insert(path.into(), module);
         }
-        index
+        Some(index)
     }
 
     /// Creates an index without file-level bindings.
@@ -479,13 +610,14 @@ impl ModuleIndex {
         let mut budget = TOTAL_BYTES;
         let mut queue = VecDeque::new();
         for (path, doc) in &docs {
-            if path.rsplit('/').next() == Some("Cargo.toml")
-                && let Some(text) = doc.resident_source().filter(|s| s.len() <= 128 * 1024)
+            if cargo_manifest(path)
+                && let Some(text) = doc.resident_source().filter(|s| s.len() <= MANIFEST_BYTES)
             {
                 for (file, label, kind) in root_targets(path, text, &docs) {
                     let seed = format!(
-                        "{}\0rust\0{path}\0{kind}\0{file}\0{label}",
-                        snapshot.workspace().as_str()
+                        "{}\0{}\0{path}\0{kind}\0{file}\0{label}",
+                        snapshot.workspace().as_str(),
+                        RUST.kind.language
                     );
                     let base = Base {
                         seed,
@@ -500,7 +632,7 @@ impl ModuleIndex {
             if doc
                 .analyses()
                 .iter()
-                .any(|a| a.context.language == "python")
+                .any(|a| a.context.language == PYTHON.kind.language)
                 && let Some(module) = python_module(snapshot.workspace().as_str(), path, |p| {
                     docs.contains_key(p)
                 })
@@ -590,48 +722,43 @@ impl ModuleIndex {
         if analysis.coverage != Coverage::Syntax {
             return None;
         }
-        if analysis.context.language == "python" {
-            return self.python.get(doc.path()).cloned();
-        }
-        if analysis.context.language == "ruby" {
-            let mut modules = vec![];
-            let mut found_module = false;
-            let mut next = Some(ordinal);
-            for _ in 0..16 {
-                let Some(n) = next else { break };
-                let fact = analysis.facts.get(n)?;
-                if fact.kind == "module" || (found_module && fact.kind == "class") {
-                    found_module |= fact.kind == "module";
-                    modules.push(fact.name.trim_start_matches("::"));
-                    if fact.name.starts_with("::") {
-                        next = None;
-                        break;
-                    }
+        (module_rule(&analysis.context.language)?.fact)(self, doc, analysis, ordinal)
+    }
+
+    fn ruby_fact(&self, analysis: &Analysis, ordinal: usize) -> Option<Module> {
+        let mut modules = vec![];
+        let mut found_module = false;
+        let mut next = Some(ordinal);
+        for _ in 0..16 {
+            let Some(n) = next else { break };
+            let fact = analysis.facts.get(n)?;
+            if fact.kind == "module" || (found_module && fact.kind == "class") {
+                found_module |= fact.kind == "module";
+                modules.push(fact.name.trim_start_matches("::"));
+                if fact.name.starts_with("::") {
+                    next = None;
+                    break;
                 }
-                next = fact.parent;
             }
-            if next.is_some() || !found_module {
-                return None;
-            }
-            modules.reverse();
-            let label = modules.join("::");
-            if label.len() > 512 {
-                return None;
-            }
-            let root = label.split("::").next()?.to_owned();
-            return Some(Module {
-                id: blake3::hash(format!("{}\0ruby\0{label}", self.workspace).as_bytes())
-                    .to_hex()
-                    .to_string(),
-                label,
-                root,
-                language: "ruby",
-                basis: "ruby_declarations",
-            });
+            next = fact.parent;
         }
-        if analysis.context.language != "rust" {
+        if next.is_some() || !found_module {
             return None;
         }
+        modules.reverse();
+        let label = modules.join("::");
+        if label.len() > 512 {
+            return None;
+        }
+        let root = label.split("::").next()?.to_owned();
+        let id =
+            blake3::hash(format!("{}\0{}\0{label}", self.workspace, RUBY.kind.language).as_bytes())
+                .to_hex()
+                .to_string();
+        Some(RUBY.kind.describe(id, label, root))
+    }
+
+    fn rust_fact(&self, doc: &Document, analysis: &Analysis, ordinal: usize) -> Option<Module> {
         let base = self.rust.get(doc.path())?.as_ref()?;
         let mut names = vec![];
         let mut parent = analysis.facts.get(ordinal)?.parent;
@@ -658,14 +785,9 @@ impl ModuleIndex {
         if label.len() > 512 {
             return None;
         }
-        Some(Module {
-            id: blake3::hash(format!("{}\0{label}", base.seed).as_bytes())
-                .to_hex()
-                .to_string(),
-            label,
-            language: "rust",
-            root: base.root.clone(),
-            basis: "rust_declarations",
-        })
+        let id = blake3::hash(format!("{}\0{label}", base.seed).as_bytes())
+            .to_hex()
+            .to_string();
+        Some(RUST.kind.describe(id, label, base.root.clone()))
     }
 }

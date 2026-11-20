@@ -13,7 +13,8 @@ Rust target roots come from captured Cargo package/target declarations and Cargo
 root rules. Module edges come from parsed Rust declarations, literal path attributes and
 literal module-scope include! inputs; lexical module parents refine each declaration.
 Python files define modules, with captured __init__.py files establishing explicit package
-chains. Classes/implementations are excluded from module paths. Conflicting contexts,
+chains. Ruby module membership comes from the captured declaration's enclosing namespace.
+Conflicting contexts,
 missing/capped/nonresident inputs and unsupported languages return no membership.
 
 Rust module IDs bind the workspace, language, source root/target and qualified module path.
@@ -29,7 +30,10 @@ from files up to 1 MiB and an 8 MiB aggregate text budget, and manifests up to 1
 Only resident captured text is eligible. Reaching a limit yields neutral membership;
 this is a bounded visual capability, not whole-repository module coverage.
 
-Saved working-tree comparisons freeze the selected file's module bindings from the same
+Native module rules choose the evidence needed for membership. Function history supplies
+bounded file captures and regular-path checks from the selected Git commit. Ruby uses
+the selected declaration's own captured facts. Saved working-tree comparisons freeze
+the selected file's module bindings from the same
 source observation. Historical Rust captures resolve bindings for an accepted version using
 Cargo manifests and Rust declarations from its immutable Git tree. Discovery allows up to
 32,768 entries and 4 MiB of tree output. Context capture allows up to 8,192 eligible documents
@@ -48,7 +52,9 @@ context reference and exact file identity. This never carries old facts or certa
 the new observation. Only native unique keys are eligible; duplicate keys remain content
 scoped. Optional file/context request fields let older clients fail conservatively.
 
-The browser validates optional module descriptors and maps opaque IDs to a fixed palette.
+The browser validates optional module descriptors using the exact language and provenance
+pairs supplied with the module script. The native rules also supply tooltip labels.
+Existing saved descriptors use the same fields. The browser maps opaque IDs to a fixed palette.
 The first six distinct modules in view order get distinct colours, probing past occupied
 hash slots. Adding later views preserves those colours; removing an earlier module can
 release its slot. Larger sets reuse colours and rely on labels and peer highlighting.
