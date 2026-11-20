@@ -5,7 +5,7 @@ use super::{
 };
 use crate::{
     definitions::{Location, Position},
-    lsp::Setup,
+    lsp::{DocumentSync, Setup},
 };
 use serde_json::json;
 use std::{
@@ -23,7 +23,11 @@ impl Profile for RubyLsp {
         &["ruby"]
     }
 
-    fn inputs<'a>(&'a self, root: &'a Path) -> Result<Inputs<'a>, String> {
+    fn inputs<'a>(
+        &'a self,
+        root: &'a Path,
+        _: &'a vizzi_core::model::Snapshot,
+    ) -> Result<Inputs<'a>, String> {
         let mut files = InputFiles::default();
         files.read(&root.join("Gemfile"))?;
         let lock = files.read(&root.join("Gemfile.lock"))?;
@@ -221,7 +225,7 @@ fn prepare(mirror: &Path, lock: Option<&[u8]>) -> Result<Setup, String> {
         configuration: json!({}),
         status_notifications: false,
         progress_token: Some("indexing-progress".into()),
-        reopen_document_sync: true,
+        document_sync: DocumentSync::ReopenWithSymbols,
     })
 }
 
@@ -375,7 +379,7 @@ mod tests {
             assert!(!saved.contains(absent));
         }
         assert!(setup.arguments.is_empty());
-        assert!(setup.reopen_document_sync);
+        assert_eq!(setup.document_sync, DocumentSync::ReopenWithSymbols);
         assert_eq!(setup.progress_token.as_deref(), Some("indexing-progress"));
         let environment = setup
             .environment

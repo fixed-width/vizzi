@@ -8,7 +8,20 @@ use std::{
     path::{Component, Path, PathBuf},
 };
 
-type Prepare<'a> = Box<dyn FnOnce(&Path) -> Result<Setup, String> + 'a>;
+pub(super) struct PreparedInputs {
+    pub setup: Setup,
+    pub rejected_configs: BTreeMap<PathBuf, String>,
+}
+impl From<Setup> for PreparedInputs {
+    fn from(setup: Setup) -> Self {
+        Self {
+            setup,
+            rejected_configs: BTreeMap::new(),
+        }
+    }
+}
+
+type Prepare<'a> = Box<dyn FnOnce(&Path) -> Result<PreparedInputs, String> + 'a>;
 
 pub(super) struct Inputs<'a> {
     digest: String,
@@ -19,7 +32,7 @@ impl Inputs<'_> {
         &self.digest
     }
 
-    pub(super) fn prepare(self, mirror: &Path) -> Result<Setup, String> {
+    pub(super) fn prepare(self, mirror: &Path) -> Result<PreparedInputs, String> {
         (self.prepare)(mirror)
     }
 }
@@ -61,11 +74,11 @@ impl InputFiles {
         Ok(Some(bytes))
     }
 
-    pub(super) fn freeze<'a>(
+    pub(super) fn freeze<'a, T: Into<PreparedInputs>>(
         self,
         profile: &str,
         implementation: &[&[u8]],
-        prepare: impl FnOnce(&Path) -> Result<Setup, String> + 'a,
+        prepare: impl FnOnce(&Path) -> Result<T, String> + 'a,
     ) -> Inputs<'a> {
         let mut hash = blake3::Hasher::new();
         for implementation in implementation {
@@ -85,7 +98,7 @@ impl InputFiles {
         }
         Inputs {
             digest: hash.finalize().to_hex().to_string(),
-            prepare: Box::new(prepare),
+            prepare: Box::new(move |mirror| prepare(mirror).map(Into::into)),
         }
     }
 }
@@ -129,7 +142,7 @@ mod tests {
             let mut files = InputFiles::default();
             files.read(&path).unwrap();
             files
-                .freeze("fixture", &[implementation], |_| Err("no mirror".into()))
+                .freeze::<Setup>("fixture", &[implementation], |_| Err("no mirror".into()))
                 .digest()
                 .to_owned()
         };

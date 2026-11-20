@@ -56,13 +56,14 @@ These keys appear under `[language-servers]` and accept strings:
 | `pyright` | Executable for Vizzi-managed Python definitions/references |
 | `ruby-lsp` | Executable for Vizzi-managed Ruby definitions/references |
 | `clangd` | Executable for Vizzi-managed C/C++ definitions/references |
+| `typescript-server` | Installed TypeScript 7 or newer `tsc` executable for Vizzi-managed definitions/references |
 | `python-path` | Python executable/environment; requires `pyright` |
 | `compile-commands` | Compilation database path; requires `clangd` |
 | `vscode-connection` | VS Code plugin connection file; equivalent to `--vscode-connection FILE` |
 
 All providers default to disabled. Multiple managed servers can coexist. Selecting
 `vscode-connection` uses editor-owned analysis for supported languages and cannot be
-combined with managed-server, interpreter or compilation-database options. A disconnected
+combined with managed-server or project options. A disconnected
 editor never triggers a managed fallback server. Each query rereads the connection file.
 
 The bridge uses VS Code's saved project context. Dirty or changed buffers and mismatched

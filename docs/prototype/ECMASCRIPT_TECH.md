@@ -39,14 +39,61 @@ context. It can reuse a retained syntax tree for that context.
   sharing is enabled. The editor handles project settings, module resolution and
   type inference. The bridge applies the same saved-source and result checks
   as for other shared languages. Quoted methods record a checked opening-quote
-  definition position alongside the exact unquoted identifier span. A standalone
-  managed server remains future work. [Provider contract](../visual/LANGUAGE_SERVERS_TECH.md)
+  definition position alongside the exact unquoted identifier span.
+  [Provider contract](../visual/LANGUAGE_SERVERS_TECH.md)
 - Capture `package.json`, `tsconfig.json` and `jsconfig.json` as source-only evidence.
   Resolve package cues from the nearest captured ancestor manifest and give the cue
   one identity per workspace and manifest path, across the three grammar contexts.
   Historical lookup identifies the nearest eligible regular manifest in the selected
   Git commit and reads that one manifest with a 128 KiB limit.
   [Module identity contract](../visual/MODULES_TECH.md)
+
+## Managed TypeScript server
+
+The TypeScript profile uses the shared LSP client and `ProjectServer`. Opt in
+with `--typescript-server` and an installed TypeScript 7 or newer `tsc`.
+Vizzi runs it with `--lsp --stdio`, disables external code at initialization,
+and disables automatic type acquisition through the server's configuration
+request. Captured JSONC project configs are prepared in the mirror
+with compiler plugins removed and original path mapping order preserved. The
+reader accepts a leading UTF-8 BOM. Relative project-config references must
+resolve to captured files. Captured package manifests stay in the mirror for
+import resolution. A rejected config is represented by a safe placeholder with
+its validated file selection settings. Its error applies when TypeScript selects
+that project or a project that needs the rejected config for inheritance or
+project references.
+
+The profile provides LSP-specific language IDs for JSX and TSX. It sends source
+opens before the lookup, using the native server's ordered document processing.
+When the mirror contains rejected configs, `custom/projectInfo` identifies the
+selected project with a bounded response before navigation proceeds. The semantic
+configuration digest covers relevant captured paths and content, so a changed
+source or project input starts a fresh server on the next query. This covers
+cross-file re-resolution without waiting for asynchronous filesystem events.
+External locations remain outside the capture.
+[Native server command](https://github.com/microsoft/TypeScript/blob/main/tsc/cmd/tsc/lsp.go) ·
+[Native server initialization and settings](https://github.com/microsoft/TypeScript/blob/main/tsc/internal/lsp/server.go)
+
+The managed integration fixture uses `VIZZI_TYPESCRIPT_SERVER` to select the
+installed tool. With that variable set, the native
+`language_servers` suite checks frozen settings and package exports, aliases,
+quoted definitions, references and cross-file updates. The Chromium
+`browser.test.mjs` suite checks the standalone call and reference workflow.
+
+Verified with the native TypeScript 7.0.2 executable and its npm launcher.
+Closing the stdio client's input before reaping the launcher lets a wrapped
+server exit on EOF. The npm launcher passed with Node.js 22.14.0, which uses
+a child process for the native executable. The native workspace suite,
+all 16 Chromium tests, and the Pyright and clangd browser smoke tests passed.
+Four focused project preparation mutations were caught after a passing baseline.
+
+Review regressions exercise equal-prefix alias precedence, BOM-marked JSONC,
+and rejected configs that are unused, inherited, or referenced by the selected
+project. A lookup in a file with 43,000 declarations passes with the same LSP
+frame allowance. Native CI, all 16 Chromium tests, and the real VS Code
+editor-provider test passed. The follow-up mutation run caught all five
+selected changes to config rejection and dependency checks.
+
 
 ## Testing and validation
 

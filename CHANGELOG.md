@@ -12,10 +12,15 @@ remains in Git and the project documentation.
   outlines, and written-call candidates. Capture skips nested `node_modules` trees.
 - Use VS Code's shared JavaScript and TypeScript service for project-aware definitions
   and references. Bubbles show captured package names, including in function history.
+- Enable standalone JavaScript and TypeScript definitions and references with
+  `--typescript-server` and the native language server in TypeScript 7 or newer.
 - JavaScript and TypeScript outlines show variable-bound object methods, anonymous
   argument callbacks, and named TypeScript signatures.
 
 ### Fixed
+
+- Managed TypeScript preserves alias precedence, scopes config errors to affected
+  projects, and handles BOM-marked configs and lookups in large source files.
 
 - Structural capabilities report written-call support from the host's registered analyzers.
 - Follow VS Code definitions to quoted JavaScript and TypeScript methods. Past package

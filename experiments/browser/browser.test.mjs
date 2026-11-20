@@ -404,3 +404,50 @@ test("JavaScript and TypeScript outlines and written calls work in the captured 
     await fixture.close();
   }
 });
+
+const managedTypeScript = process.env.VIZZI_TYPESCRIPT_SERVER;
+
+test("managed TypeScript follows project aliases and exposes semantic references", {
+  skip: !managedTypeScript,
+}, async () => {
+  const fixture = await workspace({
+    files: {
+      "tsconfig.json": JSON.stringify({ compilerOptions: {
+        module: "ESNext", moduleResolution: "Bundler", jsx: "preserve",
+        paths: { "@service": ["./service.ts"] },
+      }}),
+      "entry.tsx": "import { create as select } from '@service';\nexport function launch() { return <div>{select().run()}</div>; }\n",
+      "service.ts": 'export class Service { "run"() { return 1; } }\nexport function create() { return new Service(); }\n',
+      "decoy.ts": "export class Other { run() { return 2; } }\n",
+    },
+    sourceArguments: ["--typescript-server", managedTypeScript],
+  });
+  let live, session;
+  try {
+    live = await startHost(fixture);
+    session = await openWorkspace(chromium, live);
+    const { page } = session;
+    await page.goto(live.url);
+    await page.waitForFunction(() => document.querySelector("#visual-source-status").textContent.includes("ready"));
+    await page.getByRole("button", { name: "Add bubble", exact: true }).click();
+    await page.getByLabel("Find a function", { exact: true }).fill("launch");
+    await page.getByRole("button", { name: "Find functions", exact: true }).click();
+    await page.locator('[data-add-symbol][data-name="launch"]').click();
+    await page.locator('[data-view][data-name="launch"]').getByRole("button", { name: "Calls", exact: true }).click();
+    await page.getByRole("button", { name: "run · line 2", exact: true }).click();
+    const method = page.locator('[data-view][data-name="run"]');
+    await method.locator(".code-line").first().waitFor();
+    assert.match(await method.locator(".fragment-heading").textContent(), /Service::run/);
+    assert.equal(await page.locator('#workspace-links .link-stroke').getAttribute("data-kind"), "definition");
+    await method.getByRole("button", { name: "Actions for run bubble", exact: true }).click();
+    await page.getByRole("menuitem", { name: "Find references", exact: true }).click();
+    const references = page.locator("[data-reference-stack]");
+    await references.getByRole("status").filter({ hasText: "Language references" }).waitFor();
+    assert.match(await references.locator("[data-reference-row]").textContent(), /entry\.tsx/);
+    assert.deepEqual(session.errors, []);
+  } finally {
+    await session?.close();
+    await live?.close();
+    await fixture.close();
+  }
+});

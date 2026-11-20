@@ -117,9 +117,16 @@ pub(crate) fn uri(path: &Path) -> Result<String, String> {
         .map(|u| u.to_string())
         .map_err(|()| "Invalid language-server file path".into())
 }
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum DocumentSync {
+    Diagnostics,
+    ReopenWithSymbols,
+    Ordered,
+}
+
 pub(crate) struct Client {
     child: Child,
-    input: ChildStdin,
+    input: Option<ChildStdin>,
     messages: Receiver<Result<Value, String>>,
     reader: Option<JoinHandle<()>>,
     next: u64,
@@ -127,7 +134,7 @@ pub(crate) struct Client {
     initialization: Value,
     status_notifications: bool,
     progress_token: Option<String>,
-    pub(crate) reopen_document_sync: bool,
+    pub(crate) document_sync: DocumentSync,
     diagnostics: BTreeMap<String, i32>,
     ready: bool,
     pub version: String,
@@ -138,7 +145,7 @@ pub(crate) struct Setup {
     pub configuration: Value,
     pub status_notifications: bool,
     pub progress_token: Option<String>,
-    pub reopen_document_sync: bool,
+    pub document_sync: DocumentSync,
     pub environment: Vec<(std::ffi::OsString, Option<std::ffi::OsString>)>,
 }
 impl Client {
@@ -153,7 +160,7 @@ impl Client {
                 configuration: json!({"rust-analyzer":options}),
                 status_notifications: true,
                 progress_token: None,
-                reopen_document_sync: false,
+                document_sync: DocumentSync::Diagnostics,
                 environment: vec![],
             },
         )
@@ -231,7 +238,7 @@ impl Client {
         let ready = !setup.status_notifications && setup.progress_token.is_none();
         let mut client = Self {
             child,
-            input,
+            input: Some(input),
             messages,
             reader: Some(reader),
             next: 0,
@@ -239,7 +246,7 @@ impl Client {
             initialization: setup.initialization,
             status_notifications: setup.status_notifications,
             progress_token: setup.progress_token,
-            reopen_document_sync: setup.reopen_document_sync,
+            document_sync: setup.document_sync,
             diagnostics: BTreeMap::new(),
             ready,
             version: String::new(),
@@ -263,6 +270,14 @@ impl Client {
         client.notify("initialized", json!({}))?;
         Ok(client)
     }
+    fn send(&mut self, message: &Value) -> Result<(), String> {
+        let input = self
+            .input
+            .as_mut()
+            .ok_or("Language server stdin unavailable")?;
+        write_message(input, message)
+    }
+
     pub(crate) fn notify(&mut self, method: &str, params: Value) -> Result<(), String> {
         if matches!(method, "textDocument/didOpen" | "textDocument/didChange")
             && let Some(uri) = params["textDocument"]["uri"].as_str()
@@ -274,10 +289,7 @@ impl Client {
         {
             self.diagnostics.remove(uri);
         }
-        write_message(
-            &mut self.input,
-            &json!({"jsonrpc":"2.0","method":method,"params":params}),
-        )
+        self.send(&json!({"jsonrpc":"2.0","method":method,"params":params}))
     }
     fn event(&mut self, message: Value) -> Result<(), String> {
         let Some(method) = message["method"].as_str() else {
@@ -330,16 +342,10 @@ impl Client {
                 | "client/registerCapability"
                 | "client/unregisterCapability" => Value::Null,
                 _ => {
-                    return write_message(
-                        &mut self.input,
-                        &json!({"jsonrpc":"2.0","id":id,"error":{"code":-32601,"message":"Read-only definition client"}}),
-                    );
+                    return self.send(&json!({"jsonrpc":"2.0","id":id,"error":{"code":-32601,"message":"Read-only definition client"}}));
                 }
             };
-            write_message(
-                &mut self.input,
-                &json!({"jsonrpc":"2.0","id":id,"result":result}),
-            )?;
+            self.send(&json!({"jsonrpc":"2.0","id":id,"result":result}))?;
         }
         Ok(())
     }
@@ -359,10 +365,7 @@ impl Client {
             .checked_add(1)
             .ok_or("Language-server request identities exhausted")?;
         let id = self.next;
-        write_message(
-            &mut self.input,
-            &json!({"jsonrpc":"2.0","id":id,"method":method,"params":params}),
-        )?;
+        self.send(&json!({"jsonrpc":"2.0","id":id,"method":method,"params":params}))?;
         let deadline = Instant::now() + timeout;
         loop {
             let message = self.receive(deadline)?;
@@ -390,14 +393,18 @@ impl Client {
         Ok(())
     }
     pub(crate) fn wait_document(&mut self, path: &Path, version: i32) -> Result<(), String> {
-        if self.reopen_document_sync {
-            self.wait_ready()?;
-            self.request(
-                "textDocument/documentSymbol",
-                json!({"textDocument":{"uri":uri(path)?}}),
-                Duration::from_secs(10),
-            )?;
-            return Ok(());
+        match self.document_sync {
+            DocumentSync::Ordered => return self.wait_ready(),
+            DocumentSync::ReopenWithSymbols => {
+                self.wait_ready()?;
+                self.request(
+                    "textDocument/documentSymbol",
+                    json!({"textDocument":{"uri":uri(path)?}}),
+                    Duration::from_secs(10),
+                )?;
+                return Ok(());
+            }
+            DocumentSync::Diagnostics => {}
         }
         let uri = uri(path)?;
         let deadline = Instant::now() + Duration::from_secs(10);
@@ -471,6 +478,7 @@ fn locations_with_limit(
 }
 impl Drop for Client {
     fn drop(&mut self) {
+        drop(self.input.take());
         let _ = self.child.kill();
         let _ = self.child.wait();
         self.messages = mpsc::sync_channel(0).1;
@@ -665,7 +673,7 @@ while True:
                 configuration: json!({"python":{"analysis":{"useLibraryCodeForTypes":true}}}),
                 status_notifications: false,
                 progress_token: None,
-                reopen_document_sync: false,
+                document_sync: DocumentSync::Diagnostics,
                 environment: vec![],
             },
         )
@@ -737,7 +745,7 @@ while sys.stdin.buffer.read(1):pass
                 configuration: json!({}),
                 status_notifications: false,
                 progress_token: Some("indexing-progress".into()),
-                reopen_document_sync: true,
+                document_sync: DocumentSync::ReopenWithSymbols,
                 environment: vec![
                     ("PATH".into(), None),
                     ("VIZZI_LSP_TEST".into(), Some("selected".into())),

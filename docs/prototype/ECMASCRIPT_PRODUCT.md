@@ -44,3 +44,14 @@ the existing call workspace without installing project dependencies.
    with the same name have different identities. A closest manifest with an
    unavailable or invalid name produces a neutral bubble. Live changes update
    labels with the source observation. Historical labels use the selected commit.
+7. A standalone launch can opt into the native TypeScript language server by
+   selecting an installed TypeScript 7 or newer compiler executable. The server
+   supplies definitions and references for the captured JavaScript and TypeScript
+   files without an editor connection. Captured project configs and package
+   manifests determine project settings and import aliases. Supported settings
+   include project-local inheritance, project references, and path mappings.
+   Unsupported settings required to open the project report unavailable
+   semantic analysis, and the existing written-name evidence remains available.
+   Definitions outside the capture appear as outside results. The server uses
+   captured source and settings across edits, and project plugins and automatic
+   type acquisition are disabled.

@@ -3,7 +3,7 @@ use super::{
     inputs::{InputFiles, Inputs, absolute, save},
     project::{ExternalSource, Profile},
 };
-use crate::lsp::Setup;
+use crate::lsp::{DocumentSync, Setup};
 use serde_json::{Value, json};
 use std::{
     fs,
@@ -18,7 +18,11 @@ impl Profile for Clangd {
         &["c", "cpp"]
     }
 
-    fn inputs<'a>(&'a self, root: &'a Path) -> Result<Inputs<'a>, String> {
+    fn inputs<'a>(
+        &'a self,
+        root: &'a Path,
+        _: &'a vizzi_core::model::Snapshot,
+    ) -> Result<Inputs<'a>, String> {
         let mut files = InputFiles::default();
         let path = self.database.as_ref().map_or_else(
             || root.join("compile_commands.json"),
@@ -105,7 +109,7 @@ impl Compilation {
             configuration: json!({}),
             status_notifications: false,
             progress_token: None,
-            reopen_document_sync: false,
+            document_sync: DocumentSync::Diagnostics,
             environment: vec![],
         })
     }
@@ -261,6 +265,7 @@ fn compilation_database(value: &Value, root: &Path, mirror: &Path) -> Result<Vec
 
 #[cfg(test)]
 mod tests {
+    use super::super::project::empty_snapshot;
     use super::*;
 
     #[test]
@@ -306,8 +311,8 @@ mod tests {
         )
         .unwrap();
         let profile = Clangd { database: None };
-        let inputs = profile.inputs(root.path()).unwrap();
-        let setup = inputs.prepare(mirror.path()).unwrap();
+        let inputs = profile.inputs(root.path(), empty_snapshot()).unwrap();
+        let setup = inputs.prepare(mirror.path()).unwrap().setup;
         assert!(setup.arguments.contains(&"-j=1".into()));
         let transformed: Value =
             serde_json::from_slice(&fs::read(mirror.path().join("compile_commands.json")).unwrap())
@@ -333,7 +338,7 @@ mod tests {
         )
         .unwrap();
         profile
-            .inputs(root.path())
+            .inputs(root.path(), empty_snapshot())
             .unwrap()
             .prepare(mirror.path())
             .unwrap();
@@ -399,12 +404,12 @@ mod tests {
     fn compile_flags_fallback_requires_the_default_database_path() {
         let root = tempfile::tempdir().unwrap();
         let profile = Clangd { database: None };
-        assert!(profile.inputs(root.path()).is_err());
+        assert!(profile.inputs(root.path(), empty_snapshot()).is_err());
         fs::write(root.path().join("compile_flags.txt"), "-std=c++20").unwrap();
-        assert!(profile.inputs(root.path()).is_ok());
+        assert!(profile.inputs(root.path(), empty_snapshot()).is_ok());
         let profile = Clangd {
             database: Some("custom.json".into()),
         };
-        assert!(profile.inputs(root.path()).is_err());
+        assert!(profile.inputs(root.path(), empty_snapshot()).is_err());
     }
 }

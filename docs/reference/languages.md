@@ -25,10 +25,10 @@ type aliases and named signatures. Computed methods and anonymous argument callb
 appear in the outline. Named function bodies and methods are available in **Add bubble**.
 
 Direct calls, dotted member calls and constructor expressions provide written-call
-candidates. With VS Code provider sharing enabled, the editor handles project-aware
-definitions and references, including aliases and inferred types. Results are mapped
-to captured saved source. Without sharing, **Find references** uses written-name
-candidates. [Use VS Code's JavaScript and TypeScript service](../how-to/configure-language-servers.md#javascript-and-typescript-with-vs-code)
+candidates. A managed TypeScript language server or VS Code provider sharing can
+resolve project-aware definitions and references, including aliases and inferred
+types. Results are mapped to captured source. Without a provider, **Find references**
+uses written-name candidates. [Configure JavaScript and TypeScript navigation](../how-to/configure-language-servers.md#javascript-and-typescript-with-a-managed-server)
 
 Package labels and accents use the closest captured `package.json` within the
 workspace. A missing or invalid name leaves the bubble neutral. Historical labels

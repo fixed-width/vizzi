@@ -82,7 +82,13 @@ fn source_policy_selects_dialects_and_skips_nested_dependencies() {
             .unwrap()
             .is_some()
     );
-    for path in ["package.json", "app/tsconfig.json", "app/jsconfig.json"] {
+    for path in [
+        "package.json",
+        "app/tsconfig.json",
+        "app/jsconfig.json",
+        "app/tsconfig.base.json",
+        "app/jsconfig.build.json",
+    ] {
         assert!(matches!(
             policy.classify(path).unwrap(),
             Some(Classification::SourceOnly {
@@ -91,6 +97,12 @@ fn source_policy_selects_dialects_and_skips_nested_dependencies() {
             })
         ));
     }
+    assert!(
+        policy
+            .classify("app/tsconfig.base.jsonc")
+            .unwrap()
+            .is_none()
+    );
     let missing = SourcePolicy::new(PolicyConfig::default(), []).unwrap();
     assert!(matches!(
         missing.classify("view.tsx").unwrap(),

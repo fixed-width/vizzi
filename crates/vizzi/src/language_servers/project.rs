@@ -3,7 +3,7 @@ use super::inputs::Inputs;
 use crate::{
     definitions::{self, Answer, Location, Position, Provider},
     dependency_sources::{Capture, Catalog, Input},
-    lsp::Client,
+    lsp::{Client, DocumentSync},
 };
 use serde_json::json;
 use std::{
@@ -27,8 +27,21 @@ pub(super) trait Profile: Send + Sync {
         self.languages().contains(&language)
     }
 
-    fn inputs<'a>(&'a self, root: &'a Path) -> Result<Inputs<'a>, String>;
+    fn inputs<'a>(&'a self, root: &'a Path, snapshot: &'a Snapshot) -> Result<Inputs<'a>, String>;
     fn external_source<'a>(&self, path: &'a Path, hint: &'a str) -> Option<ExternalSource<'a>>;
+
+    fn document_language<'a>(&self, _path: &Path, language: &'a str) -> &'a str {
+        language
+    }
+
+    fn project_error(
+        &self,
+        _client: &mut Client,
+        _path: &Path,
+        _rejected_configs: &BTreeMap<PathBuf, String>,
+    ) -> Result<Option<String>, String> {
+        Ok(None)
+    }
 
     fn signature_only(&self, _path: &Path) -> bool {
         false
@@ -61,6 +74,7 @@ struct Workspace {
     directory: tempfile::TempDir,
     client: Client,
     configuration: String,
+    rejected_configs: BTreeMap<PathBuf, String>,
     files: BTreeMap<String, String>,
     opened: BTreeSet<PathBuf>,
     next: i32,
@@ -159,9 +173,10 @@ impl ProjectServer {
     }
     fn workspace(&self, snapshot: &Snapshot, inputs: Inputs<'_>) -> Result<Workspace, String> {
         fs::create_dir_all(&self.cache).map_err(|e| e.to_string())?;
+        let cache = self.cache.canonicalize().map_err(|e| e.to_string())?;
         let directory = tempfile::Builder::new()
             .prefix("captured-")
-            .tempdir_in(&self.cache)
+            .tempdir_in(cache)
             .map_err(|e| e.to_string())?;
         let mut files = BTreeMap::new();
         let mut total = 0;
@@ -179,12 +194,13 @@ impl ProjectServer {
             files.insert(doc.path().into(), doc.version().as_str().into());
         }
         let configuration = inputs.digest().to_owned();
-        let setup = inputs.prepare(directory.path())?;
-        let client = Client::configured(&self.executable, directory.path(), setup)?;
+        let prepared = inputs.prepare(directory.path())?;
+        let client = Client::configured(&self.executable, directory.path(), prepared.setup)?;
         Ok(Workspace {
             directory,
             client,
             configuration,
+            rejected_configs: prepared.rejected_configs,
             files,
             opened: BTreeSet::new(),
             next: 0,
@@ -236,7 +252,7 @@ impl ProjectServer {
         }
         let text = source(doc)?;
         let position = definitions::position(&text, byte)?;
-        let inputs = self.profile.inputs(&self.root)?;
+        let inputs = self.profile.inputs(&self.root, &snapshot)?;
         let configuration = inputs.digest().to_owned();
         let mut state = self
             .state
@@ -256,7 +272,14 @@ impl ProjectServer {
         } else {
             workspace.directory.path().join(doc.path())
         };
-        workspace.open(&path, lang, &text)?;
+        workspace.open(&path, self.profile.document_language(&path, lang), &text)?;
+        if let Some(error) =
+            self.profile
+                .project_error(&mut workspace.client, &path, &workspace.rejected_configs)?
+        {
+            *state = Some(workspace);
+            return Err(error);
+        }
         let captures = self.sources.sources()?;
         let retained = captures
             .iter()
@@ -405,7 +428,7 @@ impl ProjectServer {
             .map(|capture| capture.path())
             .collect();
         workspace.prune_external(&retained)?;
-        if self.profile.inputs(&self.root)?.digest() != configuration {
+        if self.profile.inputs(&self.root, &snapshot)?.digest() != configuration {
             return Err("Project inputs changed during semantic lookup".into());
         }
         let mut hash = blake3::Hasher::new();
@@ -560,7 +583,8 @@ impl Workspace {
             .ok_or("Semantic document versions exhausted")?;
         let uri = crate::lsp::uri(path)?;
         // Reopen full captures when the server requires ranged incremental edits.
-        let reopen = self.client.reopen_document_sync && self.opened.contains(path);
+        let reopen = self.client.document_sync == DocumentSync::ReopenWithSymbols
+            && self.opened.contains(path);
         if reopen {
             self.client
                 .notify("textDocument/didClose", json!({"textDocument":{"uri":uri}}))?;
@@ -622,7 +646,8 @@ impl Workspace {
             self.client.notify("workspace/didChangeWatchedFiles",json!({"changes":[{"uri":crate::lsp::uri(&absolute)?,"type":if self.files.contains_key(doc.path()){2}else{1}}]}))?;
             self.open(
                 &absolute,
-                language(doc).ok_or("Source language missing")?,
+                profile
+                    .document_language(&absolute, language(doc).ok_or("Source language missing")?),
                 &text,
             )?;
             self.files
@@ -630,4 +655,19 @@ impl Workspace {
         }
         Ok(())
     }
+}
+
+#[cfg(test)]
+pub(super) fn empty_snapshot() -> &'static Snapshot {
+    use std::sync::OnceLock;
+    use vizzi_core::model::{CapturePolicyId, WorkspaceId};
+    static SNAPSHOT: OnceLock<Snapshot> = OnceLock::new();
+    SNAPSHOT.get_or_init(|| {
+        Snapshot::new(
+            WorkspaceId::derive(&[b"project-input-test"]),
+            vec![],
+            CapturePolicyId::derive(&[b"fixture"]),
+        )
+        .unwrap()
+    })
 }

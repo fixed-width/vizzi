@@ -2,12 +2,38 @@
 
 Use a language server when you want type-aware definition and reference lookup rather
 than written-name candidates. Vizzi supports rust-analyzer for Rust, Pyright for Python,
-Ruby LSP for Ruby, and clangd for C/C++. Several can be configured in one mixed-language workspace.
+Ruby LSP for Ruby, clangd for C/C++, and the native TypeScript server for JavaScript
+and TypeScript. Several can be configured in one mixed-language workspace.
 Basic syntax browsing remains available without them.
 
 To save these settings in TOML, see [save launch settings](configure-vizzi.md).
-Vizzi-managed servers use captured-source mirrors. JavaScript and TypeScript use
-VS Code's shared provider.
+Vizzi-managed servers use captured-source mirrors. JavaScript and TypeScript also
+work through VS Code's shared provider.
+
+## JavaScript and TypeScript with a managed server
+
+Install the current stable TypeScript release and select its `tsc` executable.
+TypeScript 7 adds a native language server, which Vizzi starts with `--lsp --stdio`.
+The workflow was verified with TypeScript 7.0.2.
+[TypeScript 7 release announcement](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/)
+
+```sh
+npm install -g typescript
+vizzi --root /path/to/project --typescript-server tsc
+```
+
+With the server configured, open a function and follow a call or choose **Find
+references**. Vizzi uses captured `package.json`, `tsconfig.json`, `jsconfig.json`
+and variant files such as `tsconfig.base.json`. Keep `extends` and project references
+relative to captured configs. Path-valued settings such as `include` and `paths`
+must resolve within the mirror. Workspaces without a root config get a default
+project that includes both JavaScript and TypeScript.
+
+The managed provider disables automatic type acquisition and compiler plugins.
+It reopens its captured project after a relevant source or config change.
+Definitions outside the captured project appear as outside results. If the
+server or project settings are unavailable, the call workspace retains
+written-name evidence.
 
 ## JavaScript and TypeScript with VS Code
 

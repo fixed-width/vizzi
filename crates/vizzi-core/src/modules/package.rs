@@ -7,7 +7,7 @@ use super::{
 use crate::{
     analysis::ECMASCRIPT_LANGUAGES,
     model::{Document, Snapshot, WorkspaceId},
-    policy::{Classification, PACKAGE_METADATA_LANGUAGE, SourceOnlyReason},
+    policy::{Classification, ECMASCRIPT_PROJECT_METADATA, SourceOnlyReason},
 };
 use serde::Deserialize;
 use std::{collections::BTreeMap, sync::Arc};
@@ -47,7 +47,7 @@ fn is_metadata(classification: &Classification) -> bool {
         language: Some(language),
         reason: SourceOnlyReason::ProjectMetadata,
         ..
-    } if language == PACKAGE_METADATA_LANGUAGE)
+    } if language == ECMASCRIPT_PROJECT_METADATA)
 }
 
 fn valid_name(name: &str) -> bool {

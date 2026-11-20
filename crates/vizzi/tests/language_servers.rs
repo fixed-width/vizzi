@@ -117,6 +117,322 @@ fn configuration_is_lazy_and_unconfigured_languages_do_not_use_another_server() 
 }
 
 #[test]
+fn managed_typescript_resolves_captured_aliases_references_and_cross_file_edits() {
+    use vizzi::{cache::Cache, engine::Engine, source::Directory};
+    let Some(executable) = std::env::var_os("VIZZI_TYPESCRIPT_SERVER") else {
+        eprintln!("Set VIZZI_TYPESCRIPT_SERVER to exercise the managed native TypeScript server");
+        return;
+    };
+    let root = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    let config = |file: &str| {
+        serde_json::json!({"compilerOptions":{
+            "allowJs":true, "jsx":"preserve", "module":"ESNext", "moduleResolution":"Bundler",
+            "paths":{"@service":[file]}
+        }})
+        .to_string()
+    };
+    let write = |path: &str, text: &str| std::fs::write(root.path().join(path), text).unwrap();
+    write(
+        "tsconfig.json",
+        "{ // frozen project\n \"extends\": \"./tsconfig.base\",\n}",
+    );
+    write("tsconfig.base.json", &config("./old.ts"));
+    write(
+        "app.tsx",
+        "import { make as select } from '@service';\nexport function launch() { const icon = '😀'; const tool = select(); return <div>{icon}{tool.run()}</div>; }",
+    );
+    write(
+        "view.jsx",
+        "import { make } from './old';\nexport function show() { return <span>{make().run()}</span>; }",
+    );
+    let package = |file: &str| {
+        serde_json::json!({"name":"fixture-service", "exports":{"./tool":file}}).to_string()
+    };
+    write("package.json", &package("./old.ts"));
+    write(
+        "package-user.ts",
+        "import { make } from 'fixture-service/tool';\nexport function packageCall() { return make().run(); }",
+    );
+    write(
+        "old.ts",
+        "export class Old { \"run\"() {} }\nexport const make = () => new Old();",
+    );
+    write(
+        "new.ts",
+        "export class New { run() {} }\nclass Next { run() {} }\nexport const make = () => new New();",
+    );
+    let engine = Engine::new(
+        Directory::open(root.path()).unwrap(),
+        Cache::new(cache.path().join("raw")),
+        1,
+    )
+    .unwrap();
+    let capture = || engine.refresh(None, &|| false).unwrap().unwrap().snapshot;
+    let original = capture();
+    let provider = Servers::new(
+        root.path().into(),
+        cache.path().join("semantic"),
+        Configuration {
+            typescript_server: Some(executable.into()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    write("tsconfig.base.json", &config("./new.ts"));
+    write("package.json", &package("./new.ts"));
+    let resolve = |snapshot: &Arc<Snapshot>, path: &str, caller: &str, name: &str| {
+        let index = Structure::new(snapshot);
+        let function = index
+            .functions(path, caller, 0)
+            .unwrap()
+            .items
+            .remove(0)
+            .symbol;
+        let invocation = index
+            .outgoing(&function.id, path, 0)
+            .unwrap()
+            .items
+            .into_iter()
+            .find(|item| item.name.as_deref() == Some(name))
+            .unwrap();
+        let answer = provider
+            .resolve(snapshot.clone(), &index.call(&invocation.id).unwrap())
+            .unwrap();
+        assert_eq!(answer.locations.len(), 1, "{answer:?}");
+        let location = &answer.locations[0];
+        let target = snapshot
+            .file_by_path(&location.path)
+            .unwrap()
+            .resident_source()
+            .unwrap();
+        let at = vizzi::definitions::byte_offset(target, location.position).unwrap();
+        (
+            index.definition(&location.path, at).unwrap(),
+            answer.context,
+        )
+    };
+    let (alias, context) = resolve(&original, "app.tsx", "launch", "select");
+    assert_eq!(alias.name, "make");
+    assert_eq!(alias.source.path, "old.ts");
+    let (old, _) = resolve(&original, "app.tsx", "launch", "run");
+    assert_eq!(old.parents, ["Old"]);
+    let refs = provider
+        .references(
+            original.clone(),
+            &old,
+            Structure::new(&original).identifier(&old.id).unwrap(),
+        )
+        .unwrap();
+    assert!(
+        refs.locations
+            .iter()
+            .any(|location| location.path == "app.tsx"),
+        "{refs:?}"
+    );
+    assert_eq!(
+        resolve(&original, "view.jsx", "show", "run").0.parents,
+        ["Old"]
+    );
+    assert_eq!(
+        resolve(&original, "package-user.ts", "packageCall", "run")
+            .0
+            .parents,
+        ["Old"]
+    );
+
+    let updated = capture();
+    let (new, new_context) = resolve(&updated, "app.tsx", "launch", "run");
+    assert_eq!(new.parents, ["New"]);
+    assert_eq!(
+        resolve(&updated, "package-user.ts", "packageCall", "run")
+            .0
+            .parents,
+        ["New"]
+    );
+    assert_ne!(context, new_context);
+    write(
+        "new.ts",
+        "export class New { run() {} }\nclass Next { run() {} }\nexport const make = () => new Next();",
+    );
+    let edited = capture();
+    assert_eq!(
+        resolve(&edited, "app.tsx", "launch", "run").0.parents,
+        ["Next"]
+    );
+}
+
+#[test]
+fn managed_typescript_keeps_equal_prefix_path_mappings_in_captured_order() {
+    let Some(fixture) = TypeScriptFixture::new(&[
+        (
+            "tsconfig.json",
+            r#"{"compilerOptions":{"module":"ESNext","moduleResolution":"Bundler","paths":{"@service/*.js":["./specific/*"],"@service/*":["./fallback/*"]}}}"#,
+        ),
+        (
+            "app.ts",
+            "import { work } from '@service/foo.js';\nexport function launch() { return work(); }",
+        ),
+        ("specific/foo.ts", "export function work() { return 1; }"),
+        ("fallback/foo.ts", "export function work() { return 2; }"),
+    ]) else {
+        return;
+    };
+    let answer = fixture.call("app.ts").unwrap();
+    assert_eq!(answer.locations.len(), 1, "{answer:?}");
+    assert_eq!(answer.locations[0].path, "specific/foo.ts");
+}
+
+#[test]
+fn managed_typescript_accepts_a_bom_before_the_captured_jsonc() {
+    let Some(fixture) = TypeScriptFixture::new(&[
+        (
+            "tsconfig.json",
+            "\u{feff}{ // config written with a BOM\n\"compilerOptions\":{},\n}",
+        ),
+        (
+            "app.ts",
+            "function work() {}\nexport function launch() { work(); }",
+        ),
+    ]) else {
+        return;
+    };
+    assert_eq!(
+        fixture.call("app.ts").unwrap().locations[0].position.line,
+        0
+    );
+}
+
+#[test]
+fn managed_typescript_reports_config_errors_only_when_the_active_project_needs_them() {
+    let Some(fixture) = TypeScriptFixture::new(&[
+        (
+            "tsconfig.json",
+            r#"{"exclude":["broken","plain","solution"]}"#,
+        ),
+        ("tsconfig.editor.json", r#"{"extends":"@outside/tsconfig"}"#),
+        (
+            "broken/tsconfig.json",
+            r#"{"extends":"../tsconfig.editor.json","include":["**/*.ts"]}"#,
+        ),
+        (
+            "plain/tsconfig.json",
+            r#"{"extends":"@outside/unused","files":["excluded.ts"]}"#,
+        ),
+        (
+            "solution/tsconfig.json",
+            r#"{"references":[{"path":"../broken"}],"include":["app.ts"]}"#,
+        ),
+        (
+            "app.ts",
+            "function work() {}\nexport function launch() { work(); }",
+        ),
+        (
+            "broken/app.ts",
+            "function work() {}\nexport function launch() { work(); }",
+        ),
+        (
+            "plain/app.ts",
+            "function work() {}\nexport function launch() { work(); }",
+        ),
+        (
+            "solution/app.ts",
+            "function work() {}\nexport function launch() { work(); }",
+        ),
+    ]) else {
+        return;
+    };
+    assert_eq!(fixture.call("app.ts").unwrap().locations[0].path, "app.ts");
+    let error = fixture.call("broken/app.ts").unwrap_err();
+    assert!(
+        error.contains("tsconfig.editor.json") && error.contains("@outside/tsconfig"),
+        "{error}"
+    );
+    let error = fixture.call("solution/app.ts").unwrap_err();
+    assert!(
+        error.contains("broken") && error.contains("@outside/tsconfig"),
+        "{error}"
+    );
+    assert_eq!(
+        fixture.call("plain/app.ts").unwrap().locations[0].path,
+        "plain/app.ts"
+    );
+    assert_eq!(fixture.call("app.ts").unwrap().locations[0].path, "app.ts");
+}
+
+#[test]
+fn managed_typescript_resolves_a_call_without_requesting_a_large_outline() {
+    use std::fmt::Write;
+    let mut text = "function work() {}\nexport function launch() { work(); }\n".to_owned();
+    for i in 0..43_000 {
+        writeln!(text, "function filler_{i:05}() {{}}").unwrap();
+    }
+    let Some(fixture) = TypeScriptFixture::new(&[
+        ("app.ts", &text),
+        ("tsconfig.unused.json", r#"{"extends":"@outside/unused"}"#),
+    ]) else {
+        return;
+    };
+    let answer = fixture.call("app.ts").unwrap();
+    assert_eq!(answer.locations.len(), 1, "{answer:?}");
+    assert_eq!(answer.locations[0].position.line, 0);
+}
+
+struct TypeScriptFixture {
+    provider: Servers,
+    snapshot: Arc<Snapshot>,
+    _directory: tempfile::TempDir,
+}
+
+impl TypeScriptFixture {
+    fn new(files: &[(&str, &str)]) -> Option<Self> {
+        use vizzi::{cache::Cache, engine::Engine, source::Directory};
+        let executable = std::env::var_os("VIZZI_TYPESCRIPT_SERVER")?;
+        let directory = tempfile::tempdir().unwrap();
+        let root = directory.path().join("project");
+        for (path, text) in files {
+            let path = root.join(path);
+            std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+            std::fs::write(path, text).unwrap();
+        }
+        let engine = Engine::new(
+            Directory::open(&root).unwrap(),
+            Cache::new(directory.path().join("raw")),
+            1,
+        )
+        .unwrap();
+        let snapshot = engine.refresh(None, &|| false).unwrap().unwrap().snapshot;
+        let provider = Servers::new(
+            root,
+            directory.path().join("semantic"),
+            Configuration {
+                typescript_server: Some(executable.into()),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        Some(Self {
+            provider,
+            snapshot,
+            _directory: directory,
+        })
+    }
+
+    fn call(&self, path: &str) -> Result<vizzi::definitions::Answer, String> {
+        let index = Structure::new(&self.snapshot);
+        let owner = index
+            .functions(path, "launch", 0)
+            .unwrap()
+            .items
+            .remove(0)
+            .symbol;
+        let call = index.outgoing(&owner.id, path, 0).unwrap().items.remove(0);
+        self.provider
+            .resolve(self.snapshot.clone(), &index.call(&call.id).unwrap())
+    }
+}
+
+#[test]
 fn managed_servers_expose_the_shared_catalog_for_admitted_dependency_source() {
     use vizzi::dependency_sources::Input;
     let root = tempfile::tempdir().unwrap();

@@ -4,7 +4,8 @@ use crate::model::{CapturePolicyId, ModelError};
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 
-pub(crate) const PACKAGE_METADATA_LANGUAGE: &str = "javascript-project";
+/// Source-only classification for JavaScript and TypeScript project inputs.
+pub const ECMASCRIPT_PROJECT_METADATA: &str = "javascript-project";
 
 struct DefaultSourceRules {
     language: &'static str,
@@ -40,7 +41,7 @@ const DEFAULT_SOURCE_RULES: &[DefaultSourceRules] = &[
         suffixes: &["js", "jsx", "mjs", "cjs"],
         filenames: &[],
         project_metadata: Some((
-            PACKAGE_METADATA_LANGUAGE,
+            ECMASCRIPT_PROJECT_METADATA,
             &["package.json", "tsconfig.json", "jsconfig.json"],
         )),
     },
@@ -241,6 +242,16 @@ impl SourcePolicy {
             .iter()
             .filter_map(|rules| rules.project_metadata)
             .find_map(|(label, names)| names.contains(&filename).then_some(label))
+            .or_else(|| {
+                let stem = filename.strip_suffix(".json")?;
+                ["tsconfig.", "jsconfig."]
+                    .iter()
+                    .any(|prefix| {
+                        stem.strip_prefix(prefix)
+                            .is_some_and(|suffix| !suffix.is_empty())
+                    })
+                    .then_some(ECMASCRIPT_PROJECT_METADATA)
+            })
             .or_else(|| {
                 (!self.roots.is_empty()
                     && matches!(filename, "compile_commands.json" | "compile_flags.txt"))
