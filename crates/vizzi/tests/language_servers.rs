@@ -158,7 +158,7 @@ fn managed_servers_expose_the_shared_catalog_for_admitted_dependency_source() {
 
 #[cfg(unix)]
 #[test]
-fn ruby_full_capture_updates_follow_the_document_lifecycle_protocol() {
+fn ruby_reopens_changed_captures_and_verifies_definitions_and_references() {
     use std::os::unix::fs::PermissionsExt;
     let root = tempfile::tempdir().unwrap();
     let cache = tempfile::tempdir().unwrap();
@@ -176,6 +176,10 @@ def read():
     return json.loads(sys.stdin.buffer.read(int(headers['content-length'])))
 def send(value):
     data=json.dumps(value).encode();sys.stdout.buffer.write(('Content-Length: %d\r\n\r\n'%len(data)).encode()+data);sys.stdout.buffer.flush()
+def location(uri,text,offset):
+    prefix=text[:offset]
+    position={'line':prefix.count('\n'),'character':len(prefix.rsplit('\n',1)[-1])}
+    return {'uri':uri,'range':{'start':position,'end':position}}
 while True:
     request=read()
     if request is None:break
@@ -191,9 +195,15 @@ while True:
     elif method=='textDocument/documentSymbol':
         assert params['textDocument']['uri'] in opened;send({'id':request['id'],'result':[]})
     elif method=='textDocument/definition':
-        uri=params['textDocument']['uri'];text=opened[uri];offset=text.index('process');prefix=text[:offset]
-        position={'line':prefix.count('\n'),'character':len(prefix.rsplit('\n',1)[-1])}
-        send({'id':request['id'],'result':[{'uri':uri,'range':{'start':position,'end':position}}]})
+        uri=params['textDocument']['uri'];text=opened[uri]
+        locations=[location(uri+'s','',0)]
+        if 'def process' in text:
+            locations.append(location(uri,text,text.index('process')))
+        send({'id':request['id'],'result':locations})
+    elif method=='textDocument/references':
+        uri=params['textDocument']['uri'];text=opened[uri]
+        locations=[location(uri,text,text.index('process')),location(uri,text,text.rindex('process'))]
+        send({'id':request['id'],'result':locations})
 "#).unwrap();
     std::fs::set_permissions(&executable, std::fs::Permissions::from_mode(0o700)).unwrap();
     let server = Servers::new(
@@ -205,15 +215,16 @@ while True:
         },
     )
     .unwrap();
-    for (line, text) in [
+    for (definition_line, text) in [
         (
-            0,
+            Some(0),
             "def process(value); value; end\ndef run; process(1); end\n",
         ),
         (
-            1,
+            Some(1),
             "\ndef process(value); value; end\ndef run; process(1); end\n",
         ),
+        (None, "def run; process(1); end\n"),
     ] {
         let captured = snapshot(&[("app.rb", "ruby", text)]);
         let index = Structure::new(&captured);
@@ -231,8 +242,28 @@ while True:
         let result = server
             .resolve(captured.clone(), &index.call(&site.id).unwrap())
             .unwrap();
-        assert_eq!(result.locations.len(), 1);
-        assert_eq!(result.locations[0].position.line, line);
+        assert_eq!(
+            result.locations.len(),
+            usize::from(definition_line.is_some())
+        );
+        assert_eq!(
+            result.locations.first().map(|loc| loc.position.line),
+            definition_line
+        );
+        assert_eq!(result.outside, usize::from(definition_line.is_none()));
+        if let Some(line) = definition_line {
+            let symbol = index
+                .functions("app.rb", "process", 0)
+                .unwrap()
+                .items
+                .remove(0)
+                .symbol;
+            let reference = server
+                .references(captured, &symbol, text.find("process").unwrap())
+                .unwrap();
+            assert_eq!(reference.locations.len(), 1);
+            assert_eq!(reference.locations[0].position.line, line + 1);
+        }
     }
 }
 

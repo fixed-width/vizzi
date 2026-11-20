@@ -1,7 +1,7 @@
 //! Captured-source mirror and semantic lookup shared by non-Cargo adapters.
-use super::inputs::{Inputs, Profile};
+use super::inputs::Inputs;
 use crate::{
-    definitions::{self, Answer, Location, Provider},
+    definitions::{self, Answer, Location, Position, Provider},
     dependency_sources::{Capture, Catalog, Input},
     lsp::Client,
 };
@@ -19,11 +19,41 @@ use vizzi_core::{
 
 const FILE_BYTES: usize = 8 * 1024 * 1024;
 const WORKSPACE_BYTES: usize = 128 * 1024 * 1024;
+
+pub(super) trait Profile: Send + Sync {
+    fn languages(&self) -> &'static [&'static str];
+
+    fn accepts(&self, language: &str) -> bool {
+        self.languages().contains(&language)
+    }
+
+    fn inputs<'a>(&'a self, root: &'a Path) -> Result<Inputs<'a>, String>;
+    fn external_source<'a>(&self, path: &'a Path, hint: &'a str) -> Option<ExternalSource<'a>>;
+
+    fn signature_only(&self, _path: &Path) -> bool {
+        false
+    }
+
+    fn filter_references(
+        &self,
+        _lookup: ReferenceLookup<'_>,
+        locations: Vec<Location>,
+    ) -> Result<Vec<Location>, String> {
+        Ok(locations)
+    }
+}
+
+pub(super) struct ExternalSource<'a> {
+    pub root: &'a Path,
+    pub language: &'a str,
+    pub package: &'a str,
+}
+
 pub(super) struct ProjectServer {
     root: PathBuf,
     cache: PathBuf,
     executable: PathBuf,
-    profile: Profile,
+    profile: Box<dyn Profile>,
     sources: Arc<Catalog>,
     state: Mutex<Option<Workspace>>,
 }
@@ -35,6 +65,56 @@ struct Workspace {
     opened: BTreeSet<PathBuf>,
     next: i32,
 }
+
+type DefinitionLocations = Vec<(Option<PathBuf>, Position)>;
+
+pub(super) struct ReferenceLookup<'a> {
+    pub path: &'a Path,
+    pub position: Position,
+    language: &'a str,
+    snapshot: &'a Snapshot,
+    sources: &'a Catalog,
+    workspace: &'a mut Workspace,
+}
+
+impl ReferenceLookup<'_> {
+    pub(super) fn definitions_at(
+        &mut self,
+        location: &Location,
+        include: impl FnOnce(&Document, usize) -> bool,
+    ) -> Result<Option<DefinitionLocations>, String> {
+        let external = location
+            .capture
+            .as_ref()
+            .map(|id| self.sources.get(id))
+            .transpose()?
+            .flatten();
+        let doc = external
+            .as_ref()
+            .map(|capture| capture.doc())
+            .or_else(|| {
+                self.snapshot
+                    .file_by_path(&location.path)
+                    .map(AsRef::as_ref)
+            })
+            .ok_or("Reference source expired")?;
+        let text = source(doc)?;
+        let byte = definitions::byte_offset(&text, location.position)?;
+        if !include(doc, byte) {
+            return Ok(None);
+        }
+        let path = external
+            .as_ref()
+            .map(|capture| capture.path())
+            .unwrap_or_else(|| self.workspace.directory.path().join(&location.path));
+        self.workspace.open(&path, self.language, &text)?;
+        self.workspace
+            .client
+            .definitions(&path, location.position)
+            .map(Some)
+    }
+}
+
 fn source(doc: &Document) -> Result<String, String> {
     doc.captured()
         .read_text(FILE_BYTES)
@@ -65,19 +145,19 @@ impl ProjectServer {
         root: PathBuf,
         cache: PathBuf,
         executable: PathBuf,
-        profile: Profile,
+        profile: impl Profile + 'static,
         sources: Arc<Catalog>,
     ) -> Self {
         Self {
             root,
             cache,
             executable,
-            profile,
+            profile: Box::new(profile),
             sources,
             state: Mutex::new(None),
         }
     }
-    fn workspace(&self, snapshot: &Snapshot, inputs: &Inputs) -> Result<Workspace, String> {
+    fn workspace(&self, snapshot: &Snapshot, inputs: Inputs<'_>) -> Result<Workspace, String> {
         fs::create_dir_all(&self.cache).map_err(|e| e.to_string())?;
         let directory = tempfile::Builder::new()
             .prefix("captured-")
@@ -98,12 +178,13 @@ impl ProjectServer {
             write(directory.path(), doc.path(), text.as_bytes())?;
             files.insert(doc.path().into(), doc.version().as_str().into());
         }
-        let setup = inputs.prepare(&self.root, directory.path(), &self.profile)?;
+        let configuration = inputs.digest().to_owned();
+        let setup = inputs.prepare(directory.path())?;
         let client = Client::configured(&self.executable, directory.path(), setup)?;
         Ok(Workspace {
             directory,
             client,
-            configuration: inputs.digest(),
+            configuration,
             files,
             opened: BTreeSet::new(),
             next: 0,
@@ -116,67 +197,17 @@ impl ProjectServer {
         hint: &str,
     ) -> Result<Input, String> {
         let path = fs::canonicalize(path).map_err(|e| e.to_string())?;
-        let language = match path.extension().and_then(|v| v.to_str()) {
-            Some("py" | "pyi") => "python",
-            Some("rb" | "rake" | "gemspec" | "ru") => "ruby",
-            Some("c") => "c",
-            Some("cc" | "cpp" | "cxx" | "hh" | "hpp" | "hxx" | "tcc" | "ipp" | "inl") => "cpp",
-            Some("h" | "inc") | None if matches!(hint, "c" | "cpp") => hint,
-            _ => return Err("Unsupported external source language".into()),
-        };
+        let ExternalSource {
+            root,
+            language,
+            package,
+        } = self
+            .profile
+            .external_source(&path, hint)
+            .ok_or("Unsupported external source language")?;
         if !self.profile.accepts(language) {
             return Err("External source language differs".into());
         }
-        let mut root = path.parent().ok_or("External source has no directory")?;
-        if language == "ruby" {
-            for candidate in path.ancestors().skip(1).take(32) {
-                if candidate
-                    .parent()
-                    .and_then(Path::file_name)
-                    .is_some_and(|name| name == "gems")
-                {
-                    root = candidate;
-                    break;
-                }
-            }
-        }
-        if language == "python" {
-            for _ in 0..16 {
-                let Some(parent) = root.parent() else {
-                    break;
-                };
-                if (root.join("__init__.py").is_file() || root.join("__init__.pyi").is_file())
-                    && (parent.join("__init__.py").is_file()
-                        || parent.join("__init__.pyi").is_file())
-                {
-                    root = parent;
-                    continue;
-                }
-                break;
-            }
-        }
-        let package = if language == "python" {
-            if root.join("__init__.py").is_file() || root.join("__init__.pyi").is_file() {
-                root.file_name()
-                    .and_then(|name| name.to_str())
-                    .unwrap_or("Python source")
-            } else {
-                path.file_stem()
-                    .and_then(|name| name.to_str())
-                    .unwrap_or("Python source")
-            }
-        } else {
-            if language == "ruby" {
-                root.parent()
-                    .and_then(Path::file_name)
-                    .filter(|name| *name == "gems")
-                    .and_then(|_| root.file_name())
-                    .and_then(|name| name.to_str())
-                    .unwrap_or("Ruby library source")
-            } else {
-                "C/C++ source"
-            }
-        };
         Ok(Input {
             root: root.into(),
             path: path
@@ -205,17 +236,17 @@ impl ProjectServer {
         }
         let text = source(doc)?;
         let position = definitions::position(&text, byte)?;
-        let inputs = Inputs::load(&self.root, &self.profile)?;
-        let configuration = inputs.digest();
+        let inputs = self.profile.inputs(&self.root)?;
+        let configuration = inputs.digest().to_owned();
         let mut state = self
             .state
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner);
         let mut workspace = match state.take() {
             Some(workspace) if workspace.configuration == configuration => workspace,
-            _ => self.workspace(&snapshot, &inputs)?,
+            _ => self.workspace(&snapshot, inputs)?,
         };
-        workspace.sync(&snapshot, &self.profile)?;
+        workspace.sync(&snapshot, self.profile.as_ref())?;
         let path = if let Some(capture) = external {
             if capture.input.configuration != configuration {
                 return Err("Dependency configuration changed; reopen from its caller".into());
@@ -269,12 +300,7 @@ impl ProjectServer {
                     outside += 1;
                     continue;
                 };
-                if lang == "ruby"
-                    && !references
-                    && target
-                        .extension()
-                        .is_some_and(|extension| extension == "rbs")
-                {
+                if !references && self.profile.signature_only(&target) {
                     signatures += 1;
                     continue;
                 }
@@ -354,47 +380,18 @@ impl ProjectServer {
         if locations.is_empty() {
             outside += signatures;
         }
-        if references && lang == "ruby" {
-            let mut checked = Vec::new();
-            for location in locations {
-                let external = location
-                    .capture
-                    .as_ref()
-                    .map(|id| self.sources.get(id))
-                    .transpose()?
-                    .flatten();
-                let target_doc = external
-                    .as_ref()
-                    .map(|c| c.doc())
-                    .or_else(|| snapshot.file_by_path(&location.path).map(AsRef::as_ref))
-                    .ok_or("Ruby reference source expired")?;
-                let target_text = source(target_doc)?;
-                let byte = definitions::byte_offset(&target_text, location.position)?;
-                if target_doc
-                    .analyses()
-                    .iter()
-                    .flat_map(|a| &a.facts)
-                    .any(|fact| {
-                        fact.name_span
-                            .as_ref()
-                            .is_some_and(|span| span.contains(&byte))
-                    })
-                {
-                    continue;
-                }
-                let target_path = external
-                    .as_ref()
-                    .map(|c| c.path())
-                    .unwrap_or_else(|| workspace.directory.path().join(&location.path));
-                workspace.open(&target_path, "ruby", &target_text)?;
-                let definitions = workspace
-                    .client
-                    .definitions(&target_path, location.position)?;
-                if super::ruby::matches_definition(definitions, &path, position) {
-                    checked.push(location);
-                }
-            }
-            locations = checked;
+        if references {
+            locations = self.profile.filter_references(
+                ReferenceLookup {
+                    path: &path,
+                    position,
+                    language: lang,
+                    snapshot: &snapshot,
+                    sources: &self.sources,
+                    workspace: &mut workspace,
+                },
+                locations,
+            )?;
         }
         let retained = self
             .sources
@@ -408,7 +405,7 @@ impl ProjectServer {
             .map(|capture| capture.path())
             .collect();
         workspace.prune_external(&retained)?;
-        if Inputs::load(&self.root, &self.profile)?.digest() != configuration {
+        if self.profile.inputs(&self.root)?.digest() != configuration {
             return Err("Project inputs changed during semantic lookup".into());
         }
         let mut hash = blake3::Hasher::new();
@@ -577,7 +574,7 @@ impl Workspace {
         self.files.insert(key, version);
         Ok(true)
     }
-    fn sync(&mut self, snapshot: &Snapshot, profile: &Profile) -> Result<(), String> {
+    fn sync(&mut self, snapshot: &Snapshot, profile: &dyn Profile) -> Result<(), String> {
         let docs = snapshot
             .documents()
             .iter()

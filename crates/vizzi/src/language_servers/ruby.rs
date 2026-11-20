@@ -1,21 +1,125 @@
-//! Isolated Ruby LSP startup; project Ruby configuration is never evaluated.
-use crate::{definitions::Position, lsp::Setup};
+//! Isolated Ruby LSP startup, source admission, and result rules.
+use super::{
+    inputs::{InputFiles, Inputs},
+    project::{ExternalSource, Profile, ReferenceLookup},
+};
+use crate::{
+    definitions::{Location, Position},
+    lsp::Setup,
+};
 use serde_json::json;
-use std::{collections::BTreeSet, ffi::OsString, fs, path::Path};
+use std::{
+    collections::BTreeSet,
+    ffi::OsString,
+    fs,
+    path::{Path, PathBuf},
+};
 
-pub(super) fn matches_definition(
-    locations: Vec<(Option<std::path::PathBuf>, Position)>,
+pub(super) struct RubyLsp {
+    pub executable: PathBuf,
+}
+impl Profile for RubyLsp {
+    fn languages(&self) -> &'static [&'static str] {
+        &["ruby"]
+    }
+
+    fn inputs<'a>(&'a self, root: &'a Path) -> Result<Inputs<'a>, String> {
+        let mut files = InputFiles::default();
+        files.read(&root.join("Gemfile"))?;
+        let lock = files.read(&root.join("Gemfile.lock"))?;
+        files.read(&root.join(".ruby-version"))?;
+        files.read(&root.join(".tool-versions"))?;
+        Ok(files.freeze(
+            &format!(
+                "ruby:{:?}:{:?}:{:?}",
+                self.executable,
+                std::env::var_os("GEM_HOME"),
+                std::env::var_os("GEM_PATH")
+            ),
+            &[
+                include_bytes!("ruby.rs"),
+                include_bytes!("ruby-bootstrap.rb"),
+            ],
+            move |mirror| prepare(mirror, lock.as_deref()),
+        ))
+    }
+
+    fn external_source<'a>(&self, path: &'a Path, _: &'a str) -> Option<ExternalSource<'a>> {
+        if !matches!(
+            path.extension()?.to_str()?,
+            "rb" | "rake" | "gemspec" | "ru"
+        ) {
+            return None;
+        }
+        let root = path
+            .ancestors()
+            .skip(1)
+            .take(32)
+            .find(|candidate| {
+                candidate
+                    .parent()
+                    .and_then(Path::file_name)
+                    .is_some_and(|name| name == "gems")
+            })
+            .or_else(|| path.parent())?;
+        let package = root
+            .parent()
+            .and_then(Path::file_name)
+            .filter(|name| *name == "gems")
+            .and_then(|_| root.file_name())
+            .and_then(|name| name.to_str())
+            .unwrap_or("Ruby library source");
+        Some(ExternalSource {
+            root,
+            language: "ruby",
+            package,
+        })
+    }
+
+    fn signature_only(&self, path: &Path) -> bool {
+        signature(path)
+    }
+
+    fn filter_references(
+        &self,
+        mut lookup: ReferenceLookup<'_>,
+        locations: Vec<Location>,
+    ) -> Result<Vec<Location>, String> {
+        let mut checked = Vec::new();
+        for location in locations {
+            let definitions = lookup.definitions_at(&location, |doc, byte| {
+                !doc.analyses()
+                    .iter()
+                    .flat_map(|analysis| &analysis.facts)
+                    .any(|fact| {
+                        fact.name_span
+                            .as_ref()
+                            .is_some_and(|span| span.contains(&byte))
+                    })
+            })?;
+            if definitions.is_some_and(|definitions| {
+                matches_definition(definitions, lookup.path, lookup.position)
+            }) {
+                checked.push(location);
+            }
+        }
+        Ok(checked)
+    }
+}
+
+fn signature(path: &Path) -> bool {
+    path.extension().is_some_and(|ext| ext == "rbs")
+}
+
+fn matches_definition(
+    locations: Vec<(Option<PathBuf>, Position)>,
     expected: &Path,
     position: Position,
 ) -> bool {
     let expected = fs::canonicalize(expected).unwrap_or_else(|_| expected.to_owned());
     let targets = locations
         .into_iter()
-        .filter(|(path, _)| {
-            !path
-                .as_ref()
-                .is_some_and(|path| path.extension().is_some_and(|ext| ext == "rbs"))
-        })
+        .filter(|(path, _)| !path.as_deref().is_some_and(signature))
         .map(|(path, p)| {
             (
                 path.map(|path| fs::canonicalize(&path).unwrap_or(path)),
@@ -70,7 +174,7 @@ fn lockfile(bytes: &[u8]) -> Result<String, String> {
         specs.into_iter().collect::<String>()
     ))
 }
-pub(super) fn prepare(mirror: &Path, lock: Option<&[u8]>) -> Result<Setup, String> {
+fn prepare(mirror: &Path, lock: Option<&[u8]>) -> Result<Setup, String> {
     let control = mirror.join(".vizzi-ruby");
     fs::create_dir_all(&control).map_err(|e| e.to_string())?;
     // Ruby Indexer's empty-directory glob otherwise registers root files as //file.rb.
@@ -124,6 +228,30 @@ pub(super) fn prepare(mirror: &Path, lock: Option<&[u8]>) -> Result<Setup, Strin
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn external_gem_sources_keep_the_versioned_gem_directory_as_root() {
+        let profile = RubyLsp {
+            executable: "ruby-lsp".into(),
+        };
+        let source = profile
+            .external_source(Path::new("gems/logger-1.7.0/lib/logger.rb"), "ruby")
+            .unwrap();
+        assert_eq!(source.root, Path::new("gems/logger-1.7.0"));
+        assert_eq!(source.package, "logger-1.7.0");
+        assert_eq!(source.language, "ruby");
+        let source = profile
+            .external_source(Path::new("stdlib/pathname.rb"), "ruby")
+            .unwrap();
+        assert_eq!(source.root, Path::new("stdlib"));
+        assert_eq!(source.package, "Ruby library source");
+        assert!(
+            profile
+                .external_source(Path::new("stdlib/pathname.rbs"), "ruby")
+                .is_none()
+        );
+    }
+
     #[test]
     fn duplicate_uris_and_type_signatures_do_not_create_false_ambiguity() {
         let root = tempfile::tempdir().unwrap();
