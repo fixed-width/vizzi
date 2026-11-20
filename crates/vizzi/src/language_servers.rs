@@ -8,8 +8,10 @@ use vizzi_core::{
     model::Snapshot,
     structure::{CallLookup, Symbol},
 };
+mod c_family;
 mod inputs;
 mod project;
+mod python;
 mod ruby;
 
 /// Explicit native tool configuration; no executable is accepted from browser requests.
@@ -76,70 +78,80 @@ impl Servers {
         configuration: Configuration,
     ) -> Result<Self, String> {
         configuration.validate()?;
-        let sources = Arc::new(Catalog::new(cache.join("dependency-references.json")));
-        let mut providers: BTreeMap<&'static str, Arc<dyn Provider>> = BTreeMap::new();
+        let mut servers = Self {
+            sources: Arc::new(Catalog::new(cache.join("dependency-references.json"))),
+            providers: BTreeMap::new(),
+        };
         if let Some(connection) = configuration.vscode_connection {
             let provider: Arc<dyn Provider> = Arc::new(crate::editor_bridge::Bridge::new(
                 root,
                 connection,
-                sources.clone(),
+                servers.sources.clone(),
             ));
             for language in ["rust", "python", "ruby", "c", "cpp"] {
-                providers.insert(language, provider.clone());
+                servers.providers.insert(language, provider.clone());
             }
-            return Ok(Self { providers, sources });
+            return Ok(servers);
         }
         if let Some(executable) = configuration.rust_analyzer {
-            providers.insert(
+            servers.providers.insert(
                 "rust",
                 Arc::new(crate::rust_definitions::RustAnalyzer::with_sources(
                     root.clone(),
                     cache.join("rust"),
                     executable,
-                    sources.clone(),
+                    servers.sources.clone(),
                 )),
             );
         }
         if let Some(executable) = configuration.pyright {
-            providers.insert(
-                "python",
-                Arc::new(project::ProjectServer::new(
-                    root.clone(),
-                    cache.join("python"),
-                    executable,
-                    inputs::Profile::Python {
-                        interpreter: configuration.python_path,
-                    },
-                    sources.clone(),
-                )),
+            servers.add_project(
+                root.clone(),
+                cache.join("python"),
+                executable,
+                python::Pyright {
+                    interpreter: configuration.python_path,
+                },
             );
         }
         if let Some(executable) = configuration.ruby_lsp {
-            providers.insert(
-                "ruby",
-                Arc::new(project::ProjectServer::new(
-                    root.clone(),
-                    cache.join("ruby"),
-                    executable.clone(),
-                    inputs::Profile::Ruby { executable },
-                    sources.clone(),
-                )),
+            servers.add_project(
+                root.clone(),
+                cache.join("ruby"),
+                executable.clone(),
+                ruby::RubyLsp { executable },
             );
         }
         if let Some(executable) = configuration.clangd {
-            let provider: Arc<dyn Provider> = Arc::new(project::ProjectServer::new(
+            servers.add_project(
                 root,
                 cache.join("clangd"),
                 executable,
-                inputs::Profile::CFamily {
+                c_family::Clangd {
                     database: configuration.compilation_database,
                 },
-                sources.clone(),
-            ));
-            providers.insert("c", provider.clone());
-            providers.insert("cpp", provider);
+            );
         }
-        Ok(Self { providers, sources })
+        Ok(servers)
+    }
+    fn add_project(
+        &mut self,
+        root: PathBuf,
+        cache: PathBuf,
+        executable: PathBuf,
+        profile: impl project::Profile + 'static,
+    ) {
+        let languages = profile.languages();
+        let provider: Arc<dyn Provider> = Arc::new(project::ProjectServer::new(
+            root,
+            cache,
+            executable,
+            profile,
+            self.sources.clone(),
+        ));
+        for language in languages {
+            self.providers.insert(language, provider.clone());
+        }
     }
     fn provider(&self, language: &str) -> Result<&dyn Provider, String> {
         self.providers

@@ -8,6 +8,10 @@ its Cargo-specific adapter. Python, Ruby and C-family profiles use a shared capt
 mirror and lookup implementation. Executables are chosen by native launch configuration,
 never browser input.
 
+Each managed profile declares its source languages and owns project inputs, startup
+settings, external source admission, and result rules. The shared project module owns
+the private mirror, document synchronization, and captured-source verification.
+
 An optional native connection file selects `editor_bridge::Bridge` behind the same
 Provider interface for all supported languages. Managed options are then rejected before
 startup. The [configuration contract](../configuration/TECH.md) defines transport,
@@ -25,9 +29,11 @@ Python/C-family versioned diagnostic acknowledgements gate changed-document look
 Ruby LSP uses its indexing progress, full-capture reopen and an ordered document-symbol
 request; this avoids sending unsupported un-ranged changes to its incremental-only API.
 Ruby reference locations are checked against unique definitions and declarations are
-excluded. Ruby bodies take precedence over accompanying RBS signatures. Project-input digests
-include the provider profile and frozen metadata. Python JSONC/TOML settings and inherited
-configuration preserve project/source and environment paths through translation. Clangd
+excluded. Ruby bodies take precedence over accompanying RBS signatures. Project-input
+digests include the shared input implementation, the provider profile, and frozen metadata.
+An input digest change can require reopening a dependency from its caller for semantic lookup.
+Python JSONC/TOML settings and inherited configuration preserve project/source and
+environment paths through translation. Clangd
 receives a translated database/flags file; compilation commands are data, not shell execution.
 
 Semantic locations map to exact captured identifiers. Returned external local files enter
