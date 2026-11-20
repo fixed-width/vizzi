@@ -1,23 +1,12 @@
 //! Native source evidence, persistence and editor handoff over module interfaces.
 use std::sync::{Arc, Mutex};
-use vizzi::{
-    cache::Cache,
-    companion::*,
-    editor::*,
-    engine::Engine,
-    host::{Host, HostOptions},
-    source::Directory,
-};
+use vizzi::{cache::Cache, companion::*, editor::*, engine::Engine, host::Host, source::Directory};
 fn frozen(engine: Engine) -> Host {
-    Host::start_with_options(
-        engine,
-        HostOptions {
-            watch: false,
-            reconcile_interval: std::time::Duration::from_secs(3600),
-            idle_maintenance: false,
-        },
-    )
-    .unwrap()
+    let refresh = engine.refresh(None, &|| false).unwrap().unwrap();
+    let host = Host::prepare(engine).unwrap();
+    let application = host.application();
+    application.publish(application.request(), refresh);
+    host
 }
 fn setup() -> (tempfile::TempDir, tempfile::TempDir, Arc<Host>) {
     setup_with("fn entry() {}\nfn reader() {}\n")
