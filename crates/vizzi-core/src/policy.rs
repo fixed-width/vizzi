@@ -4,6 +4,8 @@ use crate::model::{CapturePolicyId, ModelError};
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 
+pub(crate) const PACKAGE_METADATA_LANGUAGE: &str = "javascript-project";
+
 struct DefaultSourceRules {
     language: &'static str,
     suffixes: &'static [&'static str],
@@ -37,7 +39,10 @@ const DEFAULT_SOURCE_RULES: &[DefaultSourceRules] = &[
         language: "javascript",
         suffixes: &["js", "jsx", "mjs", "cjs"],
         filenames: &[],
-        project_metadata: None,
+        project_metadata: Some((
+            PACKAGE_METADATA_LANGUAGE,
+            &["package.json", "tsconfig.json", "jsconfig.json"],
+        )),
     },
     DefaultSourceRules {
         language: "typescript",

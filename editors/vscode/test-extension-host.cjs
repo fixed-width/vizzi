@@ -35,6 +35,22 @@ async function main() {
       'rust-analyzer.server.extraEnv':{CARGO_NET_OFFLINE:'true',CARGO_BUILD_JOBS:'1',RUSTUP_AUTO_INSTALL:'0'},
     }));
   } else await fs.writeFile(path.join(project,'a.py'),'# fixture\ndef leaf(): pass\ndef run(): leaf()\n');
+  if (!rust && !comparison && !sourceBrowser) {
+    const javascript = path.join(project, 'js');
+    await fs.mkdir(javascript);
+    const files = {
+      'tsconfig.json': JSON.stringify({
+        compilerOptions: { module: 'ESNext', moduleResolution: 'Bundler', allowJs: true,
+          jsx: 'preserve', paths: { '@project/*': ['./*'] } },
+        typeAcquisition: { enable: false },
+      }),
+      'worker.mjs': 'export function executeJob() { return helper(); }\nfunction helper() { return 7; }\n',
+      'service.ts': 'export class Service { "run"() { return 1; } }\nexport class Other { run() { return 2; } }\n',
+      'start.ts': 'import { executeJob as launch } from "@project/worker.mjs";\nimport type { Service } from "@project/service";\nexport function start(service: Service) { return launch() + service.run(); }\n',
+      'view.tsx': 'import { Service } from "@project/service";\nimport { start } from "@project/start";\nexport const Card = () => <span>{start(new Service())}</span>;\n',
+    };
+    for (const [name, source] of Object.entries(files)) await fs.writeFile(path.join(javascript, name), source);
+  }
   if(sourceBrowser) {
     await fs.writeFile(path.join(project,'a.py'),'def leaf(): pass\n'+Array.from({length:180},(_,i)=>'# source marker '+i+'\n').join('')+'VALUE = 42\n');
     await fs.writeFile(path.join(project,'b.py'),'def other():\n    return 7\n');

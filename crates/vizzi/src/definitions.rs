@@ -21,7 +21,7 @@ pub struct Location {
     pub capture: Option<String>,
     /// Normalized workspace-relative source path.
     pub path: String,
-    /// Exact definition identifier position.
+    /// Exact provider position in the captured declaration.
     pub position: Position,
 }
 /// Semantic results, distinct from terminal-name matches.

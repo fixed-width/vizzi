@@ -5,9 +5,23 @@ than written-name candidates. Vizzi supports rust-analyzer for Rust, Pyright for
 Ruby LSP for Ruby, and clangd for C/C++. Several can be configured in one mixed-language workspace.
 Basic syntax browsing remains available without them.
 
-To save these settings in TOML or reuse VS Code's existing providers, see
-[save launch settings](configure-vizzi.md). The commands below configure Vizzi-managed
-servers, each with its own captured-source mirror.
+To save these settings in TOML, see [save launch settings](configure-vizzi.md).
+Vizzi-managed servers use captured-source mirrors. JavaScript and TypeScript use
+VS Code's shared provider.
+
+## JavaScript and TypeScript with VS Code
+
+In a trusted local folder with the Vizzi extension installed, choose **Vizzi: Open
+Workspace**. This starts provider sharing. Use **Vizzi: Explore Call** on a saved
+call to open the caller and follow the definition supplied by VS Code's JavaScript
+and TypeScript service. **Find references** can include uses beyond written calls.
+The editor's active project configuration determines its imports, types and aliases.
+[Install and use the Vizzi extension](../../editors/vscode/INSTALL.md) ·
+[VS Code TypeScript navigation](https://code.visualstudio.com/docs/typescript/typescript-editing#_code-navigation)
+
+Save workspace buffers before looking up definitions or references. Vizzi verifies
+locations against captured source. Installed dependencies outside captured scope
+appear as outside results.
 
 ## Python with Pyright
 

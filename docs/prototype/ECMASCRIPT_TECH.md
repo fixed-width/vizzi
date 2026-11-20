@@ -22,20 +22,31 @@ context. It can reuse a retained syntax tree for that context.
 - Keep declaration extraction and call rules in one adapter module. Use the
   same declaration classifier for facts and lexical scopes. For variable-bound
   functions, the declarator carries the name and encloses the body. Class methods
-  use their written identifier or private identifier. Anonymous callbacks,
-  object methods, computed/quoted method keys, and TypeScript bodyless signatures
-  are outside the initial outline. Shared identity logic marks repeated keys as
-  ambiguous.
+  use their written identifier, private identifier or unescaped quoted name.
+  Variable-bound object literals supply lexical parents for their methods.
+  Objects, computed methods, anonymous argument callbacks and bodyless signatures
+  can carry outline ranges without taking ownership of written calls. Shared
+  identity logic marks repeated keys as ambiguous. Long computed names use a
+  UTF-8 preview of at most 128 bytes and a digest of the complete computed key.
+  The traversal reuses that digest for nested declarations.
 - Allow the shared syntax collector to accept multiple expression rules so
   `call_expression` and `new_expression` use the same recorder, spelling limits,
   and nearest enclosing declaration. The adapter unwraps grouping and type-only
   syntax for callee names and function initializers. It keeps the written callee
   and the full declarator range for display and navigation. Destinations are shared
   name candidates. Syntax and call facts use the existing schema and routes.
-- Future project-aware resolution belongs in the existing captured-source
-  [provider interface](../visual/LANGUAGE_SERVERS_TECH.md). Keep configuration
-  and import resolution out of the raw adapter so syntax facts stay cacheable
-  by bytes and grammar.
+- Route the three grammar contexts to the existing VS Code provider when
+  sharing is enabled. The editor handles project settings, module resolution and
+  type inference. The bridge applies the same saved-source and result checks
+  as for other shared languages. Quoted methods record a checked opening-quote
+  definition position alongside the exact unquoted identifier span. A standalone
+  managed server remains future work. [Provider contract](../visual/LANGUAGE_SERVERS_TECH.md)
+- Capture `package.json`, `tsconfig.json` and `jsconfig.json` as source-only evidence.
+  Resolve package cues from the nearest captured ancestor manifest and give the cue
+  one identity per workspace and manifest path, across the three grammar contexts.
+  Historical lookup identifies the nearest eligible regular manifest in the selected
+  Git commit and reads that one manifest with a 128 KiB limit.
+  [Module identity contract](../visual/MODULES_TECH.md)
 
 ## Testing and validation
 
@@ -49,6 +60,11 @@ context. It can reuse a retained syntax tree for that context.
   (behaviors 1 and 4).
 - Open a function bubble in Chromium and follow a candidate across language
   registrations using the native host (behaviors 2–3).
+- Resolve a project alias and a typed receiver through the shared editor
+  provider, and map definition and reference results to captured source
+  (behavior 5).
+- Check nested manifests, shared cues across grammars, distinct duplicate
+  package names, manifest changes and commit-local membership (behavior 6).
 
 The Linux native CI check passed formatting, workspace tests and doctests, and
 Clippy. All 15 tests in `experiments/browser/browser.test.mjs` passed in Chromium.
@@ -67,3 +83,27 @@ identifier spans, ownership, and unnamed computed callees. The Chromium trail
 opens a wrapped TSX initializer from a TypeScript non-null call and follows
 its grouped callee into JavaScript. The focused review run caught 10 mutations.
 One replacement failed to build because a Tree-sitter node has no default value.
+
+The package and semantic follow-up passed native CI, all 15 Chromium tests and the
+isolated VS Code extension-host test. The editor fixture uses a TypeScript
+`paths` alias into JavaScript, discriminates same-name methods by receiver type,
+and maps a semantic reference back to its written call. Chromium checks stable
+package identity across a manifest rename. The native history fixture reads the
+closest package in the chosen commit despite an oversized outer manifest. An
+oversized closest manifest leaves the historical label neutral.
+
+Focused mutations of package validation and method detection caught 24 of 27 in
+the first run. Two replacements requiring unavailable default values failed to
+build. The remaining mutation was caught on rerun after adding a destructured
+object regression. Neither run timed out.
+
+The review regressions verify that a quoted method accepts its opening quote
+while written-call matching and reference positions retain the exact name. The
+real VS Code fixture resolves a typed receiver to a quoted method and finds its
+reference. A generated fixture with 512 nested functions verifies bounded
+UTF-8 labels and distinct, compact identities for long computed keys with a
+shared prefix. Native CI and all 15 Chromium tests passed.
+
+The review mutation run caught 13 of 15 mutations. An invalid let-chain
+replacement failed to build. The existing module inventory test caught the
+coverage-count mutation on a targeted rerun. Neither run timed out.

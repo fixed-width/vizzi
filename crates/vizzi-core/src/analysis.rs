@@ -11,6 +11,9 @@ use crate::{
 };
 use std::{collections::BTreeMap, sync::Arc};
 
+/// Captured languages served by the JavaScript and TypeScript language service.
+pub const ECMASCRIPT_LANGUAGES: &[&str] = &["javascript", "typescript", "tsx"];
+
 /// A worker-owned analyzer of captured bytes. It must not execute project tooling.
 pub trait Analyzer {
     /// Returns facts for exactly these bytes and the adapter's registered context.

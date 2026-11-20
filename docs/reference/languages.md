@@ -19,16 +19,20 @@ Default source capture includes `.js`, `.jsx`, `.mjs`, `.cjs`, `.ts`, `.mts`, `.
 `.tsx`. Vizzi uses separate TypeScript and TSX parsers and supports JSX in JavaScript.
 Browsing works without Node.js, a package install or a project build.
 
-Outlines include named functions, variable-bound arrow functions and function expressions,
-named classes and their identifier-named methods. TypeScript also shows interfaces, enums
-and type aliases. Function overloads appear through their implementation when present.
-Anonymous callbacks and object-literal methods can contain calls without appearing as
-separate function bubbles.
+Outlines include named functions, named classes, variable-bound objects, and their
+identifier-named or unescaped quoted methods. TypeScript also shows interfaces, enums,
+type aliases and named signatures. Computed methods and anonymous argument callbacks
+appear in the outline. Named function bodies and methods are available in **Add bubble**.
 
 Direct calls, dotted member calls and constructor expressions provide written-call
-candidates. Computed callees have no name to match, and JSX tags alone yield no call
-sites. **Find references** uses the same written-name evidence. Project-aware definitions,
-semantic references, and package labels are outside this first slice.
+candidates. With VS Code provider sharing enabled, the editor handles project-aware
+definitions and references, including aliases and inferred types. Results are mapped
+to captured saved source. Without sharing, **Find references** uses written-name
+candidates. [Use VS Code's JavaScript and TypeScript service](../how-to/configure-language-servers.md#javascript-and-typescript-with-vs-code)
+
+Package labels and accents use the closest captured `package.json` within the
+workspace. A missing or invalid name leaves the bubble neutral. Historical labels
+use the manifest from the selected Git commit.
 
 ## Python
 

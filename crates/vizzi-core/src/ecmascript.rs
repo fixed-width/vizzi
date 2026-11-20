@@ -8,6 +8,7 @@ use crate::{
 };
 use tree_sitter::Node;
 
+const COMPUTED_LABEL_BYTES: usize = 128;
 const CALLEE_NAMES: &[&str] = &[
     "identifier",
     "property_identifier",
@@ -89,7 +90,7 @@ impl LanguageAdapter for Dialect {
             &highlights,
             self.context(),
             collect,
-            declaration,
+            scope,
             CALLS,
         )?))
     }
@@ -106,16 +107,22 @@ fn is_class_declaration(node: Node<'_>) -> bool {
     )
 }
 
+fn expression_child(kind: &str) -> Option<usize> {
+    match kind {
+        "parenthesized_expression"
+        | "non_null_expression"
+        | "as_expression"
+        | "satisfies_expression"
+        | "instantiation_expression" => Some(0),
+        "type_assertion" => Some(1),
+        _ => None,
+    }
+}
+
 fn unwrap_expression(mut node: Node<'_>) -> Option<Node<'_>> {
     for _ in 0..256 {
-        let value_index = match node.kind() {
-            "parenthesized_expression"
-            | "non_null_expression"
-            | "as_expression"
-            | "satisfies_expression"
-            | "instantiation_expression" => 0,
-            "type_assertion" => 1,
-            _ => return Some(node),
+        let Some(value_index) = expression_child(node.kind()) else {
+            return Some(node);
         };
         let mut cursor = node.walk();
         node = node
@@ -126,41 +133,113 @@ fn unwrap_expression(mut node: Node<'_>) -> Option<Node<'_>> {
     None
 }
 
-fn declaration(node: Node<'_>, text: &str) -> Option<(&'static str, String)> {
+fn enclosing_expression(mut node: Node<'_>) -> Option<Node<'_>> {
+    for _ in 0..256 {
+        node = node.parent()?;
+        if expression_child(node.kind()).is_none() {
+            return Some(node);
+        }
+    }
+    None
+}
+
+fn named_method(node: Node<'_>) -> bool {
+    node.parent()
+        .is_some_and(|container| match container.kind() {
+            "class_body" => container.parent().is_some_and(is_class_declaration),
+            "object" => enclosing_expression(container).is_some_and(|binding| {
+                binding.kind() == "variable_declarator"
+                    && binding
+                        .child_by_field_name("name")
+                        .is_some_and(|name| name.kind() == "identifier")
+            }),
+            _ => false,
+        })
+}
+
+fn declaration(node: Node<'_>, text: &str) -> Option<Declaration> {
     let kind = match node.kind() {
         "function_declaration" | "generator_function_declaration" => "function",
         "class_declaration" | "abstract_class_declaration" => "class",
         "interface_declaration" => "interface",
         "enum_declaration" => "enum",
         "type_alias_declaration" => "type",
-        "method_definition" if node.parent()?.parent().is_some_and(is_class_declaration) => {
-            "function"
+        "function_signature" | "method_signature" | "abstract_method_signature" => "signature",
+        "method_definition" if named_method(node) => "function",
+        "variable_declarator" => {
+            match unwrap_expression(node.child_by_field_name("value")?)?.kind() {
+                "arrow_function" | "function_expression" | "generator_function" => "function",
+                "object" => "object",
+                _ => return None,
+            }
         }
-        "variable_declarator"
-            if matches!(
-                unwrap_expression(node.child_by_field_name("value")?)?.kind(),
-                "arrow_function" | "function_expression" | "generator_function"
-            ) =>
+        "arrow_function" | "function_expression" | "generator_function"
+            if node.child_by_field_name("name").is_none()
+                && enclosing_expression(node)
+                    .is_some_and(|parent| parent.kind() == "arguments") =>
         {
-            "function"
+            let mut declaration = Declaration::at(node, "callback", "callback".into());
+            declaration.owns_calls = false;
+            return Some(declaration);
         }
         _ => return None,
     };
     let name = node.child_by_field_name("name")?;
-    if !matches!(
-        name.kind(),
-        "identifier" | "property_identifier" | "private_property_identifier" | "type_identifier"
-    ) {
-        return None;
-    }
-    let spelling = text
-        .get(name.byte_range())
-        .filter(|name| !name.is_empty())?;
-    Some((kind, spelling.into()))
+    let mut range = name.byte_range();
+    let kind = match name.kind() {
+        "identifier"
+        | "property_identifier"
+        | "private_property_identifier"
+        | "type_identifier" => kind,
+        "computed_property_name" => {
+            if kind == "signature" {
+                kind
+            } else {
+                "computed_method"
+            }
+        }
+        "string" if !name.has_error() && range.len() > 2 => {
+            range = range.start + 1..range.end - 1;
+            if text.get(range.clone())?.contains(['\\', '\r', '\n']) {
+                return None;
+            }
+            kind
+        }
+        _ => return None,
+    };
+    let spelling = text.get(range.clone()).filter(|name| !name.is_empty())?;
+    let (label, identity) =
+        if name.kind() == "computed_property_name" && spelling.len() > COMPUTED_LABEL_BYTES {
+            let suffix = "…]";
+            let end = spelling.floor_char_boundary(COMPUTED_LABEL_BYTES - suffix.len());
+            (
+                format!("{}{suffix}", &spelling[..end]),
+                Some(format!(
+                    "computed:{}",
+                    blake3::hash(spelling.as_bytes()).to_hex()
+                )),
+            )
+        } else {
+            (spelling.into(), None)
+        };
+    let mut declaration = Declaration::at(node, kind, label);
+    declaration.identity = identity;
+    declaration.definition_anchor = (name.kind() == "string").then(|| name.start_byte());
+    declaration.name_span = (name.kind() != "computed_property_name").then_some(range);
+    declaration.owns_calls = !matches!(kind, "object" | "signature" | "computed_method");
+    Some(declaration)
+}
+
+fn scope(node: Node<'_>, text: &str) -> Option<(&'static str, String)> {
+    let declaration = declaration(node, text)?;
+    Some((
+        declaration.kind,
+        declaration.identity.unwrap_or(declaration.name),
+    ))
 }
 
 fn collect(node: Node<'_>, text: &str, output: &mut Vec<Declaration>) {
-    if let Some((kind, name)) = declaration(node, text) {
-        output.push(Declaration::at(node, kind, name));
+    if let Some(declaration) = declaration(node, text) {
+        output.push(declaration);
     }
 }

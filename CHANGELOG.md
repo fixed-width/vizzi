@@ -10,10 +10,17 @@ remains in Git and the project documentation.
 
 - Browse JavaScript, JSX, TypeScript, and TSX with syntax colors, declaration
   outlines, and written-call candidates. Capture skips nested `node_modules` trees.
+- Use VS Code's shared JavaScript and TypeScript service for project-aware definitions
+  and references. Bubbles show captured package names, including in function history.
+- JavaScript and TypeScript outlines show variable-bound object methods, anonymous
+  argument callbacks, and named TypeScript signatures.
 
 ### Fixed
 
 - Structural capabilities report written-call support from the host's registered analyzers.
+- Follow VS Code definitions to quoted JavaScript and TypeScript methods. Past package
+  labels in nested projects use the nearest manifest from the selected commit.
+- Bound long computed method labels and lexical keys during JavaScript and TypeScript indexing.
 
 ## 0.2.0 - 2026-11-19
 

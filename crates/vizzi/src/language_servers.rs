@@ -5,6 +5,7 @@ use crate::{
 };
 use std::{collections::BTreeMap, path::PathBuf, sync::Arc};
 use vizzi_core::{
+    analysis::ECMASCRIPT_LANGUAGES,
     model::Snapshot,
     structure::{CallLookup, Symbol},
 };
@@ -88,7 +89,10 @@ impl Servers {
                 connection,
                 servers.sources.clone(),
             ));
-            for language in ["rust", "python", "ruby", "c", "cpp"] {
+            for language in ["rust", "python", "ruby", "c", "cpp"]
+                .into_iter()
+                .chain(ECMASCRIPT_LANGUAGES.iter().copied())
+            {
                 servers.providers.insert(language, provider.clone());
             }
             return Ok(servers);

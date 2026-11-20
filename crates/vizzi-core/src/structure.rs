@@ -190,6 +190,7 @@ pub struct Structure {
     owners: BTreeMap<String, Vec<usize>>,
     uses: BTreeMap<String, Vec<usize>>,
     spans: Vec<Option<std::ops::Range<usize>>>,
+    definition_anchors: BTreeMap<usize, usize>,
     ranges: Vec<std::ops::Range<usize>>,
     files: BTreeMap<String, Vec<usize>>,
     file_sites: BTreeMap<String, Vec<usize>>,
@@ -317,6 +318,7 @@ impl Structure {
             owners: BTreeMap::new(),
             uses: BTreeMap::new(),
             spans: vec![],
+            definition_anchors: BTreeMap::new(),
             ranges: vec![],
             files: BTreeMap::new(),
             file_sites: BTreeMap::new(),
@@ -403,6 +405,9 @@ impl Structure {
                 let n = index.symbols.len();
                 index.ids.insert(id.clone(), n);
                 index.spans.push(fact.name_span.clone());
+                if let Some(anchor) = fact.definition_anchor {
+                    index.definition_anchors.insert(n, anchor);
+                }
                 index.ranges.push(fact.span.clone());
                 index.files.entry(doc.path().into()).or_default().push(n);
                 index.names.entry(fact.name.clone()).or_default().push(n);
@@ -717,7 +722,8 @@ impl Structure {
             language: site.language.clone(),
         })
     }
-    /// Maps a definition position to its narrowest admitted declaration; ties remain ambiguous.
+    /// Maps an identifier or its quoted definition anchor to the narrowest declaration.
+    /// Ties remain ambiguous.
     pub fn definition(&self, path: &str, byte: usize) -> Option<Symbol> {
         let mut matches = self
             .files
@@ -725,7 +731,7 @@ impl Structure {
             .iter()
             .filter_map(|n| {
                 let span = self.spans[*n].as_ref()?;
-                span.contains(&byte)
+                (span.contains(&byte) || self.definition_anchors.get(n) == Some(&byte))
                     .then_some((span.len(), &self.symbols[*n]))
             })
             .collect::<Vec<_>>();

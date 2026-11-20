@@ -2,7 +2,7 @@
 use crate::{
     calls::{self, CallFacts},
     model::Coverage,
-    syntax::Checkpoints,
+    syntax::{Checkpoints, ScopeFacts},
 };
 use std::collections::BTreeMap;
 use tree_sitter::Node;
@@ -186,7 +186,7 @@ pub(crate) fn collect(
     root: Node<'_>,
     text: &str,
     _: &Coverage,
-    owners: &BTreeMap<usize, usize>,
+    owners: &ScopeFacts,
     output: &mut CallFacts,
     cancelled: &dyn Fn() -> bool,
 ) -> bool {

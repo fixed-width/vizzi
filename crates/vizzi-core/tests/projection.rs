@@ -31,6 +31,7 @@ fn document(text: &str, names: &[String]) -> Arc<Document> {
                 facts: names
                     .iter()
                     .map(|name| Fact {
+                        definition_anchor: None,
                         name_span: None,
                         parent: None,
                         key: format!("key {name}"),

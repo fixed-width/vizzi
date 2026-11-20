@@ -342,9 +342,11 @@ test("deferred files stay readable and resume outlines after an admitted edit", 
 test("JavaScript and TypeScript outlines and written calls work in the captured workspace", async () => {
   const fixture = await workspace({
     files: {
+      "package.json": '{"name":"@demo/app"}',
+      "format/package.json": '{"name":"@demo/format"}',
       "start.ts": 'import { renderCard } from "./view";\nexport function start(value: number) { return renderCard!(value); }\n',
-      "view.tsx": 'import { formatCard } from "./format.mjs";\nexport const renderCard = ((value: number) => <Card title={(formatCard)(value)} />);\n',
-      "format.mjs": "export function formatCard(value) { return String(value); }\n",
+      "view.tsx": 'import { formatCard } from "./format/format.mjs";\nexport const renderCard = ((value: number) => <Card title={(formatCard)(value)} />);\n',
+      "format/format.mjs": "export function formatCard(value) { return String(value); }\n",
       "ui/node_modules/dep/fake.ts": "export function renderCard() {}\n",
     },
   });
@@ -358,7 +360,7 @@ test("JavaScript and TypeScript outlines and written calls work in the captured 
     await page.locator("#outline button[data-declaration]").filter({ hasText: "renderCard" }).waitFor();
     assert.match(await page.locator("#coverage").textContent(), /tsx: syntax parsed/);
     assert.equal(await page.locator("#source .syntax-attribute").textContent(), "title");
-    assert.match(await page.locator("#counts").textContent(), /3 files/);
+    assert.match(await page.locator("#counts").textContent(), /5 files/);
 
     await page.goto(live.url);
     await page.waitForFunction(() => document.querySelector("#visual-source-status").textContent.includes("ready"));
@@ -373,7 +375,8 @@ test("JavaScript and TypeScript outlines and written calls work in the captured 
     await card.locator(".code-line").first().waitFor();
     await card.getByRole("button", { name: "Calls", exact: true }).click();
     await page.getByRole("button", { name: "formatCard · line 2", exact: true }).click();
-    await page.locator('[data-view][data-name="formatCard"] .code-line').first().waitFor();
+    const format = page.locator('[data-view][data-name="formatCard"]');
+    await format.locator(".code-line").first().waitFor();
     assert.equal(await page.locator("[data-view]").count(), 3);
     const candidates = await page.locator('#workspace-links [data-kind="candidate"]').evaluateAll(
       links => links.map(link => link.getAttribute("aria-label"))
@@ -381,6 +384,19 @@ test("JavaScript and TypeScript outlines and written calls work in the captured 
     assert.equal(candidates.length, 2);
     assert.match(candidates[0], /renderCard! → renderCard/);
     assert.match(candidates[1], /\(formatCard\) → formatCard/);
+    const packageId = await start.getAttribute("data-module-id");
+    assert.ok(packageId);
+    assert.equal(await card.getAttribute("data-module-id"), packageId);
+    assert.equal(await start.locator(".module-tag").textContent(), "@demo/app");
+    assert.equal(await card.locator(".module-tag").textContent(), "@demo/app");
+    assert.equal(await format.locator(".module-tag").textContent(), "@demo/format");
+    assert.notEqual(await format.getAttribute("data-module-id"), packageId);
+    await writeFile(join(fixture.root, "package.json"), '{"name":"@demo/renamed"}');
+    await page.waitForFunction(() =>
+      document.querySelector('[data-name="start"] .module-tag')?.textContent === "@demo/renamed"
+      && document.querySelector('[data-name="renderCard"] .module-tag')?.textContent === "@demo/renamed"
+    );
+    assert.equal(await start.getAttribute("data-module-id"), packageId);
     assert.deepEqual(session.errors, []);
   } finally {
     await session?.close();

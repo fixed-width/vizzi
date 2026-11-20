@@ -123,6 +123,9 @@ pub struct Fact {
     /// Exact declaration identifier when available; absent for legacy/custom facts.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name_span: Option<Range<usize>>,
+    /// Opening quote accepted as a definition position for a quoted declaration name.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub definition_anchor: Option<usize>,
     /// Ordinal of the enclosing emitted lexical scope in this analysis, always earlier.
     #[serde(default)]
     pub parent: Option<usize>,
@@ -277,6 +280,25 @@ impl Document {
                         || text.and_then(|s| s.get(span.clone())) != Some(fact.name.as_str())
                 }) {
                     return Err(ModelError("invalid declaration identifier range".into()));
+                }
+                if let Some(anchor) = fact.definition_anchor
+                    && !fact
+                        .name_span
+                        .as_ref()
+                        .zip(text)
+                        .is_some_and(|(span, text)| {
+                            let bytes = text.as_bytes();
+                            let quote = bytes.get(anchor);
+                            anchor >= fact.span.start
+                                && anchor.checked_add(1) == Some(span.start)
+                                && span.end < fact.span.end
+                                && matches!(quote, Some(b'\'' | b'"'))
+                                && bytes.get(span.end) == quote
+                        })
+                {
+                    return Err(ModelError(
+                        "invalid quoted declaration definition anchor".into(),
+                    ));
                 }
                 let depth = if let Some(parent) = fact.parent {
                     let enclosing = analysis.facts.get(parent).filter(|p| {
@@ -576,6 +598,7 @@ mod tests {
             },
             coverage: Coverage::Syntax,
             facts: vec![Fact {
+                definition_anchor: None,
                 name_span: None,
                 parent: None,
                 key: "fn::f".into(),

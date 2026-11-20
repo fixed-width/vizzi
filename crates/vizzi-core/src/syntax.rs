@@ -30,23 +30,35 @@ impl<'a> Checkpoints<'a> {
 pub(crate) struct Declaration {
     pub identity: Option<String>,
     pub name_span: Option<std::ops::Range<usize>>,
+    pub definition_anchor: Option<usize>,
     pub kind: &'static str,
     pub name: String,
     pub span: std::ops::Range<usize>,
+    pub owns_calls: bool,
 }
 impl Declaration {
     pub(crate) fn at(node: tree_sitter::Node<'_>, kind: &'static str, name: String) -> Self {
         Self {
             identity: None,
+            definition_anchor: None,
             name_span: node
                 .child_by_field_name("name")
                 .map(|name| name.byte_range()),
             kind,
             name,
             span: node.byte_range(),
+            owns_calls: true,
         }
     }
 }
+
+pub(crate) struct ScopeFact {
+    pub ordinal: usize,
+    pub owns_calls: bool,
+    identity: Option<String>,
+}
+
+pub(crate) type ScopeFacts = BTreeMap<usize, ScopeFact>;
 
 type Collector = fn(tree_sitter::Node<'_>, &str, &mut Vec<Declaration>);
 type Scope = fn(tree_sitter::Node<'_>, &str) -> Option<(&'static str, String)>;
@@ -54,7 +66,7 @@ type FinishCalls = fn(
     tree_sitter::Node<'_>,
     &str,
     &Coverage,
-    &BTreeMap<usize, usize>,
+    &ScopeFacts,
     &mut CallFacts,
     &dyn Fn() -> bool,
 ) -> bool;
@@ -265,7 +277,7 @@ impl SyntaxAnalyzer {
         let mut cursor = tree.walk();
         let mut declarations = Vec::new();
         let mut calls = (!self.calls.expressions.is_empty()).then(CallFacts::default);
-        let mut scope_facts = BTreeMap::<usize, usize>::new();
+        let mut scope_facts = ScopeFacts::new();
         let mut checkpoints = Checkpoints {
             cancelled,
             ticks: 0,
@@ -284,10 +296,12 @@ impl SyntaxAnalyzer {
                     if checkpoints.poll() {
                         return Ok(None);
                     }
-                    if parent_fact.is_none() {
-                        parent_fact = scope_facts.get(&ancestor.id()).copied();
-                    }
-                    if let Some((kind, name)) = (self.scope)(ancestor, text) {
+                    if let Some(fact) = scope_facts.get(&ancestor.id()) {
+                        parent_fact.get_or_insert(fact.ordinal);
+                        let declared = &analysis.facts[fact.ordinal];
+                        let name = fact.identity.as_ref().unwrap_or(&declared.name);
+                        scope.push(format!("{}:{name}", declared.kind));
+                    } else if let Some((kind, name)) = (self.scope)(ancestor, text) {
                         scope.push(format!("{kind}:{name}"));
                     }
                     parent = ancestor.parent();
@@ -307,12 +321,20 @@ impl SyntaxAnalyzer {
                         .as_ref()
                         .is_some_and(|(kind, name)| *kind == declaration.kind && name == identity)
                     {
-                        scope_facts.insert(node.id(), analysis.facts.len());
+                        scope_facts.insert(
+                            node.id(),
+                            ScopeFact {
+                                ordinal: analysis.facts.len(),
+                                owns_calls: declaration.owns_calls,
+                                identity: declaration.identity,
+                            },
+                        );
                     }
                     analysis.facts.push(Fact {
                         name_span: declaration.name_span.filter(|range| {
                             text.get(range.clone()) == Some(declaration.name.as_str())
                         }),
+                        definition_anchor: declaration.definition_anchor,
                         parent: parent_fact,
                         key,
                         kind: declaration.kind.into(),

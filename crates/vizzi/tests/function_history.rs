@@ -327,6 +327,44 @@ fn historical_python_module_uses_the_package_chain_at_each_revision() {
 }
 
 #[test]
+fn historical_typescript_labels_use_the_package_name_at_each_revision() {
+    let root = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    let repo = root.path();
+    git(repo, &["init", "-q"]);
+    let path = "src/main.ts";
+    std::fs::create_dir(repo.join("src")).unwrap();
+    let nearest = "src/package.json";
+    let oversized = "x".repeat(128 * 1024 + 1);
+    std::fs::write(repo.join("package.json"), r#"{"name":"@work/root"}"#).unwrap();
+    std::fs::write(repo.join(nearest), &oversized).unwrap();
+    std::fs::write(repo.join(path), "function target() { return 0; }\n").unwrap();
+    git(repo, &["add", "--", path, "package.json", nearest]);
+    commit_staged(repo);
+    std::fs::write(repo.join("package.json"), oversized).unwrap();
+    std::fs::write(repo.join(nearest), r#"{"name":"@work/old"}"#).unwrap();
+    std::fs::write(repo.join(path), "function target() { return 1; }\n").unwrap();
+    git(repo, &["add", "--", path, "package.json", nearest]);
+    commit_staged(repo);
+    std::fs::write(repo.join(nearest), r#"{"name":"@work/current"}"#).unwrap();
+    std::fs::write(repo.join(path), "function target() { return 2; }\n").unwrap();
+
+    let host = history_host(repo, cache.path(), None);
+    let (request, live) = module_request(&host, path);
+    assert_eq!(live["label"], "@work/current");
+    assert_eq!(live["root"], nearest);
+    let history = FunctionHistory::new(host);
+    let pair = history.compare(&compare_current(&request)).unwrap();
+    assert_eq!(pair["newer"]["symbol"]["module"], live);
+    let old = &pair["older"]["symbol"]["module"];
+    assert_eq!(old["label"], "@work/old");
+    assert_eq!(old["id"], live["id"]);
+    let first = history.start(&request).unwrap();
+    let older = history.step(&step(&first["token"], 1)).unwrap();
+    assert!(older["symbol"]["module"].is_null());
+}
+
+#[test]
 fn ruby_history_and_captured_calls_use_the_declared_namespace() {
     let root = tempfile::tempdir().unwrap();
     let cache = tempfile::tempdir().unwrap();

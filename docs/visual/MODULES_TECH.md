@@ -14,6 +14,11 @@ root rules. Module edges come from parsed Rust declarations, literal path attrib
 literal module-scope include! inputs; lexical module parents refine each declaration.
 Python files define modules, with captured __init__.py files establishing explicit package
 chains. Ruby module membership comes from the captured declaration's enclosing namespace.
+JavaScript and TypeScript use the closest captured `package.json`. A bounded name
+from that manifest supplies a shared package descriptor across all three grammar
+contexts. The workspace and manifest path determine its identity across package name
+changes. A closest manifest with invalid, capped, or unavailable contents yields
+neutral membership.
 Conflicting contexts,
 missing/capped/nonresident inputs and unsupported languages return no membership.
 
@@ -29,6 +34,8 @@ Preparation admits at most 8,192 documents and 4,096 traversal states, Rust decl
 from files up to 1 MiB and an 8 MiB aggregate text budget, and manifests up to 128 KiB.
 Only resident captured text is eligible. Reaching a limit yields neutral membership;
 this is a bounded visual capability, not whole-repository module coverage.
+Package resolution checks up to 64 ancestor directories per file and parses up to
+8 MiB of resident manifests across the observation, with the same 128 KiB per-file limit.
 
 Native module rules choose the evidence needed for membership. Function history supplies
 bounded file captures and regular-path checks from the selected Git commit. Ruby uses
@@ -43,6 +50,8 @@ Undecodable blobs count toward the inventory and byte limits and supply path evi
 The declaration parser skips their contents. Historical Python labels use regular
 `__init__.py` paths from the selected commit, with up to 64 ancestor paths and 256 KiB
 of Git metadata. Python package labels depend on initializer presence.
+JavaScript and TypeScript history checks the ancestor paths for regular package
+manifests, then reads the closest eligible manifest with a 128 KiB limit.
 Each history source observation is bound to its commit. History and comparison owners retain
 the selected file's module bindings for captured calls.
 
