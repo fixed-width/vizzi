@@ -4,10 +4,13 @@ For contributors extending the visual call workspace. Semantic language-server n
 is a core capability. Written-name matches remain a fallback, not the intended substitute
 for language analysis in Python or C/C++.
 
-One host can configure rust-analyzer, Pyright, Ruby LSP and clangd together. Server selection uses
+One host can configure rust-analyzer, Pyright, Ruby LSP, clangd and
+the native TypeScript server together. Server selection uses
 the captured document's language, including in mixed-language repositories. Existing
 `--rust-analyzer` launches remain compatible. Python, Ruby and C-family providers are explicitly
 configured with `--pyright`, `--ruby-lsp` and `--clangd`; C-family capture scopes remain explicit.
+Standalone JavaScript and TypeScript use `--typescript-server` with an installed
+TypeScript 7 or newer `tsc` executable. Their project settings come from the capture.
 
 Definition navigation, callers and references use the same semantic provider seam. Typed
 receivers, imported aliases and cross-file definitions resolve before the name chooser.

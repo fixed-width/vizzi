@@ -33,9 +33,12 @@ written-call support. Individual files still report their own analysis coverage.
 | Language | Selected inputs | Extracted declarations | Limits |
 | --- | --- | --- | --- |
 | Rust | `.rs` | Functions, types, modules, constants, statics, implementations, macro definitions | Raw source; no macro expansion, generated declarations or compiler resolution |
-| Python | `.py` | Classes and functions, including methods, nested and async functions | No import/type resolution, assignments, or call relationships; declaration spans omit decorators |
+| Python | `.py`, `.pyi` | Classes and functions, including methods, nested and async functions | Raw syntax with written-call candidates |
+| Ruby | `.rb`, `.rake`, `.gemspec`, `.ru`, Gemfile, Rakefile | Modules, classes, methods and constants | Raw syntax with lexical local-variable checks for bare calls |
 | C | `.c` or explicit assignment inside enabled family scopes | Function/type definitions and every typedef alias | No preprocessing, include/type resolution, or compiler configuration |
 | C++ | C++ suffix hints or explicit assignment inside enabled family scopes | C forms plus named classes/namespaces, using aliases, methods/operators with bodies | No template instantiation or overload resolution |
+| JavaScript | `.js`, `.mjs`, `.cjs`, `.jsx` | Named functions, function-valued variable declarators, named classes and their methods | Raw syntax, including JSX, with written-call candidates |
+| TypeScript and TSX | `.ts`, `.mts`, `.cts`, `.tsx` | JavaScript forms plus interfaces, enums and type aliases | Distinct grammars with shared extraction and candidate behavior. See the [adapter contract](ECMASCRIPT_TECH.md). |
 
 Only UTF-8 source supports declarations. Python encoding cookies do not enable other
 decoders. Grammar recovery sets `partial`; undecodable source sets `unavailable` and
@@ -46,7 +49,7 @@ Unique declaration identities survive position changes in either language.
 The default host omits other extensions. Explicit C-family scopes capture C/C++
 candidates, ambiguous headers, fragments, and CUDA source without inventing analysis.
 Assigned C/C++ inputs now receive raw declaration analysis; ambiguous headers and CUDA
-retain source-only coverage. Python stubs, notebooks, and LPC remain outside scope.
+retain source-only coverage. Notebooks and LPC remain outside scope.
 Counts describe selected capture scope, not every repository file. The
 [C/C++ extraction reference](C_FAMILY_SYNTAX.md) defines exact forms, spans, and limits.
 
@@ -82,8 +85,7 @@ work uses the remainder; a single-worker host stays serial. Every refresh uses
 one largest-file-first queue across all selected languages and at most that many
 workers. A worker creates each needed analyzer lazily and owns it exclusively; there
 are no independent per-language thread pools. Warm cache hits create no analyzers.
-With four adapters, up to four times the worker count of parser instances may exist during
-an attempt, with no more than the worker count actively analyzing files.
+Each worker may retain a parser for each grammar it encounters during the attempt.
 
 The host serializes foreground attempts and allows one private periodic verification
 within the shared budget. Direct concurrent `Engine::refresh` callers each receive

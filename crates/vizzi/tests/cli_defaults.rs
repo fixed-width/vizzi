@@ -90,6 +90,13 @@ fn help_describes_optional_paths_without_creating_cache_data() {
     assert!(text.contains("[--root DIR]"));
     assert!(text.contains("[--cache DIR]"));
     assert!(text.contains("current directory"));
+    let (_, language_options) = text.split_once("--ruby-lsp EXECUTABLE").unwrap();
+    let (ruby, typescript) = language_options
+        .split_once("--typescript-server EXECUTABLE")
+        .unwrap();
+    let (typescript, _) = typescript.split_once("--clangd EXECUTABLE").unwrap();
+    assert!(ruby.contains("Uses local gems"));
+    assert!(!typescript.contains("gems"));
     assert!(!fixture.directory.path().join("system-cache").exists());
 }
 

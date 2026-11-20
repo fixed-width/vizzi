@@ -10,6 +10,8 @@ use std::{
 };
 use tree_sitter::{Node, Parser};
 
+mod package;
+
 const DOCUMENTS: usize = 8192;
 const STATES: usize = 4096;
 const SOURCE_BYTES: usize = 1024 * 1024;
@@ -51,18 +53,23 @@ pub trait ModuleEvidence {
 
     /// Reports the requested paths that exist as regular files in the revision.
     fn regular_paths(&self, paths: &mut dyn Iterator<Item = String>) -> Option<BTreeSet<String>>;
+
+    /// Captures one regular file from the revision, subject to the source policy and byte limit.
+    fn captured_file(&self, path: &str, limit: usize) -> Option<Document>;
 }
 
 type FactResolver = fn(&ModuleIndex, &Document, &Analysis, usize) -> Option<Module>;
 type HistoryResolver = fn(&WorkspaceId, &Arc<Document>, &dyn ModuleEvidence) -> Option<ModuleIndex>;
 
 struct ModuleRule {
+    languages: &'static [&'static str],
     kind: ModuleKind,
     fact: FactResolver,
     history: Option<HistoryResolver>,
 }
 
 const RUST: ModuleRule = ModuleRule {
+    languages: &["rust"],
     kind: ModuleKind {
         language: "rust",
         basis: "rust_declarations",
@@ -72,6 +79,7 @@ const RUST: ModuleRule = ModuleRule {
     history: Some(ModuleIndex::rust_history),
 };
 const PYTHON: ModuleRule = ModuleRule {
+    languages: &["python"],
     kind: ModuleKind {
         language: "python",
         basis: "python_module",
@@ -81,6 +89,7 @@ const PYTHON: ModuleRule = ModuleRule {
     history: Some(ModuleIndex::python_history),
 };
 const RUBY: ModuleRule = ModuleRule {
+    languages: &["ruby"],
     kind: ModuleKind {
         language: "ruby",
         basis: "ruby_declarations",
@@ -89,13 +98,13 @@ const RUBY: ModuleRule = ModuleRule {
     fact: |index, _, analysis, ordinal| index.ruby_fact(analysis, ordinal),
     history: None,
 };
-const MODULE_RULES: &[&ModuleRule] = &[&RUST, &PYTHON, &RUBY];
+const MODULE_RULES: &[&ModuleRule] = &[&RUST, &PYTHON, &RUBY, &package::RULE];
 
 fn module_rule(language: &str) -> Option<&'static ModuleRule> {
     MODULE_RULES
         .iter()
         .copied()
-        .find(|rule| rule.kind.language == language)
+        .find(|rule| rule.languages.contains(&language))
 }
 
 /// Language-aware source identity, independent of source versions or presentation groups.
@@ -139,6 +148,7 @@ pub struct ModuleIndex {
     workspace: String,
     rust: BTreeMap<String, Option<Base>>,
     python: BTreeMap<String, Module>,
+    packages: BTreeMap<String, Arc<Module>>,
 }
 
 fn parent(path: &str) -> &str {
@@ -571,6 +581,7 @@ impl ModuleIndex {
             workspace: workspace.as_str().into(),
             rust: BTreeMap::new(),
             python: BTreeMap::new(),
+            packages: BTreeMap::new(),
         }
     }
 
@@ -586,6 +597,12 @@ impl ModuleIndex {
                 .collect(),
             python: self
                 .python
+                .get_key_value(path)
+                .map(|(k, v)| (k.clone(), v.clone()))
+                .into_iter()
+                .collect(),
+            packages: self
+                .packages
                 .get_key_value(path)
                 .map(|(k, v)| (k.clone(), v.clone()))
                 .into_iter()
@@ -715,6 +732,7 @@ impl ModuleIndex {
             workspace: snapshot.workspace().as_str().into(),
             rust,
             python,
+            packages: package::bindings(snapshot, docs.into_values()),
         }
     }
     /// Finds the enclosing language module; types and implementations are not modules.

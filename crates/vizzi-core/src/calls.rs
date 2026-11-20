@@ -1,6 +1,7 @@
 //! Bounded call evidence and source-local bindings; no general import/type/runtime resolution.
+use crate::syntax::ScopeFacts;
 use serde::{Deserialize, Serialize};
-use std::{collections::BTreeMap, ops::Range};
+use std::ops::Range;
 use tree_sitter::Node;
 
 /// Maximum retained call sites per analyzed document.
@@ -24,7 +25,7 @@ pub struct CallTarget {
     /// Evidence supporting this destination.
     pub basis: TargetBasis,
 }
-/// A raw invocation expression, owned by its nearest emitted enclosing declaration.
+/// A raw invocation expression, attributed to the closest enclosing declaration that owns calls.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CallSite {
     /// Optional language-supported destination; absent for legacy or ambiguous evidence.
@@ -53,6 +54,7 @@ pub struct CallFacts {
 pub(crate) struct CallExpression {
     pub kind: &'static str,
     pub callee_field: &'static str,
+    pub unwrap_callee: Option<fn(Node<'_>) -> Option<Node<'_>>>,
     pub name_kinds: &'static [&'static str],
     pub name_fields: &'static [(&'static str, &'static str)],
 }
@@ -80,7 +82,7 @@ impl CallExpression {
         &self,
         node: Node<'_>,
         text: &str,
-        owners: &BTreeMap<usize, usize>,
+        owners: &ScopeFacts,
         output: &mut CallFacts,
     ) {
         if node.kind() != self.kind {
@@ -90,14 +92,11 @@ impl CallExpression {
             output.omitted += 1;
             return;
         };
-        record(
-            node,
-            callee.byte_range(),
-            self.name(callee, text),
-            text,
-            owners,
-            output,
-        );
+        let name = self
+            .unwrap_callee
+            .map_or(Some(callee), |unwrap| unwrap(callee))
+            .and_then(|value| self.name(value, text));
+        record(node, callee.byte_range(), name, text, owners, output);
     }
 }
 pub(crate) fn record(
@@ -105,7 +104,7 @@ pub(crate) fn record(
     span: Range<usize>,
     name: Option<(String, Range<usize>)>,
     text: &str,
-    owners: &BTreeMap<usize, usize>,
+    owners: &ScopeFacts,
     output: &mut CallFacts,
 ) {
     let Some(spelling) = text
@@ -125,8 +124,8 @@ pub(crate) fn record(
         let Some(current) = parent else {
             break;
         };
-        if let Some(index) = owners.get(&current.id()) {
-            owner = Some(*index);
+        if let Some(fact) = owners.get(&current.id()).filter(|fact| fact.owns_calls) {
+            owner = Some(fact.ordinal);
             break;
         }
         parent = current.parent();

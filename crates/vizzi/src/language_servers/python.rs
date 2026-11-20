@@ -3,7 +3,7 @@ use super::{
     inputs::{InputFiles, Inputs, absolute, save},
     project::{ExternalSource, Profile},
 };
-use crate::lsp::Setup;
+use crate::lsp::{DocumentSync, Setup};
 use serde_json::{Value, json};
 use std::{
     collections::BTreeMap,
@@ -18,7 +18,11 @@ impl Profile for Pyright {
         &["python"]
     }
 
-    fn inputs<'a>(&'a self, root: &'a Path) -> Result<Inputs<'a>, String> {
+    fn inputs<'a>(
+        &'a self,
+        root: &'a Path,
+        _: &'a vizzi_core::model::Snapshot,
+    ) -> Result<Inputs<'a>, String> {
         let mut files = InputFiles::default();
         let project = PythonInputs::load(root, &mut files)?;
         Ok(files.freeze(
@@ -229,7 +233,7 @@ impl PythonInputs {
             configuration: json!({"python":python}),
             status_notifications: false,
             progress_token: None,
-            reopen_document_sync: false,
+            document_sync: DocumentSync::Diagnostics,
             environment: vec![],
         })
     }
@@ -256,6 +260,7 @@ fn jsonc(text: &str) -> Result<Value, String> {
 
 #[cfg(test)]
 mod tests {
+    use super::super::project::empty_snapshot;
     use super::*;
     use std::fs;
 
@@ -291,12 +296,12 @@ mod tests {
         let limit = 8 * 1024 * 1024;
         let exact = format!("{}{{}}", " ".repeat(limit - 2));
         fs::write(root.path().join("pyrightconfig.json"), &exact).unwrap();
-        assert!(profile.inputs(root.path()).is_ok());
+        assert!(profile.inputs(root.path(), empty_snapshot()).is_ok());
         fs::write(root.path().join("pyrightconfig.json"), format!("{exact} ")).unwrap();
-        assert!(profile.inputs(root.path()).is_err());
+        assert!(profile.inputs(root.path(), empty_snapshot()).is_err());
         let file = root.path().join("not-a-directory");
         fs::write(&file, "{}").unwrap();
-        assert!(profile.inputs(&file).is_err());
+        assert!(profile.inputs(&file, empty_snapshot()).is_err());
         fs::write(
             root.path().join("pyrightconfig.json"),
             format!("{}{{\"extends\":\"base.json\"}}", " ".repeat(limit - 23)),
@@ -304,7 +309,7 @@ mod tests {
         .unwrap();
         fs::write(root.path().join("base.json"), &exact).unwrap();
         assert!(
-            profile.inputs(root.path()).is_ok(),
+            profile.inputs(root.path(), empty_snapshot()).is_ok(),
             "exactly 16 MiB of configuration is admitted"
         );
         fs::write(
@@ -313,7 +318,7 @@ mod tests {
         )
         .unwrap();
         fs::write(root.path().join("leaf.json"), "{}").unwrap();
-        assert!(profile.inputs(root.path()).is_err());
+        assert!(profile.inputs(root.path(), empty_snapshot()).is_err());
     }
 
     #[test]
@@ -333,14 +338,14 @@ mod tests {
             };
             fs::write(root.path().join(name), serde_json::to_vec(&value).unwrap()).unwrap();
         }
-        assert!(profile.inputs(root.path()).is_ok());
+        assert!(profile.inputs(root.path(), empty_snapshot()).is_ok());
         fs::write(
             root.path().join("config8.json"),
             "{\"extends\":\"config9.json\"}",
         )
         .unwrap();
         fs::write(root.path().join("config9.json"), "{}").unwrap();
-        assert!(profile.inputs(root.path()).is_err());
+        assert!(profile.inputs(root.path(), empty_snapshot()).is_err());
     }
 
     #[test]
@@ -353,9 +358,9 @@ mod tests {
         let profile = Pyright {
             interpreter: Some("python3".into()),
         };
-        let inputs = profile.inputs(root.path()).unwrap();
+        let inputs = profile.inputs(root.path(), empty_snapshot()).unwrap();
         let digest = inputs.digest().to_owned();
-        let setup = inputs.prepare(mirror.path()).unwrap();
+        let setup = inputs.prepare(mirror.path()).unwrap().setup;
         assert_eq!(setup.arguments, ["--stdio"]);
         assert!(!setup.status_notifications);
         assert_eq!(setup.configuration["python"]["pythonPath"], "python3");
@@ -379,15 +384,24 @@ mod tests {
             r#"{"extraPaths":["changed"]}"#,
         )
         .unwrap();
-        assert_ne!(digest, profile.inputs(root.path()).unwrap().digest());
+        assert_ne!(
+            digest,
+            profile
+                .inputs(root.path(), empty_snapshot())
+                .unwrap()
+                .digest()
+        );
         assert_eq!(
             fs::read_to_string(root.path().join("pyrightconfig.json")).unwrap(),
             original
         );
         assert_ne!(
-            profile.inputs(root.path()).unwrap().digest(),
+            profile
+                .inputs(root.path(), empty_snapshot())
+                .unwrap()
+                .digest(),
             Pyright { interpreter: None }
-                .inputs(root.path())
+                .inputs(root.path(), empty_snapshot())
                 .unwrap()
                 .digest()
         );
@@ -404,7 +418,7 @@ mod tests {
         )
         .unwrap();
         profile
-            .inputs(root.path())
+            .inputs(root.path(), empty_snapshot())
             .unwrap()
             .prepare(mirror.path())
             .unwrap();
@@ -415,7 +429,7 @@ mod tests {
             "{\"extends\":\"missing.json\"}",
         ] {
             fs::write(root.path().join("pyrightconfig.json"), text).unwrap();
-            assert!(profile.inputs(root.path()).is_err());
+            assert!(profile.inputs(root.path(), empty_snapshot()).is_err());
         }
     }
 
@@ -427,10 +441,11 @@ mod tests {
             interpreter: Some(".venv/bin/python".into()),
         };
         let setup = profile
-            .inputs(root.path())
+            .inputs(root.path(), empty_snapshot())
             .unwrap()
             .prepare(mirror.path())
-            .unwrap();
+            .unwrap()
+            .setup;
         assert_eq!(
             setup.configuration["python"]["pythonPath"],
             root.path().join(".venv/bin/python").to_str().unwrap()

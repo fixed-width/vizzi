@@ -4,7 +4,7 @@ Contributor reference for [the behaviour contract](LANGUAGE_SERVERS_PRODUCT.md).
 
 `definitions::Provider` remains the definition/reference seam. `language_servers::Servers`
 routes by native captured language and owns the shared dependency catalog. Rust retains
-its Cargo-specific adapter. Python, Ruby and C-family profiles use a shared captured-project
+its Cargo-specific adapter. Python, Ruby, C-family and TypeScript profiles use a shared captured-project
 mirror and lookup implementation. Executables are chosen by native launch configuration,
 never browser input.
 
@@ -13,7 +13,8 @@ settings, external source admission, and result rules. The shared project module
 the private mirror, document synchronization, and captured-source verification.
 
 An optional native connection file selects `editor_bridge::Bridge` behind the same
-Provider interface for all supported languages. Managed options are then rejected before
+Provider interface for all supported languages, including JavaScript, TypeScript and
+TSX. Managed options are then rejected before
 startup. The [configuration contract](../configuration/TECH.md) defines transport,
 ownership, source checks and the VS Code plugin. The remainder of this document covers
 Vizzi-managed servers and their captured mirrors.
@@ -35,6 +36,9 @@ An input digest change can require reopening a dependency from its caller for se
 Python JSONC/TOML settings and inherited configuration preserve project/source and
 environment paths through translation. Clangd
 receives a translated database/flags file; compilation commands are data, not shell execution.
+The TypeScript profile supplies language IDs for JSX and TSX, consumes captured
+project settings and reopens the project when relevant source or settings
+change. [Managed TypeScript profile](../prototype/ECMASCRIPT_TECH.md#managed-typescript-server)
 
 Semantic locations map to exact captured identifiers. Returned external local files enter
 the bounded catalog, are synchronized and verified, and lookup repeats before trusting a

@@ -338,3 +338,161 @@ test("deferred files stay readable and resume outlines after an admitted edit", 
     assert.deepEqual(session.errors,[]);
   } finally {await session?.close();await live?.close();await fixture.close();}
 });
+
+test("JavaScript and TypeScript outlines and written calls work in the captured workspace", async () => {
+  const fixture = await workspace({
+    files: {
+      "package.json": '{"name":"@demo/app"}',
+      "format/package.json": '{"name":"@demo/format"}',
+      "start.ts": 'import { renderCard } from "./view";\nexport function start(value: number) { return renderCard!(value); }\n',
+      "view.tsx": 'import { formatCard } from "./format/format.mjs";\nexport const renderCard = ((value: number) => <Card title={(formatCard)(value)} />);\n',
+      "format/format.mjs": "export function formatCard(value) { return String(value); }\n",
+      "ui/node_modules/dep/fake.ts": "export function renderCard() {}\n",
+    },
+  });
+  let live, session;
+  try {
+    live = await startHost(fixture);
+    session = await openWorkspace(chromium, live);
+    const { page } = session;
+    await page.getByText("Accessible file list", { exact: true }).click();
+    await page.getByRole("button", { name: "view.tsx", exact: true }).click();
+    await page.locator("#outline button[data-declaration]").filter({ hasText: "renderCard" }).waitFor();
+    assert.match(await page.locator("#coverage").textContent(), /tsx: syntax parsed/);
+    assert.equal(await page.locator("#source .syntax-attribute").textContent(), "title");
+    assert.match(await page.locator("#counts").textContent(), /5 files/);
+
+    await page.goto(live.url);
+    await page.waitForFunction(() => document.querySelector("#visual-source-status").textContent.includes("ready"));
+    await page.getByRole("button", { name: "Add bubble", exact: true }).click();
+    await page.getByLabel("Find a function", { exact: true }).fill("start");
+    await page.getByRole("button", { name: "Find functions", exact: true }).click();
+    await page.locator('[data-add-symbol][data-name="start"]').click();
+    const start = page.locator('[data-view][data-name="start"]');
+    await start.getByRole("button", { name: "Calls", exact: true }).click();
+    await page.getByRole("button", { name: "renderCard · line 2", exact: true }).click();
+    const card = page.locator('[data-view][data-name="renderCard"]');
+    await card.locator(".code-line").first().waitFor();
+    await card.getByRole("button", { name: "Calls", exact: true }).click();
+    await page.getByRole("button", { name: "formatCard · line 2", exact: true }).click();
+    const format = page.locator('[data-view][data-name="formatCard"]');
+    await format.locator(".code-line").first().waitFor();
+    assert.equal(await page.locator("[data-view]").count(), 3);
+    const candidates = await page.locator('#workspace-links [data-kind="candidate"]').evaluateAll(
+      links => links.map(link => link.getAttribute("aria-label"))
+    );
+    assert.equal(candidates.length, 2);
+    assert.match(candidates[0], /renderCard! → renderCard/);
+    assert.match(candidates[1], /\(formatCard\) → formatCard/);
+    const packageId = await start.getAttribute("data-module-id");
+    assert.ok(packageId);
+    assert.equal(await card.getAttribute("data-module-id"), packageId);
+    assert.equal(await start.locator(".module-tag").textContent(), "@demo/app");
+    assert.equal(await card.locator(".module-tag").textContent(), "@demo/app");
+    assert.equal(await format.locator(".module-tag").textContent(), "@demo/format");
+    assert.notEqual(await format.getAttribute("data-module-id"), packageId);
+    await writeFile(join(fixture.root, "package.json"), '{"name":"@demo/renamed"}');
+    await page.waitForFunction(() =>
+      document.querySelector('[data-name="start"] .module-tag')?.textContent === "@demo/renamed"
+      && document.querySelector('[data-name="renderCard"] .module-tag')?.textContent === "@demo/renamed"
+    );
+    assert.equal(await start.getAttribute("data-module-id"), packageId);
+    assert.deepEqual(session.errors, []);
+  } finally {
+    await session?.close();
+    await live?.close();
+    await fixture.close();
+  }
+});
+
+const managedTypeScript = process.env.VIZZI_TYPESCRIPT_SERVER;
+
+test("managed TypeScript opens installed package source beside its caller", {
+  skip: !managedTypeScript || process.platform === "win32",
+}, async () => {
+  const fixture = await workspace({
+    files: {
+      "entry.ts": "import { packageEntry } from 'fixture-pkg';\nexport function launch() { return packageEntry(); }\n",
+      "node_modules/fixture-pkg/package.json": '{"name":"fixture-pkg","version":"2.4.0","exports":"./index.ts"}',
+      "node_modules/fixture-pkg/index.ts": 'import { finish } from "./helper";\nexport function packageEntry() { return finish(); }\n',
+      "node_modules/fixture-pkg/helper.ts": "export function finish() { return 7; }\n",
+    },
+    sourceArguments: ["--typescript-server", managedTypeScript],
+  });
+  let live, session;
+  try {
+    live = await startHost(fixture);
+    session = await openWorkspace(chromium, live);
+    const { page } = session;
+    assert.match(await page.locator("#counts").textContent(), /1 files?/);
+    await page.goto(live.url);
+    await page.waitForFunction(() => document.querySelector("#visual-source-status").textContent.includes("ready"));
+    await page.getByRole("button", { name: "Add bubble", exact: true }).click();
+    await page.getByLabel("Find a function", { exact: true }).fill("launch");
+    await page.getByRole("button", { name: "Find functions", exact: true }).click();
+    await page.locator('[data-add-symbol][data-name="launch"]').click();
+    const launch = page.locator('[data-view][data-name="launch"]');
+    await launch.getByRole("button", { name: "Calls", exact: true }).click();
+    await page.getByRole("button", { name: "packageEntry · line 2", exact: true }).click();
+    const entry = page.locator('[data-view][data-name="packageEntry"]');
+    await entry.locator(".code-line").first().waitFor();
+    assert.match(await entry.locator(".fragment-heading small").textContent(), /Dependency · fixture-pkg 2\.4\.0/);
+    assert.equal(await entry.getByRole("button", { name: "Save location", exact: true }).isDisabled(), true);
+    await entry.getByRole("button", { name: "Calls", exact: true }).click();
+    await page.getByRole("button", { name: "finish · line 2", exact: true }).click();
+    const finish = page.locator('[data-view][data-name="finish"]');
+    await finish.locator(".code-line").first().waitFor();
+    assert.match(await finish.locator(".fragment-heading small").textContent(), /fixture-pkg 2\.4\.0/);
+    assert.equal(await page.locator("[data-view]").count(), 3);
+    assert.deepEqual(session.errors, []);
+  } finally {
+    await session?.close();
+    await live?.close();
+    await fixture.close();
+  }
+});
+
+test("managed TypeScript follows project aliases and exposes semantic references", {
+  skip: !managedTypeScript,
+}, async () => {
+  const fixture = await workspace({
+    files: {
+      "tsconfig.json": JSON.stringify({ compilerOptions: {
+        module: "ESNext", moduleResolution: "Bundler", jsx: "preserve",
+        paths: { "@service": ["./service.ts"] },
+      }}),
+      "entry.tsx": "import { create as select } from '@service';\nexport function launch() { return <div>{select().run()}</div>; }\n",
+      "service.ts": 'export class Service { "run"() { return 1; } }\nexport function create() { return new Service(); }\n',
+      "decoy.ts": "export class Other { run() { return 2; } }\n",
+    },
+    sourceArguments: ["--typescript-server", managedTypeScript],
+  });
+  let live, session;
+  try {
+    live = await startHost(fixture);
+    session = await openWorkspace(chromium, live);
+    const { page } = session;
+    await page.goto(live.url);
+    await page.waitForFunction(() => document.querySelector("#visual-source-status").textContent.includes("ready"));
+    await page.getByRole("button", { name: "Add bubble", exact: true }).click();
+    await page.getByLabel("Find a function", { exact: true }).fill("launch");
+    await page.getByRole("button", { name: "Find functions", exact: true }).click();
+    await page.locator('[data-add-symbol][data-name="launch"]').click();
+    await page.locator('[data-view][data-name="launch"]').getByRole("button", { name: "Calls", exact: true }).click();
+    await page.getByRole("button", { name: "run · line 2", exact: true }).click();
+    const method = page.locator('[data-view][data-name="run"]');
+    await method.locator(".code-line").first().waitFor();
+    assert.match(await method.locator(".fragment-heading").textContent(), /Service::run/);
+    assert.equal(await page.locator('#workspace-links .link-stroke').getAttribute("data-kind"), "definition");
+    await method.getByRole("button", { name: "Actions for run bubble", exact: true }).click();
+    await page.getByRole("menuitem", { name: "Find references", exact: true }).click();
+    const references = page.locator("[data-reference-stack]");
+    await references.getByRole("status").filter({ hasText: "Language references" }).waitFor();
+    assert.match(await references.locator("[data-reference-row]").textContent(), /entry\.tsx/);
+    assert.deepEqual(session.errors, []);
+  } finally {
+    await session?.close();
+    await live?.close();
+    await fixture.close();
+  }
+});

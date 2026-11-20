@@ -2,8 +2,9 @@
 use super::inputs::Inputs;
 use crate::{
     definitions::{self, Answer, Location, Position, Provider},
-    dependency_sources::{Capture, Catalog, Input},
-    lsp::Client,
+    dependency_sources::{Capture, Catalog, FILES as DEPENDENCY_FILES, Input},
+    ecmascript_dependencies::manifest_id,
+    lsp::{Client, DocumentSync},
 };
 use serde_json::json;
 use std::{
@@ -13,7 +14,7 @@ use std::{
     sync::{Arc, Mutex},
 };
 use vizzi_core::{
-    model::{Document, Snapshot},
+    model::{ContentId, Document, Snapshot},
     structure::{CallLookup, Symbol},
 };
 
@@ -27,8 +28,57 @@ pub(super) trait Profile: Send + Sync {
         self.languages().contains(&language)
     }
 
-    fn inputs<'a>(&'a self, root: &'a Path) -> Result<Inputs<'a>, String>;
-    fn external_source<'a>(&self, path: &'a Path, hint: &'a str) -> Option<ExternalSource<'a>>;
+    fn inputs<'a>(&'a self, root: &'a Path, snapshot: &'a Snapshot) -> Result<Inputs<'a>, String>;
+    fn external_source<'a>(&self, _path: &'a Path, _hint: &'a str) -> Option<ExternalSource<'a>> {
+        None
+    }
+
+    fn dependency_input(
+        &self,
+        _workspace: &Path,
+        path: &Path,
+        configuration: &str,
+        hint: &str,
+    ) -> Result<Input, String> {
+        let ExternalSource {
+            root,
+            language,
+            package,
+        } = self
+            .external_source(path, hint)
+            .ok_or("Unsupported external source language")?;
+        if !self.accepts(language) {
+            return Err("External source language differs".into());
+        }
+        Ok(Input {
+            root: root.into(),
+            path: path
+                .strip_prefix(root)
+                .map_err(|error| error.to_string())?
+                .to_str()
+                .ok_or("External filename is not UTF-8")?
+                .replace('\\', "/"),
+            language: language.into(),
+            package: package.into(),
+            version: None,
+            configuration: configuration.into(),
+            mirror_path: None,
+            installation: None,
+        })
+    }
+
+    fn document_language<'a>(&self, _path: &Path, language: &'a str) -> &'a str {
+        language
+    }
+
+    fn project_error(
+        &self,
+        _client: &mut Client,
+        _path: &Path,
+        _rejected_configs: &BTreeMap<PathBuf, String>,
+    ) -> Result<Option<String>, String> {
+        Ok(None)
+    }
 
     fn signature_only(&self, _path: &Path) -> bool {
         false
@@ -61,8 +111,11 @@ struct Workspace {
     directory: tempfile::TempDir,
     client: Client,
     configuration: String,
+    rejected_configs: BTreeMap<PathBuf, String>,
     files: BTreeMap<String, String>,
     opened: BTreeSet<PathBuf>,
+    external: BTreeSet<PathBuf>,
+    reached_manifests: BTreeMap<PathBuf, ContentId>,
     next: i32,
 }
 
@@ -103,10 +156,10 @@ impl ReferenceLookup<'_> {
         if !include(doc, byte) {
             return Ok(None);
         }
-        let path = external
-            .as_ref()
-            .map(|capture| capture.path())
-            .unwrap_or_else(|| self.workspace.directory.path().join(&location.path));
+        let path = match &external {
+            Some(capture) => self.workspace.dependency_path(capture)?,
+            None => self.workspace.directory.path().join(&location.path),
+        };
         self.workspace.open(&path, self.language, &text)?;
         self.workspace
             .client
@@ -159,9 +212,10 @@ impl ProjectServer {
     }
     fn workspace(&self, snapshot: &Snapshot, inputs: Inputs<'_>) -> Result<Workspace, String> {
         fs::create_dir_all(&self.cache).map_err(|e| e.to_string())?;
+        let cache = self.cache.canonicalize().map_err(|e| e.to_string())?;
         let directory = tempfile::Builder::new()
             .prefix("captured-")
-            .tempdir_in(&self.cache)
+            .tempdir_in(cache)
             .map_err(|e| e.to_string())?;
         let mut files = BTreeMap::new();
         let mut total = 0;
@@ -179,47 +233,18 @@ impl ProjectServer {
             files.insert(doc.path().into(), doc.version().as_str().into());
         }
         let configuration = inputs.digest().to_owned();
-        let setup = inputs.prepare(directory.path())?;
-        let client = Client::configured(&self.executable, directory.path(), setup)?;
+        let prepared = inputs.prepare(directory.path())?;
+        let client = Client::configured(&self.executable, directory.path(), prepared.setup)?;
         Ok(Workspace {
             directory,
             client,
             configuration,
+            rejected_configs: prepared.rejected_configs,
             files,
             opened: BTreeSet::new(),
+            external: BTreeSet::new(),
+            reached_manifests: BTreeMap::new(),
             next: 0,
-        })
-    }
-    fn external_input(
-        &self,
-        path: &Path,
-        configuration: &str,
-        hint: &str,
-    ) -> Result<Input, String> {
-        let path = fs::canonicalize(path).map_err(|e| e.to_string())?;
-        let ExternalSource {
-            root,
-            language,
-            package,
-        } = self
-            .profile
-            .external_source(&path, hint)
-            .ok_or("Unsupported external source language")?;
-        if !self.profile.accepts(language) {
-            return Err("External source language differs".into());
-        }
-        Ok(Input {
-            root: root.into(),
-            path: path
-                .strip_prefix(root)
-                .map_err(|e| e.to_string())?
-                .to_str()
-                .ok_or("External filename is not UTF-8")?
-                .replace('\\', "/"),
-            language: language.into(),
-            package: package.into(),
-            version: None,
-            configuration: configuration.into(),
         })
     }
     fn lookup(
@@ -236,27 +261,64 @@ impl ProjectServer {
         }
         let text = source(doc)?;
         let position = definitions::position(&text, byte)?;
-        let inputs = self.profile.inputs(&self.root)?;
+        let inputs = self.profile.inputs(&self.root, &snapshot)?;
         let configuration = inputs.digest().to_owned();
         let mut state = self
             .state
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner);
         let mut workspace = match state.take() {
-            Some(workspace) if workspace.configuration == configuration => workspace,
+            Some(workspace)
+                if workspace.configuration == configuration
+                    && workspace.reached_manifests.len() < DEPENDENCY_FILES
+                    && workspace.manifests_unchanged() =>
+            {
+                workspace
+            }
             _ => self.workspace(&snapshot, inputs)?,
         };
         workspace.sync(&snapshot, self.profile.as_ref())?;
+        let importer = external.map_or(Some(doc.path()), |capture| {
+            capture
+                .input
+                .installation
+                .as_ref()
+                .and_then(|package| package.importer.as_deref())
+        });
         let path = if let Some(capture) = external {
             if capture.input.configuration != configuration {
                 return Err("Dependency configuration changed; reopen from its caller".into());
             }
             capture.verify()?;
-            capture.path()
+            let path = workspace.dependency_path(capture)?;
+            if let Some(importer) = importer {
+                let document = snapshot
+                    .file_by_path(importer)
+                    .ok_or("The package importer is outside the current capture")?;
+                let lang = language(document)
+                    .filter(|lang| self.profile.accepts(lang))
+                    .ok_or("The package importer's language changed")?;
+                let importer = workspace.directory.path().join(importer);
+                workspace.open(
+                    &importer,
+                    self.profile.document_language(&importer, lang),
+                    &source(document)?,
+                )?;
+            }
+            workspace.remember_manifest(&capture.input)?;
+            workspace.external.insert(path.clone());
+            path
         } else {
             workspace.directory.path().join(doc.path())
         };
-        workspace.open(&path, lang, &text)?;
+        workspace.open(&path, self.profile.document_language(&path, lang), &text)?;
+        if let Some(error) =
+            self.profile
+                .project_error(&mut workspace.client, &path, &workspace.rejected_configs)?
+        {
+            *state = Some(workspace);
+            return Err(error);
+        }
         let captures = self.sources.sources()?;
         let retained = captures
             .iter()
@@ -265,19 +327,16 @@ impl ProjectServer {
                     && capture.input.configuration == configuration
                     && capture.verify().is_ok()
             })
-            .map(|capture| capture.path())
+            .filter_map(|capture| workspace.dependency_path(capture).ok())
             .collect::<BTreeSet<_>>();
         workspace.prune_external(&retained)?;
         for capture in captures {
             if self.profile.accepts(&capture.input.language)
                 && capture.input.configuration == configuration
                 && capture.verify().is_ok()
+                && let Ok(path) = workspace.dependency_path(&capture)
             {
-                workspace.open(
-                    &capture.path(),
-                    &capture.input.language,
-                    &source(capture.doc())?,
-                )?;
+                workspace.open_dependency(&path, &capture, self.profile.as_ref())?;
             }
         }
         let mut locations = vec![];
@@ -295,11 +354,11 @@ impl ProjectServer {
             signatures = 0;
             let mut changed = false;
             for (target, position) in raw {
-                let Some(target) = target.map(|path| fs::canonicalize(&path).unwrap_or(path))
-                else {
+                let Some(reported) = target else {
                     outside += 1;
                     continue;
                 };
+                let target = fs::canonicalize(&reported).unwrap_or_else(|_| reported.clone());
                 if !references && self.profile.signature_only(&target) {
                     signatures += 1;
                     continue;
@@ -319,13 +378,27 @@ impl ProjectServer {
                         outside += 1;
                     }
                 } else {
-                    let input = match self.external_input(&target, &configuration, lang) {
+                    let mut input = match self.profile.dependency_input(
+                        &self.root,
+                        &target,
+                        &configuration,
+                        lang,
+                    ) {
                         Ok(input) => input,
                         Err(_) => {
                             outside += 1;
                             continue;
                         }
                     };
+                    input.mirror_path = reported
+                        .strip_prefix(workspace.directory.path())
+                        .ok()
+                        .and_then(Path::to_str)
+                        .map(|path| path.replace('\\', "/"));
+                    if let Some(package) = &mut input.installation {
+                        package.importer = importer.map(str::to_owned);
+                    }
+                    workspace.remember_manifest(&input)?;
                     let captured = match self.sources.capture(input) {
                         Ok(capture) => capture,
                         Err(_) => {
@@ -334,11 +407,9 @@ impl ProjectServer {
                         }
                     };
                     captured.verify()?;
-                    changed |= workspace.open(
-                        &captured.path(),
-                        &captured.input.language,
-                        &source(captured.doc())?,
-                    )?;
+                    let path = workspace.dependency_path(&captured)?;
+                    changed |=
+                        workspace.open_dependency(&path, &captured, self.profile.as_ref())?;
                     locations.push(Location {
                         capture: Some(captured.origin.capture.clone()),
                         path: captured.doc().path().into(),
@@ -357,10 +428,9 @@ impl ProjectServer {
         let mut verified = Vec::with_capacity(locations.len());
         for location in locations {
             if let Some(id) = &location.capture
-                && !self
-                    .sources
-                    .get(id)?
-                    .is_some_and(|source| source.verify().is_ok())
+                && !self.sources.get(id)?.is_some_and(|source| {
+                    source.verify().is_ok() && workspace.dependency_path(&source).is_ok()
+                })
             {
                 outside += 1;
                 continue;
@@ -402,10 +472,16 @@ impl ProjectServer {
                     && capture.input.configuration == configuration
                     && capture.verify().is_ok()
             })
-            .map(|capture| capture.path())
+            .filter_map(|capture| workspace.dependency_path(&capture).ok())
             .collect();
         workspace.prune_external(&retained)?;
-        if self.profile.inputs(&self.root)?.digest() != configuration {
+        if !workspace.manifests_unchanged() {
+            return Err(
+                "Installed package manifests changed during semantic lookup; retry navigation"
+                    .into(),
+            );
+        }
+        if self.profile.inputs(&self.root, &snapshot)?.digest() != configuration {
             return Err("Project inputs changed during semantic lookup".into());
         }
         let mut hash = blake3::Hasher::new();
@@ -424,12 +500,16 @@ impl ProjectServer {
         ] {
             hash.update(value.as_bytes());
         }
-        for (path, version) in workspace.files.iter().filter(|(path, _)| {
-            Path::new(path).is_absolute()
-                && !Path::new(path).starts_with(workspace.directory.path())
-        }) {
-            hash.update(path.as_bytes());
-            hash.update(version.as_bytes());
+        for path in &workspace.external {
+            let path = path.to_string_lossy();
+            if let Some(version) = workspace.files.get(path.as_ref()) {
+                hash.update(path.as_bytes());
+                hash.update(version.as_bytes());
+            }
+        }
+        for (root, manifest) in &workspace.reached_manifests {
+            hash.update(root.as_os_str().as_encoded_bytes());
+            hash.update(manifest.as_str().as_bytes());
         }
         let context = hash.finalize().to_hex().to_string();
         *state = Some(workspace);
@@ -530,11 +610,64 @@ impl Provider for ProjectServer {
     }
 }
 impl Workspace {
+    fn manifests_unchanged(&self) -> bool {
+        self.reached_manifests
+            .iter()
+            .all(|(root, expected)| manifest_id(root).ok().as_ref() == Some(expected))
+    }
+
+    fn remember_manifest(&mut self, input: &Input) -> Result<(), String> {
+        if let Some(package) = &input.installation {
+            let expected = self
+                .reached_manifests
+                .entry(input.root.clone())
+                .or_insert_with(|| package.manifest.clone());
+            if *expected != package.manifest {
+                return Err(
+                    "Installed package manifest changed during semantic lookup; retry navigation"
+                        .into(),
+                );
+            }
+        }
+        Ok(())
+    }
+
+    fn dependency_path(&self, capture: &Capture) -> Result<PathBuf, String> {
+        if let Some(package) = &capture.input.installation
+            && manifest_id(&capture.input.root).ok().as_ref() != Some(&package.manifest)
+        {
+            return Err("Installed package manifest changed; reopen it from its caller".into());
+        }
+        let file = capture.path();
+        let Some(relative) = &capture.input.mirror_path else {
+            return Ok(file);
+        };
+        let path = self.directory.path().join(relative);
+        if fs::canonicalize(&path).ok().as_ref() != Some(&file) {
+            return Err("Dependency resolution path changed; reopen it from its caller".into());
+        }
+        Ok(path)
+    }
+
+    fn open_dependency(
+        &mut self,
+        path: &Path,
+        capture: &Capture,
+        profile: &dyn Profile,
+    ) -> Result<bool, String> {
+        self.remember_manifest(&capture.input)?;
+        self.external.insert(path.to_owned());
+        self.open(
+            path,
+            profile.document_language(path, &capture.input.language),
+            &source(capture.doc())?,
+        )
+    }
+
     fn prune_external(&mut self, retained: &BTreeSet<PathBuf>) -> Result<(), String> {
         let removed = self
-            .opened
-            .iter()
-            .filter(|path| !path.starts_with(self.directory.path()) && !retained.contains(*path))
+            .external
+            .difference(retained)
             .cloned()
             .collect::<Vec<_>>();
         for path in removed {
@@ -543,6 +676,7 @@ impl Workspace {
                 json!({"textDocument":{"uri":crate::lsp::uri(&path)?}}),
             )?;
             self.opened.remove(&path);
+            self.external.remove(&path);
             self.files.remove(&path.to_string_lossy().to_string());
         }
         Ok(())
@@ -560,7 +694,8 @@ impl Workspace {
             .ok_or("Semantic document versions exhausted")?;
         let uri = crate::lsp::uri(path)?;
         // Reopen full captures when the server requires ranged incremental edits.
-        let reopen = self.client.reopen_document_sync && self.opened.contains(path);
+        let reopen = self.client.document_sync == DocumentSync::ReopenWithSymbols
+            && self.opened.contains(path);
         if reopen {
             self.client
                 .notify("textDocument/didClose", json!({"textDocument":{"uri":uri}}))?;
@@ -622,7 +757,8 @@ impl Workspace {
             self.client.notify("workspace/didChangeWatchedFiles",json!({"changes":[{"uri":crate::lsp::uri(&absolute)?,"type":if self.files.contains_key(doc.path()){2}else{1}}]}))?;
             self.open(
                 &absolute,
-                language(doc).ok_or("Source language missing")?,
+                profile
+                    .document_language(&absolute, language(doc).ok_or("Source language missing")?),
                 &text,
             )?;
             self.files
@@ -630,4 +766,19 @@ impl Workspace {
         }
         Ok(())
     }
+}
+
+#[cfg(test)]
+pub(super) fn empty_snapshot() -> &'static Snapshot {
+    use std::sync::OnceLock;
+    use vizzi_core::model::{CapturePolicyId, WorkspaceId};
+    static SNAPSHOT: OnceLock<Snapshot> = OnceLock::new();
+    SNAPSHOT.get_or_init(|| {
+        Snapshot::new(
+            WorkspaceId::derive(&[b"project-input-test"]),
+            vec![],
+            CapturePolicyId::derive(&[b"fixture"]),
+        )
+        .unwrap()
+    })
 }

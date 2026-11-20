@@ -5,6 +5,7 @@ use crate::{
 };
 use std::{collections::BTreeMap, path::PathBuf, sync::Arc};
 use vizzi_core::{
+    analysis::ECMASCRIPT_LANGUAGES,
     model::Snapshot,
     structure::{CallLookup, Symbol},
 };
@@ -13,6 +14,7 @@ mod inputs;
 mod project;
 mod python;
 mod ruby;
+mod typescript;
 
 /// Explicit native tool configuration; no executable is accepted from browser requests.
 #[derive(Default, serde::Deserialize)]
@@ -28,6 +30,8 @@ pub struct Configuration {
     pub clangd: Option<PathBuf>,
     /// Optional Ruby LSP executable from the selected local Ruby environment.
     pub ruby_lsp: Option<PathBuf>,
+    /// Optional TypeScript compiler executable with the native LSP.
+    pub typescript_server: Option<PathBuf>,
     /// Optional interpreter/environment used by the Python server.
     pub python_path: Option<PathBuf>,
     /// Optional compilation database, otherwise root/compile_commands.json.
@@ -42,6 +46,7 @@ impl Configuration {
                 || self.pyright.is_some()
                 || self.ruby_lsp.is_some()
                 || self.clangd.is_some()
+                || self.typescript_server.is_some()
                 || self.python_path.is_some()
                 || self.compilation_database.is_some())
         {
@@ -62,6 +67,7 @@ impl Configuration {
             && self.pyright.is_none()
             && self.clangd.is_none()
             && self.ruby_lsp.is_none()
+            && self.typescript_server.is_none()
     }
 }
 
@@ -88,7 +94,10 @@ impl Servers {
                 connection,
                 servers.sources.clone(),
             ));
-            for language in ["rust", "python", "ruby", "c", "cpp"] {
+            for language in ["rust", "python", "ruby", "c", "cpp"]
+                .into_iter()
+                .chain(ECMASCRIPT_LANGUAGES.iter().copied())
+            {
                 servers.providers.insert(language, provider.clone());
             }
             return Ok(servers);
@@ -124,12 +133,20 @@ impl Servers {
         }
         if let Some(executable) = configuration.clangd {
             servers.add_project(
-                root,
+                root.clone(),
                 cache.join("clangd"),
                 executable,
                 c_family::Clangd {
                     database: configuration.compilation_database,
                 },
+            );
+        }
+        if let Some(executable) = configuration.typescript_server {
+            servers.add_project(
+                root,
+                cache.join("typescript"),
+                executable,
+                typescript::TypeScript,
             );
         }
         Ok(servers)

@@ -3,7 +3,7 @@
 use crate::review_source::{CaptureLimits, GitRepository, ReadEntry, ReviewInput};
 use std::{collections::BTreeSet, sync::Arc};
 use vizzi_core::{
-    comparison::EntryKind,
+    comparison::{EntryKind, ReviewPath},
     model::{CapturedSource, Document, Snapshot},
     modules::{ModuleEvidence, ModuleIndex},
     policy::{Classification, SourcePolicy},
@@ -50,18 +50,39 @@ impl ModuleEvidence for GitModuleEvidence<'_> {
         candidates: &mut dyn Iterator<Item = String>,
     ) -> Option<BTreeSet<String>> {
         let mut paths = Vec::new();
-        for path in candidates {
-            if self.policy.excludes(&path).ok()? {
-                break;
-            }
-            if paths.len() == PACKAGE_PATHS {
+        for (index, path) in candidates.enumerate() {
+            if index == PACKAGE_PATHS {
                 return None;
+            }
+            if self.policy.excludes(&path).ok()? {
+                continue;
             }
             paths.push(path);
         }
         self.repository
             .regular_files_at(self.commit, &paths, PACKAGE_DISCOVERY_BYTES)
             .ok()
+    }
+
+    fn captured_file(&self, name: &str, limit: usize) -> Option<Document> {
+        let classification = self.policy.classify(name).ok().flatten()?;
+        let path = ReviewPath::parse(name.as_bytes().to_vec()).ok()?;
+        let mut revision = self.repository.pin_file(self.commit, name).ok()?;
+        let ReadEntry::Present {
+            kind: EntryKind::Regular { .. },
+            bytes,
+        } = revision.read(&path, limit, &|| false).ok()?
+        else {
+            return None;
+        };
+        Document::capture_source(
+            self.repository.workspace().clone(),
+            name.into(),
+            CapturedSource::capture(bytes, None),
+            vec![],
+            classification,
+        )
+        .ok()
     }
 
     fn captured_files(

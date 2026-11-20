@@ -171,6 +171,8 @@ fn reference_targets_and_callers_can_keep_independent_dependency_provenance() {
             package: "helper".into(),
             version: Some("1.0.0".into()),
             configuration: "a".repeat(64),
+            mirror_path: None,
+            installation: None,
         })
         .unwrap();
     let target = captured

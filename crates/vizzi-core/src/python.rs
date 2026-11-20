@@ -8,12 +8,13 @@ use crate::{
 };
 
 const CALLS: CallRules = CallRules {
-    expressions: Some(&CallExpression {
+    expressions: &[CallExpression {
         kind: "call",
         callee_field: "function",
+        unwrap_callee: None,
         name_kinds: &["identifier"],
         name_fields: &[("attribute", "attribute")],
-    }),
+    }],
     finish: None,
 };
 

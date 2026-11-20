@@ -76,7 +76,16 @@ fn registration_rejects_duplicate_languages_and_contexts_and_empty_names() {
 fn builtins_advertise_written_calls_in_registration_order() {
     assert_eq!(
         Languages::builtin().unwrap().call_languages(),
-        ["rust", "python", "ruby", "c", "cpp"]
+        [
+            "rust",
+            "python",
+            "ruby",
+            "c",
+            "cpp",
+            "javascript",
+            "typescript",
+            "tsx"
+        ]
     );
 }
 

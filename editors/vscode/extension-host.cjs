@@ -74,9 +74,61 @@ async function verify() {
     assert.equal(answer.state,'unique',JSON.stringify(answer));
     assert.equal(answer.invocation.candidates[0].name,'leaf');
     assert.ok(definitions>0);
-    const references = await request('/api/references',{snapshot,symbol:answer.invocation.candidates[0].id,kind:'references'});
+    async function stableReferences(symbol) {
+      const deadline = Date.now() + 5000;
+      for (;;) {
+        const page = await request('/api/references', { snapshot, symbol, kind: 'references' });
+        if (page.precision === 'semantic' || Date.now() >= deadline
+            || !/changed during analysis|busy/.test(page.detail || '')) return page;
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+    }
+    const references = await stableReferences(answer.invocation.candidates[0].id);
     assert.equal(references.precision,'semantic',JSON.stringify(references));
     assert.equal(references.matching,1);
+
+    async function editorDefinition(path, functionName, writtenName) {
+      await vscode.workspace.openTextDocument(vscode.Uri.joinPath(root, path));
+      const functions = await request('/api/structure', { snapshot, query: {
+        kind: 'inventory', area: path, search: functionName, functions_only: true, offset: 0,
+      }});
+      const owner = functions.items.find(entry => entry.symbol.name === functionName).symbol;
+      const written = await request('/api/structure', { snapshot, query: {
+        kind: 'calls', symbol: owner.id, area: path, offset: 0,
+      }});
+      const site = written.items.find(item => item.name === writtenName);
+      const deadline = Date.now() + 10000;
+      for (;;) {
+        const result = await request('/api/call-definition', { snapshot, call: site.id });
+        if (result.state === 'unique') return { site, target: result.invocation.candidates[0] };
+        assert.ok(Date.now() < deadline, JSON.stringify(result));
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+    }
+    const alias = await editorDefinition('js/start.ts', 'start', 'launch');
+    assert.equal(alias.site.candidate_count, 0);
+    assert.equal(alias.target.name, 'executeJob');
+    assert.equal(alias.target.source.path, 'js/worker.mjs');
+    const receiver = await editorDefinition('js/start.ts', 'start', 'run');
+    for (const parent of ['Service', 'Other']) {
+      assert.ok(receiver.site.candidates.some(candidate => candidate.parents.includes(parent)));
+    }
+    assert.deepEqual(receiver.target.parents, ['Service']);
+    const typedReferences = await stableReferences(receiver.target.id);
+    assert.equal(typedReferences.precision, 'semantic', JSON.stringify(typedReferences));
+    assert.ok(typedReferences.items.some(item => item.source.path === 'js/start.ts' && item.site?.name === 'run'));
+    assert.equal((await editorDefinition('js/worker.mjs', 'executeJob', 'helper')).target.name, 'helper');
+    assert.equal((await editorDefinition('js/view.tsx', 'Card', 'start')).target.name, 'start');
+    const installed = await editorDefinition('js/consumer.ts', 'readPackage', 'installedWork');
+    assert.equal(installed.target.origin.label, 'fixture-pkg');
+    assert.equal(installed.target.origin.version, '2.4.0');
+    assert.equal(installed.target.source.path, 'index.ts');
+    const installedRefs = await request('/api/references', {
+      snapshot, symbol: installed.target.id, capture: installed.target.origin.capture, kind: 'references',
+    });
+    assert.equal(installedRefs.precision, 'semantic', JSON.stringify(installedRefs));
+    assert.ok(installedRefs.items.some(item => item.source.path === 'js/consumer.ts'));
+
     const edit = new vscode.WorkspaceEdit();
     edit.insert(file,new vscode.Position(0,0),'# unsaved\n');
     await vscode.workspace.applyEdit(edit);

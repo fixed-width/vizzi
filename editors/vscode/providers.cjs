@@ -3,9 +3,16 @@ const path = require('node:path');
 const {savedSource} = require('./editor-source.cjs');
 
 const FILE_BYTES = 4 * 1024 * 1024;
+const PACKAGE_SOURCE_SUFFIXES = new Set(['.js','.jsx','.mjs','.cjs','.ts','.tsx','.mts','.cts']);
 function within(root, file) {
   const relative = path.relative(root,file);
   return relative !== '' && !relative.startsWith(`..${path.sep}`) && relative !== '..' && !path.isAbsolute(relative);
+}
+function inInstallation(root, file) {
+  return within(root,file) && path.relative(root,file).split(path.sep).includes('node_modules');
+}
+function installedPackageSource(root, file) {
+  return PACKAGE_SOURCE_SUFFIXES.has(path.extname(file)) && inInstallation(root,file);
 }
 function validPosition(document, position) {
   if (!position || !Number.isInteger(position.line) || !Number.isInteger(position.character)
@@ -84,8 +91,9 @@ function createProvider(vscode, root, editorRoot = root) {
     const method = dependency?request.method.slice('dependency-'.length):request.method;
     if (typeof request.path !== 'string') throw new Error('Invalid editor source path');
     if (dependency) {
-      if (!path.isAbsolute(request.path) || within(root,request.path) || path.extname(request.path)!=='.rs') {
-        throw new Error('Dependency queries require a captured external Rust file');
+      const rust = !within(root,request.path) && path.extname(request.path)==='.rs';
+      if (!path.isAbsolute(request.path) || (!rust && !installedPackageSource(root,request.path))) {
+        throw new Error('Dependency queries require captured Rust or installed package source');
       }
     } else if (request.path.includes('\\') || path.isAbsolute(request.path)
         || request.path.split('/').some(part=>!part || part === '.' || part === '..')) throw new Error('Invalid editor source path');
@@ -94,7 +102,18 @@ function createProvider(vscode, root, editorRoot = root) {
     if ((!dependency && !within(root,file)) || await fs.realpath(file) !== file) throw new Error('Editor source path escapes the workspace or uses a symlink');
     const before = epoch;
     await clean();
-    const uri = vscode.Uri.file(dependency?file:path.join(editorRoot,request.path));
+    let uri = vscode.Uri.file(dependency?file:path.join(editorRoot,request.path));
+    if (request.providerUri !== undefined) {
+      if (!dependency || !installedPackageSource(root,file) || typeof request.providerUri !== 'string') {
+        throw new Error('Invalid package resolution path');
+      }
+      uri = vscode.Uri.parse(request.providerUri, true);
+      if (uri.scheme !== 'file'
+          || (!inInstallation(root,uri.fsPath) && !inInstallation(editorRoot,uri.fsPath))
+          || await fs.realpath(uri.fsPath).catch(()=>null) !== file) {
+        throw new Error('Package resolution path changed; reopen it from its caller');
+      }
+    }
     const document = await vscode.workspace.openTextDocument(uri);
     await verifyDocument(document,file);
     if (document.getText() !== request.text) throw new Error('Editor query differs from captured source');
@@ -108,17 +127,24 @@ function createProvider(vscode, root, editorRoot = root) {
     const seen = new Set();
     let outside = 0;
     let bytes = 0;
-    const witnesses = [{doc:document,file,text:request.text}];
+    const witnesses = [{doc:document,file,text:request.text,alias:request.providerUri === undefined ? undefined : uri.fsPath}];
     for (const location of raw) {
       const target = location.targetUri || location.uri;
       const start = (location.targetSelectionRange || location.targetRange || location.range)?.start;
       if (!target || !start) throw new Error('Invalid editor location');
       if (target.scheme !== 'file') {outside++; continue;}
       if (!within(root,target.fsPath) && !within(editorRoot,target.fsPath) && path.extname(target.fsPath)!=='.rs') {outside++;continue;}
-      const canonical = await fs.realpath(target.fsPath);
+      const packageAlias = inInstallation(root,target.fsPath) || inInstallation(editorRoot,target.fsPath);
+      const canonical = await fs.realpath(target.fsPath).catch(error=>{
+        if (packageAlias && ['ENOENT','ENOTDIR'].includes(error.code)) return null;
+        throw error;
+      });
+      if (!canonical) {outside++; continue;}
       const external = !within(root,canonical);
+      const installed = installedPackageSource(root,canonical);
+      if (packageAlias && !installed) {outside++; continue;}
       if (external && path.extname(canonical)!=='.rs') {outside++; continue;}
-      if (!external) {
+      if (!external && !installed) {
         const editorPath = path.join(editorRoot,path.relative(root,canonical));
         if (target.fsPath !== canonical && target.fsPath !== editorPath) throw new Error('Editor target path uses a symlink');
       }
@@ -135,11 +161,17 @@ function createProvider(vscode, root, editorRoot = root) {
       if (size > FILE_BYTES || bytes > 8 * 1024 * 1024) throw new Error('Editor target text exceeds allowance');
       await verifyDocument(doc,canonical,text);
       const declaration = external && method==='definition' && doc.languageId==='rust' ? await functionRange(doc,start):undefined;
-      locations.push({path:canonical,position:{line:start.line,character:start.character},text,...(declaration?{declaration}:{})});
-      witnesses.push({doc,file:canonical,text});
+      locations.push({path:canonical,position:{line:start.line,character:start.character},text,
+        ...(declaration?{declaration}:{}), ...(installed?{providerUri:target.toString()}:{})});
+      witnesses.push({doc,file:canonical,text,alias:installed?target.fsPath:undefined});
     }
     await clean();
-    for (const witness of witnesses) await verifyDocument(witness.doc,witness.file,witness.text);
+    for (const witness of witnesses) {
+      if (witness.alias && await fs.realpath(witness.alias).catch(()=>null) !== witness.file) {
+        throw new Error('Package resolution path changed during editor analysis');
+      }
+      await verifyDocument(witness.doc,witness.file,witness.text);
+    }
     if (before !== epoch || disposed) throw new Error('Editor workspace or configuration changed during analysis; retry navigation');
     return {epoch,locations,outside};
   }

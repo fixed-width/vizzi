@@ -9,9 +9,10 @@ use crate::{
 use tree_sitter::Node;
 
 const CALLS: CallRules = CallRules {
-    expressions: Some(&CallExpression {
+    expressions: &[CallExpression {
         kind: "call_expression",
         callee_field: "function",
+        unwrap_callee: None,
         name_kinds: &["identifier", "field_identifier", "type_identifier"],
         name_fields: &[
             ("field_expression", "field"),
@@ -19,7 +20,7 @@ const CALLS: CallRules = CallRules {
             ("template_function", "name"),
             ("template_method", "name"),
         ],
-    }),
+    }],
     finish: None,
 };
 

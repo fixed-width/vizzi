@@ -11,8 +11,9 @@ highlight. The label's specific hover target takes precedence over call highligh
 Source content, copying, navigation, pinning and fitting remain available.
 
 Membership comes from native language-aware analysis, not enclosing class names or generic
-directory grouping. The first slice covers Cargo Rust targets and explicitly declared
-Rust modules/includes, plus Python modules and explicit package chains. Unavailable,
+directory grouping. Cues cover Cargo Rust targets and declared Rust modules, Python
+modules and explicit package chains, Ruby namespaces, and JavaScript and TypeScript
+packages with a captured `package.json` name. Unavailable,
 unsupported or multiply bound membership remains neutral. Raw syntax membership makes
 no claim about compiled configuration, imports, runtime identity or macro expansion.
 
@@ -24,7 +25,7 @@ Pinned and unresolved views retain their captured module context. Old saved layo
 remain usable; live views without module fields are hydrated through native refresh.
 Legacy pinned views stay neutral until followed live; existing capture-expiry limits apply.
 
-Rust and Python function history and comparisons show module membership from each capture's source
+Function history and comparisons show module membership from each capture's source
 context. The saved working-tree side preserves the verified live membership, while historical
 sides use their selected Git commits. Calls opened from a capture use that same context.
 

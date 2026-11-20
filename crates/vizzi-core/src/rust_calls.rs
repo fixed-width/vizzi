@@ -2,7 +2,7 @@
 use crate::{
     calls::{CallFacts, CallTarget, TargetBasis},
     model::Coverage,
-    syntax::Checkpoints,
+    syntax::{Checkpoints, ScopeFacts},
 };
 use std::collections::{BTreeMap, BTreeSet};
 use tree_sitter::Node;
@@ -105,7 +105,7 @@ pub(crate) fn bind(
     root: Node<'_>,
     text: &str,
     coverage: &Coverage,
-    declarations: &BTreeMap<usize, usize>,
+    declarations: &ScopeFacts,
     calls: &mut CallFacts,
     cancelled: &dyn Fn() -> bool,
 ) -> bool {
@@ -128,16 +128,16 @@ pub(crate) fn bind(
         }
         let node = cursor.node();
         if node.kind() == "function_item"
-            && let Some(ordinal) = declarations.get(&node.id())
+            && let Some(fact) = declarations.get(&node.id())
             && let Some(method) = method(node, text)
         {
             if method.inherent {
                 targets
                     .entry((method.scope, method.ty, method.name))
                     .or_default()
-                    .push(*ordinal);
+                    .push(fact.ordinal);
             }
-            methods.insert(*ordinal, method);
+            methods.insert(fact.ordinal, method);
         }
         if node.kind() == "call_expression"
             && let Some(callee) = node.child_by_field_name("function")

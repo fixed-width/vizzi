@@ -8,6 +8,7 @@ mod captured_source;
 pub mod coloring;
 pub mod comparison;
 pub mod discovery;
+mod ecmascript;
 pub mod investigation;
 pub mod model;
 pub mod modules;

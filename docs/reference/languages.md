@@ -13,6 +13,31 @@ are separate capabilities; recognising a declaration does not imply resolving it
 | Source outside the configured repository | Locally available Python/stub captures through Pyright | Local captures through rust-analyzer | Local Ruby source reached through Ruby LSP | Local C/C++ captures through clangd |
 | Language module/package cues | Recognised Python modules/packages | Captured Cargo target/module structure | Declared Ruby modules, including reopened namespaces | Not available |
 
+## JavaScript and TypeScript
+
+Default source capture includes `.js`, `.jsx`, `.mjs`, `.cjs`, `.ts`, `.mts`, `.cts` and
+`.tsx`. Vizzi uses separate TypeScript and TSX parsers and supports JSX in JavaScript.
+Browsing works without Node.js, a package install or a project build.
+
+Outlines include named functions, named classes, variable-bound objects, and their
+identifier-named or unescaped quoted methods. TypeScript also shows interfaces, enums,
+type aliases and named signatures. Computed methods and anonymous argument callbacks
+appear in the outline. Named function bodies and methods are available in **Add bubble**.
+
+Direct calls, dotted member calls and constructor expressions provide written-call
+candidates. A managed TypeScript language server or VS Code provider sharing can
+resolve project-aware definitions and references, including aliases and inferred
+types. Results are mapped to captured source. Without a provider, **Find references**
+uses written-name candidates. [Configure JavaScript and TypeScript navigation](../how-to/configure-language-servers.md#javascript-and-typescript-with-a-managed-server)
+
+Package labels and accents use the closest captured `package.json` within the
+workspace. A missing or invalid name leaves the bubble neutral. Historical labels
+use the manifest from the selected Git commit.
+
+Managed TypeScript and VS Code sharing can open installed JavaScript or TypeScript
+package declarations in independent dependency bubbles. The selected provider
+determines whether a definition points to an implementation or a declaration file.
+
 ## Python
 
 Python does not need a runtime, virtual environment or language server for syntax browsing.
@@ -42,7 +67,7 @@ With the VS Code extension, editor-resolved Rust dependency and standard-library
 can also open as captured bubbles. A provider-reported function range can admit methods
 using newer syntax such as `[const]` bounds when native parsing misses them. The original
 text is retained, while raw call analysis inside that function can remain unavailable.
-External source in other languages still requires a Vizzi-managed provider.
+VS Code also supplies workspace-installed JavaScript and TypeScript package source.
 
 ## Ruby
 
@@ -83,8 +108,8 @@ implementation bodies.
 
 ## Shared limits
 
-Vizzi uses its own source policy. At the inspected root, `.git`, `target` and
-`node_modules` are excluded. Other paths ignored by Git are not automatically excluded;
+Vizzi uses its own source policy. Capture excludes root `.git` and `target`, and
+`node_modules` at any depth. Other paths ignored by Git are not automatically excluded;
 use `--exclude-source` for virtual environments, generated source or vendor trees you
 do not want in the reading scope. Cargo lockfiles, Python project settings and enabled
 C-family compilation metadata participate in change detection. Ruby lockfiles and runtime

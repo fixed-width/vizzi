@@ -17,8 +17,8 @@ Paths and server:
       Number of analysis workers, from 1 to 32 [default: 4].
 
 Source selection:
-  Rust, Python and Ruby are included by default. These options are repeatable;
-  scopes are file/directory paths relative to --root. Use . for the whole root.
+  Rust, Python, Ruby, JavaScript, and TypeScript are included by default.
+  These options are repeatable. Scopes are relative to --root. Use . for the whole root.
 
   --c-family-root SCOPE
       Include C/C++ source within this scope.
@@ -45,6 +45,8 @@ Language servers (optional; disabled until configured):
   --ruby-lsp EXECUTABLE
       Enable Ruby definitions and references using an installed ruby-lsp.
       Uses local gems without installing a bundle or loading project add-ons.
+  --typescript-server EXECUTABLE
+      Enable JavaScript and TypeScript definitions and references using tsc 7 or newer.
   --clangd EXECUTABLE
       Enable C/C++ definitions and references using clangd.
       Requires C/C++ source scopes and existing compilation context.

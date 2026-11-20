@@ -100,6 +100,7 @@ impl Options {
             &mut options.language_servers.pyright,
             &mut options.language_servers.ruby_lsp,
             &mut options.language_servers.clangd,
+            &mut options.language_servers.typescript_server,
             &mut options.language_servers.python_path,
         ]
         .into_iter()
@@ -170,6 +171,7 @@ pub(super) fn load(arguments: impl Iterator<Item = String>) -> Result<Option<Opt
                 | "--pyright"
                 | "--ruby-lsp"
                 | "--clangd"
+                | "--typescript-server"
                 | "--python-path"
                 | "--compile-commands"
                 | "--c-family-root"
@@ -213,6 +215,9 @@ pub(super) fn load(arguments: impl Iterator<Item = String>) -> Result<Option<Opt
             "--pyright" => options.language_servers.pyright = Some(value.into()),
             "--ruby-lsp" => options.language_servers.ruby_lsp = Some(value.into()),
             "--clangd" => options.language_servers.clangd = Some(value.into()),
+            "--typescript-server" => {
+                options.language_servers.typescript_server = Some(value.into())
+            }
             "--python-path" => options.language_servers.python_path = Some(value.into()),
             "--compile-commands" => {
                 options.language_servers.compilation_database = Some(value.into())
@@ -258,6 +263,22 @@ mod tests {
     }
 
     #[test]
+    fn managed_typescript_selects_one_executable_and_excludes_editor_sharing() {
+        let config = load_args(&["--typescript-server", "tsc"]);
+        assert!(!config.language_servers.is_empty());
+        let arguments = [
+            "--typescript-server",
+            "tsc",
+            "--vscode-connection",
+            "/workspace/editor.json",
+        ];
+        let error = load(arguments.into_iter().map(str::to_owned))
+            .err()
+            .expect("conflicting provider configuration");
+        assert!(error.contains("cannot be combined"), "{error}");
+    }
+
+    #[test]
     fn origin_connection_is_a_launch_only_choice() {
         let options = load_args(&[
             "--editor-connection",
@@ -300,6 +321,7 @@ ruby-lsp = '/absolute/ruby-lsp'
 python-path = './env/python'
 clangd = 'clangd'
 compile-commands = 'build/compile_commands.json'
+typescript-server = './bin/tsc'
 "#,
         )
         .unwrap();
@@ -328,6 +350,10 @@ compile-commands = 'build/compile_commands.json'
         assert_eq!(
             options.language_servers.compilation_database,
             Some(base.join("build/compile_commands.json"))
+        );
+        assert_eq!(
+            options.language_servers.typescript_server,
+            Some(base.join("./bin/tsc"))
         );
         assert_eq!(options.workers, 2);
         assert_eq!(options.port, 8000);
