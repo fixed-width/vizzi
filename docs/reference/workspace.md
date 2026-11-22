@@ -51,6 +51,7 @@ the lookup to one captured file, including files and declarations omitted by the
 repository search. Use the exact workspace-relative path with forward slashes.
 
 Function history freezes local HEAD when first opened and considers up to 64 file revisions.
+**Choose revision…** starts a timeline at an exact local commit, branch or tag.
 It skips unchanged declarations, stops at missing or ambiguous matches, and does not infer
 renames or moves. Historical bubbles disable current-source actions. See
 [reading function history](../how-to/read-function-history.md).

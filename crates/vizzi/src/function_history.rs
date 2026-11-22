@@ -22,11 +22,14 @@ use vizzi_core::{
 const FILE_BYTES: usize = 2 * 1024 * 1024;
 const TOTAL_BYTES: usize = 32 * 1024 * 1024;
 const SESSIONS: usize = 24;
+const PREPARED_SELECTIONS: usize = 4;
 mod captured_calls;
 mod comparison;
 mod module_context;
+mod revision;
 pub use captured_calls::{CapturedOwner, CapturedQuery, CapturedRequest, FrozenSource};
 pub use comparison::{CompareRequest, ComparisonWindow, HistoryBinding};
+pub use revision::{ConfirmRevision, SelectRevision};
 
 /// Exact current-source binding from which history starts.
 #[derive(Deserialize, Serialize)]
@@ -82,7 +85,7 @@ impl Declaration {
     }
 }
 struct Version {
-    candidate: usize,
+    commit: String,
     snapshot: String,
     modules: Arc<ModuleIndex>,
 }
@@ -103,6 +106,28 @@ struct Session {
     selected: Option<Capture>,
     index: usize,
 }
+
+#[derive(Default)]
+struct Sessions {
+    retained: VecDeque<Session>,
+    prepared: VecDeque<Session>,
+}
+
+impl Sessions {
+    fn get(&self, token: &str) -> Option<&Session> {
+        self.retained
+            .iter()
+            .chain(&self.prepared)
+            .find(|session| session.token == token)
+    }
+
+    fn prepare(&mut self, session: Session) {
+        if self.prepared.len() == PREPARED_SELECTIONS {
+            self.prepared.pop_front();
+        }
+        self.prepared.push_back(session);
+    }
+}
 fn invalid(message: impl Into<String>) -> CompanionError {
     CompanionError::Invalid(message.into())
 }
@@ -122,7 +147,7 @@ fn opaque(s: &str) -> bool {
 pub struct FunctionHistory {
     host: Arc<Host>,
     structure: Arc<StructureHost>,
-    sessions: Mutex<VecDeque<Session>>,
+    sessions: Mutex<Sessions>,
     comparisons: Mutex<VecDeque<comparison::Pair>>,
 }
 impl FunctionHistory {
@@ -136,17 +161,32 @@ impl FunctionHistory {
         Self {
             host,
             structure,
-            sessions: Mutex::new(VecDeque::new()),
+            sessions: Mutex::default(),
             comparisons: Mutex::new(VecDeque::new()),
         }
     }
-    fn lock(&self) -> Result<MutexGuard<'_, VecDeque<Session>>, CompanionError> {
+    fn lock(&self) -> Result<MutexGuard<'_, Sessions>, CompanionError> {
         self.sessions
             .try_lock()
             .map_err(|_| unavailable("Function history is busy; retry"))
     }
     /// Freezes local HEAD and prepares the first distinct earlier function version.
     pub fn start(&self, request: &Request) -> Result<Value, CompanionError> {
+        let mut sessions = self.lock()?;
+        let doc = self.observed_document(request, false)?;
+        let mut session = self.session(&doc, &request.tracking, None)?;
+        self.advance(&mut session)?;
+        self.verify_current(&request.snapshot)?;
+        let answer = frame(&session)?;
+        admit(&mut sessions.retained, session);
+        Ok(answer)
+    }
+
+    fn observed_document(
+        &self,
+        request: &Request,
+        pinned: bool,
+    ) -> Result<Arc<Document>, CompanionError> {
         if ![
             &request.snapshot,
             &request.file,
@@ -158,19 +198,45 @@ impl FunctionHistory {
         {
             return Err(invalid("Invalid function history binding"));
         }
-        let mut sessions = self.lock()?;
-        let snapshot = self
-            .host
-            .application()
-            .snapshot()
-            .ok_or_else(|| unavailable("Wait for current source"))?;
+        let app = self.host.application();
+        let snapshot = if pinned {
+            app.pinned(&request.snapshot)
+                .ok_or_else(|| conflict("Pinned source expired; follow live source"))?
+        } else {
+            app.snapshot()
+                .ok_or_else(|| unavailable("Wait for current source"))?
+        };
         if snapshot.id().as_str() != request.snapshot {
             return Err(conflict("Source changed before function history opened"));
         }
-        let doc = snapshot
+        snapshot
             .file(&request.file)
             .filter(|d| d.version().as_str() == request.version)
-            .ok_or_else(|| conflict("Function history source version differs"))?;
+            .cloned()
+            .ok_or_else(|| conflict("Function history source version differs"))
+    }
+
+    fn verify_current(&self, snapshot: &str) -> Result<(), CompanionError> {
+        if self
+            .host
+            .application()
+            .snapshot()
+            .is_some_and(|s| s.id().as_str() == snapshot)
+        {
+            Ok(())
+        } else {
+            Err(conflict(
+                "Source changed while function history was opening",
+            ))
+        }
+    }
+
+    fn session(
+        &self,
+        doc: &Document,
+        tracking: &str,
+        revision: Option<&str>,
+    ) -> Result<Session, CompanionError> {
         if doc.bytes() > FILE_BYTES {
             return Err(unavailable("Function history file exceeds 2 MiB"));
         }
@@ -178,15 +244,13 @@ impl FunctionHistory {
             a.facts
                 .iter()
                 .filter(|f| {
-                    f.unique
-                        && f.kind == "function"
-                        && doc.entity_id(a, f).as_str() == request.tracking
+                    f.unique && f.kind == "function" && doc.entity_id(a, f).as_str() == tracking
                 })
                 .map(move |f| (a, f))
         });
         let (analysis, fact) = matches
             .next()
-            .ok_or_else(|| invalid("History needs an unambiguous current function"))?;
+            .ok_or_else(|| invalid("History needs an unambiguous function"))?;
         if matches.next().is_some() {
             return Err(invalid("Function history declaration is ambiguous"));
         }
@@ -201,8 +265,18 @@ impl FunctionHistory {
                 "Function history requires a local Git worktree: {e}"
             ))
         })?;
-        let (tip, mut commits, shallow) =
-            repository.file_history(doc.path()).map_err(unavailable)?;
+        let tip = repository
+            .resolve_commit(revision.unwrap_or("HEAD"))
+            .map_err(|_| {
+                if revision.is_some() {
+                    invalid("That Git commit or ref is not available locally")
+                } else {
+                    unavailable("No local HEAD commit is available for function history")
+                }
+            })?;
+        let (mut commits, shallow) = repository
+            .file_history(&tip, doc.path())
+            .map_err(unavailable)?;
         let boundary = if commits.len() > 64 {
             commits.truncate(64);
             "Function history limit reached (64 file revisions)"
@@ -215,7 +289,7 @@ impl FunctionHistory {
         let mut random = [0; 32];
         getrandom::fill(&mut random).map_err(unavailable)?;
         let token = random.iter().map(|b| format!("{b:02x}")).collect();
-        let mut session = Session {
+        Ok(Session {
             token,
             repository,
             path: doc.path().into(),
@@ -231,32 +305,16 @@ impl FunctionHistory {
             digest,
             selected: None,
             index: 0,
-        };
-        self.advance(&mut session)?;
-        if self
-            .host
-            .application()
-            .snapshot()
-            .is_none_or(|s| s.id() != snapshot.id())
-        {
-            return Err(conflict(
-                "Source changed while function history was opening",
-            ));
-        }
-        let answer = frame(&session)?;
-        admit(&mut sessions, session);
-        Ok(answer)
+        })
     }
     /// Revisits immutable commits or lazily discovers another distinct declaration.
     pub fn step(&self, request: &Step) -> Result<Value, CompanionError> {
         let mut sessions = self.lock()?;
-        let position = sessions
-            .iter()
-            .position(|s| s.token == request.token)
+        let retained = take_session(&mut sessions.retained, &request.token);
+        let was_retained = retained.is_some();
+        let mut session = retained
+            .or_else(|| take_session(&mut sessions.prepared, &request.token))
             .ok_or_else(|| conflict("Function history expired; return to live"))?;
-        let mut session = sessions
-            .remove(position)
-            .ok_or_else(|| conflict("Function history expired"))?;
         let result = (|| {
             if request.index > session.versions.len() {
                 return Err(invalid("Invalid function history position"));
@@ -270,10 +328,14 @@ impl FunctionHistory {
             }
             frame(&session)
         })();
-        admit(&mut sessions, session);
+        if was_retained {
+            admit(&mut sessions.retained, session);
+        } else {
+            sessions.prepare(session);
+        }
         result
     }
-    /// Pages an accepted immutable version; never falls back to current bytes.
+    /// Pages an owned immutable version; never falls back to current bytes.
     pub fn window(
         &self,
         token: &str,
@@ -284,8 +346,7 @@ impl FunctionHistory {
     ) -> Result<Value, CompanionError> {
         let sessions = self.lock()?;
         let session = sessions
-            .iter()
-            .find(|s| s.token == token)
+            .get(token)
             .ok_or_else(|| conflict("Function history expired; return to live"))?;
         let restored;
         let capture = if let Some(capture) = session
@@ -319,7 +380,7 @@ impl FunctionHistory {
             return Ok(capture.clone());
         }
         let version = &session.versions[index];
-        let (declaration, _) = self.declaration(session, version.candidate)?;
+        let (declaration, _) = self.declaration(session, &version.commit)?;
         if declaration.snapshot.id().as_str() != version.snapshot {
             return Err(conflict(
                 "Historical source differs from the accepted capture",
@@ -331,10 +392,9 @@ impl FunctionHistory {
     fn declaration(
         &self,
         session: &Session,
-        index: usize,
+        commit: &str,
     ) -> Result<(Declaration, blake3::Hash), CompanionError> {
         let path = ReviewPath::parse(session.path.as_bytes().to_vec()).map_err(unavailable)?;
-        let commit = &session.commits[index];
         let mut input = session
             .repository
             .pin_file(commit, &session.path)
@@ -421,7 +481,7 @@ impl FunctionHistory {
         let mut cursor = session.cursor;
         let mut chosen: Option<(usize, Declaration, blake3::Hash)> = None;
         while cursor < session.commits.len() {
-            let (declaration, digest) = match self.declaration(session, cursor) {
+            let (declaration, digest) = match self.declaration(session, &session.commits[cursor]) {
                 Ok(value) => value,
                 Err(CompanionError::Invalid(message)) => {
                     session.boundary = message;
@@ -442,30 +502,47 @@ impl FunctionHistory {
             cursor += 1;
         }
         if let Some((candidate, declaration, digest)) = chosen {
-            let commit = &session.commits[candidate];
-            let modules = Arc::new(module_context::for_commit(
-                &session.repository,
-                commit,
-                self.host.source_policy(),
-                &declaration.snapshot.documents()[0],
-                &session.language,
-            ));
-            let capture = declaration.bind(modules.clone())?;
+            let commit = session.commits[candidate].clone();
+            self.accept(session, commit, declaration, digest)?;
             session.cursor = cursor;
-            session.digest = digest;
-            session.versions.push(Version {
-                candidate,
-                snapshot: capture.snapshot.id().as_str().into(),
-                modules,
-            });
-            session.index = session.versions.len() - 1;
-            session.selected = Some(capture);
             return Ok(());
         }
         session.stopped = true;
         Err(unavailable(&session.boundary))
     }
+
+    fn accept(
+        &self,
+        session: &mut Session,
+        commit: String,
+        declaration: Declaration,
+        digest: blake3::Hash,
+    ) -> Result<(), CompanionError> {
+        let modules = Arc::new(module_context::for_commit(
+            &session.repository,
+            &commit,
+            self.host.source_policy(),
+            &declaration.snapshot.documents()[0],
+            &session.language,
+        ));
+        let capture = declaration.bind(modules.clone())?;
+        session.digest = digest;
+        session.versions.push(Version {
+            commit,
+            snapshot: capture.snapshot.id().as_str().into(),
+            modules,
+        });
+        session.index = session.versions.len() - 1;
+        session.selected = Some(capture);
+        Ok(())
+    }
 }
+
+fn take_session(queue: &mut VecDeque<Session>, token: &str) -> Option<Session> {
+    let position = queue.iter().position(|session| session.token == token)?;
+    queue.remove(position)
+}
+
 fn size(session: &Session) -> usize {
     session.selected.as_ref().map_or(0, |c| {
         c.snapshot.documents().iter().map(|d| d.bytes()).sum()
@@ -510,6 +587,6 @@ fn frame(session: &Session) -> Result<Value, CompanionError> {
     };
     let source = window(&capture.snapshot, doc, &query)?;
     Ok(
-        json!({"token":session.token,"tip":session.tip,"commit":session.commits[session.versions[session.index].candidate],"index":session.index,"snapshot":capture.snapshot.id().as_str(),"symbol":capture.symbol,"origin":source["lines"][0],"window":source}),
+        json!({"token":session.token,"tip":session.tip,"commit":session.versions[session.index].commit,"index":session.index,"snapshot":capture.snapshot.id().as_str(),"symbol":capture.symbol,"origin":source["lines"][0],"window":source}),
     )
 }

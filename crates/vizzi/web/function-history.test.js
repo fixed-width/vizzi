@@ -23,4 +23,10 @@ const updates=unresolved.views.map(v=>v.id===root?{id:v.id,state:'unresolved'}:{
 unresolved.refresh(id(1),updates,unresolved.links.map(l=>({id:l.id,check:null})));assert.deepEqual(unresolved.view(root).symbol,displayed);assert.equal(unresolved.view(root).history.returning,true);
 updates[0]={id:root,state:'current',symbol:a,position:{section:1,line:null,byte:0,reset:false}};unresolved.refresh(id(1),updates,unresolved.links.map(l=>({id:l.id,check:null})));assert.deepEqual(unresolved.view(root).symbol,a);assert.equal(unresolved.view(root).history,undefined);assert.equal(unresolved.usable(root),true);
 for(const mutate of [h=>h.index=-1,h=>h.token='bad',h=>h.base.symbol.source.file='bad',h=>h.commit='HEAD',h=>h.base.history={}]){const bad=JSON.parse(model.serialize());mutate(bad.views[0].history);assert.throws(()=>Workspace.restore(JSON.stringify(bad),id(1)));}
+
+const selected=new Workspace(id(1)),selectedId=selected.openRoot(a,'');
+selected.read(selectedId,{section:97,top:15,left:4,anchor:{line:100,byte:6,offset:12}});
+selected.showHistory(selectedId,{...revision,tip:revision.commit,same_text:true});
+assert.deepEqual(selected.view(selectedId).reading,{section:106,top:15,left:4,anchor:{line:109,byte:6,offset:12}});
+assert.deepEqual(Workspace.restore(selected.serialize(),id(1)).view(selectedId).reading,selected.view(selectedId).reading);
 console.log('function history: validated revision bindings, relative reading position, stable layout, persistence and return to live');

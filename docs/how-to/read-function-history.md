@@ -17,6 +17,22 @@ call workspace.
    Its bubble keeps its position, size and task membership. Choose **Compare** once live
    source is ready to review it alongside the previous version.
 
+## Open a known commit, branch or tag
+
+1. In a repository function bubble, choose **Choose revision…**. In a comparison bubble,
+   open the bubble's **Actions** menu to find the command.
+2. Enter a local commit ID, branch or tag and press Enter or choose **Open revision**.
+   Use a full ref such as `refs/heads/review` to distinguish a branch from a tag with
+   the same name. The bubble shows the commit even if the declaration was unchanged.
+3. Use **Previous change** to read an older version or **Compare** to see it beside the
+   selected commit. **Next change** returns through the visited versions to the exact commit.
+   To pick a different branch or commit, choose **Choose revision…** again.
+
+The commit stays pinned if the branch or tag moves. Press Escape or choose **Cancel**
+to keep the current bubble and its captured calls readable while a selection is pending.
+If Vizzi reports that the commit or declaration is unavailable, you can correct the input
+and retry.
+
 If that function has been renamed or deleted in current source, Vizzi keeps the actual
 historical version with an unavailable message. You can continue browsing its history
 or retry **Return to live** while Vizzi waits for a successful refresh. If the original
@@ -28,7 +44,7 @@ Callers, references, Save and Editor require current source. Existing connection
 visible with historical styling; newly followed captured calls retain their own revision
 and evidence. Returning live does not silently turn captured links into current facts.
 
-History follows the first parent of merges on the frozen local HEAD ancestry. It considers
+History follows the first parent of merges from the frozen local HEAD or chosen commit. It considers
 up to 64 file revisions and does not switch branches, check out files, fetch objects or
 build the inspected project. New commits do not change an already-open timeline; return
 live and open history again to start from a newer HEAD.

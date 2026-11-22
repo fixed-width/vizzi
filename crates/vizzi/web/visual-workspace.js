@@ -24,6 +24,7 @@ const el=id=>document.getElementById(id),node=(tag,text='')=>{const n=document.c
 const error=createMessage(el('visual-error'),{label:'Dismiss workspace error'}),notice=createMessage(el('visual-notice'),{label:'Dismiss workspace notice'});
 let definitionProvider=false;const definitionCapabilities=transport('/api/structure').then(c=>{definitionProvider=c.definition_provider===true;}).catch(()=>{});
 let model,currentSnapshot,taskControls,board,editorName='editor',busy=false,saveTimer,paletteTicket=0,jobs=Promise.resolve(),demoOpened=false,livePendingTimer;
+let revisionPicker;
 const mounted=new Map();
 const returnPending=r=>r.liveReturn==='pending';
 const SECTION_ROWS=96,SECTION_LIMIT=4,SECTION_EDGE=240;
@@ -122,7 +123,7 @@ const prepareEditorCall=createCallPreparation({read:()=>model,
 const editorCalls=installWorkspaceDelivery({mode:'call',
  ready:action=>Boolean(size().w>=1&&size().h>=1&&(action.kind==='reveal'||model&&!model.stale)),
  prepare:(action,context)=>action.kind==='reveal'?Promise.resolve({commit(){}}):prepareEditorCall(action,context),failed:fail,
- changed:pending=>{if(pending){callMenu.hide();hideDestinations();window.getSelection()?.removeAllRanges();for(const r of mounted.values()){r.navigation=(r.navigation??0)+1;r.historyTicket=(r.historyTicket??0)+1;r.historyController?.abort();if(r.historyLoading)r.comparing=r.historyLoading=r.loading=false;r.resolving=false;updateFragmentStatus(r);}geometry();live.resume();}}
+ changed:pending=>{if(pending){closeRevisionPicker();callMenu.hide();hideDestinations();window.getSelection()?.removeAllRanges();for(const r of mounted.values()){r.navigation=(r.navigation??0)+1;r.historyTicket=(r.historyTicket??0)+1;r.historyController?.abort();if(r.historyLoading)r.comparing=r.historyLoading=r.loading=false;r.resolving=false;updateFragmentStatus(r);}geometry();live.resume();}}
 });
 document.addEventListener('selectionchange',()=>live.resume());
 function updateFragmentStatus(r){
@@ -141,23 +142,111 @@ function updateFragmentStatus(r){
  else if(r.awaitingLive&&v.mode==='live')r.state.textContent='Update pending';
  else r.state.textContent=v.state==='unresolved'?'Function unavailable — earlier version':v.mode==='pinned'?'Pinned version':r.sourceStatus??'Live';
 }
-async function changeHistory(id,direction){
- const r=mounted.get(id),workspace=model,v=model.view(id);if(!r||r.loading||returnPending(r)||r.sourcePane.selected())return;
- if(!v.history&&(!model.usable(id)||v.symbol.origin))return;
+function currentHistorySource(v){
+ const {file,version}=v.symbol.source;
+ return {snapshot:v.snapshot,file,version,tracking:v.symbol.tracking};
+}
+
+function canChooseRevision(v){
+ return !v.symbol.origin&&v.symbol.kind==='function'&&v.symbol.tracking&&
+  (model.usable(v.id)||v.mode==='pinned'&&v.state==='current'||frozenSource(v));
+}
+
+function openRevisionPicker(id,trigger){
+ const v=model.view(id),r=mounted.get(id);
+ if(!r||r.loading||returnPending(r)||!canChooseRevision(v))return;
+ editorCalls.manual();callMenu.hide();hideDestinations();r.popup.hidden=true;
+ revisionPicker={id,trigger,controller:new AbortController()};
+ el('revision-input').value='';
+ el('revision-error').hidden=true;
+ el('revision-status').textContent='';
+ el('open-revision').disabled=false;
+ el('revision-dialog').showModal();
+}
+
+function closeRevisionPicker(restoreFocus=false){
+ const picker=revisionPicker;
+ picker?.controller.abort();
+ revisionPicker=undefined;
+ const dialog=el('revision-dialog');
+ if(dialog.open)dialog.close();
+ if(restoreFocus&&picker){
+  const button=picker.trigger.disabled||picker.trigger.hidden?mounted.get(picker.id)?.chooseRevision:picker.trigger;
+  button?.focus({preventScroll:true});
+ }
+}
+
+el('cancel-revision').onclick=()=>closeRevisionPicker(true);
+el('revision-dialog').addEventListener('cancel',event=>{event.preventDefault();closeRevisionPicker(true);});
+el('revision-form').onsubmit=async event=>{
+ event.preventDefault();
+ const picker=revisionPicker,submit=el('open-revision'),status=el('revision-status'),error=el('revision-error');
+ if(!picker||submit.disabled)return;
+ submit.disabled=true;
+ error.hidden=true;
+ status.textContent='Reading revision…';
+ const selected=await changeHistory(picker.id,0,{
+  revision:el('revision-input').value,
+  signal:picker.controller.signal,
+  failed:failure=>{error.hidden=false;error.textContent=failure.message;},
+ });
+ if(revisionPicker!==picker)return;
+ if(selected){closeRevisionPicker(true);return;}
+ status.textContent='';
+ submit.disabled=false;
+ el('revision-input').focus();
+};
+
+async function changeHistory(id,direction,selection){
+ const r=mounted.get(id),workspace=model;
+ if(!r||r.loading||returnPending(r))return;
+ const v=model.view(id);
+ if(r.sourcePane.selected()){
+  selection?.failed(new Error('Clear the source selection before changing revision.'));
+  return;
+ }
+ if(selection&&!canChooseRevision(v)){
+  selection.failed(new Error('Wait for the function source before choosing a revision.'));
+  return;
+ }
+ if(!selection&&!v.history&&(!model.usable(id)||v.symbol.origin))return;
  editorCalls.manual();callMenu.hide();hideDestinations();r.popup.hidden=true;r.navigation=(r.navigation??0)+1;r.resolving=false;r.warming=false;
  const binding=JSON.stringify([v.snapshot,v.symbol.id,v.history]),ticket=r.historyTicket=(r.historyTicket??0)+1,controller=new AbortController();r.historyController=controller;r.historyLoading=true;r.loading=true;geometry();
- const verify=()=>{if(model!==workspace||mounted.get(id)!==r||r.historyTicket!==ticket||JSON.stringify([model.view(id).snapshot,model.view(id).symbol.id,model.view(id).history])!==binding)throw new DOMException('Function history superseded','AbortError');if(r.sourcePane.selected())throw new Error('Clear the source selection before changing revision.');};
+ const signal=selection?AbortSignal.any([controller.signal,selection.signal]):controller.signal;
+ const verify=()=>{signal.throwIfAborted();if(model!==workspace||mounted.get(id)!==r||r.historyTicket!==ticket||JSON.stringify([model.view(id).snapshot,model.view(id).symbol.id,model.view(id).history])!==binding)throw new DOMException('Function history superseded','AbortError');if(r.sourcePane.selected())throw new Error('Clear the source selection before changing revision.');};
+ let finished=false;
+ const finish=()=>{
+  if(finished)return;
+  finished=true;
+  if(mounted.get(id)===r&&r.historyTicket===ticket){r.historyLoading=false;r.loading=false;geometry();live.resume();}
+ };
+ signal.addEventListener('abort',finish,{once:true});
  try{
-  const revision=v.history?await post('/api/function-history/step',{token:v.history.token,index:v.history.index+direction},controller.signal):await post('/api/function-history',{snapshot:v.snapshot,file:v.symbol.source.file,version:v.symbol.source.version,tracking:v.symbol.tracking},controller.signal);
+  let revision;
+  if(selection){
+   const captured=frozenSource(v);
+   const origin=captured?{kind:'captured',source:captured}:{kind:v.mode==='pinned'?'pinned':'current',source:currentHistorySource(v)};
+   revision=await post('/api/function-history/select',{revision:selection.revision,origin},signal);
+  }else if(v.history){
+   revision=await post('/api/function-history/step',{token:v.history.token,index:v.history.index+direction},signal);
+  }else{
+   revision=await post('/api/function-history',currentHistorySource(v),signal);
+  }
   verify();const planned=Workspace.restore(model.serialize(),model.snapshot);planned.showHistory(id,revision);const next=planned.view(id),s=next.symbol.source,start=next.reading.section;
   const query=new URLSearchParams({token:revision.token,snapshot:revision.snapshot,file:s.file,version:s.version,line_start:String(start),line_count:String(Math.min(96,s.end_line-start+1)),outline_count:'1',reflow:'true'});
-  const [data,actions]=await Promise.all([start===s.line?revision.window:transport('/api/function-history/window?'+query,{signal:controller.signal}),capturedActions(next,start,Math.min(96,s.end_line-start+1),controller.signal)]);verify();
+  const [data,actions]=await Promise.all([start===s.line?revision.window:transport('/api/function-history/window?'+query,{signal}),capturedActions(next,start,Math.min(96,s.end_line-start+1),signal)]);verify();
   if(data?.snapshot!==revision.snapshot||data.file!==s.file||data.version!==s.version||!Array.isArray(data.lines)||!data.lines.length||data.lines.length>96||data.lines[0].number!==start||revision.origin?.number!==s.line||revision.origin.left||revision.origin.column!==0)throw new Error('Historical source differs from the requested function');
   r.sourceTicket=(r.sourceTicket??0)+1;model.showHistory(id,revision);r.liveReturn=null;r.historyLoading=false;r.loading=false;r.sites=[];r.callsReady=false;r.actions=[];
   r.element.querySelector('.fragment-heading small').textContent=`${s.path}:${s.line}`;
   applyPreparedSource(id,{data,actions,start,margin:functionIndent(revision.origin)});save();
- }catch(e){if(e.name!=='AbortError'&&mounted.get(id)===r&&model===workspace&&r.historyTicket===ticket)fail(e);}
- finally{if(mounted.get(id)===r&&r.historyTicket===ticket){r.historyLoading=false;r.loading=false;geometry();live.resume();}}
+  if(selection){
+   void post('/api/function-history/confirm',{token:revision.token}).catch(error=>{
+    if(model===workspace&&mounted.get(id)===r&&model.view(id).history?.token===revision.token)notice.show(error.message);
+   });
+  }
+  return true;
+ }catch(e){if(!signal.aborted&&e.name!=='AbortError'&&mounted.get(id)===r&&model===workspace&&r.historyTicket===ticket)(selection?.failed??fail)(e);}
+ finally{signal.removeEventListener('abort',finish);finish();}
 }
 function returnHistoryLive(id){
  const r=mounted.get(id);if(returnPending(r))return;
@@ -208,6 +297,8 @@ function historyControls(r,v){
  r.historyNext.setAttribute('aria-disabled',String(atNewest&&pending));
  r.historyLabel.textContent=v.history?v.history.commit.slice(0,8):'';
  r.historyLabel.title=v.history?`Commit ${v.history.commit}; first-parent history at ${v.history.tip}`:'';
+ r.chooseRevision.hidden=Boolean(v.comparison)||!canChooseRevision(v);
+ r.chooseRevision.disabled=r.loading||pending;
  r.pin.hidden=atNewest;
  r.pin.disabled=r.historyLoading&&!hasCapture;
  r.pin.textContent=hasCapture?'Return to live':v.mode==='pinned'?'Follow live':'Pin version';
@@ -224,6 +315,7 @@ function comparisonControls(r,v){
  r.compareButton.disabled=r.loading||returnPending(r)||model.views.length>=24&&!c||!v.history&&!model.usable(v.id);
  r.editPrevious.hidden=r.editNext.hidden=!c;r.editPrevious.disabled=r.loading||!c||c.returning||c.cursor===0;r.editNext.disabled=r.loading||!c||c.returning||c.cursor>=c.changes.length-1;
  r.historyPrevious.hidden=Boolean(c||v.captured);if(v.captured){r.historyNext.hidden=true;r.compareButton.hidden=true;r.historyLabel.textContent=shortRevision(v.captured.label);r.historyLabel.title=`Captured file · ${v.captured.label}`;}if(c){r.historyNext.hidden=true;r.historyLabel.textContent=`${comparisonTitle(c)} · ${c.changes.length?c.cursor+1:0}/${c.changes.length}`;r.historyLabel.title=`${c.label}; compared with ${c.other_label}`;r.element.dataset.comparisonSide=c.side;r.element.dataset.comparisonToken=c.token;}else{delete r.element.dataset.comparisonSide;delete r.element.dataset.comparisonToken;}
+ r.historyLabel.setAttribute('aria-label',r.historyLabel.title);
  const key=c?`${c.token}:${c.side}`:'';
  if(r.comparisonKey===key&&r.comparisonFirst===r.code.firstElementChild&&r.comparisonLast===r.code.lastElementChild)return;
  for(const row of r.code.querySelectorAll('.code-line')){const number=Number(row.dataset.line),changed=Boolean(c&&c.changes.some(([start,end])=>number>=start&&number<end));row.classList.toggle('comparison-removed',changed&&c.side==='older');row.classList.toggle('comparison-added',changed&&c.side==='newer');if(changed)row.title=`${c.side==='older'?'Removed or replaced':'Added or replaced'} line ${number} · ${shortRevision(c.label)}`;else row.removeAttribute('title');}
@@ -303,7 +395,7 @@ function links(){
 }
 function geometry(){
  if(!model)return;for(const[id,r]of mounted)if(!model.views.some(v=>v.id===id)){r.controller.abort();r.historyController?.abort();r.sourcePane.dispose();r.element.remove();mounted.delete(id);}const c=model.camera;el('workspace-world').style.transform=`translate(${-c.x*c.scale}px,${-c.y*c.scale}px) scale(${c.scale})`;el('visual-zoom').textContent=Math.round(c.scale*100)+'%';el('visual-empty').hidden=model.items().length>0;el('visual-stale').hidden=!model.views.some(v=>v.state==='unresolved'&&!mounted.get(v.id)?.liveReturn);
- for(const v of model.views){const r=mounted.get(v.id);if(!r)continue;r.element.hidden=!model.isVisible(v.id);Object.assign(r.element.style,{left:v.x+'px',top:v.y+'px',width:v.w+'px',height:(v.collapsed?54:v.h)+'px'});const membership=modulePresentation(v,model.views);r.element.classList.toggle('has-module',Boolean(membership));const moduleKey=JSON.stringify(membership);if(moduleKey!==r.moduleKey){r.moduleKey=moduleKey;r.moduleTag.hidden=!membership;if(membership){r.element.dataset.moduleId=membership.id;r.moduleTag.dataset.moduleId=membership.id;r.moduleTag.textContent=membership.label;r.moduleTag.title=membership.title;r.element.style.setProperty('--module-accent',`var(--module-${membership.colour})`);r.element.style.setProperty('--module-tint',`var(--module-tint-${membership.colour})`);}else{delete r.element.dataset.moduleId;delete r.moduleTag.dataset.moduleId;r.moduleTag.textContent='';r.element.style.removeProperty('--module-accent');r.element.style.removeProperty('--module-tint');}}r.body.hidden=v.collapsed;r.collapse.textContent=v.collapsed?'▾':'▴';r.collapse.setAttribute('aria-label',v.collapsed?'Expand bubble':'Collapse bubble');r.element.classList.toggle('is-selected',v.id===model.selected);r.element.classList.toggle('is-stale',!model.usable(v.id));r.prev.disabled=r.next.disabled=Boolean(r.historyLoading);r.callsButton.disabled=!model.navigable(v.id)||r.historyLoading;r.referenceActions.disabled=!model.usable(v.id)||r.historyLoading;r.fitHeight.disabled=r.fitWidth.disabled=r.loading||!r.lines?.length||v.collapsed;inlineAvailability(r.code,v.id);r.keep.disabled=Boolean(v.symbol.origin)||!model.usable(v.id)||r.historyLoading||!board||busy;r.keep.title=v.symbol.origin?'Dependency locations stay in this workspace.':'Save location';r.editor.disabled=!model.usable(v.id)||r.historyLoading||busy;historyControls(r,v);comparisonControls(r,v);updateFragmentStatus(r);restoreVisibleReading(r,v);}
+ for(const v of model.views){const r=mounted.get(v.id);if(!r)continue;r.element.hidden=!model.isVisible(v.id);Object.assign(r.element.style,{left:v.x+'px',top:v.y+'px',width:v.w+'px',height:(v.collapsed?54:v.h)+'px'});const membership=modulePresentation(v,model.views);r.element.classList.toggle('has-module',Boolean(membership));const moduleKey=JSON.stringify(membership);if(moduleKey!==r.moduleKey){r.moduleKey=moduleKey;r.moduleTag.hidden=!membership;if(membership){r.element.dataset.moduleId=membership.id;r.moduleTag.dataset.moduleId=membership.id;r.moduleTag.textContent=membership.label;r.moduleTag.title=membership.title;r.element.style.setProperty('--module-accent',`var(--module-${membership.colour})`);r.element.style.setProperty('--module-tint',`var(--module-tint-${membership.colour})`);}else{delete r.element.dataset.moduleId;delete r.moduleTag.dataset.moduleId;r.moduleTag.textContent='';r.element.style.removeProperty('--module-accent');r.element.style.removeProperty('--module-tint');}}r.body.hidden=v.collapsed;r.collapse.textContent=v.collapsed?'▾':'▴';r.collapse.setAttribute('aria-label',v.collapsed?'Expand bubble':'Collapse bubble');r.element.classList.toggle('is-selected',v.id===model.selected);r.element.classList.toggle('is-stale',!model.usable(v.id));r.prev.disabled=r.next.disabled=Boolean(r.historyLoading);r.callsButton.disabled=!model.navigable(v.id)||r.historyLoading;r.referenceActions.disabled=r.historyLoading||(!model.usable(v.id)&&!(v.comparison&&!r.loading&&!returnPending(r)&&canChooseRevision(v)));r.fitHeight.disabled=r.fitWidth.disabled=r.loading||!r.lines?.length||v.collapsed;inlineAvailability(r.code,v.id);r.keep.disabled=Boolean(v.symbol.origin)||!model.usable(v.id)||r.historyLoading||!board||busy;r.keep.title=v.symbol.origin?'Dependency locations stay in this workspace.':'Save location';r.editor.disabled=!model.usable(v.id)||r.historyLoading||busy;historyControls(r,v);comparisonControls(r,v);updateFragmentStatus(r);restoreVisibleReading(r,v);}
  if(model.stale)callMenu.hide();links();overview();outlines.refresh();highlights.refresh();taskGroups.refresh();referenceStacks.refresh();
 }
 function button(text,label,handler){const b=node('button',text);b.type='button';if(label)b.setAttribute('aria-label',label);b.onclick=()=>{try{handler();}catch(e){fail(e);}};return b;}
@@ -315,18 +407,30 @@ function fitCode(id,axis){const r=mounted.get(id),v=model.view(id),section=r.sec
 function mount(id,prepared){
  if(mounted.has(id)){if(prepared&&!mounted.get(id).code.querySelector('.code-line'))applyPreparedSource(id,prepared);return;}const v=model.view(id),element=node('section');element.className='fragment';element.dataset.view=id;element.dataset.name=v.symbol.name;element.setAttribute('aria-label',`${v.symbol.name} bubble`);
  const header=node('div');header.className='fragment-header';header.setAttribute('aria-label','Move bubble with arrow keys');bindLayoutKeys(header,id);const heading=node('div');heading.className='fragment-heading';const context=node('div');context.className='fragment-context';const moduleTag=node('span');moduleTag.className='module-tag';moduleTag.tabIndex=0;moduleTag.hidden=true;context.append(moduleTag,node('small',`${v.symbol.origin?originLabel(v.symbol.origin)+' · ':''}${v.symbol.source.path}:${v.symbol.source.line}`));heading.append(node('strong',[...v.symbol.parents,v.symbol.name].join('::')),context);
- const collapse=button('▴','Collapse bubble',()=>{callMenu.hide();model.collapse(id);geometry();save();}),close=button('×','Close bubble',()=>{editorCalls.manual();callMenu.hide();const r=mounted.get(id);r.controller.abort();r.historyController?.abort();r.sourcePane.dispose();element.remove();mounted.delete(id);model.close(id);hideDestinations();geometry();save();});const pin=button('Pin version','Pin version',()=>{if(model.view(id).history||model.view(id).comparison||model.view(id).captured){returnHistoryLive(id);return;}model.pin(id,model.view(id).mode!=='pinned');geometry();save();refreshLive();});const fitHeight=button('↕','Fit height',()=>fitCode(id,'height')),fitWidth=button('↔','Fit width',()=>fitCode(id,'width'));for(const b of [fitHeight,fitWidth]){b.className='bubble-fit';b.title=b.getAttribute('aria-label')+' to this code section';}heading.title=[...v.symbol.parents,v.symbol.name].join('::');const referenceActions=button('⋯',`Actions for ${v.symbol.name} bubble`,()=>callMenu.show(referenceActions,v.symbol.name,[{label:'Find callers',run:()=>openReferences(id,'callers')},{label:'Find references',run:()=>openReferences(id,'references')},{label:'Task group',run:()=>taskControls.showGroups(model.groupFor(id)?.id??'')}],false));header.append(heading,referenceActions,fitHeight,fitWidth,collapse,close);element.append(header);bindDrag(header,id);
- const body=node('div');body.className='fragment-body';const historyRow=node('div');historyRow.className='fragment-history';const historyPrevious=button('Previous change','Previous function change',()=>void changeHistory(id,1)),historyNext=button('Next change','Next function change',()=>{if(newestHistory(model.view(id)))returnHistoryLive(id);else void changeHistory(id,-1);}),historyLabel=node('span');historyLabel.setAttribute('aria-live','polite');const compareButton=button('Compare','Compare with previous version',()=>model.view(id).comparison?void changeHistory(id,1):void compareFunction(id)),editPrevious=button('Previous changed block',null,()=>void comparisonEdit(id,-1)),editNext=button('Next changed block',null,()=>void comparisonEdit(id,1));
+ const collapse=button('▴','Collapse bubble',()=>{callMenu.hide();model.collapse(id);geometry();save();}),close=button('×','Close bubble',()=>{editorCalls.manual();callMenu.hide();const r=mounted.get(id);r.controller.abort();r.historyController?.abort();r.sourcePane.dispose();element.remove();mounted.delete(id);model.close(id);hideDestinations();geometry();save();});const pin=button('Pin version','Pin version',()=>{if(model.view(id).history||model.view(id).comparison||model.view(id).captured){returnHistoryLive(id);return;}model.pin(id,model.view(id).mode!=='pinned');geometry();save();refreshLive();});const fitHeight=button('↕','Fit height',()=>fitCode(id,'height')),fitWidth=button('↔','Fit width',()=>fitCode(id,'width'));for(const b of [fitHeight,fitWidth]){b.className='bubble-fit';b.title=b.getAttribute('aria-label')+' to this code section';}heading.title=[...v.symbol.parents,v.symbol.name].join('::');
+ const referenceActions=button('⋯',`Actions for ${v.symbol.name} bubble`,()=>{
+  const view=model.view(id);
+  const actions=view.comparison?[{label:'Choose revision…',run:()=>openRevisionPicker(id,referenceActions)}]:[
+   {label:'Find callers',run:()=>openReferences(id,'callers')},
+   {label:'Find references',run:()=>openReferences(id,'references')},
+   {label:'Task group',run:()=>taskControls.showGroups(model.groupFor(id)?.id??'')},
+  ];
+  callMenu.show(referenceActions,view.symbol.name,actions,Boolean(view.comparison));
+ });
+ header.append(heading,referenceActions,fitHeight,fitWidth,collapse,close);element.append(header);bindDrag(header,id);
+ const body=node('div');body.className='fragment-body';const historyRow=node('div');historyRow.className='fragment-history';const historyPrevious=button('Previous change','Previous function change',()=>void changeHistory(id,1)),historyNext=button('Next change','Next function change',()=>{if(newestHistory(model.view(id)))returnHistoryLive(id);else void changeHistory(id,-1);}),historyLabel=node('span');historyLabel.setAttribute('role','status');const compareButton=button('Compare','Compare with previous version',()=>model.view(id).comparison?void changeHistory(id,1):void compareFunction(id)),editPrevious=button('Previous changed block',null,()=>void comparisonEdit(id,-1)),editNext=button('Next changed block',null,()=>void comparisonEdit(id,1));
+ const chooseRevision=button('Choose revision…',null,()=>openRevisionPicker(id,chooseRevision));
+ chooseRevision.setAttribute('aria-haspopup','dialog');
  editPrevious.title='Show the previous changed block in both visible comparison bubbles.';
  editNext.title='Show the next changed block in both visible comparison bubbles.';
  editPrevious.className='comparison-previous';
  editNext.className='comparison-next';
  compareButton.className='comparison-revision';
- historyRow.append(historyPrevious,editPrevious,historyLabel,historyNext,editNext,compareButton);const section=node('div');section.className='source-section';const sectionLabel=node('span','Loading captured source…');const prev=button('Previous section',null,()=>jumpSource(id,true)),next=button('Next section',null,()=>jumpSource(id,false));prev.hidden=true;next.hidden=true;section.append(sectionLabel,prev,next);
+ historyRow.append(historyPrevious,editPrevious,historyLabel,historyNext,editNext,compareButton,chooseRevision);const section=node('div');section.className='source-section';const sectionLabel=node('span','Loading captured source…');const prev=button('Previous section',null,()=>jumpSource(id,true)),next=button('Next section',null,()=>jumpSource(id,false));prev.hidden=true;next.hidden=true;section.append(sectionLabel,prev,next);
  const code=node('div');code.className='code-pane';code.tabIndex=0;code.setAttribute('aria-label',`${v.symbol.name} captured code`);code.append(node('p','Loading source…'));const footer=node('div');footer.className='fragment-footer';const callsButton=button('Calls','Calls',()=>toggleCalls(id)),state=node('span','Captured source');state.setAttribute('role','status');const keep=button('Save','Save location',()=>void keepLocation(id)),editor=button('Editor',`Open in ${editorName}`,()=>void openEditor(id));editor.disabled=true;footer.append(callsButton,state,pin,keep,editor);
  const popup=node('div');popup.className='calls-popover';popup.hidden=true;body.append(historyRow,section,code,popup,footer);const resize=button('','Resize bubble',()=>{});resize.title='Drag or use arrow keys to resize';resize.className='resize-handle';body.append(resize);bindDrag(resize,id,true);bindLayoutKeys(resize,id,true);element.append(body);el('fragment-layer').append(element);
  const kept=board?.evidence.find(e=>e.source.file===v.symbol.source.file&&e.source.version===v.symbol.source.version&&e.source.line===v.symbol.source.line)?.id??null;
- const record={id,compareButton,editPrevious,editNext,historyRow,historyPrevious,historyNext,historyLabel,referenceActions,moduleTag,pin,fitHeight,fitWidth,loading:true,liveReturn:(v.captured??v.comparison??v.history)?.returning?'waiting':null,element,body,code,collapse,sectionLabel,prev,next,callsButton,popup,state,keep,editor,sites:[],nextCalls:0,matching:0,callsReady:false,controller:new AbortController(),kept};setSections(record,[]);record.sourcePane=new SourcePane(code,(text,line,plan,margin)=>{renderCallText(text,line,record.actionsByLine.get(line.number)??[],(action,button,direct,keyboard)=>inlineAction(id,action,button,direct,keyboard),plan,margin);inlineAvailability(text,id);});record.sourcePane.setReflow(smartReflow);mounted.set(id,record);
+ const record={id,compareButton,editPrevious,editNext,historyRow,historyPrevious,historyNext,historyLabel,chooseRevision,referenceActions,moduleTag,pin,fitHeight,fitWidth,loading:true,liveReturn:(v.captured??v.comparison??v.history)?.returning?'waiting':null,element,body,code,collapse,sectionLabel,prev,next,callsButton,popup,state,keep,editor,sites:[],nextCalls:0,matching:0,callsReady:false,controller:new AbortController(),kept};setSections(record,[]);record.sourcePane=new SourcePane(code,(text,line,plan,margin)=>{renderCallText(text,line,record.actionsByLine.get(line.number)??[],(action,button,direct,keyboard)=>inlineAction(id,action,button,direct,keyboard),plan,margin);inlineAvailability(text,id);});record.sourcePane.setReflow(smartReflow);mounted.set(id,record);
  element.addEventListener('pointerdown',()=>{model.selected=id;geometry();});code.addEventListener('scroll',()=>{
   callMenu.hide();if(mounted.get(id)!==record||!code.clientHeight)return;
   const before=code.scrollTop<record.scrollTop,moved=code.scrollTop!==record.scrollTop;
@@ -556,7 +660,7 @@ async function keepLocation(id){
 async function openEditor(id){const r=mounted.get(id);if(!r||busy||!model.usable(id))return;const s=model.view(id).symbol.source;busy=true;geometry();try{await post(model.view(id).symbol.origin?'/api/dependency/editor':'/api/editor/open',{snapshot:model.view(id).symbol.origin?.capture??model.snapshot,file:s.file,version:s.version,line:s.line});}catch(e){fail(e);}finally{busy=false;geometry();live.resume();}}
 function openReferences(id,query){editorCalls.manual();try{if(!model.usable(id))throw new Error('Open a current function before finding references.');const stack=model.addReferences(model.view(id).symbol,query,id);geometry();focus([id,stack]);save();}catch(e){fail(e);}}
 function replaceTask(next){
- editorCalls.manual();callMenu.hide();hideDestinations();clearTimeout(livePendingTimer);
+ editorCalls.manual();closeRevisionPicker();callMenu.hide();hideDestinations();clearTimeout(livePendingTimer);
  for(const r of mounted.values()){r.controller.abort();r.historyController?.abort();r.sourcePane.dispose();r.element.remove();}
  mounted.clear();referenceStacks.reset();jobs=Promise.resolve();model=next;
  for(const v of model.views)mount(v.id);

@@ -163,11 +163,11 @@ impl FunctionHistory {
             super::window(&capture.snapshot, &capture.snapshot.documents()[0], query)
         })
     }
-    pub(super) fn with_comparison_capture(
+    pub(super) fn with_comparison_capture<T>(
         &self,
         binding: &ComparisonWindow,
-        operation: impl FnOnce(&Capture, &str) -> Result<Value, CompanionError>,
-    ) -> Result<Value, CompanionError> {
+        operation: impl FnOnce(&Capture, &str) -> Result<T, CompanionError>,
+    ) -> Result<T, CompanionError> {
         if !matches!(binding.side.as_str(), "older" | "newer") {
             return Err(invalid("Invalid function comparison side"));
         }
@@ -199,8 +199,7 @@ impl FunctionHistory {
     ) -> Result<(Capture, Value), CompanionError> {
         let sessions = self.lock()?;
         let session = sessions
-            .iter()
-            .find(|s| s.token == token)
+            .get(token)
             .ok_or_else(|| conflict("Function history expired; return to live"))?;
         let version = session
             .versions
@@ -209,7 +208,7 @@ impl FunctionHistory {
         let capture = self.restore(session, index)?;
         Ok((
             capture,
-            json!({"token":session.token,"tip":session.tip,"commit":session.commits[version.candidate],"index":index}),
+            json!({"token":session.token,"tip":session.tip,"commit":version.commit,"index":index}),
         ))
     }
     fn current_comparison_capture(&self, request: &Request) -> Result<Capture, CompanionError> {

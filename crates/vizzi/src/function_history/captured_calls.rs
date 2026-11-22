@@ -80,12 +80,6 @@ impl FunctionHistory {
     /// Projects captured call evidence without querying live source or language servers.
     pub fn captured_query(&self, request: &CapturedRequest) -> Result<Value, CompanionError> {
         let s = &request.source;
-        if ![&s.snapshot, &s.file, &s.version, &s.symbol]
-            .into_iter()
-            .all(|s| opaque(s))
-        {
-            return Err(invalid("Invalid captured declaration binding"));
-        }
         let project = |capture: &Capture, label: &str| {
             let index = capture.structure();
             let caller = index
@@ -167,6 +161,20 @@ impl FunctionHistory {
                 }
             }
         };
+        self.with_captured_file(s, project)
+    }
+
+    pub(super) fn with_captured_file<T>(
+        &self,
+        s: &FrozenSource,
+        project: impl FnOnce(&Capture, &str) -> Result<T, CompanionError>,
+    ) -> Result<T, CompanionError> {
+        if ![&s.snapshot, &s.file, &s.version, &s.symbol]
+            .into_iter()
+            .all(|s| opaque(s))
+        {
+            return Err(invalid("Invalid captured declaration binding"));
+        }
         match &s.owner {
             CapturedOwner::Comparison { token, side } => self.with_comparison_capture(
                 &ComparisonWindow {
@@ -181,8 +189,7 @@ impl FunctionHistory {
             CapturedOwner::History { token, index } => {
                 let sessions = self.lock()?;
                 let session = sessions
-                    .iter()
-                    .find(|v| v.token == *token)
+                    .get(token)
                     .ok_or_else(|| conflict("Captured history expired; return to live"))?;
                 let version = session
                     .versions
@@ -208,7 +215,7 @@ impl FunctionHistory {
                 {
                     return Err(conflict("Captured history source differs"));
                 }
-                project(capture, &session.commits[version.candidate])
+                project(capture, &version.commit)
             }
         }
     }

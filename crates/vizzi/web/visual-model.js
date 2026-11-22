@@ -106,10 +106,15 @@ export class Workspace {
   const v=this.view(id),base=v.history?.base??{snapshot:v.snapshot,symbol:clone(v.symbol),reading:clone(v.reading)};
   const h={token:revision.token,tip:revision.tip,commit:revision.commit,index:revision.index,base};
   require(history(h)&&opaque(revision.snapshot)&&symbol(revision.symbol)&&!revision.symbol.origin&&revision.symbol.source.file===base.symbol.source.file&&revision.symbol.tracking===base.symbol.tracking,'Invalid function revision');
-  const offset=v.reading.section-v.symbol.source.line,s=revision.symbol.source;
+  const s=revision.symbol.source,shift=s.line-v.symbol.source.line;
+  const section=Math.min(s.end_line,v.reading.section+shift);
+  const anchor=v.reading.anchor;
+  const mapped=anchor?{...anchor,line:anchor.line+shift}:null;
+  const position={section,top:revision.same_text===true?v.reading.top:0,left:v.reading.left};
+  if(revision.same_text===true&&reading({...position,anchor:mapped},s))position.anchor=mapped;
   delete v.comparison;
   delete v.captured;
-  v.history=clone(h);v.snapshot=revision.snapshot;v.symbol=clone(revision.symbol);v.mode='pinned';v.state='current';v.reading={section:Math.min(s.end_line,s.line+offset),top:0,left:v.reading.left};
+  v.history=clone(h);v.snapshot=revision.snapshot;v.symbol=clone(revision.symbol);v.mode='pinned';v.state='current';v.reading=position;
   for(const link of this.links)if(link.from===id||link.to===id)link.state='unverified';
  }
  returnLive(id){

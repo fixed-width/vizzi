@@ -46,3 +46,37 @@ mock was supplied.
    Pinning and browser storage do not promise a durable source archive.
 10. Controls use normal keyboard-focusable buttons, existing theme tokens and an announced
     status. Dependency-source bubbles retain their existing behavior without Git history.
+
+## Choose an exact revision
+
+The reviewer in the [maintainer trial](../../experiments/usability/function-history/FINDINGS.md#h04-the-review-base-has-no-distinct-function-history-entry)
+could not reach a named review base through distinct changes because the function was
+unchanged at that commit. [Issue #8](https://github.com/fixed-width/vizzi/issues/8)
+adds exact selection using Vizzi's existing bubble and dialog design.
+
+1. Choose **Choose revision…** on a repository function with an unambiguous source
+   binding. In a comparison bubble, the command is in the bubble's actions menu.
+   The dialog accepts a local commit ID, branch or tag up to 256 bytes. Enter
+   submits, and Escape or **Cancel** dismisses the dialog even during preparation.
+   The input receives focus on open and focus returns to the bubble control on close.
+2. The chosen commit appears even when the function is unchanged there. A branch or tag
+   resolves once. Revisiting or reloading the bubble shows the same immutable commit.
+   The short ID in the bubble has the full ID in its accessible description and tooltip.
+3. The chosen commit starts a first-parent timeline for that bubble. **Previous change**
+   finds the next distinct older declaration, and **Next change** retraces earlier visits
+   back to the exact selected commit. At that starting point the onward action is **Return
+   to live**. Choosing another revision starts another timeline.
+4. **Compare** pairs the selected source with its previous distinct version. Choosing a
+   revision in one comparison bubble exits the diff in that bubble. The other side remains
+   readable. Captured calls use the selected commit's file and preserve their existing
+   source evidence and revision labelling.
+5. Selection preserves bubble identity, geometry, task membership, camera and independent
+   views. It preserves reading position in unchanged declaration text and keeps the relative
+   reading section when the declaration changes. Source, revision and links change together
+   once the selected declaration and source are ready. A newer source intent supersedes a
+   pending selection, including a late success or failure.
+6. Invalid or unavailable commits, missing or ambiguous declarations and resource refusal
+   leave the existing bubble readable. The dialog reports the failure and supports retry.
+   Selection uses local objects and the same file and lexical scope as the source binding.
+   Canceled preparation preserves retained history and captured calls. Existing history
+   limits, capture expiry and Return to live apply after adoption.

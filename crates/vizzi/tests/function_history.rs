@@ -1,7 +1,7 @@
 //! Immutable per-function history through production Git and analysis interfaces.
 use serde_json::{Value, json};
 use std::{process::Command, sync::Arc};
-use vizzi::function_history::CapturedRequest;
+use vizzi::function_history::{CapturedRequest, ConfirmRevision, SelectRevision};
 use vizzi::function_history::{CompareRequest, ComparisonWindow};
 fn captured_source(frame: &Value, owner: Value) -> Value {
     let s = &frame["symbol"]["source"];
@@ -24,6 +24,199 @@ fn call_named(history: &FunctionHistory, source: &Value, name: &str) -> Value {
         .find(|c| c["name"] == name)
         .unwrap()
         .clone()
+}
+
+fn select_revision(
+    history: &FunctionHistory,
+    revision: &str,
+    origin: Value,
+) -> Result<Value, vizzi::companion::CompanionError> {
+    let request: SelectRevision =
+        serde_json::from_value(json!({"revision":revision,"origin":origin})).unwrap();
+    history.select_revision(&request)
+}
+
+#[test]
+fn exact_selection_anchors_history_comparison_and_captured_calls_at_an_unchanged_commit() {
+    let (root, _cache, host, history, request, _) = fixture("");
+    let older = commit(root.path(), "fn target() { previous(); }\nfn helper() {}\n");
+    let declaration = "fn target() { helper(); }\nfn helper() { old_helper(); }\n";
+    commit(root.path(), declaration);
+    std::fs::write(root.path().join("notes.txt"), "unrelated change").unwrap();
+    git(root.path(), &["add", "notes.txt"]);
+    let selected = commit_staged(root.path());
+    git(root.path(), &["branch", "review-base", &selected]);
+    let head = commit(
+        root.path(),
+        &declaration.replace("old_helper", "new_helper"),
+    );
+    let request = refresh_request(&host, &request);
+    let origin = json!({"kind":"current","source":request});
+    let exact = select_revision(&history, "refs/heads/review-base", origin.clone()).unwrap();
+    assert_eq!(exact["tip"], selected);
+    assert_eq!(exact["commit"], selected);
+    assert_eq!(exact["index"], 0);
+    assert_eq!(exact["same_text"], true);
+    assert_eq!(exact["window"]["lines"].as_array().unwrap().len(), 1);
+    assert_eq!(exact["window"]["outline"].as_array().unwrap().len(), 1);
+    assert_eq!(exact["window"]["lines"][0]["ending"], "\n");
+    git(root.path(), &["branch", "-f", "review-base", &head]);
+    assert_eq!(
+        history.step(&step(&exact["token"], 1)).unwrap()["commit"],
+        older
+    );
+    let owner = json!({"kind":"history","token":exact["token"],"index":exact["index"]});
+    let frozen = captured_source(&exact, owner);
+    let call = call_named(&history, &frozen, "helper");
+    let child = captured_query(
+        &history,
+        &frozen,
+        json!({"kind":"open","call":call["id"],"target":call["candidates"][0]["id"]}),
+    )
+    .unwrap();
+    assert!(text(&child["frame"]).contains("old_helper"));
+    assert_eq!(child["frame"]["captured"]["label"], selected);
+    let child_source = captured_source(&child["frame"], frozen["owner"].clone());
+    let new_child = select_revision(
+        &history,
+        "review-base",
+        json!({"kind":"captured","source":child_source}),
+    )
+    .unwrap();
+    assert_eq!(new_child["commit"], head);
+    assert_eq!(new_child["same_text"], false);
+    assert!(text(&new_child).contains("new_helper"));
+    let mut wrong = frozen.clone();
+    wrong["symbol"] = json!("0".repeat(64));
+    assert!(select_revision(&history, &head, json!({"kind":"captured","source":wrong})).is_err());
+    let revisit = history.step(&step(&exact["token"], 0)).unwrap();
+    assert_eq!(revisit["commit"], selected);
+    assert_eq!(revisit["snapshot"], exact["snapshot"]);
+    let source = &revisit["symbol"]["source"];
+    let comparison = serde_json::from_value(json!({"kind":"historical","source":{
+        "token":revisit["token"],"index":revisit["index"],"snapshot":revisit["snapshot"],
+        "file":source["file"],"version":source["version"]
+    }}))
+    .unwrap();
+    let pair = history.compare(&comparison).unwrap();
+    assert_eq!(pair["newer"]["label"], selected);
+    assert_eq!(pair["older"]["label"], older);
+}
+
+#[test]
+fn exact_selection_preserves_readable_history_when_local_source_is_unavailable() {
+    let (root, _cache, host, history, request, commits) = fixture("");
+    let missing = commit(root.path(), "fn moved() {}\n");
+    let ambiguous = commit(root.path(), "fn target() {}\nfn target() {}\n");
+    let oversized = commit(
+        root.path(),
+        &format!("fn target() {{}}\n/*{}*/", " ".repeat(2 * 1024 * 1024)),
+    );
+    let head = commit(root.path(), "fn target() { head(); }\n");
+    let pinned = json!({"kind":"pinned","source":request});
+    let request = refresh_request(&host, &request);
+    let origin = json!({"kind":"current","source":request});
+    let exact = select_revision(&history, &commits[3], origin.clone()).unwrap();
+    assert_eq!(exact["same_text"], false);
+    let selected = select_revision(&history, &commits[3], pinned.clone()).unwrap();
+    assert_eq!(selected["same_text"], true);
+    let mut stale = pinned;
+    stale["source"]["snapshot"] = json!("0".repeat(64));
+    assert!(
+        select_revision(&history, &head, stale)
+            .unwrap_err()
+            .to_string()
+            .contains("Pinned source expired")
+    );
+    let tag = format!("{}/{}", "a".repeat(127), "b".repeat(128));
+    git(root.path(), &["tag", &tag, &commits[3]]);
+    assert_eq!(
+        select_revision(&history, &tag, origin.clone()).unwrap()["commit"],
+        commits[3]
+    );
+    let overlong = format!("{tag}c");
+    for (input, expected) in [
+        ("", "commit ID, branch or tag"),
+        ("--help", "commit ID, branch or tag"),
+        ("HEAD~1", "commit ID, branch or tag"),
+        ("HEAD..HEAD", "commit ID, branch or tag"),
+        ("HEAD@{0}", "commit ID, branch or tag"),
+        ("tag with spaces", "commit ID, branch or tag"),
+        ("bad\u{0007}ref", "commit ID, branch or tag"),
+        (overlong.as_str(), "commit ID, branch or tag"),
+        ("a_nonexistent_branch", "not available locally"),
+        (missing.as_str(), "missing or ambiguous"),
+        (ambiguous.as_str(), "missing or ambiguous"),
+        (oversized.as_str(), "content bytes allowance"),
+    ] {
+        let error = select_revision(&history, input, origin.clone())
+            .unwrap_err()
+            .to_string();
+        assert!(error.contains(expected), "{input}: {error}");
+        assert_eq!(
+            history.step(&step(&exact["token"], 0)).unwrap()["commit"],
+            exact["commit"]
+        );
+    }
+    std::fs::write(root.path().join(".git/shallow"), format!("{head}\n")).unwrap();
+    let shallow = select_revision(&history, "HEAD", origin).unwrap();
+    assert_eq!(shallow["commit"], head);
+    assert_eq!(shallow["same_text"], true);
+    let error = history
+        .step(&step(&shallow["token"], 1))
+        .unwrap_err()
+        .to_string();
+    assert!(error.contains("shallow"), "{error}");
+}
+
+fn read_history_frame(
+    history: &FunctionHistory,
+    frame: &Value,
+) -> Result<Value, vizzi::companion::CompanionError> {
+    let source = &frame["symbol"]["source"];
+    history.window(
+        frame["token"].as_str().unwrap(),
+        frame["snapshot"].as_str().unwrap(),
+        source["file"].as_str().unwrap(),
+        source["version"].as_str().unwrap(),
+        &WindowQuery::default(),
+    )
+}
+
+#[test]
+fn exact_selection_preparation_preserves_the_oldest_history_at_the_session_limit() {
+    let (_root, _cache, _host, history, request, commits) = fixture("");
+    let oldest = history.start(&request).unwrap();
+    let next_oldest = history.start(&request).unwrap();
+    for _ in 2..24 {
+        history.start(&request).unwrap();
+    }
+    let origin = json!({"kind":"current","source":request});
+    let abandoned = select_revision(&history, &commits[2], origin.clone()).unwrap();
+    for _ in 0..3 {
+        select_revision(&history, &commits[2], origin.clone()).unwrap();
+    }
+    assert!(read_history_frame(&history, &abandoned).is_ok());
+    let prepared = select_revision(&history, &commits[2], origin).unwrap();
+    assert!(read_history_frame(&history, &abandoned).is_err());
+    assert!(read_history_frame(&history, &prepared).is_ok());
+    assert!(read_history_frame(&history, &oldest).is_ok());
+    let owner = json!({"kind":"history","token":oldest["token"],"index":oldest["index"]});
+    let source = captured_source(&oldest, owner);
+    assert_eq!(call_named(&history, &source, "middle")["name"], "middle");
+
+    let confirm = |frame: &Value| {
+        let request: ConfirmRevision =
+            serde_json::from_value(json!({"token":frame["token"]})).unwrap();
+        history.confirm_revision(&request)
+    };
+    assert!(confirm(&abandoned).is_err());
+    assert!(read_history_frame(&history, &oldest).is_ok());
+    confirm(&prepared).unwrap();
+    confirm(&prepared).unwrap();
+    assert!(read_history_frame(&history, &prepared).is_ok());
+    assert!(read_history_frame(&history, &oldest).is_err());
+    assert!(read_history_frame(&history, &next_oldest).is_ok());
 }
 #[test]
 fn captured_calls_follow_old_helpers_and_recursive_chains_without_current_source_fallback() {
@@ -1006,7 +1199,7 @@ fn exact_file_and_total_source_allowances_are_inclusive_and_evict_before_session
         "{prefix}{}{suffix}",
         "a".repeat(2 * 1024 * 1024 - prefix.len() - suffix.len())
     );
-    commit(root.path(), &large);
+    let large_commit = commit(root.path(), &large);
     commit(root.path(), "fn target() { small_current(); }\n");
     let request = refresh_request(&host, &request);
     let first = history.start(&request).unwrap();
@@ -1014,6 +1207,10 @@ fn exact_file_and_total_source_allowances_are_inclusive_and_evict_before_session
     for _ in 0..15 {
         tokens.push(history.start(&request).unwrap()["token"].clone());
     }
+    let origin = json!({"kind":"current","source":request});
+    let unconfirmed = select_revision(&history, &large_commit, origin).unwrap();
+    assert!(read_history_frame(&history, &unconfirmed).is_ok());
+    assert!(read_history_frame(&history, &first).is_ok());
     assert!(history.step(&step(&first["token"], 0)).is_ok());
     // Accessing the first session moves it to the end; another admission evicts the next.
     let second = history.start(&request).unwrap();

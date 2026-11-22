@@ -69,15 +69,23 @@ impl GitRepository {
     pub fn workspace(&self) -> &WorkspaceId {
         &self.workspace
     }
+    pub(crate) fn resolve_commit(&self, revision: &str) -> Result<String, CaptureError> {
+        oid(&self.run(
+            &[
+                "rev-parse",
+                "--verify",
+                "--end-of-options",
+                &format!("{revision}^{{commit}}"),
+            ],
+            1024,
+            &|| false,
+        )?)
+    }
     pub(crate) fn file_history(
         &self,
+        tip: &str,
         path: &str,
-    ) -> Result<(String, Vec<String>, bool), CaptureError> {
-        let tip = oid(&self
-            .run(&["rev-parse", "--verify", "HEAD^{commit}"], 1024, &|| false)
-            .map_err(|_| {
-                CaptureError::Git("No local HEAD commit is available for function history".into())
-            })?)?;
+    ) -> Result<(Vec<String>, bool), CaptureError> {
         let output = self.run(
             &[
                 "--literal-pathspecs",
@@ -85,7 +93,7 @@ impl GitRepository {
                 "--first-parent",
                 "-n",
                 "65",
-                &tip,
+                tip,
                 "--",
                 path,
             ],
@@ -99,7 +107,7 @@ impl GitRepository {
             .collect::<Result<Vec<_>, _>>()?;
         let shallow =
             self.run(&["rev-parse", "--is-shallow-repository"], 1024, &|| false)? == b"true\n";
-        Ok((tip, commits, shallow))
+        Ok((commits, shallow))
     }
     pub(crate) fn pin_file(&self, commit: &str, path: &str) -> Result<GitRevision, CaptureError> {
         let entries = parse_tree(

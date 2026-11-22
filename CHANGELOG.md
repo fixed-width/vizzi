@@ -8,6 +8,8 @@ remains in Git and the project documentation.
 
 ### Added
 
+- Choose an exact local Git commit, branch or tag for a function bubble, including
+  commits where the function was unchanged.
 - Browse JavaScript, JSX, TypeScript, and TSX with syntax colors, declaration
   outlines, and written-call candidates. Capture skips nested `node_modules` trees.
 - Use VS Code's shared JavaScript and TypeScript service for project-aware definitions

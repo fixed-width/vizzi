@@ -10,6 +10,14 @@ try {
  async function call(name){const functions=await post('/api/structure',{snapshot:status.snapshot,query:{kind:'inventory',area:'a.py',search:name,offset:0,functions_only:true}});const symbol=functions.items.map(x=>x.symbol).find(s=>s.name===name);assert.ok(symbol);const result=await post('/api/structure',{snapshot:status.snapshot,query:{kind:'calls',symbol:symbol.id,area:'a.py',offset:0}});return result.items[0].id;}
  const first=await call('first'),second=await call('second');
  const link=call=>'#editor-call='+call+'&snapshot='+status.snapshot;
+ const direct=await chrome.newPage(),directErrors=[];
+ direct.on('pageerror',error=>directErrors.push(error.message));
+ await direct.goto(host.url+'/workspace'+link(first));
+ assert.deepEqual(directErrors,[]);
+ await direct.locator('[data-name="first_leaf"] .code-line').first().waitFor({timeout:10000});
+ assert.equal(new URL(direct.url()).hash,'');
+ assert.deepEqual(directErrors,[]);
+ await direct.close();
  async function page(){const value=await chrome.newPage();value.setDefaultTimeout(10000);value.errors=[];value.on('pageerror',error=>value.errors.push(error.message));await value.goto(host.url);await value.waitForFunction(()=>document.querySelector('#visual-source-status').textContent.includes('ready'));return value;}
  const newest=await page();let held,release;const blocked=new Promise(r=>{held=r;});
  await newest.route('**/api/editor/call',async route=>{if(route.request().postDataJSON().query.call===first){await new Promise(r=>{release=r;held();});await route.fulfill({status:500,body:'obsolete failure'}).catch(()=>{});}else await route.continue();});
