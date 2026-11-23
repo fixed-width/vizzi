@@ -4,7 +4,7 @@ Contributor reference for [the behaviour contract](LANGUAGE_SERVERS_PRODUCT.md).
 
 `definitions::Provider` remains the definition/reference seam. `language_servers::Servers`
 routes by native captured language and owns the shared dependency catalog. Rust retains
-its Cargo-specific adapter. Python, Ruby, C-family and TypeScript profiles use a shared captured-project
+its Cargo-specific adapter. Python, Ruby, C-family, Java and TypeScript profiles use a shared captured-project
 mirror and lookup implementation. Executables are chosen by native launch configuration,
 never browser input.
 
@@ -40,6 +40,14 @@ The TypeScript profile supplies language IDs for JSX and TSX, consumes captured
 project settings and reopens the project when relevant source or settings
 change. [Managed TypeScript profile](../prototype/ECMASCRIPT_TECH.md#managed-typescript-server)
 
+JDT LS waits for `language/status` with `ServiceReady`. Its Eclipse configuration
+and workspace state are temporary siblings of the source mirror. The profile
+passes only source roots and disables project import and automatic builds. The
+same roots bound mirror admission and its input identity. Java source edits
+inside those roots restart the server and refresh results for unopened files.
+Virtual Java destinations count as outside the capture. LSP positions recognize
+LF, CRLF, and CR line endings in captured bytes.
+
 Semantic locations map to exact captured identifiers. Returned external local files enter
 the bounded catalog, are synchronized and verified, and lookup repeats before trusting a
 new capture. Captures evicted by the catalog become outside results rather than unrelated
@@ -57,3 +65,5 @@ status messages. Real Pyright/clangd fixtures cover conflicting receiver names, 
 function-value references, captured/live byte divergence, local dependencies, header
 declarations and C/C++ definitions. The browser integration checks the same navigation
 and incremental reference behaviour through the public interface.
+Set `VIZZI_JDTLS` to a JDT LS launcher to include real Java checks in the native
+language-server tests and the Chromium suite.

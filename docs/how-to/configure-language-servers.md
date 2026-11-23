@@ -2,8 +2,9 @@
 
 Use a language server when you want type-aware definition and reference lookup rather
 than written-name candidates. Vizzi supports rust-analyzer for Rust, Pyright for Python,
-Ruby LSP for Ruby, clangd for C/C++, and the native TypeScript server for JavaScript
-and TypeScript. Several can be configured in one mixed-language workspace.
+Ruby LSP for Ruby, clangd for C/C++, JDT LS for Java, and the native TypeScript
+server for JavaScript and TypeScript. Several can be configured in one
+mixed-language workspace.
 Basic syntax browsing remains available without them.
 
 To save these settings in TOML, see [save launch settings](configure-vizzi.md).
@@ -51,6 +52,33 @@ The editor's active project configuration determines its imports, types and alia
 Save workspace buffers before looking up definitions or references. Vizzi verifies
 locations against captured source and can open provider-reached source from the
 workspace's installed packages.
+
+## Java with a managed server
+
+Install Eclipse JDT LS and a JDK supported by that release. Select the JDK with
+`JAVA_HOME` or the launcher's normal runtime selection. Vizzi was verified on
+Linux with JDT LS 1.63.0 and Java 25. Use the distribution's `bin/jdtls` launcher.
+[Eclipse JDT LS downloads and launcher instructions](https://github.com/eclipse-jdtls/eclipse.jdt.ls#installation)
+
+```sh
+vizzi --root /path/to/project \
+  --jdtls /path/to/jdtls/bin/jdtls \
+  --java-source-root src/main/java \
+  --java-source-root src/test/java
+```
+
+Each source root is relative to the selected workspace. Omit the flags for
+sources whose package paths start at the workspace root. The equivalent TOML
+keys under `[language-servers]` are `jdtls` and `java-source-root`, an array of paths.
+
+The managed profile resolves definitions and references across these roots using
+captured source and the JDK. Java files outside the roots remain browsable and
+use written-name candidates. The profile disables Maven, Gradle, and Eclipse
+project imports and automatic builds. The first lookup starts the server. A
+saved change to Java source under a configured root starts a fresh server on
+the next lookup. JDT LS can check Gradle version metadata during startup.
+Navigation also works with the network unavailable. For editor-managed build
+classpaths, use VS Code sharing below.
 
 ## Java with VS Code
 

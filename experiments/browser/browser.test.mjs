@@ -459,6 +459,62 @@ test("Java source outlines and call trails work without a language server", asyn
   }
 });
 
+const managedJava = process.env.VIZZI_JDTLS;
+
+test("managed Java resolves an overload and its references across source roots", {
+  skip: !managedJava,
+}, async () => {
+  const fixture = await workspace({
+    files: {
+      "src/main/java/demo/Engine.java": `package demo;
+class Engine {
+    static int speak(int value) { return value; }
+    static int speak(String value) { return value.length(); }
+}
+`,
+      "src/test/java/demo/Caller.java": `package demo;
+class Caller { int run() { return Engine.speak("hello"); } }
+`,
+      "pom.xml": "Build metadata is outside the source-root profile.",
+    },
+    sourceArguments: [
+      "--jdtls", managedJava,
+      "--java-source-root", "src/main/java",
+      "--java-source-root", "src/test/java",
+    ],
+  });
+  let live, session;
+  try {
+    live = await startHost(fixture);
+    session = await openWorkspace(chromium, live);
+    const { page } = session;
+    await page.goto(live.url);
+    await page.waitForFunction(() => document.querySelector("#visual-source-status").textContent.includes("ready"));
+    await page.getByRole("button", { name: "Add bubble", exact: true }).click();
+    await page.getByLabel("Find a function", { exact: true }).fill("run");
+    await page.getByRole("button", { name: "Find functions", exact: true }).click();
+    await page.locator('[data-add-symbol][data-name="run"]').click();
+    const caller = page.locator('[data-view][data-name="run"]');
+    await caller.getByRole("button", { name: "Calls", exact: true }).click();
+    await caller.getByRole("button", { name: "speak · line 2", exact: true }).click();
+    const target = page.locator('[data-view][data-name="speak"]');
+    await target.locator(".code-line").first().waitFor();
+    assert.match(await target.locator(".code-pane").textContent(), /String value/);
+    assert.equal(await page.locator("#workspace-links .link-stroke").getAttribute("data-kind"), "definition");
+    await target.getByRole("button", { name: "Actions for speak bubble", exact: true }).click();
+    await page.getByRole("menuitem", { name: "Find references", exact: true }).click();
+    const stack = page.locator("[data-reference-stack]");
+    await stack.getByRole("status").filter({ hasText: "Language references" }).waitFor();
+    assert.equal(await stack.locator("[data-reference-row]").count(), 1);
+    assert.match(await stack.locator("[data-reference-row]").textContent(), /Caller\.java/);
+    assert.deepEqual(session.errors, []);
+  } finally {
+    await session?.close();
+    await live?.close();
+    await fixture.close();
+  }
+});
+
 const managedTypeScript = process.env.VIZZI_TYPESCRIPT_SERVER;
 
 test("managed TypeScript opens installed package source beside its caller", {

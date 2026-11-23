@@ -41,7 +41,8 @@ saved source in Neovim.
 
 For semantic navigation on a real project, [configure its language server](docs/how-to/configure-language-servers.md):
 `--pyright pyright-langserver` for Python, `--rust-analyzer rust-analyzer` for Rust,
-`--ruby-lsp ruby-lsp` for Ruby, or `--clangd clangd` with C/C++ compilation context.
+`--ruby-lsp ruby-lsp` for Ruby, `--clangd clangd` with C/C++ compilation context, or
+`--jdtls jdtls` for Java.
 
 For a guided first run, follow a [Python](docs/tutorials/python-call-trail.md),
 [Rust](docs/tutorials/rust-call-trail.md), [Ruby](docs/tutorials/ruby-call-trail.md)
@@ -53,7 +54,7 @@ integration is required for these lessons.
 
 - Follow calls into neighbouring bubbles, inspect callers and references, and keep branches
   visible. Configured language servers resolve typed receivers, imports and references
-  for Python, Rust, Ruby and C/C++. VS Code provider sharing also supports Java.
+  for Python, Rust, Ruby, C/C++, and Java.
 - Arrange related views into groups and save browser-local tasks. Follow saved file changes
   live or pin an earlier source view.
 - Browse source, compare Git revisions or working changes, and keep source locations and

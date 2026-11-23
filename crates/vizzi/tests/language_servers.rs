@@ -117,6 +117,263 @@ fn configuration_is_lazy_and_unconfigured_languages_do_not_use_another_server() 
 }
 
 #[test]
+fn managed_java_resolves_overloads_and_edits_with_captured_source() {
+    let Some(executable) = std::env::var_os("VIZZI_JDTLS") else {
+        eprintln!("Set VIZZI_JDTLS to exercise the managed Eclipse JDT LS profile");
+        return;
+    };
+    let executable = std::path::Path::new(&executable);
+    check_managed_java(executable, "src", "src", "\r");
+    check_managed_java(executable, "", ".", "\n");
+}
+
+#[test]
+#[cfg(unix)]
+fn managed_java_uses_private_project_inputs_and_waits_for_service_ready() {
+    use std::{fs, os::unix::fs::PermissionsExt};
+    let scripts = tempfile::tempdir().unwrap();
+    let launcher = scripts.path().join("jdtls");
+    fs::write(
+        &launcher,
+        r#"#!/usr/bin/env python3
+import json
+import os
+from pathlib import Path
+import sys
+from urllib.parse import unquote, urlparse
+
+def read():
+    header = sys.stdin.buffer.readline()
+    if not header:
+        return None
+    length = int(header.split(b":", 1)[1])
+    assert sys.stdin.buffer.readline() == b"\r\n"
+    return json.loads(sys.stdin.buffer.read(length))
+
+def send(**message):
+    body = json.dumps(dict(jsonrpc="2.0", **message)).encode()
+    sys.stdout.buffer.write(f"Content-Length: {len(body)}\r\n\r\n".encode() + body)
+    sys.stdout.buffer.flush()
+
+def request(expected):
+    message = read()
+    assert message["method"] == expected, message
+    return message
+
+def local(uri):
+    parsed = urlparse(uri)
+    assert parsed.scheme == "file"
+    return Path(unquote(parsed.path))
+
+assert all(name not in os.environ for name in ("CLIENT_HOST", "CLIENT_PIPE", "CLIENT_PORT"))
+assert sys.argv[1::2] == ["-configuration", "-data"]
+configuration, data = map(Path, sys.argv[2::2])
+message = request("initialize")
+params = message["params"]
+mirror = local(params["rootUri"])
+assert mirror == Path.cwd()
+assert configuration.parent == data.parent
+assert configuration.parent.parent == mirror.parent
+assert configuration.parent != mirror
+data.mkdir()
+java = params["initializationOptions"]["settings"]["java"]
+assert java["project"]["sourcePaths"] == ["src"]
+assert all(not importer["enabled"] for importer in java["import"].values())
+assert not java["autobuild"]["enabled"]
+assert not (mirror / "pom.xml").exists()
+assert not (mirror / "build.gradle").exists()
+assert not (mirror / ".project").exists()
+assert not (mirror / "src-generated").exists()
+send(id=message["id"], result={"capabilities": {"definitionProvider": True, "referencesProvider": True}})
+request("initialized")
+caller = mirror / "src/demo/Caller.java"
+engine = mirror / "src/demo/Engine.java"
+edited = '42' in caller.read_text()
+open_document = request("textDocument/didOpen")["params"]["textDocument"]
+assert local(open_document["uri"]) == caller
+assert open_document["text"] == caller.read_text()
+assert open_document["languageId"] == "java"
+send(method="language/status", params={"type": "Started"})
+# Processing the configuration request proves the client still awaits ServiceReady.
+send(id="settings", method="workspace/configuration", params={"items":[{"section":"java"}]})
+settings = read()
+assert settings.get("id") == "settings" and settings["result"] == [java]
+send(method="language/status", params={"type": "ServiceReady"})
+
+def position(text, needle):
+    line = next(i for i, item in enumerate(text.splitlines()) if needle in item)
+    item = text.splitlines()[line]
+    return {"line": line, "character": len(item.split("speak", 1)[0].encode("utf-16-le")) // 2}
+
+def answer(message, path, point):
+    send(id=message["id"], result=[{"uri": path.as_uri(), "range": {"start": point, "end": point}}])
+
+message = request("textDocument/definition")
+caller_point = position(caller.read_text(), "speak")
+assert message["params"]["position"] == caller_point
+target = position(engine.read_text(), "speak(int" if edited else "speak(String")
+answer(message, engine, target)
+if not edited:
+    document = request("textDocument/didOpen")["params"]["textDocument"]
+    assert local(document["uri"]) == engine
+    message = request("textDocument/references")
+    assert message["params"]["position"] == target
+    assert message["params"]["context"]["includeDeclaration"] is False
+    answer(message, caller, caller_point)
+    message = request("textDocument/definition")
+    assert not (mirror / "src-generated").exists()
+    answer(message, engine, target)
+while read() is not None:
+    pass
+"#,
+    )
+    .unwrap();
+    fs::set_permissions(&launcher, fs::Permissions::from_mode(0o700)).unwrap();
+    check_managed_java(&launcher, "src", "src", "\n");
+}
+
+fn check_managed_java(
+    executable: &std::path::Path,
+    source_dir: &str,
+    source_root: &str,
+    ending: &str,
+) {
+    use std::{fs, path::Path};
+    const ENGINE: &str = "package demo;\nclass Engine {\n    static int speak(String value) { return value.length(); }\n    static int speak(int value) { return value; }\n}\n";
+    const CALLER: &str =
+        "package demo;\nclass Caller { void run() { /* 😀 */ Engine.speak(\"first\"); } }\n";
+    const OTHER: &str = "package demo;\nclass Other { void run() { Engine.speak(7); } }\n";
+    let work = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    for (file, text) in [
+        ("pom.xml", "no Maven"),
+        ("build.gradle", "no Gradle"),
+        (".project", "no Eclipse"),
+    ] {
+        fs::write(work.path().join(file), text).unwrap();
+    }
+    let path = |name| {
+        Path::new(source_dir)
+            .join("demo")
+            .join(name)
+            .to_string_lossy()
+            .into_owned()
+    };
+    let engine = path("Engine.java");
+    let caller = path("Caller.java");
+    let other = path("Other.java");
+    let provider = Servers::new(
+        work.path().into(),
+        cache.path().into(),
+        Configuration {
+            jdtls: Some(executable.into()),
+            java_source_roots: (source_root != ".")
+                .then(|| source_root.into())
+                .into_iter()
+                .collect(),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    assert!(!cache.path().join("java").exists());
+    let resolve = |index: &Structure, capture: Arc<Snapshot>| {
+        let owner = &index.functions(&caller, "run", 0).unwrap().items[0].symbol;
+        let outgoing = index.outgoing(&owner.id, &caller, 0).unwrap();
+        let call = index.call(&outgoing.items[0].id).unwrap();
+        provider.resolve(capture, &call).unwrap()
+    };
+    let engine_text = ENGINE.replace('\n', ending);
+    let caller_text = CALLER.replace('\n', ending);
+    let other_text = OTHER.replace('\n', ending);
+    let mut files = vec![
+        (engine.as_str(), "java", engine_text.as_str()),
+        (caller.as_str(), "java", caller_text.as_str()),
+        (other.as_str(), "java", other_text.as_str()),
+    ];
+    let outside_path = "src-generated/Oversized.java";
+    let outside_text = (source_root != ".").then(|| {
+        format!(
+            "class Oversized {{ void outside() {{ unused(); }} }}\n/*{}*/",
+            "x".repeat(8 * 1024 * 1024)
+        )
+    });
+    if let Some(text) = &outside_text {
+        files.push((outside_path, "java", text));
+    }
+    let capture = snapshot(&files);
+    let index = Structure::new(&capture);
+    let answer = resolve(&index, capture.clone());
+    let [definition] = answer.locations.as_slice() else {
+        panic!("expected a single Java overload");
+    };
+    assert_eq!(definition.path, engine);
+    assert_eq!(definition.position.line, 2);
+    let byte = vizzi::definitions::byte_offset(&engine_text, definition.position).unwrap();
+    let target = index.definition(&engine, byte).unwrap();
+    let references = provider.references(capture, &target, byte).unwrap();
+    let [reference] = references.locations.as_slice() else {
+        panic!(
+            "expected only the string overload's caller: {:?}",
+            references.locations
+        );
+    };
+    assert_eq!(reference.path, caller);
+    let usage = vizzi::definitions::byte_offset(&caller_text, reference.position).unwrap();
+    assert!(index.call_at(&caller, usage).is_some());
+
+    if outside_text.is_some() {
+        let state_dirs = || {
+            fs::read_dir(cache.path().join("java"))
+                .unwrap()
+                .map(|entry| entry.unwrap().file_name())
+                .collect::<std::collections::BTreeSet<_>>()
+        };
+        let before = state_dirs();
+        files[3].2 = "class Oversized { void outside() { unused(); } }";
+        let unrelated = snapshot(&files);
+        let index = Structure::new(&unrelated);
+        let warm = resolve(&index, unrelated.clone());
+        assert_eq!(warm.locations[0].position, definition.position);
+        assert_eq!(state_dirs(), before);
+        let outside = &index.functions(outside_path, "outside", 0).unwrap().items[0].symbol;
+        let outgoing = index.outgoing(&outside.id, outside_path, 0).unwrap();
+        let call = index.call(&outgoing.items[0].id).unwrap();
+        assert!(
+            provider
+                .resolve(unrelated.clone(), &call)
+                .unwrap_err()
+                .contains("outside the configured source roots")
+        );
+        let identifier = index.identifier(&outside.id).unwrap();
+        assert!(
+            provider
+                .references(unrelated, outside, identifier)
+                .unwrap_err()
+                .contains("outside the configured source roots")
+        );
+        assert_eq!(state_dirs(), before);
+    }
+
+    let edit = caller_text.replace("\"first\"", "42");
+    let edited_engine = engine_text.replace(
+        "    static int speak(int",
+        &format!("{ending}    static int speak(int"),
+    );
+    let updated = snapshot(&[
+        (&engine, "java", &edited_engine),
+        (&caller, "java", &edit),
+        (&other, "java", &other_text),
+    ]);
+    let changed = resolve(&Structure::new(&updated), updated);
+    assert_eq!(changed.locations.len(), 1);
+    assert_eq!(changed.locations[0].path, engine);
+    assert_eq!(changed.locations[0].position.line, 4);
+    assert_ne!(changed.context, answer.context);
+    drop(provider);
+    assert_eq!(fs::read_dir(cache.path().join("java")).unwrap().count(), 0);
+}
+
+#[test]
 fn managed_typescript_resolves_captured_aliases_references_and_cross_file_edits() {
     use vizzi::{cache::Cache, engine::Engine, source::Directory};
     let Some(executable) = std::env::var_os("VIZZI_TYPESCRIPT_SERVER") else {

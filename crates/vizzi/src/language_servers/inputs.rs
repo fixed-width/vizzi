@@ -11,12 +11,14 @@ use std::{
 pub(super) struct PreparedInputs {
     pub setup: Setup,
     pub rejected_configs: BTreeMap<PathBuf, String>,
+    pub private_state: Option<tempfile::TempDir>,
 }
 impl From<Setup> for PreparedInputs {
     fn from(setup: Setup) -> Self {
         Self {
             setup,
             rejected_configs: BTreeMap::new(),
+            private_state: None,
         }
     }
 }

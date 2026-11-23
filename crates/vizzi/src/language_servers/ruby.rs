@@ -5,7 +5,7 @@ use super::{
 };
 use crate::{
     definitions::{Location, Position},
-    lsp::{DocumentSync, Setup},
+    lsp::{DocumentSync, Readiness, Setup},
 };
 use serde_json::json;
 use std::{
@@ -223,8 +223,7 @@ fn prepare(mirror: &Path, lock: Option<&[u8]>) -> Result<Setup, String> {
         environment,
         initialization: json!({"enabledFeatures":["definition","documentSymbols"],"formatter":"none","linters":[],"indexing":{"includedPatterns":["**/*.rb","**/*.rake","**/*.gemspec","**/*.ru","**/Gemfile","**/Rakefile"],"excludedPatterns":[]}}),
         configuration: json!({}),
-        status_notifications: false,
-        progress_token: Some("indexing-progress".into()),
+        readiness: Readiness::Progress("indexing-progress".into()),
         document_sync: DocumentSync::ReopenWithSymbols,
     })
 }
@@ -380,7 +379,9 @@ mod tests {
         }
         assert!(setup.arguments.is_empty());
         assert_eq!(setup.document_sync, DocumentSync::ReopenWithSymbols);
-        assert_eq!(setup.progress_token.as_deref(), Some("indexing-progress"));
+        assert!(
+            matches!(setup.readiness, Readiness::Progress(token) if token == "indexing-progress")
+        );
         let environment = setup
             .environment
             .into_iter()

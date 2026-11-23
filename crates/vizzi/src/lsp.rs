@@ -124,6 +124,13 @@ pub(crate) enum DocumentSync {
     Ordered,
 }
 
+pub(crate) enum Readiness {
+    Immediate,
+    RustAnalyzer,
+    Progress(String),
+    JdtLs,
+}
+
 pub(crate) struct Client {
     child: Child,
     input: Option<ChildStdin>,
@@ -132,8 +139,7 @@ pub(crate) struct Client {
     next: u64,
     options: Value,
     initialization: Value,
-    status_notifications: bool,
-    progress_token: Option<String>,
+    readiness: Readiness,
     pub(crate) document_sync: DocumentSync,
     diagnostics: BTreeMap<String, i32>,
     ready: bool,
@@ -143,8 +149,7 @@ pub(crate) struct Setup {
     pub arguments: Vec<String>,
     pub initialization: Value,
     pub configuration: Value,
-    pub status_notifications: bool,
-    pub progress_token: Option<String>,
+    pub readiness: Readiness,
     pub document_sync: DocumentSync,
     pub environment: Vec<(std::ffi::OsString, Option<std::ffi::OsString>)>,
 }
@@ -158,8 +163,7 @@ impl Client {
                 arguments: vec![],
                 initialization: options.clone(),
                 configuration: json!({"rust-analyzer":options}),
-                status_notifications: true,
-                progress_token: None,
+                readiness: Readiness::RustAnalyzer,
                 document_sync: DocumentSync::Diagnostics,
                 environment: vec![],
             },
@@ -235,7 +239,7 @@ impl Client {
                 }
             }
         });
-        let ready = !setup.status_notifications && setup.progress_token.is_none();
+        let ready = matches!(setup.readiness, Readiness::Immediate);
         let mut client = Self {
             child,
             input: Some(input),
@@ -244,14 +248,15 @@ impl Client {
             next: 0,
             options: setup.configuration,
             initialization: setup.initialization,
-            status_notifications: setup.status_notifications,
-            progress_token: setup.progress_token,
+            readiness: setup.readiness,
             document_sync: setup.document_sync,
             diagnostics: BTreeMap::new(),
             ready,
             version: String::new(),
         };
-        let result=client.request("initialize",json!({"processId":null,"rootUri":uri(root)?,"workspaceFolders":[{"uri":uri(root)?,"name":"captured source"}],"capabilities":{"general":{"positionEncodings":["utf-16"]},"textDocument":{"definition":{"linkSupport":true},"references":{},"publishDiagnostics":{"versionSupport":true}},"window":{"workDoneProgress":client.progress_token.is_some()},"experimental":{"serverStatusNotification":client.status_notifications},"workspace":{"configuration":true}},"initializationOptions":client.initialization}),Duration::from_secs(20))?;
+        let progress = matches!(client.readiness, Readiness::Progress(_));
+        let rust_status = matches!(client.readiness, Readiness::RustAnalyzer);
+        let result=client.request("initialize",json!({"processId":null,"rootUri":uri(root)?,"workspaceFolders":[{"uri":uri(root)?,"name":"captured source"}],"capabilities":{"general":{"positionEncodings":["utf-16"]},"textDocument":{"definition":{"linkSupport":true},"references":{},"publishDiagnostics":{"versionSupport":true}},"window":{"workDoneProgress":progress},"experimental":{"serverStatusNotification":rust_status},"workspace":{"configuration":true}},"initializationOptions":client.initialization}),Duration::from_secs(20))?;
         if !result["capabilities"]["definitionProvider"].is_object()
             && result["capabilities"]["definitionProvider"] != true
         {
@@ -295,15 +300,20 @@ impl Client {
         let Some(method) = message["method"].as_str() else {
             return Ok(());
         };
-        if self.status_notifications && method == "experimental/serverStatus" {
-            self.ready = message["params"]["quiescent"] == true;
-        }
-        if method == "$/progress"
-            && self.progress_token.as_deref() == message["params"]["token"].as_str()
-            && self.progress_token.is_some()
-            && message["params"]["value"]["kind"] == "end"
-        {
-            self.ready = true;
+        let params = &message["params"];
+        match (&self.readiness, method) {
+            (Readiness::RustAnalyzer, "experimental/serverStatus") => {
+                self.ready = params["quiescent"] == true;
+            }
+            (Readiness::Progress(token), "$/progress")
+                if params["token"] == token.as_str() && params["value"]["kind"] == "end" =>
+            {
+                self.ready = true;
+            }
+            (Readiness::JdtLs, "language/status") if params["type"] == "ServiceReady" => {
+                self.ready = true;
+            }
+            _ => {}
         }
         if method == "textDocument/publishDiagnostics"
             && let (Some(uri), Some(version)) = (
@@ -671,8 +681,7 @@ while True:
                 arguments: vec!["--stdio".into()],
                 initialization: json!({"mode":"python"}),
                 configuration: json!({"python":{"analysis":{"useLibraryCodeForTypes":true}}}),
-                status_notifications: false,
-                progress_token: None,
+                readiness: Readiness::Immediate,
                 document_sync: DocumentSync::Diagnostics,
                 environment: vec![],
             },
@@ -743,8 +752,7 @@ while sys.stdin.buffer.read(1):pass
                 arguments: vec![],
                 initialization: json!({}),
                 configuration: json!({}),
-                status_notifications: false,
-                progress_token: Some("indexing-progress".into()),
+                readiness: Readiness::Progress("indexing-progress".into()),
                 document_sync: DocumentSync::ReopenWithSymbols,
                 environment: vec![
                     ("PATH".into(), None),

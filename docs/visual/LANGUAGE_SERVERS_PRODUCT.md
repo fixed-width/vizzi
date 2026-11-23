@@ -4,7 +4,7 @@ For contributors extending the visual call workspace. Semantic language-server n
 is a core capability. Written-name matches remain a fallback, not the intended substitute
 for language analysis in Python or C/C++.
 
-One host can configure rust-analyzer, Pyright, Ruby LSP, clangd and
+One host can configure rust-analyzer, Pyright, Ruby LSP, clangd, JDT LS and
 the native TypeScript server together. Server selection uses
 the captured document's language, including in mixed-language repositories. Existing
 `--rust-analyzer` launches remain compatible. Python, Ruby and C-family providers are explicitly
@@ -22,8 +22,9 @@ Vizzi-managed providers analyse a private mirror of captured source. Initializat
 sections, language IDs, arguments and readiness differ by server; JSON-RPC framing,
 position conversion, result limits and read-only requests are shared. A Python environment
 can be selected explicitly. Clangd uses captured compilation commands rather than running
-a build to discover flags. Source changes reuse warm sessions; project-input changes
-restart them. Results remain bound to captured bytes and checked configuration.
+a build to discover flags. Project-input changes restart sessions. Profiles
+can also restart the server after a source change to refresh its project index.
+Results remain bound to captured bytes and checked configuration.
 
 Local dependency source remains bounded and language-specific. Only source reached by the
 provider can enter the existing dependency catalog. Known external/unavailable targets
@@ -40,3 +41,18 @@ The optional [editor-sharing mode](../configuration/PRODUCT.md) reuses VS Code p
 without starting or owning another language server. It verifies saved/captured source,
 rejects dirty buffers and admits repository-local results. Its live editor context and
 dependency limitations remain distinct from the managed captured-source providers.
+
+## Java with a managed server
+
+Selecting JDT LS in the native launch settings enables project-aware definitions
+and references between captured Java files. The workspace root is the default
+Java source root. Users can list workspace-relative source roots for layouts
+such as `src/main/java` and `src/test/java`.
+
+The server reads a private copy of captured Java source under those roots and
+keeps its state outside that copy. Java files elsewhere remain available for
+browsing and written-name lookup. Startup and requests remain bounded. Lookups
+after a saved edit inside a source root use the new capture. Maven, Gradle, and
+Eclipse project files stay outside this source-root configuration. Repository
+browsing requires no Java tooling.
+JDK and dependency destinations outside captured source remain outside results.

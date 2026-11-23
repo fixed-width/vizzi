@@ -3,7 +3,7 @@ use super::{
     inputs::{InputFiles, Inputs, absolute, save},
     project::{ExternalSource, Profile},
 };
-use crate::lsp::{DocumentSync, Setup};
+use crate::lsp::{DocumentSync, Readiness, Setup};
 use serde_json::{Value, json};
 use std::{
     fs,
@@ -107,8 +107,7 @@ impl Compilation {
             ],
             initialization: json!({}),
             configuration: json!({}),
-            status_notifications: false,
-            progress_token: None,
+            readiness: Readiness::Immediate,
             document_sync: DocumentSync::Diagnostics,
             environment: vec![],
         })

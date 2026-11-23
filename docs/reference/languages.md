@@ -47,10 +47,12 @@ open methods and constructors with bodies.
 
 Written method calls and `new` expressions provide name candidates, including
 separate candidates for overloaded declarations. An implicit record constructor
-can lead to its record declaration. A [shared VS Code Java provider](../how-to/configure-language-servers.md#java-with-vs-code)
-can resolve overloads and references using its project configuration. Vizzi checks
-the results against captured workspace files. Java dependency archives and virtual
-documents are outside the captured workspace.
+can lead to its record declaration. A [managed JDT LS server](../how-to/configure-language-servers.md#java-with-a-managed-server)
+can resolve overloads and references across configured source roots. A
+[shared VS Code Java provider](../how-to/configure-language-servers.md#java-with-vs-code)
+uses the editor's project configuration. Vizzi checks results against captured
+workspace files. Java dependency archives and virtual documents are outside the
+captured workspace.
 
 ## Python
 
@@ -141,7 +143,8 @@ Large-repository interaction and cross-browser support are still being qualified
 current user documentation is checked on Linux with Chromium, not a performance or
 platform guarantee for every repository.
 
-The Python/Ruby/C-family semantic mirror currently admits up to 8 MiB per source file and
-128 MiB of source per provider workspace. Exceeding these bounds makes semantic lookup
-unavailable; ordinary captured-source browsing has separate limits. Local dependency
-captures retain at most 2 MiB per file, 32 MiB total and 32 retained captures.
+The shared Python, Ruby, C-family, Java, and TypeScript semantic mirror admits up
+to 8 MiB per source file and 128 MiB of source per provider workspace. Semantic
+lookup is unavailable above those bounds. Ordinary captured-source browsing has
+separate limits. Local dependency captures retain at most 2 MiB per file, 32 MiB
+total and 32 retained captures.

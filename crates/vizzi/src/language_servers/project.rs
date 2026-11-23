@@ -28,6 +28,14 @@ pub(super) trait Profile: Send + Sync {
         self.languages().contains(&language)
     }
 
+    fn includes_path(&self, _path: &str) -> bool {
+        true
+    }
+
+    fn includes_document(&self, doc: &Document) -> bool {
+        self.includes_path(doc.path()) && language(doc).is_some_and(|lang| self.accepts(lang))
+    }
+
     fn inputs<'a>(&'a self, root: &'a Path, snapshot: &'a Snapshot) -> Result<Inputs<'a>, String>;
     fn external_source<'a>(&self, _path: &'a Path, _hint: &'a str) -> Option<ExternalSource<'a>> {
         None
@@ -108,8 +116,9 @@ pub(super) struct ProjectServer {
     state: Mutex<Option<Workspace>>,
 }
 struct Workspace {
-    directory: tempfile::TempDir,
     client: Client,
+    directory: tempfile::TempDir,
+    _private_state: Option<tempfile::TempDir>,
     configuration: String,
     rejected_configs: BTreeMap<PathBuf, String>,
     files: BTreeMap<String, String>,
@@ -222,7 +231,7 @@ impl ProjectServer {
         for doc in snapshot
             .documents()
             .iter()
-            .filter(|doc| language(doc).is_some_and(|lang| self.profile.accepts(lang)))
+            .filter(|doc| self.profile.includes_document(doc))
         {
             let text = source(doc)?;
             total += text.len();
@@ -238,6 +247,7 @@ impl ProjectServer {
         Ok(Workspace {
             directory,
             client,
+            _private_state: prepared.private_state,
             configuration,
             rejected_configs: prepared.rejected_configs,
             files,
@@ -247,10 +257,17 @@ impl ProjectServer {
             next: 0,
         })
     }
+    fn lookup_source(&self, doc: &Document, external: bool) -> Result<String, String> {
+        if !external && !self.profile.includes_path(doc.path()) {
+            return Err("Captured source is outside the configured source roots".into());
+        }
+        source(doc)
+    }
     fn lookup(
         &self,
         snapshot: Arc<Snapshot>,
         doc: &Document,
+        text: &str,
         byte: usize,
         external: Option<&Capture>,
         references: bool,
@@ -259,8 +276,7 @@ impl ProjectServer {
         if !self.profile.accepts(lang) {
             return Err("Unsupported semantic language".into());
         }
-        let text = source(doc)?;
-        let position = definitions::position(&text, byte)?;
+        let position = definitions::position(text, byte)?;
         let inputs = self.profile.inputs(&self.root, &snapshot)?;
         let configuration = inputs.digest().to_owned();
         let mut state = self
@@ -311,7 +327,7 @@ impl ProjectServer {
         } else {
             workspace.directory.path().join(doc.path())
         };
-        workspace.open(&path, self.profile.document_language(&path, lang), &text)?;
+        workspace.open(&path, self.profile.document_language(&path, lang), text)?;
         if let Some(error) =
             self.profile
                 .project_error(&mut workspace.client, &path, &workspace.rejected_configs)?
@@ -368,7 +384,9 @@ impl ProjectServer {
                         .to_str()
                         .ok_or("Semantic path is not UTF-8")?
                         .replace('\\', "/");
-                    if snapshot.file_by_path(&relative).is_some() {
+                    if self.profile.includes_path(&relative)
+                        && snapshot.file_by_path(&relative).is_some()
+                    {
                         locations.push(Location {
                             capture: None,
                             path: relative,
@@ -549,12 +567,14 @@ impl Provider for ProjectServer {
             .identifier
             .as_ref()
             .ok_or("Captured call identifier is unavailable")?;
-        if source(doc)?.get(span.clone()) != call.invocation.name.as_deref() {
+        let text = self.lookup_source(doc, external.is_some())?;
+        if text.get(span.clone()) != call.invocation.name.as_deref() {
             return Err("Captured call identifier differs".into());
         }
         self.lookup(
             snapshot.clone(),
             doc,
+            &text,
             span.start,
             external.as_deref(),
             false,
@@ -594,8 +614,9 @@ impl Provider for ProjectServer {
             })
             .map(|fact| fact.name.as_str())
             .ok_or("Reference declaration is unavailable")?;
+        let text = self.lookup_source(doc, external.is_some())?;
         if !name.starts_with(&symbol.name)
-            || source(doc)?.get(identifier..identifier.saturating_add(name.len())) != Some(name)
+            || text.get(identifier..identifier.saturating_add(name.len())) != Some(name)
         {
             return Err("Reference target identifier differs".into());
         }
@@ -603,6 +624,7 @@ impl Provider for ProjectServer {
         self.lookup(
             snapshot.clone(),
             doc,
+            &text,
             identifier + offset,
             external.as_deref(),
             true,
@@ -713,7 +735,7 @@ impl Workspace {
         let docs = snapshot
             .documents()
             .iter()
-            .filter(|doc| language(doc).is_some_and(|lang| profile.accepts(lang)))
+            .filter(|doc| profile.includes_document(doc))
             .collect::<Vec<_>>();
         let current = docs.iter().map(|doc| doc.path()).collect::<BTreeSet<_>>();
         let deleted = self
