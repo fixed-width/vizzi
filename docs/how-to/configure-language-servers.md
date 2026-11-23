@@ -7,7 +7,7 @@ and TypeScript. Several can be configured in one mixed-language workspace.
 Basic syntax browsing remains available without them.
 
 To save these settings in TOML, see [save launch settings](configure-vizzi.md).
-Vizzi-managed servers use captured-source mirrors. JavaScript and TypeScript also
+Vizzi-managed servers use captured-source mirrors. Java, JavaScript, and TypeScript
 work through VS Code's shared provider.
 
 ## JavaScript and TypeScript with a managed server
@@ -51,6 +51,19 @@ The editor's active project configuration determines its imports, types and alia
 Save workspace buffers before looking up definitions or references. Vizzi verifies
 locations against captured source and can open provider-reached source from the
 workspace's installed packages.
+
+## Java with VS Code
+
+Open a trusted local folder with the Vizzi extension and a Java extension that
+provides definitions and references. Let the Java extension finish loading the
+project and save your workspace files. Run **Vizzi: Open Workspace** to share the
+editor's language providers.
+
+Right-click a saved Java call name and choose **Vizzi: Explore Call**, or follow a
+call from a method bubble. Use **Find references** on a Java declaration to query
+the shared provider. The editor's project configuration determines which overloads,
+imports, and references it resolves. Vizzi verifies results against captured
+workspace files. [Install and use the Vizzi extension](../../editors/vscode/INSTALL.md)
 
 ## Python with Pyright
 

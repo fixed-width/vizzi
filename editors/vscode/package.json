@@ -25,7 +25,7 @@
     ],
     "menus": {
       "editor/context": [
-        {"command":"vizzi.exploreCall","when":"resourceScheme == file && isWorkspaceTrusted && editorLangId =~ /^(rust|python|ruby|c|cpp|javascript|javascriptreact|typescript|typescriptreact)$/","group":"navigation@20"},
+        {"command":"vizzi.exploreCall","when":"resourceScheme == file && isWorkspaceTrusted && editorLangId =~ /^(rust|python|ruby|c|cpp|java|javascript|javascriptreact|typescript|typescriptreact)$/","group":"navigation@20"},
         {"command":"vizzi.openSourceBrowser","when":"resourceScheme == file && isWorkspaceTrusted","group":"navigation@21"}
       ],
       "editor/title/context": [{"command":"vizzi.openSourceBrowser","when":"resourceScheme == file && isWorkspaceTrusted","group":"navigation@20"}],

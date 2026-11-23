@@ -94,7 +94,7 @@ impl Servers {
                 connection,
                 servers.sources.clone(),
             ));
-            for language in ["rust", "python", "ruby", "c", "cpp"]
+            for language in ["rust", "python", "ruby", "c", "cpp", "java"]
                 .into_iter()
                 .chain(ECMASCRIPT_LANGUAGES.iter().copied())
             {

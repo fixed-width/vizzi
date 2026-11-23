@@ -20,6 +20,7 @@ const CALLS: CallRules = CallRules {
         CallExpression {
             kind: "call_expression",
             callee_field: "function",
+            receiver_field: None,
             unwrap_callee: Some(unwrap_expression),
             name_kinds: CALLEE_NAMES,
             name_fields: DOTTED_CALLEE,
@@ -27,6 +28,7 @@ const CALLS: CallRules = CallRules {
         CallExpression {
             kind: "new_expression",
             callee_field: "constructor",
+            receiver_field: None,
             unwrap_callee: Some(unwrap_expression),
             name_kinds: CALLEE_NAMES,
             name_fields: DOTTED_CALLEE,

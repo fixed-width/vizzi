@@ -1,7 +1,7 @@
 # Run Vizzi on your project
 
 Use this guide after [building Vizzi](install.md). The project can be a plain source
-directory. Git is only required for revision review. Rust, Python, Ruby, JavaScript,
+directory. Git is only required for revision review. Rust, Python, Ruby, Java, JavaScript,
 and TypeScript are selected by default, including JSX and TSX. Vizzi analyzes saved files.
 
 ## Start the local server

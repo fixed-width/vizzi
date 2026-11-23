@@ -37,6 +37,12 @@ const DEFAULT_SOURCE_RULES: &[DefaultSourceRules] = &[
         )),
     },
     DefaultSourceRules {
+        language: "java",
+        suffixes: &["java"],
+        filenames: &[],
+        project_metadata: None,
+    },
+    DefaultSourceRules {
         language: "javascript",
         suffixes: &["js", "jsx", "mjs", "cjs"],
         filenames: &[],

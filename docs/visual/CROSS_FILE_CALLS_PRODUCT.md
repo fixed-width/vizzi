@@ -9,7 +9,7 @@ every language with written-call and declaration analysis. [Issue #7](https://gi
 1. When an inline call or Calls entry has a captured written name, the reader can look
    for its declaration in another file from the caller's commit. The reader browses
    paths in that commit or enters a repository-relative path directly. This works in
-   Rust, Python, Ruby, C, C++, JavaScript, TypeScript and TSX wherever the configured
+   Rust, Python, Ruby, C, C++, Java, JavaScript, TypeScript and TSX wherever the configured
    source policy and syntax analysis supply the required facts. Existing same-file
    actions remain available. Escape or Close returns keyboard focus to the inline call
    or the bubble's Calls button. [Language support](../reference/languages.md) ·

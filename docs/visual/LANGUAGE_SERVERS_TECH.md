@@ -13,8 +13,8 @@ settings, external source admission, and result rules. The shared project module
 the private mirror, document synchronization, and captured-source verification.
 
 An optional native connection file selects `editor_bridge::Bridge` behind the same
-Provider interface for all supported languages, including JavaScript, TypeScript and
-TSX. Managed options are then rejected before
+Provider interface for all supported languages, including Java, JavaScript, TypeScript
+and TSX. Managed options are then rejected before
 startup. The [configuration contract](../configuration/TECH.md) defines transport,
 ownership, source checks and the VS Code plugin. The remainder of this document covers
 Vizzi-managed servers and their captured mirrors.

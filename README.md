@@ -53,14 +53,14 @@ integration is required for these lessons.
 
 - Follow calls into neighbouring bubbles, inspect callers and references, and keep branches
   visible. Configured language servers resolve typed receivers, imports and references
-  for Python, Rust, Ruby and C/C++.
+  for Python, Rust, Ruby and C/C++. VS Code provider sharing also supports Java.
 - Arrange related views into groups and save browser-local tasks. Follow saved file changes
   live or pin an earlier source view.
 - Browse source, compare Git revisions or working changes, and keep source locations and
   notes. Hand off a current location to VS Code or Neovim when you want to work on it.
 
-Rust, Python, Ruby, JavaScript, and TypeScript are selected by default, including JSX and
-TSX. Raw C/C++ browsing uses explicit source scopes.
+Rust, Python, Ruby, Java, JavaScript, and TypeScript are selected by default, including
+JSX and TSX. Raw C/C++ browsing uses explicit source scopes.
 Language support and call resolution have [important differences](docs/reference/languages.md);
 a candidate match is not proof of a runtime call.
 

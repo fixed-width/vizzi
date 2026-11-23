@@ -405,6 +405,60 @@ test("JavaScript and TypeScript outlines and written calls work in the captured 
   }
 });
 
+test("Java source outlines and call trails work without a language server", async () => {
+  const fixture = await workspace({
+    files: {
+      "Caller.java": "class Caller {\n    int run() {\n        var pair = new Pair(1, 2);\n        return Counter.seed()\n            .next()\n            .finish();\n    }\n}\n",
+      "Counter.java": "class Counter {\n    static Counter seed() { return new Counter(); }\n    Counter next() { return this; }\n    int finish() { return 1; }\n}\n",
+      "Pair.java": "record Pair(int x, int y) {}\n",
+    },
+  });
+  let live, session;
+  try {
+    live = await startHost(fixture);
+    session = await openWorkspace(chromium, live);
+    const { page } = session;
+    await page.getByText("Accessible file list", { exact: true }).click();
+    await page.getByRole("button", { name: "Caller.java", exact: true }).click();
+    await page.locator("#outline button[data-declaration]").filter({ hasText: "run" }).waitFor();
+    assert.match(await page.locator("#coverage").textContent(), /java: syntax parsed/);
+    assert.match(await page.locator("#source .syntax-keyword").first().textContent(), /class/);
+
+    await page.goto(live.url);
+    await page.waitForFunction(() => document.querySelector("#visual-source-status").textContent.includes("ready"));
+    await page.getByRole("button", { name: "Add bubble", exact: true }).click();
+    await page.getByLabel("Find a function", { exact: true }).fill("run");
+    await page.getByRole("button", { name: "Find functions", exact: true }).click();
+    await page.locator('[data-add-symbol][data-name="run"]').click();
+    const run = page.locator('[data-view][data-name="run"]');
+    await run.getByRole("button", { name: "Calls", exact: true }).click();
+    await run.getByRole("button", { name: "next · line 5", exact: true }).waitFor();
+    await run.getByRole("button", { name: "finish · line 6", exact: true }).click();
+    const finish = page.locator('[data-view][data-name="finish"]');
+    await finish.locator(".code-line").first().waitFor();
+    assert.match(await finish.textContent(), /return 1/);
+    assert.deepEqual(await run.locator(".is-call").evaluateAll(lines => lines.map(line => line.dataset.line)), ["6"]);
+    const link = page.locator('#workspace-links [data-kind="candidate"]');
+    await link.waitFor({ state: "attached" });
+    assert.match(await link.getAttribute("aria-label"), /→ Counter::finish/);
+    await page.getByRole("button", { name: "Fit workspace", exact: true }).click();
+    await finish.locator(".fragment-header").hover();
+    await paint(page);
+    assert.deepEqual(await run.locator(".is-linked-call").evaluateAll(lines => lines.map(line => line.dataset.line)), ["4", "5", "6"]);
+
+    await run.getByRole("button", { name: "Calls", exact: true }).click();
+    await run.getByRole("button", { name: "Pair · line 3", exact: true }).click();
+    const pair = page.locator('[data-view][data-name="Pair"]');
+    await pair.locator(".code-line").first().waitFor();
+    assert.match(await pair.textContent(), /record Pair/);
+    assert.deepEqual(session.errors, []);
+  } finally {
+    await session?.close();
+    await live?.close();
+    await fixture.close();
+  }
+});
+
 const managedTypeScript = process.env.VIZZI_TYPESCRIPT_SERVER;
 
 test("managed TypeScript opens installed package source beside its caller", {

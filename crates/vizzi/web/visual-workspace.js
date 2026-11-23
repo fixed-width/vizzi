@@ -859,12 +859,13 @@ async function loadCalls(id,offset){
  const r=mounted.get(id);if(!r||!model.navigable(id))return;const v=model.view(id),source=frozenSource(v),expected=source?.snapshot??model.snapshot,binding=JSON.stringify([v.snapshot,v.symbol.id,source]);
  try{const data=source?await post('/api/captured-functions',{source,query:{kind:'calls',offset}},r.controller.signal):await post('/api/structure',{snapshot:expected,path:v.symbol.origin?undefined:v.symbol.source.path,query:{kind:'calls',symbol:v.symbol.id,area:v.area||v.symbol.source.path,offset}},r.controller.signal);if(mounted.get(id)!==r||!model.navigable(id)||JSON.stringify([model.view(id).snapshot,model.view(id).symbol.id,frozenSource(model.view(id))])!==binding)return;if(data.snapshot!==expected||!Array.isArray(data.items)||data.items.length>8)throw new Error('Call response differs');r.sites=offset===0?data.items:[...r.sites,...data.items];r.nextCalls=data.next;r.matching=data.matching;r.callsReady=true;renderCalls(id);if(!source)void prepareDefinitions(id);}catch(error){if(error.name!=='AbortError'){r.callsReady=true;r.popup.replaceChildren(node('p',error.message));}}
 }
+function callLine(site){return site.identifier_line??site.source.line;}
 function renderCalls(id){
  const r=mounted.get(id);if(!r)return;
  const view=model.view(id);
  r.popup.replaceChildren(node('p',`${r.sites.length} of ${r.matching} written calls.`));
  for(const site of r.sites){
-  const action=button(`${site.name??'Dynamic call'} · line ${site.source.line}`,null,()=>chooseCall(id,site));
+  const action=button(`${site.name??'Dynamic call'} · line ${callLine(site)}`,null,()=>chooseCall(id,site));
   if(!canLookInFile(view,site)){r.popup.append(action);continue;}
   const row=node('div');row.className='captured-call-row';
   row.append(action,button('Look in another file…',`Look for ${site.name} in another file`,()=>void chooseCapturedCall(id,site,{anotherFile:true})));
@@ -890,7 +891,7 @@ async function chooseCall(id,site,opener){
  try{verify();}catch{return;}
  highlightCall(id,choice.site);const target=directDestination(choice);if(target){follow(id,choice.site,target);return;}showDestinations(id,choice);
 }
-function highlightCall(id,site){const r=mounted.get(id);r.popup.hidden=true;for(const line of r.code.querySelectorAll('.is-call'))line.classList.remove('is-call');r.code.querySelector(`[data-line="${site.source.line}"]`)?.classList.add('is-call');}
+function highlightCall(id,site){const r=mounted.get(id);r.popup.hidden=true;for(const line of r.code.querySelectorAll('.is-call'))line.classList.remove('is-call');r.code.querySelector(`[data-line="${callLine(site)}"]`)?.classList.add('is-call');}
 function showDestinations(id,{site,note,semantic,captured}) {
  highlightCall(id,site);const candidates=site.candidates,stack=el('destination-stack'),v=model.view(id);
  stack.replaceChildren(node('h2',site.spelling),node('p',candidates.length?`Choose among ${site.candidate_count} ${semantic?'definition locations':'terminal-name matches'}. ${candidates.length} captured destinations are shown.${note?' '+note:''}`:note||'No indexed destination. Dynamic or external calls remain unresolved.'));stack.append(button('Close choices',null,hideDestinations));

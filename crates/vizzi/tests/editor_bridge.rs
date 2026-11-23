@@ -33,10 +33,13 @@ impl Fixture {
         Self::with_text(TEXT)
     }
     fn with_text(text: &str) -> Self {
+        Self::with_source("a.py", text)
+    }
+    fn with_source(path: &str, text: &str) -> Self {
         let directory = tempfile::tempdir().unwrap();
         let root = directory.path().canonicalize().unwrap().join("project");
         fs::create_dir(&root).unwrap();
-        fs::write(root.join("a.py"), text).unwrap();
+        fs::write(root.join(path), text).unwrap();
         let snapshot = Engine::new(
             Directory::open(&root).unwrap(),
             Cache::new(directory.path().join("cache")),
@@ -189,6 +192,64 @@ fn editor_definitions_and_references_reuse_the_connection_with_captured_position
     assert_ne!(answer.context, previous_context);
     assert_eq!(peer.finish()["position"], json!({"line":1,"character":4}));
     assert!(!fixture.directory.path().join("semantic").exists());
+}
+
+#[test]
+fn editor_java_queries_preserve_overload_and_utf16_positions() {
+    const PATH: &str = "Engine.java";
+    const JAVA: &str = r#"class Engine {
+    static int speak(int value) { return value; }
+    static int speak(String value) { return value.length(); }
+    static void run() { /* 😀 */ Engine.speak("hello"); }
+}
+"#;
+    let fixture = Fixture::with_source(PATH, JAVA);
+    let provider = fixture.provider();
+    let index = Structure::new(&fixture.snapshot);
+    let run = index
+        .functions(PATH, "run", 0)
+        .unwrap()
+        .items
+        .remove(0)
+        .symbol;
+    let site = index.outgoing(&run.id, PATH, 0).unwrap().items.remove(0);
+    let call = index.call(&site.id).unwrap();
+    assert_eq!(call.invocation.candidate_count, 2);
+
+    let definition = json!({"line":2,"character":15});
+    let usage = json!({"line":3,"character":40});
+    let reply = |position: &Value| {
+        json!({"version":1,"status":"ok","session":"java","epoch":0,"outside":0,
+            "locations":[{"path":fixture.root.join(PATH),"position":position,"text":JAVA}]})
+    };
+    let response = reply(&definition);
+    let peer = Peer::start(&fixture, move |_| frame(response));
+    let answer = provider.resolve(fixture.snapshot.clone(), &call).unwrap();
+    let request = peer.finish();
+    assert_eq!(request["method"], "definition");
+    assert_eq!(request["path"], PATH);
+    assert_eq!(request["text"], JAVA);
+    assert_eq!(request["position"], usage);
+    let [target] = answer.locations.as_slice() else {
+        panic!("expected one captured Java definition");
+    };
+    assert_eq!(serde_json::to_value(target.position).unwrap(), definition);
+    let identifier = vizzi::definitions::byte_offset(JAVA, target.position).unwrap();
+    let declaration = index.definition(PATH, identifier).unwrap();
+    assert_eq!(declaration.source.line, 3);
+
+    let response = reply(&usage);
+    let peer = Peer::start(&fixture, move |_| frame(response));
+    let answer = provider
+        .references(fixture.snapshot, &declaration, identifier)
+        .unwrap();
+    let request = peer.finish();
+    assert_eq!(request["method"], "references");
+    assert_eq!(request["position"], definition);
+    let [reference] = answer.locations.as_slice() else {
+        panic!("expected one captured Java reference");
+    };
+    assert_eq!(serde_json::to_value(reference.position).unwrap(), usage);
 }
 
 #[test]

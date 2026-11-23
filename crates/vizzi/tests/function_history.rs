@@ -578,6 +578,12 @@ fn historical_cross_file_names_use_the_same_commit_in_every_written_call_adapter
             "def helper\n  17\nend\n",
         ),
         (
+            "java",
+            "java",
+            "class Caller { void target() { Callee.helper(); } }\n",
+            "class Callee { static int helper() { return 17; } }\n",
+        ),
+        (
             "c",
             "c",
             "void target() { helper(); }\n",

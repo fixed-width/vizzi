@@ -112,9 +112,11 @@ and revision/diff views remain part of the design direction. No new model, parse
 existing captured call metadata without requiring a repository build.
 
 
-Hovering a bubble highlights its originating call lines and connecting arrows. Hovering
-an original physical call line highlights all opened destinations for captured callee spellings spanning
-that line and their arrows. Wrapped rows retain the original line association. Multiple
+The **Calls** list and selection highlight use the line of the callee name when
+available. Hovering a bubble highlights its originating call lines
+and connecting arrows. Hovering an original physical call line highlights all
+opened destinations for captured callee spellings spanning that line and their arrows.
+Wrapped rows retain the original line association. Multiple
 callers, repeated calls and branches remain distinct. Arrow hover identifies both ends.
 Keyboard-visible focus provides the same connection cues. This transient feedback changes
 no selection, layout, camera, source capture or stored state, and performs no source IO.

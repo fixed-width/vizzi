@@ -38,6 +38,20 @@ Managed TypeScript and VS Code sharing can open installed JavaScript or TypeScri
 package declarations in independent dependency bubbles. The selected provider
 determines whether a definition points to an implementation or a declaration file.
 
+## Java
+
+Vizzi captures `.java` files by default. Syntax coloring, outlines, and written-call
+navigation work without a JDK or project build. Outlines include classes, interfaces,
+enums, records, annotation types, methods, and constructors. Use **Add bubble** to
+open methods and constructors with bodies.
+
+Written method calls and `new` expressions provide name candidates, including
+separate candidates for overloaded declarations. An implicit record constructor
+can lead to its record declaration. A [shared VS Code Java provider](../how-to/configure-language-servers.md#java-with-vs-code)
+can resolve overloads and references using its project configuration. Vizzi checks
+the results against captured workspace files. Java dependency archives and virtual
+documents are outside the captured workspace.
+
 ## Python
 
 Python does not need a runtime, virtual environment or language server for syntax browsing.

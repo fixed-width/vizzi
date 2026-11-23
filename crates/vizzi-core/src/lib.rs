@@ -10,6 +10,7 @@ pub mod comparison;
 pub mod discovery;
 mod ecmascript;
 pub mod investigation;
+mod java;
 pub mod model;
 pub mod modules;
 pub mod policy;

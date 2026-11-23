@@ -140,6 +140,12 @@ pub(crate) fn edit(
         "rust" => ("//", format!("fn {name}() {{}}\n")),
         "python" => ("#", format!("def {name}(): pass\n")),
         "ruby" => ("#", format!("def {name}; {sample}; end\n")),
+        "java" => (
+            "//",
+            format!(
+                "class VizziMaintenance{sample} {{ static int {name}() {{ return {sample}; }} }}\n"
+            ),
+        ),
         "javascript" | "typescript" | "tsx" => {
             ("//", format!("function {name}() {{ return {sample}; }}\n"))
         }
@@ -404,7 +410,11 @@ mod tests {
                 .analyze(&bytes)
                 .unwrap();
             assert!(fresh.facts.iter().any(|fact| fact.name == name));
-            assert_eq!(fresh.coverage, vizzi_core::model::Coverage::Syntax);
+            assert_eq!(
+                fresh.coverage,
+                vizzi_core::model::Coverage::Syntax,
+                "{language}"
+            );
         }
     }
     #[test]

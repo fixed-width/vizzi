@@ -80,6 +80,7 @@ fn builtins_advertise_written_calls_in_registration_order() {
             "rust",
             "python",
             "ruby",
+            "java",
             "c",
             "cpp",
             "javascript",

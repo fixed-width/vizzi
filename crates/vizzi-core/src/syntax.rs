@@ -444,6 +444,7 @@ mod tests {
             expressions: &[CallExpression {
                 kind: "call",
                 callee_field: "function",
+                receiver_field: None,
                 unwrap_callee: None,
                 name_kinds: &["identifier"],
                 name_fields: &[("attribute", "attribute")],
@@ -524,6 +525,7 @@ mod tests {
                 expressions: &[CallExpression {
                     kind: "call",
                     callee_field: "method",
+                    receiver_field: None,
                     unwrap_callee: None,
                     name_kinds: &["identifier"],
                     name_fields: &[],
