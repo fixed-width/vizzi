@@ -22,6 +22,16 @@
 <p id="revision-status" role="status"></p><p id="revision-error" role="alert" hidden></p>
 <div class="dialog-actions"><button id="cancel-revision" type="button">Cancel</button><button id="open-revision" type="submit">Open revision</button></div>
 </form></dialog>
+<dialog id="cross-file-dialog" aria-labelledby="cross-file-title">
+<div class="dialog-heading"><h2 id="cross-file-title">Look in another file</h2><button id="close-cross-file" type="button">Close</button></div>
+<p id="cross-file-commit"></p>
+<form id="cross-file-form">
+<label for="cross-file-path">Repository-relative file path<input id="cross-file-path" maxlength="4096" autocomplete="off" spellcheck="false" required autofocus></label>
+<button type="submit">Find candidates</button>
+</form>
+<p id="cross-file-status" role="status"></p><p id="cross-file-error" role="alert" hidden></p>
+<div id="cross-file-results"></div>
+</dialog>
 <dialog id="task-name-dialog"><form id="task-name-form"><h2>Name task</h2><label>Task name<input id="task-name" maxlength="256" required></label><button type="submit">Save name</button><button type="button" data-close-dialog="task-name-dialog">Cancel</button></form></dialog>
 <dialog id="task-shelf-dialog"><h2>Task shelf</h2><div id="task-list"></div><button type="button" data-close-dialog="task-shelf-dialog">Close shelf</button></dialog>
 <dialog id="group-dialog"><form id="group-form"><h2>Task groups</h2><label>Group<select id="group-choice"></select></label><label>Group name<input id="group-name" maxlength="256" required></label><fieldset id="group-members"><legend>Members</legend></fieldset><button type="submit">Save group</button><button type="button" data-close-dialog="group-dialog">Cancel</button></form></dialog>

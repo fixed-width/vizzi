@@ -58,8 +58,8 @@ Visual tasks currently have no export/import interface and do not synchronise be
 devices. [Managing tasks](../how-to/manage-tasks.md) describes the controls.
 
 Function history considers up to 64 file revisions per session, with a 2-MiB file limit.
-Only the selected analysed file is retained for each session; revisiting a version reads
-its immutable Git objects again. These are logical source-byte bounds, excluding analysis
+The selected analysed caller file is retained for each session. Revisiting its earlier
+versions can read their immutable Git objects again. These are logical source-byte bounds, excluding analysis
 metadata and parser memory. Reload can restore a retained history session; restarting the
 server expires it. **Return to live** remains available when a historical capture expires.
 
@@ -68,6 +68,10 @@ when selected. Comparison inputs have the same 2-MiB per-file bound. Their lifet
 independent of history sessions and the active Review changes comparison. Closing one
 bubble leaves the other capture usable until its pair expires; it does not create an
 archive. Changes to files or Git refs do not retarget retained comparison captures.
+
+Cross-file historical calls admit up to eight additional files and 4 MiB per history
+session or comparison pair, within the owner's aggregate source limits. Each lookup
+examines one selected file of up to 2 MiB. Extra captures share their owner's expiry.
 
 Following a captured call shares its existing history/comparison file owner. Child bubbles
 and captured links persist that exact context and use the same native expiry and source

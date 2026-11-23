@@ -184,6 +184,356 @@ fn read_history_frame(
 }
 
 #[test]
+fn historical_cross_file_names_use_the_same_commit_in_every_written_call_adapter() {
+    use vizzi_core::{analysis::Languages, policy::PolicyConfig};
+    let root = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    git(root.path(), &["init", "-q"]);
+    let fixtures = [
+        (
+            "rust",
+            "rs",
+            "fn target() { helper(); }\n",
+            "fn helper() -> i32 { 17 }\n",
+        ),
+        (
+            "python",
+            "py",
+            "def target():\n    helper()\n",
+            "def helper():\n    return 17\n",
+        ),
+        (
+            "ruby",
+            "rb",
+            "def target\n  helper()\nend\n",
+            "def helper\n  17\nend\n",
+        ),
+        (
+            "c",
+            "c",
+            "void target() { helper(); }\n",
+            "int helper() { return 17; }\n",
+        ),
+        (
+            "cpp",
+            "cpp",
+            "void target() { helper(); }\n",
+            "int helper() { return 17; }\n",
+        ),
+        (
+            "javascript",
+            "js",
+            "function target() { helper(); }\n",
+            "function helper() { return 17; }\n",
+        ),
+        (
+            "typescript",
+            "ts",
+            "function target() { helper(); }\n",
+            "function helper(): number { return 17; }\n",
+        ),
+        (
+            "tsx",
+            "tsx",
+            "function target() { helper(); return <div />; }\n",
+            "function helper(): number { return 17; }\n",
+        ),
+    ];
+    for (language, extension, caller, callee) in fixtures {
+        let directory = root.path().join(language);
+        std::fs::create_dir(&directory).unwrap();
+        std::fs::write(directory.join(format!("caller.{extension}")), caller).unwrap();
+        std::fs::write(directory.join(format!("callee.{extension}")), callee).unwrap();
+    }
+    git(root.path(), &["add", "."]);
+    let older = commit_staged(root.path());
+    for (language, extension, _, callee) in fixtures {
+        std::fs::write(
+            root.path().join(format!("{language}/callee.{extension}")),
+            callee.replace("17", "29"),
+        )
+        .unwrap();
+    }
+    git(root.path(), &["add", "."]);
+    let newer = commit_staged(root.path());
+    let languages = Languages::builtin().unwrap();
+    assert_eq!(
+        languages.call_languages(),
+        &fixtures.map(|(language, ..)| language)
+    );
+    let directory = Directory::with_policy(
+        root.path(),
+        PolicyConfig {
+            c_family_roots: vec![".".into()],
+            ..PolicyConfig::default()
+        },
+        Arc::new(languages),
+    )
+    .unwrap();
+    let host = Arc::new(
+        Host::start_with_options(
+            Engine::new(directory, Cache::new(cache.path().join("analysis")), 1).unwrap(),
+            HostOptions {
+                watch: false,
+                reconcile_interval: std::time::Duration::from_secs(3600),
+                idle_maintenance: false,
+            },
+        )
+        .unwrap(),
+    );
+    let history = FunctionHistory::new(host.clone());
+    let snapshot = host.application().snapshot().unwrap();
+    let index = Structure::new(&snapshot);
+    for (language, extension, _, _) in fixtures {
+        let path = format!("{language}/callee.{extension}");
+        let caller_path = format!("{language}/caller.{extension}");
+        let entry = index
+            .functions(&caller_path, "target", 0)
+            .unwrap()
+            .items
+            .remove(0);
+        let s = &entry.symbol;
+        let origin = json!({"kind":"current","source":{"snapshot":snapshot.id().as_str(),"file":s.source.file,"version":s.source.version,"tracking":s.tracking}});
+        for (commit, expected) in [(&older, "17"), (&newer, "29")] {
+            let frame = select_revision(&history, commit, origin.clone()).unwrap();
+            let owner = json!({"kind":"history","token":frame["token"],"index":0});
+            let source = captured_source(&frame, owner.clone());
+            let call = call_named(&history, &source, "helper");
+            let files = captured_query(
+                &history,
+                &source,
+                json!({"kind":"files","call":call["id"],"directory":language,"offset":0}),
+            )
+            .unwrap();
+            assert_eq!(files["commit"], *commit);
+            assert!(
+                files["items"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .any(|item| item["path"] == path)
+            );
+            let choices = captured_query(
+                &history,
+                &source,
+                json!({"kind":"candidates","call":call["id"],"path":path,"offset":0}),
+            )
+            .unwrap();
+            assert_eq!(choices["matching"], 1, "{language}");
+            assert_eq!(choices["commit"], *commit);
+            let opened = captured_query(&history, &source, json!({"kind":"open_file","call":call["id"],"path":path,"snapshot":choices["snapshot"],"target":choices["items"][0]["id"]})).unwrap();
+            assert_eq!(opened["frame"]["captured"]["label"], *commit);
+            assert!(
+                text(&opened["frame"]).contains(expected),
+                "{language}: {opened}"
+            );
+            assert!(opened["invocation"]["binding"].is_null());
+            let destination = captured_source(&opened["frame"], owner);
+            captured_query(&history, &destination, json!({"kind":"confirm_file"})).unwrap();
+            assert!(
+                history
+                    .window(
+                        frame["token"].as_str().unwrap(),
+                        destination["snapshot"].as_str().unwrap(),
+                        destination["file"].as_str().unwrap(),
+                        destination["version"].as_str().unwrap(),
+                        &WindowQuery::default(),
+                    )
+                    .is_ok()
+            );
+        }
+    }
+}
+
+#[test]
+fn historical_cross_file_choices_validate_pins_and_preserve_retained_files_at_capacity() {
+    let (root, _cache, host, history, request, _) = fixture("");
+    for n in 0..9 {
+        std::fs::write(
+            root.path().join(format!("helper{n}.rs")),
+            format!("fn worker() {{ {n}; }}\n"),
+        )
+        .unwrap();
+    }
+    std::fs::write(
+        root.path().join("duplicate.rs"),
+        "mod left { fn worker() {} }\nmod right { fn worker() {} }\nfn other() {}\n",
+    )
+    .unwrap();
+    std::fs::write(
+        root.path().join("Cargo.toml"),
+        "[package]\nname='fixture'\nversion='1.0.0'\n",
+    )
+    .unwrap();
+    git(root.path(), &["add", "."]);
+    let old = commit(root.path(), "fn target() { worker(); (|| {})(); }\n");
+    commit(root.path(), "fn target() { worker(); }\n");
+    std::fs::remove_file(root.path().join("Cargo.toml")).unwrap();
+    let request = refresh_request(&host, &request);
+    let pair = history.compare(&compare_current(&request)).unwrap();
+    let owner = |side| json!({"kind":"comparison","token":pair["token"],"side":side});
+    let source = captured_source(&pair["older"], owner("older"));
+    let call = call_named(&history, &source, "worker");
+    let query =
+        |kind: &str, path: &str| json!({"kind":kind,"call":call["id"],"path":path,"offset":0});
+    let mut wrong_caller = source.clone();
+    wrong_caller["version"] = json!("0".repeat(64));
+    assert!(captured_query(&history, &wrong_caller, query("candidates", "helper0.rs")).is_err());
+    let mut wrong_call = query("candidates", "helper0.rs");
+    wrong_call["call"] = json!("0".repeat(64));
+    assert!(captured_query(&history, &source, wrong_call).is_err());
+    for (path, text) in [
+        ("absent.rs", "missing"),
+        ("Cargo.toml", "analysis is unavailable"),
+        ("target/ignored.rs", "outside the configured source scope"),
+        ("../escape.rs", "relative review path"),
+    ] {
+        let error = captured_query(&history, &source, query("candidates", path)).unwrap_err();
+        assert!(error.to_string().contains(text), "{path}: {error}");
+    }
+    let current = captured_source(&pair["newer"], owner("newer"));
+    let current_call = call_named(&history, &current, "worker");
+    assert!(
+        captured_query(
+            &history,
+            &current,
+            json!({"kind":"candidates","call":current_call["id"],"path":"helper0.rs","offset":0})
+        )
+        .is_err()
+    );
+    let calls = captured_query(&history, &source, json!({"kind":"calls","offset":0})).unwrap();
+    let dynamic = calls["items"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|item| item["name"].is_null())
+        .unwrap();
+    assert!(
+        captured_query(
+            &history,
+            &source,
+            json!({"kind":"candidates","call":dynamic["id"],"path":"helper0.rs","offset":0})
+        )
+        .unwrap_err()
+        .to_string()
+        .contains("no captured name")
+    );
+    let choices = captured_query(&history, &source, query("candidates", "duplicate.rs")).unwrap();
+    assert_eq!(choices["matching"], 2);
+    assert_eq!(choices["commit"], old);
+    let open = |path: &str, snapshot: &Value, target: &Value| {
+        captured_query(
+            &history,
+            &source,
+            json!({"kind":"open_file","call":call["id"],"path":path,"snapshot":snapshot,"target":target}),
+        )
+    };
+    assert!(open("duplicate.rs", &json!("bad"), &choices["items"][0]["id"]).is_err());
+    assert!(open("duplicate.rs", &choices["snapshot"], &json!("bad")).is_err());
+    let helper = |n| {
+        let path = format!("helper{n}.rs");
+        let candidates = captured_query(&history, &source, query("candidates", &path)).unwrap();
+        open(
+            &path,
+            &candidates["snapshot"],
+            &candidates["items"][0]["id"],
+        )
+        .map(|result| captured_source(&result["frame"], owner("older")))
+    };
+    let confirm = |source: &Value| captured_query(&history, source, json!({"kind":"confirm_file"}));
+    let first = helper(0).unwrap();
+    confirm(&first).unwrap();
+    for n in 1..7 {
+        confirm(&helper(n).unwrap()).unwrap();
+    }
+    let canceled = helper(7).unwrap();
+    let replacement = helper(8).unwrap();
+    assert!(confirm(&canceled).is_err());
+    confirm(&replacement).unwrap();
+    confirm(&replacement).unwrap();
+    assert!(
+        matches!(helper(7), Err(vizzi::companion::CompanionError::Conflict(message))
+        if message.contains("retained source allowance"))
+    );
+    confirm(&first).unwrap();
+    let mut wrong = replacement;
+    wrong["owner"] = owner("newer");
+    assert!(confirm(&wrong).is_err());
+    for _ in 0..12 {
+        history.compare(&compare_current(&request)).unwrap();
+    }
+    assert!(
+        confirm(&first)
+            .unwrap_err()
+            .to_string()
+            .contains("comparison expired")
+    );
+}
+
+#[test]
+fn historical_cross_file_byte_limits_reserve_space_without_displacing_confirmed_files() {
+    let (root, _cache, host, history, request, _) = fixture("");
+    let prefix = "fn worker() {\n/*";
+    let suffix = "*/\n}\n";
+    let full_file = format!(
+        "{prefix}{}{suffix}",
+        "x".repeat(2 * 1024 * 1024 - prefix.len() - suffix.len())
+    );
+    std::fs::write(root.path().join("large_a.rs"), &full_file).unwrap();
+    std::fs::write(root.path().join("large_b.rs"), &full_file).unwrap();
+    std::fs::write(root.path().join("small.rs"), "fn worker() {}\n").unwrap();
+    git(root.path(), &["add", "."]);
+    let caller_prefix = "fn target() {\nworker();\n/*";
+    let caller = format!(
+        "{caller_prefix}{}{suffix}",
+        "x".repeat(2 * 1024 * 1024 - caller_prefix.len() - suffix.len())
+    );
+    let revision = commit(root.path(), &caller);
+    let request = refresh_request(&host, &request);
+    let origin = json!({"kind":"current","source":request});
+    let initial = select_revision(&history, &revision, origin.clone()).unwrap();
+    let peer = select_revision(&history, &revision, origin).unwrap();
+    let owner = json!({"kind":"history","token":initial["token"],"index":0});
+    let source = captured_source(&initial, owner.clone());
+    let call = call_named(&history, &source, "worker");
+    let open = |source: &Value, path: &str| {
+        let choices = captured_query(
+            &history,
+            source,
+            json!({"kind":"candidates","call":call["id"],"path":path,"offset":0}),
+        )
+        .unwrap();
+        captured_query(
+            &history,
+            source,
+            json!({"kind":"open_file","call":call["id"],"path":path,"snapshot":choices["snapshot"],"target":choices["items"][0]["id"]}),
+        )
+    };
+    let first = open(&source, "large_a.rs").unwrap();
+    let first_source = captured_source(&first["frame"], owner.clone());
+    captured_query(&history, &first_source, json!({"kind":"confirm_file"})).unwrap();
+    let second = open(&source, "large_b.rs").unwrap();
+    assert_eq!(second["prepared"], true);
+    assert_eq!(open(&source, "large_b.rs").unwrap()["prepared"], true);
+    let peer = captured_source(
+        &peer,
+        json!({"kind":"history","token":peer["token"],"index":0}),
+    );
+    assert!(
+        matches!(open(&peer, "small.rs"), Err(vizzi::companion::CompanionError::Conflict(message))
+        if message.contains("retained source allowance"))
+    );
+    let second_source = captured_source(&second["frame"], owner);
+    captured_query(&history, &second_source, json!({"kind":"confirm_file"})).unwrap();
+    assert!(
+        matches!(open(&source, "small.rs"), Err(vizzi::companion::CompanionError::Conflict(message))
+        if message.contains("retained source allowance"))
+    );
+    assert_eq!(open(&source, "large_a.rs").unwrap()["prepared"], false);
+    assert_eq!(open(&source, "large_b.rs").unwrap()["prepared"], false);
+}
+
+#[test]
 fn exact_selection_preparation_preserves_the_oldest_history_at_the_session_limit() {
     let (_root, _cache, _host, history, request, commits) = fixture("");
     let oldest = history.start(&request).unwrap();

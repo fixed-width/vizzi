@@ -125,6 +125,46 @@ impl GitRepository {
             batch: None,
         })
     }
+
+    pub(crate) fn revision_directory(
+        &self,
+        commit: &str,
+        directory: &str,
+    ) -> Result<Vec<(String, bool)>, CaptureError> {
+        let tree = if directory.is_empty() {
+            commit.to_owned()
+        } else {
+            ReviewPath::parse(directory.as_bytes().to_vec())?;
+            format!("{commit}:{directory}")
+        };
+        let listing = self.run(&["ls-tree", "-z", &tree], 256 * 1024, &|| false)?;
+        let mut entries = Vec::new();
+        for record in records(&listing)? {
+            let (meta, name) = split_record(record)?;
+            let (mode, _) =
+                meta.split_at(meta.iter().position(|b| *b == b' ').unwrap_or(meta.len()));
+            let folder = mode == b"040000";
+            if !folder && !matches!(kind(mode), Ok(EntryKind::Regular { .. })) {
+                continue;
+            }
+            let relative = ReviewPath::parse(name.to_vec())?;
+            let Some(name) = relative
+                .document_path()
+                .filter(|name| !name.chars().any(char::is_control))
+            else {
+                continue;
+            };
+            let path = if directory.is_empty() {
+                name.into()
+            } else {
+                format!("{directory}/{name}")
+            };
+            if path.len() <= 4096 {
+                entries.push((path, folder));
+            }
+        }
+        Ok(entries)
+    }
     pub(crate) fn regular_files_at(
         &self,
         commit: &str,

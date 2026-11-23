@@ -24,7 +24,7 @@ const el=id=>document.getElementById(id),node=(tag,text='')=>{const n=document.c
 const error=createMessage(el('visual-error'),{label:'Dismiss workspace error'}),notice=createMessage(el('visual-notice'),{label:'Dismiss workspace notice'});
 let definitionProvider=false;const definitionCapabilities=transport('/api/structure').then(c=>{definitionProvider=c.definition_provider===true;}).catch(()=>{});
 let model,currentSnapshot,taskControls,board,editorName='editor',busy=false,saveTimer,paletteTicket=0,jobs=Promise.resolve(),demoOpened=false,livePendingTimer;
-let revisionPicker;
+let revisionPicker,crossFilePicker;
 const mounted=new Map();
 const returnPending=r=>r.liveReturn==='pending';
 const SECTION_ROWS=96,SECTION_LIMIT=4,SECTION_EDGE=240;
@@ -33,7 +33,15 @@ const outlines=installModuleOutlines(el('module-outlines'),()=>model?model.visib
 let showModuleOutlines=false;try{showModuleOutlines=localStorage.getItem('vizzi.visual.module-outlines')==='true';}catch{}
 el('module-outlines-setting').checked=showModuleOutlines;outlines.setEnabled(showModuleOutlines);el('module-outlines-setting').onchange=()=>{showModuleOutlines=el('module-outlines-setting').checked;outlines.setEnabled(showModuleOutlines);try{localStorage.setItem('vizzi.visual.module-outlines',String(showModuleOutlines));}catch{notice.show('The module outline preference could not be saved.');}};
 const callMenu=createCallMenu(el('call-action-menu'));
-function inlineAction(id,action,element,direct,keyboard){if(!model.navigable(id)||mounted.get(id)?.historyLoading)return;editorCalls.manual();callMenu.hide();const open=()=>{if(mounted.has(id)&&model.navigable(id))void chooseCall(id,{...action,lookup:true});};if(direct)open();else callMenu.show(element,action.name,[{label:frozenSource(model.view(id))?'Open in captured file':'Open definition',hint:'Ctrl/⌘-click',run:open}],keyboard);}
+function inlineAction(id,action,element,direct,keyboard){
+ if(!model.navigable(id)||mounted.get(id)?.historyLoading)return;
+ editorCalls.manual();callMenu.hide();
+ const view=model.view(id),open=()=>{if(mounted.has(id)&&model.navigable(id))void chooseCall(id,{...action,lookup:true},element);};
+ if(direct){open();return;}
+ const actions=[{label:frozenSource(view)?'Open in captured file':'Open definition',hint:'Ctrl/⌘-click',run:open}];
+ if(canLookInFile(view,action))actions.push({label:'Look in another file…',run:()=>void chooseCapturedCall(id,action,{anotherFile:true,opener:element})});
+ callMenu.show(element,action.name,actions,keyboard);
+}
 function inlineAvailability(code,id){for(const name of code.querySelectorAll('.code-call')){name.setAttribute('aria-disabled',String(!model.navigable(id)||Boolean(mounted.get(id)?.historyLoading)));name.tabIndex=model.navigable(id)&&!mounted.get(id)?.historyLoading?0:-1;if(frozenSource(model.view(id)))name.title='Captured-file call · Ctrl/⌘-click opens a same-file destination';}}
 installAppearance(el('theme'));
 let smartReflow=true;try{smartReflow=localStorage.getItem('vizzi.visual.code-layout')!=='original';}catch{}
@@ -123,7 +131,7 @@ const prepareEditorCall=createCallPreparation({read:()=>model,
 const editorCalls=installWorkspaceDelivery({mode:'call',
  ready:action=>Boolean(size().w>=1&&size().h>=1&&(action.kind==='reveal'||model&&!model.stale)),
  prepare:(action,context)=>action.kind==='reveal'?Promise.resolve({commit(){}}):prepareEditorCall(action,context),failed:fail,
- changed:pending=>{if(pending){closeRevisionPicker();callMenu.hide();hideDestinations();window.getSelection()?.removeAllRanges();for(const r of mounted.values()){r.navigation=(r.navigation??0)+1;r.historyTicket=(r.historyTicket??0)+1;r.historyController?.abort();if(r.historyLoading)r.comparing=r.historyLoading=r.loading=false;r.resolving=false;updateFragmentStatus(r);}geometry();live.resume();}}
+ changed:pending=>{if(pending){closeRevisionPicker();closeCrossFilePicker();callMenu.hide();hideDestinations();window.getSelection()?.removeAllRanges();for(const r of mounted.values()){r.navigation=(r.navigation??0)+1;r.historyTicket=(r.historyTicket??0)+1;r.historyController?.abort();if(r.historyLoading)r.comparing=r.historyLoading=r.loading=false;r.resolving=false;updateFragmentStatus(r);}geometry();live.resume();}}
 });
 document.addEventListener('selectionchange',()=>live.resume());
 function updateFragmentStatus(r){
@@ -262,29 +270,172 @@ async function capturedActions(v,start,count,signal){
  const actions=[];let offset=0;
  try{for(let page=0;page<16;page++){const data=await post('/api/captured-functions',{source:frozenSource(v),query:{kind:'actions',line_start:start,line_count:count,offset}},signal);if(data.snapshot!==v.snapshot||!Array.isArray(data.items)||data.items.length>256||!Number.isSafeInteger(data.matching)||data.matching>4096)throw new Error('Invalid captured call actions');actions.push(...data.items);if(data.next===null)return actions;if(!Number.isSafeInteger(data.next)||data.next<=offset)throw new Error('Invalid captured call continuation');offset=data.next;}throw new Error('Captured call-action allowance exceeded');}catch(error){if(signal?.aborted)throw error;return [];}
 }
-async function chooseCapturedCall(id,action){
- const r=mounted.get(id),workspace=model,source=frozenSource(model.view(id));if(!r||!source||!model.navigable(id)||r.historyLoading)return;
- editorCalls.manual();callMenu.hide();hideDestinations();r.popup.hidden=true;const epoch=r.navigation=(r.navigation??0)+1,signature=JSON.stringify(source),controller=new AbortController();r.historyController=controller;r.resolving=r.resolvingCaptured=true;updateFragmentStatus(r);
- const verify=()=>{if(model!==workspace||mounted.get(id)!==r||r.navigation!==epoch||!model.navigable(id)||JSON.stringify(frozenSource(model.view(id)))!==signature)throw new DOMException('Captured navigation superseded','AbortError');};
- const open=async(site,target)=>{
-  verify();if(r.sourcePane.selected())return;r.resolving=r.resolvingCaptured=true;updateFragmentStatus(r);
-  try{
-   const result=await post('/api/captured-functions',{source,query:{kind:'open',call:site.id,target:target.id}},controller.signal);verify();
-   const planned=Workspace.restore(model.serialize(),model.snapshot),next=planned.followCaptured(id,result.invocation,result.frame),view=planned.view(next),s=view.symbol.source,start=view.reading.section,query=new URLSearchParams({...sourceBinding(view),snapshot:view.snapshot,file:s.file,version:s.version,line_start:String(start),line_count:String(Math.min(96,s.end_line-start+1)),outline_count:'1',reflow:'true'});
-   const [data,actions]=await Promise.all([start===result.frame.window.line_start?result.frame.window:transport(sourceEndpointForView(view)+'?'+query,{signal:controller.signal}),capturedActions(view,start,Math.min(96,s.end_line-start+1),controller.signal)]);verify();
-   if(r.sourcePane.selected())throw new DOMException('Captured navigation deferred for selection','AbortError');
-   const prepared=preparedComparison(view,{window:data,origin:result.frame.origin});prepared.actions=actions;
-   const destination=model.followCaptured(id,result.invocation,result.frame);hideDestinations();mount(destination,prepared);focus([id,destination]);save();
-  }catch(error){if(error.name!=='AbortError'&&model===workspace&&mounted.get(id)===r&&r.navigation===epoch)fail(error);}
-  finally{if(mounted.get(id)===r&&r.navigation===epoch){r.resolving=false;updateFragmentStatus(r);live.resume();}}
- };
+function canLookInFile(view,site){
+ return Boolean(site.name&&/^(?:[0-9a-f]{40}|[0-9a-f]{64})$/.test(frozenLabel(view)));
+}
+
+function closeCrossFilePicker(restoreFocus=false){
+ const picker=crossFilePicker;
+ crossFilePicker=undefined;
+ picker?.request?.abort();
+ const dialog=el('cross-file-dialog');
+ if(dialog.open)dialog.close();
+ if(restoreFocus)picker?.restoreFocus();
+}
+
+function openCrossFilePicker({commit,site,path,signal,request,open,restoreFocus}){
+ closeCrossFilePicker();
+ const picker={commit,path,signal,request:null,send:request,open,restoreFocus};
+ crossFilePicker=picker;
+ el('cross-file-path').value='';
+ el('cross-file-commit').textContent=`${site.spelling??site.name} · ${commit}`;
+ el('cross-file-results').replaceChildren();
+ el('cross-file-error').hidden=true;
+ el('cross-file-dialog').showModal();
+ signal.addEventListener('abort',()=>{if(crossFilePicker===picker)closeCrossFilePicker();},{once:true});
+ void browseCapturedDirectory(path.split('/').slice(0,-1).join('/'));
+}
+
+async function runCrossFileOperation(message,operation,render){
+ const picker=crossFilePicker;
+ if(!picker)return;
+ picker.request?.abort();
+ const task=new AbortController();picker.request=task;
+ const signal=AbortSignal.any([picker.signal,task.signal]);
+ const error=el('cross-file-error'),status=el('cross-file-status');
+ error.hidden=true;status.textContent=message;
  try{
-  const result=await post('/api/captured-functions',{source,query:{kind:'definition',call:action.id}},controller.signal);verify();
-  const site=result.invocation;if(result.snapshot!==source.snapshot||site?.owner!==source.symbol||site.id!==action.id)throw new Error('Captured definition differs from the visible caller');
-  const choice={site,attempted:!result.complete&&!site.binding,semantic:false,note:result.detail,captured:{open:target=>void open(site,target)}};const target=directDestination(choice);
-  if(target)await open(site,target);else showDestinations(id,choice);
- }catch(error){if(error.name!=='AbortError'&&model===workspace&&mounted.get(id)===r&&r.navigation===epoch)fail(error);}
- finally{if(mounted.get(id)===r&&r.navigation===epoch){r.resolving=false;updateFragmentStatus(r);live.resume();}}
+  const result=await operation(picker,signal);
+  signal.throwIfAborted();
+  render(result,picker);
+ }catch(failure){
+  if(!signal.aborted&&crossFilePicker===picker&&failure.name!=='AbortError'){
+   error.textContent=failure.message;error.hidden=false;
+  }
+ }finally{
+  if(crossFilePicker===picker&&picker.request===task&&status.textContent===message)status.textContent='';
+ }
+}
+
+function browseCapturedDirectory(directory,offset=0){
+ const results=el('cross-file-results');
+ const restoreFocus=results.contains(document.activeElement);
+ results.replaceChildren();
+ const up=button('Up one directory',null,()=>void browseCapturedDirectory(directory.split('/').slice(0,-1).join('/')));
+ up.hidden=!directory;results.append(up);
+ const root=button('Repository root',null,()=>void browseCapturedDirectory(''));
+ root.hidden=!directory;results.append(root);
+ return runCrossFileOperation('Reading files at this commit…',
+  (picker,signal)=>picker.send({kind:'files',directory,offset},signal),
+  (data,picker)=>{
+   if(data.commit!==picker.commit||data.directory!==directory||!Array.isArray(data.items)||data.items.length>24)throw new Error('Directory listing differs from the captured commit');
+   el('cross-file-status').textContent=directory?`Files in ${directory}`:'Files at repository root';
+   for(const item of data.items){
+    if(item.path===picker.path)continue;
+    const name=item.path.split('/').at(-1)+(item.directory?'/':'');
+    const label=item.directory?`Browse ${item.path}`:`Find candidates in ${item.path}`;
+    results.append(button(name,label,()=>{
+     if(item.directory)void browseCapturedDirectory(item.path);
+     else{el('cross-file-path').value=item.path;void findCapturedCandidates(item.path);}
+    }));
+   }
+   if(Number.isSafeInteger(data.next)&&data.next>offset)results.append(button('More files',null,()=>void browseCapturedDirectory(directory,data.next)));
+   if(restoreFocus)(results.querySelector('button:not([hidden])')??el('cross-file-path')).focus();
+  });
+}
+
+function findCapturedCandidates(path,offset=0){
+ const results=el('cross-file-results'),restoreFocus=results.contains(document.activeElement);
+ results.replaceChildren(button('Browse repository files',null,()=>void browseCapturedDirectory('')));
+ return runCrossFileOperation('Reading declarations in the selected file…',
+  (picker,signal)=>picker.send({kind:'candidates',path,offset},signal),
+  (data,picker)=>{
+   if(data.commit!==picker.commit||data.path!==path||!Array.isArray(data.items)||data.items.length>8)throw new Error('File candidates differ from the captured commit');
+   const partial=data.coverage?.partial_files||data.coverage?.omitted_symbols;
+   el('cross-file-status').textContent=(data.matching?`${data.matching} name ${data.matching===1?'candidate':'candidates'} in ${path}.`:`No name candidates in ${path}.`)+(partial?' Declaration coverage is partial.':'');
+   let firstChoice;
+   for(const target of data.items){
+    if(target.source?.path!==path)throw new Error('Candidate is outside the selected file');
+    const label=[...target.parents,target.name].join('::');
+    const choice=button(label,`Open candidate ${label}`,()=>{
+     void runCrossFileOperation('Preparing captured source…',
+      (pending,signal)=>pending.open({kind:'open_file',path,snapshot:data.snapshot,target:target.id},signal),
+      opened=>{if(opened)closeCrossFilePicker();});
+    });
+    choice.append(node('small',`${path}:${target.source.line} · Name candidate`));results.append(choice);
+    firstChoice??=choice;
+   }
+   if(Number.isSafeInteger(data.next)&&data.next>offset)results.append(button('More candidates',null,()=>void findCapturedCandidates(path,data.next)));
+   if(restoreFocus)(firstChoice??el('cross-file-path')).focus();
+  });
+}
+el('close-cross-file').onclick=()=>closeCrossFilePicker(true);
+el('cross-file-dialog').addEventListener('cancel',event=>{event.preventDefault();closeCrossFilePicker(true);});
+el('cross-file-form').onsubmit=event=>{event.preventDefault();void findCapturedCandidates(el('cross-file-path').value);};
+
+async function chooseCapturedCall(id,action,{anotherFile=false,opener}={}){
+ const r=mounted.get(id),workspace=model,view=model.view(id),source=frozenSource(view);
+ if(!r||!source||!model.navigable(id)||r.historyLoading)return;
+ editorCalls.manual();callMenu.hide();hideDestinations();r.popup.hidden=true;
+ r.historyController?.abort();
+ const epoch=r.navigation=(r.navigation??0)+1,signature=JSON.stringify(source),controller=new AbortController();
+ r.historyController=controller;
+ const current=()=>model===workspace&&mounted.get(id)===r&&r.navigation===epoch;
+ const verify=()=>{
+  controller.signal.throwIfAborted();
+  if(!current()||!model.navigable(id)||JSON.stringify(frozenSource(model.view(id)))!==signature)throw new DOMException('Captured navigation superseded','AbortError');
+ };
+ const send=async(query,signal)=>{
+  verify();signal.throwIfAborted();
+  const result=await post('/api/captured-functions',{source,query:{...query,call:action.id}},signal);
+  verify();signal.throwIfAborted();return result;
+ };
+ const open=async(query,signal)=>{
+  if(r.sourcePane.selected())throw new Error('Clear the source selection before following the call.');
+  r.resolving=r.resolvingCaptured=true;updateFragmentStatus(r);
+  try{
+   const result=await send(query,signal),frame=result.frame;
+   if(result.invocation?.id!==action.id||frame?.symbol?.id!==query.target||
+    (query.kind==='open_file'&&(frame.cross_file!==true||typeof result.prepared!=='boolean'||frame.snapshot!==query.snapshot||frame.symbol.source.path!==query.path)))throw new Error('Captured destination differs from the selected candidate');
+   const planned=Workspace.restore(model.serialize(),model.snapshot),next=planned.followCaptured(id,result.invocation,frame),view=planned.view(next),s=view.symbol.source,start=view.reading.section;
+   const count=Math.min(96,s.end_line-start+1),params=new URLSearchParams({...sourceBinding(view),snapshot:view.snapshot,file:s.file,version:s.version,line_start:String(start),line_count:String(count),outline_count:'1',reflow:'true'});
+   const [data,actions]=await Promise.all([start===frame.window.line_start?frame.window:transport(sourceEndpointForView(view)+'?'+params,{signal}),capturedActions(view,start,count,signal)]);
+   verify();signal.throwIfAborted();
+   const prepared=preparedComparison(view,{window:data,origin:frame.origin});prepared.actions=actions;
+   if(result.prepared===true){
+    await post('/api/captured-functions',{source:frozenSource(view),query:{kind:'confirm_file'}},signal);
+    verify();signal.throwIfAborted();
+   }
+   if(r.sourcePane.selected())throw new DOMException('Captured navigation deferred for selection','AbortError');
+   const destination=model.followCaptured(id,result.invocation,frame);
+   hideDestinations();mount(destination,prepared);focus([id,destination]);save();
+   return true;
+  }finally{if(current()){r.resolving=false;updateFragmentStatus(r);live.resume();}}
+ };
+ const restoreFocus=()=>{
+  if(mounted.get(id)!==r)return;
+  const control=opener?.isConnected?opener:r.callsButton;
+  control.focus({preventScroll:true});
+ };
+ const browse=site=>openCrossFilePicker({commit:frozenLabel(view),site,path:view.symbol.source.path,signal:controller.signal,request:send,open,restoreFocus});
+ const report=error=>{if(error.name!=='AbortError'&&current())fail(error);};
+ if(anotherFile){
+  r.resolving=false;updateFragmentStatus(r);
+  if(canLookInFile(view,action))browse(action);
+  return;
+ }
+ r.resolving=r.resolvingCaptured=true;updateFragmentStatus(r);
+ try{
+  const result=await send({kind:'definition'},controller.signal);
+  const site=result.invocation;
+  if(result.snapshot!==source.snapshot||site?.owner!==source.symbol||site.id!==action.id)throw new Error('Captured definition differs from the visible caller');
+  const openLocal=target=>open({kind:'open',target:target.id},controller.signal);
+  const choice={site,attempted:!result.complete&&!site.binding,semantic:false,note:result.detail,
+   captured:{open:target=>void openLocal(target).catch(report),browse:canLookInFile(view,site)?()=>browse(site):null}};
+  const target=directDestination(choice);
+  if(target)await openLocal(target);else showDestinations(id,choice);
+ }catch(error){report(error);}
+ finally{if(current()){r.resolving=false;updateFragmentStatus(r);live.resume();}}
 }
 function historyControls(r,v){
  const atNewest=newestHistory(v),pending=returnPending(r),hasCapture=v.history||v.comparison||v.captured;
@@ -628,11 +779,24 @@ async function loadCalls(id,offset){
  const r=mounted.get(id);if(!r||!model.navigable(id))return;const v=model.view(id),source=frozenSource(v),expected=source?.snapshot??model.snapshot,binding=JSON.stringify([v.snapshot,v.symbol.id,source]);
  try{const data=source?await post('/api/captured-functions',{source,query:{kind:'calls',offset}},r.controller.signal):await post('/api/structure',{snapshot:expected,path:v.symbol.origin?undefined:v.symbol.source.path,query:{kind:'calls',symbol:v.symbol.id,area:v.area||v.symbol.source.path,offset}},r.controller.signal);if(mounted.get(id)!==r||!model.navigable(id)||JSON.stringify([model.view(id).snapshot,model.view(id).symbol.id,frozenSource(model.view(id))])!==binding)return;if(data.snapshot!==expected||!Array.isArray(data.items)||data.items.length>8)throw new Error('Call response differs');r.sites=offset===0?data.items:[...r.sites,...data.items];r.nextCalls=data.next;r.matching=data.matching;r.callsReady=true;renderCalls(id);if(!source)void prepareDefinitions(id);}catch(error){if(error.name!=='AbortError'){r.callsReady=true;r.popup.replaceChildren(node('p',error.message));}}
 }
-function renderCalls(id){const r=mounted.get(id);if(!r)return;r.popup.replaceChildren(node('p',`${r.sites.length} of ${r.matching} written calls.`));for(const site of r.sites)r.popup.append(button(`${site.name??'Dynamic call'} · line ${site.source.line}`,null,()=>chooseCall(id,site)));if(r.nextCalls!==null&&r.nextCalls!==undefined&&r.sites.length<64)r.popup.append(button('More written calls',null,()=>void loadCalls(id,r.nextCalls)));if(!r.matching)r.popup.append(node('p','No attributed calls recorded. This does not prove no runtime calls.'));}
+function renderCalls(id){
+ const r=mounted.get(id);if(!r)return;
+ const view=model.view(id);
+ r.popup.replaceChildren(node('p',`${r.sites.length} of ${r.matching} written calls.`));
+ for(const site of r.sites){
+  const action=button(`${site.name??'Dynamic call'} · line ${site.source.line}`,null,()=>chooseCall(id,site));
+  if(!canLookInFile(view,site)){r.popup.append(action);continue;}
+  const row=node('div');row.className='captured-call-row';
+  row.append(action,button('Look in another file…',`Look for ${site.name} in another file`,()=>void chooseCapturedCall(id,site,{anotherFile:true})));
+  r.popup.append(row);
+ }
+ if(r.nextCalls!=null&&r.sites.length<64)r.popup.append(button('More written calls',null,()=>void loadCalls(id,r.nextCalls)));
+ if(!r.matching)r.popup.append(node('p','No attributed calls recorded. This does not prove no runtime calls.'));
+}
 function toggleCalls(id){editorCalls.manual();const r=mounted.get(id);if(!r||!model.navigable(id))return;hideDestinations();for(const[other,x]of mounted)if(other!==id)x.popup.hidden=true;r.popup.hidden=!r.popup.hidden;if(!r.callsReady){r.popup.replaceChildren(node('p','Loading written calls…'));void loadCalls(id,0);}else renderCalls(id);}
 function hideDestinations(){el('destination-stack').hidden=true;}
-async function chooseCall(id,site){
- editorCalls.manual();const record=mounted.get(id);if(!record||!model.navigable(id))return;if(frozenSource(model.view(id))){void chooseCapturedCall(id,site);return;}record.resolvingCaptured=false;
+async function chooseCall(id,site,opener){
+ editorCalls.manual();const record=mounted.get(id);if(!record||!model.navigable(id))return;if(frozenSource(model.view(id))){void chooseCapturedCall(id,site,{opener});return;}record.resolvingCaptured=false;
  const symbol=model.view(id).symbol;
  site={...site,owner:symbol.id};
  const ticket=record.navigation=(record.navigation??0)+1,expected=model.snapshot;
@@ -650,6 +814,7 @@ function highlightCall(id,site){const r=mounted.get(id);r.popup.hidden=true;for(
 function showDestinations(id,{site,note,semantic,captured}) {
  highlightCall(id,site);const candidates=site.candidates,stack=el('destination-stack'),v=model.view(id);
  stack.replaceChildren(node('h2',site.spelling),node('p',candidates.length?`Choose among ${site.candidate_count} ${semantic?'definition locations':'terminal-name matches'}. ${candidates.length} captured destinations are shown.${note?' '+note:''}`:note||'No indexed destination. Dynamic or external calls remain unresolved.'));stack.append(button('Close choices',null,hideDestinations));
+ if(captured?.browse)stack.append(button('Look in another file…',null,captured.browse));
  for(const candidate of candidates){const b=button([...candidate.parents,candidate.name].join('::'),null,()=>captured?captured.open(candidate):follow(id,site,candidate));b.dataset.candidate=candidate.id;b.dataset.path=candidate.source.path;b.append(node('small',`${candidate.origin?originLabel(candidate.origin)+' · ':''}${candidate.source.path}:${candidate.source.line}`));stack.append(b);}Object.assign(stack.style,{left:v.x+v.w+24+'px',top:v.y+'px'});stack.hidden=false;
 }
 function follow(parent,site,target){editorCalls.manual();try{const id=model.follow(parent,site,target);hideDestinations();const record=mounted.get(id);mount(id);if(target.origin&&record&&(record.element.classList.contains('is-stale')||!record.lines?.length)){void loadSource(id,model.view(id).reading.section);record.callsReady=false;void loadCalls(id,0);}focus([parent,id]);save();}catch(e){fail(e);}}
@@ -660,7 +825,7 @@ async function keepLocation(id){
 async function openEditor(id){const r=mounted.get(id);if(!r||busy||!model.usable(id))return;const s=model.view(id).symbol.source;busy=true;geometry();try{await post(model.view(id).symbol.origin?'/api/dependency/editor':'/api/editor/open',{snapshot:model.view(id).symbol.origin?.capture??model.snapshot,file:s.file,version:s.version,line:s.line});}catch(e){fail(e);}finally{busy=false;geometry();live.resume();}}
 function openReferences(id,query){editorCalls.manual();try{if(!model.usable(id))throw new Error('Open a current function before finding references.');const stack=model.addReferences(model.view(id).symbol,query,id);geometry();focus([id,stack]);save();}catch(e){fail(e);}}
 function replaceTask(next){
- editorCalls.manual();closeRevisionPicker();callMenu.hide();hideDestinations();clearTimeout(livePendingTimer);
+ editorCalls.manual();closeRevisionPicker();closeCrossFilePicker();callMenu.hide();hideDestinations();clearTimeout(livePendingTimer);
  for(const r of mounted.values()){r.controller.abort();r.historyController?.abort();r.sourcePane.dispose();r.element.remove();}
  mounted.clear();referenceStacks.reset();jobs=Promise.resolve();model=next;
  for(const v of model.views)mount(v.id);

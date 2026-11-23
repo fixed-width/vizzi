@@ -23,8 +23,10 @@ const FILE_BYTES: usize = 2 * 1024 * 1024;
 const TOTAL_BYTES: usize = 32 * 1024 * 1024;
 const SESSIONS: usize = 24;
 const PREPARED_SELECTIONS: usize = 4;
+const PREPARED_BYTES: usize = PREPARED_SELECTIONS * FILE_BYTES;
 mod captured_calls;
 mod comparison;
+mod cross_file;
 mod module_context;
 mod revision;
 pub use captured_calls::{CapturedOwner, CapturedQuery, CapturedRequest, FrozenSource};
@@ -55,14 +57,28 @@ pub struct Step {
 }
 #[derive(Clone)]
 struct Capture {
-    snapshot: Arc<Snapshot>,
+    file: FileCapture,
     symbol: Symbol,
     span: std::ops::Range<usize>,
+}
+#[derive(Clone)]
+struct FileCapture {
+    snapshot: Arc<Snapshot>,
     modules: Arc<ModuleIndex>,
 }
-impl Capture {
+impl FileCapture {
     fn structure(&self) -> Structure {
         Structure::with_modules(&self.snapshot, &self.modules)
+    }
+
+    fn document(&self) -> &Document {
+        &self.snapshot.documents()[0]
+    }
+
+    fn matches(&self, snapshot: &str, file: &str, version: &str) -> bool {
+        self.snapshot.id().as_str() == snapshot
+            && self.document().id().as_str() == file
+            && self.document().version().as_str() == version
     }
 }
 struct Declaration {
@@ -77,10 +93,12 @@ impl Declaration {
             .cloned()
             .ok_or_else(|| unavailable("Captured function has no readable source binding"))?;
         Ok(Capture {
-            snapshot: self.snapshot,
+            file: FileCapture {
+                snapshot: self.snapshot,
+                modules,
+            },
             symbol,
             span: self.span,
-            modules,
         })
     }
 }
@@ -105,6 +123,7 @@ struct Session {
     digest: blake3::Hash,
     selected: Option<Capture>,
     index: usize,
+    files: cross_file::AdditionalFiles,
 }
 
 #[derive(Default)]
@@ -122,7 +141,9 @@ impl Sessions {
     }
 
     fn prepare(&mut self, session: Session) {
-        if self.prepared.len() == PREPARED_SELECTIONS {
+        while self.prepared.len() >= PREPARED_SELECTIONS
+            || self.prepared.iter().map(size).sum::<usize>() + size(&session) > PREPARED_BYTES
+        {
             self.prepared.pop_front();
         }
         self.prepared.push_back(session);
@@ -305,6 +326,7 @@ impl FunctionHistory {
             digest,
             selected: None,
             index: 0,
+            files: cross_file::AdditionalFiles::default(),
         })
     }
     /// Revisits immutable commits or lazily discovers another distinct declaration.
@@ -349,12 +371,14 @@ impl FunctionHistory {
             .get(token)
             .ok_or_else(|| conflict("Function history expired; return to live"))?;
         let restored;
-        let capture = if let Some(capture) = session
+        let capture = if let Some(extra) = session.files.find(None, snapshot) {
+            extra
+        } else if let Some(capture) = session
             .selected
             .as_ref()
-            .filter(|c| c.snapshot.id().as_str() == snapshot)
+            .filter(|c| c.file.snapshot.id().as_str() == snapshot)
         {
-            capture
+            &capture.file
         } else {
             let index = session
                 .versions
@@ -362,7 +386,7 @@ impl FunctionHistory {
                 .position(|v| v.snapshot == snapshot)
                 .ok_or_else(|| conflict("Function history source version differs"))?;
             restored = self.restore(session, index)?;
-            &restored
+            &restored.file
         };
         let doc = capture
             .snapshot
@@ -394,49 +418,8 @@ impl FunctionHistory {
         session: &Session,
         commit: &str,
     ) -> Result<(Declaration, blake3::Hash), CompanionError> {
-        let path = ReviewPath::parse(session.path.as_bytes().to_vec()).map_err(unavailable)?;
-        let mut input = session
-            .repository
-            .pin_file(commit, &session.path)
-            .map_err(unavailable)?;
-        let ReadEntry::Present {
-            kind: EntryKind::Regular { .. },
-            bytes,
-        } = input
-            .read(&path, FILE_BYTES, &|| false)
-            .map_err(unavailable)?
-        else {
-            return Err(invalid(
-                "Function unavailable at this revision; history stops at a deletion or file move",
-            ));
-        };
-        let doc = Document::capture(
-            session.repository.workspace().clone(),
-            session.path.clone(),
-            &bytes,
-            vec![],
-            session.classification.clone(),
-        )
-        .map_err(unavailable)?;
-        let source = Snapshot::new(
-            session.repository.workspace().clone(),
-            vec![Arc::new(doc)],
-            CapturePolicyId::derive(&[b"function-history-source-v1"]),
-        )
-        .map_err(unavailable)?;
-        let analyzed = self.host.analyze_history(&source).map_err(unavailable)?;
-        let snapshot = Arc::new(
-            Snapshot::new(
-                analyzed.workspace().clone(),
-                analyzed.documents().to_vec(),
-                CapturePolicyId::derive(&[
-                    b"function-history-revision-v1",
-                    analyzed.policy().as_str().as_bytes(),
-                    commit.as_bytes(),
-                ]),
-            )
-            .map_err(unavailable)?,
-        );
+        let snapshot = self.analyzed_revision_file(&session.repository, commit, &session.path, session.classification.clone())?
+            .ok_or_else(|| invalid("Function unavailable at this revision; history stops at a deletion or file move"))?;
         let doc = snapshot
             .file_by_path(&session.path)
             .ok_or_else(|| unavailable("Historical source is unavailable"))?;
@@ -462,7 +445,12 @@ impl FunctionHistory {
         if matches.next().is_some() {
             return Err(invalid("Function is ambiguous at this revision"));
         }
-        let digest = blake3::hash(&bytes[fact.span.clone()]);
+        let bytes = doc
+            .captured()
+            .reader()
+            .read(fact.span.clone(), FILE_BYTES)
+            .map_err(unavailable)?;
+        let digest = blake3::hash(&bytes);
         let tracking = doc.entity_id(analysis, fact);
         let span = fact.span.clone();
         Ok((
@@ -473,6 +461,53 @@ impl FunctionHistory {
             },
             digest,
         ))
+    }
+
+    fn analyzed_revision_file(
+        &self,
+        repository: &GitRepository,
+        commit: &str,
+        path: &str,
+        classification: vizzi_core::policy::Classification,
+    ) -> Result<Option<Arc<Snapshot>>, CompanionError> {
+        let relative = ReviewPath::parse(path.as_bytes().to_vec())
+            .map_err(|error| invalid(error.to_string()))?;
+        let mut input = repository.pin_file(commit, path).map_err(unavailable)?;
+        let ReadEntry::Present {
+            kind: EntryKind::Regular { .. },
+            bytes,
+        } = input
+            .read(&relative, FILE_BYTES, &|| false)
+            .map_err(unavailable)?
+        else {
+            return Ok(None);
+        };
+        let doc = Document::capture_source(
+            repository.workspace().clone(),
+            path.into(),
+            vizzi_core::model::CapturedSource::capture(bytes, None),
+            vec![],
+            classification,
+        )
+        .map_err(unavailable)?;
+        let source = Snapshot::new(
+            repository.workspace().clone(),
+            vec![Arc::new(doc)],
+            CapturePolicyId::derive(&[b"function-history-source-v1"]),
+        )
+        .map_err(unavailable)?;
+        let analyzed = self.host.analyze_history(&source).map_err(unavailable)?;
+        let snapshot = Snapshot::new(
+            analyzed.workspace().clone(),
+            analyzed.documents().to_vec(),
+            CapturePolicyId::derive(&[
+                b"function-history-revision-v1",
+                analyzed.policy().as_str().as_bytes(),
+                commit.as_bytes(),
+            ]),
+        )
+        .map_err(unavailable)?;
+        Ok(Some(Arc::new(snapshot)))
     }
     fn advance(&self, session: &mut Session) -> Result<(), CompanionError> {
         if session.stopped {
@@ -529,7 +564,7 @@ impl FunctionHistory {
         session.digest = digest;
         session.versions.push(Version {
             commit,
-            snapshot: capture.snapshot.id().as_str().into(),
+            snapshot: capture.file.snapshot.id().as_str().into(),
             modules,
         });
         session.index = session.versions.len() - 1;
@@ -544,9 +579,11 @@ fn take_session(queue: &mut VecDeque<Session>, token: &str) -> Option<Session> {
 }
 
 fn size(session: &Session) -> usize {
-    session.selected.as_ref().map_or(0, |c| {
-        c.snapshot.documents().iter().map(|d| d.bytes()).sum()
-    })
+    session
+        .selected
+        .as_ref()
+        .map_or(0, |c| c.file.document().bytes())
+        + session.files.bytes()
 }
 fn admit(sessions: &mut VecDeque<Session>, session: Session) {
     while sessions.len() >= SESSIONS
@@ -574,7 +611,8 @@ fn frame(session: &Session) -> Result<Value, CompanionError> {
         .as_ref()
         .ok_or_else(|| unavailable("No earlier function change is available"))?;
     let s = &capture.symbol.source;
-    let doc = capture
+    let capture_file = &capture.file;
+    let doc = capture_file
         .snapshot
         .file(&s.file)
         .ok_or_else(|| unavailable("Historical source is unavailable"))?;
@@ -585,8 +623,8 @@ fn frame(session: &Session) -> Result<Value, CompanionError> {
         reflow: Some(true),
         ..WindowQuery::default()
     };
-    let source = window(&capture.snapshot, doc, &query)?;
+    let source = window(&capture_file.snapshot, doc, &query)?;
     Ok(
-        json!({"token":session.token,"tip":session.tip,"commit":session.versions[session.index].commit,"index":session.index,"snapshot":capture.snapshot.id().as_str(),"symbol":capture.symbol,"origin":source["lines"][0],"window":source}),
+        json!({"token":session.token,"tip":session.tip,"commit":session.versions[session.index].commit,"index":session.index,"snapshot":capture_file.snapshot.id().as_str(),"symbol":capture.symbol,"origin":source["lines"][0],"window":source}),
     )
 }

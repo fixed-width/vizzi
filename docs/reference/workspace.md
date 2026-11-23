@@ -41,6 +41,7 @@ structural view remains a contributor prototype, not the main reading workflow.
 | Open live source | Open the current caller from a result row with its supported call connection |
 | Show comparison | Reveal an existing comparison of the caller at its retained reading position |
 | Open in captured file | Follow a call using only the historical/comparison file's declarations |
+| Look in another file… | Choose a repository file and confirm a name candidate at the caller's Git commit |
 | Save | Keep a repository source location separately from the visual layout |
 | Editor | Verify and hand off a current source location to VS Code |
 

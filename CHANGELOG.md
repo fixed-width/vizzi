@@ -8,6 +8,8 @@ remains in Git and the project documentation.
 
 ### Added
 
+- Follow named calls across repository files at the caller's Git revision. The same
+  file chooser and name-candidate flow work across the supported written-call languages.
 - Choose an exact local Git commit, branch or tag for a function bubble, including
   commits where the function was unchanged.
 - Browse JavaScript, JSX, TypeScript, and TSX with syntax colors, declaration

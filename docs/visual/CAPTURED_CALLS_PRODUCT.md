@@ -3,6 +3,9 @@
 For readers exploring a historical function or a pinned comparison without mixing source
 revisions. Use the existing call controls, candidate chooser and bubble design.
 
+The behaviour below describes **Open in captured file**. Git captures also offer
+[cross-file calls at the same commit](CROSS_FILE_CALLS_PRODUCT.md).
+
 ## Behaviour
 
 1. History and comparison bubbles support inline call actions and the Calls list. Opening

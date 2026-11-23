@@ -57,8 +57,10 @@ source/relationship refreshes. Individual views can pin a captured version, choo
 Git commit or step through function history independently. See [function history](docs/visual/HISTORY_PRODUCT.md).
 Adjacent function versions can be compared as independently pinned source views with
 native declaration-range differences; see [function comparison](docs/visual/FUNCTION_COMPARISON_PRODUCT.md).
-Calls from either capture can follow same-file declarations in that exact revision,
-retaining source-local and name-candidate evidence; see [captured calls](docs/visual/CAPTURED_CALLS_PRODUCT.md).
+Calls from either capture can follow same-file declarations, retaining source-local and
+name-candidate evidence. A committed capture can also follow a named call into another
+file selected at the same revision. See [captured calls](docs/visual/CAPTURED_CALLS_PRODUCT.md)
+and [cross-file calls](docs/visual/CROSS_FILE_CALLS_PRODUCT.md).
 Ambiguous or
 missing declarations retain earlier context rather than adopting a guessed target; see
 the [live view contract](docs/visual/LIVE_PRODUCT.md).

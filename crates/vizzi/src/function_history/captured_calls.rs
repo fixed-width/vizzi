@@ -3,7 +3,7 @@ use super::*;
 use vizzi_core::structure::Invocation;
 
 /// Native lifetime owner of a captured file; no working pathname is accepted.
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
 pub enum CapturedOwner {
     /// An accepted Git function-history version.
@@ -66,6 +66,37 @@ pub enum CapturedQuery {
         /// Candidate identity from this exact invocation.
         target: String,
     },
+    /// Lists direct entries in one directory at the caller's commit.
+    Files {
+        /// Captured invocation witness.
+        call: String,
+        /// Repository-relative directory or an empty string for the root.
+        directory: String,
+        /// Index into the bounded directory inventory.
+        offset: usize,
+    },
+    /// Finds declarations matching the invocation's written name in one selected file.
+    Candidates {
+        /// Captured invocation witness.
+        call: String,
+        /// Literal repository-relative file at the caller's commit.
+        path: String,
+        /// Index in the selected file's candidate list.
+        offset: usize,
+    },
+    /// Prepares one selected cross-file name candidate.
+    OpenFile {
+        /// Captured invocation witness.
+        call: String,
+        /// Selected file at the caller's commit.
+        path: String,
+        /// Observation returned by the candidate query for this file.
+        snapshot: String,
+        /// Exact declaration identity from that candidate list.
+        target: String,
+    },
+    /// Confirms retention of an additional file before the browser opens it.
+    ConfirmFile,
 }
 /// One bounded, idempotent captured-file query.
 #[derive(Deserialize)]
@@ -80,7 +111,16 @@ impl FunctionHistory {
     /// Projects captured call evidence without querying live source or language servers.
     pub fn captured_query(&self, request: &CapturedRequest) -> Result<Value, CompanionError> {
         let s = &request.source;
-        let project = |capture: &Capture, label: &str| {
+        if matches!(
+            request.query,
+            CapturedQuery::Files { .. }
+                | CapturedQuery::Candidates { .. }
+                | CapturedQuery::OpenFile { .. }
+                | CapturedQuery::ConfirmFile
+        ) {
+            return self.cross_file_query(request);
+        }
+        let project = |capture: &FileCapture, label: &str| {
             let index = capture.structure();
             let caller = index
                 .resolve(None, &s.symbol)
@@ -129,36 +169,10 @@ impl FunctionHistory {
                         .ok_or_else(|| {
                             conflict("Destination is not a candidate of the captured call")
                         })?;
-                    let doc = capture
-                        .snapshot
-                        .file(&s.file)
-                        .ok_or_else(|| conflict("Captured source file differs"))?;
-                    let source = &target.source;
-                    let data = super::window(
-                        &capture.snapshot,
-                        doc,
-                        &WindowQuery {
-                            line_start: Some(source.line),
-                            line_count: Some(96.min(source.end_line - source.line + 1)),
-                            outline_count: Some(1),
-                            reflow: Some(true),
-                            ..WindowQuery::default()
-                        },
-                    )?;
-                    let origin = super::window(
-                        &capture.snapshot,
-                        doc,
-                        &WindowQuery {
-                            line_start: Some(source.line),
-                            line_count: Some(1),
-                            outline_count: Some(1),
-                            ..WindowQuery::default()
-                        },
-                    )?;
-                    Ok(
-                        json!({"invocation":invocation,"frame":{"snapshot":s.snapshot,"symbol":target,"captured":{"owner":s.owner,"label":label},"window":data,"origin":origin["lines"][0]}}),
-                    )
+                    let frame = destination_frame(capture, target, &s.owner, label)?;
+                    Ok(json!({"invocation":invocation,"frame":frame}))
                 }
+                _ => Err(invalid("Expected a captured-file query")),
             }
         };
         self.with_captured_file(s, project)
@@ -167,7 +181,7 @@ impl FunctionHistory {
     pub(super) fn with_captured_file<T>(
         &self,
         s: &FrozenSource,
-        project: impl FnOnce(&Capture, &str) -> Result<T, CompanionError>,
+        project: impl FnOnce(&FileCapture, &str) -> Result<T, CompanionError>,
     ) -> Result<T, CompanionError> {
         if ![&s.snapshot, &s.file, &s.version, &s.symbol]
             .into_iter()
@@ -195,24 +209,16 @@ impl FunctionHistory {
                     .versions
                     .get(*index)
                     .ok_or_else(|| conflict("Captured history version is unavailable"))?;
-                if version.snapshot != s.snapshot {
-                    return Err(conflict("Captured history observation differs"));
-                }
                 let restored;
-                let capture = if let Some(capture) = session
-                    .selected
-                    .as_ref()
-                    .filter(|c| c.snapshot.id().as_str() == s.snapshot)
-                {
-                    capture
-                } else {
+                let capture = if let Some(extra) = session.files.find(Some(&s.owner), &s.snapshot) {
+                    extra
+                } else if version.snapshot == s.snapshot {
                     restored = self.restore(session, *index)?;
-                    &restored
+                    &restored.file
+                } else {
+                    return Err(conflict("Captured history observation differs"));
                 };
-                if capture.snapshot.id().as_str() != s.snapshot
-                    || capture.symbol.source.file != s.file
-                    || capture.symbol.source.version != s.version
-                {
+                if !capture.matches(&s.snapshot, &s.file, &s.version) {
                     return Err(conflict("Captured history source differs"));
                 }
                 project(capture, &version.commit)
@@ -220,7 +226,11 @@ impl FunctionHistory {
         }
     }
 }
-fn invocation(index: &Structure, call: &str, caller: &str) -> Result<Invocation, CompanionError> {
+pub(super) fn invocation(
+    index: &Structure,
+    call: &str,
+    caller: &str,
+) -> Result<Invocation, CompanionError> {
     let invocation = index
         .call(call)
         .ok_or_else(|| conflict("Captured call is unavailable"))?
@@ -229,4 +239,34 @@ fn invocation(index: &Structure, call: &str, caller: &str) -> Result<Invocation,
         return Err(conflict("Captured call belongs to another declaration"));
     }
     Ok(invocation)
+}
+
+pub(super) fn destination_frame(
+    capture: &FileCapture,
+    target: &Symbol,
+    owner: &CapturedOwner,
+    label: &str,
+) -> Result<Value, CompanionError> {
+    let source = &target.source;
+    let doc = capture.document();
+    let query = WindowQuery {
+        line_start: Some(source.line),
+        line_count: Some(96.min(source.end_line - source.line + 1)),
+        outline_count: Some(1),
+        reflow: Some(true),
+        ..WindowQuery::default()
+    };
+    let data = window(&capture.snapshot, doc, &query)?;
+    let origin = window(
+        &capture.snapshot,
+        doc,
+        &WindowQuery {
+            line_count: Some(1),
+            reflow: None,
+            ..query
+        },
+    )?;
+    Ok(
+        json!({"snapshot":capture.snapshot.id().as_str(),"symbol":target,"captured":{"owner":owner,"label":label},"window":data,"origin":origin["lines"][0]}),
+    )
 }

@@ -21,6 +21,8 @@ For people extending Vizzi or investigating its implementation. The
   [architecture and validation](../visual/FUNCTION_COMPARISON_TECH.md)
 - [Captured-call behaviour](../visual/CAPTURED_CALLS_PRODUCT.md) and
   [architecture and validation](../visual/CAPTURED_CALLS_TECH.md)
+- Cross-file historical calls [behaviour](../visual/CROSS_FILE_CALLS_PRODUCT.md)
+  and [architecture](../visual/CROSS_FILE_CALLS_TECH.md)
 - [Language-server integration](../visual/LANGUAGE_SERVERS_TECH.md) and
   [detailed Rust call-resolution rules](call-resolution.md)
 - [Launch configuration and editor sharing behaviour](../configuration/PRODUCT.md),
