@@ -24,6 +24,7 @@ const el=id=>document.getElementById(id),node=(tag,text='')=>{const n=document.c
 const error=createMessage(el('visual-error'),{label:'Dismiss workspace error'}),notice=createMessage(el('visual-notice'),{label:'Dismiss workspace notice'});
 let definitionProvider=false;const definitionCapabilities=transport('/api/structure').then(c=>{definitionProvider=c.definition_provider===true;}).catch(()=>{});
 let model,currentSnapshot,taskControls,board,editorName='editor',busy=false,saveTimer,paletteTicket=0,jobs=Promise.resolve(),demoOpened=false,livePendingTimer;
+let revisionPicker,lineagePicker,crossFilePicker;
 const mounted=new Map();
 const returnPending=r=>r.liveReturn==='pending';
 const SECTION_ROWS=96,SECTION_LIMIT=4,SECTION_EDGE=240;
@@ -32,7 +33,15 @@ const outlines=installModuleOutlines(el('module-outlines'),()=>model?model.visib
 let showModuleOutlines=false;try{showModuleOutlines=localStorage.getItem('vizzi.visual.module-outlines')==='true';}catch{}
 el('module-outlines-setting').checked=showModuleOutlines;outlines.setEnabled(showModuleOutlines);el('module-outlines-setting').onchange=()=>{showModuleOutlines=el('module-outlines-setting').checked;outlines.setEnabled(showModuleOutlines);try{localStorage.setItem('vizzi.visual.module-outlines',String(showModuleOutlines));}catch{notice.show('The module outline preference could not be saved.');}};
 const callMenu=createCallMenu(el('call-action-menu'));
-function inlineAction(id,action,element,direct,keyboard){if(!model.navigable(id)||mounted.get(id)?.historyLoading)return;editorCalls.manual();callMenu.hide();const open=()=>{if(mounted.has(id)&&model.navigable(id))void chooseCall(id,{...action,lookup:true});};if(direct)open();else callMenu.show(element,action.name,[{label:frozenSource(model.view(id))?'Open in captured file':'Open definition',hint:'Ctrl/⌘-click',run:open}],keyboard);}
+function inlineAction(id,action,element,direct,keyboard){
+ if(!model.navigable(id)||mounted.get(id)?.historyLoading)return;
+ editorCalls.manual();callMenu.hide();
+ const view=model.view(id),open=()=>{if(mounted.has(id)&&model.navigable(id))void chooseCall(id,{...action,lookup:true},element);};
+ if(direct){open();return;}
+ const actions=[{label:frozenSource(view)?'Open in captured file':'Open definition',hint:'Ctrl/⌘-click',run:open}];
+ if(canLookInFile(view,action))actions.push({label:'Look in another file…',run:()=>void chooseCapturedCall(id,action,{anotherFile:true,opener:element})});
+ callMenu.show(element,action.name,actions,keyboard);
+}
 function inlineAvailability(code,id){for(const name of code.querySelectorAll('.code-call')){name.setAttribute('aria-disabled',String(!model.navigable(id)||Boolean(mounted.get(id)?.historyLoading)));name.tabIndex=model.navigable(id)&&!mounted.get(id)?.historyLoading?0:-1;if(frozenSource(model.view(id)))name.title='Captured-file call · Ctrl/⌘-click opens a same-file destination';}}
 installAppearance(el('theme'));
 let smartReflow=true;try{smartReflow=localStorage.getItem('vizzi.visual.code-layout')!=='original';}catch{}
@@ -43,7 +52,9 @@ const post=(path,body,signal)=>transport(path,{method:'POST',headers:{'Content-T
 const definitionWarmup=new DefinitionWarmup((snapshot,call,path)=>post('/api/call-definition',{snapshot,call,path}));
 function refreshCapture(){
  const views=model.views.filter(v=>v.mode==='live');const key=JSON.stringify([views.map(v=>[v.id,v.symbol.id,v.mode,mounted.get(v.id)?.sourceTicket,v.reading]),model.links.map(l=>[l.id,l.state])]);
- return {key,body:{views:views.map(v=>{const r=mounted.get(v.id),context=r?.sourcePane.readingContext(),reading=v.reading,a=reading.anchor;return {id:v.id,tracking:v.symbol.tracking??null,symbol:v.symbol.id,file:v.symbol.source.file,context:v.symbol.source.context,capture:v.symbol.origin?.capture??null,version:r?.lines?.length?v.symbol.source.version:'0'.repeat(64),area:v.area,section_offset:reading.section-v.symbol.source.line,anchor:a?{offset:a.line-v.symbol.source.line,byte:a.byte,text:context?.reading.anchor?.line===a.line?context.text:''}:null};}),links:model.links.map(l=>({id:l.id,from:l.from,to:l.to,spelling:l.spelling,kind:l.kind}))}};
+ return {key,body:{views:views.map(v=>{const r=mounted.get(v.id),context=r?.sourcePane.readingContext(),reading=v.reading,a=reading.anchor;
+  const tracked=v.history?.lineage?.length?v.history.base.symbol:v.symbol;
+  return {id:v.id,tracking:tracked.tracking??null,symbol:tracked.id,file:tracked.source.file,context:tracked.source.context,capture:tracked.origin?.capture??null,version:r?.lines?.length?v.symbol.source.version:'0'.repeat(64),area:v.area,section_offset:reading.section-v.symbol.source.line,anchor:a?{offset:a.line-v.symbol.source.line,byte:a.byte,text:context?.reading.anchor?.line===a.line?context.text:''}:null};}),links:model.links.map(l=>({id:l.id,from:l.from,to:l.to,spelling:l.spelling,kind:l.kind}))}};
 }
 async function requestLiveRefresh(body,signal){
  const data=await post('/api/visual/refresh',body,signal);
@@ -84,7 +95,7 @@ function applyLive(data){
    if(!retargetCalls(r.code,before,r.actions))r.sourcePane.rerender();
   }
   const callsChanged=JSON.stringify(r.sites)!==JSON.stringify(update.calls.items);r.sites=update.calls.items;r.nextCalls=update.calls.next;r.matching=update.calls.matching;r.callsReady=true;if(publicationChanged||update.window)r.popup.hidden=true;if(callsChanged)renderCalls(v.id);
-  r.element.dataset.name=v.symbol.name;r.element.setAttribute('aria-label',`${v.symbol.name} bubble`);r.element.querySelector('.fragment-heading strong').textContent=[...v.symbol.parents,v.symbol.name].join('::');r.element.querySelector('.fragment-heading small').textContent=`${v.symbol.origin?originLabel(v.symbol.origin)+' · ':''}${v.symbol.source.path}:${v.symbol.source.line}`;
+  updateFragmentHeading(r,v);
   sourceStatus(r,p.reset?'Live · reading reset':'Live');recordReading(r);void prepareDefinitions(v.id);
   if(r.restoreAnchor)void extendSource(r,false);
  }
@@ -122,9 +133,21 @@ const prepareEditorCall=createCallPreparation({read:()=>model,
 const editorCalls=installWorkspaceDelivery({mode:'call',
  ready:action=>Boolean(size().w>=1&&size().h>=1&&(action.kind==='reveal'||model&&!model.stale)),
  prepare:(action,context)=>action.kind==='reveal'?Promise.resolve({commit(){}}):prepareEditorCall(action,context),failed:fail,
- changed:pending=>{if(pending){callMenu.hide();hideDestinations();window.getSelection()?.removeAllRanges();for(const r of mounted.values()){r.navigation=(r.navigation??0)+1;r.historyTicket=(r.historyTicket??0)+1;r.historyController?.abort();if(r.historyLoading)r.comparing=r.historyLoading=r.loading=false;r.resolving=false;updateFragmentStatus(r);}geometry();live.resume();}}
+ changed:pending=>{if(pending){closeRevisionPicker();closeLineagePicker();closeCrossFilePicker();callMenu.hide();hideDestinations();window.getSelection()?.removeAllRanges();for(const r of mounted.values()){r.navigation=(r.navigation??0)+1;r.historyTicket=(r.historyTicket??0)+1;r.historyController?.abort();if(r.historyLoading)r.comparing=r.historyLoading=r.loading=false;r.resolving=false;updateFragmentStatus(r);}geometry();live.resume();}}
 });
 document.addEventListener('selectionchange',()=>live.resume());
+function qualifiedName(symbol){return [...symbol.parents,symbol.name].join('::');}
+function updateFragmentHeading(record,view){
+ const {element,referenceActions,code}=record,{symbol}=view;
+ element.dataset.name=symbol.name;
+ element.setAttribute('aria-label',`${symbol.name} bubble`);
+ referenceActions.setAttribute('aria-label',`Actions for ${symbol.name} bubble`);
+ code.setAttribute('aria-label',`${symbol.name} captured code`);
+ const heading=element.querySelector('.fragment-heading');
+ heading.title=qualifiedName(symbol);
+ heading.querySelector('strong').textContent=heading.title;
+ heading.querySelector('small').textContent=`${symbol.origin?originLabel(symbol.origin)+' · ':''}${symbol.source.path}:${symbol.source.line}`;
+}
 function updateFragmentStatus(r){
  const v=model.view(r.id);
  if(r.historyLoading)r.state.textContent=r.comparing?'Loading comparison…':'Loading function history…';
@@ -141,23 +164,175 @@ function updateFragmentStatus(r){
  else if(r.awaitingLive&&v.mode==='live')r.state.textContent='Update pending';
  else r.state.textContent=v.state==='unresolved'?'Function unavailable — earlier version':v.mode==='pinned'?'Pinned version':r.sourceStatus??'Live';
 }
-async function changeHistory(id,direction){
- const r=mounted.get(id),workspace=model,v=model.view(id);if(!r||r.loading||returnPending(r)||r.sourcePane.selected())return;
- if(!v.history&&(!model.usable(id)||v.symbol.origin))return;
+function currentHistorySource(v){
+ const {file,version}=v.symbol.source;
+ return {snapshot:v.snapshot,file,version,tracking:v.symbol.tracking};
+}
+
+function historySource(v){
+ const {file,version}=v.symbol.source;
+ return {token:v.history.token,index:v.history.index,snapshot:v.snapshot,file,version};
+}
+
+function canFindEarlier(v){return Boolean(v.history&&!v.comparison&&v.mode==='pinned');}
+
+function closeLineagePicker(restoreFocus=false){
+ const picker=lineagePicker;
+ lineagePicker=undefined;
+ picker?.controller.abort();
+ const dialog=el('lineage-dialog');
+ if(dialog.open)dialog.close();
+ if(restoreFocus&&picker?.trigger.isConnected)picker.trigger.focus({preventScroll:true});
+}
+
+function lineageStatus(message){
+ const status=el('lineage-status');status.textContent=message;status.hidden=!message;
+}
+
+function lineageError(error){
+ const message=el('lineage-error');message.textContent=error.message;message.hidden=false;
+}
+
+async function openLineagePicker(id,trigger){
+ const view=model.view(id);
+ if(!canFindEarlier(view)||mounted.get(id)?.loading)return;
+ editorCalls.manual();callMenu.hide();hideDestinations();
+ const controller=new AbortController(),source=historySource(view),picker={id,trigger,controller,source};
+ lineagePicker=picker;
+ const current=el('lineage-current'),candidate=el('lineage-candidate'),accept=el('accept-lineage');
+ current.textContent=`${qualifiedName(view.symbol)} · ${view.symbol.source.path}:${view.symbol.source.line} · ${view.history.commit}`;
+ candidate.hidden=true;accept.disabled=true;el('lineage-error').hidden=true;
+ lineageStatus('Checking the immediate parent…');
+ el('lineage-dialog').showModal();
+ try{
+  const result=await post('/api/function-history/lineage',{kind:'preview',source},controller.signal);
+  if(lineagePicker!==picker)return;
+  candidate.textContent=`${qualifiedName(result.symbol)} · ${result.symbol.source.path}:${result.symbol.source.line} · ${result.commit}`;
+  candidate.hidden=false;
+  picker.selection={kind:'accept',source,snapshot:result.snapshot,target:result.symbol.id};
+  accept.disabled=false;
+  lineageStatus('The declaration text matches apart from its name, and the enclosing scope matches.');
+ }catch(error){
+  if(lineagePicker===picker&&error.name!=='AbortError'){lineageStatus('');lineageError(error);}
+ }
+}
+el('cancel-lineage').onclick=()=>closeLineagePicker(true);
+el('lineage-dialog').addEventListener('cancel',event=>{event.preventDefault();closeLineagePicker(true);});
+el('lineage-form').onsubmit=async event=>{
+ event.preventDefault();
+ const picker=lineagePicker,accept=el('accept-lineage');
+ if(!picker?.selection||accept.disabled)return;
+ accept.disabled=true;el('lineage-error').hidden=true;
+ lineageStatus('Preparing the earlier declaration…');
+ const accepted=await changeHistory(picker.id,0,{lineage:picker.selection,signal:picker.controller.signal,failed:lineageError});
+ if(lineagePicker!==picker)return;
+ if(accepted){closeLineagePicker(true);return;}
+ lineageStatus('');accept.disabled=false;
+};
+
+function canChooseRevision(v){
+ return !v.symbol.origin&&v.symbol.kind==='function'&&v.symbol.tracking&&
+  (model.usable(v.id)||v.mode==='pinned'&&v.state==='current'||frozenSource(v));
+}
+
+function openRevisionPicker(id,trigger){
+ const v=model.view(id),r=mounted.get(id);
+ if(!r||r.loading||returnPending(r)||!canChooseRevision(v))return;
+ editorCalls.manual();callMenu.hide();hideDestinations();r.popup.hidden=true;
+ revisionPicker={id,trigger,controller:new AbortController()};
+ el('revision-input').value='';
+ el('revision-error').hidden=true;
+ el('revision-status').textContent='';
+ el('open-revision').disabled=false;
+ el('revision-dialog').showModal();
+}
+
+function closeRevisionPicker(restoreFocus=false){
+ const picker=revisionPicker;
+ picker?.controller.abort();
+ revisionPicker=undefined;
+ const dialog=el('revision-dialog');
+ if(dialog.open)dialog.close();
+ if(restoreFocus&&picker){
+  const button=picker.trigger.disabled||picker.trigger.hidden?mounted.get(picker.id)?.chooseRevision:picker.trigger;
+  button?.focus({preventScroll:true});
+ }
+}
+
+el('cancel-revision').onclick=()=>closeRevisionPicker(true);
+el('revision-dialog').addEventListener('cancel',event=>{event.preventDefault();closeRevisionPicker(true);});
+el('revision-form').onsubmit=async event=>{
+ event.preventDefault();
+ const picker=revisionPicker,submit=el('open-revision'),status=el('revision-status'),error=el('revision-error');
+ if(!picker||submit.disabled)return;
+ submit.disabled=true;
+ error.hidden=true;
+ status.textContent='Reading revision…';
+ const selected=await changeHistory(picker.id,0,{
+  revision:el('revision-input').value,
+  signal:picker.controller.signal,
+  failed:failure=>{error.hidden=false;error.textContent=failure.message;},
+ });
+ if(revisionPicker!==picker)return;
+ if(selected){closeRevisionPicker(true);return;}
+ status.textContent='';
+ submit.disabled=false;
+ el('revision-input').focus();
+};
+
+async function changeHistory(id,direction,selection){
+ const r=mounted.get(id),workspace=model;
+ if(!r||r.loading||returnPending(r))return;
+ const v=model.view(id);
+ if(r.sourcePane.selected()){
+  selection?.failed(new Error('Clear the source selection before changing revision.'));
+  return;
+ }
+ if(selection&&!(selection.lineage?canFindEarlier(v):canChooseRevision(v))){
+  selection.failed(new Error('Wait for the function source before choosing a revision.'));
+  return;
+ }
+ if(!selection&&!v.history&&(!model.usable(id)||v.symbol.origin))return;
  editorCalls.manual();callMenu.hide();hideDestinations();r.popup.hidden=true;r.navigation=(r.navigation??0)+1;r.resolving=false;r.warming=false;
  const binding=JSON.stringify([v.snapshot,v.symbol.id,v.history]),ticket=r.historyTicket=(r.historyTicket??0)+1,controller=new AbortController();r.historyController=controller;r.historyLoading=true;r.loading=true;geometry();
- const verify=()=>{if(model!==workspace||mounted.get(id)!==r||r.historyTicket!==ticket||JSON.stringify([model.view(id).snapshot,model.view(id).symbol.id,model.view(id).history])!==binding)throw new DOMException('Function history superseded','AbortError');if(r.sourcePane.selected())throw new Error('Clear the source selection before changing revision.');};
+ const signal=selection?AbortSignal.any([controller.signal,selection.signal]):controller.signal;
+ const verify=()=>{signal.throwIfAborted();if(model!==workspace||mounted.get(id)!==r||r.historyTicket!==ticket||JSON.stringify([model.view(id).snapshot,model.view(id).symbol.id,model.view(id).history])!==binding)throw new DOMException('Function history superseded','AbortError');if(r.sourcePane.selected())throw new Error('Clear the source selection before changing revision.');};
+ let finished=false;
+ const finish=()=>{
+  if(finished)return;
+  finished=true;
+  if(mounted.get(id)===r&&r.historyTicket===ticket){r.historyLoading=false;r.loading=false;geometry();live.resume();}
+ };
+ signal.addEventListener('abort',finish,{once:true});
  try{
-  const revision=v.history?await post('/api/function-history/step',{token:v.history.token,index:v.history.index+direction},controller.signal):await post('/api/function-history',{snapshot:v.snapshot,file:v.symbol.source.file,version:v.symbol.source.version,tracking:v.symbol.tracking},controller.signal);
+  let revision;
+  if(selection?.lineage){
+   if(JSON.stringify(historySource(v))!==JSON.stringify(selection.lineage.source))throw new Error('The selected revision changed. Open the earlier declaration finder again.');
+   revision=await post('/api/function-history/lineage',selection.lineage,signal);
+  }else if(selection){
+   const captured=frozenSource(v);
+   const origin=captured?{kind:'captured',source:captured}:{kind:v.mode==='pinned'?'pinned':'current',source:currentHistorySource(v)};
+   revision=await post('/api/function-history/select',{revision:selection.revision,origin},signal);
+  }else if(v.history){
+   revision=await post('/api/function-history/step',{token:v.history.token,index:v.history.index+direction},signal);
+  }else{
+   revision=await post('/api/function-history',currentHistorySource(v),signal);
+  }
   verify();const planned=Workspace.restore(model.serialize(),model.snapshot);planned.showHistory(id,revision);const next=planned.view(id),s=next.symbol.source,start=next.reading.section;
   const query=new URLSearchParams({token:revision.token,snapshot:revision.snapshot,file:s.file,version:s.version,line_start:String(start),line_count:String(Math.min(96,s.end_line-start+1)),outline_count:'1',reflow:'true'});
-  const [data,actions]=await Promise.all([start===s.line?revision.window:transport('/api/function-history/window?'+query,{signal:controller.signal}),capturedActions(next,start,Math.min(96,s.end_line-start+1),controller.signal)]);verify();
+  const [data,actions]=await Promise.all([start===s.line?revision.window:transport('/api/function-history/window?'+query,{signal}),capturedActions(next,start,Math.min(96,s.end_line-start+1),signal)]);verify();
   if(data?.snapshot!==revision.snapshot||data.file!==s.file||data.version!==s.version||!Array.isArray(data.lines)||!data.lines.length||data.lines.length>96||data.lines[0].number!==start||revision.origin?.number!==s.line||revision.origin.left||revision.origin.column!==0)throw new Error('Historical source differs from the requested function');
   r.sourceTicket=(r.sourceTicket??0)+1;model.showHistory(id,revision);r.liveReturn=null;r.historyLoading=false;r.loading=false;r.sites=[];r.callsReady=false;r.actions=[];
-  r.element.querySelector('.fragment-heading small').textContent=`${s.path}:${s.line}`;
+  updateFragmentHeading(r,model.view(id));
   applyPreparedSource(id,{data,actions,start,margin:functionIndent(revision.origin)});save();
- }catch(e){if(e.name!=='AbortError'&&mounted.get(id)===r&&model===workspace&&r.historyTicket===ticket)fail(e);}
- finally{if(mounted.get(id)===r&&r.historyTicket===ticket){r.historyLoading=false;r.loading=false;geometry();live.resume();}}
+  if(selection&&!selection.lineage){
+   void post('/api/function-history/confirm',{token:revision.token}).catch(error=>{
+    if(model===workspace&&mounted.get(id)===r&&model.view(id).history?.token===revision.token)notice.show(error.message);
+   });
+  }
+  return true;
+ }catch(e){if(!signal.aborted&&e.name!=='AbortError'&&mounted.get(id)===r&&model===workspace&&r.historyTicket===ticket)(selection?.failed??fail)(e);}
+ finally{signal.removeEventListener('abort',finish);finish();}
 }
 function returnHistoryLive(id){
  const r=mounted.get(id);if(returnPending(r))return;
@@ -173,29 +348,172 @@ async function capturedActions(v,start,count,signal){
  const actions=[];let offset=0;
  try{for(let page=0;page<16;page++){const data=await post('/api/captured-functions',{source:frozenSource(v),query:{kind:'actions',line_start:start,line_count:count,offset}},signal);if(data.snapshot!==v.snapshot||!Array.isArray(data.items)||data.items.length>256||!Number.isSafeInteger(data.matching)||data.matching>4096)throw new Error('Invalid captured call actions');actions.push(...data.items);if(data.next===null)return actions;if(!Number.isSafeInteger(data.next)||data.next<=offset)throw new Error('Invalid captured call continuation');offset=data.next;}throw new Error('Captured call-action allowance exceeded');}catch(error){if(signal?.aborted)throw error;return [];}
 }
-async function chooseCapturedCall(id,action){
- const r=mounted.get(id),workspace=model,source=frozenSource(model.view(id));if(!r||!source||!model.navigable(id)||r.historyLoading)return;
- editorCalls.manual();callMenu.hide();hideDestinations();r.popup.hidden=true;const epoch=r.navigation=(r.navigation??0)+1,signature=JSON.stringify(source),controller=new AbortController();r.historyController=controller;r.resolving=r.resolvingCaptured=true;updateFragmentStatus(r);
- const verify=()=>{if(model!==workspace||mounted.get(id)!==r||r.navigation!==epoch||!model.navigable(id)||JSON.stringify(frozenSource(model.view(id)))!==signature)throw new DOMException('Captured navigation superseded','AbortError');};
- const open=async(site,target)=>{
-  verify();if(r.sourcePane.selected())return;r.resolving=r.resolvingCaptured=true;updateFragmentStatus(r);
-  try{
-   const result=await post('/api/captured-functions',{source,query:{kind:'open',call:site.id,target:target.id}},controller.signal);verify();
-   const planned=Workspace.restore(model.serialize(),model.snapshot),next=planned.followCaptured(id,result.invocation,result.frame),view=planned.view(next),s=view.symbol.source,start=view.reading.section,query=new URLSearchParams({...sourceBinding(view),snapshot:view.snapshot,file:s.file,version:s.version,line_start:String(start),line_count:String(Math.min(96,s.end_line-start+1)),outline_count:'1',reflow:'true'});
-   const [data,actions]=await Promise.all([start===result.frame.window.line_start?result.frame.window:transport(sourceEndpointForView(view)+'?'+query,{signal:controller.signal}),capturedActions(view,start,Math.min(96,s.end_line-start+1),controller.signal)]);verify();
-   if(r.sourcePane.selected())throw new DOMException('Captured navigation deferred for selection','AbortError');
-   const prepared=preparedComparison(view,{window:data,origin:result.frame.origin});prepared.actions=actions;
-   const destination=model.followCaptured(id,result.invocation,result.frame);hideDestinations();mount(destination,prepared);focus([id,destination]);save();
-  }catch(error){if(error.name!=='AbortError'&&model===workspace&&mounted.get(id)===r&&r.navigation===epoch)fail(error);}
-  finally{if(mounted.get(id)===r&&r.navigation===epoch){r.resolving=false;updateFragmentStatus(r);live.resume();}}
- };
+function canLookInFile(view,site){
+ return Boolean(site.name&&/^(?:[0-9a-f]{40}|[0-9a-f]{64})$/.test(frozenLabel(view)));
+}
+
+function closeCrossFilePicker(restoreFocus=false){
+ const picker=crossFilePicker;
+ crossFilePicker=undefined;
+ picker?.request?.abort();
+ const dialog=el('cross-file-dialog');
+ if(dialog.open)dialog.close();
+ if(restoreFocus)picker?.restoreFocus();
+}
+
+function openCrossFilePicker({commit,site,path,signal,request,open,restoreFocus}){
+ closeCrossFilePicker();
+ const picker={commit,path,signal,request:null,send:request,open,restoreFocus};
+ crossFilePicker=picker;
+ el('cross-file-path').value='';
+ el('cross-file-commit').textContent=`${site.spelling??site.name} · ${commit}`;
+ el('cross-file-results').replaceChildren();
+ el('cross-file-error').hidden=true;
+ el('cross-file-dialog').showModal();
+ signal.addEventListener('abort',()=>{if(crossFilePicker===picker)closeCrossFilePicker();},{once:true});
+ void browseCapturedDirectory(path.split('/').slice(0,-1).join('/'));
+}
+
+async function runCrossFileOperation(message,operation,render){
+ const picker=crossFilePicker;
+ if(!picker)return;
+ picker.request?.abort();
+ const task=new AbortController();picker.request=task;
+ const signal=AbortSignal.any([picker.signal,task.signal]);
+ const error=el('cross-file-error'),status=el('cross-file-status');
+ error.hidden=true;status.textContent=message;
  try{
-  const result=await post('/api/captured-functions',{source,query:{kind:'definition',call:action.id}},controller.signal);verify();
-  const site=result.invocation;if(result.snapshot!==source.snapshot||site?.owner!==source.symbol||site.id!==action.id)throw new Error('Captured definition differs from the visible caller');
-  const choice={site,attempted:!result.complete&&!site.binding,semantic:false,note:result.detail,captured:{open:target=>void open(site,target)}};const target=directDestination(choice);
-  if(target)await open(site,target);else showDestinations(id,choice);
- }catch(error){if(error.name!=='AbortError'&&model===workspace&&mounted.get(id)===r&&r.navigation===epoch)fail(error);}
- finally{if(mounted.get(id)===r&&r.navigation===epoch){r.resolving=false;updateFragmentStatus(r);live.resume();}}
+  const result=await operation(picker,signal);
+  signal.throwIfAborted();
+  render(result,picker);
+ }catch(failure){
+  if(!signal.aborted&&crossFilePicker===picker&&failure.name!=='AbortError'){
+   error.textContent=failure.message;error.hidden=false;
+  }
+ }finally{
+  if(crossFilePicker===picker&&picker.request===task&&status.textContent===message)status.textContent='';
+ }
+}
+
+function browseCapturedDirectory(directory,offset=0){
+ const results=el('cross-file-results');
+ const restoreFocus=results.contains(document.activeElement);
+ results.replaceChildren();
+ const up=button('Up one directory',null,()=>void browseCapturedDirectory(directory.split('/').slice(0,-1).join('/')));
+ up.hidden=!directory;results.append(up);
+ const root=button('Repository root',null,()=>void browseCapturedDirectory(''));
+ root.hidden=!directory;results.append(root);
+ return runCrossFileOperation('Reading files at this commit…',
+  (picker,signal)=>picker.send({kind:'files',directory,offset},signal),
+  (data,picker)=>{
+   if(data.commit!==picker.commit||data.directory!==directory||!Array.isArray(data.items)||data.items.length>24)throw new Error('Directory listing differs from the captured commit');
+   el('cross-file-status').textContent=directory?`Files in ${directory}`:'Files at repository root';
+   for(const item of data.items){
+    if(item.path===picker.path)continue;
+    const name=item.path.split('/').at(-1)+(item.directory?'/':'');
+    const label=item.directory?`Browse ${item.path}`:`Find candidates in ${item.path}`;
+    results.append(button(name,label,()=>{
+     if(item.directory)void browseCapturedDirectory(item.path);
+     else{el('cross-file-path').value=item.path;void findCapturedCandidates(item.path);}
+    }));
+   }
+   if(Number.isSafeInteger(data.next)&&data.next>offset)results.append(button('More files',null,()=>void browseCapturedDirectory(directory,data.next)));
+   if(restoreFocus)(results.querySelector('button:not([hidden])')??el('cross-file-path')).focus();
+  });
+}
+
+function findCapturedCandidates(path,offset=0){
+ const results=el('cross-file-results'),restoreFocus=results.contains(document.activeElement);
+ results.replaceChildren(button('Browse repository files',null,()=>void browseCapturedDirectory('')));
+ return runCrossFileOperation('Reading declarations in the selected file…',
+  (picker,signal)=>picker.send({kind:'candidates',path,offset},signal),
+  (data,picker)=>{
+   if(data.commit!==picker.commit||data.path!==path||!Array.isArray(data.items)||data.items.length>8)throw new Error('File candidates differ from the captured commit');
+   const partial=data.coverage?.partial_files||data.coverage?.omitted_symbols;
+   el('cross-file-status').textContent=(data.matching?`${data.matching} name ${data.matching===1?'candidate':'candidates'} in ${path}.`:`No name candidates in ${path}.`)+(partial?' Declaration coverage is partial.':'');
+   let firstChoice;
+   for(const target of data.items){
+    if(target.source?.path!==path)throw new Error('Candidate is outside the selected file');
+    const label=[...target.parents,target.name].join('::');
+    const choice=button(label,`Open candidate ${label}`,()=>{
+     void runCrossFileOperation('Preparing captured source…',
+      (pending,signal)=>pending.open({kind:'open_file',path,snapshot:data.snapshot,target:target.id},signal),
+      opened=>{if(opened)closeCrossFilePicker();});
+    });
+    choice.append(node('small',`${path}:${target.source.line} · Name candidate`));results.append(choice);
+    firstChoice??=choice;
+   }
+   if(Number.isSafeInteger(data.next)&&data.next>offset)results.append(button('More candidates',null,()=>void findCapturedCandidates(path,data.next)));
+   if(restoreFocus)(firstChoice??el('cross-file-path')).focus();
+  });
+}
+el('close-cross-file').onclick=()=>closeCrossFilePicker(true);
+el('cross-file-dialog').addEventListener('cancel',event=>{event.preventDefault();closeCrossFilePicker(true);});
+el('cross-file-form').onsubmit=event=>{event.preventDefault();void findCapturedCandidates(el('cross-file-path').value);};
+
+async function chooseCapturedCall(id,action,{anotherFile=false,opener}={}){
+ const r=mounted.get(id),workspace=model,view=model.view(id),source=frozenSource(view);
+ if(!r||!source||!model.navigable(id)||r.historyLoading)return;
+ editorCalls.manual();callMenu.hide();hideDestinations();r.popup.hidden=true;
+ r.historyController?.abort();
+ const epoch=r.navigation=(r.navigation??0)+1,signature=JSON.stringify(source),controller=new AbortController();
+ r.historyController=controller;
+ const current=()=>model===workspace&&mounted.get(id)===r&&r.navigation===epoch;
+ const verify=()=>{
+  controller.signal.throwIfAborted();
+  if(!current()||!model.navigable(id)||JSON.stringify(frozenSource(model.view(id)))!==signature)throw new DOMException('Captured navigation superseded','AbortError');
+ };
+ const send=async(query,signal)=>{
+  verify();signal.throwIfAborted();
+  const result=await post('/api/captured-functions',{source,query:{...query,call:action.id}},signal);
+  verify();signal.throwIfAborted();return result;
+ };
+ const open=async(query,signal)=>{
+  if(r.sourcePane.selected())throw new Error('Clear the source selection before following the call.');
+  r.resolving=r.resolvingCaptured=true;updateFragmentStatus(r);
+  try{
+   const result=await send(query,signal),frame=result.frame;
+   if(result.invocation?.id!==action.id||frame?.symbol?.id!==query.target||
+    (query.kind==='open_file'&&(frame.cross_file!==true||typeof result.prepared!=='boolean'||frame.snapshot!==query.snapshot||frame.symbol.source.path!==query.path)))throw new Error('Captured destination differs from the selected candidate');
+   const planned=Workspace.restore(model.serialize(),model.snapshot),next=planned.followCaptured(id,result.invocation,frame),view=planned.view(next),s=view.symbol.source,start=view.reading.section;
+   const count=Math.min(96,s.end_line-start+1),params=new URLSearchParams({...sourceBinding(view),snapshot:view.snapshot,file:s.file,version:s.version,line_start:String(start),line_count:String(count),outline_count:'1',reflow:'true'});
+   const [data,actions]=await Promise.all([start===frame.window.line_start?frame.window:transport(sourceEndpointForView(view)+'?'+params,{signal}),capturedActions(view,start,count,signal)]);
+   verify();signal.throwIfAborted();
+   const prepared=preparedComparison(view,{window:data,origin:frame.origin});prepared.actions=actions;
+   if(result.prepared===true){
+    await post('/api/captured-functions',{source:frozenSource(view),query:{kind:'confirm_file'}},signal);
+    verify();signal.throwIfAborted();
+   }
+   if(r.sourcePane.selected())throw new DOMException('Captured navigation deferred for selection','AbortError');
+   const destination=model.followCaptured(id,result.invocation,frame);
+   hideDestinations();mount(destination,prepared);focus([id,destination]);save();
+   return true;
+  }finally{if(current()){r.resolving=false;updateFragmentStatus(r);live.resume();}}
+ };
+ const restoreFocus=()=>{
+  if(mounted.get(id)!==r)return;
+  const control=opener?.isConnected?opener:r.callsButton;
+  control.focus({preventScroll:true});
+ };
+ const browse=site=>openCrossFilePicker({commit:frozenLabel(view),site,path:view.symbol.source.path,signal:controller.signal,request:send,open,restoreFocus});
+ const report=error=>{if(error.name!=='AbortError'&&current())fail(error);};
+ if(anotherFile){
+  r.resolving=false;updateFragmentStatus(r);
+  if(canLookInFile(view,action))browse(action);
+  return;
+ }
+ r.resolving=r.resolvingCaptured=true;updateFragmentStatus(r);
+ try{
+  const result=await send({kind:'definition'},controller.signal);
+  const site=result.invocation;
+  if(result.snapshot!==source.snapshot||site?.owner!==source.symbol||site.id!==action.id)throw new Error('Captured definition differs from the visible caller');
+  const openLocal=target=>open({kind:'open',target:target.id},controller.signal);
+  const choice={site,attempted:!result.complete&&!site.binding,semantic:false,note:result.detail,
+   captured:{open:target=>void openLocal(target).catch(report),browse:canLookInFile(view,site)?()=>browse(site):null}};
+  const target=directDestination(choice);
+  if(target)await openLocal(target);else showDestinations(id,choice);
+ }catch(error){report(error);}
+ finally{if(current()){r.resolving=false;updateFragmentStatus(r);live.resume();}}
 }
 function historyControls(r,v){
  const atNewest=newestHistory(v),pending=returnPending(r),hasCapture=v.history||v.comparison||v.captured;
@@ -208,6 +526,8 @@ function historyControls(r,v){
  r.historyNext.setAttribute('aria-disabled',String(atNewest&&pending));
  r.historyLabel.textContent=v.history?v.history.commit.slice(0,8):'';
  r.historyLabel.title=v.history?`Commit ${v.history.commit}; first-parent history at ${v.history.tip}`:'';
+ r.chooseRevision.hidden=Boolean(v.comparison)||!canChooseRevision(v);
+ r.chooseRevision.disabled=r.loading||pending;
  r.pin.hidden=atNewest;
  r.pin.disabled=r.historyLoading&&!hasCapture;
  r.pin.textContent=hasCapture?'Return to live':v.mode==='pinned'?'Follow live':'Pin version';
@@ -224,6 +544,7 @@ function comparisonControls(r,v){
  r.compareButton.disabled=r.loading||returnPending(r)||model.views.length>=24&&!c||!v.history&&!model.usable(v.id);
  r.editPrevious.hidden=r.editNext.hidden=!c;r.editPrevious.disabled=r.loading||!c||c.returning||c.cursor===0;r.editNext.disabled=r.loading||!c||c.returning||c.cursor>=c.changes.length-1;
  r.historyPrevious.hidden=Boolean(c||v.captured);if(v.captured){r.historyNext.hidden=true;r.compareButton.hidden=true;r.historyLabel.textContent=shortRevision(v.captured.label);r.historyLabel.title=`Captured file · ${v.captured.label}`;}if(c){r.historyNext.hidden=true;r.historyLabel.textContent=`${comparisonTitle(c)} · ${c.changes.length?c.cursor+1:0}/${c.changes.length}`;r.historyLabel.title=`${c.label}; compared with ${c.other_label}`;r.element.dataset.comparisonSide=c.side;r.element.dataset.comparisonToken=c.token;}else{delete r.element.dataset.comparisonSide;delete r.element.dataset.comparisonToken;}
+ r.historyLabel.setAttribute('aria-label',r.historyLabel.title);
  const key=c?`${c.token}:${c.side}`:'';
  if(r.comparisonKey===key&&r.comparisonFirst===r.code.firstElementChild&&r.comparisonLast===r.code.lastElementChild)return;
  for(const row of r.code.querySelectorAll('.code-line')){const number=Number(row.dataset.line),changed=Boolean(c&&c.changes.some(([start,end])=>number>=start&&number<end));row.classList.toggle('comparison-removed',changed&&c.side==='older');row.classList.toggle('comparison-added',changed&&c.side==='newer');if(changed)row.title=`${c.side==='older'?'Removed or replaced':'Added or replaced'} line ${number} · ${shortRevision(c.label)}`;else row.removeAttribute('title');}
@@ -249,7 +570,7 @@ async function compareFunction(id){
   const actionSets=await Promise.all([id,preview.older].map(viewId=>{const view=planned.view(viewId);return capturedActions(view,view.reading.section,Math.min(96,view.symbol.source.end_line-view.reading.section+1),controller.signal);}));
   if(model!==workspace||mounted.get(id)!==r||r.historyTicket!==ticket||JSON.stringify([model.view(id).snapshot,model.view(id).symbol.id,model.view(id).history])!==binding)throw new DOMException('Comparison superseded','AbortError');
   if(r.sourcePane.selected())throw new DOMException('Comparison deferred for selection','AbortError');newer.actions=actionSets[0];older.actions=actionSets[1];
-  const opened=model.openComparison(id,pair);r.historyLoading=r.loading=r.comparing=false;r.liveReturn=null;r.sites=[];r.actions=[];r.callsReady=false;r.element.querySelector('.fragment-heading small').textContent=`${model.view(id).symbol.source.path}:${model.view(id).symbol.source.line}`;
+  const opened=model.openComparison(id,pair);r.historyLoading=r.loading=r.comparing=false;r.liveReturn=null;r.sites=[];r.actions=[];r.callsReady=false;updateFragmentHeading(r,model.view(id));
   applyPreparedSource(id,{...newer,openedAtFirstBlock:pair.newer.changes.length>0});
   mount(opened.older,older);focus([id,opened.older]);save();
  }catch(error){if(error.name!=='AbortError'&&model===workspace&&mounted.get(id)===r&&r.historyTicket===ticket)fail(error);}
@@ -303,7 +624,7 @@ function links(){
 }
 function geometry(){
  if(!model)return;for(const[id,r]of mounted)if(!model.views.some(v=>v.id===id)){r.controller.abort();r.historyController?.abort();r.sourcePane.dispose();r.element.remove();mounted.delete(id);}const c=model.camera;el('workspace-world').style.transform=`translate(${-c.x*c.scale}px,${-c.y*c.scale}px) scale(${c.scale})`;el('visual-zoom').textContent=Math.round(c.scale*100)+'%';el('visual-empty').hidden=model.items().length>0;el('visual-stale').hidden=!model.views.some(v=>v.state==='unresolved'&&!mounted.get(v.id)?.liveReturn);
- for(const v of model.views){const r=mounted.get(v.id);if(!r)continue;r.element.hidden=!model.isVisible(v.id);Object.assign(r.element.style,{left:v.x+'px',top:v.y+'px',width:v.w+'px',height:(v.collapsed?54:v.h)+'px'});const membership=modulePresentation(v,model.views);r.element.classList.toggle('has-module',Boolean(membership));const moduleKey=JSON.stringify(membership);if(moduleKey!==r.moduleKey){r.moduleKey=moduleKey;r.moduleTag.hidden=!membership;if(membership){r.element.dataset.moduleId=membership.id;r.moduleTag.dataset.moduleId=membership.id;r.moduleTag.textContent=membership.label;r.moduleTag.title=membership.title;r.element.style.setProperty('--module-accent',`var(--module-${membership.colour})`);r.element.style.setProperty('--module-tint',`var(--module-tint-${membership.colour})`);}else{delete r.element.dataset.moduleId;delete r.moduleTag.dataset.moduleId;r.moduleTag.textContent='';r.element.style.removeProperty('--module-accent');r.element.style.removeProperty('--module-tint');}}r.body.hidden=v.collapsed;r.collapse.textContent=v.collapsed?'▾':'▴';r.collapse.setAttribute('aria-label',v.collapsed?'Expand bubble':'Collapse bubble');r.element.classList.toggle('is-selected',v.id===model.selected);r.element.classList.toggle('is-stale',!model.usable(v.id));r.prev.disabled=r.next.disabled=Boolean(r.historyLoading);r.callsButton.disabled=!model.navigable(v.id)||r.historyLoading;r.referenceActions.disabled=!model.usable(v.id)||r.historyLoading;r.fitHeight.disabled=r.fitWidth.disabled=r.loading||!r.lines?.length||v.collapsed;inlineAvailability(r.code,v.id);r.keep.disabled=Boolean(v.symbol.origin)||!model.usable(v.id)||r.historyLoading||!board||busy;r.keep.title=v.symbol.origin?'Dependency locations stay in this workspace.':'Save location';r.editor.disabled=!model.usable(v.id)||r.historyLoading||busy;historyControls(r,v);comparisonControls(r,v);updateFragmentStatus(r);restoreVisibleReading(r,v);}
+ for(const v of model.views){const r=mounted.get(v.id);if(!r)continue;r.element.hidden=!model.isVisible(v.id);Object.assign(r.element.style,{left:v.x+'px',top:v.y+'px',width:v.w+'px',height:(v.collapsed?54:v.h)+'px'});const membership=modulePresentation(v,model.views);r.element.classList.toggle('has-module',Boolean(membership));const moduleKey=JSON.stringify(membership);if(moduleKey!==r.moduleKey){r.moduleKey=moduleKey;r.moduleTag.hidden=!membership;if(membership){r.element.dataset.moduleId=membership.id;r.moduleTag.dataset.moduleId=membership.id;r.moduleTag.textContent=membership.label;r.moduleTag.title=membership.title;r.element.style.setProperty('--module-accent',`var(--module-${membership.colour})`);r.element.style.setProperty('--module-tint',`var(--module-tint-${membership.colour})`);}else{delete r.element.dataset.moduleId;delete r.moduleTag.dataset.moduleId;r.moduleTag.textContent='';r.element.style.removeProperty('--module-accent');r.element.style.removeProperty('--module-tint');}}r.body.hidden=v.collapsed;r.collapse.textContent=v.collapsed?'▾':'▴';r.collapse.setAttribute('aria-label',v.collapsed?'Expand bubble':'Collapse bubble');r.element.classList.toggle('is-selected',v.id===model.selected);r.element.classList.toggle('is-stale',!model.usable(v.id));r.prev.disabled=r.next.disabled=Boolean(r.historyLoading);r.callsButton.disabled=!model.navigable(v.id)||r.historyLoading;r.referenceActions.disabled=r.historyLoading||(!model.usable(v.id)&&!(!r.loading&&!returnPending(r)&&(canFindEarlier(v)||v.comparison&&canChooseRevision(v))));r.fitHeight.disabled=r.fitWidth.disabled=r.loading||!r.lines?.length||v.collapsed;inlineAvailability(r.code,v.id);r.keep.disabled=Boolean(v.symbol.origin)||!model.usable(v.id)||r.historyLoading||!board||busy;r.keep.title=v.symbol.origin?'Dependency locations stay in this workspace.':'Save location';r.editor.disabled=!model.usable(v.id)||r.historyLoading||busy;historyControls(r,v);comparisonControls(r,v);updateFragmentStatus(r);restoreVisibleReading(r,v);}
  if(model.stale)callMenu.hide();links();overview();outlines.refresh();highlights.refresh();taskGroups.refresh();referenceStacks.refresh();
 }
 function button(text,label,handler){const b=node('button',text);b.type='button';if(label)b.setAttribute('aria-label',label);b.onclick=()=>{try{handler();}catch(e){fail(e);}};return b;}
@@ -315,18 +636,32 @@ function fitCode(id,axis){const r=mounted.get(id),v=model.view(id),section=r.sec
 function mount(id,prepared){
  if(mounted.has(id)){if(prepared&&!mounted.get(id).code.querySelector('.code-line'))applyPreparedSource(id,prepared);return;}const v=model.view(id),element=node('section');element.className='fragment';element.dataset.view=id;element.dataset.name=v.symbol.name;element.setAttribute('aria-label',`${v.symbol.name} bubble`);
  const header=node('div');header.className='fragment-header';header.setAttribute('aria-label','Move bubble with arrow keys');bindLayoutKeys(header,id);const heading=node('div');heading.className='fragment-heading';const context=node('div');context.className='fragment-context';const moduleTag=node('span');moduleTag.className='module-tag';moduleTag.tabIndex=0;moduleTag.hidden=true;context.append(moduleTag,node('small',`${v.symbol.origin?originLabel(v.symbol.origin)+' · ':''}${v.symbol.source.path}:${v.symbol.source.line}`));heading.append(node('strong',[...v.symbol.parents,v.symbol.name].join('::')),context);
- const collapse=button('▴','Collapse bubble',()=>{callMenu.hide();model.collapse(id);geometry();save();}),close=button('×','Close bubble',()=>{editorCalls.manual();callMenu.hide();const r=mounted.get(id);r.controller.abort();r.historyController?.abort();r.sourcePane.dispose();element.remove();mounted.delete(id);model.close(id);hideDestinations();geometry();save();});const pin=button('Pin version','Pin version',()=>{if(model.view(id).history||model.view(id).comparison||model.view(id).captured){returnHistoryLive(id);return;}model.pin(id,model.view(id).mode!=='pinned');geometry();save();refreshLive();});const fitHeight=button('↕','Fit height',()=>fitCode(id,'height')),fitWidth=button('↔','Fit width',()=>fitCode(id,'width'));for(const b of [fitHeight,fitWidth]){b.className='bubble-fit';b.title=b.getAttribute('aria-label')+' to this code section';}heading.title=[...v.symbol.parents,v.symbol.name].join('::');const referenceActions=button('⋯',`Actions for ${v.symbol.name} bubble`,()=>callMenu.show(referenceActions,v.symbol.name,[{label:'Find callers',run:()=>openReferences(id,'callers')},{label:'Find references',run:()=>openReferences(id,'references')},{label:'Task group',run:()=>taskControls.showGroups(model.groupFor(id)?.id??'')}],false));header.append(heading,referenceActions,fitHeight,fitWidth,collapse,close);element.append(header);bindDrag(header,id);
- const body=node('div');body.className='fragment-body';const historyRow=node('div');historyRow.className='fragment-history';const historyPrevious=button('Previous change','Previous function change',()=>void changeHistory(id,1)),historyNext=button('Next change','Next function change',()=>{if(newestHistory(model.view(id)))returnHistoryLive(id);else void changeHistory(id,-1);}),historyLabel=node('span');historyLabel.setAttribute('aria-live','polite');const compareButton=button('Compare','Compare with previous version',()=>model.view(id).comparison?void changeHistory(id,1):void compareFunction(id)),editPrevious=button('Previous changed block',null,()=>void comparisonEdit(id,-1)),editNext=button('Next changed block',null,()=>void comparisonEdit(id,1));
+ const collapse=button('▴','Collapse bubble',()=>{callMenu.hide();model.collapse(id);geometry();save();}),close=button('×','Close bubble',()=>{editorCalls.manual();callMenu.hide();const r=mounted.get(id);r.controller.abort();r.historyController?.abort();r.sourcePane.dispose();element.remove();mounted.delete(id);model.close(id);hideDestinations();geometry();save();});const pin=button('Pin version','Pin version',()=>{if(model.view(id).history||model.view(id).comparison||model.view(id).captured){returnHistoryLive(id);return;}model.pin(id,model.view(id).mode!=='pinned');geometry();save();refreshLive();});const fitHeight=button('↕','Fit height',()=>fitCode(id,'height')),fitWidth=button('↔','Fit width',()=>fitCode(id,'width'));for(const b of [fitHeight,fitWidth]){b.className='bubble-fit';b.title=b.getAttribute('aria-label')+' to this code section';}heading.title=[...v.symbol.parents,v.symbol.name].join('::');
+ const referenceActions=button('⋯',`Actions for ${v.symbol.name} bubble`,()=>{
+  const view=model.view(id);
+  const actions=view.comparison?[{label:'Choose revision…',run:()=>openRevisionPicker(id,referenceActions)}]:canFindEarlier(view)?[
+   {label:'Find earlier declaration…',run:()=>void openLineagePicker(id,referenceActions)},
+  ]:[
+   {label:'Find callers',run:()=>openReferences(id,'callers')},
+   {label:'Find references',run:()=>openReferences(id,'references')},
+   {label:'Task group',run:()=>taskControls.showGroups(model.groupFor(id)?.id??'')},
+  ];
+  callMenu.show(referenceActions,view.symbol.name,actions,Boolean(view.comparison)||canFindEarlier(view));
+ });
+ header.append(heading,referenceActions,fitHeight,fitWidth,collapse,close);element.append(header);bindDrag(header,id);
+ const body=node('div');body.className='fragment-body';const historyRow=node('div');historyRow.className='fragment-history';const historyPrevious=button('Previous change','Previous function change',()=>void changeHistory(id,1)),historyNext=button('Next change','Next function change',()=>{if(newestHistory(model.view(id)))returnHistoryLive(id);else void changeHistory(id,-1);}),historyLabel=node('span');historyLabel.setAttribute('role','status');const compareButton=button('Compare','Compare with previous version',()=>model.view(id).comparison?void changeHistory(id,1):void compareFunction(id)),editPrevious=button('Previous changed block',null,()=>void comparisonEdit(id,-1)),editNext=button('Next changed block',null,()=>void comparisonEdit(id,1));
+ const chooseRevision=button('Choose revision…',null,()=>openRevisionPicker(id,chooseRevision));
+ chooseRevision.setAttribute('aria-haspopup','dialog');
  editPrevious.title='Show the previous changed block in both visible comparison bubbles.';
  editNext.title='Show the next changed block in both visible comparison bubbles.';
  editPrevious.className='comparison-previous';
  editNext.className='comparison-next';
  compareButton.className='comparison-revision';
- historyRow.append(historyPrevious,editPrevious,historyLabel,historyNext,editNext,compareButton);const section=node('div');section.className='source-section';const sectionLabel=node('span','Loading captured source…');const prev=button('Previous section',null,()=>jumpSource(id,true)),next=button('Next section',null,()=>jumpSource(id,false));prev.hidden=true;next.hidden=true;section.append(sectionLabel,prev,next);
+ historyRow.append(historyPrevious,editPrevious,historyLabel,historyNext,editNext,compareButton,chooseRevision);const section=node('div');section.className='source-section';const sectionLabel=node('span','Loading captured source…');const prev=button('Previous section',null,()=>jumpSource(id,true)),next=button('Next section',null,()=>jumpSource(id,false));prev.hidden=true;next.hidden=true;section.append(sectionLabel,prev,next);
  const code=node('div');code.className='code-pane';code.tabIndex=0;code.setAttribute('aria-label',`${v.symbol.name} captured code`);code.append(node('p','Loading source…'));const footer=node('div');footer.className='fragment-footer';const callsButton=button('Calls','Calls',()=>toggleCalls(id)),state=node('span','Captured source');state.setAttribute('role','status');const keep=button('Save','Save location',()=>void keepLocation(id)),editor=button('Editor',`Open in ${editorName}`,()=>void openEditor(id));editor.disabled=true;footer.append(callsButton,state,pin,keep,editor);
  const popup=node('div');popup.className='calls-popover';popup.hidden=true;body.append(historyRow,section,code,popup,footer);const resize=button('','Resize bubble',()=>{});resize.title='Drag or use arrow keys to resize';resize.className='resize-handle';body.append(resize);bindDrag(resize,id,true);bindLayoutKeys(resize,id,true);element.append(body);el('fragment-layer').append(element);
  const kept=board?.evidence.find(e=>e.source.file===v.symbol.source.file&&e.source.version===v.symbol.source.version&&e.source.line===v.symbol.source.line)?.id??null;
- const record={id,compareButton,editPrevious,editNext,historyRow,historyPrevious,historyNext,historyLabel,referenceActions,moduleTag,pin,fitHeight,fitWidth,loading:true,liveReturn:(v.captured??v.comparison??v.history)?.returning?'waiting':null,element,body,code,collapse,sectionLabel,prev,next,callsButton,popup,state,keep,editor,sites:[],nextCalls:0,matching:0,callsReady:false,controller:new AbortController(),kept};setSections(record,[]);record.sourcePane=new SourcePane(code,(text,line,plan,margin)=>{renderCallText(text,line,record.actionsByLine.get(line.number)??[],(action,button,direct,keyboard)=>inlineAction(id,action,button,direct,keyboard),plan,margin);inlineAvailability(text,id);});record.sourcePane.setReflow(smartReflow);mounted.set(id,record);
+ const record={id,compareButton,editPrevious,editNext,historyRow,historyPrevious,historyNext,historyLabel,chooseRevision,referenceActions,moduleTag,pin,fitHeight,fitWidth,loading:true,liveReturn:(v.captured??v.comparison??v.history)?.returning?'waiting':null,element,body,code,collapse,sectionLabel,prev,next,callsButton,popup,state,keep,editor,sites:[],nextCalls:0,matching:0,callsReady:false,controller:new AbortController(),kept};setSections(record,[]);record.sourcePane=new SourcePane(code,(text,line,plan,margin)=>{renderCallText(text,line,record.actionsByLine.get(line.number)??[],(action,button,direct,keyboard)=>inlineAction(id,action,button,direct,keyboard),plan,margin);inlineAvailability(text,id);});record.sourcePane.setReflow(smartReflow);mounted.set(id,record);
  element.addEventListener('pointerdown',()=>{model.selected=id;geometry();});code.addEventListener('scroll',()=>{
   callMenu.hide();if(mounted.get(id)!==record||!code.clientHeight)return;
   const before=code.scrollTop<record.scrollTop,moved=code.scrollTop!==record.scrollTop;
@@ -524,11 +859,24 @@ async function loadCalls(id,offset){
  const r=mounted.get(id);if(!r||!model.navigable(id))return;const v=model.view(id),source=frozenSource(v),expected=source?.snapshot??model.snapshot,binding=JSON.stringify([v.snapshot,v.symbol.id,source]);
  try{const data=source?await post('/api/captured-functions',{source,query:{kind:'calls',offset}},r.controller.signal):await post('/api/structure',{snapshot:expected,path:v.symbol.origin?undefined:v.symbol.source.path,query:{kind:'calls',symbol:v.symbol.id,area:v.area||v.symbol.source.path,offset}},r.controller.signal);if(mounted.get(id)!==r||!model.navigable(id)||JSON.stringify([model.view(id).snapshot,model.view(id).symbol.id,frozenSource(model.view(id))])!==binding)return;if(data.snapshot!==expected||!Array.isArray(data.items)||data.items.length>8)throw new Error('Call response differs');r.sites=offset===0?data.items:[...r.sites,...data.items];r.nextCalls=data.next;r.matching=data.matching;r.callsReady=true;renderCalls(id);if(!source)void prepareDefinitions(id);}catch(error){if(error.name!=='AbortError'){r.callsReady=true;r.popup.replaceChildren(node('p',error.message));}}
 }
-function renderCalls(id){const r=mounted.get(id);if(!r)return;r.popup.replaceChildren(node('p',`${r.sites.length} of ${r.matching} written calls.`));for(const site of r.sites)r.popup.append(button(`${site.name??'Dynamic call'} · line ${site.source.line}`,null,()=>chooseCall(id,site)));if(r.nextCalls!==null&&r.nextCalls!==undefined&&r.sites.length<64)r.popup.append(button('More written calls',null,()=>void loadCalls(id,r.nextCalls)));if(!r.matching)r.popup.append(node('p','No attributed calls recorded. This does not prove no runtime calls.'));}
+function renderCalls(id){
+ const r=mounted.get(id);if(!r)return;
+ const view=model.view(id);
+ r.popup.replaceChildren(node('p',`${r.sites.length} of ${r.matching} written calls.`));
+ for(const site of r.sites){
+  const action=button(`${site.name??'Dynamic call'} · line ${site.source.line}`,null,()=>chooseCall(id,site));
+  if(!canLookInFile(view,site)){r.popup.append(action);continue;}
+  const row=node('div');row.className='captured-call-row';
+  row.append(action,button('Look in another file…',`Look for ${site.name} in another file`,()=>void chooseCapturedCall(id,site,{anotherFile:true})));
+  r.popup.append(row);
+ }
+ if(r.nextCalls!=null&&r.sites.length<64)r.popup.append(button('More written calls',null,()=>void loadCalls(id,r.nextCalls)));
+ if(!r.matching)r.popup.append(node('p','No attributed calls recorded. This does not prove no runtime calls.'));
+}
 function toggleCalls(id){editorCalls.manual();const r=mounted.get(id);if(!r||!model.navigable(id))return;hideDestinations();for(const[other,x]of mounted)if(other!==id)x.popup.hidden=true;r.popup.hidden=!r.popup.hidden;if(!r.callsReady){r.popup.replaceChildren(node('p','Loading written calls…'));void loadCalls(id,0);}else renderCalls(id);}
 function hideDestinations(){el('destination-stack').hidden=true;}
-async function chooseCall(id,site){
- editorCalls.manual();const record=mounted.get(id);if(!record||!model.navigable(id))return;if(frozenSource(model.view(id))){void chooseCapturedCall(id,site);return;}record.resolvingCaptured=false;
+async function chooseCall(id,site,opener){
+ editorCalls.manual();const record=mounted.get(id);if(!record||!model.navigable(id))return;if(frozenSource(model.view(id))){void chooseCapturedCall(id,site,{opener});return;}record.resolvingCaptured=false;
  const symbol=model.view(id).symbol;
  site={...site,owner:symbol.id};
  const ticket=record.navigation=(record.navigation??0)+1,expected=model.snapshot;
@@ -546,6 +894,7 @@ function highlightCall(id,site){const r=mounted.get(id);r.popup.hidden=true;for(
 function showDestinations(id,{site,note,semantic,captured}) {
  highlightCall(id,site);const candidates=site.candidates,stack=el('destination-stack'),v=model.view(id);
  stack.replaceChildren(node('h2',site.spelling),node('p',candidates.length?`Choose among ${site.candidate_count} ${semantic?'definition locations':'terminal-name matches'}. ${candidates.length} captured destinations are shown.${note?' '+note:''}`:note||'No indexed destination. Dynamic or external calls remain unresolved.'));stack.append(button('Close choices',null,hideDestinations));
+ if(captured?.browse)stack.append(button('Look in another file…',null,captured.browse));
  for(const candidate of candidates){const b=button([...candidate.parents,candidate.name].join('::'),null,()=>captured?captured.open(candidate):follow(id,site,candidate));b.dataset.candidate=candidate.id;b.dataset.path=candidate.source.path;b.append(node('small',`${candidate.origin?originLabel(candidate.origin)+' · ':''}${candidate.source.path}:${candidate.source.line}`));stack.append(b);}Object.assign(stack.style,{left:v.x+v.w+24+'px',top:v.y+'px'});stack.hidden=false;
 }
 function follow(parent,site,target){editorCalls.manual();try{const id=model.follow(parent,site,target);hideDestinations();const record=mounted.get(id);mount(id);if(target.origin&&record&&(record.element.classList.contains('is-stale')||!record.lines?.length)){void loadSource(id,model.view(id).reading.section);record.callsReady=false;void loadCalls(id,0);}focus([parent,id]);save();}catch(e){fail(e);}}
@@ -556,7 +905,7 @@ async function keepLocation(id){
 async function openEditor(id){const r=mounted.get(id);if(!r||busy||!model.usable(id))return;const s=model.view(id).symbol.source;busy=true;geometry();try{await post(model.view(id).symbol.origin?'/api/dependency/editor':'/api/editor/open',{snapshot:model.view(id).symbol.origin?.capture??model.snapshot,file:s.file,version:s.version,line:s.line});}catch(e){fail(e);}finally{busy=false;geometry();live.resume();}}
 function openReferences(id,query){editorCalls.manual();try{if(!model.usable(id))throw new Error('Open a current function before finding references.');const stack=model.addReferences(model.view(id).symbol,query,id);geometry();focus([id,stack]);save();}catch(e){fail(e);}}
 function replaceTask(next){
- editorCalls.manual();callMenu.hide();hideDestinations();clearTimeout(livePendingTimer);
+ editorCalls.manual();closeRevisionPicker();closeLineagePicker();closeCrossFilePicker();callMenu.hide();hideDestinations();clearTimeout(livePendingTimer);
  for(const r of mounted.values()){r.controller.abort();r.historyController?.abort();r.sourcePane.dispose();r.element.remove();}
  mounted.clear();referenceStacks.reset();jobs=Promise.resolve();model=next;
  for(const v of model.views)mount(v.id);

@@ -1,9 +1,6 @@
 //! Owned, bounded declaration pairs, independent of live publication and review.
 use super::*;
-use vizzi_core::{
-    model::Document,
-    text_diff::{DiffInput, DiffLimits, TextEdit, compare_ranges},
-};
+use vizzi_core::text_diff::{DiffInput, DiffLimits, TextEdit, compare_ranges};
 const PAIRS: usize = 12;
 const PAIR_BYTES: usize = 32 * 1024 * 1024;
 
@@ -60,10 +57,11 @@ pub(super) struct Pair {
     newer_label: String,
     older_label: String,
     edits: Vec<TextEdit>,
+    files: cross_file::AdditionalFiles,
 }
 impl Pair {
     fn bytes(&self) -> usize {
-        self.newer.snapshot.documents()[0].bytes() + self.older.snapshot.documents()[0].bytes()
+        self.newer.file.document().bytes() + self.older.file.document().bytes() + self.files.bytes()
     }
 }
 impl FunctionHistory {
@@ -83,7 +81,7 @@ impl FunctionHistory {
             }
             CompareRequest::Historical { source } => {
                 let (newer, history) = self.comparison_history(&source.token, source.index)?;
-                validate(&newer, &source.snapshot, &source.file, &source.version)?;
+                validate(&newer.file, &source.snapshot, &source.file, &source.version)?;
                 let index = source
                     .index
                     .checked_add(1)
@@ -96,8 +94,8 @@ impl FunctionHistory {
                 (newer, Some(history), older, older_history)
             }
         };
-        let before = &older.snapshot.documents()[0];
-        let after = &newer.snapshot.documents()[0];
+        let before = older.file.document();
+        let after = newer.file.document();
         let edits = compare_ranges(
             DiffInput {
                 document: before,
@@ -137,6 +135,7 @@ impl FunctionHistory {
             newer_label,
             older_label,
             edits,
+            files: cross_file::AdditionalFiles::default(),
         };
         let answer = json!({"token":pair.token,"newer":frame(&pair,"newer")?,"older":frame(&pair,"older")?,"edits":pair.edits});
         let mut pairs = self
@@ -160,14 +159,14 @@ impl FunctionHistory {
         query: &WindowQuery,
     ) -> Result<Value, CompanionError> {
         self.with_comparison_capture(binding, |capture, _| {
-            super::window(&capture.snapshot, &capture.snapshot.documents()[0], query)
+            super::window(&capture.snapshot, capture.document(), query)
         })
     }
-    pub(super) fn with_comparison_capture(
+    pub(super) fn with_comparison_capture<T>(
         &self,
         binding: &ComparisonWindow,
-        operation: impl FnOnce(&Capture, &str) -> Result<Value, CompanionError>,
-    ) -> Result<Value, CompanionError> {
+        operation: impl FnOnce(&FileCapture, &str) -> Result<T, CompanionError>,
+    ) -> Result<T, CompanionError> {
         if !matches!(binding.side.as_str(), "older" | "newer") {
             return Err(invalid("Invalid function comparison side"));
         }
@@ -179,11 +178,19 @@ impl FunctionHistory {
             .iter()
             .find(|p| p.token == binding.token)
             .ok_or_else(|| conflict("Function comparison expired; return to live"))?;
-        let capture = if binding.side == "older" {
-            &pair.older
+        let primary = if binding.side == "older" {
+            &pair.older.file
         } else {
-            &pair.newer
+            &pair.newer.file
         };
+        let owner = CapturedOwner::Comparison {
+            token: binding.token.clone(),
+            side: binding.side.clone(),
+        };
+        let capture = pair
+            .files
+            .find(Some(&owner), &binding.snapshot)
+            .unwrap_or(primary);
         validate(capture, &binding.snapshot, &binding.file, &binding.version)?;
         let label = if binding.side == "older" {
             &pair.older_label
@@ -192,6 +199,41 @@ impl FunctionHistory {
         };
         operation(capture, label)
     }
+
+    pub(super) fn with_comparison_revision<T>(
+        &self,
+        token: &str,
+        side: &str,
+        operation: impl FnOnce(cross_file::RevisionFiles<'_>) -> Result<T, CompanionError>,
+    ) -> Result<T, CompanionError> {
+        let mut pairs = self
+            .comparisons
+            .try_lock()
+            .map_err(|_| unavailable("Function comparison is busy; retry"))?;
+        let allowance = PAIR_BYTES.saturating_sub(pairs.iter().map(Pair::bytes).sum());
+        let pair = pairs
+            .iter_mut()
+            .find(|pair| pair.token == token)
+            .ok_or_else(|| conflict("Function comparison expired; return to live"))?;
+        let (primary, commit) = match side {
+            "older" => (&pair.older.file, pair.older_label.as_str()),
+            "newer" if pair.newer_history.is_some() => {
+                (&pair.newer.file, pair.newer_label.as_str())
+            }
+            "newer" => {
+                return Err(invalid(
+                    "Choose a Git revision before looking in another file",
+                ));
+            }
+            _ => return Err(invalid("Invalid function comparison side")),
+        };
+        operation(cross_file::RevisionFiles {
+            primary: primary.clone(),
+            commit,
+            files: &mut pair.files,
+            allowance,
+        })
+    }
     fn comparison_history(
         &self,
         token: &str,
@@ -199,18 +241,13 @@ impl FunctionHistory {
     ) -> Result<(Capture, Value), CompanionError> {
         let sessions = self.lock()?;
         let session = sessions
-            .iter()
-            .find(|s| s.token == token)
+            .get(token)
             .ok_or_else(|| conflict("Function history expired; return to live"))?;
-        let version = session
-            .versions
-            .get(index)
-            .ok_or_else(|| invalid("Invalid comparison history position"))?;
+        if index >= session.versions.len() {
+            return Err(invalid("Invalid comparison history position"));
+        }
         let capture = self.restore(session, index)?;
-        Ok((
-            capture,
-            json!({"token":session.token,"tip":session.tip,"commit":session.commits[version.candidate],"index":index}),
-        ))
+        Ok((capture, session.metadata(index)))
     }
     fn current_comparison_capture(&self, request: &Request) -> Result<Capture, CompanionError> {
         let snapshot = self
@@ -267,13 +304,12 @@ impl FunctionHistory {
     }
 }
 fn validate(
-    capture: &Capture,
+    capture: &FileCapture,
     snapshot: &str,
     file: &str,
     version: &str,
 ) -> Result<(), CompanionError> {
-    let s = &capture.symbol.source;
-    if capture.snapshot.id().as_str() != snapshot || s.file != file || s.version != version {
+    if !capture.matches(snapshot, file, version) {
         return Err(conflict("Function comparison source version differs"));
     }
     Ok(())
@@ -310,9 +346,10 @@ fn frame(pair: &Pair, side: &str) -> Result<Value, CompanionError> {
     let start = changes.first().map_or(s.line, |c| {
         c[0].saturating_sub(3).max(s.line).min(s.end_line)
     });
-    let doc: &Document = &capture.snapshot.documents()[0];
+    let file = &capture.file;
+    let doc = file.document();
     let source = super::window(
-        &capture.snapshot,
+        &file.snapshot,
         doc,
         &WindowQuery {
             line_start: Some(start),
@@ -323,7 +360,7 @@ fn frame(pair: &Pair, side: &str) -> Result<Value, CompanionError> {
         },
     )?;
     let origin = super::window(
-        &capture.snapshot,
+        &file.snapshot,
         doc,
         &WindowQuery {
             line_start: Some(s.line),
@@ -333,6 +370,6 @@ fn frame(pair: &Pair, side: &str) -> Result<Value, CompanionError> {
         },
     )?;
     Ok(
-        json!({"snapshot":capture.snapshot.id().as_str(),"symbol":capture.symbol,"history":history,"label":label,"other_label":other_label,"changes":changes,"origin":origin["lines"][0],"window":source}),
+        json!({"snapshot":file.snapshot.id().as_str(),"symbol":capture.symbol,"history":history,"label":label,"other_label":other_label,"changes":changes,"origin":origin["lines"][0],"window":source}),
     )
 }

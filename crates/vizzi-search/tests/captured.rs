@@ -181,6 +181,7 @@ fn the_window_allowance_accepts_65536_and_rejects_one_more_atomically() {
     analysis.coloring = None;
     analysis.facts = (0..4096)
         .map(|n| Fact {
+            declaration_span: None,
             definition_anchor: None,
             name_span: None,
             parent: None,

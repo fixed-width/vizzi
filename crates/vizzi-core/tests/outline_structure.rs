@@ -163,6 +163,7 @@ fn escaped_hierarchy_labels_and_styles_still_fit_the_document_window_budget() {
     let text = format!("{}\n", "\u{1}".repeat(341)).repeat(96);
     let facts = (0usize..201)
         .map(|i| Fact {
+            declaration_span: None,
             definition_anchor: None,
             name_span: None,
             parent: i.checked_sub(1),
@@ -234,6 +235,7 @@ fn lexical_parent_ranges_allow_one_shared_boundary_but_reject_coextensive_declar
     ] {
         let mut analyses = doc.analyses().to_vec();
         analyses[0].facts[0].span = parent;
+        analyses[0].facts[1].declaration_span = Some(child.clone());
         analyses[0].facts[1].span = child;
         analyses[0].facts[1].parent = Some(0);
         let result = Document::capture(
@@ -244,6 +246,26 @@ fn lexical_parent_ranges_allow_one_shared_boundary_but_reject_coextensive_declar
             doc.classification().clone(),
         );
         assert_eq!(result.is_ok(), valid);
+    }
+}
+
+#[test]
+fn c_family_prototype_evidence_includes_the_return_type_when_the_declarator_is_unique() {
+    let text = "int earlier(int x);\nint first(int x), second(int x);\n";
+    for language in ["c", "cpp"] {
+        let doc = document(language, text);
+        let facts = &doc.analyses()[0].facts;
+        let earlier = facts.iter().find(|fact| fact.name == "earlier").unwrap();
+        assert_eq!(text.get(earlier.span.clone()), Some("earlier(int x)"));
+        assert_eq!(
+            earlier
+                .declaration_span
+                .clone()
+                .and_then(|span| text.get(span)),
+            Some("int earlier(int x);"),
+        );
+        let first = facts.iter().find(|fact| fact.name == "first").unwrap();
+        assert!(first.declaration_span.is_none());
     }
 }
 #[test]

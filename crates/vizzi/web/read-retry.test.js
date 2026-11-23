@@ -7,7 +7,7 @@ test('historical window reads recover from busy admission without retrying histo
   const response=await fetchRead('/api/function-history/window?token=captured&line_start=97',{},async()=>new Response(++attempts===1?'busy':'historical source',{status:attempts===1?status:200}),async delay=>delays.push(delay));
   assert.equal(await response.text(),'historical source');assert.equal(attempts,2);assert.deepEqual(delays,[50]);
  }
- for(const path of ['/api/function-history','/api/function-history/step','/api/function-comparisons'])assert.equal((await fetchRead(path,{method:'POST'},async()=>new Response('busy',{status:503}),()=>{throw Error('History navigation must not retry');})).status,503);
+ for(const path of ['/api/function-history','/api/function-history/select','/api/function-history/step','/api/function-comparisons'])assert.equal((await fetchRead(path,{method:'POST'},async()=>new Response('busy',{status:503}),()=>{throw Error('History navigation must not retry');})).status,503);
 });
 test('historical window retries remain bounded, respect cancellation and retain expiry conflicts',async()=>{
  const path='/api/function-history/window?token=captured';let attempts=0;const delays=[];
@@ -44,8 +44,11 @@ test('permanent admission failure terminates and cancellation prevents another r
  const abort=new AbortController();await assert.rejects(fetchRead('/api/window',{signal:abort.signal},async()=>new Response('busy',{status:503}),async()=>abort.abort()),e=>e.name==='AbortError');
 });
 test('all source read interfaces recover while successful and nonbusy responses return directly',async()=>{
- for(const path of ['/api/window','/api/dependency/window','/api/function-history/window','/api/function-comparisons/window','/api/captured-functions','/api/structure','/api/visual/refresh','/api/references']){let busy=true;const response=await fetchRead(path,{},async()=>{if(busy){busy=false;return new Response('busy',{status:503});}return new Response('source');},async()=>{});assert.equal(await response.text(),'source');}
- const response=await fetchRead('/api/window',{},async()=>new Response('expired',{status:409}),()=>{throw Error('Conflict must not retry');});assert.equal(response.status,409);
+ for(const path of ['/api/window','/api/dependency/window','/api/function-history/window','/api/function-history/confirm','/api/function-comparisons/window','/api/captured-functions','/api/structure','/api/visual/refresh','/api/references']){let busy=true;const response=await fetchRead(path,{},async()=>{if(busy){busy=false;return new Response('busy',{status:503});}return new Response('source');},async()=>{});assert.equal(await response.text(),'source');}
+ for(const path of ['/api/window','/api/captured-functions']){
+  const response=await fetchRead(path,{},async()=>new Response('conflict',{status:409}),()=>{throw Error('Conflict must not retry');});
+  assert.equal(response.status,409);
+ }
 });
 test('real backoff can be cancelled before or during its timer',async()=>{
  const controller=new AbortController();const request=fetchRead('/api/window',{signal:controller.signal},async()=>new Response('busy',{status:503}));controller.abort();await assert.rejects(request,e=>e.name==='AbortError');

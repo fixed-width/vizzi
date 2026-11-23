@@ -57,6 +57,41 @@ active comparison and must not be used as a bubble-history registry.
 - Keep source reading/paging on SourcePane. Historical source uses the history window
   route and never requests live call actions. Persist metadata rather than source bytes.
 
+## Explicit revision selection
+
+`POST /api/function-history/select` takes a local commit ID or ref and an exact current,
+retained publication or captured declaration binding. The Git adapter resolves the
+commit before discovery or capture. The resulting ID anchors bounded first-parent file
+history and owns the exact first capture. Accepted versions store the captured commit,
+so the starting commit can be visited even when path history filters it out.
+
+The bubble's dialog reuses the history preparation and adoption path. A successful
+selection carries a declaration-text equality result so the browser can preserve its
+reading anchor. Native preparation keeps up to four selections in a separate queue,
+with a 2 MiB per-file limit and up to 8 MiB of source bytes. The usual history window and
+captured-call routes can read a prepared source. After applying the validated source
+to the bubble, the browser sends `POST /api/function-history/confirm` with the session
+token. Confirmation moves the session into the ordinary history quota and can be retried
+with the same token. Canceling a selection suppresses confirmation, so even native work
+that finishes after cancellation cannot evict a retained session. New preparations can
+expire the oldest unconfirmed entry.
+
+Native fixtures cover exact unchanged selections, moving refs, first-parent steps,
+comparison, immutable calls and windows, shallow history and invalid bindings (1–6).
+Chromium checks exercise keyboard access, reload, layout, failure and supersession (1–6).
+Keep the existing history, comparison and captured-call regressions in both suites.
+
+Local verification used the default browser runner with the optimized host and tested
+the reported lpc-rs review base. Selecting `2a6a23ad1be7` for `Task::run_entry` displayed
+the exact commit. The first 96 captured lines matched the Git blob at that commit.
+The focused serial mutation run caught all 13 mutations in the selection module after
+a passing unmodified baseline.
+
+Review regression checks exercise direct editor-call links on page load, canceled
+preparation at both retention limits and a complete source row in a 320×200 committed
+comparison bubble. The full native and default Chromium suites passed with their
+usual opt-in checks excluded.
+
 ## Validation
 
 Use deterministic Git repositories to exercise skipped unrelated edits, saved working

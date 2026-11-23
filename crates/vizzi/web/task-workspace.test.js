@@ -60,6 +60,25 @@ test('caller comparison choices match declaration tracking and retain only open 
  restored.returnLive(two.newer);restored.close(one.older);
  assert.deepEqual(choices(),[[token(70),[one.newer]],[token(80),[two.older]]]);
 });
+test('caller comparison choices include both declaration identities across an accepted move',()=>{
+ const model=new TaskWorkspace(token(1));
+ const newerSymbol={...symbol(3),tracking:token(200)};
+ const olderSymbol={...symbol(4),tracking:token(201),source:{...symbol(4).source,file:token(202),path:'earlier.rs'}};
+ const caller=model.openRoot(newerSymbol,'');
+ const newer={token:token(300),tip:'a'.repeat(40),commit:'a'.repeat(40),index:0,snapshot:token(20),symbol:newerSymbol};
+ const older={...newer,commit:'b'.repeat(40),index:1,snapshot:token(21),symbol:olderSymbol};
+ const pin=frame=>({commit:frame.commit,snapshot:frame.snapshot,file:frame.symbol.source.file,tracking:frame.symbol.tracking});
+ const lineage=[{at:1,newer:pin(newer),older:pin(older)}];
+ model.showHistory(caller,newer);
+ const side=(frame,other)=>({snapshot:frame.snapshot,symbol:frame.symbol,label:frame.commit,other_label:other.commit,
+  history:{token:frame.token,tip:frame.tip,commit:frame.commit,index:frame.index,lineage},changes:[],window:{line_start:frame.symbol.source.line}});
+ const pair=model.openComparison(caller,{token:token(70),older:side(older,newer),newer:side(newer,older)});
+ const choices=(workspace,symbol)=>workspace.comparisonsFor(symbol).map(({views})=>views.map(view=>view.id));
+ for(const symbol of [olderSymbol,newerSymbol])assert.deepEqual(choices(model,symbol),[[pair.older,pair.newer]]);
+ const restored=TaskWorkspace.restore(model.serialize(),token(1));
+ restored.close(pair.newer);assert.deepEqual(choices(restored,newerSymbol),[[pair.older]]);
+ model.close(pair.older);assert.deepEqual(choices(model,olderSymbol),[[pair.newer]]);
+});
 test('new items avoid occupied source and result rectangles and inherit an existing group',()=>{
  const model=new TaskWorkspace(token(1)),a=model.openRoot(symbol(2),'lib.rs'),g=model.saveGroup(null,'Trace',[a]),r=model.addReferences(symbol(2),'callers',a);
  assert.ok(model.group(g).members.includes(r));assert.ok(model.view(r).x>=model.view(a).x+model.view(a).w);

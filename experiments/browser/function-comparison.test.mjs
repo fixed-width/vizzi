@@ -95,6 +95,13 @@ try{
  const olderRevision=newerView.getByRole('button',{name:'Older revision (exit diff)',exact:true});
  assert.equal(await olderRevision.textContent(),'Older revision (exit diff)');
  const outer=await newerView.boundingBox();
+ assert.equal(await newerPane.evaluate(pane=>pane.clientHeight>=pane.querySelector('.code-line').offsetHeight),true,'minimum-size committed comparisons leave room for a complete source row');
+ const actions=newerView.getByRole('button',{name:'Actions for target bubble',exact:true});
+ await actions.press('Enter');
+ await page.getByRole('menuitem',{name:'Choose revision…',exact:true}).press('Enter');
+ await page.getByRole('dialog',{name:'Choose revision'}).waitFor();
+ await page.keyboard.press('Escape');
+ assert.equal(await actions.evaluate(button=>button===document.activeElement),true);
  for(const control of [previousBlock,nextBlock,olderRevision,newerView.getByRole('button',{name:'Return to live',exact:true})]){
   const box=await control.boundingBox();assert.ok(box.x+box.width<=outer.x+outer.width+1&&box.y+box.height<=outer.y+outer.height+1);
  }

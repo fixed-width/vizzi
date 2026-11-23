@@ -1,7 +1,7 @@
 //! Immutable per-function history through production Git and analysis interfaces.
 use serde_json::{Value, json};
 use std::{process::Command, sync::Arc};
-use vizzi::function_history::CapturedRequest;
+use vizzi::function_history::{CapturedRequest, ConfirmRevision, LineageRequest, SelectRevision};
 use vizzi::function_history::{CompareRequest, ComparisonWindow};
 fn captured_source(frame: &Value, owner: Value) -> Value {
     let s = &frame["symbol"]["source"];
@@ -24,6 +24,918 @@ fn call_named(history: &FunctionHistory, source: &Value, name: &str) -> Value {
         .find(|c| c["name"] == name)
         .unwrap()
         .clone()
+}
+
+fn select_revision(
+    history: &FunctionHistory,
+    revision: &str,
+    origin: Value,
+) -> Result<Value, vizzi::companion::CompanionError> {
+    let request: SelectRevision =
+        serde_json::from_value(json!({"revision":revision,"origin":origin})).unwrap();
+    history.select_revision(&request)
+}
+
+#[test]
+fn exact_selection_anchors_history_comparison_and_captured_calls_at_an_unchanged_commit() {
+    let (root, _cache, host, history, request, _) = fixture("");
+    let older = commit(root.path(), "fn target() { previous(); }\nfn helper() {}\n");
+    let declaration = "fn target() { helper(); }\nfn helper() { old_helper(); }\n";
+    commit(root.path(), declaration);
+    std::fs::write(root.path().join("notes.txt"), "unrelated change").unwrap();
+    git(root.path(), &["add", "notes.txt"]);
+    let selected = commit_staged(root.path());
+    git(root.path(), &["branch", "review-base", &selected]);
+    let head = commit(
+        root.path(),
+        &declaration.replace("old_helper", "new_helper"),
+    );
+    let request = refresh_request(&host, &request);
+    let origin = json!({"kind":"current","source":request});
+    let exact = select_revision(&history, "refs/heads/review-base", origin.clone()).unwrap();
+    assert_eq!(exact["tip"], selected);
+    assert_eq!(exact["commit"], selected);
+    assert_eq!(exact["index"], 0);
+    assert_eq!(exact["same_text"], true);
+    assert_eq!(exact["window"]["lines"].as_array().unwrap().len(), 1);
+    assert_eq!(exact["window"]["outline"].as_array().unwrap().len(), 1);
+    assert_eq!(exact["window"]["lines"][0]["ending"], "\n");
+    git(root.path(), &["branch", "-f", "review-base", &head]);
+    assert_eq!(
+        history.step(&step(&exact["token"], 1)).unwrap()["commit"],
+        older
+    );
+    let owner = json!({"kind":"history","token":exact["token"],"index":exact["index"]});
+    let frozen = captured_source(&exact, owner);
+    let call = call_named(&history, &frozen, "helper");
+    let child = captured_query(
+        &history,
+        &frozen,
+        json!({"kind":"open","call":call["id"],"target":call["candidates"][0]["id"]}),
+    )
+    .unwrap();
+    assert!(text(&child["frame"]).contains("old_helper"));
+    assert_eq!(child["frame"]["captured"]["label"], selected);
+    let child_source = captured_source(&child["frame"], frozen["owner"].clone());
+    let new_child = select_revision(
+        &history,
+        "review-base",
+        json!({"kind":"captured","source":child_source}),
+    )
+    .unwrap();
+    assert_eq!(new_child["commit"], head);
+    assert_eq!(new_child["same_text"], false);
+    assert!(text(&new_child).contains("new_helper"));
+    let mut wrong = frozen.clone();
+    wrong["symbol"] = json!("0".repeat(64));
+    assert!(select_revision(&history, &head, json!({"kind":"captured","source":wrong})).is_err());
+    let revisit = history.step(&step(&exact["token"], 0)).unwrap();
+    assert_eq!(revisit["commit"], selected);
+    assert_eq!(revisit["snapshot"], exact["snapshot"]);
+    let source = &revisit["symbol"]["source"];
+    let comparison = serde_json::from_value(json!({"kind":"historical","source":{
+        "token":revisit["token"],"index":revisit["index"],"snapshot":revisit["snapshot"],
+        "file":source["file"],"version":source["version"]
+    }}))
+    .unwrap();
+    let pair = history.compare(&comparison).unwrap();
+    assert_eq!(pair["newer"]["label"], selected);
+    assert_eq!(pair["older"]["label"], older);
+}
+
+#[test]
+fn exact_selection_preserves_readable_history_when_local_source_is_unavailable() {
+    let (root, _cache, host, history, request, commits) = fixture("");
+    let missing = commit(root.path(), "fn moved() {}\n");
+    let ambiguous = commit(root.path(), "fn target() {}\nfn target() {}\n");
+    let oversized = commit(
+        root.path(),
+        &format!("fn target() {{}}\n/*{}*/", " ".repeat(2 * 1024 * 1024)),
+    );
+    let head = commit(root.path(), "fn target() { head(); }\n");
+    let pinned = json!({"kind":"pinned","source":request});
+    let request = refresh_request(&host, &request);
+    let origin = json!({"kind":"current","source":request});
+    let exact = select_revision(&history, &commits[3], origin.clone()).unwrap();
+    assert_eq!(exact["same_text"], false);
+    let selected = select_revision(&history, &commits[3], pinned.clone()).unwrap();
+    assert_eq!(selected["same_text"], true);
+    let mut stale = pinned;
+    stale["source"]["snapshot"] = json!("0".repeat(64));
+    assert!(
+        select_revision(&history, &head, stale)
+            .unwrap_err()
+            .to_string()
+            .contains("Pinned source expired")
+    );
+    let tag = format!("{}/{}", "a".repeat(127), "b".repeat(128));
+    git(root.path(), &["tag", &tag, &commits[3]]);
+    assert_eq!(
+        select_revision(&history, &tag, origin.clone()).unwrap()["commit"],
+        commits[3]
+    );
+    let overlong = format!("{tag}c");
+    for (input, expected) in [
+        ("", "commit ID, branch or tag"),
+        ("--help", "commit ID, branch or tag"),
+        ("HEAD~1", "commit ID, branch or tag"),
+        ("HEAD..HEAD", "commit ID, branch or tag"),
+        ("HEAD@{0}", "commit ID, branch or tag"),
+        ("tag with spaces", "commit ID, branch or tag"),
+        ("bad\u{0007}ref", "commit ID, branch or tag"),
+        (overlong.as_str(), "commit ID, branch or tag"),
+        ("a_nonexistent_branch", "not available locally"),
+        (missing.as_str(), "missing or ambiguous"),
+        (ambiguous.as_str(), "missing or ambiguous"),
+        (oversized.as_str(), "content bytes allowance"),
+    ] {
+        let error = select_revision(&history, input, origin.clone())
+            .unwrap_err()
+            .to_string();
+        assert!(error.contains(expected), "{input}: {error}");
+        assert_eq!(
+            history.step(&step(&exact["token"], 0)).unwrap()["commit"],
+            exact["commit"]
+        );
+    }
+    std::fs::write(root.path().join(".git/shallow"), format!("{head}\n")).unwrap();
+    let shallow = select_revision(&history, "HEAD", origin).unwrap();
+    assert_eq!(shallow["commit"], head);
+    assert_eq!(shallow["same_text"], true);
+    let error = history
+        .step(&step(&shallow["token"], 1))
+        .unwrap_err()
+        .to_string();
+    assert!(error.contains("shallow"), "{error}");
+}
+
+fn read_history_frame(
+    history: &FunctionHistory,
+    frame: &Value,
+) -> Result<Value, vizzi::companion::CompanionError> {
+    let source = &frame["symbol"]["source"];
+    history.window(
+        frame["token"].as_str().unwrap(),
+        frame["snapshot"].as_str().unwrap(),
+        source["file"].as_str().unwrap(),
+        source["version"].as_str().unwrap(),
+        &WindowQuery::default(),
+    )
+}
+
+fn history_binding(frame: &Value) -> Value {
+    let source = &frame["symbol"]["source"];
+    json!({"token":frame["token"],"index":frame["index"],"snapshot":frame["snapshot"],"file":source["file"],"version":source["version"]})
+}
+
+fn lineage(
+    history: &FunctionHistory,
+    body: Value,
+) -> Result<Value, vizzi::companion::CompanionError> {
+    let request: LineageRequest = serde_json::from_value(body).unwrap();
+    history.lineage(&request)
+}
+
+#[test]
+fn adjacent_lineage_previews_renames_and_moves_then_retraces_and_compares_accepted_versions() {
+    for (moved, earlier_name) in [(false, "earlier"), (true, "earlier"), (true, "target")] {
+        let (root, _cache, host, history, request, _) = fixture("");
+        let old_path = if moved { "earlier.rs" } else { "lib.rs" };
+        if moved {
+            std::fs::write(root.path().join("lib.rs"), "fn unrelated() {}\n").unwrap();
+        }
+        std::fs::write(
+            root.path().join(old_path),
+            format!("fn {earlier_name}() {{ ancient(); }}\nfn steady() {{}}\n"),
+        )
+        .unwrap();
+        git(root.path(), &["add", "."]);
+        let ancestor = commit_staged(root.path());
+        std::fs::write(
+            root.path().join(old_path),
+            format!("fn {earlier_name}() {{ steady(); }}\nfn steady() {{}}\n"),
+        )
+        .unwrap();
+        git(root.path(), &["add", "."]);
+        let parent = commit_staged(root.path());
+        if moved {
+            std::fs::remove_file(root.path().join(old_path)).unwrap();
+            git(root.path(), &["add", "-u"]);
+        }
+        let head = commit(root.path(), "fn target() { steady(); }\nfn steady() {}\n");
+        let request = refresh_request(&host, &request);
+        let current =
+            select_revision(&history, &head, json!({"kind":"current","source":request})).unwrap();
+        let source = history_binding(&current);
+        let preview = lineage(&history, json!({"kind":"preview","source":source})).unwrap();
+        assert_eq!(preview["commit"], parent);
+        assert_eq!(preview["symbol"]["name"], earlier_name);
+        assert_eq!(preview["symbol"]["source"]["path"], old_path);
+        assert_eq!(
+            history.step(&step(&current["token"], 0)).unwrap()["commit"],
+            head
+        );
+        assert!(lineage(&history, json!({"kind":"accept","source":source,"snapshot":preview["snapshot"],"target":"wrong"})).is_err());
+        let earlier = lineage(&history, json!({"kind":"accept","source":source,"snapshot":preview["snapshot"],"target":preview["symbol"]["id"]})).unwrap();
+        assert_eq!(earlier["commit"], parent);
+        assert_eq!(earlier["index"], 1);
+        assert_eq!(earlier["lineage"][0]["newer"]["commit"], head);
+        assert_eq!(earlier["lineage"][0]["older"]["commit"], parent);
+        let owner = json!({"kind":"history","token":earlier["token"],"index":earlier["index"]});
+        let call = call_named(&history, &captured_source(&earlier, owner), "steady");
+        assert_eq!(call["source"]["path"], old_path);
+        assert_eq!(
+            history.step(&step(&current["token"], 2)).unwrap()["commit"],
+            ancestor
+        );
+        assert!(read_history_frame(&history, &earlier).is_ok());
+        assert_eq!(
+            history.step(&step(&current["token"], 0)).unwrap()["commit"],
+            head
+        );
+        let compare = serde_json::from_value(json!({"kind":"historical","source":source})).unwrap();
+        let pair = history.compare(&compare).unwrap();
+        assert_eq!(pair["older"]["symbol"]["source"]["path"], old_path);
+        assert_eq!(pair["older"]["label"], parent);
+        assert_eq!(pair["newer"]["label"], head);
+    }
+}
+
+#[test]
+fn adjacent_lineage_keeps_unsupported_transitions_unresolved() {
+    for (before, newer) in [
+        (
+            "fn earlier() { steady(); }\nfn duplicate() { steady(); }\n",
+            "fn target() { steady(); }\n",
+        ),
+        (
+            "fn earlier() { steady(); }\n",
+            "fn earlier() { changed(); }\nfn target() { steady(); }\n",
+        ),
+        (
+            "fn target() { changed(); }\nfn earlier() { steady(); }\n",
+            "fn target() { steady(); }\n",
+        ),
+        (
+            "mod old { fn earlier() { steady(); } }\n",
+            "fn target() { steady(); }\n",
+        ),
+        (
+            "fn earlier() { different(); }\n",
+            "fn target() { steady(); }\n",
+        ),
+        (
+            "fn earlier() { steady(); }\nfn earlier() { other(); }\n",
+            "fn target() { steady(); }\n",
+        ),
+    ] {
+        let (root, _cache, host, history, request, _) = fixture("");
+        commit(root.path(), before);
+        let head = commit(root.path(), newer);
+        let request = refresh_request(&host, &request);
+        let frame =
+            select_revision(&history, &head, json!({"kind":"current","source":request})).unwrap();
+        assert!(
+            lineage(
+                &history,
+                json!({"kind":"preview","source":history_binding(&frame)})
+            )
+            .is_err(),
+            "{before} → {newer}"
+        );
+        assert!(read_history_frame(&history, &frame).is_ok());
+    }
+}
+
+#[test]
+fn adjacent_lineage_uses_parsed_python_scope_and_does_not_search_past_a_gap() {
+    let root = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    git(root.path(), &["init", "-q"]);
+    let file = root.path().join("example.py");
+    for candidate in [
+        Some("old_name"),
+        None,
+        Some("new_name"),
+        Some("latest_name"),
+    ] {
+        let contents = candidate.map_or_else(
+            || "class Thing:\n    pass\n".into(),
+            |name| format!("class Thing:\n    def {name}(self):\n        return 3\n"),
+        );
+        std::fs::write(&file, contents).unwrap();
+        git(root.path(), &["add", "."]);
+        commit_staged(root.path());
+    }
+    let host = history_host(root.path(), cache.path(), None);
+    let history = FunctionHistory::new(host.clone());
+    let snapshot = host.application().snapshot().unwrap();
+    let index = Structure::new(&snapshot);
+    let entry = index
+        .functions("example.py", "latest_name", 0)
+        .unwrap()
+        .items
+        .remove(0);
+    let source = &entry.symbol.source;
+    let origin = json!({"kind":"current","source":{"snapshot":snapshot.id().as_str(),"file":source.file,"version":source.version,"tracking":entry.symbol.tracking}});
+    let newest = select_revision(&history, "HEAD", origin).unwrap();
+    let source = history_binding(&newest);
+    let preview = lineage(&history, json!({"kind":"preview","source":source})).unwrap();
+    assert_eq!(preview["symbol"]["name"], "new_name");
+    assert_eq!(preview["symbol"]["parents"], json!(["Thing"]));
+    let previous = lineage(&history, json!({"kind":"accept","source":source,"snapshot":preview["snapshot"],"target":preview["symbol"]["id"]})).unwrap();
+    assert!(
+        lineage(
+            &history,
+            json!({"kind":"preview","source":history_binding(&previous)})
+        )
+        .is_err()
+    );
+    assert!(read_history_frame(&history, &previous).is_ok());
+}
+
+#[test]
+fn adjacent_lineage_requires_a_complete_scan_within_the_changed_path_allowance() {
+    for count in [16, 17] {
+        let (root, _cache, host, history, request, _) = fixture("");
+        commit(root.path(), "fn earlier() { steady(); }\n");
+        for n in 1..count {
+            std::fs::write(
+                root.path().join(format!("extra{n}.rs")),
+                format!("fn extra{n}() {{ unrelated(); }}\n"),
+            )
+            .unwrap();
+        }
+        git(root.path(), &["add", "."]);
+        let changed = commit(root.path(), "fn target() { steady(); }\n");
+        let request = refresh_request(&host, &request);
+        let frame = select_revision(
+            &history,
+            &changed,
+            json!({"kind":"current","source":request}),
+        )
+        .unwrap();
+        let result = lineage(
+            &history,
+            json!({"kind":"preview","source":history_binding(&frame)}),
+        );
+        if count == 16 {
+            assert_eq!(result.unwrap()["symbol"]["name"], "earlier");
+        } else {
+            assert!(
+                result
+                    .unwrap_err()
+                    .to_string()
+                    .contains("Too many changed files")
+            );
+        }
+        assert!(read_history_frame(&history, &frame).is_ok());
+    }
+}
+
+#[test]
+fn adjacent_lineage_rejects_unreadable_candidates_instead_of_resolving_an_ambiguity() {
+    let (root, _cache, host, history, request, _) = fixture("");
+    std::fs::write(
+        root.path().join("duplicate.rs"),
+        "fn duplicate() { steady(); }\n",
+    )
+    .unwrap();
+    git(root.path(), &["add", "duplicate.rs"]);
+    let parent = commit(root.path(), "fn earlier() { steady(); }\n");
+    let object = git(
+        root.path(),
+        &["rev-parse", &format!("{parent}:duplicate.rs")],
+    );
+    std::fs::remove_file(root.path().join("duplicate.rs")).unwrap();
+    git(root.path(), &["add", "-u"]);
+    let head = commit(root.path(), "fn target() { steady(); }\n");
+    let request = refresh_request(&host, &request);
+    let frame =
+        select_revision(&history, &head, json!({"kind":"current","source":request})).unwrap();
+    let preview = json!({"kind":"preview","source":history_binding(&frame)});
+    assert!(
+        lineage(&history, preview.clone())
+            .unwrap_err()
+            .to_string()
+            .contains("Several declarations")
+    );
+    std::fs::remove_file(
+        root.path()
+            .join(".git/objects")
+            .join(&object[..2])
+            .join(&object[2..]),
+    )
+    .unwrap();
+    assert!(
+        lineage(&history, preview)
+            .unwrap_err()
+            .to_string()
+            .contains("Could not read changed source")
+    );
+    assert!(read_history_frame(&history, &frame).is_ok());
+}
+
+#[test]
+fn adjacent_lineage_checks_unemitted_ruby_scopes_and_full_c_family_prototypes() {
+    use vizzi_core::{analysis::Languages, policy::PolicyConfig};
+    for (path, before, after, expected) in [
+        (
+            "example.rb",
+            "class Thing\n  class << self\n    def earlier\n      3\n    end\n  end\nend\n",
+            "class Thing\n    def target\n      3\n    end\nend\n",
+            None,
+        ),
+        (
+            "example.rb",
+            "class Thing\n  class << self\n    def earlier\n      3\n    end\n  end\nend\n",
+            "class Thing\n  class << self\n    def target\n      3\n    end\n  end\nend\n",
+            Some("earlier"),
+        ),
+        (
+            "example.c",
+            "int earlier(int x);\n",
+            "double target(int x);\n",
+            None,
+        ),
+        (
+            "example.cpp",
+            "int earlier(int x);\n",
+            "double target(int x);\n",
+            None,
+        ),
+        (
+            "example.c",
+            "int earlier(int x);\n",
+            "int target(int x);\n",
+            Some("earlier"),
+        ),
+        (
+            "example.cpp",
+            "int earlier(int x);\n",
+            "int target(int x);\n",
+            Some("earlier"),
+        ),
+        (
+            "example.c",
+            "int earlier(int x), other(int y);\n",
+            "int target(int x), other(int y);\n",
+            None,
+        ),
+        (
+            "example.cpp",
+            "int Earlier::earlier(int x) { return x; }\n",
+            "int Different::target(int x) { return x; }\n",
+            None,
+        ),
+        (
+            "example.cpp",
+            "int Same::earlier(int x) { return x; }\n",
+            "int Same::target(int x) { return x; }\n",
+            Some("Same::earlier"),
+        ),
+    ] {
+        let root = tempfile::tempdir().unwrap();
+        let cache = tempfile::tempdir().unwrap();
+        git(root.path(), &["init", "-q"]);
+        for source in [before, after] {
+            std::fs::write(root.path().join(path), source).unwrap();
+            git(root.path(), &["add", path]);
+            commit_staged(root.path());
+        }
+        let directory = Directory::with_policy(
+            root.path(),
+            PolicyConfig {
+                c_family_roots: vec![".".into()],
+                ..PolicyConfig::default()
+            },
+            Arc::new(Languages::builtin().unwrap()),
+        )
+        .unwrap();
+        let host = Arc::new(
+            Host::start_with_options(
+                Engine::new(directory, Cache::new(cache.path().join("analysis")), 1).unwrap(),
+                HostOptions {
+                    watch: false,
+                    reconcile_interval: std::time::Duration::from_secs(3600),
+                    idle_maintenance: false,
+                },
+            )
+            .unwrap(),
+        );
+        let history = FunctionHistory::new(host.clone());
+        let snapshot = host.application().snapshot().unwrap();
+        let symbol = Structure::new(&snapshot)
+            .functions(path, "target", 0)
+            .unwrap()
+            .items
+            .remove(0)
+            .symbol;
+        let frame = select_revision(&history, "HEAD", json!({"kind":"current","source":{"snapshot":snapshot.id().as_str(),"file":symbol.source.file,"version":symbol.source.version,"tracking":symbol.tracking}})).unwrap();
+        let result = lineage(
+            &history,
+            json!({"kind":"preview","source":history_binding(&frame)}),
+        );
+        if let Some(name) = expected {
+            let preview = result.unwrap();
+            assert_eq!(preview["symbol"]["name"], name, "{path}");
+            let accepted = lineage(&history, json!({"kind":"accept","source":history_binding(&frame),"snapshot":preview["snapshot"],"target":preview["symbol"]["id"]})).unwrap();
+            assert_eq!(accepted["index"], 1);
+            assert!(
+                history.step(&step(&frame["token"], 2)).is_err(),
+                "the accepted parent must not appear twice"
+            );
+        } else {
+            assert!(result.is_err(), "{path}: {before} → {after}");
+        }
+        assert!(read_history_frame(&history, &frame).is_ok());
+    }
+}
+
+#[test]
+fn historical_cross_file_names_use_the_same_commit_in_every_written_call_adapter() {
+    use vizzi_core::{analysis::Languages, policy::PolicyConfig};
+    let root = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    git(root.path(), &["init", "-q"]);
+    let fixtures = [
+        (
+            "rust",
+            "rs",
+            "fn target() { helper(); }\n",
+            "fn helper() -> i32 { 17 }\n",
+        ),
+        (
+            "python",
+            "py",
+            "def target():\n    helper()\n",
+            "def helper():\n    return 17\n",
+        ),
+        (
+            "ruby",
+            "rb",
+            "def target\n  helper()\nend\n",
+            "def helper\n  17\nend\n",
+        ),
+        (
+            "c",
+            "c",
+            "void target() { helper(); }\n",
+            "int helper() { return 17; }\n",
+        ),
+        (
+            "cpp",
+            "cpp",
+            "void target() { helper(); }\n",
+            "int helper() { return 17; }\n",
+        ),
+        (
+            "javascript",
+            "js",
+            "function target() { helper(); }\n",
+            "function helper() { return 17; }\n",
+        ),
+        (
+            "typescript",
+            "ts",
+            "function target() { helper(); }\n",
+            "function helper(): number { return 17; }\n",
+        ),
+        (
+            "tsx",
+            "tsx",
+            "function target() { helper(); return <div />; }\n",
+            "function helper(): number { return 17; }\n",
+        ),
+    ];
+    for (language, extension, caller, callee) in fixtures {
+        let directory = root.path().join(language);
+        std::fs::create_dir(&directory).unwrap();
+        std::fs::write(directory.join(format!("caller.{extension}")), caller).unwrap();
+        std::fs::write(directory.join(format!("callee.{extension}")), callee).unwrap();
+    }
+    git(root.path(), &["add", "."]);
+    let older = commit_staged(root.path());
+    for (language, extension, _, callee) in fixtures {
+        std::fs::write(
+            root.path().join(format!("{language}/callee.{extension}")),
+            callee.replace("17", "29"),
+        )
+        .unwrap();
+    }
+    git(root.path(), &["add", "."]);
+    let newer = commit_staged(root.path());
+    let languages = Languages::builtin().unwrap();
+    assert_eq!(
+        languages.call_languages(),
+        &fixtures.map(|(language, ..)| language)
+    );
+    let directory = Directory::with_policy(
+        root.path(),
+        PolicyConfig {
+            c_family_roots: vec![".".into()],
+            ..PolicyConfig::default()
+        },
+        Arc::new(languages),
+    )
+    .unwrap();
+    let host = Arc::new(
+        Host::start_with_options(
+            Engine::new(directory, Cache::new(cache.path().join("analysis")), 1).unwrap(),
+            HostOptions {
+                watch: false,
+                reconcile_interval: std::time::Duration::from_secs(3600),
+                idle_maintenance: false,
+            },
+        )
+        .unwrap(),
+    );
+    let history = FunctionHistory::new(host.clone());
+    let snapshot = host.application().snapshot().unwrap();
+    let index = Structure::new(&snapshot);
+    for (language, extension, _, _) in fixtures {
+        let path = format!("{language}/callee.{extension}");
+        let caller_path = format!("{language}/caller.{extension}");
+        let entry = index
+            .functions(&caller_path, "target", 0)
+            .unwrap()
+            .items
+            .remove(0);
+        let s = &entry.symbol;
+        let origin = json!({"kind":"current","source":{"snapshot":snapshot.id().as_str(),"file":s.source.file,"version":s.source.version,"tracking":s.tracking}});
+        for (commit, expected) in [(&older, "17"), (&newer, "29")] {
+            let frame = select_revision(&history, commit, origin.clone()).unwrap();
+            let owner = json!({"kind":"history","token":frame["token"],"index":0});
+            let source = captured_source(&frame, owner.clone());
+            let call = call_named(&history, &source, "helper");
+            let files = captured_query(
+                &history,
+                &source,
+                json!({"kind":"files","call":call["id"],"directory":language,"offset":0}),
+            )
+            .unwrap();
+            assert_eq!(files["commit"], *commit);
+            assert!(
+                files["items"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .any(|item| item["path"] == path)
+            );
+            let choices = captured_query(
+                &history,
+                &source,
+                json!({"kind":"candidates","call":call["id"],"path":path,"offset":0}),
+            )
+            .unwrap();
+            assert_eq!(choices["matching"], 1, "{language}");
+            assert_eq!(choices["commit"], *commit);
+            let opened = captured_query(&history, &source, json!({"kind":"open_file","call":call["id"],"path":path,"snapshot":choices["snapshot"],"target":choices["items"][0]["id"]})).unwrap();
+            assert_eq!(opened["frame"]["captured"]["label"], *commit);
+            assert!(
+                text(&opened["frame"]).contains(expected),
+                "{language}: {opened}"
+            );
+            assert!(opened["invocation"]["binding"].is_null());
+            let destination = captured_source(&opened["frame"], owner);
+            captured_query(&history, &destination, json!({"kind":"confirm_file"})).unwrap();
+            assert!(
+                history
+                    .window(
+                        frame["token"].as_str().unwrap(),
+                        destination["snapshot"].as_str().unwrap(),
+                        destination["file"].as_str().unwrap(),
+                        destination["version"].as_str().unwrap(),
+                        &WindowQuery::default(),
+                    )
+                    .is_ok()
+            );
+        }
+    }
+}
+
+#[test]
+fn historical_cross_file_choices_validate_pins_and_preserve_retained_files_at_capacity() {
+    let (root, _cache, host, history, request, _) = fixture("");
+    for n in 0..9 {
+        std::fs::write(
+            root.path().join(format!("helper{n}.rs")),
+            format!("fn worker() {{ {n}; }}\n"),
+        )
+        .unwrap();
+    }
+    std::fs::write(
+        root.path().join("duplicate.rs"),
+        "mod left { fn worker() {} }\nmod right { fn worker() {} }\nfn other() {}\n",
+    )
+    .unwrap();
+    std::fs::write(
+        root.path().join("Cargo.toml"),
+        "[package]\nname='fixture'\nversion='1.0.0'\n",
+    )
+    .unwrap();
+    git(root.path(), &["add", "."]);
+    let old = commit(root.path(), "fn target() { worker(); (|| {})(); }\n");
+    commit(root.path(), "fn target() { worker(); }\n");
+    std::fs::remove_file(root.path().join("Cargo.toml")).unwrap();
+    let request = refresh_request(&host, &request);
+    let pair = history.compare(&compare_current(&request)).unwrap();
+    let owner = |side| json!({"kind":"comparison","token":pair["token"],"side":side});
+    let source = captured_source(&pair["older"], owner("older"));
+    let call = call_named(&history, &source, "worker");
+    let query =
+        |kind: &str, path: &str| json!({"kind":kind,"call":call["id"],"path":path,"offset":0});
+    let mut wrong_caller = source.clone();
+    wrong_caller["version"] = json!("0".repeat(64));
+    assert!(captured_query(&history, &wrong_caller, query("candidates", "helper0.rs")).is_err());
+    let mut wrong_call = query("candidates", "helper0.rs");
+    wrong_call["call"] = json!("0".repeat(64));
+    assert!(captured_query(&history, &source, wrong_call).is_err());
+    for (path, text) in [
+        ("absent.rs", "missing"),
+        ("Cargo.toml", "analysis is unavailable"),
+        ("target/ignored.rs", "outside the configured source scope"),
+        ("../escape.rs", "relative review path"),
+    ] {
+        let error = captured_query(&history, &source, query("candidates", path)).unwrap_err();
+        assert!(error.to_string().contains(text), "{path}: {error}");
+    }
+    let current = captured_source(&pair["newer"], owner("newer"));
+    let current_call = call_named(&history, &current, "worker");
+    assert!(
+        captured_query(
+            &history,
+            &current,
+            json!({"kind":"candidates","call":current_call["id"],"path":"helper0.rs","offset":0})
+        )
+        .is_err()
+    );
+    let calls = captured_query(&history, &source, json!({"kind":"calls","offset":0})).unwrap();
+    let dynamic = calls["items"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|item| item["name"].is_null())
+        .unwrap();
+    assert!(
+        captured_query(
+            &history,
+            &source,
+            json!({"kind":"candidates","call":dynamic["id"],"path":"helper0.rs","offset":0})
+        )
+        .unwrap_err()
+        .to_string()
+        .contains("no captured name")
+    );
+    let choices = captured_query(&history, &source, query("candidates", "duplicate.rs")).unwrap();
+    assert_eq!(choices["matching"], 2);
+    assert_eq!(choices["commit"], old);
+    let open = |path: &str, snapshot: &Value, target: &Value| {
+        captured_query(
+            &history,
+            &source,
+            json!({"kind":"open_file","call":call["id"],"path":path,"snapshot":snapshot,"target":target}),
+        )
+    };
+    assert!(open("duplicate.rs", &json!("bad"), &choices["items"][0]["id"]).is_err());
+    assert!(open("duplicate.rs", &choices["snapshot"], &json!("bad")).is_err());
+    let helper = |n| {
+        let path = format!("helper{n}.rs");
+        let candidates = captured_query(&history, &source, query("candidates", &path)).unwrap();
+        open(
+            &path,
+            &candidates["snapshot"],
+            &candidates["items"][0]["id"],
+        )
+        .map(|result| captured_source(&result["frame"], owner("older")))
+    };
+    let confirm = |source: &Value| captured_query(&history, source, json!({"kind":"confirm_file"}));
+    let first = helper(0).unwrap();
+    confirm(&first).unwrap();
+    for n in 1..7 {
+        confirm(&helper(n).unwrap()).unwrap();
+    }
+    let canceled = helper(7).unwrap();
+    let replacement = helper(8).unwrap();
+    assert!(confirm(&canceled).is_err());
+    confirm(&replacement).unwrap();
+    confirm(&replacement).unwrap();
+    assert!(
+        matches!(helper(7), Err(vizzi::companion::CompanionError::Conflict(message))
+        if message.contains("retained source allowance"))
+    );
+    confirm(&first).unwrap();
+    let mut wrong = replacement;
+    wrong["owner"] = owner("newer");
+    assert!(confirm(&wrong).is_err());
+    for _ in 0..12 {
+        history.compare(&compare_current(&request)).unwrap();
+    }
+    assert!(
+        confirm(&first)
+            .unwrap_err()
+            .to_string()
+            .contains("comparison expired")
+    );
+}
+
+#[test]
+fn historical_cross_file_byte_limits_reserve_space_without_displacing_confirmed_files() {
+    let (root, _cache, host, history, request, _) = fixture("");
+    let prefix = "fn worker() {\n/*";
+    let suffix = "*/\n}\n";
+    let full_file = format!(
+        "{prefix}{}{suffix}",
+        "x".repeat(2 * 1024 * 1024 - prefix.len() - suffix.len())
+    );
+    std::fs::write(root.path().join("large_a.rs"), &full_file).unwrap();
+    std::fs::write(root.path().join("large_b.rs"), &full_file).unwrap();
+    std::fs::write(root.path().join("small.rs"), "fn worker() {}\n").unwrap();
+    git(root.path(), &["add", "."]);
+    let caller_prefix = "fn target() {\nworker();\n/*";
+    let caller = format!(
+        "{caller_prefix}{}{suffix}",
+        "x".repeat(2 * 1024 * 1024 - caller_prefix.len() - suffix.len())
+    );
+    let revision = commit(root.path(), &caller);
+    let request = refresh_request(&host, &request);
+    let origin = json!({"kind":"current","source":request});
+    let initial = select_revision(&history, &revision, origin.clone()).unwrap();
+    let peer = select_revision(&history, &revision, origin).unwrap();
+    let owner = json!({"kind":"history","token":initial["token"],"index":0});
+    let source = captured_source(&initial, owner.clone());
+    let call = call_named(&history, &source, "worker");
+    let open = |source: &Value, path: &str| {
+        let choices = captured_query(
+            &history,
+            source,
+            json!({"kind":"candidates","call":call["id"],"path":path,"offset":0}),
+        )
+        .unwrap();
+        captured_query(
+            &history,
+            source,
+            json!({"kind":"open_file","call":call["id"],"path":path,"snapshot":choices["snapshot"],"target":choices["items"][0]["id"]}),
+        )
+    };
+    let first = open(&source, "large_a.rs").unwrap();
+    let first_source = captured_source(&first["frame"], owner.clone());
+    captured_query(&history, &first_source, json!({"kind":"confirm_file"})).unwrap();
+    let second = open(&source, "large_b.rs").unwrap();
+    assert_eq!(second["prepared"], true);
+    assert_eq!(open(&source, "large_b.rs").unwrap()["prepared"], true);
+    let peer = captured_source(
+        &peer,
+        json!({"kind":"history","token":peer["token"],"index":0}),
+    );
+    assert!(
+        matches!(open(&peer, "small.rs"), Err(vizzi::companion::CompanionError::Conflict(message))
+        if message.contains("retained source allowance"))
+    );
+    let second_source = captured_source(&second["frame"], owner);
+    captured_query(&history, &second_source, json!({"kind":"confirm_file"})).unwrap();
+    assert!(
+        matches!(open(&source, "small.rs"), Err(vizzi::companion::CompanionError::Conflict(message))
+        if message.contains("retained source allowance"))
+    );
+    assert_eq!(open(&source, "large_a.rs").unwrap()["prepared"], false);
+    assert_eq!(open(&source, "large_b.rs").unwrap()["prepared"], false);
+}
+
+#[test]
+fn exact_selection_preparation_preserves_the_oldest_history_at_the_session_limit() {
+    let (_root, _cache, _host, history, request, commits) = fixture("");
+    let oldest = history.start(&request).unwrap();
+    let next_oldest = history.start(&request).unwrap();
+    for _ in 2..24 {
+        history.start(&request).unwrap();
+    }
+    let origin = json!({"kind":"current","source":request});
+    let abandoned = select_revision(&history, &commits[2], origin.clone()).unwrap();
+    for _ in 0..3 {
+        select_revision(&history, &commits[2], origin.clone()).unwrap();
+    }
+    assert!(read_history_frame(&history, &abandoned).is_ok());
+    let prepared = select_revision(&history, &commits[2], origin).unwrap();
+    assert!(read_history_frame(&history, &abandoned).is_err());
+    assert!(read_history_frame(&history, &prepared).is_ok());
+    assert!(read_history_frame(&history, &oldest).is_ok());
+    let owner = json!({"kind":"history","token":oldest["token"],"index":oldest["index"]});
+    let source = captured_source(&oldest, owner);
+    assert_eq!(call_named(&history, &source, "middle")["name"], "middle");
+
+    let confirm = |frame: &Value| {
+        let request: ConfirmRevision =
+            serde_json::from_value(json!({"token":frame["token"]})).unwrap();
+        history.confirm_revision(&request)
+    };
+    assert!(confirm(&abandoned).is_err());
+    assert!(read_history_frame(&history, &oldest).is_ok());
+    confirm(&prepared).unwrap();
+    confirm(&prepared).unwrap();
+    assert!(read_history_frame(&history, &prepared).is_ok());
+    assert!(read_history_frame(&history, &oldest).is_err());
+    assert!(read_history_frame(&history, &next_oldest).is_ok());
 }
 #[test]
 fn captured_calls_follow_old_helpers_and_recursive_chains_without_current_source_fallback() {
@@ -1006,7 +1918,7 @@ fn exact_file_and_total_source_allowances_are_inclusive_and_evict_before_session
         "{prefix}{}{suffix}",
         "a".repeat(2 * 1024 * 1024 - prefix.len() - suffix.len())
     );
-    commit(root.path(), &large);
+    let large_commit = commit(root.path(), &large);
     commit(root.path(), "fn target() { small_current(); }\n");
     let request = refresh_request(&host, &request);
     let first = history.start(&request).unwrap();
@@ -1014,6 +1926,10 @@ fn exact_file_and_total_source_allowances_are_inclusive_and_evict_before_session
     for _ in 0..15 {
         tokens.push(history.start(&request).unwrap()["token"].clone());
     }
+    let origin = json!({"kind":"current","source":request});
+    let unconfirmed = select_revision(&history, &large_commit, origin).unwrap();
+    assert!(read_history_frame(&history, &unconfirmed).is_ok());
+    assert!(read_history_frame(&history, &first).is_ok());
     assert!(history.step(&step(&first["token"], 0)).is_ok());
     // Accessing the first session moves it to the end; another admission evicts the next.
     let second = history.start(&request).unwrap();

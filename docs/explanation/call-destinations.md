@@ -30,12 +30,13 @@ context can remain useful, but it must not be read as a proven call in the new s
 Module accents and task-group frames encode other relationships: language membership
 and the reader's organisation, respectively.
 
-Within history or a comparison, call lookup is limited to that exact captured file.
-Supported source-local bindings and written-name candidates keep their distinct evidence.
-The live language server and other files are not consulted. Captured arrows identify
-their revision and remain valid through unrelated saves while both ends retain it. A
-revision change or return to live makes that recorded relation historical until an
-explicit follow establishes new evidence. See [captured call instructions](../how-to/follow-captured-calls.md).
+Within history or a comparison, the default call lookup uses the exact captured file.
+At a Git commit, a reader can also choose another file from that commit and confirm a
+written-name candidate. Captured calls use stored source evidence, independent of the
+live language server. Captured arrows identify their revision and remain valid through
+unrelated saves while both ends retain it. A revision change or return to live makes
+that recorded relation historical until an explicit follow establishes new evidence.
+See [captured call instructions](../how-to/follow-captured-calls.md).
 
 ## Callers and references
 

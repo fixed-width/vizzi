@@ -69,15 +69,62 @@ impl GitRepository {
     pub fn workspace(&self) -> &WorkspaceId {
         &self.workspace
     }
+    pub(crate) fn resolve_commit(&self, revision: &str) -> Result<String, CaptureError> {
+        oid(&self.run(
+            &[
+                "rev-parse",
+                "--verify",
+                "--end-of-options",
+                &format!("{revision}^{{commit}}"),
+            ],
+            1024,
+            &|| false,
+        )?)
+    }
+
+    pub(crate) fn sole_parent(&self, commit: &str) -> Result<Option<String>, CaptureError> {
+        let output = self.run(&["rev-list", "--parents", "-n", "1", commit], 4096, &|| {
+            false
+        })?;
+        let mut parts = output.trim_ascii().split(|byte| *byte == b' ');
+        if parts.next() != Some(commit.as_bytes()) {
+            return Err(CaptureError::Git("Unexpected lineage commit".into()));
+        }
+        match (parts.next(), parts.next()) {
+            (Some(parent), None) => oid(parent).map(Some),
+            _ => Ok(None),
+        }
+    }
+
+    pub(crate) fn changed_paths(
+        &self,
+        parent: &str,
+        commit: &str,
+    ) -> Result<Vec<ReviewPath>, CaptureError> {
+        let output = self.run(
+            &[
+                "diff-tree",
+                "--no-commit-id",
+                "--no-renames",
+                "-r",
+                "-z",
+                "--name-only",
+                parent,
+                commit,
+                "--",
+            ],
+            128 * 1024,
+            &|| false,
+        )?;
+        records(&output)?
+            .map(|path| ReviewPath::parse(path.to_vec()).map_err(CaptureError::from))
+            .collect()
+    }
     pub(crate) fn file_history(
         &self,
+        tip: &str,
         path: &str,
-    ) -> Result<(String, Vec<String>, bool), CaptureError> {
-        let tip = oid(&self
-            .run(&["rev-parse", "--verify", "HEAD^{commit}"], 1024, &|| false)
-            .map_err(|_| {
-                CaptureError::Git("No local HEAD commit is available for function history".into())
-            })?)?;
+    ) -> Result<(Vec<String>, bool), CaptureError> {
         let output = self.run(
             &[
                 "--literal-pathspecs",
@@ -85,7 +132,7 @@ impl GitRepository {
                 "--first-parent",
                 "-n",
                 "65",
-                &tip,
+                tip,
                 "--",
                 path,
             ],
@@ -99,7 +146,7 @@ impl GitRepository {
             .collect::<Result<Vec<_>, _>>()?;
         let shallow =
             self.run(&["rev-parse", "--is-shallow-repository"], 1024, &|| false)? == b"true\n";
-        Ok((tip, commits, shallow))
+        Ok((commits, shallow))
     }
     pub(crate) fn pin_file(&self, commit: &str, path: &str) -> Result<GitRevision, CaptureError> {
         let entries = parse_tree(
@@ -116,6 +163,46 @@ impl GitRepository {
             entries: Arc::new(entries),
             batch: None,
         })
+    }
+
+    pub(crate) fn revision_directory(
+        &self,
+        commit: &str,
+        directory: &str,
+    ) -> Result<Vec<(String, bool)>, CaptureError> {
+        let tree = if directory.is_empty() {
+            commit.to_owned()
+        } else {
+            ReviewPath::parse(directory.as_bytes().to_vec())?;
+            format!("{commit}:{directory}")
+        };
+        let listing = self.run(&["ls-tree", "-z", &tree], 256 * 1024, &|| false)?;
+        let mut entries = Vec::new();
+        for record in records(&listing)? {
+            let (meta, name) = split_record(record)?;
+            let (mode, _) =
+                meta.split_at(meta.iter().position(|b| *b == b' ').unwrap_or(meta.len()));
+            let folder = mode == b"040000";
+            if !folder && !matches!(kind(mode), Ok(EntryKind::Regular { .. })) {
+                continue;
+            }
+            let relative = ReviewPath::parse(name.to_vec())?;
+            let Some(name) = relative
+                .document_path()
+                .filter(|name| !name.chars().any(char::is_control))
+            else {
+                continue;
+            };
+            let path = if directory.is_empty() {
+                name.into()
+            } else {
+                format!("{directory}/{name}")
+            };
+            if path.len() <= 4096 {
+                entries.push((path, folder));
+            }
+        }
+        Ok(entries)
     }
     pub(crate) fn regular_files_at(
         &self,

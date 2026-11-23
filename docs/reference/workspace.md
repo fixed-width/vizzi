@@ -38,9 +38,11 @@ structural view remains a contributor prototype, not the main reading workflow.
 | Compare | Open pinned Before/After views of adjacent function versions at the first changed block |
 | Previous changed block / Next changed block | Reveal corresponding changes in visible comparison bubbles |
 | Older revision (exit diff) | Step back through function history and exit the comparison in that bubble |
+| Find earlier declaration… | Inspect and confirm a rename or file move from a history bubble at the changing commit |
 | Open live source | Open the current caller from a result row with its supported call connection |
 | Show comparison | Reveal an existing comparison of the caller at its retained reading position |
 | Open in captured file | Follow a call using only the historical/comparison file's declarations |
+| Look in another file… | Choose a repository file and confirm a name candidate at the caller's Git commit |
 | Save | Keep a repository source location separately from the visual layout |
 | Editor | Verify and hand off a current source location to VS Code |
 
@@ -51,6 +53,7 @@ the lookup to one captured file, including files and declarations omitted by the
 repository search. Use the exact workspace-relative path with forward slashes.
 
 Function history freezes local HEAD when first opened and considers up to 64 file revisions.
+**Choose revision…** starts a timeline at an exact local commit, branch or tag.
 It skips unchanged declarations, stops at missing or ambiguous matches, and does not infer
 renames or moves. Historical bubbles disable current-source actions. See
 [reading function history](../how-to/read-function-history.md).

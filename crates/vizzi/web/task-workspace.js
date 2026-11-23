@@ -102,13 +102,22 @@ export class TaskWorkspace extends Workspace {
   const pairs = new Map();
   for (const view of this.views) {
    const comparison = view.comparison;
-   if (!comparison || comparison.returning || view.state !== 'current'
-     || view.symbol.tracking !== symbol.tracking || view.symbol.source.file !== symbol.source.file) continue;
+   if (!comparison || comparison.returning || view.state !== 'current') continue;
    const pair = pairs.get(comparison.token) ?? {};
    pair[comparison.side] = view;
    pairs.set(comparison.token, pair);
   }
-  return Array.from(pairs, ([token, {older, newer}]) => ({token, views: [older, newer].filter(Boolean)}));
+  const matches = (file, tracking) => file === symbol.source.file && tracking === symbol.tracking;
+  return Array.from(pairs, ([token, {older, newer}]) => ({token, views: [older, newer].filter(Boolean)}))
+   .filter(({views}) => views.some(view => {
+    if (matches(view.symbol.source.file, view.symbol.tracking)) return true;
+    const history = view.history;
+    if (!history?.lineage) return false;
+    const older = view.comparison.side === 'older';
+    const edge = history.lineage.find(edge => edge.at === history.index + (older ? 0 : 1));
+    const counterpart = older ? edge?.newer : edge?.older;
+    return Boolean(counterpart && matches(counterpart.file, counterpart.tracking));
+   }));
  }
 
  revealComparison(ids, width, height) {

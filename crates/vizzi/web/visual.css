@@ -56,6 +56,31 @@
 .reference-preview>.code-pane{height:220px;min-height:100px;margin-top:6px}
 .task-row{display:flex;align-items:center;gap:8px;margin:8px 0}.task-row>button:first-child{flex:1;text-align:left}.task-row [aria-current=true]{font-weight:700;border-color:var(--focus)}.task-row small{font-size:10px;color:var(--muted)}
 #task-shelf-dialog{width:min(680px,90vw)}
+#revision-dialog{width:min(420px,95vw);padding:22px;border:1px solid var(--border);border-radius:8px;color:var(--text);background:var(--paper)}
+#revision-dialog::backdrop{background:#18304455}
+#revision-form{display:grid;gap:12px}
+#revision-form h2,#revision-form p{margin:0}
+#revision-form label{display:grid;gap:5px}
+#revision-form input{width:100%;font:inherit}
+#revision-status:empty{display:none}
+#revision-error{color:var(--error-text)}
+#revision-form .dialog-actions{display:flex;justify-content:end;gap:8px}
+#lineage-dialog{width:min(560px,95vw);padding:22px;border:1px solid var(--border);border-radius:8px;color:var(--text);background:var(--paper)}
+#lineage-dialog::backdrop{background:#18304455}
+#lineage-form{display:grid;gap:12px;overflow-wrap:anywhere}
+#lineage-form h2,#lineage-form p{margin:0}
+#lineage-error{color:var(--error-text)}
+#lineage-form .dialog-actions{display:flex;justify-content:end;gap:8px}
+#cross-file-dialog{width:min(620px,95vw);max-height:80dvh;padding:22px;border:1px solid var(--border);border-radius:8px;color:var(--text);background:var(--paper)}
+#cross-file-dialog::backdrop{background:#18304455}
+#cross-file-commit{overflow-wrap:anywhere}
+#cross-file-form{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:8px}
+#cross-file-form input{display:block;width:100%;padding:7px;margin-top:5px}
+#cross-file-error{color:var(--error-text)}
+#cross-file-results{display:grid;gap:5px;max-height:42dvh;overflow:auto;overscroll-behavior:contain}
+#cross-file-results button{text-align:left;overflow-wrap:anywhere}
+#cross-file-results small{display:block;color:var(--muted)}
+.captured-call-row{display:flex;flex-wrap:wrap;gap:5px}
 #task-name-form,#group-form{display:grid;gap:12px;min-width:280px}
 #task-name-form label,#group-form>label{display:grid;gap:5px}
 #group-members{display:grid;gap:6px;max-height:320px;overflow:auto}

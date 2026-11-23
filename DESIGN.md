@@ -53,12 +53,16 @@ fragment view references a particular source observation/version/range; it is no
 to the short excerpt stored by the existing investigation model. This seam also permits
 several representations of the same source and per-view revision context for reviews.
 Working-tree views follow saved changes through explicit declaration tracking and coherent
-source/relationship refreshes. Individual views can pin a captured version or step through
-local Git function history independently; see [function history](docs/visual/HISTORY_PRODUCT.md).
+source/relationship refreshes. Individual views can pin a captured version, choose a local
+Git commit or step through function history independently. See [function history](docs/visual/HISTORY_PRODUCT.md).
+An explicit [history correspondence](docs/visual/HISTORY_LINEAGE_PRODUCT.md) can continue
+the timeline across an adjacent rename or move with exact declaration evidence.
 Adjacent function versions can be compared as independently pinned source views with
 native declaration-range differences; see [function comparison](docs/visual/FUNCTION_COMPARISON_PRODUCT.md).
-Calls from either capture can follow same-file declarations in that exact revision,
-retaining source-local and name-candidate evidence; see [captured calls](docs/visual/CAPTURED_CALLS_PRODUCT.md).
+Calls from either capture can follow same-file declarations, retaining source-local and
+name-candidate evidence. A committed capture can also follow a named call into another
+file selected at the same revision. See [captured calls](docs/visual/CAPTURED_CALLS_PRODUCT.md)
+and [cross-file calls](docs/visual/CROSS_FILE_CALLS_PRODUCT.md).
 Ambiguous or
 missing declarations retain earlier context rather than adopting a guessed target; see
 the [live view contract](docs/visual/LIVE_PRODUCT.md).

@@ -254,6 +254,13 @@ fn bounded(text: &str) -> String {
     }
     text[..end].into()
 }
+
+fn call_candidate(symbol: &Symbol) -> bool {
+    matches!(
+        symbol.kind.as_str(),
+        "function" | "struct" | "enum" | "type" | "class"
+    )
+}
 impl Structure {
     /// Builds from captured facts and bounded resident module declarations; no source IO.
     pub fn new(snapshot: &Snapshot) -> Self {
@@ -640,6 +647,16 @@ impl Structure {
     fn invocation(&self, site: &Site, area: &str) -> Invocation {
         self.invocation_with_candidates(site, area, None)
     }
+
+    /// Finds eligible declarations with the exact written name in this projection.
+    pub fn named_callees(&self, name: &str) -> impl Iterator<Item = &Symbol> {
+        self.names
+            .get(name)
+            .into_iter()
+            .flatten()
+            .map(|n| &self.symbols[*n])
+            .filter(|symbol| call_candidate(symbol))
+    }
     fn invocation_with_candidates(
         &self,
         site: &Site,
@@ -676,12 +693,7 @@ impl Structure {
             .flatten()
             .map(|n| &self.symbols[*n])
             .chain(extra)
-            .filter(|s| {
-                matches!(
-                    s.kind.as_str(),
-                    "function" | "struct" | "enum" | "type" | "class"
-                )
-            })
+            .filter(|symbol| call_candidate(symbol))
             .collect::<Vec<_>>();
         candidates.sort_by_key(|s| {
             (

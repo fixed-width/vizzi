@@ -91,6 +91,7 @@ impl Declaration {
             },
             coverage: Coverage::Partial,
             facts: vec![Fact {
+                declaration_span: None,
                 definition_anchor: None,
                 name_span: Some(self.identifier.clone()), parent: None,
                 key: format!("provider-function:{}:{}", self.identifier.start, self.name),
