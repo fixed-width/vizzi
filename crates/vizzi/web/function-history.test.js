@@ -29,4 +29,19 @@ selected.read(selectedId,{section:97,top:15,left:4,anchor:{line:100,byte:6,offse
 selected.showHistory(selectedId,{...revision,tip:revision.commit,same_text:true});
 assert.deepEqual(selected.view(selectedId).reading,{section:106,top:15,left:4,anchor:{line:109,byte:6,offset:12}});
 assert.deepEqual(Workspace.restore(selected.serialize(),id(1)).view(selectedId).reading,selected.view(selectedId).reading);
+const prior={...revision,commit:'c'.repeat(40),index:1,snapshot:id(45),symbol:{...symbol(45),tracking:id(46),name:'oldRun',source:{...symbol(45).source,file:id(47),path:'old.rs'}}};
+const pin=frame=>({commit:frame.commit,snapshot:frame.snapshot,file:frame.symbol.source.file,tracking:frame.symbol.tracking});
+prior.lineage=[{at:1,newer:pin(revision),older:pin(prior)}];
+model.showHistory(root,prior);
+assert.equal(model.view(root).symbol.source.path,'old.rs');
+assert.equal(model.links[0].source.path,'lib.rs');
+assert.doesNotThrow(()=>Workspace.restore(model.serialize(),id(1)));
+const badLink=JSON.parse(model.serialize());badLink.links[0].earlier_caller.path='forged.rs';
+assert.throws(()=>Workspace.restore(JSON.stringify(badLink),id(1)));
+for(const mutate of [edge=>edge.at=0,edge=>edge.older.snapshot=id(99),edge=>edge.newer.tracking=id(99),edge=>edge.older.file=id(99)]){
+ const bad=JSON.parse(model.serialize());mutate(bad.views[0].history.lineage[0]);
+ assert.throws(()=>Workspace.restore(JSON.stringify(bad),id(1)));
+}
+model.showHistory(root,{...revision,lineage:prior.lineage});
+assert.equal(model.view(root).symbol.source.path,'lib.rs');
 console.log('function history: validated revision bindings, relative reading position, stable layout, persistence and return to live');

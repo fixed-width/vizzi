@@ -55,6 +55,8 @@ several representations of the same source and per-view revision context for rev
 Working-tree views follow saved changes through explicit declaration tracking and coherent
 source/relationship refreshes. Individual views can pin a captured version, choose a local
 Git commit or step through function history independently. See [function history](docs/visual/HISTORY_PRODUCT.md).
+An explicit [history correspondence](docs/visual/HISTORY_LINEAGE_PRODUCT.md) can continue
+the timeline across an adjacent rename or move with exact declaration evidence.
 Adjacent function versions can be compared as independently pinned source views with
 native declaration-range differences; see [function comparison](docs/visual/FUNCTION_COMPARISON_PRODUCT.md).
 Calls from either capture can follow same-file declarations, retaining source-local and

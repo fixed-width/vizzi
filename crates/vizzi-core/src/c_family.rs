@@ -99,6 +99,16 @@ fn collect(node: Node<'_>, text: &str, output: &mut Vec<Declaration>) {
         let mut declaration = Declaration::at(node, kind, name);
         if kind == "function" {
             declaration.name_span = declarator_span(node, text, &declaration.name);
+            if node.kind() == "function_declarator" {
+                declaration.declaration_span = prototype_container(node).and_then(|parent| {
+                    let mut cursor = parent.walk();
+                    (parent
+                        .children_by_field_name("declarator", &mut cursor)
+                        .count()
+                        == 1)
+                        .then(|| parent.byte_range())
+                });
+            }
         }
         output.push(declaration);
     } else if node.kind() == "type_definition" {
@@ -155,24 +165,8 @@ fn scope(node: Node<'_>, text: &str) -> Option<(&'static str, String)> {
         ) {
             return None;
         }
-        let mut parent = node.parent();
-        for _ in 0..32 {
-            let current = parent?;
-            if matches!(current.kind(), "declaration" | "field_declaration") {
-                return Some(("function", declarator_name(node, text)?));
-            }
-            if matches!(
-                current.kind(),
-                "function_definition"
-                    | "parameter_declaration"
-                    | "type_definition"
-                    | "type_descriptor"
-            ) {
-                return None;
-            }
-            parent = current.parent();
-        }
-        return None;
+        prototype_container(node)?;
+        return Some(("function", declarator_name(node, text)?));
     }
     let kind = match node.kind() {
         "function_definition" => "function",
@@ -190,6 +184,21 @@ fn scope(node: Node<'_>, text: &str) -> Option<(&'static str, String)> {
         spelling(node.child_by_field_name("name")?, text)?
     };
     Some((kind, name))
+}
+
+fn prototype_container(mut node: Node<'_>) -> Option<Node<'_>> {
+    for _ in 0..32 {
+        node = node.parent()?;
+        match node.kind() {
+            "declaration" | "field_declaration" => return Some(node),
+            "function_definition"
+            | "parameter_declaration"
+            | "type_definition"
+            | "type_descriptor" => return None,
+            _ => {}
+        }
+    }
+    None
 }
 
 fn spelling(node: Node<'_>, text: &str) -> Option<String> {

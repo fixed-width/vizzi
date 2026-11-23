@@ -81,6 +81,45 @@ impl GitRepository {
             &|| false,
         )?)
     }
+
+    pub(crate) fn sole_parent(&self, commit: &str) -> Result<Option<String>, CaptureError> {
+        let output = self.run(&["rev-list", "--parents", "-n", "1", commit], 4096, &|| {
+            false
+        })?;
+        let mut parts = output.trim_ascii().split(|byte| *byte == b' ');
+        if parts.next() != Some(commit.as_bytes()) {
+            return Err(CaptureError::Git("Unexpected lineage commit".into()));
+        }
+        match (parts.next(), parts.next()) {
+            (Some(parent), None) => oid(parent).map(Some),
+            _ => Ok(None),
+        }
+    }
+
+    pub(crate) fn changed_paths(
+        &self,
+        parent: &str,
+        commit: &str,
+    ) -> Result<Vec<ReviewPath>, CaptureError> {
+        let output = self.run(
+            &[
+                "diff-tree",
+                "--no-commit-id",
+                "--no-renames",
+                "-r",
+                "-z",
+                "--name-only",
+                parent,
+                commit,
+                "--",
+            ],
+            128 * 1024,
+            &|| false,
+        )?;
+        records(&output)?
+            .map(|path| ReviewPath::parse(path.to_vec()).map_err(CaptureError::from))
+            .collect()
+    }
     pub(crate) fn file_history(
         &self,
         tip: &str,

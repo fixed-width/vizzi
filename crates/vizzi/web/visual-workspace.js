@@ -24,7 +24,7 @@ const el=id=>document.getElementById(id),node=(tag,text='')=>{const n=document.c
 const error=createMessage(el('visual-error'),{label:'Dismiss workspace error'}),notice=createMessage(el('visual-notice'),{label:'Dismiss workspace notice'});
 let definitionProvider=false;const definitionCapabilities=transport('/api/structure').then(c=>{definitionProvider=c.definition_provider===true;}).catch(()=>{});
 let model,currentSnapshot,taskControls,board,editorName='editor',busy=false,saveTimer,paletteTicket=0,jobs=Promise.resolve(),demoOpened=false,livePendingTimer;
-let revisionPicker,crossFilePicker;
+let revisionPicker,lineagePicker,crossFilePicker;
 const mounted=new Map();
 const returnPending=r=>r.liveReturn==='pending';
 const SECTION_ROWS=96,SECTION_LIMIT=4,SECTION_EDGE=240;
@@ -52,7 +52,9 @@ const post=(path,body,signal)=>transport(path,{method:'POST',headers:{'Content-T
 const definitionWarmup=new DefinitionWarmup((snapshot,call,path)=>post('/api/call-definition',{snapshot,call,path}));
 function refreshCapture(){
  const views=model.views.filter(v=>v.mode==='live');const key=JSON.stringify([views.map(v=>[v.id,v.symbol.id,v.mode,mounted.get(v.id)?.sourceTicket,v.reading]),model.links.map(l=>[l.id,l.state])]);
- return {key,body:{views:views.map(v=>{const r=mounted.get(v.id),context=r?.sourcePane.readingContext(),reading=v.reading,a=reading.anchor;return {id:v.id,tracking:v.symbol.tracking??null,symbol:v.symbol.id,file:v.symbol.source.file,context:v.symbol.source.context,capture:v.symbol.origin?.capture??null,version:r?.lines?.length?v.symbol.source.version:'0'.repeat(64),area:v.area,section_offset:reading.section-v.symbol.source.line,anchor:a?{offset:a.line-v.symbol.source.line,byte:a.byte,text:context?.reading.anchor?.line===a.line?context.text:''}:null};}),links:model.links.map(l=>({id:l.id,from:l.from,to:l.to,spelling:l.spelling,kind:l.kind}))}};
+ return {key,body:{views:views.map(v=>{const r=mounted.get(v.id),context=r?.sourcePane.readingContext(),reading=v.reading,a=reading.anchor;
+  const tracked=v.history?.lineage?.length?v.history.base.symbol:v.symbol;
+  return {id:v.id,tracking:tracked.tracking??null,symbol:tracked.id,file:tracked.source.file,context:tracked.source.context,capture:tracked.origin?.capture??null,version:r?.lines?.length?v.symbol.source.version:'0'.repeat(64),area:v.area,section_offset:reading.section-v.symbol.source.line,anchor:a?{offset:a.line-v.symbol.source.line,byte:a.byte,text:context?.reading.anchor?.line===a.line?context.text:''}:null};}),links:model.links.map(l=>({id:l.id,from:l.from,to:l.to,spelling:l.spelling,kind:l.kind}))}};
 }
 async function requestLiveRefresh(body,signal){
  const data=await post('/api/visual/refresh',body,signal);
@@ -93,7 +95,7 @@ function applyLive(data){
    if(!retargetCalls(r.code,before,r.actions))r.sourcePane.rerender();
   }
   const callsChanged=JSON.stringify(r.sites)!==JSON.stringify(update.calls.items);r.sites=update.calls.items;r.nextCalls=update.calls.next;r.matching=update.calls.matching;r.callsReady=true;if(publicationChanged||update.window)r.popup.hidden=true;if(callsChanged)renderCalls(v.id);
-  r.element.dataset.name=v.symbol.name;r.element.setAttribute('aria-label',`${v.symbol.name} bubble`);r.element.querySelector('.fragment-heading strong').textContent=[...v.symbol.parents,v.symbol.name].join('::');r.element.querySelector('.fragment-heading small').textContent=`${v.symbol.origin?originLabel(v.symbol.origin)+' · ':''}${v.symbol.source.path}:${v.symbol.source.line}`;
+  updateFragmentHeading(r,v);
   sourceStatus(r,p.reset?'Live · reading reset':'Live');recordReading(r);void prepareDefinitions(v.id);
   if(r.restoreAnchor)void extendSource(r,false);
  }
@@ -131,9 +133,21 @@ const prepareEditorCall=createCallPreparation({read:()=>model,
 const editorCalls=installWorkspaceDelivery({mode:'call',
  ready:action=>Boolean(size().w>=1&&size().h>=1&&(action.kind==='reveal'||model&&!model.stale)),
  prepare:(action,context)=>action.kind==='reveal'?Promise.resolve({commit(){}}):prepareEditorCall(action,context),failed:fail,
- changed:pending=>{if(pending){closeRevisionPicker();closeCrossFilePicker();callMenu.hide();hideDestinations();window.getSelection()?.removeAllRanges();for(const r of mounted.values()){r.navigation=(r.navigation??0)+1;r.historyTicket=(r.historyTicket??0)+1;r.historyController?.abort();if(r.historyLoading)r.comparing=r.historyLoading=r.loading=false;r.resolving=false;updateFragmentStatus(r);}geometry();live.resume();}}
+ changed:pending=>{if(pending){closeRevisionPicker();closeLineagePicker();closeCrossFilePicker();callMenu.hide();hideDestinations();window.getSelection()?.removeAllRanges();for(const r of mounted.values()){r.navigation=(r.navigation??0)+1;r.historyTicket=(r.historyTicket??0)+1;r.historyController?.abort();if(r.historyLoading)r.comparing=r.historyLoading=r.loading=false;r.resolving=false;updateFragmentStatus(r);}geometry();live.resume();}}
 });
 document.addEventListener('selectionchange',()=>live.resume());
+function qualifiedName(symbol){return [...symbol.parents,symbol.name].join('::');}
+function updateFragmentHeading(record,view){
+ const {element,referenceActions,code}=record,{symbol}=view;
+ element.dataset.name=symbol.name;
+ element.setAttribute('aria-label',`${symbol.name} bubble`);
+ referenceActions.setAttribute('aria-label',`Actions for ${symbol.name} bubble`);
+ code.setAttribute('aria-label',`${symbol.name} captured code`);
+ const heading=element.querySelector('.fragment-heading');
+ heading.title=qualifiedName(symbol);
+ heading.querySelector('strong').textContent=heading.title;
+ heading.querySelector('small').textContent=`${symbol.origin?originLabel(symbol.origin)+' · ':''}${symbol.source.path}:${symbol.source.line}`;
+}
 function updateFragmentStatus(r){
  const v=model.view(r.id);
  if(r.historyLoading)r.state.textContent=r.comparing?'Loading comparison…':'Loading function history…';
@@ -154,6 +168,67 @@ function currentHistorySource(v){
  const {file,version}=v.symbol.source;
  return {snapshot:v.snapshot,file,version,tracking:v.symbol.tracking};
 }
+
+function historySource(v){
+ const {file,version}=v.symbol.source;
+ return {token:v.history.token,index:v.history.index,snapshot:v.snapshot,file,version};
+}
+
+function canFindEarlier(v){return Boolean(v.history&&!v.comparison&&v.mode==='pinned');}
+
+function closeLineagePicker(restoreFocus=false){
+ const picker=lineagePicker;
+ lineagePicker=undefined;
+ picker?.controller.abort();
+ const dialog=el('lineage-dialog');
+ if(dialog.open)dialog.close();
+ if(restoreFocus&&picker?.trigger.isConnected)picker.trigger.focus({preventScroll:true});
+}
+
+function lineageStatus(message){
+ const status=el('lineage-status');status.textContent=message;status.hidden=!message;
+}
+
+function lineageError(error){
+ const message=el('lineage-error');message.textContent=error.message;message.hidden=false;
+}
+
+async function openLineagePicker(id,trigger){
+ const view=model.view(id);
+ if(!canFindEarlier(view)||mounted.get(id)?.loading)return;
+ editorCalls.manual();callMenu.hide();hideDestinations();
+ const controller=new AbortController(),source=historySource(view),picker={id,trigger,controller,source};
+ lineagePicker=picker;
+ const current=el('lineage-current'),candidate=el('lineage-candidate'),accept=el('accept-lineage');
+ current.textContent=`${qualifiedName(view.symbol)} · ${view.symbol.source.path}:${view.symbol.source.line} · ${view.history.commit}`;
+ candidate.hidden=true;accept.disabled=true;el('lineage-error').hidden=true;
+ lineageStatus('Checking the immediate parent…');
+ el('lineage-dialog').showModal();
+ try{
+  const result=await post('/api/function-history/lineage',{kind:'preview',source},controller.signal);
+  if(lineagePicker!==picker)return;
+  candidate.textContent=`${qualifiedName(result.symbol)} · ${result.symbol.source.path}:${result.symbol.source.line} · ${result.commit}`;
+  candidate.hidden=false;
+  picker.selection={kind:'accept',source,snapshot:result.snapshot,target:result.symbol.id};
+  accept.disabled=false;
+  lineageStatus('The declaration text matches apart from its name, and the enclosing scope matches.');
+ }catch(error){
+  if(lineagePicker===picker&&error.name!=='AbortError'){lineageStatus('');lineageError(error);}
+ }
+}
+el('cancel-lineage').onclick=()=>closeLineagePicker(true);
+el('lineage-dialog').addEventListener('cancel',event=>{event.preventDefault();closeLineagePicker(true);});
+el('lineage-form').onsubmit=async event=>{
+ event.preventDefault();
+ const picker=lineagePicker,accept=el('accept-lineage');
+ if(!picker?.selection||accept.disabled)return;
+ accept.disabled=true;el('lineage-error').hidden=true;
+ lineageStatus('Preparing the earlier declaration…');
+ const accepted=await changeHistory(picker.id,0,{lineage:picker.selection,signal:picker.controller.signal,failed:lineageError});
+ if(lineagePicker!==picker)return;
+ if(accepted){closeLineagePicker(true);return;}
+ lineageStatus('');accept.disabled=false;
+};
 
 function canChooseRevision(v){
  return !v.symbol.origin&&v.symbol.kind==='function'&&v.symbol.tracking&&
@@ -213,7 +288,7 @@ async function changeHistory(id,direction,selection){
   selection?.failed(new Error('Clear the source selection before changing revision.'));
   return;
  }
- if(selection&&!canChooseRevision(v)){
+ if(selection&&!(selection.lineage?canFindEarlier(v):canChooseRevision(v))){
   selection.failed(new Error('Wait for the function source before choosing a revision.'));
   return;
  }
@@ -231,7 +306,10 @@ async function changeHistory(id,direction,selection){
  signal.addEventListener('abort',finish,{once:true});
  try{
   let revision;
-  if(selection){
+  if(selection?.lineage){
+   if(JSON.stringify(historySource(v))!==JSON.stringify(selection.lineage.source))throw new Error('The selected revision changed. Open the earlier declaration finder again.');
+   revision=await post('/api/function-history/lineage',selection.lineage,signal);
+  }else if(selection){
    const captured=frozenSource(v);
    const origin=captured?{kind:'captured',source:captured}:{kind:v.mode==='pinned'?'pinned':'current',source:currentHistorySource(v)};
    revision=await post('/api/function-history/select',{revision:selection.revision,origin},signal);
@@ -245,9 +323,9 @@ async function changeHistory(id,direction,selection){
   const [data,actions]=await Promise.all([start===s.line?revision.window:transport('/api/function-history/window?'+query,{signal}),capturedActions(next,start,Math.min(96,s.end_line-start+1),signal)]);verify();
   if(data?.snapshot!==revision.snapshot||data.file!==s.file||data.version!==s.version||!Array.isArray(data.lines)||!data.lines.length||data.lines.length>96||data.lines[0].number!==start||revision.origin?.number!==s.line||revision.origin.left||revision.origin.column!==0)throw new Error('Historical source differs from the requested function');
   r.sourceTicket=(r.sourceTicket??0)+1;model.showHistory(id,revision);r.liveReturn=null;r.historyLoading=false;r.loading=false;r.sites=[];r.callsReady=false;r.actions=[];
-  r.element.querySelector('.fragment-heading small').textContent=`${s.path}:${s.line}`;
+  updateFragmentHeading(r,model.view(id));
   applyPreparedSource(id,{data,actions,start,margin:functionIndent(revision.origin)});save();
-  if(selection){
+  if(selection&&!selection.lineage){
    void post('/api/function-history/confirm',{token:revision.token}).catch(error=>{
     if(model===workspace&&mounted.get(id)===r&&model.view(id).history?.token===revision.token)notice.show(error.message);
    });
@@ -492,7 +570,7 @@ async function compareFunction(id){
   const actionSets=await Promise.all([id,preview.older].map(viewId=>{const view=planned.view(viewId);return capturedActions(view,view.reading.section,Math.min(96,view.symbol.source.end_line-view.reading.section+1),controller.signal);}));
   if(model!==workspace||mounted.get(id)!==r||r.historyTicket!==ticket||JSON.stringify([model.view(id).snapshot,model.view(id).symbol.id,model.view(id).history])!==binding)throw new DOMException('Comparison superseded','AbortError');
   if(r.sourcePane.selected())throw new DOMException('Comparison deferred for selection','AbortError');newer.actions=actionSets[0];older.actions=actionSets[1];
-  const opened=model.openComparison(id,pair);r.historyLoading=r.loading=r.comparing=false;r.liveReturn=null;r.sites=[];r.actions=[];r.callsReady=false;r.element.querySelector('.fragment-heading small').textContent=`${model.view(id).symbol.source.path}:${model.view(id).symbol.source.line}`;
+  const opened=model.openComparison(id,pair);r.historyLoading=r.loading=r.comparing=false;r.liveReturn=null;r.sites=[];r.actions=[];r.callsReady=false;updateFragmentHeading(r,model.view(id));
   applyPreparedSource(id,{...newer,openedAtFirstBlock:pair.newer.changes.length>0});
   mount(opened.older,older);focus([id,opened.older]);save();
  }catch(error){if(error.name!=='AbortError'&&model===workspace&&mounted.get(id)===r&&r.historyTicket===ticket)fail(error);}
@@ -546,7 +624,7 @@ function links(){
 }
 function geometry(){
  if(!model)return;for(const[id,r]of mounted)if(!model.views.some(v=>v.id===id)){r.controller.abort();r.historyController?.abort();r.sourcePane.dispose();r.element.remove();mounted.delete(id);}const c=model.camera;el('workspace-world').style.transform=`translate(${-c.x*c.scale}px,${-c.y*c.scale}px) scale(${c.scale})`;el('visual-zoom').textContent=Math.round(c.scale*100)+'%';el('visual-empty').hidden=model.items().length>0;el('visual-stale').hidden=!model.views.some(v=>v.state==='unresolved'&&!mounted.get(v.id)?.liveReturn);
- for(const v of model.views){const r=mounted.get(v.id);if(!r)continue;r.element.hidden=!model.isVisible(v.id);Object.assign(r.element.style,{left:v.x+'px',top:v.y+'px',width:v.w+'px',height:(v.collapsed?54:v.h)+'px'});const membership=modulePresentation(v,model.views);r.element.classList.toggle('has-module',Boolean(membership));const moduleKey=JSON.stringify(membership);if(moduleKey!==r.moduleKey){r.moduleKey=moduleKey;r.moduleTag.hidden=!membership;if(membership){r.element.dataset.moduleId=membership.id;r.moduleTag.dataset.moduleId=membership.id;r.moduleTag.textContent=membership.label;r.moduleTag.title=membership.title;r.element.style.setProperty('--module-accent',`var(--module-${membership.colour})`);r.element.style.setProperty('--module-tint',`var(--module-tint-${membership.colour})`);}else{delete r.element.dataset.moduleId;delete r.moduleTag.dataset.moduleId;r.moduleTag.textContent='';r.element.style.removeProperty('--module-accent');r.element.style.removeProperty('--module-tint');}}r.body.hidden=v.collapsed;r.collapse.textContent=v.collapsed?'▾':'▴';r.collapse.setAttribute('aria-label',v.collapsed?'Expand bubble':'Collapse bubble');r.element.classList.toggle('is-selected',v.id===model.selected);r.element.classList.toggle('is-stale',!model.usable(v.id));r.prev.disabled=r.next.disabled=Boolean(r.historyLoading);r.callsButton.disabled=!model.navigable(v.id)||r.historyLoading;r.referenceActions.disabled=r.historyLoading||(!model.usable(v.id)&&!(v.comparison&&!r.loading&&!returnPending(r)&&canChooseRevision(v)));r.fitHeight.disabled=r.fitWidth.disabled=r.loading||!r.lines?.length||v.collapsed;inlineAvailability(r.code,v.id);r.keep.disabled=Boolean(v.symbol.origin)||!model.usable(v.id)||r.historyLoading||!board||busy;r.keep.title=v.symbol.origin?'Dependency locations stay in this workspace.':'Save location';r.editor.disabled=!model.usable(v.id)||r.historyLoading||busy;historyControls(r,v);comparisonControls(r,v);updateFragmentStatus(r);restoreVisibleReading(r,v);}
+ for(const v of model.views){const r=mounted.get(v.id);if(!r)continue;r.element.hidden=!model.isVisible(v.id);Object.assign(r.element.style,{left:v.x+'px',top:v.y+'px',width:v.w+'px',height:(v.collapsed?54:v.h)+'px'});const membership=modulePresentation(v,model.views);r.element.classList.toggle('has-module',Boolean(membership));const moduleKey=JSON.stringify(membership);if(moduleKey!==r.moduleKey){r.moduleKey=moduleKey;r.moduleTag.hidden=!membership;if(membership){r.element.dataset.moduleId=membership.id;r.moduleTag.dataset.moduleId=membership.id;r.moduleTag.textContent=membership.label;r.moduleTag.title=membership.title;r.element.style.setProperty('--module-accent',`var(--module-${membership.colour})`);r.element.style.setProperty('--module-tint',`var(--module-tint-${membership.colour})`);}else{delete r.element.dataset.moduleId;delete r.moduleTag.dataset.moduleId;r.moduleTag.textContent='';r.element.style.removeProperty('--module-accent');r.element.style.removeProperty('--module-tint');}}r.body.hidden=v.collapsed;r.collapse.textContent=v.collapsed?'▾':'▴';r.collapse.setAttribute('aria-label',v.collapsed?'Expand bubble':'Collapse bubble');r.element.classList.toggle('is-selected',v.id===model.selected);r.element.classList.toggle('is-stale',!model.usable(v.id));r.prev.disabled=r.next.disabled=Boolean(r.historyLoading);r.callsButton.disabled=!model.navigable(v.id)||r.historyLoading;r.referenceActions.disabled=r.historyLoading||(!model.usable(v.id)&&!(!r.loading&&!returnPending(r)&&(canFindEarlier(v)||v.comparison&&canChooseRevision(v))));r.fitHeight.disabled=r.fitWidth.disabled=r.loading||!r.lines?.length||v.collapsed;inlineAvailability(r.code,v.id);r.keep.disabled=Boolean(v.symbol.origin)||!model.usable(v.id)||r.historyLoading||!board||busy;r.keep.title=v.symbol.origin?'Dependency locations stay in this workspace.':'Save location';r.editor.disabled=!model.usable(v.id)||r.historyLoading||busy;historyControls(r,v);comparisonControls(r,v);updateFragmentStatus(r);restoreVisibleReading(r,v);}
  if(model.stale)callMenu.hide();links();overview();outlines.refresh();highlights.refresh();taskGroups.refresh();referenceStacks.refresh();
 }
 function button(text,label,handler){const b=node('button',text);b.type='button';if(label)b.setAttribute('aria-label',label);b.onclick=()=>{try{handler();}catch(e){fail(e);}};return b;}
@@ -561,12 +639,14 @@ function mount(id,prepared){
  const collapse=button('▴','Collapse bubble',()=>{callMenu.hide();model.collapse(id);geometry();save();}),close=button('×','Close bubble',()=>{editorCalls.manual();callMenu.hide();const r=mounted.get(id);r.controller.abort();r.historyController?.abort();r.sourcePane.dispose();element.remove();mounted.delete(id);model.close(id);hideDestinations();geometry();save();});const pin=button('Pin version','Pin version',()=>{if(model.view(id).history||model.view(id).comparison||model.view(id).captured){returnHistoryLive(id);return;}model.pin(id,model.view(id).mode!=='pinned');geometry();save();refreshLive();});const fitHeight=button('↕','Fit height',()=>fitCode(id,'height')),fitWidth=button('↔','Fit width',()=>fitCode(id,'width'));for(const b of [fitHeight,fitWidth]){b.className='bubble-fit';b.title=b.getAttribute('aria-label')+' to this code section';}heading.title=[...v.symbol.parents,v.symbol.name].join('::');
  const referenceActions=button('⋯',`Actions for ${v.symbol.name} bubble`,()=>{
   const view=model.view(id);
-  const actions=view.comparison?[{label:'Choose revision…',run:()=>openRevisionPicker(id,referenceActions)}]:[
+  const actions=view.comparison?[{label:'Choose revision…',run:()=>openRevisionPicker(id,referenceActions)}]:canFindEarlier(view)?[
+   {label:'Find earlier declaration…',run:()=>void openLineagePicker(id,referenceActions)},
+  ]:[
    {label:'Find callers',run:()=>openReferences(id,'callers')},
    {label:'Find references',run:()=>openReferences(id,'references')},
    {label:'Task group',run:()=>taskControls.showGroups(model.groupFor(id)?.id??'')},
   ];
-  callMenu.show(referenceActions,view.symbol.name,actions,Boolean(view.comparison));
+  callMenu.show(referenceActions,view.symbol.name,actions,Boolean(view.comparison)||canFindEarlier(view));
  });
  header.append(heading,referenceActions,fitHeight,fitWidth,collapse,close);element.append(header);bindDrag(header,id);
  const body=node('div');body.className='fragment-body';const historyRow=node('div');historyRow.className='fragment-history';const historyPrevious=button('Previous change','Previous function change',()=>void changeHistory(id,1)),historyNext=button('Next change','Next function change',()=>{if(newestHistory(model.view(id)))returnHistoryLive(id);else void changeHistory(id,-1);}),historyLabel=node('span');historyLabel.setAttribute('role','status');const compareButton=button('Compare','Compare with previous version',()=>model.view(id).comparison?void changeHistory(id,1):void compareFunction(id)),editPrevious=button('Previous changed block',null,()=>void comparisonEdit(id,-1)),editNext=button('Next changed block',null,()=>void comparisonEdit(id,1));
@@ -825,7 +905,7 @@ async function keepLocation(id){
 async function openEditor(id){const r=mounted.get(id);if(!r||busy||!model.usable(id))return;const s=model.view(id).symbol.source;busy=true;geometry();try{await post(model.view(id).symbol.origin?'/api/dependency/editor':'/api/editor/open',{snapshot:model.view(id).symbol.origin?.capture??model.snapshot,file:s.file,version:s.version,line:s.line});}catch(e){fail(e);}finally{busy=false;geometry();live.resume();}}
 function openReferences(id,query){editorCalls.manual();try{if(!model.usable(id))throw new Error('Open a current function before finding references.');const stack=model.addReferences(model.view(id).symbol,query,id);geometry();focus([id,stack]);save();}catch(e){fail(e);}}
 function replaceTask(next){
- editorCalls.manual();closeRevisionPicker();closeCrossFilePicker();callMenu.hide();hideDestinations();clearTimeout(livePendingTimer);
+ editorCalls.manual();closeRevisionPicker();closeLineagePicker();closeCrossFilePicker();callMenu.hide();hideDestinations();clearTimeout(livePendingTimer);
  for(const r of mounted.values()){r.controller.abort();r.historyController?.abort();r.sourcePane.dispose();r.element.remove();}
  mounted.clear();referenceStacks.reset();jobs=Promise.resolve();model=next;
  for(const v of model.views)mount(v.id);

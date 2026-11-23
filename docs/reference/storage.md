@@ -58,6 +58,8 @@ Visual tasks currently have no export/import interface and do not synchronise be
 devices. [Managing tasks](../how-to/manage-tasks.md) describes the controls.
 
 Function history considers up to 64 file revisions per session, with a 2-MiB file limit.
+An accepted rename or move counts toward the same history bounds. A session can hold
+up to four [accepted transitions](../visual/HISTORY_LINEAGE_PRODUCT.md).
 The selected analysed caller file is retained for each session. Revisiting its earlier
 versions can read their immutable Git objects again. These are logical source-byte bounds, excluding analysis
 metadata and parser memory. Reload can restore a retained history session; restarting the

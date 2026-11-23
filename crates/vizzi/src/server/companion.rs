@@ -42,6 +42,7 @@ pub(super) fn router(
     let history_step = history.clone();
     let history_select = history.clone();
     let history_confirm = history.clone();
+    let history_lineage = history.clone();
     let comparison_start = history.clone();
     let comparison_windows = history.clone();
     let captured_calls = history.clone();
@@ -61,6 +62,7 @@ pub(super) fn router(
         .route("/api/function-history/step",post(move |Json(request):Json<crate::function_history::Step>|{let history=history_step.clone();async move{work(move||history.step(&request)).await}}))
         .route("/api/function-history/select",post(move |Json(request):Json<crate::function_history::SelectRevision>|{let history=history_select.clone();async move{work(move||history.select_revision(&request)).await}}))
         .route("/api/function-history/confirm",post(move |Json(request):Json<crate::function_history::ConfirmRevision>|{let history=history_confirm.clone();async move{work(move||history.confirm_revision(&request)).await}}))
+        .route("/api/function-history/lineage",post(move |Json(request):Json<crate::function_history::LineageRequest>|{let history=history_lineage.clone();async move{work(move||history.lineage(&request)).await}}))
         .route("/api/function-history/window",get(move |Query(binding):Query<HistoryWindow>,Query(query):Query<vizzi_core::projection::WindowQuery>|{let history=history.clone();async move{work(move||history.window(&binding.token,&binding.snapshot,&binding.file,&binding.version,&query)).await}}))
         .route("/api/editor/call",post(move|Json(request):Json<crate::structural::editor::Request>|{let structure=editor_calls.clone();async move{work(move||structure.editor_call(&request)).await}}).layer(DefaultBodyLimit::max(16*1024*1024)))
         .route("/api/dependency/window",get(move |Query(binding):Query<DependencyWindow>,Query(query):Query<vizzi_core::projection::WindowQuery>|{let app=dependency_windows.clone();async move{dependency_read(move||app.dependency_window(&binding.snapshot,&binding.file,&binding.version,&query)).await}}))

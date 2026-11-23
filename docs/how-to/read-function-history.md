@@ -49,10 +49,19 @@ up to 64 file revisions and does not switch branches, check out files, fetch obj
 build the inspected project. New commits do not change an already-open timeline; return
 live and open history again to start from a newer HEAD.
 
-Matching stops when the declaration is missing or ambiguous. Renames, moves to another
-file or lexical scope, and ambiguous overloads require opening the desired function
-explicitly. Boundary messages distinguish a matching failure, shallow history and the
-64-revision bound from the beginning of complete available history.
+Ordinary matching stops when the declaration is missing or ambiguous. Boundary messages
+distinguish a matching failure, shallow history and the 64-revision bound from the
+beginning of complete available history.
+
+## Continue across a rename or file move
+
+1. Open the commit at the boundary with **Previous change** or **Choose revision…**.
+2. Open the bubble's Actions menu and choose **Find earlier declaration…**.
+3. Check the names, paths and commit IDs. Choose **Use earlier declaration** to add the
+   match to the timeline. Use **Next change** to return across the accepted transition.
+
+The match requires the same enclosing scope and exact declaration text apart from the
+name. If the candidate is missing or ambiguous, the bubble keeps the displayed capture.
 
 Captured history is temporary. A reload can restore it while its native session remains
 available; server restart or session eviction can make it unavailable. **Return to live**

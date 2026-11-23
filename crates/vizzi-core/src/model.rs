@@ -120,6 +120,10 @@ pub enum SourceEncoding {
 /// A lexical declaration before binding to a workspace path.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Fact {
+    /// Complete source span for a parsed function when the adapter can establish it.
+    /// Some adapters project a narrower `span`, such as a C function declarator.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub declaration_span: Option<Range<usize>>,
     /// Exact declaration identifier when available; absent for legacy/custom facts.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name_span: Option<Range<usize>>,
@@ -322,6 +326,13 @@ impl Document {
                     return Err(ModelError(
                         "invalid or duplicate declaration range/key".into(),
                     ));
+                }
+                if let Some(span) = &fact.declaration_span
+                    && (span.start > fact.span.start
+                        || span.end < fact.span.end
+                        || !text.is_some_and(|text| text.get(span.clone()).is_some()))
+                {
+                    return Err(ModelError("invalid complete declaration range".into()));
                 }
             }
             if let Some(calls) = &analysis.calls {
@@ -598,6 +609,7 @@ mod tests {
             },
             coverage: Coverage::Syntax,
             facts: vec![Fact {
+                declaration_span: None,
                 definition_anchor: None,
                 name_span: None,
                 parent: None,

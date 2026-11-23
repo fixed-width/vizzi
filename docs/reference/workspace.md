@@ -38,6 +38,7 @@ structural view remains a contributor prototype, not the main reading workflow.
 | Compare | Open pinned Before/After views of adjacent function versions at the first changed block |
 | Previous changed block / Next changed block | Reveal corresponding changes in visible comparison bubbles |
 | Older revision (exit diff) | Step back through function history and exit the comparison in that bubble |
+| Find earlier declaration… | Inspect and confirm a rename or file move from a history bubble at the changing commit |
 | Open live source | Open the current caller from a result row with its supported call connection |
 | Show comparison | Reveal an existing comparison of the caller at its retained reading position |
 | Open in captured file | Follow a call using only the historical/comparison file's declarations |

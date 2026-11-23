@@ -243,15 +243,11 @@ impl FunctionHistory {
         let session = sessions
             .get(token)
             .ok_or_else(|| conflict("Function history expired; return to live"))?;
-        let version = session
-            .versions
-            .get(index)
-            .ok_or_else(|| invalid("Invalid comparison history position"))?;
+        if index >= session.versions.len() {
+            return Err(invalid("Invalid comparison history position"));
+        }
         let capture = self.restore(session, index)?;
-        Ok((
-            capture,
-            json!({"token":session.token,"tip":session.tip,"commit":version.commit,"index":index}),
-        ))
+        Ok((capture, session.metadata(index)))
     }
     fn current_comparison_capture(&self, request: &Request) -> Result<Capture, CompanionError> {
         let snapshot = self

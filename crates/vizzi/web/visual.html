@@ -22,6 +22,12 @@
 <p id="revision-status" role="status"></p><p id="revision-error" role="alert" hidden></p>
 <div class="dialog-actions"><button id="cancel-revision" type="button">Cancel</button><button id="open-revision" type="submit">Open revision</button></div>
 </form></dialog>
+<dialog id="lineage-dialog" aria-labelledby="lineage-title"><form id="lineage-form">
+<h2 id="lineage-title">Find earlier declaration</h2>
+<p id="lineage-current"></p><p id="lineage-candidate" hidden></p>
+<p id="lineage-status" role="status" hidden></p><p id="lineage-error" role="alert" hidden></p>
+<div class="dialog-actions"><button id="cancel-lineage" type="button" autofocus>Close</button><button id="accept-lineage" type="submit" disabled>Use earlier declaration</button></div>
+</form></dialog>
 <dialog id="cross-file-dialog" aria-labelledby="cross-file-title">
 <div class="dialog-heading"><h2 id="cross-file-title">Look in another file</h2><button id="close-cross-file" type="button">Close</button></div>
 <p id="cross-file-commit"></p>

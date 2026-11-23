@@ -278,7 +278,13 @@ impl FunctionHistory {
             .ok_or_else(|| invalid("File is outside the configured source scope"))?;
         let repository = GitRepository::open(self.host.root()).map_err(unavailable)?;
         let snapshot = self
-            .analyzed_revision_file(&repository, context.commit, path, classification)?
+            .analyzed_revision_file(
+                &repository,
+                context.commit,
+                path,
+                classification,
+                FILE_BYTES,
+            )?
             .ok_or_else(|| invalid("File is missing or is not a regular file at this commit"))?;
         if !snapshot.documents()[0]
             .analyses()

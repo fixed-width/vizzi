@@ -314,6 +314,7 @@ fn declaration_and_call_allowances_are_finite_and_expose_omissions() {
     analysis.calls = None;
     analysis.facts = (0..65537)
         .map(|n| Fact {
+            declaration_span: None,
             definition_anchor: None,
             name_span: None,
             parent: None,

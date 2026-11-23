@@ -8,6 +8,8 @@ remains in Git and the project documentation.
 
 ### Added
 
+- Find and confirm an earlier declaration across a simple rename or file move in Git
+  function history, with exact before and after source evidence.
 - Follow named calls across repository files at the caller's Git revision. The same
   file chooser and name-candidate flow work across the supported written-call languages.
 - Choose an exact local Git commit, branch or tag for a function bubble, including

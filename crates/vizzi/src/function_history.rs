@@ -24,13 +24,16 @@ const TOTAL_BYTES: usize = 32 * 1024 * 1024;
 const SESSIONS: usize = 24;
 const PREPARED_SELECTIONS: usize = 4;
 const PREPARED_BYTES: usize = PREPARED_SELECTIONS * FILE_BYTES;
+const HISTORY_REVISIONS: usize = 64;
 mod captured_calls;
 mod comparison;
 mod cross_file;
+mod lineage;
 mod module_context;
 mod revision;
 pub use captured_calls::{CapturedOwner, CapturedQuery, CapturedRequest, FrozenSource};
 pub use comparison::{CompareRequest, ComparisonWindow, HistoryBinding};
+pub use lineage::LineageRequest;
 pub use revision::{ConfirmRevision, SelectRevision};
 
 /// Exact current-source binding from which history starts.
@@ -106,20 +109,27 @@ struct Version {
     commit: String,
     snapshot: String,
     modules: Arc<ModuleIndex>,
+    location: Location,
+}
+#[derive(Clone)]
+struct Location {
+    path: String,
+    key: String,
+    classification: vizzi_core::policy::Classification,
 }
 struct Session {
     token: String,
     repository: GitRepository,
-    path: String,
-    key: String,
+    location: Location,
     language: String,
-    classification: vizzi_core::policy::Classification,
     tip: String,
     commits: Vec<String>,
     boundary: String,
     stopped: bool,
     cursor: usize,
+    explored: usize,
     versions: Vec<Version>,
+    lineage: Vec<lineage::Edge>,
     digest: blake3::Hash,
     selected: Option<Capture>,
     index: usize,
@@ -295,34 +305,28 @@ impl FunctionHistory {
                     unavailable("No local HEAD commit is available for function history")
                 }
             })?;
-        let (mut commits, shallow) = repository
-            .file_history(&tip, doc.path())
-            .map_err(unavailable)?;
-        let boundary = if commits.len() > 64 {
-            commits.truncate(64);
-            "Function history limit reached (64 file revisions)"
-        } else if shallow {
-            "Earlier history is unavailable in this shallow checkout"
-        } else {
-            "Beginning of available function history"
-        }
-        .into();
+        let (commits, boundary) =
+            segment_history(&repository, &tip, doc.path(), HISTORY_REVISIONS)?;
         let mut random = [0; 32];
         getrandom::fill(&mut random).map_err(unavailable)?;
         let token = random.iter().map(|b| format!("{b:02x}")).collect();
         Ok(Session {
             token,
             repository,
-            path: doc.path().into(),
-            key: fact.key.clone(),
+            location: Location {
+                path: doc.path().into(),
+                key: fact.key.clone(),
+                classification: doc.classification().clone(),
+            },
             language: analysis.context.language.clone(),
-            classification: doc.classification().clone(),
             tip,
             commits,
             boundary,
             stopped: false,
             cursor: 0,
+            explored: 0,
             versions: vec![],
+            lineage: vec![],
             digest,
             selected: None,
             index: 0,
@@ -404,7 +408,7 @@ impl FunctionHistory {
             return Ok(capture.clone());
         }
         let version = &session.versions[index];
-        let (declaration, _) = self.declaration(session, &version.commit)?;
+        let (declaration, _) = self.declaration_at(session, &version.location, &version.commit)?;
         if declaration.snapshot.id().as_str() != version.snapshot {
             return Err(conflict(
                 "Historical source differs from the accepted capture",
@@ -418,10 +422,19 @@ impl FunctionHistory {
         session: &Session,
         commit: &str,
     ) -> Result<(Declaration, blake3::Hash), CompanionError> {
-        let snapshot = self.analyzed_revision_file(&session.repository, commit, &session.path, session.classification.clone())?
+        self.declaration_at(session, &session.location, commit)
+    }
+
+    fn declaration_at(
+        &self,
+        session: &Session,
+        location: &Location,
+        commit: &str,
+    ) -> Result<(Declaration, blake3::Hash), CompanionError> {
+        let snapshot = self.analyzed_revision_file(&session.repository, commit, &location.path, location.classification.clone(), FILE_BYTES)?
             .ok_or_else(|| invalid("Function unavailable at this revision; history stops at a deletion or file move"))?;
         let doc = snapshot
-            .file_by_path(&session.path)
+            .file_by_path(&location.path)
             .ok_or_else(|| unavailable("Historical source is unavailable"))?;
         if !doc.analyses().iter().any(|a| {
             a.context.language == session.language
@@ -438,7 +451,7 @@ impl FunctionHistory {
             .flat_map(|a| {
                 a.facts
                     .iter()
-                    .filter(|f| f.unique && f.key == session.key && f.kind == "function")
+                    .filter(|f| f.unique && f.key == location.key && f.kind == "function")
                     .map(move |f| (a, f))
             });
         let (analysis,fact) = matches.next().ok_or_else(|| invalid("Function missing or ambiguous at this revision; history stops before a rename, move or ambiguous declaration"))?;
@@ -469,18 +482,25 @@ impl FunctionHistory {
         commit: &str,
         path: &str,
         classification: vizzi_core::policy::Classification,
+        max_bytes: usize,
     ) -> Result<Option<Arc<Snapshot>>, CompanionError> {
         let relative = ReviewPath::parse(path.as_bytes().to_vec())
             .map_err(|error| invalid(error.to_string()))?;
         let mut input = repository.pin_file(commit, path).map_err(unavailable)?;
-        let ReadEntry::Present {
-            kind: EntryKind::Regular { .. },
-            bytes,
-        } = input
-            .read(&relative, FILE_BYTES, &|| false)
+        let bytes = match input
+            .read(&relative, max_bytes, &|| false)
             .map_err(unavailable)?
-        else {
-            return Ok(None);
+        {
+            ReadEntry::Present {
+                kind: EntryKind::Regular { .. },
+                bytes,
+            } => bytes,
+            ReadEntry::Absent | ReadEntry::Present { .. } => return Ok(None),
+            ReadEntry::Unobserved(_) | ReadEntry::Unavailable { .. } => {
+                return Err(unavailable(format!(
+                    "Could not read changed source {path} at {commit}"
+                )));
+            }
         };
         let doc = Document::capture_source(
             repository.workspace().clone(),
@@ -510,6 +530,11 @@ impl FunctionHistory {
         Ok(Some(Arc::new(snapshot)))
     }
     fn advance(&self, session: &mut Session) -> Result<(), CompanionError> {
+        if session.versions.len() == HISTORY_REVISIONS {
+            return Err(unavailable(
+                "Function history limit reached (64 file revisions)",
+            ));
+        }
         if session.stopped {
             return Err(unavailable(&session.boundary));
         }
@@ -553,6 +578,19 @@ impl FunctionHistory {
         declaration: Declaration,
         digest: blake3::Hash,
     ) -> Result<(), CompanionError> {
+        let (version, capture) =
+            self.history_capture(session, session.location.clone(), commit, declaration)?;
+        session.push(version, capture, digest);
+        Ok(())
+    }
+
+    fn history_capture(
+        &self,
+        session: &Session,
+        location: Location,
+        commit: String,
+        declaration: Declaration,
+    ) -> Result<(Version, Capture), CompanionError> {
         let modules = Arc::new(module_context::for_commit(
             &session.repository,
             &commit,
@@ -561,16 +599,45 @@ impl FunctionHistory {
             &session.language,
         ));
         let capture = declaration.bind(modules.clone())?;
-        session.digest = digest;
-        session.versions.push(Version {
+        let version = Version {
             commit,
             snapshot: capture.file.snapshot.id().as_str().into(),
             modules,
-        });
-        session.index = session.versions.len() - 1;
-        session.selected = Some(capture);
-        Ok(())
+            location,
+        };
+        Ok((version, capture))
     }
+}
+
+impl Session {
+    fn push(&mut self, version: Version, capture: Capture, digest: blake3::Hash) {
+        self.digest = digest;
+        self.index = self.versions.len();
+        self.versions.push(version);
+        self.selected = Some(capture);
+    }
+
+    fn metadata(&self, index: usize) -> Value {
+        json!({"token":self.token,"tip":self.tip,"commit":self.versions[index].commit,"index":index,"lineage":self.lineage})
+    }
+}
+
+fn segment_history(
+    repository: &GitRepository,
+    tip: &str,
+    path: &str,
+    limit: usize,
+) -> Result<(Vec<String>, String), CompanionError> {
+    let (mut commits, shallow) = repository.file_history(tip, path).map_err(unavailable)?;
+    let boundary = if commits.len() > limit {
+        commits.truncate(limit);
+        "Function history limit reached (64 file revisions)"
+    } else if shallow {
+        "Earlier history is unavailable in this shallow checkout"
+    } else {
+        "Beginning of available function history"
+    };
+    Ok((commits, boundary.into()))
 }
 
 fn take_session(queue: &mut VecDeque<Session>, token: &str) -> Option<Session> {
@@ -624,7 +691,10 @@ fn frame(session: &Session) -> Result<Value, CompanionError> {
         ..WindowQuery::default()
     };
     let source = window(&capture_file.snapshot, doc, &query)?;
-    Ok(
-        json!({"token":session.token,"tip":session.tip,"commit":session.versions[session.index].commit,"index":session.index,"snapshot":capture_file.snapshot.id().as_str(),"symbol":capture.symbol,"origin":source["lines"][0],"window":source}),
-    )
+    let mut result = session.metadata(session.index);
+    result["snapshot"] = json!(capture_file.snapshot.id().as_str());
+    result["symbol"] = json!(capture.symbol);
+    result["origin"] = source["lines"][0].clone();
+    result["window"] = source;
+    Ok(result)
 }

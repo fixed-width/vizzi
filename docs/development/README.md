@@ -17,6 +17,8 @@ For people extending Vizzi or investigating its implementation. The
   [syntax adapters](../prototype/ECMASCRIPT_TECH.md)
 - [Function-history behaviour](../visual/HISTORY_PRODUCT.md) and
   [implementation and validation](../visual/HISTORY_TECH.md)
+- Function-history correspondence [behaviour](../visual/HISTORY_LINEAGE_PRODUCT.md)
+  and [architecture](../visual/HISTORY_LINEAGE_TECH.md)
 - [Function comparison behaviour](../visual/FUNCTION_COMPARISON_PRODUCT.md) and
   [architecture and validation](../visual/FUNCTION_COMPARISON_TECH.md)
 - [Captured-call behaviour](../visual/CAPTURED_CALLS_PRODUCT.md) and

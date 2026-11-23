@@ -30,9 +30,10 @@ mock was supplied.
    through [captured call exploration](CAPTURED_CALLS_PRODUCT.md). Callers, references, Save
    and Editor remain current-source actions. Existing arrows become historical; captured
    links retain their own revision/evidence rather than adopting working-tree facts.
-5. Matching requires an unambiguous declaration in the same file and lexical scope.
-   Missing, renamed, moved or ambiguous declarations stop traversal explicitly; the last
-   readable source remains. No name similarity guesses are made.
+5. Ordinary matching requires an unambiguous declaration in the same file and lexical
+   scope. Missing, renamed, moved or ambiguous declarations stop automatic traversal.
+   The last readable source remains. At a committed boundary, readers can inspect and
+   accept a supported [rename or move](HISTORY_LINEAGE_PRODUCT.md).
 6. History uses local objects, without checkout, builds or fetching. A non-Git directory,
    unborn HEAD, unavailable/shallow history, unsupported capture or exceeded bound produces
    a useful message without replacing the bubble. A failed step can be retried.
