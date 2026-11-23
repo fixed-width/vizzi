@@ -461,6 +461,82 @@ test("Java source outlines and call trails work without a language server", asyn
 
 const managedJava = process.env.VIZZI_JDTLS;
 
+test("the workspace action imports a Gradle Java classpath explicitly", {
+  skip: !managedJava || !process.env.GRADLE_HOME,
+}, async () => {
+  const fixture = await workspace({
+    files: {
+      "settings.gradle": "rootProject.name = 'vizzi_browser'\n",
+      "build.gradle": "plugins { id 'java' }\nsourceSets.main.java.setSrcDirs(['sources'])\n",
+      "sources/demo/Caller.java": "package demo; class Caller { int run() { return Counter.next(); } }\n",
+      "sources/demo/Counter.java": "package demo; class Counter { static int next() { return 1; } }\n",
+      "script.py": "def python_leaf(): pass\ndef invoke():\n" + "    python_leaf()\n".repeat(10),
+    },
+    sourceArguments: ["--jdtls", managedJava],
+  });
+  let host, context;
+  try {
+    host = await startHost(fixture);
+    context = await chromium.newContext();
+    const page = await context.newPage();
+    const imports = [];
+    page.on("request", request => {
+      if (request.method() === "POST" && new URL(request.url()).pathname === "/api/java-project") {
+        imports.push(request);
+      }
+    });
+    await page.goto(host.url);
+    await page.getByText("Workspace", { exact: true }).click();
+    const action = page.getByRole("button", { name: "Import Gradle classpath", exact: true });
+    await action.waitFor();
+    assert.equal(imports.length, 0);
+    const rejected = await page.request.post(host.url + "/api/java-project", { data: { snapshot: "foreign" } });
+    assert.equal(rejected.status(), 400);
+    assert.match(await rejected.text(), /same-origin/);
+    const { snapshot } = await (await page.request.get(host.url + "/api/java-project")).json();
+    const inventory = await page.request.post(host.url + "/api/structure", {
+      data: { snapshot, query: { kind: "inventory", area: "script.py", search: "python_leaf", offset: 0, functions_only: true } },
+    });
+    assert.equal(inventory.status(), 200);
+    const [{ symbol }] = (await inventory.json()).items;
+    const refRequest = { snapshot, symbol: symbol.id, kind: "references" };
+    const first = await page.request.post(host.url + "/api/references", { data: refRequest });
+    assert.equal(first.status(), 200);
+    const { query, next } = await first.json();
+    assert.equal(next, 8);
+
+    await page.route("**/api/java-project", route => route.fulfill({
+      status: 503, json: { message: "Fixture import failed." },
+    }), { times: 1 });
+    await action.click();
+    await page.getByText("Fixture import failed.", { exact: true }).waitFor();
+    assert.equal(await page.locator("#visual-notice").isHidden(), true);
+    await page.getByText("Workspace", { exact: true }).click();
+    await action.click();
+    await page.getByText("Java project classpath imported.", { exact: true }).waitFor({ timeout: 60000 });
+    assert.equal(imports.length, 2);
+    const nextPage = await page.request.post(host.url + "/api/references", {
+      data: { ...refRequest, query, offset: next },
+    });
+    assert.equal(nextPage.status(), 200);
+    assert.equal((await nextPage.json()).items.length, 2);
+
+    await page.getByRole("button", { name: "Add bubble", exact: true }).click();
+    await page.getByLabel("Find a function", { exact: true }).fill("run");
+    await page.getByRole("button", { name: "Find functions", exact: true }).click();
+    await page.locator('[data-add-symbol][data-name="run"]').click();
+    const caller = page.locator('[data-view][data-name="run"]');
+    await caller.getByRole("button", { name: "Calls", exact: true }).click();
+    await caller.getByRole("button", { name: "next · line 1", exact: true }).click();
+    await page.locator('[data-view][data-name="next"] .code-line').first().waitFor();
+    assert.equal(await page.locator("#workspace-links .link-stroke").getAttribute("data-kind"), "definition");
+  } finally {
+    await context?.close();
+    await host?.close();
+    await fixture.close();
+  }
+});
+
 test("managed Java resolves an overload and its references across source roots", {
   skip: !managedJava,
 }, async () => {

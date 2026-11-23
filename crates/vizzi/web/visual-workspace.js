@@ -22,7 +22,11 @@ import {createCallPreparation,resolveCallChoice,directDestination} from '/call-d
 installAppHeader(document.querySelector('body > header'));
 const el=id=>document.getElementById(id),node=(tag,text='')=>{const n=document.createElement(tag);n.textContent=text;return n;},svg=(tag,attrs={})=>{const n=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const[k,v]of Object.entries(attrs))n.setAttribute(k,String(v));return n;};
 const error=createMessage(el('visual-error'),{label:'Dismiss workspace error'}),notice=createMessage(el('visual-notice'),{label:'Dismiss workspace notice'});
-let definitionProvider=false;const definitionCapabilities=transport('/api/structure').then(c=>{definitionProvider=c.definition_provider===true;}).catch(()=>{});
+let definitionProvider=false,javaImportAvailable=false;
+const definitionCapabilities=transport('/api/structure').then(c=>{
+ definitionProvider=c.definition_provider===true;
+ javaImportAvailable=c.java_project_import===true;
+}).catch(()=>{});
 let model,currentSnapshot,taskControls,board,editorName='editor',busy=false,saveTimer,paletteTicket=0,jobs=Promise.resolve(),demoOpened=false,livePendingTimer;
 let revisionPicker,lineagePicker,crossFilePicker;
 const mounted=new Map();
@@ -49,6 +53,31 @@ el('code-layout').value=smartReflow?'smart':'original';el('code-layout').onchang
 const fail=e=>error.show(e?.message??String(e));
 async function transport(path,options){const response=await fetchRead(path,options);if(!response.ok){let text=await response.text();try{text=JSON.parse(text).message??text;}catch{}const error=new Error(text);error.status=response.status;throw error;}return response.json();}
 const post=(path,body,signal)=>transport(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal});
+const javaImportButton=el('import-java-project');
+let javaProject;
+async function updateJavaProject(snapshot){
+ await definitionCapabilities;
+ if(!javaImportAvailable||currentSnapshot!==snapshot)return;
+ try{
+  const project=await transport('/api/java-project');
+  if(currentSnapshot!==snapshot)return;
+  javaProject=project?.snapshot===snapshot&&['Maven','Gradle'].includes(project.kind)?project:null;
+  javaImportButton.hidden=!javaProject;
+  if(javaProject)javaImportButton.textContent=`Import ${javaProject.kind} classpath`;
+ }catch{}
+}
+javaImportButton.onclick=async()=>{
+ const project=javaProject;
+ if(!project||project.snapshot!==currentSnapshot||javaImportButton.disabled)return;
+ javaImportButton.disabled=true;
+ el('workspace-actions').open=false;
+ notice.show(`Importing Java classpath with ${project.kind}…`);
+ try{
+  await post('/api/java-project',{snapshot:project.snapshot});
+  notice.show('Java project classpath imported.');
+ }catch(e){notice.show(null);fail(e);}
+ finally{javaImportButton.disabled=false;}
+};
 const definitionWarmup=new DefinitionWarmup((snapshot,call,path)=>post('/api/call-definition',{snapshot,call,path}));
 function refreshCapture(){
  const views=model.views.filter(v=>v.mode==='live');const key=JSON.stringify([views.map(v=>[v.id,v.symbol.id,v.mode,mounted.get(v.id)?.sourceTicket,v.reading]),model.links.map(l=>[l.id,l.state])]);
@@ -914,7 +943,10 @@ function replaceTask(next){
 }
 function receive(status){
  el('visual-source-status').textContent=status.snapshot?'Source ready':status.error?'Source unavailable':'Mapping source…';
- if(!status.snapshot)return;currentSnapshot=status.snapshot;
+ if(!status.snapshot)return;
+ const changed=currentSnapshot!==status.snapshot;
+ currentSnapshot=status.snapshot;
+ if(changed)void updateJavaProject(currentSnapshot);
  if(!model){
   try{model=taskControls.load(status.name??'source',currentSnapshot);}catch(e){model=new Workspace(currentSnapshot);fail(e);}
   for(const v of model.views)mount(v.id);geometry();save();

@@ -48,7 +48,9 @@ open methods and constructors with bodies.
 Written method calls and `new` expressions provide name candidates, including
 separate candidates for overloaded declarations. An implicit record constructor
 can lead to its record declaration. A [managed JDT LS server](../how-to/configure-language-servers.md#java-with-a-managed-server)
-can resolve overloads and references across configured source roots. A
+can resolve overloads and references across configured source roots. The
+Workspace menu can import a Maven or Gradle classpath from captured build
+descriptors and local caches. A
 [shared VS Code Java provider](../how-to/configure-language-servers.md#java-with-vs-code)
 uses the editor's project configuration. Vizzi checks results against captured
 workspace files. Managed JDT LS can open local JDK and dependency source archives

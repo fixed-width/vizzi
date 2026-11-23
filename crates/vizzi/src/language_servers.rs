@@ -244,4 +244,19 @@ impl Provider for Servers {
     fn dependencies(&self) -> Option<&Catalog> {
         Some(&self.sources)
     }
+    fn supports_java_project_import(&self) -> bool {
+        self.provider("java")
+            .is_ok_and(Provider::supports_java_project_import)
+    }
+    fn java_project_kind(&self, snapshot: &Snapshot) -> Option<&'static str> {
+        self.provider("java").ok()?.java_project_kind(snapshot)
+    }
+    fn import_java_project(
+        &self,
+        snapshot: Arc<Snapshot>,
+        current: &dyn Fn() -> Option<Arc<Snapshot>>,
+    ) -> Result<(), String> {
+        self.provider("java")?
+            .import_java_project(snapshot, current)
+    }
 }

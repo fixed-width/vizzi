@@ -49,6 +49,22 @@ pub trait Provider: Send + Sync {
     fn dependencies(&self) -> Option<&crate::dependency_sources::Catalog> {
         None
     }
+    /// Whether this provider offers managed Java project import.
+    fn supports_java_project_import(&self) -> bool {
+        false
+    }
+    /// Reports the captured Java build system available for explicit import.
+    fn java_project_kind(&self, _snapshot: &Snapshot) -> Option<&'static str> {
+        None
+    }
+    /// Loads captured Java project metadata following an explicit user action.
+    fn import_java_project(
+        &self,
+        _snapshot: Arc<Snapshot>,
+        _current: &dyn Fn() -> Option<Arc<Snapshot>>,
+    ) -> Result<(), String> {
+        Err("Java project import requires a managed JDT LS server".into())
+    }
     /// Resolves the captured call; implementations must not substitute live source bytes.
     fn resolve(&self, snapshot: Arc<Snapshot>, call: &CallLookup) -> Result<Answer, String>;
 }

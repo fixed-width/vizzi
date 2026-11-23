@@ -5,6 +5,7 @@ use crate::{
     dependency_sources::{Capture, Catalog, FILES as DEPENDENCY_FILES, Input},
     ecmascript_dependencies::manifest_id,
     lsp::{Client, DocumentSync},
+    review_source::{DirectoryInput, ReadEntry, ReviewInput},
 };
 use serde_json::json;
 use std::{
@@ -12,8 +13,10 @@ use std::{
     fs,
     path::{Path, PathBuf},
     sync::{Arc, Mutex},
+    time::Duration,
 };
 use vizzi_core::{
+    comparison::{EntryKind, ReviewPath},
     model::{ContentId, Document, Snapshot},
     structure::{CallLookup, Symbol},
 };
@@ -38,6 +41,20 @@ pub(super) trait Profile: Send + Sync {
     }
 
     fn inputs<'a>(&'a self, root: &'a Path, snapshot: &'a Snapshot) -> Result<Inputs<'a>, String>;
+    fn java_project_kind(&self, _snapshot: &Snapshot) -> Option<&'static str> {
+        None
+    }
+    fn imported_inputs<'a>(&'a self, _snapshot: &'a Snapshot) -> Result<Inputs<'a>, String> {
+        Err("Java project import is unavailable".into())
+    }
+    fn verify_import(
+        &self,
+        _client: &mut Client,
+        _mirror: &Path,
+        _snapshot: &Snapshot,
+    ) -> Result<(), String> {
+        Err("Java project import is unavailable".into())
+    }
     fn external_source<'a>(&self, _path: &'a Path, _hint: &'a str) -> Option<ExternalSource<'a>> {
         None
     }
@@ -128,7 +145,13 @@ pub(super) struct ProjectServer {
     executable: PathBuf,
     profile: Box<dyn Profile>,
     sources: Arc<Catalog>,
-    state: Mutex<Option<Workspace>>,
+    state: Mutex<Session>,
+    import_gate: Mutex<()>,
+}
+#[derive(Default)]
+struct Session {
+    workspace: Option<Workspace>,
+    imported: bool,
 }
 struct Workspace {
     client: Client,
@@ -142,6 +165,17 @@ struct Workspace {
     archives: BTreeMap<String, String>,
     reached_manifests: BTreeMap<PathBuf, ContentId>,
     next: i32,
+}
+
+struct Lookup<'a> {
+    snapshot: &'a Snapshot,
+    doc: &'a Document,
+    text: &'a str,
+    position: Position,
+    language: &'a str,
+    external: Option<&'a Capture>,
+    references: bool,
+    imported: bool,
 }
 
 type DefinitionLocations = Vec<(Option<PathBuf>, Position)>;
@@ -200,6 +234,25 @@ fn source(doc: &Document) -> Result<String, String> {
         .map(|text| text.into_owned())
         .ok_or_else(|| "Captured semantic source is not UTF-8".into())
 }
+fn verify_mirror_source(reader: &mut DirectoryInput, doc: &Document) -> Result<(), String> {
+    let path = ReviewPath::parse(doc.path().as_bytes().to_vec()).map_err(|e| e.to_string())?;
+    let entry = reader
+        .read(&path, FILE_BYTES, &|| false)
+        .map_err(|e| e.to_string())?;
+    if let ReadEntry::Present {
+        kind: EntryKind::Regular { .. },
+        bytes,
+        ..
+    } = entry
+        && ContentId::derive(&[&bytes]) == *doc.content()
+    {
+        return Ok(());
+    }
+    Err(format!(
+        "Java project source differs from the capture: {}",
+        doc.path()
+    ))
+}
 fn language(doc: &Document) -> Option<&str> {
     doc.analyses()
         .first()
@@ -232,7 +285,8 @@ impl ProjectServer {
             executable,
             profile: Box::new(profile),
             sources,
-            state: Mutex::new(None),
+            state: Mutex::new(Session::default()),
+            import_gate: Mutex::new(()),
         }
     }
     fn workspace(&self, snapshot: &Snapshot, inputs: Inputs<'_>) -> Result<Workspace, String> {
@@ -280,6 +334,13 @@ impl ProjectServer {
         }
         source(doc)
     }
+    fn inputs<'a>(&'a self, snapshot: &'a Snapshot, imported: bool) -> Result<Inputs<'a>, String> {
+        if imported {
+            self.profile.imported_inputs(snapshot)
+        } else {
+            self.profile.inputs(&self.root, snapshot)
+        }
+    }
     fn lookup(
         &self,
         snapshot: Arc<Snapshot>,
@@ -294,17 +355,27 @@ impl ProjectServer {
             return Err("Unsupported semantic language".into());
         }
         let position = definitions::position(text, byte)?;
-        let inputs = self.profile.inputs(&self.root, &snapshot)?;
-        let configuration = inputs.digest().to_owned();
-        if external.is_some_and(|capture| capture.input.configuration != configuration) {
-            return Err("Dependency configuration changed; reopen from its caller".into());
-        }
         let archived = external.filter(|capture| capture.input.archive.is_some());
         let mut state = self
             .state
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner);
-        let mut workspace = match state.take() {
+        let imported = state.imported;
+        if imported
+            && state
+                .workspace
+                .as_mut()
+                .is_none_or(|workspace| !workspace.client.is_open())
+        {
+            state.workspace = None;
+            return Err("The imported Java server stopped. Import the project again".into());
+        }
+        let inputs = self.inputs(&snapshot, imported)?;
+        let configuration = inputs.digest().to_owned();
+        if external.is_some_and(|capture| capture.input.configuration != configuration) {
+            return Err("Dependency configuration changed; reopen from its caller".into());
+        }
+        let mut workspace = match state.workspace.take() {
             Some(workspace)
                 if workspace.configuration == configuration
                     && workspace.reached_manifests.len() < DEPENDENCY_FILES
@@ -312,13 +383,68 @@ impl ProjectServer {
             {
                 workspace
             }
+            previous if imported => {
+                state.workspace = previous;
+                return Err("Java build configuration changed; import the project again".into());
+            }
             previous if archived.is_some() => {
-                *state = previous;
+                state.workspace = previous;
                 return Err("Reopen archive source from its caller to continue navigation".into());
             }
             _ => self.workspace(&snapshot, inputs)?,
         };
-        workspace.sync(&snapshot, self.profile.as_ref())?;
+        let mut keep_on_error = false;
+        let answer = self.lookup_workspace(
+            &mut workspace,
+            Lookup {
+                snapshot: &snapshot,
+                doc,
+                text,
+                position,
+                language: lang,
+                external,
+                references,
+                imported,
+            },
+            &mut keep_on_error,
+        );
+        if imported && !workspace.client.is_open() {
+            return answer.map_err(|error| format!("{error}. Import the Java project again"));
+        }
+        if imported || keep_on_error || answer.is_ok() {
+            state.workspace = Some(workspace);
+        }
+        answer
+    }
+
+    fn lookup_workspace(
+        &self,
+        workspace: &mut Workspace,
+        query: Lookup<'_>,
+        keep_on_error: &mut bool,
+    ) -> Result<Answer, String> {
+        let Lookup {
+            snapshot,
+            doc,
+            text,
+            position,
+            language: lang,
+            external,
+            references,
+            imported,
+        } = query;
+        let configuration = workspace.configuration.clone();
+        let archived = external.filter(|capture| capture.input.archive.is_some());
+        workspace.sync(snapshot, self.profile.as_ref())?;
+        let mut imported_source = imported
+            .then(|| DirectoryInput::open(workspace.directory.path()))
+            .transpose()
+            .map_err(|e| e.to_string())?;
+        if let Some(reader) = &mut imported_source
+            && external.is_none()
+        {
+            verify_mirror_source(reader, doc)?;
+        }
         let importer = external.map_or(Some(doc.path()), |capture| {
             capture
                 .input
@@ -333,7 +459,7 @@ impl ProjectServer {
                 .iter()
                 .find_map(|(uri, id)| (id == &capture.origin.capture).then(|| uri.clone()))
             else {
-                *state = Some(workspace);
+                *keep_on_error = true;
                 return Err("Reopen archive source from its caller to continue navigation".into());
             };
             self.profile
@@ -369,7 +495,7 @@ impl ProjectServer {
                 &path,
                 &workspace.rejected_configs,
             )? {
-                *state = Some(workspace);
+                *keep_on_error = true;
                 return Err(error);
             }
             let uri = crate::lsp::uri(&path)?;
@@ -452,8 +578,11 @@ impl ProjectServer {
                         .ok_or("Semantic path is not UTF-8")?
                         .replace('\\', "/");
                     if self.profile.includes_path(&relative)
-                        && snapshot.file_by_path(&relative).is_some()
+                        && let Some(document) = snapshot.file_by_path(&relative)
                     {
+                        if let Some(reader) = &mut imported_source {
+                            verify_mirror_source(reader, document)?;
+                        }
                         locations.push(Location {
                             capture: None,
                             path: relative,
@@ -543,9 +672,9 @@ impl ProjectServer {
                     path,
                     position,
                     language: lang,
-                    snapshot: &snapshot,
+                    snapshot,
                     sources: &self.sources,
-                    workspace: &mut workspace,
+                    workspace,
                 },
                 locations,
             )?;
@@ -571,7 +700,7 @@ impl ProjectServer {
                     .into(),
             );
         }
-        if self.profile.inputs(&self.root, &snapshot)?.digest() != configuration {
+        if self.inputs(snapshot, imported)?.digest() != configuration {
             return Err("Project inputs changed during semantic lookup".into());
         }
         let mut hash = blake3::Hasher::new();
@@ -602,7 +731,6 @@ impl ProjectServer {
             hash.update(manifest.as_str().as_bytes());
         }
         let context = hash.finalize().to_hex().to_string();
-        *state = Some(workspace);
         Ok(Answer {
             locations,
             outside,
@@ -611,6 +739,53 @@ impl ProjectServer {
     }
 }
 impl Provider for ProjectServer {
+    fn supports_java_project_import(&self) -> bool {
+        self.profile.accepts("java")
+    }
+
+    fn java_project_kind(&self, snapshot: &Snapshot) -> Option<&'static str> {
+        self.profile.java_project_kind(snapshot)
+    }
+
+    fn import_java_project(
+        &self,
+        snapshot: Arc<Snapshot>,
+        current: &dyn Fn() -> Option<Arc<Snapshot>>,
+    ) -> Result<(), String> {
+        let _import = self
+            .import_gate
+            .try_lock()
+            .map_err(|_| "A Java project import is already running")?;
+        let inputs = self.profile.imported_inputs(&snapshot)?;
+        let mut workspace = self.workspace(&snapshot, inputs)?;
+        workspace.client.wait_ready_for(Duration::from_secs(120))?;
+        self.profile
+            .verify_import(&mut workspace.client, workspace.directory.path(), &snapshot)?;
+        let mut source =
+            DirectoryInput::open(workspace.directory.path()).map_err(|e| e.to_string())?;
+        for doc in snapshot
+            .documents()
+            .iter()
+            .filter(|doc| self.profile.includes_document(doc))
+        {
+            verify_mirror_source(&mut source, doc)?;
+        }
+        let mut state = self
+            .state
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        let current =
+            current().ok_or("Source capture is unavailable; retry Java project import")?;
+        if self.profile.imported_inputs(&current)?.digest() != workspace.configuration {
+            return Err(
+                "Java build configuration changed during import; import the project again".into(),
+            );
+        }
+        state.imported = true;
+        state.workspace = Some(workspace);
+        Ok(())
+    }
+
     fn dependencies(&self) -> Option<&Catalog> {
         Some(&self.sources)
     }

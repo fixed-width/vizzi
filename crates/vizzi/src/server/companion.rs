@@ -3,7 +3,7 @@ use crate::companion::{Companion, CompanionError, EditInvestigation, OpenSource,
 use axum::{
     Json, Router,
     extract::{DefaultBodyLimit, Path, Query, State},
-    http::{StatusCode, header},
+    http::{HeaderMap, StatusCode, header},
     response::{IntoResponse, Response},
     routing::{get, post},
 };
@@ -48,6 +48,8 @@ pub(super) fn router(
     let captured_calls = history.clone();
     let refresh = structure.clone();
     let definitions = structure.clone();
+    let java_project = structure.clone();
+    let java_import = structure.clone();
     let references = structure.clone();
     let capabilities = structure.clone();
     let dependency_windows = structure.clone();
@@ -69,7 +71,14 @@ pub(super) fn router(
         .route("/api/dependency/editor",post(move |Json(request):Json<OpenSource>|{let structure=dependency_locations.clone();let app=dependency_editor.clone();async move{editor_handoff(move||app.open_verified_location(&structure.dependency_location(&request)?)).await}}))
         .route("/api/investigation", get(view).post(edit))
         .route("/api/discovery", get(discover))
-        .route("/api/structure", get(move || {let capabilities=capabilities.clone();async move {Json(serde_json::json!({"trial":true,"resolution":"candidate_only","call_languages":capabilities.call_languages(),"definition_provider":capabilities.definitions_available()}))}}).post(move |Json(request):Json<crate::structural::Request>| {let structure=structure.clone();async move {work(move ||structure.query(&request)).await}}))
+        .route("/api/structure", get(move || {let capabilities=capabilities.clone();async move {Json(serde_json::json!({"trial":true,"resolution":"candidate_only","call_languages":capabilities.call_languages(),"definition_provider":capabilities.definitions_available(),"java_project_import":capabilities.supports_java_project_import()}))}}).post(move |Json(request):Json<crate::structural::Request>| {let structure=structure.clone();async move {work(move ||structure.query(&request)).await}}))
+        .route("/api/java-project", get(move || {let java_project=java_project.clone();async move {Json(java_project.java_project())}})
+            .post(move |headers:HeaderMap,Json(request):Json<JavaProjectImport>| {let java_import=java_import.clone();async move{
+                if !same_loopback_origin(&headers) {
+                    return Err(Error(CompanionError::Invalid("Java project import requires a same-origin workspace action".into())));
+                }
+                work(move ||java_import.import_java_project(&request.snapshot)).await
+            }}))
         .route("/api/visual/refresh", post({let structure=refresh.clone();move |Json(request):Json<crate::structural::live::Request>|{let structure=structure.clone();async move{work(move ||structure.refresh(&request)).await}}}).layer(DefaultBodyLimit::max(192*1024)))
         .route("/api/call-definition", post(move |Json(request):Json<crate::structural::DefinitionRequest>| {let definitions=definitions.clone();async move {work(move ||definitions.definition(&request)).await}}))
         .route("/api/references",post(move |Json(request):Json<crate::structural::references::ReferenceRequest>|{let references=references.clone();async move{work(move||references.references(&request)).await}}))
@@ -105,6 +114,50 @@ pub(super) fn router(
             },
         ))
         .with_state(app)
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct JavaProjectImport {
+    snapshot: String,
+}
+
+fn same_loopback_origin(headers: &HeaderMap) -> bool {
+    let Some(host) = headers
+        .get(header::HOST)
+        .and_then(|value| value.to_str().ok())
+    else {
+        return false;
+    };
+    let expected = format!("http://{host}");
+    let Ok(url) = url::Url::parse(&expected) else {
+        return false;
+    };
+    matches!(url.host_str(), Some("127.0.0.1" | "localhost"))
+        && headers
+            .get(header::ORIGIN)
+            .is_some_and(|origin| origin == expected.as_str())
+}
+
+#[cfg(test)]
+#[test]
+fn java_import_origin_requires_the_same_loopback_host_and_port() {
+    let valid = |host, origin| {
+        let mut headers = HeaderMap::new();
+        headers.insert(header::HOST, axum::http::HeaderValue::from_static(host));
+        if let Some(origin) = origin {
+            headers.insert(header::ORIGIN, axum::http::HeaderValue::from_static(origin));
+        }
+        same_loopback_origin(&headers)
+    };
+    assert!(valid("127.0.0.1:7474", Some("http://127.0.0.1:7474")));
+    assert!(valid("localhost:4000", Some("http://localhost:4000")));
+    assert!(!valid("localhost:4000", None));
+    assert!(!valid("localhost:4000", Some("http://localhost:4040")));
+    assert!(!valid(
+        "example.invalid:4000",
+        Some("http://example.invalid:4000")
+    ));
 }
 #[derive(Deserialize)]
 struct DependencyWindow {

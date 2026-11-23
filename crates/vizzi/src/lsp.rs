@@ -142,6 +142,7 @@ pub(crate) struct Client {
     readiness: Readiness,
     pub(crate) document_sync: DocumentSync,
     diagnostics: BTreeMap<String, i32>,
+    maven_errors: BTreeMap<PathBuf, String>,
     ready: bool,
     pub version: String,
 }
@@ -251,6 +252,7 @@ impl Client {
             readiness: setup.readiness,
             document_sync: setup.document_sync,
             diagnostics: BTreeMap::new(),
+            maven_errors: BTreeMap::new(),
             ready,
             version: String::new(),
         };
@@ -325,6 +327,28 @@ impl Client {
         {
             *current = (*current).max(version);
         }
+        if method == "textDocument/publishDiagnostics"
+            && matches!(self.readiness, Readiness::JdtLs)
+            && let Some(path) = params["uri"]
+                .as_str()
+                .and_then(|value| Url::parse(value).ok())
+                .and_then(|uri| uri.to_file_path().ok())
+            && path.file_name().is_some_and(|name| name == "pom.xml")
+            && let Some(diagnostics) = params["diagnostics"].as_array()
+        {
+            if let Some(error) = diagnostics
+                .iter()
+                .find(|diagnostic| diagnostic["severity"] == 1)
+                .and_then(|diagnostic| diagnostic["message"].as_str())
+            {
+                if self.maven_errors.len() < 64 || self.maven_errors.contains_key(&path) {
+                    self.maven_errors
+                        .insert(path, error.chars().take(384).collect());
+                }
+            } else {
+                self.maven_errors.remove(&path);
+            }
+        }
         if let Some(id) = message.get("id") {
             let result = match method {
                 "workspace/configuration" => {
@@ -358,6 +382,17 @@ impl Client {
             self.send(&json!({"jsonrpc":"2.0","id":id,"result":result}))?;
         }
         Ok(())
+    }
+    pub(crate) fn maven_error(&self, root: &Path) -> Option<&str> {
+        self.maven_errors
+            .iter()
+            .find_map(|(path, message)| path.starts_with(root).then_some(message.as_str()))
+    }
+    pub(crate) fn is_open(&mut self) -> bool {
+        self.reader
+            .as_ref()
+            .is_some_and(|reader| !reader.is_finished())
+            && self.child.try_wait().is_ok_and(|status| status.is_none())
     }
     fn receive(&mut self, deadline: Instant) -> Result<Value, String> {
         self.messages
@@ -395,7 +430,11 @@ impl Client {
         }
     }
     pub(crate) fn wait_ready(&mut self) -> Result<(), String> {
-        let deadline = Instant::now() + Duration::from_secs(20);
+        self.wait_ready_for(Duration::from_secs(20))
+    }
+
+    pub(crate) fn wait_ready_for(&mut self, timeout: Duration) -> Result<(), String> {
+        let deadline = Instant::now() + timeout;
         while !self.ready {
             let message = self.receive(deadline)?;
             self.event(message)?;

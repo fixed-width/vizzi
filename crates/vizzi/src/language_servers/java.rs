@@ -11,11 +11,16 @@ use percent_encoding::percent_decode_str;
 use serde_json::json;
 use std::{
     collections::BTreeSet,
+    ffi::OsStr,
+    fs,
     io::Read,
     path::{Path, PathBuf},
-    time::Duration,
+    time::{Duration, Instant},
 };
-use vizzi_core::model::{ContentId, Snapshot};
+use vizzi_core::{
+    model::{ContentId, Document, Snapshot},
+    policy::{Classification, JAVA_PROJECT_METADATA, SourceOnlyReason},
+};
 
 pub(super) struct JdtLs {
     pub roots: BTreeSet<String>,
@@ -57,8 +62,164 @@ impl Profile for JdtLs {
         Ok(InputFiles::default().freeze(
             &format!("jdtls:{}", captured.finalize().to_hex()),
             &[include_bytes!("java.rs")],
-            move |mirror| prepare(mirror, &self.roots, libraries, first_source),
+            move |mirror| prepare(mirror, &self.roots, libraries, first_source, None),
         ))
+    }
+
+    fn java_project_kind(&self, snapshot: &Snapshot) -> Option<&'static str> {
+        let has = |name| {
+            snapshot
+                .file_by_path(name)
+                .is_some_and(|doc| is_build_input(doc))
+        };
+        let maven = has("pom.xml");
+        let gradle = [
+            "settings.gradle",
+            "settings.gradle.kts",
+            "build.gradle",
+            "build.gradle.kts",
+        ]
+        .into_iter()
+        .any(has);
+        match (maven, gradle) {
+            (true, false) => Some("Maven"),
+            (false, true) => Some("Gradle"),
+            _ => None,
+        }
+    }
+
+    fn imported_inputs<'a>(&'a self, snapshot: &'a Snapshot) -> Result<Inputs<'a>, String> {
+        let kind = self
+            .java_project_kind(snapshot)
+            .ok_or("Select a workspace with a captured Maven or Gradle build at its root")?;
+        let gradle_home = if kind == "Gradle" {
+            Some(local_gradle_home(
+                std::env::var_os("GRADLE_HOME").as_deref(),
+                std::env::var_os("PATH").as_deref(),
+            )?)
+        } else {
+            None
+        };
+        let mut hash = blake3::Hasher::new();
+        if let Some(home) = &gradle_home {
+            let path = home.as_os_str().as_encoded_bytes();
+            hash.update(&(path.len() as u64).to_le_bytes());
+            hash.update(path);
+        }
+        let mut descriptors = Vec::new();
+        let mut bytes = 0;
+        for doc in snapshot
+            .documents()
+            .iter()
+            .filter(|doc| is_build_input(doc))
+        {
+            bytes += doc.bytes();
+            if doc.bytes() > 2 * 1024 * 1024 || bytes > 16 * 1024 * 1024 {
+                return Err("Captured Java build descriptors exceed allowance".into());
+            }
+            hash.update(&(doc.path().len() as u64).to_le_bytes());
+            hash.update(doc.path().as_bytes());
+            hash.update(doc.content().as_str().as_bytes());
+            descriptors.push(doc.as_ref());
+        }
+        Ok(InputFiles::default().freeze(
+            &format!("jdtls-import:{kind}:{}", hash.finalize().to_hex()),
+            &[include_bytes!("java.rs")],
+            move |mirror| {
+                for doc in descriptors {
+                    let path = mirror.join(doc.path());
+                    fs::create_dir_all(path.parent().ok_or("Build descriptor has no directory")?)
+                        .map_err(|e| e.to_string())?;
+                    let data = doc
+                        .captured()
+                        .read_all(2 * 1024 * 1024)
+                        .map_err(|e| e.to_string())?;
+                    fs::write(path, data.bytes()).map_err(|e| e.to_string())?;
+                }
+                prepare(
+                    mirror,
+                    &self.roots,
+                    json!([]),
+                    None,
+                    Some((kind, gradle_home.as_deref())),
+                )
+            },
+        ))
+    }
+
+    fn verify_import(
+        &self,
+        client: &mut Client,
+        mirror: &Path,
+        snapshot: &Snapshot,
+    ) -> Result<(), String> {
+        const NATURES: &str = "org.eclipse.jdt.ls.core.natureIds";
+        let kind = self.java_project_kind(snapshot);
+        let nature = match kind {
+            Some("Maven") => "org.eclipse.m2e.core.maven2Nature",
+            Some("Gradle") => "org.eclipse.buildship.core.gradleprojectnature",
+            _ => return Err("Java project import is unavailable".into()),
+        };
+        let projects = client.request(
+            "workspace/executeCommand",
+            json!({"command":"java.project.getAll","arguments":[]}),
+            Duration::from_secs(10),
+        )?;
+        let projects = projects
+            .as_array()
+            .ok_or("JDT LS did not report imported projects")?;
+        let deadline = Instant::now() + Duration::from_secs(20);
+        let mut loaded = false;
+        let local_projects = projects
+            .iter()
+            .filter_map(serde_json::Value::as_str)
+            .filter(|project| {
+                url::Url::parse(project)
+                    .ok()
+                    .and_then(|uri| uri.to_file_path().ok())
+                    .is_some_and(|path| path.starts_with(mirror))
+            });
+        for (index, project) in local_projects.enumerate() {
+            if index == 32 {
+                return Err(
+                    "Java classpath verification exceeds the project count allowance".into(),
+                );
+            }
+            let remaining = deadline.saturating_duration_since(Instant::now());
+            if remaining.is_zero() {
+                return Err("Java classpath verification timed out".into());
+            }
+            let Ok(settings) = client.request(
+                "workspace/executeCommand",
+                json!({"command":"java.project.getSettings","arguments":[project,[NATURES]]}),
+                remaining,
+            ) else {
+                continue;
+            };
+            if let Some(natures) = settings[NATURES].as_array()
+                && natures.iter().any(|value| value == nature)
+                && natures
+                    .iter()
+                    .any(|value| value == "org.eclipse.jdt.core.javanature")
+            {
+                loaded = true;
+                if kind == Some("Maven") {
+                    verify_maven_classpath(client, project, deadline)?;
+                } else {
+                    return Ok(());
+                }
+            }
+        }
+        if let Some(error) = client.maven_error(mirror) {
+            return Err(format!("Maven classpath import is incomplete. {error}"));
+        }
+        if loaded {
+            return Ok(());
+        }
+        Err(
+            "JDT LS did not load a Java classpath. Check the local build cache and import again."
+                .into(),
+        )
     }
 
     fn archive_input(
@@ -135,6 +296,87 @@ impl Profile for JdtLs {
             Err("Archive source differs from the current JDT LS document".into())
         }
     }
+}
+
+fn verify_maven_classpath(
+    client: &mut Client,
+    project: &str,
+    deadline: Instant,
+) -> Result<(), String> {
+    let remaining = deadline.saturating_duration_since(Instant::now());
+    if remaining.is_zero() {
+        return Err("Java classpath verification timed out".into());
+    }
+    let paths = client.request(
+        "workspace/executeCommand",
+        json!({"command":"java.project.getClasspaths","arguments":[project,{"scope":"test"}]}),
+        remaining,
+    )?;
+    for field in ["classpaths", "modulepaths"] {
+        for value in paths[field]
+            .as_array()
+            .ok_or("JDT LS did not report the Maven classpath")?
+        {
+            let path = Path::new(
+                value
+                    .as_str()
+                    .ok_or("JDT LS returned an invalid Maven classpath entry")?,
+            );
+            if matches!(
+                path.extension().and_then(OsStr::to_str),
+                Some("jar" | "zip")
+            ) && !path.is_file()
+            {
+                return Err(format!(
+                    "Maven classpath import is incomplete. Missing {}",
+                    path.display()
+                ));
+            }
+        }
+    }
+    Ok(())
+}
+
+fn is_build_input(doc: &Document) -> bool {
+    matches!(doc.classification(), Classification::SourceOnly {
+        language: Some(language), reason: SourceOnlyReason::ProjectMetadata, ..
+    } if language == JAVA_PROJECT_METADATA)
+}
+
+fn local_gradle_home(configured: Option<&OsStr>, path: Option<&OsStr>) -> Result<PathBuf, String> {
+    let launcher = if cfg!(windows) {
+        "gradle.bat"
+    } else {
+        "gradle"
+    };
+    let valid = |home: &Path| -> Option<PathBuf> {
+        let home = home.canonicalize().ok()?;
+        if !home.join("bin").join(launcher).is_file() {
+            return None;
+        }
+        fs::read_dir(home.join("lib"))
+            .ok()?
+            .flatten()
+            .any(|entry| {
+                entry.file_name().to_str().is_some_and(|name| {
+                    name.starts_with("gradle-launcher-") && name.ends_with(".jar")
+                }) && entry.path().is_file()
+            })
+            .then_some(home)
+    };
+    if let Some(configured) = configured {
+        return valid(Path::new(configured))
+            .ok_or_else(|| "GRADLE_HOME is not a local Gradle distribution".into());
+    }
+    path.into_iter()
+        .flat_map(std::env::split_paths)
+        .find_map(|directory| {
+            let executable = directory.join(launcher).canonicalize().ok()?;
+            valid(executable.parent()?.parent()?)
+        })
+        .ok_or_else(|| {
+            "Install Gradle locally and set GRADLE_HOME or add its bin directory to PATH".into()
+        })
 }
 
 fn project_libraries(
@@ -273,6 +515,7 @@ fn prepare(
     roots: &BTreeSet<String>,
     libraries: serde_json::Value,
     first_source: Option<&str>,
+    project: Option<(&str, Option<&Path>)>,
 ) -> Result<PreparedInputs, String> {
     let private_state = tempfile::Builder::new()
         .prefix("jdtls-")
@@ -288,15 +531,29 @@ fn prepare(
             .into_string()
             .map_err(|_| "JDT LS state path is not UTF-8".into())
     };
+    let (kind, gradle_home) = project.unwrap_or_default();
+    let gradle_home = gradle_home
+        .map(|path| path.to_str().ok_or("Gradle installation path is not UTF-8"))
+        .transpose()?;
     let settings = json!({
         "java": {
             "autobuild": {"enabled": false},
             "configuration": {"updateBuildConfiguration": "disabled"},
             "import": {
                 "eclipse": {"enabled": false},
-                "gradle": {"enabled": false},
-                "maven": {"enabled": false}
+                "gradle": {
+                    "enabled": kind == "Gradle",
+                    "home": gradle_home,
+                    "offline": {"enabled": true},
+                    "wrapper": {"enabled": false},
+                    "annotationProcessing": {"enabled": false}
+                },
+                "maven": {
+                    "enabled": kind == "Maven",
+                    "offline": {"enabled": true}
+                }
             },
+            "maven": {"downloadSources": false},
             "project": {"sourcePaths": roots, "referencedLibraries": libraries},
             "telemetry": {"enabled": false}
         }
@@ -333,6 +590,34 @@ fn prepare(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn gradle_import_resolves_an_installed_distribution_and_rejects_an_invalid_home() {
+        let directory = tempfile::tempdir().unwrap();
+        let home = directory.path().join("gradle");
+        let bin = home.join("bin");
+        fs::create_dir_all(&bin).unwrap();
+        let launcher = if cfg!(windows) {
+            "gradle.bat"
+        } else {
+            "gradle"
+        };
+        fs::write(bin.join(launcher), "").unwrap();
+        let path = std::env::join_paths([&bin]).unwrap();
+        assert!(local_gradle_home(Some(home.as_os_str()), None).is_err());
+        assert!(local_gradle_home(None, Some(&path)).is_err());
+        fs::create_dir(home.join("lib")).unwrap();
+        fs::write(home.join("lib/other.jar"), "").unwrap();
+        fs::create_dir(home.join("lib/gradle-launcher-directory.jar")).unwrap();
+        assert!(local_gradle_home(None, Some(&path)).is_err());
+        fs::write(home.join("lib/gradle-launcher-test.jar"), "").unwrap();
+        assert_eq!(
+            local_gradle_home(None, Some(&path)).unwrap(),
+            home.canonicalize().unwrap()
+        );
+        assert!(local_gradle_home(Some(directory.path().as_os_str()), Some(&path)).is_err());
+        assert!(local_gradle_home(None, None).is_err());
+    }
 
     #[test]
     fn archive_destinations_decode_java_segments_and_reject_invalid_paths() {

@@ -41,10 +41,23 @@ project settings and reopens the project when relevant source or settings
 change. [Managed TypeScript profile](../prototype/ECMASCRIPT_TECH.md#managed-typescript-server)
 
 JDT LS waits for `language/status` with `ServiceReady`. Its Eclipse configuration
-and workspace state are temporary siblings of the source mirror. The profile
-passes only source roots and disables project import and automatic builds. The
-same roots bound mirror admission and its input identity. Java source edits
-inside those roots restart the server and refresh results for unopened files.
+and workspace state are temporary siblings of the source mirror. Source-root
+mode disables project import and automatic builds. Its input identity includes
+Java source bytes, so source edits restart that server and refresh results for
+unopened files.
+
+The Workspace menu's Java import action sends a same-origin request for the
+current snapshot. Only that request can prepare an import-enabled mirror.
+The mirror admits the captured Maven or Gradle descriptors and JDT LS uses the
+local build caches in offline mode. Vizzi checks that the server loaded a Java
+project of the selected build type, rejects Maven resolution errors, and verifies
+mirrored source bytes before activating it. Gradle uses a validated local
+distribution from `GRADLE_HOME` or `PATH`. The classpath context uses the current
+build-descriptor digest at activation. Java edits synchronize inside that
+session and build edits require another explicit import. Recoverable errors keep
+the active import. An exited server requires another import. Ordinary requests
+never restart an import-enabled server.
+
 Virtual Java destinations can enter the dependency catalog through a verified
 local source archive. LSP positions recognize LF, CRLF, and CR line endings in
 captured bytes.
@@ -68,3 +81,9 @@ declarations and C/C++ definitions. The browser integration checks the same navi
 and incremental reference behaviour through the public interface.
 Set `VIZZI_JDTLS` to a JDT LS launcher to include real Java checks in the native
 language-server tests and the Chromium suite.
+For the Maven import fixture, set `VIZZI_TEST_MAVEN_IMPORT=1` and give JDT LS a
+local Maven repository with the lifecycle plugins for a default Java project.
+A successful `mvn package` in a disposable default Java project with the same
+Maven version can populate that cache. The test creates its own dependency JAR.
+Set `GRADLE_HOME` to a compatible local distribution to exercise the real
+Gradle fixture and browser action.

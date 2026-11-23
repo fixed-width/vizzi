@@ -60,9 +60,23 @@ Install Eclipse JDT LS and a JDK supported by that release. Select the JDK with
 Linux with JDT LS 1.63.0 and Java 25. Use the distribution's `bin/jdtls` launcher.
 [Eclipse JDT LS downloads and launcher instructions](https://github.com/eclipse-jdtls/eclipse.jdt.ls#installation)
 
+### Use a Maven or Gradle classpath
+
+Open the build root with `vizzi --jdtls jdtls`. In the call workspace's
+**Workspace** menu, choose **Import Maven classpath** or **Import Gradle classpath**.
+This action runs build configuration using captured project descriptors and the
+local plugin and dependency caches. Gradle import needs a local distribution from
+`GRADLE_HOME` or `PATH`. Maven reports missing cached dependencies as an incomplete import.
+
+Import again after changing a build file or installing new dependencies. Java
+source edits use the imported session directly. Select a root with a single build
+system. For builds that require extra scripts or plugins outside the captured
+descriptors, use VS Code sharing.
+
+### Explore a source folder directly
+
 ```sh
-vizzi --root /path/to/project \
-  --jdtls /path/to/jdtls/bin/jdtls \
+vizzi --root /path/to/project --jdtls jdtls \
   --java-source-root src/main/java \
   --java-source-root src/test/java
 ```
@@ -70,21 +84,20 @@ vizzi --root /path/to/project \
 Each source root is relative to the selected workspace. Omit the flags for
 sources whose package paths start at the workspace root. The equivalent TOML
 keys under `[language-servers]` are `jdtls` and `java-source-root`, an array of paths.
-
 The managed profile resolves definitions and references across these roots using
 captured source and the JDK. Java files outside the roots remain browsable and
-use written-name candidates. The profile disables Maven, Gradle, and Eclipse
-project imports and automatic builds. The first lookup starts the server. A
-saved change to Java source under a configured root starts a fresh server on
+use written-name candidates. In source-root mode, JDT LS starts on the first
+lookup with project import and automatic builds disabled. A saved change to
+Java source under a configured root starts a fresh server on
 the next lookup. JDT LS can check Gradle version metadata during startup.
-Navigation also works with the network unavailable. For editor-managed build
-classpaths, use VS Code sharing below.
+Navigation also works with the network unavailable.
 
 ### Open Java library source
 
 Install the JDK's `src.zip` to follow definitions into the standard library.
-For a local dependency, add its binary JAR and keep the matching `-sources.jar`
-beside it.
+Maven and Gradle projects use the imported classpath for library resolution. For
+an unmanaged folder, a local binary JAR and its matching `-sources.jar` can be
+configured directly.
 
 ```sh
 vizzi --jdtls jdtls --java-source-root src/main/java \

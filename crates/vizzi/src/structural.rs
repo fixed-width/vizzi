@@ -510,6 +510,40 @@ impl StructureHost {
     pub fn definitions_available(&self) -> bool {
         self.definitions.is_some()
     }
+    pub(crate) fn supports_java_project_import(&self) -> bool {
+        self.definitions
+            .as_ref()
+            .is_some_and(|provider| provider.supports_java_project_import())
+    }
+    pub(crate) fn java_project(&self) -> Option<serde_json::Value> {
+        let snapshot = self.host.application().snapshot()?;
+        let kind = self.definitions.as_ref()?.java_project_kind(&snapshot)?;
+        Some(serde_json::json!({"snapshot":snapshot.id().as_str(), "kind":kind}))
+    }
+    pub(crate) fn import_java_project(&self, expected: &str) -> Result<(), CompanionError> {
+        let snapshot = self
+            .host
+            .application()
+            .snapshot()
+            .ok_or_else(|| CompanionError::Unavailable("Wait for source indexing".into()))?;
+        if snapshot.id().as_str() != expected {
+            return Err(CompanionError::Conflict(
+                "Source changed before Java project import".into(),
+            ));
+        }
+        self.definitions
+            .as_ref()
+            .ok_or_else(|| {
+                CompanionError::Unavailable("Java project import requires managed JDT LS".into())
+            })?
+            .import_java_project(snapshot, &|| self.host.application().snapshot())
+            .map_err(CompanionError::Unavailable)?;
+        self.reference_sets
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
+            .retain(|set| !set.uses_java);
+        Ok(())
+    }
     pub(crate) fn call_languages(&self) -> &[String] {
         self.host.call_languages()
     }

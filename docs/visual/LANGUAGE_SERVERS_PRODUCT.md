@@ -57,3 +57,11 @@ Eclipse project files stay outside this source-root configuration. Repository
 browsing requires no Java tooling.
 JDK and local library destinations can open an independent source capture when
 JDT LS identifies a matching attached source archive.
+
+For a Maven or Gradle workspace, **Import Java project** loads the build
+classpath through JDT LS from the captured project files. The action uses
+already installed tooling and local dependencies. Ordinary browsing and
+definition requests do not start an import. After import, saved Java changes
+update the existing session. A build configuration change asks the reader
+to import again before using that classpath. Java projects imported this way
+need no source-root or per-JAR flags.

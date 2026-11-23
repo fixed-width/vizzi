@@ -285,6 +285,258 @@ fn check_managed_java_library(package: &str, archive_prefix: &str) {
 }
 
 #[test]
+#[cfg(unix)]
+fn managed_java_keeps_import_mode_across_recoverable_and_fatal_lookup_errors() {
+    use std::{fs, os::unix::fs::PermissionsExt};
+    use vizzi::{cache::Cache, engine::Engine, source::Directory};
+    let root = tempfile::tempdir().unwrap();
+    let tools = tempfile::tempdir().unwrap();
+    let launcher = tools.path().join("jdtls");
+    let text = "class Caller { int run() { return answer(); } int answer() { return 1; } }";
+    fs::write(root.path().join("Caller.java"), text).unwrap();
+    fs::write(root.path().join("pom.xml"), "<project/>").unwrap();
+    fs::write(&launcher, r#"#!/usr/bin/env python3
+import json
+import sys
+from pathlib import Path
+
+def send(message):
+    body = json.dumps(dict(jsonrpc="2.0", **message)).encode()
+    sys.stdout.buffer.write(f"Content-Length: {len(body)}\r\n\r\n".encode() + body)
+    sys.stdout.buffer.flush()
+
+definitions = 0
+while header := sys.stdin.buffer.readline():
+    length = int(header.split(b":", 1)[1])
+    sys.stdin.buffer.readline()
+    request = json.loads(sys.stdin.buffer.read(length))
+    method = request.get("method")
+    if method == "initialize":
+        assert Path("pom.xml").is_file()
+        result = {"capabilities": {"definitionProvider": True}}
+    elif method == "initialized":
+        send({"method":"language/status","params":{"type":"ServiceReady"}})
+        continue
+    elif method == "workspace/executeCommand":
+        command = request["params"]["command"]
+        if command == "java.project.getAll":
+            result = [Path.cwd().as_uri()]
+        elif command == "java.project.getSettings":
+            result = {"org.eclipse.jdt.ls.core.natureIds":["org.eclipse.m2e.core.maven2Nature","org.eclipse.jdt.core.javanature"]}
+        elif command == "java.project.getClasspaths":
+            result = {"classpaths":[],"modulepaths":[]}
+        else:
+            raise AssertionError(command)
+    elif method == "textDocument/definition":
+        definitions += 1
+        if definitions == 1:
+            send({"id":request["id"],"error":{"code":-32603,"message":"Temporary lookup error"}})
+            continue
+        if definitions == 3:
+            break
+        uri = request["params"]["textDocument"]["uri"]
+        result = [{"uri":uri,"range":{"start":{"line":0,"character":49},"end":{"line":0,"character":55}}}]
+    else:
+        continue
+    send({"id":request["id"],"result":result})
+"#).unwrap();
+    fs::set_permissions(&launcher, fs::Permissions::from_mode(0o700)).unwrap();
+    let snapshot = Engine::new(
+        Directory::open(root.path()).unwrap(),
+        Cache::new(tools.path().join("capture")),
+        1,
+    )
+    .unwrap()
+    .refresh(None, &|| false)
+    .unwrap()
+    .unwrap()
+    .snapshot;
+    let provider = Servers::new(
+        root.path().into(),
+        tools.path().join("semantic"),
+        Configuration {
+            jdtls: Some(launcher),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    provider
+        .import_java_project(snapshot.clone(), &|| Some(snapshot.clone()))
+        .unwrap();
+    let index = Structure::new(&snapshot);
+    let owner = &index.functions("Caller.java", "run", 0).unwrap().items[0].symbol;
+    let outgoing = index.outgoing(&owner.id, "Caller.java", 0).unwrap();
+    let call = index.call(&outgoing.items[0].id).unwrap();
+    let resolve = || provider.resolve(snapshot.clone(), &call);
+    assert!(resolve().unwrap_err().contains("Temporary lookup error"));
+    assert_eq!(resolve().unwrap().locations.len(), 1);
+    assert!(resolve().is_err());
+    assert!(resolve().unwrap_err().contains("Import the project again"));
+}
+
+#[test]
+fn managed_java_imports_maven_classpath_without_library_flags() {
+    if std::env::var_os("VIZZI_TEST_MAVEN_IMPORT").is_some() {
+        check_managed_java_project("Maven");
+    }
+}
+
+#[test]
+fn managed_java_imports_gradle_classpath_without_library_flags() {
+    if std::env::var_os("GRADLE_HOME").is_some() {
+        check_managed_java_project("Gradle");
+    }
+}
+
+fn check_managed_java_project(kind: &str) {
+    use std::{fs, io::Write, process::Command};
+    use vizzi::{cache::Cache, engine::Engine, source::Directory};
+    let Some(executable) = std::env::var_os("VIZZI_JDTLS") else {
+        return;
+    };
+    let root = tempfile::tempdir().unwrap();
+    let tools = tempfile::tempdir().unwrap();
+    let helper = tools.path().join("Helper.java");
+    fs::write(
+        &helper,
+        "package lib; public class Helper { public static String answer() { return \"ok\"; } }",
+    )
+    .unwrap();
+    let javac = std::env::var_os("JAVA_HOME")
+        .map(|p| std::path::PathBuf::from(p).join("bin/javac"))
+        .unwrap_or_else(|| "javac".into());
+    let build = Command::new(javac)
+        .arg("-d")
+        .arg(tools.path())
+        .arg(helper)
+        .output()
+        .unwrap();
+    assert!(
+        build.status.success(),
+        "{}",
+        String::from_utf8_lossy(&build.stderr)
+    );
+    let jar = tools.path().join("library.jar");
+    let mut zip = zip::ZipWriter::new(fs::File::create(&jar).unwrap());
+    zip.start_file("lib/Helper.class", zip::write::SimpleFileOptions::default())
+        .unwrap();
+    zip.write_all(&fs::read(tools.path().join("lib/Helper.class")).unwrap())
+        .unwrap();
+    zip.finish().unwrap();
+    fs::create_dir(root.path().join("app")).unwrap();
+    let (descriptor, settings) = if kind == "Maven" {
+        fs::write(root.path().join("pom.xml"), "<project><modelVersion>4.0.0</modelVersion><groupId>demo</groupId><artifactId>root</artifactId><version>1</version><packaging>pom</packaging><modules><module>app</module></modules></project>").unwrap();
+        (
+            "app/pom.xml",
+            format!(
+                r#"<project>
+<modelVersion>4.0.0</modelVersion><groupId>demo</groupId><artifactId>app</artifactId><version>1</version>
+<dependencies><dependency><groupId>lib</groupId><artifactId>helper</artifactId><version>1</version>
+<scope>system</scope><systemPath>{}</systemPath></dependency></dependencies>
+</project>"#,
+                jar.display()
+            ),
+        )
+    } else {
+        fs::write(
+            root.path().join("settings.gradle"),
+            "rootProject.name = 'vizzi_test'\ninclude 'app'\n",
+        )
+        .unwrap();
+        (
+            "app/build.gradle",
+            format!(
+                "plugins {{ id 'java' }}\ndependencies {{ implementation files('{}') }}\n",
+                jar.display()
+            ),
+        )
+    };
+    fs::write(root.path().join(descriptor), &settings).unwrap();
+    let path = "app/src/main/java/demo/Caller.java";
+    let source = root.path().join(path);
+    fs::create_dir_all(source.parent().unwrap()).unwrap();
+    let text = "package demo; class Caller { String run() { return lib.Helper.answer(); } }";
+    fs::write(&source, text).unwrap();
+    let engine = Engine::new(
+        Directory::open(root.path()).unwrap(),
+        Cache::new(tools.path().join("capture")),
+        1,
+    )
+    .unwrap();
+    let capture = || engine.refresh(None, &|| false).unwrap().unwrap().snapshot;
+    let provider = Servers::new(
+        root.path().into(),
+        tools.path().join("semantic"),
+        Configuration {
+            jdtls: Some(executable.into()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let navigate = |snapshot: Arc<Snapshot>| {
+        let index = Structure::new(&snapshot);
+        let owner = index
+            .functions(path, "run", 0)
+            .unwrap()
+            .items
+            .remove(0)
+            .symbol;
+        let site = index.outgoing(&owner.id, path, 0).unwrap().items.remove(0);
+        provider.resolve(snapshot, &index.call(&site.id).unwrap())
+    };
+    let initial = capture();
+    assert_eq!(provider.java_project_kind(&initial), Some(kind));
+    let before = navigate(initial.clone()).unwrap();
+    assert_eq!(before.locations.len() + before.outside, 0);
+    fs::write(&source, format!("// saved edit\n{text}")).unwrap();
+    let edited = capture();
+    provider
+        .import_java_project(initial.clone(), &|| Some(edited.clone()))
+        .unwrap_or_else(|e| panic!("{kind}: {e}"));
+    let after = navigate(edited).unwrap();
+    assert_eq!(
+        after.locations.len() + after.outside,
+        1,
+        "{kind}: {after:?}"
+    );
+    fs::write(&source, format!("// second saved edit\n{text}")).unwrap();
+    let edited = navigate(capture()).unwrap();
+    assert_eq!(
+        edited.locations.len() + edited.outside,
+        1,
+        "{kind}: {edited:?}"
+    );
+    fs::write(root.path().join(descriptor), format!("{settings}\n")).unwrap();
+    let changed = capture();
+    assert!(
+        navigate(changed.clone())
+            .unwrap_err()
+            .contains("import the project again")
+    );
+    assert!(
+        provider
+            .import_java_project(initial, &|| Some(changed.clone()))
+            .unwrap_err()
+            .contains("changed during import")
+    );
+    if kind == "Maven" {
+        let missing = settings.replace("</dependencies>", "<dependency><groupId>fixture.unavailable</groupId><artifactId>missing</artifactId><version>55</version></dependency></dependencies>");
+        fs::write(root.path().join(descriptor), missing).unwrap();
+        let unresolved = capture();
+        let error = provider
+            .import_java_project(unresolved.clone(), &|| Some(unresolved.clone()))
+            .unwrap_err();
+        assert!(
+            error.contains("Maven classpath import is incomplete"),
+            "{error}"
+        );
+    }
+    fs::write(root.path().join(descriptor), settings).unwrap();
+    let retained = navigate(capture()).unwrap();
+    assert_eq!(retained.locations.len() + retained.outside, 1);
+}
+
+#[test]
 fn managed_java_resolves_overloads_and_edits_with_captured_source() {
     let Some(executable) = std::env::var_os("VIZZI_JDTLS") else {
         eprintln!("Set VIZZI_JDTLS to exercise the managed Eclipse JDT LS profile");

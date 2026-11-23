@@ -6,6 +6,8 @@ use std::collections::{BTreeMap, BTreeSet};
 
 /// Source-only classification for JavaScript and TypeScript project inputs.
 pub const ECMASCRIPT_PROJECT_METADATA: &str = "javascript-project";
+/// Inert descriptors for an explicitly imported Maven or Gradle project.
+pub const JAVA_PROJECT_METADATA: &str = "java-project";
 
 struct DefaultSourceRules {
     language: &'static str,
@@ -40,7 +42,18 @@ const DEFAULT_SOURCE_RULES: &[DefaultSourceRules] = &[
         language: "java",
         suffixes: &["java"],
         filenames: &[],
-        project_metadata: None,
+        project_metadata: Some((
+            JAVA_PROJECT_METADATA,
+            &[
+                "pom.xml",
+                "settings.gradle",
+                "settings.gradle.kts",
+                "build.gradle",
+                "build.gradle.kts",
+                "gradle.properties",
+                "libs.versions.toml",
+            ],
+        )),
     },
     DefaultSourceRules {
         language: "javascript",
