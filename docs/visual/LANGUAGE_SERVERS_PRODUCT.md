@@ -55,4 +55,5 @@ browsing and written-name lookup. Startup and requests remain bounded. Lookups
 after a saved edit inside a source root use the new capture. Maven, Gradle, and
 Eclipse project files stay outside this source-root configuration. Repository
 browsing requires no Java tooling.
-JDK and dependency destinations outside captured source remain outside results.
+JDK and local library destinations can open an independent source capture when
+JDT LS identifies a matching attached source archive.

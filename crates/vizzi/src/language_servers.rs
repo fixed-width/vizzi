@@ -38,6 +38,9 @@ pub struct Configuration {
     /// Java source roots relative to the workspace, defaulting to the workspace root.
     #[serde(rename = "java-source-root")]
     pub java_source_roots: Vec<String>,
+    /// Local binary JARs on the managed Java classpath.
+    #[serde(rename = "java-library")]
+    pub java_libraries: Vec<PathBuf>,
     /// Optional interpreter/environment used by the Python server.
     pub python_path: Option<PathBuf>,
     /// Optional compilation database, otherwise root/compile_commands.json.
@@ -55,6 +58,7 @@ impl Configuration {
                 || self.typescript_server.is_some()
                 || self.jdtls.is_some()
                 || !self.java_source_roots.is_empty()
+                || !self.java_libraries.is_empty()
                 || self.python_path.is_some()
                 || self.compilation_database.is_some())
         {
@@ -71,6 +75,9 @@ impl Configuration {
                 return Err("--java-source-root requires --jdtls".into());
             }
             java::source_roots(&self.java_source_roots)?;
+        }
+        if !self.java_libraries.is_empty() && self.jdtls.is_none() {
+            return Err("--java-library requires --jdtls".into());
         }
         Ok(())
     }
@@ -163,6 +170,7 @@ impl Servers {
                 executable,
                 java::JdtLs {
                     roots: java::source_roots(&configuration.java_source_roots)?,
+                    libraries: configuration.java_libraries,
                 },
             );
         }

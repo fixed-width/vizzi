@@ -64,6 +64,9 @@ pub struct SourceOrigin {
     pub version: Option<String>,
     /// Supplying language.
     pub language: String,
+    /// Captured from a source archive rather than a plain file.
+    #[serde(skip_serializing_if = "std::ops::Not::not")]
+    pub archive: bool,
 }
 /// Projection allowances and unavailable capability, not a completeness guarantee.
 #[derive(Default, Clone, Debug, Serialize)]

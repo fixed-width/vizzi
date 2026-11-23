@@ -45,8 +45,9 @@ and workspace state are temporary siblings of the source mirror. The profile
 passes only source roots and disables project import and automatic builds. The
 same roots bound mirror admission and its input identity. Java source edits
 inside those roots restart the server and refresh results for unopened files.
-Virtual Java destinations count as outside the capture. LSP positions recognize
-LF, CRLF, and CR line endings in captured bytes.
+Virtual Java destinations can enter the dependency catalog through a verified
+local source archive. LSP positions recognize LF, CRLF, and CR line endings in
+captured bytes.
 
 Semantic locations map to exact captured identifiers. Returned external local files enter
 the bounded catalog, are synchronized and verified, and lookup repeats before trusting a

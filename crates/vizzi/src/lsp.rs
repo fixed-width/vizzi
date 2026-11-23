@@ -433,31 +433,54 @@ impl Client {
         path: &Path,
         position: Position,
     ) -> Result<Vec<(Option<PathBuf>, Position)>, String> {
-        self.wait_ready()?;
-        let result = self.request(
-            "textDocument/definition",
-            json!({"textDocument":{"uri":uri(path)?},"position":position}),
-            Duration::from_secs(10),
-        )?;
-        locations(result)
+        Ok(file_locations(self.lookup_locations(
+            &uri(path)?,
+            position,
+            false,
+        )?))
     }
     pub(crate) fn references(
         &mut self,
         path: &Path,
         position: Position,
     ) -> Result<Vec<(Option<PathBuf>, Position)>, String> {
+        Ok(file_locations(self.lookup_locations(
+            &uri(path)?,
+            position,
+            true,
+        )?))
+    }
+    pub(crate) fn lookup_locations(
+        &mut self,
+        uri: &str,
+        position: Position,
+        references: bool,
+    ) -> Result<Vec<(Url, Position)>, String> {
         self.wait_ready()?;
-        let result=self.request("textDocument/references",json!({"textDocument":{"uri":uri(path)?},"position":position,"context":{"includeDeclaration":false}}),Duration::from_secs(10))?;
-        locations_with_limit(result, 1024)
+        let mut params = json!({"textDocument":{"uri":uri},"position":position});
+        let (method, limit) = if references {
+            params["context"] = json!({"includeDeclaration":false});
+            ("textDocument/references", 1024)
+        } else {
+            ("textDocument/definition", 64)
+        };
+        locations_with_limit(
+            self.request(method, params, Duration::from_secs(10))?,
+            limit,
+        )
     }
 }
-fn locations(result: Value) -> Result<Vec<(Option<PathBuf>, Position)>, String> {
-    locations_with_limit(result, 64)
+fn file_locations(locations: Vec<(Url, Position)>) -> Vec<(Option<PathBuf>, Position)> {
+    locations
+        .into_iter()
+        .map(|(uri, position)| (uri.to_file_path().ok(), position))
+        .collect()
 }
-fn locations_with_limit(
-    result: Value,
-    limit: usize,
-) -> Result<Vec<(Option<PathBuf>, Position)>, String> {
+#[cfg(test)]
+fn locations(result: Value) -> Result<Vec<(Option<PathBuf>, Position)>, String> {
+    Ok(file_locations(locations_with_limit(result, 64)?))
+}
+fn locations_with_limit(result: Value, limit: usize) -> Result<Vec<(Url, Position)>, String> {
     let items = match result {
         Value::Null => vec![],
         Value::Array(v) => v,
@@ -477,11 +500,10 @@ fn locations_with_limit(
         };
         let uri =
             Url::parse(uri.as_str().ok_or("Missing definition URI")?).map_err(|e| e.to_string())?;
-        let path = uri.to_file_path().ok();
         let position =
             serde_json::from_value::<Position>(point.clone()).map_err(|e| e.to_string())?;
         if seen.insert((uri.to_string(), position.line, position.character)) {
-            output.push((path, position));
+            output.push((uri, position));
         }
     }
     Ok(output)

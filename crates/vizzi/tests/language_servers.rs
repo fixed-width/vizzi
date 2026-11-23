@@ -117,6 +117,174 @@ fn configuration_is_lazy_and_unconfigured_languages_do_not_use_another_server() 
 }
 
 #[test]
+fn managed_java_opens_jdk_source_from_the_local_attachment() {
+    let Some(executable) = std::env::var_os("VIZZI_JDTLS") else {
+        eprintln!("Set VIZZI_JDTLS and select a JDK with src.zip to exercise archive sources");
+        return;
+    };
+    let root = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    let provider = Servers::new(
+        root.path().into(),
+        cache.path().into(),
+        Configuration {
+            jdtls: Some(executable.into()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let path = "demo/Caller.java";
+    let text = "package demo;\nclass Caller { int run(String value) { return value.length(); } }\n";
+    let capture = snapshot(&[(path, "java", text)]);
+    let index = Structure::new(&capture);
+    let owner = &index.functions(path, "run", 0).unwrap().items[0].symbol;
+    let outgoing = index.outgoing(&owner.id, path, 0).unwrap();
+    let call = index.call(&outgoing.items[0].id).unwrap();
+    let answer = provider.resolve(capture.clone(), &call).unwrap();
+    let [target] = answer.locations.as_slice() else {
+        panic!("expected an attached JDK source location, got {answer:?}");
+    };
+    let id = target.capture.as_deref().expect("independent JDK capture");
+    let sources = provider.dependencies().unwrap();
+    let source = sources.get(id).unwrap().unwrap();
+    assert_eq!(source.origin.language, "java");
+    assert!(source.doc().path().ends_with("/String.java"));
+    let text = source.doc().resident_source().unwrap();
+    let byte = vizzi::definitions::byte_offset(text, target.position).unwrap();
+    let symbol = source
+        .index
+        .definition(source.doc().path(), byte)
+        .expect("exact library method");
+    assert_eq!(symbol.name, "length");
+    let body = source
+        .index
+        .outgoing(&symbol.id, source.doc().path(), 0)
+        .unwrap();
+    let inner = body
+        .items
+        .iter()
+        .find(|site| site.name.as_deref() == Some("coder"))
+        .unwrap();
+    let followed = provider
+        .resolve(capture, &source.index.call(&inner.id).unwrap())
+        .unwrap();
+    assert_eq!(followed.locations[0].capture.as_deref(), Some(id));
+}
+
+#[test]
+fn managed_java_opens_local_libraries_with_common_source_jar_layouts() {
+    for (package, prefix) in [("lib", ""), ("", ""), ("lib", "src/main/java/")] {
+        check_managed_java_library(package, prefix);
+    }
+}
+
+fn check_managed_java_library(package: &str, archive_prefix: &str) {
+    use std::{fs, io::Write, path::Path, process::Command};
+    let Some(executable) = std::env::var_os("VIZZI_JDTLS") else {
+        return;
+    };
+    let root = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    let library = tempfile::tempdir().unwrap();
+    let declaration = if package.is_empty() {
+        String::new()
+    } else {
+        format!("package {package};\n")
+    };
+    let contents = format!(
+        "{declaration}public class Helper {{ public static int answer() {{ return 42; }} }}\n"
+    );
+    let source = library.path().join("Helper.java");
+    fs::write(&source, &contents).unwrap();
+    let javac = std::env::var_os("JAVA_HOME")
+        .map(|path| std::path::PathBuf::from(path).join("bin/javac"))
+        .unwrap_or_else(|| "javac".into());
+    let compiled = Command::new(javac)
+        .arg("-d")
+        .arg(library.path())
+        .arg(&source)
+        .output()
+        .unwrap();
+    assert!(
+        compiled.status.success(),
+        "{}",
+        String::from_utf8_lossy(&compiled.stderr)
+    );
+    let jar = library.path().join("helper.jar");
+    let attachment = library.path().join("helper-sources.jar");
+    let write_jar = |path: &Path, name: &str, bytes: &[u8]| {
+        let mut zip = zip::ZipWriter::new(fs::File::create(path).unwrap());
+        zip.start_file(name, zip::write::SimpleFileOptions::default())
+            .unwrap();
+        zip.write_all(bytes).unwrap();
+        zip.finish().unwrap();
+    };
+    let prefix = if package.is_empty() {
+        String::new()
+    } else {
+        format!("{package}/")
+    };
+    let class = format!("{prefix}Helper.class");
+    let entry = format!("{archive_prefix}{prefix}Helper.java");
+    write_jar(
+        &jar,
+        &class,
+        &fs::read(library.path().join(&class)).unwrap(),
+    );
+    write_jar(&attachment, &entry, contents.as_bytes());
+    let provider = Servers::new(
+        root.path().into(),
+        cache.path().into(),
+        Configuration {
+            jdtls: Some(executable.into()),
+            java_libraries: vec![jar],
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let path = "Caller.java";
+    let receiver = if package.is_empty() {
+        "Helper".to_owned()
+    } else {
+        format!("{package}.Helper")
+    };
+    let text = format!("class Caller {{ int run() {{ return {receiver}.answer(); }} }}");
+    let capture = snapshot(&[(path, "java", &text)]);
+    let index = Structure::new(&capture);
+    let owner = &index.functions(path, "run", 0).unwrap().items[0].symbol;
+    let outgoing = index.outgoing(&owner.id, path, 0).unwrap();
+    let call = index.call(&outgoing.items[0].id).unwrap();
+    let found = provider.resolve(capture.clone(), &call).unwrap();
+    let [target] = found.locations.as_slice() else {
+        panic!("expected one exact library definition, got {found:?}");
+    };
+    let id = target.capture.as_deref().unwrap();
+    let reached = provider.dependencies().unwrap().get(id).unwrap().unwrap();
+    assert_eq!(reached.origin.label, "helper.jar");
+    assert_eq!(reached.doc().path(), entry);
+    assert_eq!(reached.doc().resident_source(), Some(contents.as_str()));
+    let byte = vizzi::definitions::byte_offset(&contents, target.position).unwrap();
+    let helper = reached.symbol(reached.index.definition(&entry, byte).unwrap());
+    assert_eq!(helper.name, "answer");
+    let refs = provider.references(capture.clone(), &helper, byte).unwrap();
+    assert_eq!(
+        refs.locations
+            .iter()
+            .map(|location| location.path.as_str())
+            .collect::<Vec<_>>(),
+        [path]
+    );
+
+    if package == "lib" && archive_prefix.is_empty() {
+        fs::remove_file(attachment).unwrap();
+        let absent = provider.resolve(capture, &call).unwrap();
+        assert!(absent.locations.is_empty());
+        assert_eq!(absent.outside, 1);
+        assert!(reached.verify().is_err());
+    }
+}
+
+#[test]
 fn managed_java_resolves_overloads_and_edits_with_captured_source() {
     let Some(executable) = std::env::var_os("VIZZI_JDTLS") else {
         eprintln!("Set VIZZI_JDTLS to exercise the managed Eclipse JDT LS profile");
@@ -717,7 +885,7 @@ fn managed_typescript_follows_installed_packages_and_retains_the_resolution_path
         "{references:?}"
     );
     std::fs::write(
-        router.path(),
+        router.path().unwrap(),
         "// moved\nexport function work() { return 8; }",
     )
     .unwrap();
@@ -975,6 +1143,7 @@ fn managed_servers_expose_the_shared_catalog_for_admitted_dependency_source() {
             version: None,
             configuration: "a".repeat(64),
             mirror_path: None,
+            archive: None,
             installation: None,
         })
         .unwrap();

@@ -9,8 +9,46 @@ fn input(root: &std::path::Path) -> Input {
         version: Some("1.2.3".into()),
         configuration: "a".repeat(64),
         mirror_path: None,
+        archive: None,
         installation: None,
     }
+}
+
+#[test]
+fn archive_capture_restores_only_the_verified_member() {
+    use std::{fs::File, io::Write};
+    use vizzi_core::model::ContentId;
+    let library = tempfile::tempdir().unwrap();
+    let archive = library.path().join("helper-sources.jar");
+    let references = library.path().join("refs.json");
+    let text = "package lib;\nclass Helper { int answer() { return 7; } }\n";
+    let write_archive = |text: &str| {
+        let mut zip = zip::ZipWriter::new(File::create(&archive).unwrap());
+        zip.start_file("lib/Helper.java", zip::write::SimpleFileOptions::default())
+            .unwrap();
+        zip.write_all(text.as_bytes()).unwrap();
+        zip.finish().unwrap();
+    };
+    write_archive(text);
+    let input = Input {
+        root: archive.canonicalize().unwrap(),
+        path: "lib/Helper.java".into(),
+        language: "java".into(),
+        archive: Some(ContentId::derive(&[text.as_bytes()])),
+        ..input(library.path())
+    };
+    let catalog = Catalog::new(references.clone());
+    let captured = catalog.capture(input.clone()).unwrap();
+    assert!(captured.origin.archive);
+    assert!(captured.path().is_none());
+    let id = &captured.origin.capture;
+    let restored = Catalog::new(references.clone()).get(id).unwrap().unwrap();
+    assert_eq!(restored.doc().resident_source(), Some(text));
+    write_archive("package lib; class Helper {}\n");
+    assert!(captured.verify().is_err());
+    assert!(catalog.capture(input).is_err());
+    assert!(Catalog::new(references).get(id).unwrap().is_none());
+    assert_eq!(captured.doc().resident_source(), Some(text));
 }
 
 #[test]

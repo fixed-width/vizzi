@@ -60,7 +60,7 @@ fn managed_java_configuration_loads_without_launching_the_server() {
     fs::write(root.join("Example.java"), "class Example {}\n").unwrap();
     fs::write(
         &config,
-        "[language-servers]\njdtls = './missing-jdtls'\njava-source-root = ['.']\n",
+        "[language-servers]\njdtls = './missing-jdtls'\njava-source-root = ['.']\njava-library = ['lib/config.jar']\n",
     )
     .unwrap();
     let output = Command::new(env!("CARGO_BIN_EXE_vizzi"))
@@ -76,6 +76,8 @@ fn managed_java_configuration_loads_without_launching_the_server() {
             "missing-override",
             "--java-source-root",
             ".",
+            "--java-library",
+            "lib/cli.jar",
         ])
         .output()
         .unwrap();
@@ -108,6 +110,7 @@ fn invalid_configurations_fail_before_creating_analysis_storage() {
         "[language-servers]\npython-path = 'python'",
         "[language-servers]\ncompile-commands = 'commands.json'",
         "[language-servers]\njava-source-root = ['src']",
+        "[language-servers]\njava-library = ['helper.jar']",
         "[language-servers]\njdtls = 'jdtls'\njava-source-root = ['../outside']",
         "[language-servers]\njdtls = 'jdtls'\nvscode-connection = 'bridge.json'",
         "[language-servers]\nvscode-connection = 'bridge.json'\nrust-analyzer = 'rust-analyzer'",

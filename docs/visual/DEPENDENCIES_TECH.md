@@ -28,6 +28,17 @@ and recheck the alias before and after follow-up queries.
 [Node package lookup](https://nodejs.org/api/modules.html#loading-from-node_modules-folders) ·
 [pnpm installation layout](https://pnpm.io/symlinked-node-modules-structure)
 
+Managed Java retains the virtual URI returned by JDT LS in the current server
+session. It uses the server's read-only source attachment query and class document
+contents to identify a bounded ZIP member. The provider accepts unnamed-package
+URIs and requires a unique exact byte match among members with the reported
+relative source path, including paths with source-root prefixes. The catalog
+verifies the member's bytes against that content before parsing and stores its
+archive path, member name, and content identity for restoration. The host reads
+members without extracting them. Follow-up requests use the same verified virtual URI. The browser
+gets the package origin and an archive flag to disable physical editor handoff.
+Source archives and explicitly configured library JARs are limited to 256 MiB each.
+
 Each capture has its own source scope, snapshot, parsed document and structural projection.
 A public origin descriptor identifies package/language/version and the capture reference;
 absolute paths stay native. Source windows bind the dependency snapshot. Structural and

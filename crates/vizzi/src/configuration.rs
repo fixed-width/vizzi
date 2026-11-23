@@ -95,6 +95,9 @@ impl Options {
         {
             path(base, value);
         }
+        for value in &mut options.language_servers.java_libraries {
+            path(base, value);
+        }
         for value in [
             &mut options.language_servers.rust_analyzer,
             &mut options.language_servers.pyright,
@@ -175,6 +178,7 @@ pub(super) fn load(arguments: impl Iterator<Item = String>) -> Result<Option<Opt
                 | "--typescript-server"
                 | "--jdtls"
                 | "--java-source-root"
+                | "--java-library"
                 | "--python-path"
                 | "--compile-commands"
                 | "--c-family-root"
@@ -223,6 +227,7 @@ pub(super) fn load(arguments: impl Iterator<Item = String>) -> Result<Option<Opt
             }
             "--jdtls" => options.language_servers.jdtls = Some(value.into()),
             "--java-source-root" => options.language_servers.java_source_roots.push(value),
+            "--java-library" => options.language_servers.java_libraries.push(value.into()),
             "--python-path" => options.language_servers.python_path = Some(value.into()),
             "--compile-commands" => {
                 options.language_servers.compilation_database = Some(value.into())

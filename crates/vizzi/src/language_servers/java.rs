@@ -3,16 +3,23 @@ use super::{
     inputs::{InputFiles, Inputs, PreparedInputs},
     project::Profile,
 };
-use crate::lsp::{DocumentSync, Readiness, Setup};
+use crate::{
+    dependency_sources::{ARCHIVE_BYTES, FILE_BYTES, Input, matching_archive_member, open_archive},
+    lsp::{Client, DocumentSync, Readiness, Setup},
+};
+use percent_encoding::percent_decode_str;
 use serde_json::json;
 use std::{
     collections::BTreeSet,
+    io::Read,
     path::{Path, PathBuf},
+    time::Duration,
 };
-use vizzi_core::model::Snapshot;
+use vizzi_core::model::{ContentId, Snapshot};
 
 pub(super) struct JdtLs {
     pub roots: BTreeSet<String>,
+    pub libraries: Vec<PathBuf>,
 }
 
 impl Profile for JdtLs {
@@ -27,7 +34,7 @@ impl Profile for JdtLs {
             .any(|root| root == "." || parent.is_some_and(|parent| parent.starts_with(root)))
     }
 
-    fn inputs<'a>(&'a self, _root: &'a Path, snapshot: &'a Snapshot) -> Result<Inputs<'a>, String> {
+    fn inputs<'a>(&'a self, root: &'a Path, snapshot: &'a Snapshot) -> Result<Inputs<'a>, String> {
         let mut captured = blake3::Hasher::new();
         captured.update(
             serde_json::to_string(&self.roots)
@@ -35,21 +42,206 @@ impl Profile for JdtLs {
                 .as_bytes(),
         );
         // Rebuild the project index after edits, including changes to unopened files.
+        let mut first_source = None;
         for doc in snapshot
             .documents()
             .iter()
             .filter(|doc| self.includes_document(doc))
         {
+            first_source.get_or_insert(doc.path());
             captured.update(&(doc.path().len() as u64).to_le_bytes());
             captured.update(doc.path().as_bytes());
             captured.update(doc.content().as_str().as_bytes());
         }
+        let libraries = project_libraries(root, &self.libraries, &mut captured)?;
         Ok(InputFiles::default().freeze(
             &format!("jdtls:{}", captured.finalize().to_hex()),
             &[include_bytes!("java.rs")],
-            |mirror| prepare(mirror, &self.roots),
+            move |mirror| prepare(mirror, &self.roots, libraries, first_source),
         ))
     }
+
+    fn archive_input(
+        &self,
+        client: &mut Client,
+        uri: &url::Url,
+        configuration: &str,
+    ) -> Result<Option<Input>, String> {
+        let Some((library, package, file)) = archive_destination(uri) else {
+            return Ok(None);
+        };
+        let attachment = client.request(
+            "workspace/executeCommand",
+            json!({
+                "command": "java.project.resolveSourceAttachment",
+                "arguments": [{"classFileUri": uri.as_str()}]
+            }),
+            Duration::from_secs(10),
+        )?;
+        let attributes = &attachment["attributes"];
+        let Some(source) = attributes["sourceAttachmentPath"].as_str().map(Path::new) else {
+            return Ok(None);
+        };
+        if !source.is_absolute()
+            || !matches!(
+                source.extension().and_then(|ext| ext.to_str()),
+                Some("jar" | "zip")
+            )
+        {
+            return Ok(None);
+        }
+        let binary_name = attributes["jarPath"]
+            .as_str()
+            .and_then(|path| Path::new(path).file_name())
+            .and_then(|name| name.to_str())
+            .ok_or("JDT LS did not identify the library")?;
+        let modular_jdk = binary_name == "jrt-fs.jar";
+        let mut path = PathBuf::new();
+        if modular_jdk {
+            path.push(&library);
+        }
+        if !package.is_empty() {
+            path.push(package.replace('.', "/"));
+        }
+        path.push(file);
+        let member = path
+            .to_str()
+            .ok_or("Archive entry is not UTF-8")?
+            .replace('\\', "/");
+        let root = source.canonicalize().map_err(|e| e.to_string())?;
+        let text = archive_text(client, uri.as_str())?;
+        let path = matching_archive_member(&root, &member, text.as_bytes())?;
+        Ok(Some(Input {
+            root,
+            path,
+            language: "java".into(),
+            package: if modular_jdk {
+                library
+            } else {
+                binary_name.into()
+            },
+            version: None,
+            configuration: configuration.into(),
+            mirror_path: None,
+            installation: None,
+            archive: Some(ContentId::derive(&[text.as_bytes()])),
+        }))
+    }
+
+    fn verify_archive(&self, client: &mut Client, uri: &str, text: &str) -> Result<(), String> {
+        if archive_text(client, uri)? == text {
+            Ok(())
+        } else {
+            Err("Archive source differs from the current JDT LS document".into())
+        }
+    }
+}
+
+fn project_libraries(
+    root: &Path,
+    paths: &[PathBuf],
+    captured: &mut blake3::Hasher,
+) -> Result<serde_json::Value, String> {
+    let mut binaries = BTreeSet::new();
+    let mut sources = serde_json::Map::new();
+    for path in paths {
+        let binary = super::inputs::absolute(root, path);
+        let library = binary.to_str().ok_or("Java library path is not UTF-8")?;
+        if library.contains(['*', '?', '[', ']', '{', '}'])
+            || (!cfg!(windows) && library.contains('\\'))
+        {
+            return Err(format!(
+                "Java library path contains glob characters: {library}"
+            ));
+        }
+        let stem = binary
+            .file_stem()
+            .and_then(|name| name.to_str())
+            .ok_or("Java library needs a UTF-8 file name")?;
+        if binary.extension().and_then(|ext| ext.to_str()) != Some("jar") {
+            return Err("--java-library expects a local JAR file".into());
+        }
+        if binaries.insert(binary.clone()) {
+            fingerprint_library(&binary, captured)?;
+            let attachment = binary.with_file_name(format!("{stem}-sources.jar"));
+            if attachment.is_file() {
+                fingerprint_library(&attachment, captured)?;
+                sources.insert(
+                    library.into(),
+                    json!(attachment.to_str().ok_or("Java source path is not UTF-8")?),
+                );
+            }
+        }
+    }
+    let include = binaries
+        .iter()
+        .map(|path| path.to_str().ok_or("Java library path is not UTF-8"))
+        .collect::<Result<Vec<_>, _>>()?;
+    Ok(json!({"include": include, "sources": sources}))
+}
+
+fn fingerprint_library(path: &Path, hash: &mut blake3::Hasher) -> Result<(), String> {
+    let resolved = path
+        .canonicalize()
+        .map_err(|e| format!("Java library {}: {e}", path.display()))?;
+    let file = open_archive(&resolved)?;
+    let mut content = blake3::Hasher::new();
+    if std::io::copy(&mut file.take(ARCHIVE_BYTES + 1), &mut content).map_err(|e| e.to_string())?
+        > ARCHIVE_BYTES
+    {
+        return Err("Java library exceeds allowance".into());
+    }
+    let name = path.as_os_str().as_encoded_bytes();
+    hash.update(&(name.len() as u64).to_le_bytes());
+    hash.update(name);
+    hash.update(content.finalize().as_bytes());
+    Ok(())
+}
+
+fn archive_destination(uri: &url::Url) -> Option<(String, String, String)> {
+    if uri.scheme() != "jdt" || uri.host_str() != Some("contents") || uri.as_str().len() > 16 * 1024
+    {
+        return None;
+    }
+    let mut segments = uri.path_segments()?;
+    let decode = |part| {
+        let value = percent_decode_str(part).decode_utf8().ok()?;
+        (!value.contains(['/', '\\', ':', '\0']) && !matches!(value.as_ref(), "." | ".."))
+            .then(|| value.into_owned())
+    };
+    let library = decode(segments.next()?)?;
+    let next = decode(segments.next()?)?;
+    let (package, file) = match segments.next() {
+        Some(file) => (next, decode(file)?),
+        None => (String::new(), next),
+    };
+    if library.is_empty()
+        || (!package.is_empty() && package.split('.').any(str::is_empty))
+        || segments.next().is_some()
+    {
+        return None;
+    }
+    let file = if file.ends_with(".java") {
+        file
+    } else {
+        format!("{}.java", file.strip_suffix(".class")?.split('$').next()?)
+    };
+    Some((library, package, file))
+}
+
+fn archive_text(client: &mut Client, uri: &str) -> Result<String, String> {
+    let value = client.request(
+        "java/classFileContents",
+        json!({"uri":uri}),
+        Duration::from_secs(10),
+    )?;
+    let serde_json::Value::String(text) = value else {
+        return Err("JDT LS source content is unavailable".into());
+    };
+    if text.is_empty() || text.len() > FILE_BYTES {
+        return Err("JDT LS source content exceeds allowance or is empty".into());
+    }
+    Ok(text)
 }
 
 pub(super) fn source_roots(roots: &[String]) -> Result<BTreeSet<String>, String> {
@@ -76,7 +268,12 @@ pub(super) fn source_roots(roots: &[String]) -> Result<BTreeSet<String>, String>
         .collect()
 }
 
-fn prepare(mirror: &Path, roots: &BTreeSet<String>) -> Result<PreparedInputs, String> {
+fn prepare(
+    mirror: &Path,
+    roots: &BTreeSet<String>,
+    libraries: serde_json::Value,
+    first_source: Option<&str>,
+) -> Result<PreparedInputs, String> {
     let private_state = tempfile::Builder::new()
         .prefix("jdtls-")
         .tempdir_in(
@@ -100,10 +297,17 @@ fn prepare(mirror: &Path, roots: &BTreeSet<String>) -> Result<PreparedInputs, St
                 "gradle": {"enabled": false},
                 "maven": {"enabled": false}
             },
-            "project": {"sourcePaths": roots},
+            "project": {"sourcePaths": roots, "referencedLibraries": libraries},
             "telemetry": {"enabled": false}
         }
     });
+    let mut initialization = json!({
+        "settings": settings,
+        "extendedClientCapabilities": {"classFileContentsSupport": true}
+    });
+    if let Some(source) = first_source {
+        initialization["triggerFiles"] = json!([crate::lsp::uri(&mirror.join(source))?]);
+    }
     let setup = Setup {
         arguments: vec![
             "-configuration".into(),
@@ -111,10 +315,7 @@ fn prepare(mirror: &Path, roots: &BTreeSet<String>) -> Result<PreparedInputs, St
             "-data".into(),
             argument("workspace")?,
         ],
-        initialization: json!({
-            "settings": settings,
-            "extendedClientCapabilities": {"classFileContentsSupport": true}
-        }),
+        initialization,
         configuration: settings,
         readiness: Readiness::JdtLs,
         document_sync: DocumentSync::Ordered,
@@ -132,6 +333,48 @@ fn prepare(mirror: &Path, roots: &BTreeSet<String>) -> Result<PreparedInputs, St
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn archive_destinations_decode_java_segments_and_reject_invalid_paths() {
+        let destination = |value: &str| archive_destination(&url::Url::parse(value).unwrap());
+        assert_eq!(
+            destination("jdt://contents/java.base/java.lang/Str%C3%A9.java?h"),
+            Some(("java.base".into(), "java.lang".into(), "Stré.java".into()))
+        );
+        assert_eq!(
+            destination("jdt://contents/helper.jar//Top$Nested.class?h"),
+            Some(("helper.jar".into(), "".into(), "Top.java".into()))
+        );
+        assert_eq!(
+            destination("jdt://contents/helper.jar/Helper.java?h"),
+            Some(("helper.jar".into(), "".into(), "Helper.java".into()))
+        );
+        for value in [
+            "https://contents/helper.jar/lib/Tool.java",
+            "jdt://other/helper.jar/lib/Tool.java",
+            "jdt://contents/helper.jar/../Tool.java",
+            "jdt://contents/helper.jar/lib/%2FTool.java",
+            "jdt://contents/helper.jar/lib..sub/Tool.java",
+            "jdt://contents/helper.jar/lib/Tool.txt",
+            "jdt://contents/helper.jar/lib/Tool.java/extra",
+        ] {
+            assert!(destination(value).is_none(), "{value}");
+        }
+    }
+
+    #[test]
+    #[cfg(unix)]
+    fn library_paths_reject_globs_even_when_a_literal_file_exists() {
+        let root = tempfile::tempdir().unwrap();
+        for name in ["helper?.jar", "helper*.jar", "lib[1]/helper.jar"] {
+            let path = root.path().join(name);
+            std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+            std::fs::write(&path, b"literal file").unwrap();
+            let error = project_libraries(root.path(), &[name.into()], &mut blake3::Hasher::new())
+                .unwrap_err();
+            assert!(error.contains("glob"), "{error}");
+        }
+    }
 
     #[test]
     fn source_roots_default_to_the_workspace_and_normalize_explicit_paths() {

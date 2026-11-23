@@ -473,7 +473,7 @@ class Engine {
 }
 `,
       "src/test/java/demo/Caller.java": `package demo;
-class Caller { int run() { return Engine.speak("hello"); } }
+class Caller { int run() { return Engine.speak("hello") + "abc".length(); } }
 `,
       "pom.xml": "Build metadata is outside the source-root profile.",
     },
@@ -507,6 +507,13 @@ class Caller { int run() { return Engine.speak("hello"); } }
     await stack.getByRole("status").filter({ hasText: "Language references" }).waitFor();
     assert.equal(await stack.locator("[data-reference-row]").count(), 1);
     assert.match(await stack.locator("[data-reference-row]").textContent(), /Caller\.java/);
+    await caller.getByRole("button", { name: "Calls", exact: true }).click();
+    await caller.getByRole("button", { name: "length · line 2", exact: true }).click();
+    const length = page.locator('[data-view][data-name="length"]');
+    await length.locator(".code-line").first().waitFor();
+    assert.match(await length.locator(".fragment-heading").textContent(), /java\.base.*String\.java/);
+    assert.match(await length.locator(".code-pane").textContent(), /coder\(\)/);
+    assert.equal(await length.getByRole("button", { name: /^Open in/ }).isDisabled(), true);
     assert.deepEqual(session.errors, []);
   } finally {
     await session?.close();

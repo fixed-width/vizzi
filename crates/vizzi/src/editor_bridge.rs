@@ -213,7 +213,10 @@ impl Bridge {
             .as_ref()
             .and_then(|package| package.editor_uri.as_deref())
         {
-            self.verify_package_uri(uri, &capture.path(), editor_root)?;
+            let path = capture
+                .path()
+                .ok_or("Editor package source needs a local file")?;
+            self.verify_package_uri(uri, &path, editor_root)?;
         }
         Ok(())
     }
@@ -326,7 +329,13 @@ impl Bridge {
             self.verify_dependency(source, &connection.root)?;
         }
         let text = source(doc)?;
-        let external_path = dependency.map(Capture::path);
+        let external_path = dependency
+            .map(|source| {
+                source
+                    .path()
+                    .ok_or("Editor dependency source needs a local file")
+            })
+            .transpose()?;
         let query_path = external_path
             .as_ref()
             .map(|path| path.to_str().ok_or("Editor dependency path is not UTF-8"))

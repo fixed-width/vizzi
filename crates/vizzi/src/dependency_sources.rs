@@ -6,7 +6,7 @@ use std::{
     collections::BTreeMap,
     fs,
     io::{Read, Write},
-    path::PathBuf,
+    path::{Path, PathBuf},
     sync::{Arc, Mutex},
 };
 use vizzi_core::{
@@ -19,7 +19,9 @@ use vizzi_core::{
     policy::{Classification, Provenance},
     structure::{SourceOrigin, Structure, Symbol},
 };
-const FILE_BYTES: usize = 2 * 1024 * 1024;
+pub(crate) const FILE_BYTES: usize = 2 * 1024 * 1024;
+pub(crate) const ARCHIVE_BYTES: u64 = 256 * 1024 * 1024;
+const ARCHIVE_CANDIDATES: usize = 32;
 const TOTAL_BYTES: usize = 32 * 1024 * 1024;
 pub(crate) const FILES: usize = 32;
 const SYMBOLS: usize = 32768;
@@ -28,7 +30,7 @@ const SYMBOLS: usize = 32768;
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Input {
-    /// Canonical package/source root selected by a language provider.
+    /// Canonical package directory or source archive selected by a language provider.
     pub root: PathBuf,
     /// Normalized source-root-relative file.
     pub path: String,
@@ -46,6 +48,9 @@ pub struct Input {
     /// Installed package resolution evidence local to the native provider.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub installation: Option<PackageContext>,
+    /// Expected provider source bytes when the input names an archive member.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub archive: Option<ContentId>,
 }
 
 /// Evidence needed to re-use an installed package capture in semantic navigation.
@@ -138,6 +143,16 @@ fn read(input: &Input) -> Result<Vec<u8>, String> {
         return Err("Invalid dependency source descriptor".into());
     }
     let path = ReviewPath::parse(input.path.as_bytes().to_vec()).map_err(|e| e.to_string())?;
+    if let Some(content) = &input.archive {
+        if input.installation.is_some() || input.mirror_path.is_some() {
+            return Err("Archive sources cannot have an installation alias".into());
+        }
+        let bytes = read_archive_member(input)?;
+        if ContentId::derive(&[&bytes]) != *content {
+            return Err("Source archive does not match the language server's document".into());
+        }
+        return Ok(bytes);
+    }
     let mut directory = DirectoryInput::open(&input.root).map_err(|e| e.to_string())?;
     match directory
         .read(&path, FILE_BYTES, &|| false)
@@ -150,6 +165,88 @@ fn read(input: &Input) -> Result<Vec<u8>, String> {
         } => Ok(bytes),
         _ => Err("Dependency source is unavailable or is not a regular file".into()),
     }
+}
+
+pub(crate) fn open_archive(path: &Path) -> Result<fs::File, String> {
+    #[cfg(unix)]
+    let file = {
+        use rustix::fs::{Mode, OFlags, open};
+        fs::File::from(
+            open(
+                path,
+                OFlags::RDONLY | OFlags::CLOEXEC | OFlags::NOFOLLOW | OFlags::NONBLOCK,
+                Mode::empty(),
+            )
+            .map_err(|e| e.to_string())?,
+        )
+    };
+    #[cfg(not(unix))]
+    let file = fs::File::open(path).map_err(|e| e.to_string())?;
+    let metadata = file.metadata().map_err(|e| e.to_string())?;
+    if !metadata.is_file() || metadata.len() > ARCHIVE_BYTES {
+        return Err("Source archive is unavailable or exceeds allowance".into());
+    }
+    Ok(file)
+}
+
+fn read_archive_member(input: &Input) -> Result<Vec<u8>, String> {
+    let mut archive =
+        zip::ZipArchive::new(open_archive(&input.root)?).map_err(|e| e.to_string())?;
+    let entry = archive.by_name(&input.path).map_err(|e| e.to_string())?;
+    read_archive_entry(entry)
+}
+
+pub(crate) fn matching_archive_member(
+    archive: &Path,
+    member: &str,
+    expected: &[u8],
+) -> Result<String, String> {
+    let mut archive = zip::ZipArchive::new(open_archive(archive)?).map_err(|e| e.to_string())?;
+    let candidates = archive
+        .file_names()
+        .filter_map(Result::ok)
+        .filter(|name| {
+            name.strip_suffix(member)
+                .is_some_and(|prefix| prefix.is_empty() || prefix.ends_with('/'))
+                && name.len() <= 4096
+                && !name.contains('\\')
+                && ReviewPath::parse(name.as_bytes().to_vec()).is_ok()
+        })
+        .take(ARCHIVE_CANDIDATES + 1)
+        .map(std::borrow::Cow::into_owned)
+        .collect::<Vec<_>>();
+    if candidates.len() > ARCHIVE_CANDIDATES {
+        return Err("Source archive member search exceeds allowance".into());
+    }
+    let mut matched = None;
+    for name in candidates {
+        let entry = archive.by_name(&name).map_err(|e| e.to_string())?;
+        if !entry.is_file()
+            || entry.size() != expected.len() as u64
+            || read_archive_entry(entry)? != expected
+        {
+            continue;
+        }
+        if matched.replace(name).is_some() {
+            return Err("Source archive contains multiple matching source members".into());
+        }
+    }
+    matched.ok_or_else(|| "No source archive member matches the language server's document".into())
+}
+
+fn read_archive_entry(entry: zip::read::ZipFile<'_, fs::File>) -> Result<Vec<u8>, String> {
+    if !entry.is_file() || entry.size() > FILE_BYTES as u64 {
+        return Err("Source archive member is unavailable or exceeds allowance".into());
+    }
+    let mut bytes = Vec::new();
+    entry
+        .take(FILE_BYTES as u64 + 1)
+        .read_to_end(&mut bytes)
+        .map_err(|e| e.to_string())?;
+    if bytes.len() > FILE_BYTES {
+        return Err("Source archive member exceeds allowance".into());
+    }
+    Ok(bytes)
 }
 /// One immutable dependency file and its structural facts.
 pub struct Capture {
@@ -197,9 +294,12 @@ impl Capture {
         }
         Ok(())
     }
-    /// Exact native file path for the configured provider/editor adapter.
-    pub fn path(&self) -> PathBuf {
-        self.input.root.join(&self.input.path)
+    /// Exact native file path for file-backed captures.
+    pub fn path(&self) -> Option<PathBuf> {
+        self.input
+            .archive
+            .is_none()
+            .then(|| self.input.root.join(&self.input.path))
     }
 }
 thread_local! {static ANALYZERS: RefCell<BTreeMap<String, Box<dyn Analyzer>>> = RefCell::new(BTreeMap::new());}
@@ -286,6 +386,7 @@ fn capture(input: Input, declaration: Option<Declaration>) -> Result<Arc<Capture
         label: input.package.clone(),
         version: input.version.clone(),
         language: input.language.clone(),
+        archive: input.archive.is_some(),
     };
     Ok(Arc::new(Capture {
         snapshot,
@@ -464,4 +565,45 @@ fn admit(state: &mut State, source: Arc<Capture>) {
         state.sources.remove(0);
     }
     state.sources.push(source);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn archive_member_match_requires_exact_bytes_and_unique_path_suffix() {
+        let root = tempfile::tempdir().unwrap();
+        let archive = root.path().join("sources.jar");
+        let contents = b"actual source";
+        let member = "lib/Helper.java";
+        let write_archive = |ambiguous| {
+            let mut zip = zip::ZipWriter::new(fs::File::create(&archive).unwrap());
+            let mut entries: Vec<(&str, &[u8])> = vec![
+                (member, b"former source"),
+                ("otherlib/Helper.java", contents),
+                ("src/main/java/lib/Helper.java", contents),
+            ];
+            if ambiguous {
+                entries.push(("src/test/java/lib/Helper.java", contents));
+            }
+            for (name, bytes) in entries {
+                zip.start_file(name, zip::write::SimpleFileOptions::default())
+                    .unwrap();
+                zip.write_all(bytes).unwrap();
+            }
+            zip.finish().unwrap();
+        };
+        write_archive(false);
+        assert_eq!(
+            matching_archive_member(&archive, member, contents).unwrap(),
+            "src/main/java/lib/Helper.java"
+        );
+        write_archive(true);
+        assert!(
+            matching_archive_member(&archive, member, contents)
+                .unwrap_err()
+                .contains("multiple matching")
+        );
+    }
 }

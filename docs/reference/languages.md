@@ -51,8 +51,8 @@ can lead to its record declaration. A [managed JDT LS server](../how-to/configur
 can resolve overloads and references across configured source roots. A
 [shared VS Code Java provider](../how-to/configure-language-servers.md#java-with-vs-code)
 uses the editor's project configuration. Vizzi checks results against captured
-workspace files. Java dependency archives and virtual documents are outside the
-captured workspace.
+workspace files. Managed JDT LS can open local JDK and dependency source archives
+in independent bubbles. [Configure Java library source](../how-to/configure-language-servers.md#open-java-library-source)
 
 ## Python
 

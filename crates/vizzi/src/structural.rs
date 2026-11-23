@@ -257,6 +257,9 @@ impl StructureHost {
         let source = self
             .dependency(&request.snapshot)?
             .ok_or_else(|| CompanionError::Conflict("Dependency capture expired".into()))?;
+        let path = source.path().ok_or_else(|| {
+            CompanionError::Unavailable("Archive source has no local editor file".into())
+        })?;
         if source.doc().id().as_str() != request.file
             || source.doc().version().as_str() != request.version
             || request.line == 0
@@ -274,7 +277,7 @@ impl StructureHost {
             .map_err(|e| CompanionError::Unavailable(e.to_string()))?
             .ok_or_else(|| CompanionError::Invalid("Dependency source is not UTF-8".into()))?;
         Ok(crate::editor::EditorLocation {
-            path: source.path(),
+            path,
             line: request.line,
             source: crate::editor::SourceWitness::from_bytes(text.as_bytes()),
         })

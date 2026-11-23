@@ -12,6 +12,7 @@ remains in Git and the project documentation.
   shared VS Code Java provider to resolve definitions and references in workspace source.
 - Run Eclipse JDT LS directly from Vizzi with `--jdtls` for Java definitions and references
   across configured source roots.
+- Open JDK and local Java library source from attached archives in dependency bubbles.
 - Open Vizzi from Neovim and jump back to verified saved source in the launching split.
 - Find and confirm an earlier declaration across a simple rename or file move in Git
   function history, with exact before and after source evidence.

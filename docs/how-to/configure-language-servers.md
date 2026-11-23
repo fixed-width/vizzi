@@ -80,6 +80,25 @@ the next lookup. JDT LS can check Gradle version metadata during startup.
 Navigation also works with the network unavailable. For editor-managed build
 classpaths, use VS Code sharing below.
 
+### Open Java library source
+
+Install the JDK's `src.zip` to follow definitions into the standard library.
+For a local dependency, add its binary JAR and keep the matching `-sources.jar`
+beside it.
+
+```sh
+vizzi --jdtls jdtls --java-source-root src/main/java \
+  --java-library lib/example.jar
+```
+
+Repeat `--java-library` for several JARs. Flag paths are relative to the workspace
+root. The TOML key `java-library` is an array under `[language-servers]` with paths
+relative to the config file. Use paths without glob characters. Vizzi opens
+the matching source entry, including when the archive has a source-root prefix.
+The dependency bubble can reopen from the same archive after a restart. Follow
+the original call again to use semantic navigation from the bubble in a new
+JDT LS session.
+
 ## Java with VS Code
 
 Open a trusted local folder with the Vizzi extension and a Java extension that
