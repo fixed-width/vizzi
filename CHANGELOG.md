@@ -8,6 +8,7 @@ remains in Git and the project documentation.
 
 ### Added
 
+- Open Vizzi from Neovim and jump back to verified saved source in the launching split.
 - Find and confirm an earlier declaration across a simple rename or file move in Git
   function history, with exact before and after source evidence.
 - Follow named calls across repository files at the caller's Git revision. The same

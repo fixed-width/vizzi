@@ -26,6 +26,7 @@ branches together, with shared module labels.
 - [Follow calls within captured source](how-to/follow-captured-calls.md)
 - [Configure language servers and local dependencies](how-to/configure-language-servers.md)
 - [Explore an editor call with the VS Code extension](../editors/vscode/INSTALL.md)
+- [Open Vizzi and return to source in Neovim](../editors/neovim/INSTALL.md)
 - [Save launch settings](how-to/configure-vizzi.md)
 - [Browse files and declarations](how-to/browse-source.md)
 - [Review working changes or two Git commits](how-to/review-local-changes.md)

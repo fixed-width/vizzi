@@ -82,6 +82,18 @@ The VS Code navigator checks only target buffers, then revalidates after asynchr
 presentation before synchronously selecting the captured line. Other editor plugins can
 implement the same [originating-editor contract](ORIGIN_EDITOR.md).
 
+The Neovim Lua plugin uses the same launch argument and protocol. It pins the split ID
+at launch, supervises the child, and owns its loopback listener and private descriptor.
+The adapter compares raw saved bytes and loaded file buffers before and after presenting
+the buffer. The final cursor move follows the last check without yielding to Neovim's
+event loop. The workspace opens in the default browser.
+
+After building the native executable, run `node --test editors/neovim/companion.test.mjs`
+from the checkout. The test launches two headless Neovim instances and real native
+workspaces. Set `VIZZI_NVIM_EXECUTABLE` or `VIZZI_TEST_BINARY` to override the
+executables. With the repository's Playwright dependencies and Chromium installed,
+set `VIZZI_NVIM_BROWSER=1` to exercise the browser's **Editor** button.
+
 ## Launch configuration and editor connection
 
 - Move launch parsing into a binary-private `configuration` module. Deserialize a strict
