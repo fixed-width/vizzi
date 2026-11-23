@@ -37,6 +37,7 @@ local function retire(session)
   session.stopping = true
   session.origin.close()
   cancel_timer(session.startup_timer)
+  cancel_timer(session.window_timer)
   if not session.process:is_closing() then
     session.process:kill('sigint')
     session.stop_timer = vim.defer_fn(function()
@@ -85,6 +86,10 @@ start = function(intent)
       ready = true
       vim.schedule(function()
         if active == session and not session.stopping then
+          if not api.nvim_win_is_valid(session.window) then
+            retire(session)
+            return
+          end
           cancel_timer(session.startup_timer)
           session.url = ('http://127.0.0.1:%d/'):format(port)
           present(session)
@@ -96,6 +101,7 @@ start = function(intent)
     session.origin.close()
     cancel_timer(session.startup_timer)
     cancel_timer(session.stop_timer)
+    cancel_timer(session.window_timer)
     if active == session then
       active = nil
       if not session.stopping then
@@ -116,6 +122,13 @@ start = function(intent)
   end
   session.process = process
   active = session
+  -- Non-nested autocommands can close a split without emitting WinClosed.
+  session.window_timer = uv.new_timer()
+  session.window_timer:start(500, 500, vim.schedule_wrap(function()
+    if active == session and not api.nvim_win_is_valid(session.window) then
+      retire(session)
+    end
+  end))
   session.startup_timer = vim.defer_fn(function()
     retire(session)
     report('workspace startup timed out\n' .. vim.trim(diagnostic))
@@ -127,7 +140,8 @@ local function enqueue(directory)
   local root = uv.fs_realpath(path)
   local stat = root and uv.fs_stat(root)
   assert(stat and stat.type == 'directory', 'Choose an existing project directory')
-  if active and not active.stopping and active.root == root and not active.process:is_closing() then
+  if active and not active.stopping and active.root == root and not active.process:is_closing()
+    and api.nvim_win_is_valid(active.window) then
     if active.url then
       present(active)
     end

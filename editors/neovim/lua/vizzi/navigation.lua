@@ -1,5 +1,6 @@
 local api = vim.api
 local uv = vim.uv
+local sha256 = require('vizzi.sha256')
 local M = {}
 
 local changed = 'Saved source changed or does not match the captured source'
@@ -93,6 +94,28 @@ local function checked_target(path, bytes)
   return target
 end
 
+local function show_target(window, target)
+  local outgoing = api.nvim_win_get_buf(window)
+  if outgoing == target then
+    return
+  end
+  local options = vim.bo[outgoing]
+  local bufhidden = options.bufhidden
+  local protect = options.modified and bufhidden ~= '' and bufhidden ~= 'hide'
+  if protect then
+    options.bufhidden = 'hide'
+  end
+  local ok, failure = pcall(api.nvim_win_call, window, function()
+    vim.cmd.buffer({ args = { tostring(target) }, mods = { hide = true } })
+  end)
+  if protect and api.nvim_buf_is_valid(outgoing) and options.bufhidden == 'hide' then
+    options.bufhidden = bufhidden
+  end
+  if not ok then
+    error(failure, 0)
+  end
+end
+
 function M.open(window, request, alive, reply)
   local function verify(proceed)
     read_source(request, function(bytes, problem, stat)
@@ -104,7 +127,7 @@ function M.open(window, request, alive, reply)
         reply(problem)
         return
       end
-      local hashed, digest = pcall(vim.fn.sha256, bytes)
+      local hashed, digest = pcall(sha256, bytes)
       if not hashed then
         reply('Neovim could not verify the saved bytes of the target')
         return
@@ -145,7 +168,7 @@ function M.open(window, request, alive, reply)
     if not alive() or not api.nvim_win_is_valid(window) then
       return expired
     end
-    api.nvim_win_set_buf(window, target)
+    show_target(window, target)
 
     verify(function(current, stat)
       if api.nvim_win_get_buf(window) ~= target or not buffer_matches(target, request.path) then

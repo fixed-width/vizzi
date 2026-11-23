@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import {execFile, spawn} from 'node:child_process';
+import {createHash} from 'node:crypto';
 import {mkdir, mkdtemp, readFile, realpath, rm, writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join, resolve} from 'node:path';
@@ -91,13 +92,13 @@ async function openFromBrowser(url, cleanups) {
   };
 }
 
-test('Neovim opens a native workspace and returns to its owning split', {timeout: 30000}, async t => {
+async function workspace(t, files) {
   const directory = await realpath(await mkdtemp(join(tmpdir(), 'vizzi-nvim-')));
   const root = join(directory, 'project');
   await mkdir(root);
-  const file = 'literal [name].rs';
-  const target = join(root, file);
-  await writeFile(target, '\ufeff// café\r\npub fn entry() {}\r\n');
+  for (const [file, source] of Object.entries(files)) {
+    await writeFile(join(root, file), source);
+  }
   await writeFile(join(directory, 'init.lua'), `
     vim.opt.runtimepath:prepend(vim.env.VIZZI_NVIM_PLUGIN)
     vim.g.vizzi_executable = vim.env.VIZZI_TEST_BINARY
@@ -114,8 +115,33 @@ test('Neovim opens a native workspace and returns to its owning split', {timeout
       await rm(directory, {recursive: true, force: true});
     }
   });
-  const first = await launch(cleanups, directory, root, 'first');
-  const second = await launch(cleanups, directory, root, 'second');
+  return {directory, root, cleanups, launch: name => launch(cleanups, directory, root, name)};
+}
+
+async function editorRequest(url, file) {
+  const post = (path, body) => fetch(new URL(path, url), {
+    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body),
+  });
+  assert.ok((await post('/api/workspace/start', {})).ok);
+  const lookup = new URL('/api/investigation/lookup', url);
+  lookup.searchParams.set('path', file);
+  const captured = await until(async () => {
+    const response = await fetch(lookup);
+    if (response.ok) return response.json();
+    await response.text();
+  }, 'Native capture did not include the target file');
+  return (line = 2) => post('/api/editor/open', {
+    snapshot: captured.snapshot, file: captured.file, version: captured.version, line,
+  });
+}
+
+test('Neovim opens a native workspace and returns to its owning split', {timeout: 30000}, async t => {
+  const file = 'literal [name].rs';
+  const fixture = await workspace(t, {[file]: '\ufeff// café\r\npub fn entry() {}\r\n'});
+  const {directory, root, cleanups} = fixture;
+  const target = join(root, file);
+  const first = await fixture.launch('first');
+  const second = await fixture.launch('second');
   const originWindow = await first.evaluate('vim.api.nvim_get_current_win()');
   const unrelated = await first.evaluate('vim.api.nvim_get_current_buf()');
   await first.command('VizziOpen');
@@ -134,22 +160,9 @@ test('Neovim opens a native workspace and returns to its owning split', {timeout
   assert.notEqual(otherUrl, url);
   assert.equal((await (await fetch(new URL('/api/investigation', url))).json()).editor, 'Neovim');
 
-  const post = (path, body) => fetch(new URL(path, url), {
-    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body),
-  });
-  assert.ok((await post('/api/workspace/start', {})).ok);
-  const lookup = new URL('/api/investigation/lookup', url);
-  lookup.searchParams.set('path', file);
-  const captured = await until(async () => {
-    const response = await fetch(lookup);
-    if (response.ok) return response.json();
-    await response.text();
-  }, 'Native capture did not include the target file');
   const open = process.env.VIZZI_NVIM_BROWSER
     ? await openFromBrowser(url, cleanups)
-    : () => post('/api/editor/open', {
-      snapshot: captured.snapshot, file: captured.file, version: captured.version, line: 2,
-    });
+    : await editorRequest(url, file);
   let response = await open();
   assert.equal(response.status, 200, await response.text());
   assert.equal(await first.evaluate('vim.api.nvim_get_current_win()'), originWindow);
@@ -200,4 +213,92 @@ test('Neovim opens a native workspace and returns to its owning split', {timeout
   await second.quit();
   await until(async () => fetch(otherUrl).then(() => false, () => true), 'Vizzi kept running after Neovim quit');
   await first.quit();
+});
+
+test('return preserves an unrelated named buffer with nohidden', {timeout: 15000}, async t => {
+  const saved = 'saved on disk\n';
+  const fixture = await workspace(t, {'target.rs': '\npub fn entry() {}\n', 'notes.txt': saved});
+  const host = await fixture.launch('origin');
+  const notes = join(fixture.root, 'notes.txt');
+  await host.command('edit notes.txt');
+  const buffer = await host.evaluate('vim.api.nvim_get_current_buf()');
+  await host.command('VizziOpen');
+  const open = await editorRequest(await host.url(), 'target.rs');
+  const optionState = 'table.concat({vim.o.hidden and 1 or 0, vim.o.autowrite and 1 or 0, vim.o.autowriteall and 1 or 0}, ":")';
+  for (const [options, bufhidden] of [
+    ['autowrite noautowriteall', ''],
+    ['noautowrite autowriteall', ''],
+    ['noautowrite noautowriteall', ''],
+    ['autowrite autowriteall', 'wipe'],
+  ]) {
+    await host.command('buffer ' + buffer);
+    await host.command('set nohidden ' + options);
+    await host.command('setlocal bufhidden=' + bufhidden);
+    await host.command('call setline(1, "unsaved note")');
+    const before = await host.evaluate(optionState);
+    const response = await open();
+    assert.equal(response.status, 200, await response.text());
+    assert.equal(await readFile(notes, 'utf8'), saved, options);
+    assert.equal(await host.evaluate('vim.fn.getbufline(' + buffer + ', 1)[1]'), 'unsaved note');
+    assert.equal(await host.evaluate('vim.fn.getbufvar(' + buffer + ', "&modified")'), '1');
+    assert.equal(await host.evaluate('vim.fn.getbufvar(' + buffer + ', "&bufhidden")'), bufhidden);
+    assert.equal(await host.evaluate(optionState), before);
+  }
+});
+
+test('closing the origin inside a non-nested autocommand retires its workspace', {timeout: 15000}, async t => {
+  const fixture = await workspace(t, {'lib.rs': 'pub fn entry() {}\n'});
+  const host = await fixture.launch('origin');
+  for (const reopen of [true, false]) {
+    const window = await host.evaluate('vim.api.nvim_get_current_win()');
+    await host.command('VizziOpen');
+    const url = await host.url(reopen ? 1 : 3);
+    await host.command('vnew');
+    await host.command('autocmd User VizziCloseSplit ++once lua vim.api.nvim_win_close(' + window + ', true)' +
+      (reopen ? '; vim.cmd.VizziOpen()' : ''));
+    await host.command('doautocmd User VizziCloseSplit');
+    if (reopen) {
+      const replacement = await host.url(2);
+      const open = await editorRequest(replacement, 'lib.rs');
+      const response = await open(1);
+      assert.equal(response.status, 200, await response.text());
+      if (replacement === url) continue;
+    }
+    await until(async () => fetch(url).then(() => false, () => true), 'Vizzi kept running after its origin closed');
+  }
+});
+
+test('return verifies NUL bytes in captured UTF-8 source', {timeout: 15000}, async t => {
+  const file = 'lib.rs';
+  const fixture = await workspace(t, {[file]: '// literal NUL\npub fn entry() { let _ = b"x\0y"; }\n'});
+  const host = await fixture.launch('origin');
+  await host.command('VizziOpen');
+  const open = await editorRequest(await host.url(), file);
+  const response = await open();
+  assert.equal(response.status, 200, await response.text());
+  assert.equal(await host.evaluate('vim.api.nvim_win_get_cursor(0)[1]'), '2');
+});
+
+test('SHA-256 agrees with Node for NULs and block padding boundaries', {timeout: 15000}, async t => {
+  const inputs = [Buffer.alloc(0), Buffer.from('saved source'), ...[1, 55, 56, 63, 64, 65, 119, 120, 4097].map(
+    size => Buffer.from(Array.from({length: size}, (_, index) => (index * 131) % 256)),
+  )];
+  const filenames = inputs.map((_, index) => 'input-' + index);
+  const fixture = await workspace(t, Object.fromEntries(filenames.map((file, index) => [file, inputs[index]])));
+  const script = join(fixture.directory, 'hash.lua');
+  await writeFile(script, `
+    vim.opt.runtimepath:prepend(vim.env.VIZZI_NVIM_PLUGIN)
+    local sha256 = require('vizzi.sha256')
+    for _, path in ipairs(arg) do
+      local file = assert(io.open(path, 'rb'))
+      local bytes = file:read('*a')
+      file:close()
+      io.stdout:write(sha256(bytes), '\\n')
+    end
+  `);
+  const {stdout} = await run(nvim, ['--headless', '--clean', '-l', script, ...filenames], {
+    cwd: fixture.root,
+    env: {...process.env, VIZZI_NVIM_PLUGIN: plugin, NVIM_LOG_FILE: join(fixture.directory, 'nvim.log')},
+  });
+  assert.deepEqual(stdout.trim().split('\n'), inputs.map(bytes => createHash('sha256').update(bytes).digest('hex')));
 });
