@@ -100,6 +100,25 @@ Stopping the workspace or changing projects disposes the old tab. The separate
 Saved tasks in an external browser and the VS Code tab belong to their respective
 browser storage profiles.
 
+## Neovim companion
+
+`:VizziOpen` starts Vizzi for Neovim's current working directory or an explicitly
+selected directory, then opens the browser workspace. An explicit user configuration
+can select the Vizzi executable and a native TOML file. Launches without a TOML file
+select an available port so independent Neovim sessions can inspect the same project.
+
+Each Neovim instance owns one native workspace. Reopening the same project reuses
+its process and browser address. The **Editor** action returns to the Neovim split
+that started the workspace, including when another split or instance has focus.
+A changed saved file, modified target buffer or divergent target buffer refuses the
+jump. The action leaves unrelated buffers alone.
+
+`:VizziStop`, closing the originating split, quitting Neovim or opening a different
+project releases the workspace. Closing the browser leaves it running. An unexpected
+process exit releases the connection and the next explicit Open can start again.
+If the browser cannot open, Neovim reports the address of the running workspace.
+Semantic navigation uses the optional native language-server configuration.
+
 ## Concurrent workspace commands
 
 **Stop Workspace** cancels all earlier pending opens, comparisons and source actions,

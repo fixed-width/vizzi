@@ -35,6 +35,10 @@ Using VS Code? [Install the bundled extension](editors/vscode/INSTALL.md), then 
 a saved call name and choose **Vizzi: Explore Call** to open its caller and definition
 together in an editor tab.
 
+Using Neovim? [Load the companion plugin](editors/neovim/INSTALL.md) and run `:VizziOpen`
+to open the browser workspace. Use a bubble's **Editor** button to jump back to its
+saved source in Neovim.
+
 For semantic navigation on a real project, [configure its language server](docs/how-to/configure-language-servers.md):
 `--pyright pyright-langserver` for Python, `--rust-analyzer rust-analyzer` for Rust,
 `--ruby-lsp ruby-lsp` for Ruby, or `--clangd clangd` with C/C++ compilation context.
@@ -53,7 +57,7 @@ integration is required for these lessons.
 - Arrange related views into groups and save browser-local tasks. Follow saved file changes
   live or pin an earlier source view.
 - Browse source, compare Git revisions or working changes, and keep source locations and
-  notes. Hand off a current location to VS Code when you want to work on it.
+  notes. Hand off a current location to VS Code or Neovim when you want to work on it.
 
 Rust, Python, Ruby, JavaScript, and TypeScript are selected by default, including JSX and
 TSX. Raw C/C++ browsing uses explicit source scopes.
