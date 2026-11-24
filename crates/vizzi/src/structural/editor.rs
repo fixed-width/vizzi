@@ -32,6 +32,9 @@ pub enum Query {
     Invocation {
         /// Observation-bound native call ID.
         call: String,
+        /// Captured file identity for source-browser calls, including file-scoped results.
+        #[serde(default)]
+        file: Option<String>,
     },
 }
 /// The workspace opens the caller before using its ordinary call-follow operation.
@@ -46,7 +49,7 @@ pub struct Handoff {
 }
 enum Selection<'a> {
     Position(&'a str, usize),
-    Invocation(&'a str),
+    Invocation(&'a str, Option<&'a str>),
 }
 impl StructureHost {
     /// Maps exact saved editor source to a call without performing name-based lookup.
@@ -88,10 +91,10 @@ impl StructureHost {
                 crate::definitions::byte_offset(&captured, *position).map_err(|e| invalid(&e))?,
             )
         } else {
-            let Query::Invocation { call } = &request.query else {
+            let Query::Invocation { call, file } = &request.query else {
                 return Err(invalid("Invalid editor selection"));
             };
-            Selection::Invocation(call)
+            Selection::Invocation(call, file.as_deref())
         };
         self.resolve_editor_call(&snapshot, selection)
     }
@@ -125,16 +128,25 @@ impl StructureHost {
             let previous = cache.take();
             *cache = Some(Cached::rebuild(snapshot, previous));
         }
-        let index = &cache
-            .as_ref()
-            .ok_or_else(|| invalid("Captured structure is unavailable"))?
-            .index;
+        let cache = cache
+            .as_mut()
+            .ok_or_else(|| invalid("Captured structure is unavailable"))?;
+        let scoped = if let Selection::Invocation(_, Some(file)) = selection {
+            let doc = snapshot
+                .file(file)
+                .ok_or_else(|| invalid("File is absent from this observation"))?;
+            cache.for_evidence(snapshot, doc.path())?
+        } else {
+            None
+        };
+        let index = scoped.as_deref().unwrap_or(&cache.index);
         let call = match selection {
             Selection::Position(path, byte) => index
                 .call_at(path, byte)
                 .ok_or_else(|| invalid("Place the cursor on a captured call name"))?,
-            Selection::Invocation(call) => index
-                .call(call)
+            Selection::Invocation(call, file) => index
+                .call_with_candidates(call, scoped.as_ref().map(|_| &cache.index))
+                .filter(|call| file.is_none_or(|file| call.invocation.source.file == file))
                 .ok_or_else(|| invalid("The selected call is absent from this observation"))?,
         };
         let caller = call

@@ -75,14 +75,14 @@ export function createCallPreparation({
   }) {
     check(signal);
     const model = read();
-    if (!model || model.stale || model.snapshot !== action.snapshot) throw new Error('Source changed since editor navigation; retry Explore Call.');
+    if (!model || model.stale || model.snapshot !== action.snapshot) throw new Error('Source changed since the call was selected. Select it again.');
     const binding = await bind(action, signal);
     check(signal);
-    if (read() !== model || model.stale || model.snapshot !== action.snapshot || binding.snapshot !== action.snapshot || binding.invocation?.id !== action.call || binding.invocation.owner !== binding.caller?.id) throw new Error('Editor call differs from current captured source');
+    if (read() !== model || model.stale || model.snapshot !== action.snapshot || binding.snapshot !== action.snapshot || binding.invocation?.id !== action.call || binding.invocation.owner !== binding.caller?.id || action.file && binding.caller?.source.file !== action.file) throw new Error('The selected call differs from current captured source');
     const choice = await resolve({
       ...binding.invocation,
       lookup: true
-    }, signal, action.snapshot);
+    }, signal, action.snapshot, binding.caller.source.path);
     check(signal);
     if (read() !== model || model.stale || model.snapshot !== action.snapshot) throw new Error('Captured source changed while preparing call navigation');
     const caller = binding.caller,

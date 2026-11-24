@@ -8,6 +8,8 @@ remains in Git and the project documentation.
 
 ### Added
 
+- Open highlighted function definitions and written calls in the Call workspace from
+  the Source browser.
 - Browse every captured file in large repositories through directory cards and pages.
   Open captured READMEs and project manifests from the map's landmarks.
 - Browse Java files with syntax colors, outlines, and written-call candidates. Use a

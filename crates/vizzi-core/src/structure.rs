@@ -174,6 +174,22 @@ pub struct CallAction {
     /// Source-local evidence, when already known.
     pub binding: Option<TargetBasis>,
 }
+/// An exact captured identifier that can open source in the Call workspace.
+#[derive(Debug, Serialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum SourceAction {
+    /// A written call with an admitted enclosing declaration.
+    Call(CallAction),
+    /// A named function declaration.
+    Function {
+        /// Observation-bound symbol identity.
+        id: String,
+        /// Function name for the action label.
+        name: String,
+        /// Captured position of the written name.
+        position: CallPosition,
+    },
+}
 struct Site {
     position: Option<CallPosition>,
     id: String,
@@ -254,6 +270,33 @@ fn source(doc: &Document, context: &str, span: &std::ops::Range<usize>) -> Sourc
         context: context.into(),
         line: lines.start,
         end_line: lines.end,
+    }
+}
+fn identifier_position(doc: &Document, span: &std::ops::Range<usize>) -> Option<CallPosition> {
+    let lines = doc.lines(span);
+    let line = doc.captured().line_range(lines.start)?;
+    (lines.start == lines.end && span.end <= line.end).then_some(CallPosition {
+        line: lines.start,
+        start: span.start - line.start,
+        end: span.end - line.start,
+    })
+}
+
+fn action_lines(line_start: usize, line_count: usize) -> Result<std::ops::Range<usize>, Error> {
+    if line_start == 0 || !(1..=96).contains(&line_count) {
+        return Err(Error(
+            "Source actions require a positive source line and at most 96 lines".into(),
+        ));
+    }
+    Ok(line_start..line_start.saturating_add(line_count))
+}
+
+fn call_action(site: &Site, position: &CallPosition, name: &str) -> CallAction {
+    CallAction {
+        id: site.id.clone(),
+        name: name.into(),
+        position: position.clone(),
+        binding: site.target.as_ref().map(|(_, basis)| *basis),
     }
 }
 fn bounded(text: &str) -> String {
@@ -490,15 +533,10 @@ impl Structure {
                     index.uses.entry(name.clone()).or_default().push(n);
                 }
                 index.sites.push(Site {
-                    position: call.name_span.as_ref().and_then(|span| {
-                        let lines = doc.lines(span);
-                        let line = doc.captured().line_range(lines.start)?;
-                        (lines.start == lines.end && span.end <= line.end).then_some(CallPosition {
-                            line: lines.start,
-                            start: span.start - line.start,
-                            end: span.end - line.start,
-                        })
-                    }),
+                    position: call
+                        .name_span
+                        .as_ref()
+                        .and_then(|span| identifier_position(doc, span)),
                     id: blake3::hash(
                         format!(
                             "{}:{}:{}:{}:{}:{}",
@@ -846,29 +884,77 @@ impl Structure {
         offset: usize,
     ) -> Result<Page<CallAction>, Error> {
         self.symbol(id)?;
-        if line_start == 0 || !(1..=96).contains(&line_count) {
-            return Err(Error(
-                "Call actions require a positive source line and at most 96 lines".into(),
-            ));
-        }
-        let end = line_start.saturating_add(line_count);
+        let lines = action_lines(line_start, line_count)?;
         Ok(self.page(
-            self.owners.get(id).into_iter().flatten().filter_map(|n| {
-                let site = &self.sites[*n];
-                let position = site.position.as_ref()?;
-                let name = site.name.as_ref()?;
-                (position.line >= line_start && position.line < end)
-                    .then_some((site, position, name))
-            }),
+            self.calls_in(self.owners.get(id), &lines),
             offset,
             256,
-            |(site, position, name)| CallAction {
-                id: site.id.clone(),
-                name: name.clone(),
-                position: position.clone(),
-                binding: site.target.as_ref().map(|(_, basis)| *basis),
-            },
+            |(site, position, name)| call_action(site, position, name),
         ))
+    }
+    /// Returns call and function actions within one bounded window of a captured file.
+    pub fn source_actions(
+        &self,
+        doc: &Document,
+        line_start: usize,
+        line_count: usize,
+        offset: usize,
+    ) -> Result<Page<SourceAction>, Error> {
+        let lines = action_lines(line_start, line_count)?;
+        let calls = self
+            .calls_in(self.file_sites.get(doc.path()), &lines)
+            .filter(|(site, _, _)| {
+                site.owner.is_some()
+                    && site.source.file == doc.id().as_str()
+                    && site.source.version == doc.version().as_str()
+            })
+            .map(|(site, position, name)| SourceEntry::Call(site, position, name));
+        let functions = self
+            .files
+            .get(doc.path())
+            .into_iter()
+            .flatten()
+            .filter_map(|&n| {
+                let symbol = &self.symbols[n];
+                if symbol.kind != "function"
+                    || symbol.source.file != doc.id().as_str()
+                    || symbol.source.version != doc.version().as_str()
+                    || symbol.source.end_line < lines.start
+                    || symbol.source.line >= lines.end
+                {
+                    return None;
+                }
+                let position = identifier_position(doc, self.spans[n].as_ref()?)?;
+                lines
+                    .contains(&position.line)
+                    .then_some(SourceEntry::Function(symbol, position))
+            });
+        Ok(
+            self.page(calls.chain(functions), offset, 256, |entry| match entry {
+                SourceEntry::Call(site, position, name) => {
+                    SourceAction::Call(call_action(site, position, name))
+                }
+                SourceEntry::Function(symbol, position) => SourceAction::Function {
+                    id: symbol.id.clone(),
+                    name: symbol.name.clone(),
+                    position,
+                },
+            }),
+        )
+    }
+    fn calls_in<'a>(
+        &'a self,
+        indices: Option<&'a Vec<usize>>,
+        lines: &'a std::ops::Range<usize>,
+    ) -> impl Iterator<Item = (&'a Site, &'a CallPosition, &'a str)> {
+        indices.into_iter().flatten().filter_map(|&n| {
+            let site = &self.sites[n];
+            let position = site.position.as_ref()?;
+            let name = site.name.as_deref()?;
+            lines
+                .contains(&position.line)
+                .then_some((site, position, name))
+        })
     }
     /// Lists sites sharing a declaration's terminal name; same-name ambiguity is preserved.
     pub fn uses(&self, id: &str, area: &str, offset: usize) -> Result<Page<Invocation>, Error> {
@@ -880,6 +966,11 @@ impl Structure {
             |n| self.invocation(&self.sites[*n], area),
         ))
     }
+}
+
+enum SourceEntry<'a> {
+    Call(&'a Site, &'a CallPosition, &'a str),
+    Function(&'a Symbol, CallPosition),
 }
 
 /// Fresh evidence for a retained visual relationship.

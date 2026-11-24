@@ -1,13 +1,15 @@
 import {kindGroup,renderStyledText} from "/presentation.js";
 import { createWindowReader } from "/windows.js";
+import { decorateSourceActions } from "/call-actions.js";
 
 const SOURCE_ROW = 22, OUTLINE_ROW = 48;
-export function createInspector({ source, space, outline, transport, select, onError, makeReader=createWindowReader, decorateLine=()=>{}, emptyText="Select a file in the repository map." }) {
+export function createInspector({ source, space, outline, transport, select, onError, makeReader=createWindowReader, decorateLine=()=>{}, loadActions, activateAction, emptyText="Select a file in the repository map." }) {
   const outlineSpace = outline.ownerDocument.createElement("div"); outline.replaceChildren(outlineSpace);
   outline.setAttribute("role","list"); outline.setAttribute("aria-label","Declarations");
   outline.style.maxHeight = `${180 * OUTLINE_ROW}px`; source.style.maxHeight = `${64 * SOURCE_ROW}px`;
   let view, data, sourceRows = new Map(), entries = new Map(), cursor = 0, scheduled = false, queuedActivation = false;
   let columnLine, column = 0;
+  let actionsByLine = new Map(), actionRequest;
   const sourceNodes = new Map(), outlineNodes = new Map();
   const emptyNote=document.createElement("p");emptyNote.className="source-empty";
   const emptyOutline=document.createElement("p");emptyOutline.className="outline-empty";
@@ -23,11 +25,26 @@ export function createInspector({ source, space, outline, transport, select, onE
     space.style.height=`${Math.max(1,view?.source?.summary.lines ?? 0)*SOURCE_ROW}px`;
     outlineSpace.style.height=`${Math.max(1,view?.source?.summary.declarations ?? 0)*OUTLINE_ROW}px`;
   }
+  function refreshActions(window) {
+    actionRequest?.abort();
+    actionRequest=undefined;
+    actionsByLine.clear();
+    if(!loadActions||!window?.lines.length)return;
+    const request=actionRequest=new AbortController();
+    void loadActions(view,window,request.signal).then(actions=>{
+      if(request.signal.aborted)return;
+      actionsByLine=Map.groupBy(actions,action=>action.position?.line);
+      renderSource();
+    }).catch(()=>{}).finally(()=>{if(actionRequest===request)actionRequest=undefined;});
+  }
   function accept(window, query, intent = {}, retainedFragment) {
     const hadFocus=outline.contains(document.activeElement);
     if (intent.fragment) {
       for(const row of window.lines)sourceRows.set(row.number,row);
-    } else sourceRows=new Map(window.lines.map(row=>[row.number,row]));
+    } else {
+      sourceRows=new Map(window.lines.map(row=>[row.number,row]));
+      refreshActions(window);
+    }
     if(retainedFragment) {
       const row=sourceRows.get(retainedFragment.number);
       if(row && row.column===retainedFragment.column && row.end_column<retainedFragment.end_column)sourceRows.set(row.number,retainedFragment);
@@ -59,7 +76,16 @@ export function createInspector({ source, space, outline, transport, select, onE
         }
         row.append(label,controls,text);space.append(row);node={row,label,text,buttons};sourceNodes.set(number,node);
       }
-      node.row.style.top=`${(number-1)*SOURCE_ROW}px`;node.label.textContent=number;if(node.line!==line){renderStyledText(node.text,line);node.line=line;}
+      node.row.style.top=`${(number-1)*SOURCE_ROW}px`;node.label.textContent=number;
+      const actions=actionsByLine.get(number);
+      if(node.line!==line||node.actions!==actions){
+        if(node.line!==line||node.actions?.length)renderStyledText(node.text,line);
+        if(activateAction&&actions?.length){
+          const captured=view;
+          decorateSourceActions(node.text,line,actions,(...args)=>activateAction(captured,...args),"Ctrl/⌘-click opens in Call workspace");
+        }
+        node.line=line;node.actions=actions;
+      }
       const active=view.source.summary.active;node.row.classList.toggle("active",Boolean(active && number>=active.start_line && number<=active.end_line));
       decorateLine(node.row,number,view);
       for(const [action,button] of node.buttons)button.hidden=action==="first" || action==="previous" ? !line.left : !line.right;
@@ -161,7 +187,7 @@ export function createInspector({ source, space, outline, transport, select, onE
       view=next;queuedActivation=false;reader.activate(view);
       if(!sourceNodes.size)space.replaceChildren();if(!outlineNodes.size)outlineSpace.replaceChildren();sizes();
       if(next.inspection){source.scrollTop=next.inspectionPosition.sourceTop;outline.scrollTop=next.inspectionPosition.outlineTop;accept(next.inspection,{},{},retainedFragment);columnLine=next.inspectionPosition.columnLine;column=next.inspectionPosition.column;source.scrollLeft=next.inspectionPosition.sourceLeft;}
-      else {data=null;sourceRows=new Map();entries=new Map();cursor=0;columnLine=undefined;column=0;renderSource();renderOutline();}
+      else {refreshActions();data=null;sourceRows=new Map();entries=new Map();cursor=0;columnLine=undefined;column=0;renderSource();renderOutline();}
       if(hadFocus && !view.source?.summary.declarations)outline.focus({preventScroll:true});
     },
     async revealActive() {
