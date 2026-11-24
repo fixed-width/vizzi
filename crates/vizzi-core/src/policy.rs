@@ -79,6 +79,19 @@ const DEFAULT_SOURCE_RULES: &[DefaultSourceRules] = &[
     },
 ];
 
+pub(crate) fn is_readme(filename: &str) -> bool {
+    [
+        "README",
+        "README.md",
+        "README.markdown",
+        "README.rst",
+        "README.txt",
+        "README.adoc",
+    ]
+    .iter()
+    .any(|name| filename.eq_ignore_ascii_case(name))
+}
+
 /// Requested raw C-family language; it does not select a compiler configuration.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -135,6 +148,8 @@ pub enum Provenance {
 pub enum SourceOnlyReason {
     /// Project declarations are captured for language context, without an analyser.
     ProjectMetadata,
+    /// A README is available as captured text for repository orientation.
+    Documentation,
     /// Review source is retained outside the engine's selected analysis scope.
     OutsideAnalysisScope,
     /// This source capture deliberately runs no language analysis.
@@ -258,6 +273,13 @@ impl SourcePolicy {
         }
         let filename = path.rsplit('/').next().unwrap_or(path);
         let filename_provenance = || Provenance::ExplicitScope { scope: path.into() };
+        if is_readme(filename) {
+            return Ok(Some(Classification::SourceOnly {
+                language: None,
+                provenance: filename_provenance(),
+                reason: SourceOnlyReason::Documentation,
+            }));
+        }
         let metadata = DEFAULT_SOURCE_RULES
             .iter()
             .filter_map(|rules| rules.project_metadata)

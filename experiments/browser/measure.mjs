@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile, writeFile, mkdir, readdir, stat, access } from "node:fs/promises";
-import { join, dirname, basename, extname } from "node:path";
+import { join, dirname, basename, extname, relative } from "node:path";
 import { cpus, totalmem, platform, release } from "node:os";
 import { createHash, randomUUID } from "node:crypto";
 import { setTimeout as delay } from "node:timers/promises";
@@ -32,15 +32,31 @@ assert.ok(!options.source || options.revision, "a reference source needs --revis
 try { await access(options.output); throw new Error(`Refusing to overwrite ${options.output}`); } catch (error) { if (error.code !== "ENOENT") throw error; }
 
 async function capturedFiles(root, directory = root, files = [], fullProfile = null) {
-  const suffixes = new Set(fullProfile ? [".rs", ".py", ".c", ".cc", ".cpp", ".cxx", ".C", ".c++", ".h", ".hh", ".hpp", ".hxx", ".H", ".h++", ".cu", ".cuh", ".inc", ".inl", ".ipp", ".tpp"] : [".rs"]);
+  const syntaxSuffixes = new Set(fullProfile ? [
+    ".rs", ".py", ".pyi", ".rb", ".rake", ".gemspec", ".ru", ".java", ".js", ".jsx", ".mjs", ".cjs", ".ts", ".mts", ".cts", ".tsx",
+    ".c", ".cc", ".cpp", ".cxx", ".C", ".c++", ".h", ".hh", ".hpp", ".hxx", ".H", ".h++", ".inc", ".inl", ".ipp", ".tpp",
+  ] : [".rs"]);
+  const metadata = new Set(fullProfile ? [
+    "Cargo.toml", "Cargo.lock", "pyproject.toml", "pyrightconfig.json", "Gemfile.lock", ".ruby-version", ".tool-versions",
+    "pom.xml", "settings.gradle", "settings.gradle.kts", "build.gradle", "build.gradle.kts", "gradle.properties", "gradle-wrapper.properties", "libs.versions.toml",
+    "package.json", "tsconfig.json", "jsconfig.json", "compile_commands.json", "compile_flags.txt",
+  ] : []);
   const exclusions = fullProfile ? fullProfile.source_arguments.filter((value, index, array) => index > 0 && array[index-1] === "--exclude-source") : [];
   for (const entry of await readdir(directory, { withFileTypes: true })) {
-    if (directory === root && ["target", ".git", "node_modules"].includes(entry.name)) continue;
+    if (entry.name === "node_modules" || directory === root && ["target", ".git"].includes(entry.name)) continue;
     const path = join(directory, entry.name);
-    const relative = path.slice(root.length + 1);
-    if (exclusions.some(scope => relative === scope || relative.startsWith(scope + "/"))) continue;
-    if (entry.isDirectory()) await capturedFiles(root, path, files, fullProfile);
-    else if (entry.isFile() && suffixes.has(extname(entry.name))) files.push({ path, bytes: (await stat(path)).size });
+    const name = path.slice(root.length + 1);
+    if (exclusions.some(scope => name === scope || name.startsWith(scope + "/"))) continue;
+    if (entry.isDirectory()) {
+      await capturedFiles(root, path, files, fullProfile);
+    } else if (entry.isFile()) {
+      const suffix = extname(entry.name);
+      const parserInput = syntaxSuffixes.has(suffix) || Boolean(fullProfile && ["Gemfile", "Rakefile"].includes(entry.name));
+      const readme = /^readme(?:\.(?:md|markdown|rst|txt|adoc))?$/i.test(entry.name);
+      const sourceOnly = readme || metadata.has(entry.name) || (fullProfile &&
+        ([".cu", ".cuh"].includes(suffix) || /^(?:tsconfig|jsconfig)\..+\.json$/.test(entry.name)));
+      if (parserInput || sourceOnly) files.push({ path, bytes: (await stat(path)).size, parserInput });
+    }
   }
   return files;
 }
@@ -67,6 +83,11 @@ async function sampleRss(pid) {
   if (platform() !== "linux") return null;
   const status = await readFile(`/proc/${pid}/status`, "utf8");
   return { currentKiB: Number(status.match(/VmRSS:\s+(\d+)/)?.[1]), highWaterKiB: Number(status.match(/VmHWM:\s+(\d+)/)?.[1]) };
+}
+
+function lineComment(path) {
+  return [".py", ".pyi", ".rb", ".rake", ".gemspec", ".ru"].includes(extname(path)) ||
+    ["Gemfile", "Rakefile"].includes(basename(path)) ? "#" : "//";
 }
 
 async function beginProbe(page) {
@@ -164,12 +185,58 @@ async function interaction(page, host, edits) {
     requestMs: sampled.metrics.requestMs, nativeRss: await sampleRss(host.pid) };
 }
 
-async function inspectAndPick(page, host) {
-  const view = await (await fetch(`${host.url}/api/view`)).json();
+function measurementDirectory(root, files) {
+  const directories = new Map();
+  for (const file of files) {
+    if (!file.parserInput || !file.bytes || file.bytes >= 131072) continue;
+    const directory = dirname(relative(root, file.path));
+    directories.set(directory, (directories.get(directory) ?? 0) + 1);
+  }
+  return [...directories].sort(([left, a], [right, b]) =>
+    Math.min(b, 100) - Math.min(a, 100) || left.localeCompare(right, "en"))[0]?.[0];
+}
+
+async function openFilePage(page, directory) {
+  await page.waitForFunction(() => window.vizziMetrics?.lastFrame?.snapshot);
+  if (await page.evaluate(() => window.vizziMetrics.scene.paged)) {
+    assert.ok(directory, "no directory contains an ordinary parser input");
+    const next = page.getByRole("button", { name: "Next page", exact: true });
+    async function advance() {
+      assert.ok(await next.isVisible() && await next.isEnabled(), `no measured file page in ${directory}`);
+      const previous = await page.locator("#map-page-range").textContent();
+      await next.click();
+      await page.waitForFunction(range => document.getElementById("map-page-range").textContent !== range, previous);
+    }
+    let path = "";
+    for (const component of directory === "." ? [] : directory.split("/")) {
+      path = path ? `${path}/${component}` : component;
+      while (!await page.evaluate(target => window.vizziMetrics.scene.groups.some(group => group.path === target), path)) await advance();
+      await page.getByRole("button", { name: "Fit map", exact: true }).click();
+      await paint(page);
+      const position = await page.evaluate(target => {
+        const { rect } = window.vizziMetrics.scene.groups.find(group => group.path === target);
+        const { camera } = window.vizziMetrics.lastFrame;
+        return { x: camera.x + (rect.x + rect.width / 2) * camera.scale, y: camera.y + (rect.y + rect.height / 2) * camera.scale };
+      }, path);
+      await page.locator("#map").click({ position });
+      await page.waitForFunction(target => window.vizziMetrics.scene.focus === target, path);
+    }
+    while (!await page.evaluate(() => window.vizziMetrics.scene.files.some(file =>
+      file.classification.kind === "assigned" && file.coverage !== "unavailable" && file.bytes > 0 && file.bytes < 131072))) await advance();
+  }
+  await paint(page);
+}
+
+async function inspectAndPick(page) {
   const frame = await page.evaluate(() => window.vizziMetrics.lastFrame);
   const bounds = await page.locator("#map").boundingBox();
   const scene=await page.evaluate(()=>window.vizziMetrics.scene);
-  const target = scene.files.filter(file => file.classification.kind === "assigned" && file.coverage !== "unavailable" && file.bytes < 131072).find(file => file.rect.y * frame.camera.scale + frame.camera.y + file.rect.height * frame.camera.scale < frame.height - 20);
+  const target = scene.files.find(file => {
+    const { x, y, width, height } = file.rect, { camera } = frame;
+    const centerX = camera.x + (x + width / 2) * camera.scale, centerY = camera.y + (y + height / 2) * camera.scale;
+    return file.classification.kind === "assigned" && file.coverage !== "unavailable" && file.bytes > 0 && file.bytes < 131072 &&
+      centerX >= 0 && centerX < frame.width - 20 && centerY >= 0 && centerY < frame.height - 20;
+  });
   assert.ok(target);
   const x = bounds.x + frame.camera.x + (target.rect.x + target.rect.width / 2) * frame.camera.scale;
   const y = bounds.y + frame.camera.y + (target.rect.y + target.rect.height / 2) * frame.camera.scale;
@@ -191,7 +258,7 @@ async function singleEdits(page, input, host, picking) {
     const before = options.duringRecovery ? await activeRecovery(host, previousRecovery) : await settled(host);
     previousRecovery = before.recovery?.completed;
     if (!options.duringRecovery) await delay(offset);
-    const marker = `${view.source.outlines[0].context.language === "python" ? "#" : "//"} browser-visible-${options.probeId}-${offset}`;
+    const marker = `${lineComment(path)} browser-visible-${options.probeId}-${offset}`;
     const started = performance.now();
     await writeFile(path, Buffer.concat([Buffer.from(marker + "\n"), original]));
     const publication = (async () => {
@@ -227,7 +294,7 @@ async function largeSource(page, input, host, file) {
   const openMs = performance.now() - opened;
   const openProbe = await endProbe(page);
   const original = await readFile(file.path);
-  const marker = `// full-corpus-large-source-edit-${options.probeId}`;
+  const marker = `${lineComment(file.path)} full-corpus-large-source-edit-${options.probeId}`;
   const before = await settled(host);
   await beginProbe(page);
   const edited = performance.now();
@@ -276,24 +343,25 @@ async function qualify(chromium, definition) {
     for (const file of files.toSorted((a, b) => a.path.localeCompare(b.path, "en"))) {
       manifest.update(JSON.stringify([file.path.slice(input.root.length + 1), createHash("sha256").update(await readFile(file.path)).digest("hex")]));
     }
-    const heavy = files.filter(file => ![".cu", ".cuh"].includes(extname(file.path))).toSorted((a, b) => b.bytes - a.bytes).slice(0, definition.heavyFiles);
+    const heavy = files.filter(file => file.parserInput).toSorted((a, b) => b.bytes - a.bytes).slice(0, definition.heavyFiles);
+    const directory = measurementDirectory(input.root, files);
     const originals = await Promise.all(heavy.map(file => readFile(file.path)));
     const runs = [];
     for (let sample = 0; sample < options.samples; sample++) {
       for (const condition of ["steady", "refresh"]) {
         await settled(host); await session.page.reload();
         await session.page.bringToFront();
-        await session.page.waitForFunction(() => window.vizziMetrics?.lastFrame?.snapshot);
-        await paint(session.page);
-        const run = await interaction(session.page, host, condition === "refresh" ? () => Promise.all(heavy.map((file, index) => writeFile(file.path, Buffer.concat([Buffer.from(`${extname(file.path) === ".py" ? "#" : "//"} background ${options.probeId}-${sample}\n`), originals[index]])))) : null);
+        await openFilePage(session.page, directory);
+        const run = await interaction(session.page, host, condition === "refresh" ? () => Promise.all(heavy.map((file, index) => writeFile(file.path, Buffer.concat([Buffer.from(`${lineComment(file.path)} background ${options.probeId}-${sample}\n`), originals[index]])))) : null);
         runs.push({ sample, condition, ...run });
         console.log(`${definition.name} ${condition} ${sample + 1}: ${run.frameSummary.count} rAF intervals; ${run.pendingObservations} pending observations`);
       }
     }
     assert.ok(runs.some(run => run.condition === "refresh" && run.pendingObservations > 0), "background analysis did not overlap interaction");
     await settled(host); await session.page.reload();
-    await session.page.waitForFunction(() => window.vizziMetrics?.lastFrame?.snapshot); await paint(session.page);
-    const picking = await inspectAndPick(session.page, host);
+    await openFilePage(session.page, directory);
+    const overview = await session.page.evaluate(() => ({ directory: window.vizziMetrics.scene.focus, files: window.vizziMetrics.scene.files.length }));
+    const picking = await inspectAndPick(session.page);
     const editLatency = await singleEdits(session.page, input, host, picking);
     const large = definition.profile ? await largeSource(session.page, input, host, heavy[0]) : null;
     const cdp = await session.page.context().newCDPSession(session.page);
@@ -316,7 +384,7 @@ async function qualify(chromium, definition) {
     await Promise.all(payloadJobs);
     assert.deepEqual(payloadErrors, []);
     return { name: definition.name, revision: definition.revision, originalSourceManifestSha256: manifest.digest("hex"), capturedFiles: files.length, sourceArguments: input.sourceArguments, sourceBytes: files.reduce((sum, file) => sum + file.bytes, 0),
-      overviewFiles: final.files.length, heavyFiles: heavy.map(file => ({ path: file.path.slice(input.root.length + 1), bytes: file.bytes })),
+      overviewFiles: overview.files, overviewDirectory: overview.directory, heavyFiles: heavy.map(file => ({ path: file.path.slice(input.root.length + 1), bytes: file.bytes })),
       runs, picking, editLatency, largeSource: large, heap, webgpu, screenshot, cleanSnapshotMatches: true, nativeRss: await sampleRss(host.pid), errors: session.errors,
       payloads, browserRequests: Object.fromEntries([...new Set(session.requests)].map(path => [path, session.requests.filter(value => value === path).length])) };
   } finally { await session?.close(); await host?.close(); await input.close(); }

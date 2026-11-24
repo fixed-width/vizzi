@@ -99,10 +99,11 @@ npm test -- --measure \
 ```
 
 Repeat with `--headed` and a different output path for the desktop browser. The driver
-always generates a 10,008-file Rust workspace with a 2,000-tile overview; `--source`
-adds a reference-repository copy. Its originals remain untouched. Supplied source
-directories should be pinned archives without build outputs. The reported manifest
-fingerprint hashes normalised paths and source-content SHA-256 values before edits.
+generates a 10,008-file Rust workspace and opens a populated directory page before
+timing interactions. It records the measured directory and the number of file tiles.
+Use `--source` to add a reference-repository copy. Supplied source directories should
+be pinned archives without build outputs. The reported manifest fingerprint hashes
+normalised paths and source-content SHA-256 values before edits.
 
 Each workload gets three four-second steady-state runs and three runs that change a
 batch of Rust files during pan/zoom. Periodic native reconciliation stays active in

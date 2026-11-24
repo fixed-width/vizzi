@@ -1,26 +1,51 @@
 const ROW=28,LIMIT=64;
-export function createDirectoryControls({tree,breadcrumbs,onChange}) {
+export function createDirectoryControls({tree,breadcrumbs,onChange,onOpen}) {
   const document=tree.ownerDocument,space=document.createElement('div');space.className='directory-space';tree.append(space);tree.setAttribute('role','tree');tree.setAttribute('aria-label','Map directories');
   let model,rows=[],focused,dragging,lastTree,lastBreadcrumbs;
   function change(action){if(action()===false)return;render();onChange();}
+  function open(path){if(model.project().paged)onOpen(path);else change(()=>model.focus(path));}
   function render(){
-    if(!model)return;const scene=model.project();lastTree=scene.tree;lastBreadcrumbs=scene.breadcrumbs;rows=scene.tree;space.style.height=`${rows.length*ROW}px`;
+    if(!model)return;const scene=model.project();
+    const activeElement=document.activeElement;
+    const hadFocus=tree.contains(activeElement),breadcrumbFocus=activeElement?.dataset.breadcrumb;
+    if(scene.paged && lastTree!==scene.tree)tree.scrollTop=0;
+    lastTree=scene.tree;rows=scene.tree;space.style.height=`${rows.length*ROW}px`;
+    tree.hidden=scene.paged && !rows.length;
     const first=Math.max(0,Math.floor(tree.scrollTop/ROW)-4),last=Math.min(rows.length,first+LIMIT,Math.ceil((tree.scrollTop+tree.clientHeight)/ROW)+5);
-    const hadFocus=tree.contains(document.activeElement),active=focused ?? rows[first]?.path;
+    const active=rows.some(row=>row.path===focused)?focused:rows[first]?.path;
     const fragment=document.createDocumentFragment();
     for(let i=first;i<last;i++){
-      const dir=rows[i],row=document.createElement('div');row.className='directory-row';row.style.top=`${i*ROW}px`;row.style.paddingLeft=`${Math.min(dir.depth*12,120)}px`;row.dataset.directory=dir.path;row.draggable=true;row.setAttribute('role','treeitem');row.setAttribute('aria-level',String(dir.depth+1));row.setAttribute('aria-expanded',String(!dir.collapsed));row.setAttribute('aria-label',dir.path);row.title=dir.path;
-      const button=(text,label,action)=>{const b=document.createElement('button');b.type='button';b.textContent=text;b.setAttribute('aria-label',label);b.onclick=()=>{focused=dir.path;change(action);};row.append(b);return b;};
-      button(dir.collapsed?'▸':'▾',`${dir.collapsed?'Expand':'Collapse'} directory ${dir.path}`,()=>model.toggle(dir.path));
-      const name=button(`${dir.label} (${dir.count})`,`Focus directory ${dir.path}`,()=>model.focus(dir.path));name.className='directory-name';name.dataset.focusDirectory=dir.path;name.tabIndex=dir.path===active?0:-1;name.onfocus=()=>{focused=dir.path;};
-      const siblings=rows.filter(r=>r.parent===dir.parent),at=siblings.findIndex(r=>r.path===dir.path);
-      button('↑',`Move ${dir.path} earlier`,()=>model.move(dir.path,siblings[at-1].path)).disabled=!dir.earlier;
-      button('↓',`Move ${dir.path} later`,()=>model.move(dir.path,siblings[at+2]?.path ?? null)).disabled=!dir.later;
+      const dir=rows[i],row=document.createElement('div');row.className='directory-row';row.style.top=`${i*ROW}px`;row.style.paddingLeft=`${Math.min(dir.depth*12,120)}px`;row.dataset.directory=dir.path;row.draggable=!dir.summary;row.setAttribute('role','treeitem');row.setAttribute('aria-level',String(dir.depth+1));row.setAttribute('aria-label',dir.path);row.title=dir.path;
+      const button=(text,label,action)=>{const b=document.createElement('button');b.type='button';b.textContent=text;b.setAttribute('aria-label',label);b.onclick=()=>{focused=dir.path;action();};row.append(b);return b;};
+      if(!dir.summary){
+        row.setAttribute('aria-expanded',String(!dir.collapsed));
+        button(dir.collapsed?'▸':'▾',`${dir.collapsed?'Expand':'Collapse'} directory ${dir.path}`,()=>change(()=>model.toggle(dir.path)));
+      }
+      const count=dir.count.toLocaleString();
+      const name=button(`${dir.label} (${count})`,dir.summary?`Open directory ${dir.path}, ${count} ${dir.count===1?'file':'files'}`:`Focus directory ${dir.path}`,
+        ()=>open(dir.path));
+      name.className='directory-name';name.dataset.focusDirectory=dir.path;name.tabIndex=dir.path===active?0:-1;name.onfocus=()=>{focused=dir.path;};
+      if(!dir.summary){
+        const siblings=rows.filter(r=>r.parent===dir.parent),at=siblings.findIndex(r=>r.path===dir.path);
+        button('↑',`Move ${dir.path} earlier`,()=>change(()=>model.move(dir.path,siblings[at-1].path))).disabled=!dir.earlier;
+        button('↓',`Move ${dir.path} later`,()=>change(()=>model.move(dir.path,siblings[at+2]?.path ?? null))).disabled=!dir.later;
+      }
       fragment.append(row);
     }
     space.replaceChildren(fragment);
-    if(hadFocus){const node=[...space.querySelectorAll('[data-focus-directory]')].find(b=>b.dataset.focusDirectory===focused);node?.focus({preventScroll:true});}
-    breadcrumbs.replaceChildren();for(const dir of scene.breadcrumbs){const b=document.createElement('button');b.type='button';b.textContent=dir.label;b.setAttribute('aria-label',dir.path==='.'?'Repository root':`Focus directory ${dir.path}`);if(dir.path===scene.focus)b.setAttribute('aria-current','location');b.onclick=()=>change(()=>model.focus(dir.path));breadcrumbs.append(b);}
+    if(lastBreadcrumbs!==scene.breadcrumbs){
+      lastBreadcrumbs=scene.breadcrumbs;
+      const buttons=scene.breadcrumbs.map(dir=>{
+        const button=document.createElement('button');button.type='button';button.textContent=dir.label;button.dataset.breadcrumb=dir.path;
+        if(dir.path==='.' || !scene.paged)button.setAttribute('aria-label',dir.path==='.'?'Repository root':`Focus directory ${dir.path}`);
+        if(dir.path===scene.focus)button.setAttribute('aria-current','location');
+        button.onclick=()=>open(dir.path);
+        return button;
+      });
+      breadcrumbs.replaceChildren(...buttons);
+      if(breadcrumbFocus!==undefined)(buttons.find(button=>button.dataset.breadcrumb===breadcrumbFocus) ?? breadcrumbs.lastElementChild)?.focus({preventScroll:true});
+    }
+    if(hadFocus){const node=[...space.querySelectorAll('[data-focus-directory]')].find(b=>b.dataset.focusDirectory===active);(node ?? breadcrumbs.lastElementChild)?.focus({preventScroll:true});}
   }
   tree.addEventListener('scroll',render,{passive:true});new ResizeObserver(render).observe(tree);
   tree.addEventListener('dragstart',event=>{const row=event.target.closest('[data-directory]');if(!row)return;dragging=row.dataset.directory;event.dataTransfer.setData('text/plain',dragging);event.dataTransfer.effectAllowed='move';});
@@ -29,8 +54,8 @@ export function createDirectoryControls({tree,breadcrumbs,onChange}) {
   tree.addEventListener('keydown',event=>{
     const path=event.target.closest('[data-directory]')?.dataset.directory,at=rows.findIndex(r=>r.path===path);if(at<0)return;
     const dir=rows[at];
-    if(event.altKey && ['ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();const siblings=rows.filter(r=>r.parent===dir.parent),index=siblings.findIndex(r=>r.path===path);if(event.key==='ArrowUp' && dir.earlier)change(()=>model.move(path,siblings[index-1].path));if(event.key==='ArrowDown' && dir.later)change(()=>model.move(path,siblings[index+2]?.path ?? null));return;}
-    if(event.key==='ArrowLeft' || event.key==='ArrowRight'){event.preventDefault();if((event.key==='ArrowLeft')!==dir.collapsed)change(()=>model.toggle(path));return;}
+    if(!dir.summary && event.altKey && ['ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();const siblings=rows.filter(r=>r.parent===dir.parent),index=siblings.findIndex(r=>r.path===path);if(event.key==='ArrowUp' && dir.earlier)change(()=>model.move(path,siblings[index-1].path));if(event.key==='ArrowDown' && dir.later)change(()=>model.move(path,siblings[index+2]?.path ?? null));return;}
+    if(event.key==='ArrowLeft' || event.key==='ArrowRight'){event.preventDefault();if(dir.summary){if(event.key==='ArrowRight')open(path);}else if((event.key==='ArrowLeft')!==dir.collapsed)change(()=>model.toggle(path));return;}
     const next={ArrowUp:at-1,ArrowDown:at+1,Home:0,End:rows.length-1}[event.key];if(next===undefined)return;event.preventDefault();const index=Math.max(0,Math.min(rows.length-1,next));focused=rows[index].path;tree.scrollTop=Math.max(0,Math.min(index*ROW,Math.max(tree.scrollTop,(index+1)*ROW-tree.clientHeight)));render();[...space.querySelectorAll('[data-focus-directory]')].find(b=>b.dataset.focusDirectory===focused)?.focus({preventScroll:true});
   });
   return {apply(next){model=next;const scene=model.project();if(scene.tree!==lastTree || scene.breadcrumbs!==lastBreadcrumbs)render();}};

@@ -130,6 +130,37 @@ fn default_project_metadata_is_captured_without_analyzers() {
 }
 
 #[test]
+fn conventional_readmes_are_source_only_and_respect_exclusions() {
+    let rules = policy(PolicyConfig {
+        exclusions: vec!["vendor".into()],
+        ..Default::default()
+    });
+    for path in [
+        "README",
+        "docs/README.md",
+        "pkg/readme.rst",
+        "pkg/Readme.adoc",
+    ] {
+        assert_eq!(
+            rules.classify(path).unwrap(),
+            Some(Classification::SourceOnly {
+                language: None,
+                provenance: Provenance::ExplicitScope { scope: path.into() },
+                reason: SourceOnlyReason::Documentation,
+            })
+        );
+    }
+    for path in [
+        "vendor/README.md",
+        "node_modules/pkg/README.md",
+        "NOTES.md",
+        "README.sh",
+    ] {
+        assert_eq!(rules.classify(path).unwrap(), None, "{path}");
+    }
+}
+
+#[test]
 fn c_family_project_metadata_requires_an_enabled_scope() {
     let plain = policy(PolicyConfig::default());
     let c_family = policy(PolicyConfig {

@@ -44,6 +44,17 @@ test("accepted visits preserve the previous position, filter changes do not add 
   assert.equal(f.state().count, 2);
 });
 
+test("a new path filter resets an inherited page while history restores its recorded offset", async () => {
+  const f = fixture();
+  f.show({ ...location("a"), directory: "src", offset: 100 });
+  await f.navigation.navigate({ file: "b", filter: "parser" });
+  const next = f.loads.at(-1);
+  assert.equal(next.query.offset, 0);
+  f.show({ ...location("b"), filter: "parser", directory: "src", offset: 0 }, next.intent);
+  await f.navigation.traverse(f.replacements[0]);
+  assert.equal(f.loads.at(-1).query.offset, 100);
+});
+
 test('editor anchors reject changed snapshots/files/versions before replacing the displayed visit',async()=>{
   const f=fixture(),anchor={snapshot:'expected',file:'b',version:'v2',line:131};
   await f.navigation.navigate({file:'b',entity:null,filter:''},anchor);

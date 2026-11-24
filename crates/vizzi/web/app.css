@@ -94,9 +94,15 @@ footer { min-height: 36px; padding: 10px 24px; border-top: 1px solid var(--borde
 
 .directory-heading { display:flex;justify-content:space-between;align-items:center;font-size:11px;margin:0 0 5px; }
 .directory-heading button { padding:3px 7px;font-size:10px; }
+.directory-heading:has(+ #directory-tree[hidden]) { display:none; }
+#map-landmarks:not([hidden]), #map-pages:not([hidden]) { display:flex;align-items:center;gap:8px;margin:0 0 8px;font-size:11px; }
+#landmark-files { display:flex;min-width:0;gap:4px;overflow-x:auto; }
+#landmark-files button, #map-pages button { flex:none;padding:3px 7px;font-size:11px; }
+#map-pages { flex-wrap:wrap; }
 #directory-tree { height:150px;min-height:60px;flex-shrink:0;overflow:auto;position:relative; }
 .directory-space { position:relative; }
 .directory-row { position:absolute;left:0;right:0;height:28px;display:grid;grid-template-columns:22px minmax(0,1fr) 24px 24px;align-items:center; }
+.directory-row:not([aria-expanded]) { grid-template-columns:minmax(0,1fr); }
 .directory-row button { padding:3px 4px;border:0;background:transparent;font-size:11px;min-width:0; }
 .directory-row button:disabled { opacity:.35;cursor:default; }
 .directory-row .directory-name { overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left; }
