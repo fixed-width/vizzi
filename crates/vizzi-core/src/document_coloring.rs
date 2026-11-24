@@ -5,6 +5,7 @@ use crate::{
     model::{CapturedSource, ContextId, SourceEncoding, SourceReadError},
     policy::DocumentFormat,
 };
+use jsonc_parser::{Scanner, ScannerOptions, errors::ParseErrorKind, tokens::Token};
 use pulldown_cmark::{Event as MarkdownEvent, Options, Parser, Tag};
 use std::sync::OnceLock;
 use toml_parser::{
@@ -53,6 +54,7 @@ impl DocumentColoring {
             Ok(Some(text)) => Some(self.index.get_or_init(|| match self.format {
                 DocumentFormat::Toml => toml_coloring(&text),
                 DocumentFormat::Markdown => markdown_coloring(&text),
+                DocumentFormat::Json => json_coloring(&text),
             })),
             Err(SourceReadError::Capacity) => Some(self.index.get_or_init(Coloring::limited)),
             _ => None,
@@ -142,4 +144,66 @@ fn markdown_coloring(text: &str) -> Coloring {
             Some((range, style))
         });
     Coloring::from_spans(spans, INDEX_BYTES)
+}
+
+fn json_coloring(text: &str) -> Coloring {
+    let content = text.strip_prefix('\u{feff}').unwrap_or(text);
+    let mut offset = text.len() - content.len();
+    let options = ScannerOptions::default();
+    let mut scanner = Scanner::new(content, &options);
+    let tokens = std::iter::from_fn(|| match scanner.scan() {
+        Ok(Some(token)) => {
+            let range = offset + scanner.token_start()..offset + scanner.token_end();
+            Some((range, token))
+        }
+        Err(error) if matches!(error.kind(), ParseErrorKind::String(_)) => {
+            let start = offset + scanner.token_start();
+            let end = start + json_string_len(&text[start..])?;
+            scanner = Scanner::new(&text[end..], &options);
+            offset = end;
+            Some((start..end, Token::String(text[start + 1..end - 1].into())))
+        }
+        _ => None,
+    });
+    let spans = tokens.filter_map(|(range, token)| {
+        let style = match token {
+            Token::String(_) if json_colon_follows(&text[range.end..], &options) => {
+                Style::Attribute
+            }
+            Token::String(_) => Style::String,
+            Token::Number(_) => Style::Number,
+            Token::Boolean(_) | Token::Null => Style::Constant,
+            Token::CommentLine(_) | Token::CommentBlock(_) => Style::Comment,
+            _ => return None,
+        };
+        Some((range, style))
+    });
+    Coloring::from_spans(spans, INDEX_BYTES)
+}
+
+fn json_string_len(text: &str) -> Option<usize> {
+    let mut bytes = text.bytes().enumerate();
+    let (_, quote) = bytes.next()?;
+    while let Some((index, byte)) = bytes.next() {
+        match byte {
+            b'\\' => {
+                bytes.next();
+            }
+            b'\r' | b'\n' => return None,
+            _ if byte == quote => return Some(index + 1),
+            _ => {}
+        }
+    }
+    None
+}
+
+fn json_colon_follows(text: &str, options: &ScannerOptions) -> bool {
+    let mut scanner = Scanner::new(text, options);
+    while let Ok(Some(token)) = scanner.scan() {
+        match token {
+            Token::CommentLine(_) | Token::CommentBlock(_) => continue,
+            _ => return matches!(token, Token::Colon),
+        }
+    }
+    false
 }

@@ -138,6 +138,13 @@ do not want in the reading scope. Cargo lockfiles, Python project settings and e
 C-family compilation metadata participate in change detection. Ruby lockfiles and runtime
 selection metadata are captured as project context without execution.
 
+Vizzi captures `.json` files by default and colors keys, strings, numbers, booleans, and
+`null`. Comments are colored in JSON configuration files that use them. Known project
+files such as `package.json` and `tsconfig.json` also supply project context.
+The live Source browser admits other JSON files in order of depth, then path, up to
+8 MiB per file, 16 MiB total, and 1,024 files. These files use resident storage,
+including when source spooling is enabled.
+
 Workspace capture does not follow source-file symlinks. Unsupported encodings, parser
 recovery, deferred analysis, projection limits and missing dependency source are distinct
 availability states. Source may be readable even when analysis is unavailable.

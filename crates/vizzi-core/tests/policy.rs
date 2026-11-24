@@ -160,7 +160,7 @@ fn conventional_readmes_are_source_only_and_respect_exclusions() {
 }
 
 #[test]
-fn toml_and_markdown_files_are_source_only_and_respect_exclusions() {
+fn toml_markdown_and_json_files_are_source_only_and_respect_exclusions() {
     let rules = policy(PolicyConfig {
         exclusions: vec!["vendor".into()],
         ..Default::default()
@@ -170,6 +170,8 @@ fn toml_and_markdown_files_are_source_only_and_respect_exclusions() {
         ("docs/guide.markdown", "markdown", "markdown"),
         ("pyproject.TOML", "toml", "TOML"),
         ("settings.TOML", "toml", "TOML"),
+        ("tests/fixtures/ulib_apply_review.json", "json", "json"),
+        ("fixtures/example.JSON", "json", "JSON"),
     ] {
         assert_eq!(
             rules.classify(path).unwrap(),
@@ -185,6 +187,7 @@ fn toml_and_markdown_files_are_source_only_and_respect_exclusions() {
     }
     for path in [
         "vendor/notes.md",
+        "vendor/fixtures.json",
         "node_modules/package/settings.toml",
         "target/build.toml",
     ] {
@@ -199,8 +202,18 @@ fn c_family_project_metadata_requires_an_enabled_scope() {
         c_family_roots: vec!["src".into()],
         ..PolicyConfig::default()
     });
+    assert_eq!(
+        plain.classify("compile_commands.json").unwrap(),
+        Some(Classification::SourceOnly {
+            language: Some("json".into()),
+            provenance: Provenance::Extension {
+                extension: "json".into(),
+            },
+            reason: SourceOnlyReason::AnalysisNotRequested,
+        })
+    );
+    assert_eq!(plain.classify("compile_flags.txt").unwrap(), None);
     for path in ["compile_commands.json", "compile_flags.txt"] {
-        assert!(plain.classify(path).unwrap().is_none());
         assert_eq!(
             c_family.classify(path).unwrap(),
             Some(Classification::SourceOnly {

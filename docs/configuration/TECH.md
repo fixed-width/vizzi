@@ -124,6 +124,8 @@ set `VIZZI_NVIM_BROWSER=1` to exercise the browser's **Editor** button.
   rejects dirty or disk-divergent open documents in the workspace, validates query text,
   and rejects any editor/document/configuration/filesystem epoch change during lookup.
   Native admission checks returned target text and positions against captured source.
+  Browse-only JSON is verified by streaming saved bytes under its own file-count and
+  aggregate byte limits. The 4 MiB query and target limit applies to transmitted source.
   Context identities include editor session, epoch and snapshot; old captured versions
   cannot acquire current-editor answers. This is conservative live-editor analysis;
   it cannot freeze an editor's full transitive dependency/configuration universe.

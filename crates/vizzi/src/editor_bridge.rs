@@ -1,10 +1,11 @@
 //! Editor-owned analysis over a bounded, authenticated local connection.
 use crate::definitions::{self, Answer, Location, Position, Provider};
 use crate::dependency_sources::{Capture, Catalog, Declaration, EditorArchive};
+use crate::source::{BROWSE_JSON_BYTES, BROWSE_JSON_FILES};
 use serde::{Deserialize, Serialize};
 use std::{
     fs::File,
-    io::{Read, Write},
+    io::{BufRead, BufReader, Read, Write},
     net::{Ipv4Addr, SocketAddr, TcpStream},
     path::{Path, PathBuf},
     sync::{Arc, Mutex},
@@ -92,19 +93,37 @@ pub(crate) struct Bridge {
     active: Mutex<()>,
     sources: Arc<Catalog>,
 }
-fn read_file(path: &Path, limit: usize) -> Result<Vec<u8>, String> {
+fn open_regular(path: &Path) -> Result<File, String> {
     let file = File::open(path).map_err(|e| format!("Cannot read {}: {e}", path.display()))?;
     if !file.metadata().map_err(|e| e.to_string())?.is_file() {
         return Err("Editor connection/source must be a regular file".into());
     }
+    Ok(file)
+}
+fn read_file(path: &Path, limit: usize) -> Result<Vec<u8>, String> {
     let mut bytes = Vec::new();
-    file.take(limit as u64 + 1)
+    open_regular(path)?
+        .take(limit as u64 + 1)
         .read_to_end(&mut bytes)
         .map_err(|e| e.to_string())?;
     if bytes.len() > limit {
         return Err("Editor connection/source exceeds allowance".into());
     }
     Ok(bytes)
+}
+fn browse_json_matches(path: &Path, doc: &Document) -> Result<bool, String> {
+    let limit = doc.bytes().saturating_add(1) as u64;
+    let mut disk = BufReader::new(open_regular(path)?.take(limit));
+    let mut verifier = doc.captured().verifier();
+    loop {
+        let bytes = disk.fill_buf().map_err(|e| e.to_string())?;
+        if bytes.is_empty() {
+            return Ok(verifier.matches());
+        }
+        verifier.update(bytes);
+        let count = bytes.len();
+        disk.consume(count);
+    }
 }
 fn source(doc: &Document) -> Result<String, String> {
     doc.captured()
@@ -271,25 +290,42 @@ impl Bridge {
         Ok(())
     }
     fn verify(&self, snapshot: &Snapshot) -> Result<(), String> {
-        if snapshot.documents().len() > 8192 {
+        let browse_files = snapshot
+            .documents()
+            .iter()
+            .filter(|doc| doc.classification().is_browse_only_json())
+            .count();
+        if snapshot.documents().len() - browse_files > 8192 || browse_files > BROWSE_JSON_FILES {
             return Err("Editor workspace exceeds file allowance".into());
         }
         let mut total = 0usize;
+        let mut browse_total = 0usize;
         for doc in snapshot.documents() {
-            total = total.saturating_add(doc.bytes());
-            if total > WORKSPACE_BYTES {
+            let browse_json = doc.classification().is_browse_only_json();
+            let (charged, limit) = if browse_json {
+                (&mut browse_total, BROWSE_JSON_BYTES)
+            } else {
+                (&mut total, WORKSPACE_BYTES)
+            };
+            *charged = charged.saturating_add(doc.bytes());
+            if *charged > limit {
                 return Err("Editor workspace exceeds byte allowance".into());
             }
             let path = self.root.join(doc.path());
             if path.canonicalize().map_err(|e| e.to_string())? != path {
                 return Err("Editor source path changed or uses a symlink".into());
             }
-            let current = read_file(&path, FILE_BYTES)?;
-            let captured = doc
-                .captured()
-                .read_all(FILE_BYTES)
-                .map_err(|e| e.to_string())?;
-            if current != captured.bytes() {
+            let matches = if browse_json {
+                browse_json_matches(&path, doc)?
+            } else {
+                let current = read_file(&path, FILE_BYTES)?;
+                let captured = doc
+                    .captured()
+                    .read_all(FILE_BYTES)
+                    .map_err(|e| e.to_string())?;
+                current == captured.bytes()
+            };
+            if !matches {
                 return Err("Editor analysis requires captured source to match saved files; refresh or use a managed server".into());
             }
         }

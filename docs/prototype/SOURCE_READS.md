@@ -122,6 +122,10 @@ observation and dirty hints. Free ranges use best-fit allocation, split remainde
 coalesce adjacent retirements. Fragmentation can refuse a contiguous capture despite
 sufficient total free bytes. Live ranges never move; compaction is not implemented.
 
+The live directory capture keeps browse-only JSON resident under separate per-file and
+per-observation limits. It admits shallower files before deeper ones and uses path order
+within the same depth. Hints for these paths reconcile admission across the directory.
+
 Each backing descriptor owns its range. The final descriptor release queues retirement
 using a separate memory-only lock, without acquiring the backing IO lock or writer gate.
 Publication expiration alone does not free an externally pinned source. Capture/commit

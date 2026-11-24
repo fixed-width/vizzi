@@ -41,6 +41,7 @@ fn document_coloring_invalidates_legacy_versions_for_eligible_files() {
     for (path, text, eligible) in [
         ("README.md", "# Title", true),
         ("Cargo.toml", "[package]", true),
+        ("package.json", "{}", true),
         ("README", "Title", false),
         ("Cargo.lock", "# Generated file", false),
     ] {
@@ -201,6 +202,71 @@ fn markdown_comments_end_at_the_closing_delimiter() {
             ("<!-- unclosed", Style::Comment),
         ]
     );
+}
+
+#[test]
+fn json_colors_keys_and_values_in_nested_objects_and_arrays() {
+    let text = "\u{feff}{\r\n  \"items\": [\"first\", {\"emoji🙂\" : \"escaped\\\" quote\"}, -1.25e+3, null, true, false],\r\n  \"empty\": {}\r\n}";
+    for path in ["fixture.JSON", "package.json", "tsconfig.build.json"] {
+        let window = source_window(path, text.as_bytes(), WindowQuery::default());
+        assert_eq!(window.coloring, "ready", "{path}");
+        assert_eq!(
+            styled_text(&window),
+            [
+                ("\"items\"", Style::Attribute),
+                ("\"first\"", Style::String),
+                ("\"emoji🙂\"", Style::Attribute),
+                ("\"escaped\\\" quote\"", Style::String),
+                ("-1.25e+3", Style::Number),
+                ("null", Style::Constant),
+                ("true", Style::Constant),
+                ("false", Style::Constant),
+                ("\"empty\"", Style::Attribute),
+            ],
+            "{path}"
+        );
+    }
+}
+
+#[test]
+fn json_colors_comments_and_keeps_text_readable_after_a_lexical_error() {
+    let text = "{\n  // settings\n  \"name\" /* key comment */: \"demo\",\n  \"count\": -\n}";
+    let window = source_window("tsconfig.json", text.as_bytes(), WindowQuery::default());
+    assert_eq!(
+        styled_text(&window),
+        [
+            ("// settings", Style::Comment),
+            ("\"name\"", Style::Attribute),
+            ("/* key comment */", Style::Comment),
+            ("\"demo\"", Style::String),
+            ("\"count\"", Style::Attribute),
+        ]
+    );
+    assert_eq!(window.lines[3].text, "  \"count\": -");
+}
+
+#[test]
+fn json_colors_tokens_after_escaped_lone_surrogates() {
+    let text = r#"{"\uDEAD": ["\uD800", "\uDEAD\"🙂"], "after": true}"#;
+    let window = source_window("fixture.json", text.as_bytes(), WindowQuery::default());
+    assert_eq!(
+        styled_text(&window),
+        [
+            (r#""\uDEAD""#, Style::Attribute),
+            (r#""\uD800""#, Style::String),
+            (r#""\uDEAD\"🙂""#, Style::String),
+            (r#""after""#, Style::Attribute),
+            ("true", Style::Constant),
+        ]
+    );
+}
+
+#[test]
+fn json_string_recovery_does_not_cross_an_unescaped_newline() {
+    let text = r#"{"broken": "\uDEAD
+"after": true}"#;
+    let window = source_window("fixture.json", text.as_bytes(), WindowQuery::default());
+    assert_eq!(styled_text(&window), [(r#""broken""#, Style::Attribute)]);
 }
 
 #[test]
