@@ -10,6 +10,7 @@ use std::{
 };
 use tree_sitter::{Node, Parser};
 
+mod java;
 mod package;
 
 const DOCUMENTS: usize = 8192;
@@ -98,7 +99,7 @@ const RUBY: ModuleRule = ModuleRule {
     fact: |index, _, analysis, ordinal| index.ruby_fact(analysis, ordinal),
     history: None,
 };
-const MODULE_RULES: &[&ModuleRule] = &[&RUST, &PYTHON, &RUBY, &package::RULE];
+const MODULE_RULES: &[&ModuleRule] = &[&RUST, &PYTHON, &RUBY, &java::RULE, &package::RULE];
 
 fn module_rule(language: &str) -> Option<&'static ModuleRule> {
     MODULE_RULES
@@ -142,12 +143,14 @@ enum Target {
 #[derive(Default)]
 pub struct ModuleCache {
     rust: BTreeMap<String, (String, Vec<Edge>)>,
+    java: java::Cache,
 }
 /// Module bindings for one immutable source observation.
 pub struct ModuleIndex {
     workspace: String,
     rust: BTreeMap<String, Option<Base>>,
     python: BTreeMap<String, Module>,
+    java: BTreeMap<String, Module>,
     packages: BTreeMap<String, Arc<Module>>,
 }
 
@@ -581,6 +584,7 @@ impl ModuleIndex {
             workspace: workspace.as_str().into(),
             rust: BTreeMap::new(),
             python: BTreeMap::new(),
+            java: BTreeMap::new(),
             packages: BTreeMap::new(),
         }
     }
@@ -597,6 +601,12 @@ impl ModuleIndex {
                 .collect(),
             python: self
                 .python
+                .get_key_value(path)
+                .map(|(k, v)| (k.clone(), v.clone()))
+                .into_iter()
+                .collect(),
+            java: self
+                .java
                 .get_key_value(path)
                 .map(|(k, v)| (k.clone(), v.clone()))
                 .into_iter()
@@ -622,6 +632,7 @@ impl ModuleIndex {
             .map(|d| (d.path(), d.as_ref()))
             .collect::<BTreeMap<_, _>>();
         cache.rust.retain(|p, _| docs.contains_key(p.as_str()));
+        cache.java.retain(|p, _| docs.contains_key(p.as_str()));
         let mut rust = BTreeMap::new();
         let mut python = BTreeMap::new();
         let mut budget = TOTAL_BYTES;
@@ -732,6 +743,7 @@ impl ModuleIndex {
             workspace: snapshot.workspace().as_str().into(),
             rust,
             python,
+            java: java::bindings(snapshot, docs.values().copied(), &mut cache.java),
             packages: package::bindings(snapshot, docs.into_values()),
         }
     }

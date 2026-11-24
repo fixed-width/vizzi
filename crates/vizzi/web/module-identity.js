@@ -10,7 +10,7 @@ function moduleKind(module) {
  if (!module || !opaque(module.id) ||
      typeof module.label !== 'string' || !module.label || encoder.encode(module.label).length > 512 ||
      typeof module.root !== 'string' || !module.root || encoder.encode(module.root).length > 4096 ||
-     module.root.includes('\\') || module.root.split('/').some(part => !part || part === '.' || part === '..')) {
+     module.root.includes('\\') || (module.root !== '.' && module.root.split('/').some(part => !part || part === '.' || part === '..'))) {
   return undefined;
  }
  return moduleKinds.find(kind => kind.language === module.language && kind.basis === module.basis);

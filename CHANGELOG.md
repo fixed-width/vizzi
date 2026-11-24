@@ -15,6 +15,7 @@ remains in Git and the project documentation.
 - Open JDK and local Java library source from attached archives in dependency bubbles.
 - Import Maven and Gradle Java classpaths from the Workspace menu without listing individual JARs.
 - Reuse cached Gradle Wrapper distributions and resume Java archive navigation after JDT LS restarts.
+- Show Java package and named module cues in live, historical, and comparison bubbles.
 - Open Vizzi from Neovim and jump back to verified saved source in the launching split.
 - Find and confirm an earlier declaration across a simple rename or file move in Git
   function history, with exact before and after source evidence.

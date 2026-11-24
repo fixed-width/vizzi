@@ -459,6 +459,75 @@ test("Java source outlines and call trails work without a language server", asyn
   }
 });
 
+test("Java package cues group calls and track captured module descriptors without JDT LS", async () => {
+  const fixture = await workspace({
+    files: {
+      "module-info.java": "module example.app { exports demo; }\n",
+      "demo/Caller.java": "package demo; class Caller { int startJava() { return Peer.finishJava(); } }\n",
+      "demo/Peer.java": "package demo; class Peer { static int finishJava() { return 1; } }\n",
+      "Loose.java": "package loose; class Loose { int standaloneJava() { return 2; } }\n",
+    },
+  });
+  let host, session;
+  try {
+    host = await startHost(fixture);
+    session = await openWorkspace(chromium, host);
+    const { page } = session;
+    await page.goto(host.url);
+    await page.waitForFunction(() => document.querySelector("#visual-source-status").textContent.includes("ready"));
+    const open = async name => {
+      await page.getByRole("button", { name: "Add bubble", exact: true }).click();
+      await page.getByLabel("Find a function", { exact: true }).fill(name);
+      await page.getByRole("button", { name: "Find functions", exact: true }).click();
+      await page.locator(`[data-add-symbol][data-name="${name}"]`).click();
+      const bubble = page.locator(`[data-view][data-name="${name}"]`);
+      await bubble.locator(".code-line").first().waitFor();
+      return bubble;
+    };
+    const start = await open("startJava");
+    await start.getByRole("button", { name: "Calls", exact: true }).click();
+    await start.getByRole("button", { name: "finishJava · line 1", exact: true }).click();
+    const finish = page.locator('[data-view][data-name="finishJava"]');
+    await finish.locator(".code-line").first().waitFor();
+    const id = await start.getAttribute("data-module-id");
+    assert.ok(id);
+    assert.equal(await finish.getAttribute("data-module-id"), id);
+    assert.equal(await start.locator(".module-tag").textContent(), "example.app/demo");
+    assert.equal(await finish.locator(".module-tag").textContent(), "example.app/demo");
+    await start.locator(".fragment-header").focus();
+    await page.keyboard.press("Tab");
+    await paint(page);
+    assert.equal(await page.locator(".fragment.is-module-peer").count(), 2);
+    assert.equal(await page.locator("#overview-map .is-module-peer").count(), 2);
+    await page.locator("#workspace-settings > summary").click();
+    await page.getByLabel("Module outlines", { exact: true }).check();
+    await page.keyboard.press("Escape");
+    await page.locator("#module-outlines .module-outline").waitFor({ state: "attached" });
+
+    await writeFile(join(fixture.root, "module-info.java"), "// generated descriptor\rmodule example.\\u0072enamed { exports demo; }\r");
+    await page.waitForFunction(() =>
+      document.querySelector('[data-name="startJava"] .module-tag')?.textContent === "example.renamed/demo"
+      && document.querySelector('[data-name="finishJava"] .module-tag')?.textContent === "example.renamed/demo"
+    );
+    assert.equal(await start.getAttribute("data-module-id"), id);
+    await page.reload();
+    await start.locator(".code-line").first().waitFor();
+    await finish.locator(".code-line").first().waitFor();
+    assert.equal(await start.getAttribute("data-module-id"), id);
+    assert.equal(await finish.locator(".module-tag").textContent(), "example.renamed/demo");
+
+    const standalone = await open("standaloneJava");
+    assert.equal(await standalone.locator(".module-tag").textContent(), "loose");
+    assert.match(await standalone.locator(".module-tag").getAttribute("title"), /Java package\nRoot: \.$/);
+    assert.notEqual(await standalone.getAttribute("data-module-id"), id);
+    assert.deepEqual(session.errors, []);
+  } finally {
+    await session?.close();
+    await host?.close();
+    await fixture.close();
+  }
+});
+
 const managedJava = process.env.VIZZI_JDTLS;
 const gradleWrapperUrl = process.env.VIZZI_TEST_GRADLE_WRAPPER_URL;
 const gradleJavaHome = process.env.VIZZI_TEST_GRADLE_JAVA_HOME;

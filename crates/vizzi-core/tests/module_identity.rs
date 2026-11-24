@@ -2,7 +2,7 @@
 use std::sync::Arc;
 use vizzi_core::{
     analysis::{LanguageAdapter, Languages},
-    model::{CapturePolicyId, Document, Snapshot, WorkspaceId},
+    model::{Analysis, CapturePolicyId, ContentId, Coverage, Document, Snapshot, WorkspaceId},
     policy::{Classification, PolicyConfig, Provenance, SourceOnlyReason, SourcePolicy},
     python::PythonAdapter,
     ruby::RubyAdapter,
@@ -14,6 +14,12 @@ fn snapshot(files: &[(&str, &str)]) -> Snapshot {
     let mut rust = RustAdapter.create().unwrap();
     let mut python = PythonAdapter.create().unwrap();
     let mut ruby = RubyAdapter.create().unwrap();
+    let mut java = Languages::builtin()
+        .unwrap()
+        .select("java")
+        .unwrap()
+        .create()
+        .unwrap();
     let documents = files
         .iter()
         .map(|(path, text)| {
@@ -44,6 +50,16 @@ fn snapshot(files: &[(&str, &str)]) -> Snapshot {
                         language: "ruby".into(),
                         provenance: Provenance::Extension {
                             extension: "rb".into(),
+                        },
+                    },
+                )
+            } else if path.ends_with(".java") {
+                (
+                    vec![java.analyze(text.as_bytes()).unwrap()],
+                    Classification::Assigned {
+                        language: "java".into(),
+                        provenance: Provenance::Extension {
+                            extension: "java".into(),
                         },
                     },
                 )
@@ -96,6 +112,10 @@ fn native_module_catalog_describes_emitted_language_and_provenance_pairs() {
         ("lib.rs", "fn from_rust() {}"),
         ("worker.py", "def from_python(): pass\n"),
         ("worker.rb", "module Audio; def from_ruby; end; end\n"),
+        (
+            "Worker.java",
+            "package audio; class Worker { void fromJava() {} }",
+        ),
     ]);
     let index = Structure::new(&source);
     let kinds = vizzi_core::modules::module_kinds()
@@ -105,6 +125,7 @@ fn native_module_catalog_describes_emitted_language_and_provenance_pairs() {
         ("from_rust", "Rust module"),
         ("from_python", "Python module"),
         ("from_ruby", "Ruby module"),
+        ("fromJava", "Java package"),
     ] {
         let member = module(&index, name);
         let kind = kinds
@@ -112,6 +133,245 @@ fn native_module_catalog_describes_emitted_language_and_provenance_pairs() {
             .find(|kind| kind["language"] == member.language && kind["basis"] == member.basis)
             .unwrap();
         assert_eq!(kind["tooltip"], tooltip);
+    }
+}
+
+#[test]
+fn java_packages_use_declared_names_and_keep_separate_directories_distinct() {
+    let snapshot = snapshot(&[
+        (
+            "First.java",
+            "/* package wrong; */ @Deprecated package café /* comment */ . audio; class First { void first() {} }",
+        ),
+        (
+            "Second.java",
+            "package café.audio; class Second { void second() {} }",
+        ),
+        (
+            "other/Third.java",
+            "package café.audio; class Third { void third() {} }",
+        ),
+        (
+            "other/Other.java",
+            "package different.audio; class Other { void different() {} }",
+        ),
+        (
+            "Neutral.java",
+            "class Neutral { void neutral() { String text = \"package pretend;\"; } }",
+        ),
+        (
+            "Duplicate.java",
+            "package first; package second; class Duplicate { void duplicate() {} }",
+        ),
+        (
+            "Broken.java",
+            "package bad.; class Broken { void broken() {} }",
+        ),
+    ]);
+    let index = Structure::new(&snapshot);
+    let first = module(&index, "first");
+    assert_eq!(first.label, "café.audio");
+    assert_eq!(first.root, ".");
+    assert_eq!(first, module(&index, "second"));
+    let third = module(&index, "third");
+    let different = module(&index, "different");
+    assert_eq!(first.label, third.label);
+    assert_ne!(first.id, third.id);
+    assert_eq!(third.root, "other");
+    assert_ne!(third.id, different.id);
+    for name in ["neutral", "duplicate", "broken"] {
+        let page = index.functions("", name, 0).unwrap();
+        assert!(
+            page.items
+                .iter()
+                .find(|entry| entry.symbol.name == name)
+                .unwrap()
+                .symbol
+                .module
+                .is_none(),
+            "{name}"
+        );
+    }
+}
+
+#[test]
+fn java_named_modules_use_the_matching_source_root_and_refresh_in_place() {
+    let files = |descriptor| {
+        snapshot(&[
+            ("one/module-info.java", "module unrelated {}"),
+            ("one/src/module-info.java", descriptor),
+            (
+                "one/src/demo/engine/App.java",
+                "package demo.engine; class App { void start() {} }",
+            ),
+            (
+                "one/src/demo/engine/Peer.java",
+                "package demo.engine; class Peer { void peer() {} }",
+            ),
+            (
+                "one/src/demo/util/Utility.java",
+                "package demo.util; class Utility { void utility() {} }",
+            ),
+            (
+                "one/src/Different.java",
+                "package demo.engine; class Different { void misplaced() {} }",
+            ),
+            (
+                "two/src/module-info.java",
+                "open module com.example { exports demo.engine; }",
+            ),
+            (
+                "two/src/demo/engine/Other.java",
+                "package demo.engine; class Other { void other() {} }",
+            ),
+        ])
+    };
+    let mut cache = vizzi_core::modules::ModuleCache::default();
+    let initial = Structure::with_module_cache(
+        &files(
+            "import java.lang.Deprecated; @Deprecated open module com.example { exports demo.engine; }",
+        ),
+        &mut cache,
+    );
+    let original = module(&initial, "start");
+    assert_eq!(original.label, "com.example/demo.engine");
+    assert_eq!(original.root, "one/src/module-info.java");
+    assert_eq!(original, module(&initial, "peer"));
+    assert_ne!(original.id, module(&initial, "other").id);
+    assert_eq!(module(&initial, "utility").label, "com.example/demo.util");
+    assert_eq!(module(&initial, "misplaced").label, "demo.engine");
+
+    let renamed = files("module com.renamed {}");
+    let updated = module(&Structure::with_module_cache(&renamed, &mut cache), "start");
+    assert_eq!(updated, module(&Structure::new(&renamed), "start"));
+    assert_eq!(updated.id, original.id);
+    assert_eq!(updated.label, "com.renamed/demo.engine");
+
+    for descriptor in [
+        "module com.broken",
+        "module com.first {} module com.second {}",
+    ] {
+        let invalid = Structure::with_module_cache(&files(descriptor), &mut cache);
+        assert_eq!(module(&invalid, "start").label, "demo.engine");
+    }
+}
+
+#[test]
+fn java_cues_keep_descriptor_identity_when_deferred_files_fill_the_source_budget() {
+    let baseline = snapshot(&[
+        (
+            "src/demo/Caller.java",
+            "package demo; class Caller { void target() {} }",
+        ),
+        (
+            "src/module-info.java",
+            "module example.app { exports demo; }",
+        ),
+    ]);
+    let mut cache = vizzi_core::modules::ModuleCache::default();
+    let original = module(
+        &Structure::with_module_cache(&baseline, &mut cache),
+        "target",
+    );
+    assert_eq!(original.label, "example.app/demo");
+
+    let caller = baseline.file_by_path("src/demo/Caller.java").unwrap();
+    let mut documents = baseline.documents().to_vec();
+    let content = " ".repeat(1024 * 1024);
+    let deferred = Analysis {
+        calls: None,
+        coloring: None,
+        content: ContentId::derive(&[content.as_bytes()]),
+        context: caller.analyses()[0].context.clone(),
+        coverage: Coverage::Deferred,
+        facts: vec![],
+        diagnostics: vec![],
+    };
+    for n in 0..8 {
+        let end = content.len() - if n == 7 { caller.bytes() } else { 0 };
+        let bytes = &content.as_bytes()[..end];
+        documents.push(Arc::new(
+            Document::capture(
+                baseline.workspace().clone(),
+                format!("src/generated-{n}.java"),
+                bytes,
+                vec![Analysis {
+                    content: ContentId::derive(&[bytes]),
+                    ..deferred.clone()
+                }],
+                caller.classification().clone(),
+            )
+            .unwrap(),
+        ));
+    }
+    let updated = Snapshot::new(
+        baseline.workspace().clone(),
+        documents,
+        baseline.policy().clone(),
+    )
+    .unwrap();
+    assert_eq!(
+        module(
+            &Structure::with_module_cache(&updated, &mut cache),
+            "target"
+        ),
+        original
+    );
+    assert_eq!(module(&Structure::new(&updated), "target"), original);
+}
+
+#[test]
+fn java_module_descriptors_reject_stray_top_level_tokens() {
+    for descriptor in [
+        "module example.app {} @",
+        "module example.app {};",
+        ";module example.app {}",
+    ] {
+        let snapshot = snapshot(&[
+            ("src/module-info.java", descriptor),
+            (
+                "src/demo/Caller.java",
+                "package demo; class Caller { void target() {} }",
+            ),
+        ]);
+        assert_eq!(
+            module(&Structure::new(&snapshot), "target").label,
+            "demo",
+            "{descriptor}"
+        );
+    }
+}
+
+#[test]
+fn java_module_descriptors_apply_unicode_escapes_before_line_terminators() {
+    for (descriptor, label) in [
+        (r"module example.\u0061pp {}", "example.app/demo"),
+        (
+            "// leading comment\rmodule example.app {}",
+            "example.app/demo",
+        ),
+        (
+            r"// \u000d\u000amodule example.\uu0061pp {}",
+            "example.app/demo",
+        ),
+        (r"module example.\uD801\uDC00 {}", "example.𐐀/demo"),
+        (r"// \u005c\u000dmodule example.app {}", "example.app/demo"),
+        (r"// \u005cu000dmodule unexpected {}", "demo"),
+        (r"// \\u000dmodule unexpected {}", "demo"),
+        ("// \\u00XX\nmodule example.app {}", "demo"),
+    ] {
+        let snapshot = snapshot(&[
+            ("src/module-info.java", descriptor),
+            (
+                "src/demo/Caller.java",
+                "package demo; class Caller { void target() {} }",
+            ),
+        ]);
+        assert_eq!(
+            module(&Structure::new(&snapshot), "target").label,
+            label,
+            "{descriptor}"
+        );
     }
 }
 

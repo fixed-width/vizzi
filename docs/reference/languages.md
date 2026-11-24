@@ -45,6 +45,11 @@ navigation work without a JDK or project build. Outlines include classes, interf
 enums, records, annotation types, methods, and constructors. Use **Add bubble** to
 open methods and constructors with bodies.
 
+Bubbles show their declared Java package and share a cue with other bubbles in
+the same package directory. A captured `module-info.java` at the corresponding
+source root qualifies the label as `module/package`. The cues also work in
+function history and comparisons. [Module cues](../visual/MODULES_PRODUCT.md)
+
 Written method calls and `new` expressions provide name candidates, including
 separate candidates for overloaded declarations. An implicit record constructor
 can lead to its record declaration. A [managed JDT LS server](../how-to/configure-language-servers.md#java-with-a-managed-server)
