@@ -11,6 +11,8 @@ workspace = true
 toml = { workspace = true, features = ["display"] }
 url.workspace = true
 percent-encoding.workspace = true
+java-properties.workspace = true
+md5.workspace = true
 zip.workspace = true
 vizzi-search = { path = "../vizzi-search" }
 vizzi-core = { path = "../vizzi-core" }

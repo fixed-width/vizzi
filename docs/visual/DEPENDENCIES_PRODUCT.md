@@ -35,9 +35,10 @@ outside source. Dependency capture uses the shared catalog bounds.
 
 Managed Java can open attached JDK and library archive entries reached through JDT LS.
 Vizzi checks the returned source against the local archive before opening a bubble.
-The capture can reopen from the archive and supports semantic navigation in the
-server session that reached it. A new session can reach the source again from
-its caller. Archive entries use the captured source view for reading and copying.
+The capture can reopen from the archive. After a restart, it can resume semantic
+navigation by replaying its unchanged caller trail against the available
+classpath and checking each resulting archive member. Archive entries use the
+captured source view for reading and copying.
 
 Validate exact source/location binding, dependency-to-dependency call steps, same-named
 files, stale replies/configuration, unavailable sources, bounded retention, reload and

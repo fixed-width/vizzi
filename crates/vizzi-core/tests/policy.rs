@@ -22,6 +22,7 @@ fn java_build_descriptors_are_captured_as_inert_project_inputs() {
         "module/build.gradle",
         "gradle.properties",
         "gradle/libs.versions.toml",
+        "gradle/wrapper/gradle-wrapper.properties",
     ] {
         assert!(
             matches!(

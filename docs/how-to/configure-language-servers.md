@@ -65,8 +65,10 @@ Linux with JDT LS 1.63.0 and Java 25. Use the distribution's `bin/jdtls` launche
 Open the build root with `vizzi --jdtls jdtls`. In the call workspace's
 **Workspace** menu, choose **Import Maven classpath** or **Import Gradle classpath**.
 This action runs build configuration using captured project descriptors and the
-local plugin and dependency caches. Gradle import needs a local distribution from
-`GRADLE_HOME` or `PATH`. Maven reports missing cached dependencies as an incomplete import.
+local plugin and dependency caches. Gradle import reuses the exact distribution
+already cached for the project's Wrapper. For a build without a Wrapper, it
+uses `GRADLE_HOME` or `PATH`. A configured `org.gradle.java.home` selects the
+Java runtime for Gradle. Maven reports missing cached dependencies as an incomplete import.
 
 Import again after changing a build file or installing new dependencies. Java
 source edits use the imported session directly. Select a root with a single build
@@ -108,9 +110,10 @@ Repeat `--java-library` for several JARs. Flag paths are relative to the workspa
 root. The TOML key `java-library` is an array under `[language-servers]` with paths
 relative to the config file. Use paths without glob characters. Vizzi opens
 the matching source entry, including when the archive has a source-root prefix.
-The dependency bubble can reopen from the same archive after a restart. Follow
-the original call again to use semantic navigation from the bubble in a new
-JDT LS session.
+The dependency bubble can reopen from the same archive after a restart. With
+the classpath available, Vizzi can resume navigation by replaying an unchanged
+caller trail. Follow the call again if its source has changed or a capture in
+the trail is no longer available.
 
 ## Java with VS Code
 

@@ -51,6 +51,7 @@ const DEFAULT_SOURCE_RULES: &[DefaultSourceRules] = &[
                 "build.gradle",
                 "build.gradle.kts",
                 "gradle.properties",
+                "gradle-wrapper.properties",
                 "libs.versions.toml",
             ],
         )),

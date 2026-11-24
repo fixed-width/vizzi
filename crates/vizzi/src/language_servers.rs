@@ -10,6 +10,7 @@ use vizzi_core::{
     structure::{CallLookup, Symbol},
 };
 mod c_family;
+mod gradle;
 mod inputs;
 mod java;
 mod project;

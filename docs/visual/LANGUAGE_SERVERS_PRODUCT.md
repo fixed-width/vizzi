@@ -65,3 +65,8 @@ definition requests do not start an import. After import, saved Java changes
 update the existing session. A build configuration change asks the reader
 to import again before using that classpath. Java projects imported this way
 need no source-root or per-JAR flags.
+
+Gradle projects with a Wrapper use the distribution identified by the captured
+Wrapper properties and the completed local cache. This lookup does not run
+the Wrapper or provision a distribution. A project without a Wrapper uses a
+local Gradle installation. A configured Gradle JVM may differ from the JDT LS JVM.

@@ -128,7 +128,7 @@ fn managed_java_opens_jdk_source_from_the_local_attachment() {
         root.path().into(),
         cache.path().into(),
         Configuration {
-            jdtls: Some(executable.into()),
+            jdtls: Some(executable.clone().into()),
             ..Default::default()
         },
     )
@@ -169,6 +169,30 @@ fn managed_java_opens_jdk_source_from_the_local_attachment() {
         .resolve(capture, &source.index.call(&inner.id).unwrap())
         .unwrap();
     assert_eq!(followed.locations[0].capture.as_deref(), Some(id));
+
+    drop(provider);
+    let restarted = Servers::new(
+        root.path().into(),
+        cache.path().into(),
+        Configuration {
+            jdtls: Some(executable.into()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let restored = restarted.dependencies().unwrap().get(id).unwrap().unwrap();
+    let current = snapshot(&[
+        (
+            path,
+            "java",
+            "package demo;\nclass Caller { int run(String value) { return value.length(); } }\n",
+        ),
+        ("demo/Peer.java", "java", "package demo; class Peer {}"),
+    ]);
+    let rebound = restarted
+        .resolve(current, &restored.index.call(&inner.id).unwrap())
+        .unwrap();
+    assert_eq!(rebound.locations[0].capture.as_deref(), Some(id));
 }
 
 #[test]
@@ -192,10 +216,15 @@ fn check_managed_java_library(package: &str, archive_prefix: &str) {
         format!("package {package};\n")
     };
     let contents = format!(
-        "{declaration}public class Helper {{ public static int answer() {{ return 42; }} }}\n"
+        "{declaration}public class Helper {{ public static int answer() {{ return Other.more(); }} public static int last() {{ return 42; }} }}\n"
     );
     let source = library.path().join("Helper.java");
     fs::write(&source, &contents).unwrap();
+    let other_contents = format!(
+        "{declaration}public class Other {{ public static int more() {{ return Helper.last(); }} }}\n"
+    );
+    let other = library.path().join("Other.java");
+    fs::write(&other, &other_contents).unwrap();
     let javac = std::env::var_os("JAVA_HOME")
         .map(|path| std::path::PathBuf::from(path).join("bin/javac"))
         .unwrap_or_else(|| "javac".into());
@@ -203,6 +232,7 @@ fn check_managed_java_library(package: &str, archive_prefix: &str) {
         .arg("-d")
         .arg(library.path())
         .arg(&source)
+        .arg(&other)
         .output()
         .unwrap();
     assert!(
@@ -212,11 +242,13 @@ fn check_managed_java_library(package: &str, archive_prefix: &str) {
     );
     let jar = library.path().join("helper.jar");
     let attachment = library.path().join("helper-sources.jar");
-    let write_jar = |path: &Path, name: &str, bytes: &[u8]| {
+    let write_jar = |path: &Path, entries: &[(&str, &[u8])]| {
         let mut zip = zip::ZipWriter::new(fs::File::create(path).unwrap());
-        zip.start_file(name, zip::write::SimpleFileOptions::default())
-            .unwrap();
-        zip.write_all(bytes).unwrap();
+        for (name, bytes) in entries {
+            zip.start_file(*name, zip::write::SimpleFileOptions::default())
+                .unwrap();
+            zip.write_all(bytes).unwrap();
+        }
         zip.finish().unwrap();
     };
     let prefix = if package.is_empty() {
@@ -226,18 +258,24 @@ fn check_managed_java_library(package: &str, archive_prefix: &str) {
     };
     let class = format!("{prefix}Helper.class");
     let entry = format!("{archive_prefix}{prefix}Helper.java");
+    let other_class = format!("{prefix}Other.class");
+    let other_entry = format!("{archive_prefix}{prefix}Other.java");
+    let binary = fs::read(library.path().join(&class)).unwrap();
+    let other_binary = fs::read(library.path().join(&other_class)).unwrap();
+    write_jar(&jar, &[(&class, &binary), (&other_class, &other_binary)]);
     write_jar(
-        &jar,
-        &class,
-        &fs::read(library.path().join(&class)).unwrap(),
+        &attachment,
+        &[
+            (&entry, contents.as_bytes()),
+            (&other_entry, other_contents.as_bytes()),
+        ],
     );
-    write_jar(&attachment, &entry, contents.as_bytes());
     let provider = Servers::new(
         root.path().into(),
         cache.path().into(),
         Configuration {
-            jdtls: Some(executable.into()),
-            java_libraries: vec![jar],
+            jdtls: Some(executable.clone().into()),
+            java_libraries: vec![jar.clone()],
             ..Default::default()
         },
     )
@@ -276,6 +314,89 @@ fn check_managed_java_library(package: &str, archive_prefix: &str) {
     );
 
     if package == "lib" && archive_prefix.is_empty() {
+        let more = reached.index.outgoing(&helper.id, &entry, 0).unwrap();
+        let destination = provider
+            .resolve(
+                capture.clone(),
+                &reached.index.call(&more.items[0].id).unwrap(),
+            )
+            .unwrap();
+        let expected = &destination.locations[0];
+        let second_id = expected.capture.as_deref().unwrap();
+        assert_ne!(id, second_id);
+
+        drop(provider);
+        let provider = Servers::new(
+            root.path().into(),
+            cache.path().into(),
+            Configuration {
+                jdtls: Some(executable.clone().into()),
+                java_libraries: vec![jar.clone()],
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let second = provider
+            .dependencies()
+            .unwrap()
+            .get(second_id)
+            .unwrap()
+            .unwrap();
+        let byte_in_other =
+            vizzi::definitions::byte_offset(&other_contents, expected.position).unwrap();
+        let other_method = second
+            .index
+            .definition(&other_entry, byte_in_other)
+            .unwrap();
+        let more = second
+            .index
+            .outgoing(&other_method.id, &other_entry, 0)
+            .unwrap();
+        let rebound = provider
+            .resolve(
+                capture.clone(),
+                &second.index.call(&more.items[0].id).unwrap(),
+            )
+            .unwrap();
+        assert_eq!(rebound.locations[0].capture.as_deref(), Some(id));
+
+        let restored = provider.dependencies().unwrap().get(id).unwrap().unwrap();
+        let helper = restored.symbol(restored.index.definition(&entry, byte).unwrap());
+        let refs = provider.references(capture.clone(), &helper, byte).unwrap();
+        assert_eq!(refs.locations[0].path, path);
+
+        #[cfg(unix)]
+        {
+            let beta = library.path().join("beta.jar");
+            fs::copy(&jar, &beta).unwrap();
+            std::os::unix::fs::symlink(&attachment, library.path().join("beta-sources.jar"))
+                .unwrap();
+            let renamed = Servers::new(
+                root.path().into(),
+                cache.path().into(),
+                Configuration {
+                    jdtls: Some(executable.clone().into()),
+                    java_libraries: vec![beta],
+                    ..Default::default()
+                },
+            )
+            .unwrap();
+            let latest = renamed.resolve(capture.clone(), &call).unwrap();
+            let new_id = latest.locations[0].capture.as_deref().unwrap();
+            let new_source = renamed
+                .dependencies()
+                .unwrap()
+                .get(new_id)
+                .unwrap()
+                .unwrap();
+            assert_eq!(new_source.origin.label, "beta.jar");
+            assert_eq!(new_source.input.root, reached.input.root);
+            let error = renamed
+                .references(capture.clone(), &helper, byte)
+                .unwrap_err();
+            assert!(error.contains("Archive destination changed"), "{error}");
+        }
+
         fs::remove_file(attachment).unwrap();
         let absent = provider.resolve(capture, &call).unwrap();
         assert!(absent.locations.is_empty());
@@ -383,7 +504,9 @@ fn managed_java_imports_maven_classpath_without_library_flags() {
 
 #[test]
 fn managed_java_imports_gradle_classpath_without_library_flags() {
-    if std::env::var_os("GRADLE_HOME").is_some() {
+    if std::env::var_os("GRADLE_HOME").is_some()
+        || std::env::var_os("VIZZI_TEST_GRADLE_WRAPPER_URL").is_some()
+    {
         check_managed_java_project("Gradle");
     }
 }
@@ -424,6 +547,24 @@ fn check_managed_java_project(kind: &str) {
         .unwrap();
     zip.finish().unwrap();
     fs::create_dir(root.path().join("app")).unwrap();
+    if kind == "Gradle" {
+        if let Ok(url) = std::env::var("VIZZI_TEST_GRADLE_WRAPPER_URL") {
+            let wrapper = root.path().join("gradle/wrapper");
+            fs::create_dir_all(&wrapper).unwrap();
+            fs::write(
+                wrapper.join("gradle-wrapper.properties"),
+                format!("distributionUrl={url}\n"),
+            )
+            .unwrap();
+        }
+        if let Ok(home) = std::env::var("VIZZI_TEST_GRADLE_JAVA_HOME") {
+            fs::write(
+                root.path().join("gradle.properties"),
+                format!("org.gradle.java.home={home}\n"),
+            )
+            .unwrap();
+        }
+    }
     let (descriptor, settings) = if kind == "Maven" {
         fs::write(root.path().join("pom.xml"), "<project><modelVersion>4.0.0</modelVersion><groupId>demo</groupId><artifactId>root</artifactId><version>1</version><packaging>pom</packaging><modules><module>app</module></modules></project>").unwrap();
         (

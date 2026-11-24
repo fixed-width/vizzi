@@ -51,8 +51,11 @@ current snapshot. Only that request can prepare an import-enabled mirror.
 The mirror admits the captured Maven or Gradle descriptors and JDT LS uses the
 local build caches in offline mode. Vizzi checks that the server loaded a Java
 project of the selected build type, rejects Maven resolution errors, and verifies
-mirrored source bytes before activating it. Gradle uses a validated local
-distribution from `GRADLE_HOME` or `PATH`. The classpath context uses the current
+mirrored source bytes before activating it. Gradle resolves the captured
+`gradle-wrapper.properties` against its completed distribution cache, including
+custom cache bases and paths. It supplies the installed distribution and any
+configured Gradle JVM to JDT LS with Wrapper downloads disabled. For projects
+without a Wrapper, Gradle uses `GRADLE_HOME` or `PATH`. The classpath context uses the current
 build-descriptor digest at activation. Java edits synchronize inside that
 session and build edits require another explicit import. Recoverable errors keep
 the active import. An exited server requires another import. Ordinary requests
@@ -87,3 +90,6 @@ A successful `mvn package` in a disposable default Java project with the same
 Maven version can populate that cache. The test creates its own dependency JAR.
 Set `GRADLE_HOME` to a compatible local distribution to exercise the real
 Gradle fixture and browser action.
+For the cached-Wrapper case in either suite, set `VIZZI_TEST_GRADLE_WRAPPER_URL`
+to the distribution URL already provisioned under `GRADLE_USER_HOME`. Set
+`VIZZI_TEST_GRADLE_JAVA_HOME` to exercise a separate Gradle JVM.

@@ -35,7 +35,12 @@ URIs and requires a unique exact byte match among members with the reported
 relative source path, including paths with source-root prefixes. The catalog
 verifies the member's bytes against that content before parsing and stores its
 archive path, member name, and content identity for restoration. The host reads
-members without extracting them. Follow-up requests use the same verified virtual URI. The browser
+members without extracting them. The catalog stores a caller's path and content
+identity or its archive capture ID, plus the source and destination positions.
+Vizzi can refresh an expired trail when a new lookup reaches the same source.
+It keeps a valid direct repository caller when navigating through another archive.
+A fresh JDT LS session replays up to eight retained steps and checks each archive,
+entry, content, and library origin before using its new virtual URI. The browser
 gets the package origin and an archive flag to disable physical editor handoff.
 Source archives and explicitly configured library JARs are limited to 256 MiB each.
 

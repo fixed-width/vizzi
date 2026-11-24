@@ -2,7 +2,10 @@
 use super::inputs::Inputs;
 use crate::{
     definitions::{self, Answer, Location, Position, Provider},
-    dependency_sources::{Capture, Catalog, FILES as DEPENDENCY_FILES, Input},
+    dependency_sources::{
+        ARCHIVE_REPLAY_DEPTH, ArchiveCaller, ArchiveCallerSource, Capture, Catalog,
+        FILES as DEPENDENCY_FILES, Input,
+    },
     ecmascript_dependencies::manifest_id,
     lsp::{Client, DocumentSync},
     review_source::{DirectoryInput, ReadEntry, ReviewInput},
@@ -44,7 +47,11 @@ pub(super) trait Profile: Send + Sync {
     fn java_project_kind(&self, _snapshot: &Snapshot) -> Option<&'static str> {
         None
     }
-    fn imported_inputs<'a>(&'a self, _snapshot: &'a Snapshot) -> Result<Inputs<'a>, String> {
+    fn imported_inputs<'a>(
+        &'a self,
+        _root: &'a Path,
+        _snapshot: &'a Snapshot,
+    ) -> Result<Inputs<'a>, String> {
         Err("Java project import is unavailable".into())
     }
     fn verify_import(
@@ -334,9 +341,121 @@ impl ProjectServer {
         }
         source(doc)
     }
+    fn archive_uri(
+        &self,
+        workspace: &mut Workspace,
+        snapshot: &Snapshot,
+        capture: &Capture,
+        text: &str,
+        imported: bool,
+        remaining: usize,
+    ) -> Result<String, String> {
+        capture.verify()?;
+        if let Some(uri) = workspace
+            .archives
+            .iter()
+            .find_map(|(uri, id)| (id == &capture.origin.capture).then(|| uri.clone()))
+        {
+            self.profile
+                .verify_archive(&mut workspace.client, &uri, text)?;
+            return Ok(uri);
+        }
+        if remaining == 0 {
+            return Err(
+                "Archive caller trail exceeds the replay allowance; reopen from its caller".into(),
+            );
+        }
+        let witness = capture
+            .archive_caller
+            .as_ref()
+            .ok_or("Reopen archive source from its caller to continue navigation")?;
+        let caller_uri = match &witness.source {
+            ArchiveCallerSource::Repository { path, content } => {
+                let doc = snapshot
+                    .file_by_path(path)
+                    .filter(|doc| self.profile.includes_document(doc) && doc.content() == content)
+                    .ok_or("Archive caller changed or is unavailable; reopen from its caller")?;
+                if imported {
+                    let mut reader = DirectoryInput::open(workspace.directory.path())
+                        .map_err(|e| e.to_string())?;
+                    verify_mirror_source(&mut reader, doc)?;
+                }
+                let path = workspace.directory.path().join(doc.path());
+                let caller_text = source(doc)?;
+                definitions::byte_offset(&caller_text, witness.position)?;
+                workspace.open(
+                    &path,
+                    self.profile
+                        .document_language(&path, &capture.input.language),
+                    &caller_text,
+                )?;
+                crate::lsp::uri(&path)?
+            }
+            ArchiveCallerSource::Archive { capture: id } => {
+                let parent = self
+                    .sources
+                    .get(id)?
+                    .filter(|parent| {
+                        parent.input.archive.is_some()
+                            && parent.input.language == capture.input.language
+                    })
+                    .ok_or("Archive caller expired; reopen it from the repository")?;
+                let caller_text = source(parent.doc())?;
+                definitions::byte_offset(&caller_text, witness.position)?;
+                self.archive_uri(
+                    workspace,
+                    snapshot,
+                    &parent,
+                    &caller_text,
+                    imported,
+                    remaining - 1,
+                )?
+            }
+        };
+        let results = workspace
+            .client
+            .lookup_locations(&caller_uri, witness.position, false)?;
+        let candidates = results
+            .into_iter()
+            .filter(|(uri, position)| uri.scheme() != "file" && *position == witness.destination)
+            .take(ARCHIVES_PER_LOOKUP + 1)
+            .collect::<Vec<_>>();
+        if candidates.len() > ARCHIVES_PER_LOOKUP {
+            return Err("Archive caller has too many destinations; reopen from its caller".into());
+        }
+        let mut matched = None;
+        for (uri, _) in candidates {
+            let Ok(Some(input)) =
+                self.profile
+                    .archive_input(&mut workspace.client, &uri, &workspace.configuration)
+            else {
+                continue;
+            };
+            if input.root != capture.input.root
+                || input.path != capture.input.path
+                || input.archive != capture.input.archive
+                || input.language != capture.input.language
+                || input.package != capture.input.package
+                || input.version != capture.input.version
+            {
+                continue;
+            }
+            if matched.replace(String::from(uri)).is_some() {
+                return Err(
+                    "Archive caller has multiple matching destinations; reopen from its caller"
+                        .into(),
+                );
+            }
+        }
+        let uri = matched.ok_or("Archive destination changed; reopen from its caller")?;
+        workspace
+            .archives
+            .insert(uri.clone(), capture.origin.capture.clone());
+        Ok(uri)
+    }
     fn inputs<'a>(&'a self, snapshot: &'a Snapshot, imported: bool) -> Result<Inputs<'a>, String> {
         if imported {
-            self.profile.imported_inputs(snapshot)
+            self.profile.imported_inputs(&self.root, snapshot)
         } else {
             self.profile.inputs(&self.root, snapshot)
         }
@@ -372,7 +491,15 @@ impl ProjectServer {
         }
         let inputs = self.inputs(&snapshot, imported)?;
         let configuration = inputs.digest().to_owned();
-        if external.is_some_and(|capture| capture.input.configuration != configuration) {
+        if archived
+            .and_then(|capture| capture.archive_caller.as_ref())
+            .is_some_and(|caller| caller.imported && !imported)
+        {
+            return Err("Import the Java project before continuing from this archive".into());
+        }
+        if external.is_some_and(|capture| {
+            capture.archive_caller.is_none() && capture.input.configuration != configuration
+        }) {
             return Err("Dependency configuration changed; reopen from its caller".into());
         }
         let mut workspace = match state.workspace.take() {
@@ -387,7 +514,7 @@ impl ProjectServer {
                 state.workspace = previous;
                 return Err("Java build configuration changed; import the project again".into());
             }
-            previous if archived.is_some() => {
+            previous if archived.is_some_and(|capture| capture.archive_caller.is_none()) => {
                 state.workspace = previous;
                 return Err("Reopen archive source from its caller to continue navigation".into());
             }
@@ -453,17 +580,18 @@ impl ProjectServer {
                 .and_then(|package| package.importer.as_deref())
         });
         let (path, request_uri) = if let Some(capture) = archived {
-            capture.verify()?;
-            let Some(uri) = workspace
-                .archives
-                .iter()
-                .find_map(|(uri, id)| (id == &capture.origin.capture).then(|| uri.clone()))
-            else {
-                *keep_on_error = true;
-                return Err("Reopen archive source from its caller to continue navigation".into());
-            };
-            self.profile
-                .verify_archive(&mut workspace.client, &uri, text)?;
+            let uri = self
+                .archive_uri(
+                    workspace,
+                    snapshot,
+                    capture,
+                    text,
+                    imported,
+                    ARCHIVE_REPLAY_DEPTH,
+                )
+                .inspect_err(|_| {
+                    *keep_on_error = workspace.client.is_open();
+                })?;
             (None, uri)
         } else {
             let path = if let Some(capture) = external {
@@ -528,6 +656,7 @@ impl ProjectServer {
         let mut signatures = 0;
         let mut archive_budget = ARCHIVES_PER_LOOKUP;
         let mut stable = false;
+        let caller_position = position;
         for _ in 0..3 {
             let raw = workspace
                 .client
@@ -538,18 +667,44 @@ impl ProjectServer {
             let mut changed = false;
             for (target, position) in raw {
                 let Ok(reported) = target.to_file_path() else {
+                    let caller_source = match (references, external) {
+                        (false, None) => Some(ArchiveCallerSource::Repository {
+                            path: doc.path().into(),
+                            content: doc.content().clone(),
+                        }),
+                        (false, Some(parent)) if parent.archive_caller.is_some() => {
+                            Some(ArchiveCallerSource::Archive {
+                                capture: parent.origin.capture.clone(),
+                            })
+                        }
+                        _ => None,
+                    };
+                    let caller = caller_source.map(|source| ArchiveCaller {
+                        source,
+                        position: caller_position,
+                        destination: position,
+                        imported,
+                    });
                     let captured = if let Some(id) = workspace.archives.get(target.as_str())
                         && let Some(capture) = self.sources.get(id)?
                         && capture.verify().is_ok()
                     {
-                        Some(capture)
+                        if caller.is_some() && caller != capture.archive_caller {
+                            self.sources
+                                .capture_archive(capture.input.clone(), caller, snapshot)
+                                .ok()
+                        } else {
+                            Some(capture)
+                        }
                     } else if !references && archive_budget > 0 {
                         archive_budget -= 1;
                         self.profile
                             .archive_input(&mut workspace.client, &target, &configuration)
                             .ok()
                             .flatten()
-                            .and_then(|input| self.sources.capture(input).ok())
+                            .and_then(|input| {
+                                self.sources.capture_archive(input, caller, snapshot).ok()
+                            })
                     } else {
                         None
                     };
@@ -756,7 +911,7 @@ impl Provider for ProjectServer {
             .import_gate
             .try_lock()
             .map_err(|_| "A Java project import is already running")?;
-        let inputs = self.profile.imported_inputs(&snapshot)?;
+        let inputs = self.profile.imported_inputs(&self.root, &snapshot)?;
         let mut workspace = self.workspace(&snapshot, inputs)?;
         workspace.client.wait_ready_for(Duration::from_secs(120))?;
         self.profile
@@ -776,7 +931,7 @@ impl Provider for ProjectServer {
             .unwrap_or_else(std::sync::PoisonError::into_inner);
         let current =
             current().ok_or("Source capture is unavailable; retry Java project import")?;
-        if self.profile.imported_inputs(&current)?.digest() != workspace.configuration {
+        if self.profile.imported_inputs(&self.root, &current)?.digest() != workspace.configuration {
             return Err(
                 "Java build configuration changed during import; import the project again".into(),
             );

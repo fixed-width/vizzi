@@ -1,5 +1,6 @@
 //! JDT LS over explicit source roots in a captured project.
 use super::{
+    gradle,
     inputs::{InputFiles, Inputs, PreparedInputs},
     project::Profile,
 };
@@ -88,23 +89,20 @@ impl Profile for JdtLs {
         }
     }
 
-    fn imported_inputs<'a>(&'a self, snapshot: &'a Snapshot) -> Result<Inputs<'a>, String> {
+    fn imported_inputs<'a>(
+        &'a self,
+        root: &'a Path,
+        snapshot: &'a Snapshot,
+    ) -> Result<Inputs<'a>, String> {
         let kind = self
             .java_project_kind(snapshot)
             .ok_or("Select a workspace with a captured Maven or Gradle build at its root")?;
-        let gradle_home = if kind == "Gradle" {
-            Some(local_gradle_home(
-                std::env::var_os("GRADLE_HOME").as_deref(),
-                std::env::var_os("PATH").as_deref(),
-            )?)
-        } else {
-            None
-        };
+        let gradle = (kind == "Gradle")
+            .then(|| gradle::installation(root, snapshot))
+            .transpose()?;
         let mut hash = blake3::Hasher::new();
-        if let Some(home) = &gradle_home {
-            let path = home.as_os_str().as_encoded_bytes();
-            hash.update(&(path.len() as u64).to_le_bytes());
-            hash.update(path);
+        if let Some(installation) = &gradle {
+            installation.fingerprint(&mut hash);
         }
         let mut descriptors = Vec::new();
         let mut bytes = 0;
@@ -124,7 +122,7 @@ impl Profile for JdtLs {
         }
         Ok(InputFiles::default().freeze(
             &format!("jdtls-import:{kind}:{}", hash.finalize().to_hex()),
-            &[include_bytes!("java.rs")],
+            &[include_bytes!("java.rs"), include_bytes!("gradle.rs")],
             move |mirror| {
                 for doc in descriptors {
                     let path = mirror.join(doc.path());
@@ -141,7 +139,7 @@ impl Profile for JdtLs {
                     &self.roots,
                     json!([]),
                     None,
-                    Some((kind, gradle_home.as_deref())),
+                    Some((kind, gradle.as_ref())),
                 )
             },
         ))
@@ -343,42 +341,6 @@ fn is_build_input(doc: &Document) -> bool {
     } if language == JAVA_PROJECT_METADATA)
 }
 
-fn local_gradle_home(configured: Option<&OsStr>, path: Option<&OsStr>) -> Result<PathBuf, String> {
-    let launcher = if cfg!(windows) {
-        "gradle.bat"
-    } else {
-        "gradle"
-    };
-    let valid = |home: &Path| -> Option<PathBuf> {
-        let home = home.canonicalize().ok()?;
-        if !home.join("bin").join(launcher).is_file() {
-            return None;
-        }
-        fs::read_dir(home.join("lib"))
-            .ok()?
-            .flatten()
-            .any(|entry| {
-                entry.file_name().to_str().is_some_and(|name| {
-                    name.starts_with("gradle-launcher-") && name.ends_with(".jar")
-                }) && entry.path().is_file()
-            })
-            .then_some(home)
-    };
-    if let Some(configured) = configured {
-        return valid(Path::new(configured))
-            .ok_or_else(|| "GRADLE_HOME is not a local Gradle distribution".into());
-    }
-    path.into_iter()
-        .flat_map(std::env::split_paths)
-        .find_map(|directory| {
-            let executable = directory.join(launcher).canonicalize().ok()?;
-            valid(executable.parent()?.parent()?)
-        })
-        .ok_or_else(|| {
-            "Install Gradle locally and set GRADLE_HOME or add its bin directory to PATH".into()
-        })
-}
-
 fn project_libraries(
     root: &Path,
     paths: &[PathBuf],
@@ -510,12 +472,17 @@ pub(super) fn source_roots(roots: &[String]) -> Result<BTreeSet<String>, String>
         .collect()
 }
 
+fn toolkit_path(path: &Path) -> Result<&str, String> {
+    path.to_str()
+        .ok_or_else(|| "Gradle installation paths must be UTF-8".into())
+}
+
 fn prepare(
     mirror: &Path,
     roots: &BTreeSet<String>,
     libraries: serde_json::Value,
     first_source: Option<&str>,
-    project: Option<(&str, Option<&Path>)>,
+    project: Option<(&str, Option<&gradle::Installation>)>,
 ) -> Result<PreparedInputs, String> {
     let private_state = tempfile::Builder::new()
         .prefix("jdtls-")
@@ -531,9 +498,14 @@ fn prepare(
             .into_string()
             .map_err(|_| "JDT LS state path is not UTF-8".into())
     };
-    let (kind, gradle_home) = project.unwrap_or_default();
-    let gradle_home = gradle_home
-        .map(|path| path.to_str().ok_or("Gradle installation path is not UTF-8"))
+    let (kind, gradle) = project.unwrap_or_default();
+    let gradle_home = gradle.map(|value| toolkit_path(&value.home)).transpose()?;
+    let gradle_user_home = gradle
+        .map(|value| toolkit_path(&value.user_home))
+        .transpose()?;
+    let gradle_java_home = gradle
+        .and_then(|value| value.java_home.as_deref())
+        .map(toolkit_path)
         .transpose()?;
     let settings = json!({
         "java": {
@@ -544,6 +516,8 @@ fn prepare(
                 "gradle": {
                     "enabled": kind == "Gradle",
                     "home": gradle_home,
+                    "user": {"home": gradle_user_home},
+                    "java": {"home": gradle_java_home},
                     "offline": {"enabled": true},
                     "wrapper": {"enabled": false},
                     "annotationProcessing": {"enabled": false}
@@ -604,19 +578,21 @@ mod tests {
         };
         fs::write(bin.join(launcher), "").unwrap();
         let path = std::env::join_paths([&bin]).unwrap();
-        assert!(local_gradle_home(Some(home.as_os_str()), None).is_err());
-        assert!(local_gradle_home(None, Some(&path)).is_err());
+        assert!(gradle::local_gradle_home(Some(home.as_os_str()), None).is_err());
+        assert!(gradle::local_gradle_home(None, Some(&path)).is_err());
         fs::create_dir(home.join("lib")).unwrap();
         fs::write(home.join("lib/other.jar"), "").unwrap();
         fs::create_dir(home.join("lib/gradle-launcher-directory.jar")).unwrap();
-        assert!(local_gradle_home(None, Some(&path)).is_err());
+        assert!(gradle::local_gradle_home(None, Some(&path)).is_err());
         fs::write(home.join("lib/gradle-launcher-test.jar"), "").unwrap();
         assert_eq!(
-            local_gradle_home(None, Some(&path)).unwrap(),
+            gradle::local_gradle_home(None, Some(&path)).unwrap(),
             home.canonicalize().unwrap()
         );
-        assert!(local_gradle_home(Some(directory.path().as_os_str()), Some(&path)).is_err());
-        assert!(local_gradle_home(None, None).is_err());
+        assert!(
+            gradle::local_gradle_home(Some(directory.path().as_os_str()), Some(&path)).is_err()
+        );
+        assert!(gradle::local_gradle_home(None, None).is_err());
     }
 
     #[test]

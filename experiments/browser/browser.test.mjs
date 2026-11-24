@@ -460,14 +460,18 @@ test("Java source outlines and call trails work without a language server", asyn
 });
 
 const managedJava = process.env.VIZZI_JDTLS;
+const gradleWrapperUrl = process.env.VIZZI_TEST_GRADLE_WRAPPER_URL;
+const gradleJavaHome = process.env.VIZZI_TEST_GRADLE_JAVA_HOME;
 
 test("the workspace action imports a Gradle Java classpath explicitly", {
-  skip: !managedJava || !process.env.GRADLE_HOME,
+  skip: !managedJava || !(gradleWrapperUrl || process.env.GRADLE_HOME),
 }, async () => {
   const fixture = await workspace({
     files: {
       "settings.gradle": "rootProject.name = 'vizzi_browser'\n",
       "build.gradle": "plugins { id 'java' }\nsourceSets.main.java.setSrcDirs(['sources'])\n",
+      ...(gradleWrapperUrl && { "gradle/wrapper/gradle-wrapper.properties": `distributionUrl=${gradleWrapperUrl}\n` }),
+      ...(gradleJavaHome && { "gradle.properties": `org.gradle.java.home=${gradleJavaHome.replaceAll("\\", "\\\\")}\n` }),
       "sources/demo/Caller.java": "package demo; class Caller { int run() { return Counter.next(); } }\n",
       "sources/demo/Counter.java": "package demo; class Counter { static int next() { return 1; } }\n",
       "script.py": "def python_leaf(): pass\ndef invoke():\n" + "    python_leaf()\n".repeat(10),
@@ -512,7 +516,13 @@ test("the workspace action imports a Gradle Java classpath explicitly", {
     await page.getByText("Fixture import failed.", { exact: true }).waitFor();
     assert.equal(await page.locator("#visual-notice").isHidden(), true);
     await page.getByText("Workspace", { exact: true }).click();
+    const completed = page.waitForResponse(response =>
+      response.request().method() === "POST" && new URL(response.url()).pathname === "/api/java-project",
+      { timeout: 120000 },
+    );
     await action.click();
+    const result = await completed;
+    assert.equal(result.status(), 200, await result.text());
     await page.getByText("Java project classpath imported.", { exact: true }).waitFor({ timeout: 60000 });
     assert.equal(imports.length, 2);
     const nextPage = await page.request.post(host.url + "/api/references", {
@@ -590,6 +600,20 @@ class Caller { int run() { return Engine.speak("hello") + "abc".length(); } }
     assert.match(await length.locator(".fragment-heading").textContent(), /java\.base.*String\.java/);
     assert.match(await length.locator(".code-pane").textContent(), /coder\(\)/);
     assert.equal(await length.getByRole("button", { name: /^Open in/ }).isDisabled(), true);
+
+    await caller.getByRole("button", { name: "Close bubble", exact: true }).press("Enter");
+    await target.getByRole("button", { name: "Close bubble", exact: true }).press("Enter");
+    const port = Number(new URL(live.url).port);
+    await live.close();
+    live = await startHost(fixture, 4, port);
+    await page.reload();
+    await length.locator(".code-line").first().waitFor();
+    assert.equal(await page.locator('[data-view]').count(), 1);
+    await length.getByRole("button", { name: "Actions for coder", exact: true }).press("Control+Enter");
+    const coder = page.locator('[data-view][data-name="coder"]');
+    await coder.locator(".code-line").first().waitFor();
+    assert.match(await coder.locator(".fragment-heading").textContent(), /java\.base.*String\.java/);
+    assert.equal(await page.locator("#workspace-links .link-stroke").getAttribute("data-kind"), "definition");
     assert.deepEqual(session.errors, []);
   } finally {
     await session?.close();

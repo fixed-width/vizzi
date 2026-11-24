@@ -1,5 +1,8 @@
 //! Bounded captured source admitted by native language providers, never browser paths.
-use crate::review_source::{DirectoryInput, ReadEntry, ReviewInput};
+use crate::{
+    definitions::Position,
+    review_source::{DirectoryInput, ReadEntry, ReviewInput},
+};
 use serde::{Deserialize, Serialize};
 use std::{
     cell::RefCell,
@@ -22,6 +25,7 @@ use vizzi_core::{
 pub(crate) const FILE_BYTES: usize = 2 * 1024 * 1024;
 pub(crate) const ARCHIVE_BYTES: u64 = 256 * 1024 * 1024;
 const ARCHIVE_CANDIDATES: usize = 32;
+pub(crate) const ARCHIVE_REPLAY_DEPTH: usize = 8;
 const TOTAL_BYTES: usize = 32 * 1024 * 1024;
 pub(crate) const FILES: usize = 32;
 const SYMBOLS: usize = 32768;
@@ -260,6 +264,22 @@ pub struct Capture {
     pub input: Input,
     document: Arc<Document>,
     declaration: Option<Declaration>,
+    pub(crate) archive_caller: Option<ArchiveCaller>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub(crate) struct ArchiveCaller {
+    pub source: ArchiveCallerSource,
+    pub position: Position,
+    pub destination: Position,
+    pub imported: bool,
+}
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case", deny_unknown_fields)]
+pub(crate) enum ArchiveCallerSource {
+    Repository { path: String, content: ContentId },
+    Archive { capture: String },
 }
 impl Capture {
     /// Written calls whose same-file candidates retain dependency provenance.
@@ -303,11 +323,28 @@ impl Capture {
     }
 }
 thread_local! {static ANALYZERS: RefCell<BTreeMap<String, Box<dyn Analyzer>>> = RefCell::new(BTreeMap::new());}
-fn capture(input: Input, declaration: Option<Declaration>) -> Result<Arc<Capture>, String> {
+fn capture(
+    input: Input,
+    declaration: Option<Declaration>,
+    archive_caller: Option<ArchiveCaller>,
+) -> Result<Arc<Capture>, String> {
     if !input.root.is_absolute()
         || fs::canonicalize(&input.root).map_err(|e| e.to_string())? != input.root
     {
         return Err("Dependency root must be canonical".into());
+    }
+    if let Some(caller) = &archive_caller {
+        let valid = match &caller.source {
+            ArchiveCallerSource::Repository { path, .. } => {
+                path.len() <= 4096
+                    && !path.contains('\\')
+                    && ReviewPath::parse(path.as_bytes().to_vec()).is_ok()
+            }
+            ArchiveCallerSource::Archive { capture } => opaque(capture),
+        };
+        if input.archive.is_none() || !valid {
+            return Err("Invalid archive caller".into());
+        }
     }
     let bytes = read(&input)?;
     let analysis = ANALYZERS.with_borrow_mut(|analyzers| {
@@ -395,6 +432,7 @@ fn capture(input: Input, declaration: Option<Declaration>) -> Result<Arc<Capture
         input,
         document: doc,
         declaration,
+        archive_caller,
     }))
 }
 #[derive(Serialize, Deserialize)]
@@ -404,11 +442,58 @@ struct Reference {
     input: Input,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     declaration: Option<Declaration>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    archive_caller: Option<ArchiveCaller>,
 }
 #[derive(Default)]
 struct State {
     loaded: bool,
     sources: Vec<Arc<Capture>>,
+}
+impl State {
+    fn archive_trail_available<'a>(
+        &'a self,
+        snapshot: &Snapshot,
+        mut caller: &'a ArchiveCaller,
+        imported: bool,
+        destination: Option<&Capture>,
+        language: &str,
+    ) -> bool {
+        for _ in 0..ARCHIVE_REPLAY_DEPTH {
+            if caller.imported && !imported {
+                return false;
+            }
+            match &caller.source {
+                ArchiveCallerSource::Repository { path, content } => {
+                    return snapshot.file_by_path(path).is_some_and(|doc| {
+                        doc.content() == content && matches!(
+                            doc.classification(), Classification::Assigned { language: assigned, .. } if assigned == language
+                        )
+                    });
+                }
+                ArchiveCallerSource::Archive { capture } => {
+                    if destination.is_some_and(|source| &source.origin.capture == capture) {
+                        return false;
+                    }
+                    let Some(parent) = self.sources.iter().find(|source| {
+                        &source.origin.capture == capture
+                            && source.input.archive.is_some()
+                            && source.input.language == language
+                    }) else {
+                        return false;
+                    };
+                    let Some(previous) = &parent.archive_caller else {
+                        return false;
+                    };
+                    if parent.verify().is_err() {
+                        return false;
+                    }
+                    caller = previous;
+                }
+            }
+        }
+        false
+    }
 }
 /// A small reusable catalog. Its cache allowance does not cap total process memory.
 pub struct Catalog {
@@ -448,7 +533,7 @@ impl Catalog {
                 if !opaque(&r.capture) {
                     return Err("Invalid dependency capture reference".into());
                 }
-                if let Ok(source) = capture(r.input, r.declaration)
+                if let Ok(source) = capture(r.input, r.declaration, r.archive_caller)
                     && source.origin.capture == r.capture
                 {
                     admit(state, source);
@@ -471,6 +556,7 @@ impl Catalog {
                 capture: s.origin.capture.clone(),
                 input: s.input.clone(),
                 declaration: s.declaration.clone(),
+                archive_caller: s.archive_caller.clone(),
             })
             .collect::<Vec<_>>();
         let mut file = tempfile::NamedTempFile::new_in(parent).map_err(|e| e.to_string())?;
@@ -481,7 +567,7 @@ impl Catalog {
     }
     /// Captures one provider-admitted file; existing captured bytes are never mutated.
     pub fn capture(&self, input: Input) -> Result<Arc<Capture>, String> {
-        self.capture_inner(input, None)
+        self.capture_inner(input, None, None)
     }
     /// Captures source with a checked provider range when raw syntax cannot identify a function.
     pub fn capture_with_declaration(
@@ -489,28 +575,59 @@ impl Catalog {
         input: Input,
         declaration: Declaration,
     ) -> Result<Arc<Capture>, String> {
-        self.capture_inner(input, Some(declaration))
+        self.capture_inner(input, Some(declaration), None)
+    }
+    pub(crate) fn capture_archive(
+        &self,
+        input: Input,
+        caller: Option<ArchiveCaller>,
+        snapshot: &Snapshot,
+    ) -> Result<Arc<Capture>, String> {
+        self.capture_inner(input, None, caller.map(|caller| (caller, snapshot)))
     }
     fn capture_inner(
         &self,
         input: Input,
         declaration: Option<Declaration>,
+        archive_caller: Option<(ArchiveCaller, &Snapshot)>,
     ) -> Result<Arc<Capture>, String> {
         let mut state = self
             .state
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner);
         self.load(&mut state)?;
-        if let Some(n) = state
+        let existing = state
             .sources
             .iter()
-            .rposition(|s| s.input == input && s.declaration == declaration && s.verify().is_ok())
+            .rposition(|s| s.input == input && s.declaration == declaration && s.verify().is_ok());
+        let previous = existing.map(|index| state.sources[index].as_ref());
+        let archive_caller = archive_caller.and_then(|(caller, snapshot)| {
+            let available = |witness| {
+                state.archive_trail_available(
+                    snapshot,
+                    witness,
+                    caller.imported,
+                    previous,
+                    &input.language,
+                )
+            };
+            let replace = previous
+                .and_then(|source| source.archive_caller.as_ref())
+                .is_none_or(|old| {
+                    old != &caller
+                        && (matches!(caller.source, ArchiveCallerSource::Repository { .. })
+                            || !available(old))
+                });
+            (replace && available(&caller)).then_some(caller)
+        });
+        if let Some(n) = existing
+            && archive_caller.is_none()
         {
             let source = state.sources.remove(n);
             state.sources.push(source.clone());
             return Ok(source);
         }
-        let source = capture(input, declaration)?;
+        let source = capture(input, declaration, archive_caller)?;
         admit(&mut state, source.clone());
         self.persist(&state)?;
         Ok(source)
@@ -570,6 +687,153 @@ fn admit(state: &mut State, source: Arc<Capture>) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn archive_input(root: &Path, path: &str, contents: &[u8]) -> Input {
+        let archive = root.join(format!("{path}.jar"));
+        let mut zip = zip::ZipWriter::new(fs::File::create(&archive).unwrap());
+        zip.start_file(path, zip::write::SimpleFileOptions::default())
+            .unwrap();
+        zip.write_all(contents).unwrap();
+        zip.finish().unwrap();
+        Input {
+            root: archive.canonicalize().unwrap(),
+            path: path.into(),
+            language: "java".into(),
+            package: "helper.jar".into(),
+            version: None,
+            configuration: "a".repeat(64),
+            mirror_path: None,
+            installation: None,
+            archive: Some(ContentId::derive(&[contents])),
+        }
+    }
+
+    fn repository_caller(contents: &[u8]) -> ArchiveCaller {
+        ArchiveCaller {
+            source: ArchiveCallerSource::Repository {
+                path: "Caller.java".into(),
+                content: ContentId::derive(&[contents]),
+            },
+            position: Position {
+                line: 0,
+                character: 27,
+            },
+            destination: Position {
+                line: 0,
+                character: 26,
+            },
+            imported: true,
+        }
+    }
+
+    fn repository_snapshot(contents: &[u8]) -> Snapshot {
+        let workspace = WorkspaceId::derive(&[b"archive replay fixture"]);
+        let caller = Document::capture(
+            workspace.clone(),
+            "Caller.java".into(),
+            contents,
+            vec![],
+            Classification::Assigned {
+                language: "java".into(),
+                provenance: Provenance::ExplicitScope { scope: ".".into() },
+            },
+        )
+        .unwrap();
+        Snapshot::new(
+            workspace,
+            vec![Arc::new(caller)],
+            CapturePolicyId::derive(&[b"fixture"]),
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn archive_replay_retains_the_latest_repository_caller() {
+        let root = tempfile::tempdir().unwrap();
+        let input = archive_input(
+            root.path(),
+            "Helper.java",
+            b"class Helper { static int answer() { return 1; } }",
+        );
+        let cache = root.path().join("cache");
+        let latest = repository_caller(b"current caller");
+        let snapshot = repository_snapshot(b"current caller");
+        let id = {
+            let catalog = Catalog::new(cache.clone());
+            let initial = catalog
+                .capture_archive(
+                    input.clone(),
+                    Some(repository_caller(b"old caller")),
+                    &repository_snapshot(b"old caller"),
+                )
+                .unwrap();
+            let refreshed = catalog
+                .capture_archive(input.clone(), Some(latest.clone()), &snapshot)
+                .unwrap();
+            assert_eq!(initial.origin.capture, refreshed.origin.capture);
+            let parent = catalog
+                .capture_archive(
+                    archive_input(root.path(), "Parent.java", b"class Parent {}"),
+                    Some(latest.clone()),
+                    &snapshot,
+                )
+                .unwrap();
+            let indirect = ArchiveCaller {
+                source: ArchiveCallerSource::Archive {
+                    capture: parent.origin.capture.clone(),
+                },
+                ..latest.clone()
+            };
+            catalog
+                .capture_archive(input, Some(indirect), &snapshot)
+                .unwrap();
+            refreshed.origin.capture.clone()
+        };
+        let restored = Catalog::new(cache).get(&id).unwrap().unwrap();
+        assert_eq!(restored.archive_caller, Some(latest));
+    }
+
+    #[test]
+    fn archive_replay_replaces_an_expired_indirect_caller() {
+        let root = tempfile::tempdir().unwrap();
+        let cache = root.path().join("cache");
+        let catalog = Catalog::new(cache.clone());
+        let direct = repository_caller(b"working repository caller");
+        let snapshot = repository_snapshot(b"working repository caller");
+        let parent = |path, contents| {
+            catalog
+                .capture_archive(
+                    archive_input(root.path(), path, contents),
+                    Some(direct.clone()),
+                    &snapshot,
+                )
+                .unwrap()
+        };
+        let first = parent("First.java", b"class First {}");
+        let second = parent("Second.java", b"class Second {}");
+        let indirect = |parent: &Capture| ArchiveCaller {
+            source: ArchiveCallerSource::Archive {
+                capture: parent.origin.capture.clone(),
+            },
+            ..direct.clone()
+        };
+        let input = archive_input(root.path(), "Helper.java", b"class Helper {}");
+        let reached = catalog
+            .capture_archive(input.clone(), Some(indirect(&first)), &snapshot)
+            .unwrap();
+        assert_eq!(reached.archive_caller, Some(indirect(&first)));
+        fs::remove_file(&first.input.root).unwrap();
+        let replacement = indirect(&second);
+        let refreshed = catalog
+            .capture_archive(input, Some(replacement.clone()), &snapshot)
+            .unwrap();
+        assert_eq!(reached.origin.capture, refreshed.origin.capture);
+        let restored = Catalog::new(cache)
+            .get(&reached.origin.capture)
+            .unwrap()
+            .unwrap();
+        assert_eq!(restored.archive_caller, Some(replacement));
+    }
 
     #[test]
     fn archive_member_match_requires_exact_bytes_and_unique_path_suffix() {
