@@ -92,6 +92,42 @@ pub(crate) fn is_readme(filename: &str) -> bool {
     .any(|name| filename.eq_ignore_ascii_case(name))
 }
 
+#[derive(Clone, Copy, Debug)]
+pub(crate) enum DocumentFormat {
+    Toml,
+    Markdown,
+}
+
+impl DocumentFormat {
+    fn from_extension(extension: &str) -> Option<Self> {
+        if extension.eq_ignore_ascii_case("toml") {
+            Some(Self::Toml)
+        } else if ["md", "markdown"]
+            .iter()
+            .any(|suffix| extension.eq_ignore_ascii_case(suffix))
+        {
+            Some(Self::Markdown)
+        } else {
+            None
+        }
+    }
+
+    pub(crate) fn from_path(path: &str) -> Option<Self> {
+        let (stem, extension) = path.rsplit('/').next()?.rsplit_once('.')?;
+        if stem.is_empty() {
+            return None;
+        }
+        Self::from_extension(extension)
+    }
+
+    fn language(self) -> &'static str {
+        match self {
+            Self::Toml => "toml",
+            Self::Markdown => "markdown",
+        }
+    }
+}
+
 /// Requested raw C-family language; it does not select a compiler configuration.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -321,6 +357,13 @@ impl SourcePolicy {
         let provenance = Provenance::Extension {
             extension: extension.into(),
         };
+        if let Some(format) = DocumentFormat::from_extension(extension) {
+            return Ok(Some(Classification::SourceOnly {
+                language: Some(format.language().into()),
+                provenance,
+                reason: SourceOnlyReason::AnalysisNotRequested,
+            }));
+        }
         let language = if let Some(rules) = DEFAULT_SOURCE_RULES
             .iter()
             .find(|rules| rules.suffixes.contains(&extension))

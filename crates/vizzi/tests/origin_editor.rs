@@ -50,6 +50,8 @@ fn peer_reply(
                 Err(error) => panic!("Callback accept failed: {error}"),
             }
         };
+        // macOS can inherit the listener's nonblocking mode on accepted sockets.
+        stream.set_nonblocking(false).unwrap();
         stream
             .set_read_timeout(Some(Duration::from_secs(2)))
             .unwrap();

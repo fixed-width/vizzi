@@ -4,7 +4,7 @@ pub use crate::captured_source::{
     SourceVerifier,
 };
 
-use crate::policy::Classification;
+use crate::{document_coloring::DocumentColoring, policy::Classification};
 use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, BTreeSet},
@@ -181,6 +181,7 @@ pub struct Document {
     source: Arc<CapturedSource>,
     analyses: Vec<Analysis>,
     classification: Classification,
+    pub(crate) document_coloring: Option<Arc<DocumentColoring>>,
     pub(crate) outline_index: OnceLock<BTreeMap<String, usize>>,
     pub(crate) outline_depths: Arc<[usize]>,
 }
@@ -357,14 +358,23 @@ impl Document {
         let id = FileId::derive(&[workspace.as_str().as_bytes(), path.as_bytes()]);
         let encoded = serde_json::to_vec(&(&classification, &analyses))
             .map_err(|error| ModelError(error.to_string()))?;
-        let analysis_digest = blake3::hash(&encoded);
+        let document_coloring = DocumentColoring::for_path(&path).map(Arc::new);
+        let metadata_digest = if document_coloring.is_some() {
+            blake3::Hasher::new()
+                .update(DocumentColoring::fingerprint().as_str().as_bytes())
+                .update(&encoded)
+                .finalize()
+        } else {
+            blake3::hash(&encoded)
+        };
         let version = DocumentVersion::derive(&[
             b"document-v2",
             id.as_str().as_bytes(),
             content.as_str().as_bytes(),
-            analysis_digest.as_bytes(),
+            metadata_digest.as_bytes(),
         ]);
         Ok(Self {
+            document_coloring,
             id,
             workspace,
             path,

@@ -124,7 +124,7 @@ fn default_project_metadata_is_captured_without_analyzers() {
             "{path}"
         );
     }
-    for path in ["gemfile.lock", "pyproject.TOML", "vendor/.ruby-version"] {
+    for path in ["gemfile.lock", "vendor/.ruby-version"] {
         assert_eq!(empty.classify(path).unwrap(), None, "{path}");
     }
 }
@@ -153,8 +153,40 @@ fn conventional_readmes_are_source_only_and_respect_exclusions() {
     for path in [
         "vendor/README.md",
         "node_modules/pkg/README.md",
-        "NOTES.md",
         "README.sh",
+    ] {
+        assert_eq!(rules.classify(path).unwrap(), None, "{path}");
+    }
+}
+
+#[test]
+fn toml_and_markdown_files_are_source_only_and_respect_exclusions() {
+    let rules = policy(PolicyConfig {
+        exclusions: vec!["vendor".into()],
+        ..Default::default()
+    });
+    for (path, language, extension) in [
+        ("NOTES.md", "markdown", "md"),
+        ("docs/guide.markdown", "markdown", "markdown"),
+        ("pyproject.TOML", "toml", "TOML"),
+        ("settings.TOML", "toml", "TOML"),
+    ] {
+        assert_eq!(
+            rules.classify(path).unwrap(),
+            Some(Classification::SourceOnly {
+                language: Some(language.into()),
+                provenance: Provenance::Extension {
+                    extension: extension.into(),
+                },
+                reason: SourceOnlyReason::AnalysisNotRequested,
+            }),
+            "{path}"
+        );
+    }
+    for path in [
+        "vendor/notes.md",
+        "node_modules/package/settings.toml",
+        "target/build.toml",
     ] {
         assert_eq!(rules.classify(path).unwrap(), None, "{path}");
     }

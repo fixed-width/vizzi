@@ -23,3 +23,5 @@ tree-sitter-java.workspace = true
 tree-sitter-javascript.workspace = true
 tree-sitter-typescript.workspace = true
 toml.workspace = true
+toml_parser.workspace = true
+pulldown-cmark.workspace = true

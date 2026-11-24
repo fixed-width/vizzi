@@ -545,9 +545,20 @@ fn cargo_manifests_are_selected_as_immutable_project_inputs_without_an_analyser(
     let policy =
         SourcePolicy::new(PolicyConfig::default(), languages.names().map(String::from)).unwrap();
     let selected = policy.classify("crate/Cargo.toml").unwrap().unwrap();
-    assert!(matches!(selected, Classification::SourceOnly { .. }));
-    assert_eq!(selected.assigned_language(), None);
-    assert!(policy.classify("crate/unrelated.toml").unwrap().is_none());
+    assert!(matches!(
+        selected,
+        Classification::SourceOnly {
+            reason: SourceOnlyReason::ProjectMetadata,
+            ..
+        }
+    ));
+    assert!(matches!(
+        policy.classify("crate/unrelated.toml").unwrap(),
+        Some(Classification::SourceOnly {
+            reason: SourceOnlyReason::AnalysisNotRequested,
+            ..
+        })
+    ));
     assert!(policy.classify("target/Cargo.toml").unwrap().is_none());
     let index = Structure::new(&snapshot(&[
         ("Cargo.toml", "[package]\nname='audio'\n"),

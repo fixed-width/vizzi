@@ -8,6 +8,7 @@ mod captured_source;
 pub mod coloring;
 pub mod comparison;
 pub mod discovery;
+mod document_coloring;
 mod ecmascript;
 pub mod investigation;
 mod java;

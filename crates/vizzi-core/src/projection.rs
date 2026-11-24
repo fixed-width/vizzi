@@ -224,7 +224,9 @@ impl Document {
         let allowance = SOURCE_BYTES / count.max(1);
         let mut lines = Vec::new();
         let colored = self.analyses().iter().find(|a| a.coloring.is_some());
-        let coloring = colored.and_then(|a| a.coloring.as_ref());
+        let coloring = colored
+            .and_then(|a| a.coloring.as_ref())
+            .or_else(|| self.document_coloring.as_ref()?.index(self.captured()));
         let mut coloring_status = coloring.map_or("unavailable", |c| {
             if c.available() { "ready" } else { "limited" }
         });
