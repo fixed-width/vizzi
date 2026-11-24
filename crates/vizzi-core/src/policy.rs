@@ -96,12 +96,15 @@ pub(crate) fn is_readme(filename: &str) -> bool {
 pub(crate) enum DocumentFormat {
     Toml,
     Markdown,
+    Json,
 }
 
 impl DocumentFormat {
     fn from_extension(extension: &str) -> Option<Self> {
         if extension.eq_ignore_ascii_case("toml") {
             Some(Self::Toml)
+        } else if extension.eq_ignore_ascii_case("json") {
+            Some(Self::Json)
         } else if ["md", "markdown"]
             .iter()
             .any(|suffix| extension.eq_ignore_ascii_case(suffix))
@@ -124,6 +127,7 @@ impl DocumentFormat {
         match self {
             Self::Toml => "toml",
             Self::Markdown => "markdown",
+            Self::Json => "json",
         }
     }
 }
@@ -221,6 +225,18 @@ pub enum Classification {
     },
 }
 impl Classification {
+    /// Whether this is generic JSON for browsing, with no project metadata role.
+    pub fn is_browse_only_json(&self) -> bool {
+        matches!(
+            self,
+            Self::SourceOnly {
+                language: Some(language),
+                reason: SourceOnlyReason::AnalysisNotRequested,
+                ..
+            } if language == "json"
+        )
+    }
+
     /// Returns the selected analyzer language, excluding source-only requests.
     pub fn assigned_language(&self) -> Option<&str> {
         match self {

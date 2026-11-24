@@ -1018,6 +1018,45 @@ fn metadata(
 }
 
 #[test]
+fn editor_verifies_large_browse_only_json_before_and_after_a_lookup() {
+    let mut fixture = Fixture::new();
+    let path = fixture.root.join("fixture.json");
+    let mut bytes = vec![b' '; 4 * 1024 * 1024 + 1];
+    fs::write(&path, &bytes).unwrap();
+    fixture.snapshot = Engine::new(
+        Directory::open(&fixture.root).unwrap(),
+        Cache::new(fixture.directory.path().join("cache")),
+        1,
+    )
+    .unwrap()
+    .refresh(None, &|| false)
+    .unwrap()
+    .unwrap()
+    .snapshot;
+    assert!(fixture.snapshot.file_by_path("fixture.json").is_some());
+    let call = fixture.call();
+    let provider = fixture.provider();
+    let response = fixture.answer();
+    let peer = Peer::start(&fixture, move |_| frame(response));
+    assert!(provider.resolve(fixture.snapshot.clone(), &call).is_ok());
+    peer.finish();
+
+    let response = fixture.answer();
+    bytes[0] = b'0';
+    let peer = Peer::start(&fixture, move |_| {
+        fs::write(path, bytes).unwrap();
+        frame(response)
+    });
+    assert!(
+        provider
+            .resolve(fixture.snapshot.clone(), &call)
+            .unwrap_err()
+            .contains("match saved files")
+    );
+    peer.finish();
+}
+
+#[test]
 fn exact_file_and_workspace_byte_allowances_are_accepted_and_excess_bytes_are_rejected() {
     use vizzi_core::model::CapturedSource;
     let mut fixture = Fixture::new();

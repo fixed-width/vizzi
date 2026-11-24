@@ -1,6 +1,11 @@
 //! Immutable spool capture keeps old source independent of workspace and host lifetime.
 use std::sync::Arc;
-use vizzi::{cache::Cache, engine::Engine, source::Directory, source_spool::SourceSpool};
+use vizzi::{
+    cache::Cache,
+    engine::Engine,
+    source::{CaptureScope, Directory},
+    source_spool::SourceSpool,
+};
 use vizzi_core::{
     model::BULK_SOURCE_LIMIT,
     projection::WindowQuery,
@@ -82,6 +87,92 @@ fn spool_capacity_failure_keeps_the_last_published_observation_readable() {
     );
     assert_eq!(spool.stats().written_bytes, "fn first() {}".len());
     assert!(SourceSpool::new(external.path(), 0).is_err());
+}
+
+#[test]
+fn browse_only_json_cannot_exhaust_the_source_spool() {
+    let root = tempfile::tempdir().unwrap();
+    let external = tempfile::tempdir().unwrap();
+    let spool = Arc::new(SourceSpool::new(external.path(), 32).unwrap());
+    let directory = Directory::open(root.path())
+        .unwrap()
+        .with_spool(spool.clone())
+        .unwrap();
+    std::fs::write(root.path().join("a.rs"), "fn first() {}").unwrap();
+    std::fs::write(root.path().join("fixture.json"), b" ".repeat(64)).unwrap();
+    let capture = directory.capture().unwrap();
+    assert_eq!(
+        capture
+            .files
+            .iter()
+            .map(|file| (file.path.as_str(), file.source.len()))
+            .collect::<Vec<_>>(),
+        [("a.rs", 13), ("fixture.json", 64)]
+    );
+    assert_eq!(spool.stats().written_bytes, 13);
+}
+
+#[test]
+fn json_budget_skips_oversized_files_and_readmits_a_file_when_a_hint_frees_space() {
+    const MIB: u64 = 1024 * 1024;
+    let root = tempfile::tempdir().unwrap();
+    let external = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    let spool = Arc::new(SourceSpool::new(external.path(), 32).unwrap());
+    let engine = Engine::new(
+        Directory::open(root.path())
+            .unwrap()
+            .with_spool(spool)
+            .unwrap(),
+        Cache::new(cache.path().into()),
+        1,
+    )
+    .unwrap();
+    std::fs::create_dir(root.path().join("0-build")).unwrap();
+    for (name, len) in [
+        ("0-build/generated.json", 8 * MIB),
+        ("a-export.json", 8 * MIB + 1),
+        ("b.json", 8 * MIB),
+        ("c.json", 8 * MIB),
+        ("d.json", 2),
+    ] {
+        std::fs::File::create(root.path().join(name))
+            .unwrap()
+            .set_len(len)
+            .unwrap();
+    }
+    std::fs::write(root.path().join("source.rs"), "fn first() {}").unwrap();
+    let first = engine.refresh(None, &|| false).unwrap().unwrap();
+    let paths = |snapshot: &vizzi_core::model::Snapshot| {
+        snapshot
+            .documents()
+            .iter()
+            .map(|doc| doc.path().to_owned())
+            .collect::<Vec<_>>()
+    };
+    assert_eq!(paths(&first.snapshot), ["b.json", "c.json", "source.rs"]);
+    std::fs::write(root.path().join("b.json"), "{}").unwrap();
+    let updated = engine
+        .refresh_scoped(
+            Some(&first.snapshot),
+            &CaptureScope::Paths(["b.json".into()].into()),
+            &|| false,
+        )
+        .unwrap()
+        .unwrap();
+    assert_eq!(
+        paths(&updated.snapshot),
+        ["b.json", "c.json", "d.json", "source.rs"]
+    );
+    assert_eq!(
+        updated.snapshot.id(),
+        engine
+            .refresh(None, &|| false)
+            .unwrap()
+            .unwrap()
+            .snapshot
+            .id()
+    );
 }
 
 #[test]

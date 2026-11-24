@@ -3,7 +3,7 @@
 use std::sync::Arc;
 use std::{
     collections::BTreeSet,
-    io,
+    io::{self, Read},
     path::{Component, Path, PathBuf},
 };
 use vizzi_core::{
@@ -34,6 +34,9 @@ pub enum CaptureScope {
 
 /// Maximum retained path hints before promoting work to a full reconciliation.
 pub const MAX_PATH_HINTS: usize = 4096;
+const BROWSE_JSON_FILE_BYTES: usize = 8 * 1024 * 1024;
+pub(crate) const BROWSE_JSON_BYTES: usize = 16 * 1024 * 1024;
+pub(crate) const BROWSE_JSON_FILES: usize = 1024;
 
 impl CaptureScope {
     pub(crate) fn merge(&mut self, next: Self) {
@@ -167,6 +170,7 @@ impl Directory {
         };
         let mut directories = Vec::new();
         let mut pending = vec![self.root.clone()];
+        let mut browse_json = Vec::new();
         while let Some(directory) = pending.pop() {
             if cancelled() {
                 return Ok(None);
@@ -193,6 +197,15 @@ impl Directory {
                     .classify(&key)
                     .map_err(io::Error::other)?
                 {
+                    if classification.is_browse_only_json() {
+                        browse_json.push((
+                            relative.components().count(),
+                            key,
+                            path,
+                            classification,
+                        ));
+                        continue;
+                    }
                     let Some(source) = self.read_source(&key, &path, previous, cancelled)? else {
                         return Ok(None);
                     };
@@ -205,12 +218,48 @@ impl Directory {
             }
             directories.push(directory);
         }
+        browse_json.sort_unstable_by(|(depth, key, _, _), (other_depth, other_key, _, _)| {
+            depth.cmp(other_depth).then_with(|| key.cmp(other_key))
+        });
+        let mut remaining = BROWSE_JSON_BYTES;
+        let mut admitted = 0;
+        for (_, key, path, classification) in browse_json {
+            if cancelled() {
+                return Ok(None);
+            }
+            if admitted == BROWSE_JSON_FILES {
+                break;
+            }
+            let limit = remaining.min(BROWSE_JSON_FILE_BYTES);
+            let metadata = std::fs::symlink_metadata(&path)?;
+            if !metadata.is_file() || metadata.len() > limit as u64 {
+                continue;
+            }
+            let mut bytes = Vec::new();
+            std::fs::File::open(path)?
+                .take((limit + 1) as u64)
+                .read_to_end(&mut bytes)?;
+            if bytes.len() > limit {
+                continue;
+            }
+            remaining -= bytes.len();
+            admitted += 1;
+            bytes.shrink_to_fit();
+            let old = previous
+                .and_then(|snapshot| snapshot.file_by_path(&key))
+                .map(|file| file.captured());
+            capture.files.push(CapturedFile {
+                path: key,
+                source: CapturedSource::capture(bytes, old),
+                classification,
+            });
+        }
         capture.files.sort_by(|a, b| a.path.cmp(&b.path));
         capture.directories = Some(directories);
         Ok((!cancelled()).then_some(capture))
     }
 
-    /// Reopens hinted files; ambiguous paths fall back to complete discovery.
+    /// Reopens hinted files, reconciling inventory when browse-only JSON may change admission.
     pub fn capture_paths(&self, paths: &BTreeSet<PathBuf>) -> io::Result<Capture> {
         self.capture_hints(paths, None, &|| false)?
             .ok_or_else(|| io::Error::other("uncancelled capture was interrupted"))
@@ -240,6 +289,13 @@ impl Directory {
                 Ok(None) => continue,
                 Err(_) => return self.capture_full(previous, cancelled),
             };
+            let classification = self.policy().classify(&key).map_err(io::Error::other)?;
+            if classification
+                .as_ref()
+                .is_some_and(Classification::is_browse_only_json)
+            {
+                return self.capture_full(previous, cancelled);
+            }
             let mut absolute = self.root.clone();
             let components: Vec<_> = path.components().collect();
             for (index, component) in components.iter().enumerate() {
@@ -251,7 +307,7 @@ impl Directory {
                 let metadata = match std::fs::symlink_metadata(&absolute) {
                     Ok(metadata) => metadata,
                     Err(error) if error.kind() == io::ErrorKind::NotFound && leaf => {
-                        if self.source_path(path) {
+                        if classification.is_some() {
                             capture.removed.push(key.clone());
                         }
                         break;
@@ -262,22 +318,19 @@ impl Directory {
                     if !metadata.file_type().is_dir() {
                         return self.capture_full(previous, cancelled);
                     }
-                } else if metadata.file_type().is_dir() {
+                    continue;
+                }
+                if metadata.file_type().is_dir() {
                     return self.capture_full(previous, cancelled);
-                } else if self.source_path(path) {
+                }
+                if let Some(classification) = classification {
                     if metadata.file_type().is_file() {
-                        if let Some(classification) = self
-                            .plan
-                            .policy()
-                            .classify(&key)
-                            .map_err(io::Error::other)?
-                        {
-                            reads.push((key.clone(), absolute.clone(), classification));
-                        }
+                        reads.push((key.clone(), absolute.clone(), classification));
                     } else {
                         capture.removed.push(key.clone());
                     }
                 }
+                break;
             }
         }
         for (path, absolute, classification) in reads {
