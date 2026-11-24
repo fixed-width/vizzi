@@ -42,6 +42,24 @@ pub enum Operation {
         /// Continuation offset for the finite action page.
         offset: usize,
     },
+    /// Decorate call and function names in a captured file window.
+    SourceActions {
+        /// Exact captured file identity.
+        file: String,
+        /// First visible one-based line.
+        line_start: usize,
+        /// Visible line allowance, at most 96.
+        line_count: usize,
+        /// Continuation offset for the finite action page.
+        offset: usize,
+    },
+    /// Open an exact captured function declaration from the source browser.
+    Function {
+        /// Exact captured file identity.
+        file: String,
+        /// Observation-bound function identity.
+        symbol: String,
+    },
     /// Find source directories/files.
     Areas {
         /// Literal name/path substring.
@@ -377,6 +395,14 @@ impl StructureHost {
         let cache = cache
             .as_mut()
             .ok_or_else(|| CompanionError::Unavailable("Structure is unavailable".into()))?;
+        let source_doc = match &request.query {
+            Operation::SourceActions { file, .. } | Operation::Function { file, .. } => {
+                Some(snapshot.file(file).ok_or_else(|| {
+                    CompanionError::Invalid("File is absent from this observation".into())
+                })?)
+            }
+            _ => None,
+        };
         let scoped = match &request.query {
             Operation::Inventory {
                 area,
@@ -386,6 +412,10 @@ impl StructureHost {
             Operation::Actions { symbol, .. } => {
                 cache.for_symbol(&snapshot, symbol, request.path.as_deref())?
             }
+            Operation::SourceActions { .. } | Operation::Function { .. } => match source_doc {
+                Some(doc) => cache.for_evidence(&snapshot, doc.path())?,
+                None => None,
+            },
             Operation::Uses { symbol, .. } if cache.index.resolve(None, symbol).is_some() => None,
             Operation::Calls { symbol, area, .. } | Operation::Uses { symbol, area, .. } => {
                 cache.for_symbol(&snapshot, symbol, request.path.as_deref().or(Some(area)))?
@@ -415,6 +445,29 @@ impl StructureHost {
                     .actions(symbol, *line_start, *line_count, *offset)
                     .map_err(|e| CompanionError::Invalid(e.to_string()))?,
             ),
+            Operation::SourceActions {
+                line_start,
+                line_count,
+                offset,
+                ..
+            } => {
+                let doc = source_doc
+                    .ok_or_else(|| CompanionError::Invalid("Captured file is required".into()))?;
+                serde_json::to_value(
+                    index
+                        .source_actions(doc, *line_start, *line_count, *offset)
+                        .map_err(|e| CompanionError::Invalid(e.to_string()))?,
+                )
+            }
+            Operation::Function { file, symbol } => {
+                let function = index
+                    .resolve(None, symbol)
+                    .filter(|symbol| symbol.kind == "function" && symbol.source.file == *file)
+                    .ok_or_else(|| {
+                        CompanionError::Invalid("Function is absent from this captured file".into())
+                    })?;
+                Ok(serde_json::json!({"snapshot":request.snapshot,"symbol":function}))
+            }
             Operation::Areas { search, offset } => serde_json::to_value(
                 index
                     .areas(search, *offset)

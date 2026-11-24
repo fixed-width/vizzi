@@ -26,10 +26,17 @@ export function deliveryAction(value) {
       ticket: value.ticket
     })
   };
-  if (value.kind === 'call' && fields(value, ['kind', 'snapshot', 'call']) && captured(value.snapshot) && captured(value.call)) return {
+  if (value.kind === 'call' && fields(value, ['kind', 'snapshot', 'call', 'file']) && captured(value.snapshot) && captured(value.call) && (value.file === undefined || captured(value.file))) return {
     kind: 'call',
     snapshot: value.snapshot,
-    call: value.call
+    call: value.call,
+    ...(value.file === undefined ? {} : {file:value.file})
+  };
+  if (value.kind === 'function' && fields(value, ['kind', 'snapshot', 'file', 'symbol']) && [value.snapshot, value.file, value.symbol].every(captured)) return {
+    kind: 'function',
+    snapshot: value.snapshot,
+    file: value.file,
+    symbol: value.symbol
   };
   if (value.kind === 'file' && fields(value, ['kind', 'snapshot', 'file', 'version', 'line']) && [value.snapshot, value.file, value.version].every(captured) && Number.isSafeInteger(value.line) && value.line >= 1) return {
     kind: 'file',
@@ -432,7 +439,7 @@ export function createDeliveryPage({
       current = record;
       record.timer = schedule(() => refuse(record, new Error('Could not confirm workspace navigation before its deadline')), record.expires - now());
       changed(true);
-      const target = action.kind === 'reveal' ? mode === 'landing' ? 'call' : mode : action.kind;
+      const target = action.kind === 'reveal' ? mode === 'landing' ? 'call' : mode : action.kind === 'function' ? 'call' : action.kind;
       if (target !== mode) {
         record.routing = true;
         record.transition = record.id;

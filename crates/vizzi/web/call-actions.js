@@ -4,8 +4,13 @@ import {callRanges} from './call-ranges.js';
 // Keep source characters and syntax spans intact; controls wrap only native identifier ranges.
 export function renderCallText(node,line,actions,activate,plan=null,margin={bytes:0,columns:0}) {
     renderReflowText(node,line,plan,margin);
+    decorateSourceActions(node,line,actions,activate,'Call actions · Ctrl/⌘-click opens the definition');
+}
+
+export function decorateSourceActions(node,line,actions,activate,title) {
     const ranges=callRanges(line,actions);if(!ranges.length)return;
-    const document=node.ownerDocument,offsets=new Map([[0,0]]);let byte=0,index=0;
+    let byte=0,index=line.left?1:0;
+    const document=node.ownerDocument,offsets=new Map([[0,index]]);
     for(const ch of line.text){const value=ch.codePointAt(0);byte+=value<128?1:value<2048?2:value<65536?3:4;index+=ch.length;offsets.set(byte,index);}
     const nodes=[];const walker=document.createTreeWalker(node,4);let text,total=0;
     while((text=walker.nextNode())){const length=text.textContent.length;if(length)nodes.push({node:text,start:total,end:total+length});total+=length;}
@@ -17,8 +22,11 @@ export function renderCallText(node,line,actions,activate,plan=null,margin={byte
         const start=offsets.get(range.start),end=offsets.get(range.end);if(start===undefined||end===undefined)continue;
         const first=endpoint(start,false),last=endpoint(end,true);if(!first||!last)continue;
         const selection=document.createRange();selection.setStart(first.node,start-first.start);selection.setEnd(last.node,end-last.start);
-        const button=document.createElement('span');button.className='code-call';button.dataset.callId=range.id;button.callAction=range.action;button.setAttribute('role','button');button.tabIndex=0;
-        button.setAttribute('aria-label',`Actions for ${range.name}`);button.setAttribute('aria-haspopup','menu');button.setAttribute('aria-expanded','false');button.title='Call actions · Ctrl/⌘-click opens the definition';
+        const button=document.createElement('span');
+        if(range.action.kind==='function'){button.className='code-function';button.dataset.symbolId=range.id;}
+        else{button.className='code-call';button.dataset.callId=range.id;}
+        button.callAction=range.action;button.setAttribute('role','button');button.tabIndex=0;
+        button.setAttribute('aria-label',`Actions for ${range.name}`);button.setAttribute('aria-haspopup','menu');button.setAttribute('aria-expanded','false');button.title=title;
         button.append(selection.extractContents());selection.insertNode(button);
         const selected=()=>{const value=document.getSelection();if(!value||value.isCollapsed)return false;for(let i=0;i<value.rangeCount;i++)if(value.getRangeAt(i).intersectsNode(button))return true;return false;};
         const disabled=()=>button.getAttribute('aria-disabled')==='true';
@@ -27,6 +35,20 @@ export function renderCallText(node,line,actions,activate,plan=null,margin={byte
         button.addEventListener('keydown',event=>{if(disabled())return;if(event.key==='Enter'){event.preventDefault();activate(button.callAction,button,Boolean(event.ctrlKey||event.metaKey),true);}else if(event.key==='ArrowDown'||event.key==='ContextMenu'||(event.shiftKey&&event.key==='F10')){event.preventDefault();activate(button.callAction,button,false,true);}else if(event.key===' ')event.preventDefault();});
         button.addEventListener('keyup',event=>{if(event.key===' '&&!disabled()){event.preventDefault();activate(button.callAction,button,false,true);}});
     }
+}
+
+export async function requestSourceActions(post,snapshot,query,signal,path) {
+    const actions=[];
+    let offset=0;
+    for(let page=0;page<16;page++){
+        const data=await post('/api/structure',{snapshot,path,query:{...query,offset}},signal);
+        if(data.snapshot!==snapshot||!Array.isArray(data.items)||data.items.length>256||!Number.isSafeInteger(data.matching)||data.matching<0)throw new Error('Invalid captured source actions');
+        actions.push(...data.items);
+        if(data.next===null)return actions;
+        if(!Number.isSafeInteger(data.next)||data.next<=offset)throw new Error('Invalid source action continuation');
+        offset=data.next;
+    }
+    return actions;
 }
 
 const actionKey=action=>JSON.stringify([action.name,action.position?.line,action.position?.start,action.position?.end]);
@@ -44,7 +66,7 @@ export function createCallMenu(root) {
     const show=(element,name,actions,keyboard=false)=>{
         hide();trigger=element;element.setAttribute('aria-expanded','true');root.setAttribute('aria-label',`Actions for ${name}`);
         for(const action of actions){const button=document.createElement('button');button.type='button';button.setAttribute('role','menuitem');button.append(document.createTextNode(action.label));if(action.hint){const hint=document.createElement('small');hint.textContent=action.hint;button.append(hint);}button.addEventListener('click',()=>{hide();action.run();});root.append(button);}
-        root.hidden=false;const anchor=element.getBoundingClientRect(),menu=root.getBoundingClientRect(),view=document.defaultView;const left=Math.max(8,Math.min(anchor.left,view.innerWidth-menu.width-8));const top=anchor.bottom+6+menu.height<=view.innerHeight-8?anchor.bottom+6:Math.max(8,anchor.top-menu.height-6);Object.assign(root.style,{left:left+'px',top:top+'px'});if(keyboard)root.querySelector('[role=menuitem]')?.focus();
+        root.hidden=false;const anchor=element.getBoundingClientRect(),menu=root.getBoundingClientRect(),view=document.defaultView;const left=Math.max(8,Math.min(anchor.left,view.innerWidth-menu.width-8));const top=anchor.bottom+6+menu.height<=view.innerHeight-8?anchor.bottom+6:Math.max(8,anchor.top-menu.height-6);Object.assign(root.style,{left:left+'px',top:top+'px'});if(keyboard)root.querySelector('[role=menuitem]')?.focus({preventScroll:true});
     };
     root.addEventListener('keydown',event=>{const items=[...root.querySelectorAll('[role=menuitem]')],index=items.indexOf(document.activeElement);if(event.key==='Escape'){event.preventDefault();event.stopPropagation();hide(true);}else if(['ArrowDown','ArrowUp','Home','End'].includes(event.key)&&items.length){event.preventDefault();const next=event.key==='Home'?0:event.key==='End'?items.length-1:(index+(event.key==='ArrowDown'?1:items.length-1))%items.length;items[next].focus();}else if(event.key==='Tab')hide(true);});
     document.addEventListener('pointerdown',event=>{if(trigger&&!root.contains(event.target)&&!trigger.contains(event.target))hide();});

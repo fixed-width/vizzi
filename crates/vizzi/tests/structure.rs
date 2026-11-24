@@ -441,6 +441,34 @@ fn partially_projected_callers_keep_the_file_binding_through_live_navigation() {
         }),
     );
     assert_eq!(actions["items"][0]["binding"], call["binding"]);
+    let file = &start["source"]["file"];
+    let source_actions = fixture.query(
+        &app,
+        None,
+        json!({
+            "kind":"source_actions", "file":file, "line_start":1, "line_count":1, "offset":0
+        }),
+    );
+    assert!(
+        source_actions["items"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|item| { item["kind"] == "function" && item["id"] == run["id"] })
+    );
+    let source_function = fixture.query(
+        &app,
+        None,
+        json!({
+            "kind":"function", "file":file, "symbol":run["id"]
+        }),
+    );
+    assert_eq!(source_function["symbol"], run);
+    let browser_call = app.editor_call(&serde_json::from_value(json!({
+        "snapshot":fixture.snapshot, "query":{"kind":"invocation", "call":call["id"], "file":file}
+    })).unwrap()).unwrap();
+    assert_eq!(browser_call.invocation.id, call["id"]);
+    assert_eq!(browser_call.caller.id, start["id"]);
     let definition = app
         .definition(&DefinitionRequest {
             snapshot: fixture.snapshot.clone(),

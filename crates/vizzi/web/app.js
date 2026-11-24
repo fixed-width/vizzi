@@ -15,6 +15,8 @@ import { createInspector } from "/inspector.js";
 import { createNavigation } from "/navigation.js";
 import { createStartup } from "/startup.js";
 import {installWorkspaceDelivery} from "/editor-delivery.js";
+import {createCallMenu,requestSourceActions} from "/call-actions.js";
+import {fetchRead} from "/read-retry.js";
 
 installAppHeader(document.querySelector('body > header'));
 const element = id => document.getElementById(id);
@@ -24,6 +26,9 @@ let overviewTransform,overviewDrag=false;
 installSplitter(element("explore-workspace"),{key:"explore",label:"Repository map and source widths",initial:.43,minBefore:240,minAfter:320});
 installSplitter(element("outline").closest(".source-layout"),{key:"explore-outline",label:"Declarations and source widths",initial:.3,minBefore:100,minAfter:200});
 const source = element("source"), space = element("source-space");
+const callMenu = createCallMenu(element("call-action-menu"));
+source.addEventListener("wheel",()=>callMenu.hide(),{passive:true});
+source.addEventListener("touchmove",()=>callMenu.hide(),{passive:true});
 const keepEvidence=document.createElement("button");keepEvidence.type="button";keepEvidence.id="keep-evidence";keepEvidence.textContent="Save location";keepEvidence.disabled=true;element("snapshot").before(keepEvidence);
 keepEvidence.addEventListener("click",async()=>{if(!view?.source)return;keepEvidence.disabled=true;try{const response=await fetch('/api/investigation');if(!response.ok)throw new Error(await response.text());const state=await response.json();const active=view.source.summary.active;const kept=await fetch('/api/investigation/evidence',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({revision:state.board.revision,snapshot:view.snapshot,file:view.source.id,version:view.source.version,line:active?.start_line ?? 1,title:active?.name ?? view.source.path})});if(!kept.ok)throw new Error(await kept.text());location.assign('/investigate#saved');}catch(e){showError(e);keepEvidence.disabled=false;}});
 const metrics = { drawCpuMs: [], interactionFrameMs: [], requestMs: [], pickingMs: [], lastFrame: null };
@@ -57,9 +62,31 @@ const startup=createStartup({transport:fetchJSON,onError:showError,onState:state
   if(state.initial){messages.status.show(state.label);element("counts").textContent=state.label;}
 }});
 element("start-index").addEventListener("click",()=>startup.activate());
-const inspector = createInspector({source,space,outline:element("outline"),transport:fetchJSON,onError:error=>{showError(error);updates?.restart();},select:async fact=>{
-  if(await navigate({entity:fact.id}))await inspector.revealActive();
-}});
+const inspector = createInspector({
+  source,space,outline:element("outline"),transport:fetchJSON,
+  onError:error=>{showError(error);updates?.restart();},
+  select:async fact=>{if(await navigate({entity:fact.id}))await inspector.revealActive();},
+  loadActions:async (captured,window,signal)=>{
+    if(!captured.source.summary.declarations)return [];
+    const post=async (path,body,signal)=>{
+      const response=await fetchRead(path,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body),signal});
+      if(!response.ok)throw new Error("Captured source actions are unavailable");
+      return response.json();
+    };
+    return requestSourceActions(post,captured.snapshot,{kind:"source_actions",file:captured.source.id,line_start:window.line_start,line_count:window.lines.length},signal);
+  },
+  activateAction:(captured,action,trigger,direct,keyboard)=>{
+    editorFiles.manual();
+    const isFunction=action.kind==="function";
+    const open=()=>{
+      if(!trigger.isConnected || captured.snapshot!==view?.snapshot || captured.source.id!==view.source?.id)return;
+      const hash=new URLSearchParams({[isFunction?"source-function":"source-call"]:action.id,snapshot:captured.snapshot,file:captured.source.id});
+      location.assign(`/#${hash}`);
+    };
+    if(direct){callMenu.hide();open();return;}
+    callMenu.show(trigger,action.name,[{label:isFunction?"Open in Call workspace":"Open definition in Call workspace",hint:"Ctrl/⌘-click",run:open}],keyboard);
+  },
+});
 
 const navigation = createNavigation({
   capture: () => ({ file:view?.selection.file ?? null,entity:view?.selection.entity ?? null,
@@ -112,7 +139,7 @@ const controller = createController({
     const { coverage, diagnostics } = describeSource(next.source);
     messages.coverage.show(coverage,next.source?.id);
     messages.diagnostics.show(diagnostics.join(". "),next.source?.version);
-    inspector.apply(next); renderFileList();
+    callMenu.hide();inspector.apply(next); renderFileList();
     const restore=navigation.restoration(next,info.intent);
     const sameScene=restore && restore.snapshot===next.snapshot && restore.position.layoutRevision===mapModel.revision &&
       restore.filter===viewFilter && restore.directory===(next.browse?.directory ?? ".") && restore.offset===(next.browse?.offset ?? 0);

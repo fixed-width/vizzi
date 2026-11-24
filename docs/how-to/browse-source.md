@@ -33,6 +33,17 @@ On the nested map, use directory controls to collapse, focus or reorder groups. 
 rows or headers, or use their up/down controls to reorder siblings. **Reset map**
 restores the default order and expansion.
 
+## Continue in the Call workspace
+
+Click a highlighted function name in its definition and choose **Open in Call
+workspace** to open its bubble in the active task. Click a highlighted call name and
+choose **Open definition in Call workspace** to open its caller and follow the call.
+If Vizzi finds several possible destinations, it opens the same chooser used in the
+[Call workspace](follow-a-call-trail.md).
+
+Ctrl-click or Cmd-click to open directly. With the keyboard, Tab to a highlighted
+name and press Enter for its menu or Ctrl/Cmd+Enter to open directly.
+
 ## Adjust the reading panes
 
 Drag dividers to resize the map/source or declaration/source sections. Focus a divider

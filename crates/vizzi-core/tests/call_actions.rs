@@ -1,35 +1,50 @@
 //! Source-pane actions refer to exact captured identifier bytes, not text-name guesses.
 use std::sync::Arc;
 use vizzi_core::{
-    model::{CapturePolicyId, Document, Snapshot, WorkspaceId},
+    analysis::Languages,
+    model::{Analysis, CapturePolicyId, Document, Snapshot, WorkspaceId},
     policy::{Classification, Provenance},
     rust::RustAnalyzer,
-    structure::Structure,
+    structure::{SourceAction, Structure},
 };
 fn index(text: &str) -> Structure {
-    let workspace = WorkspaceId::derive(&[b"call actions"]);
+    fixture(text).0
+}
+fn fixture(text: &str) -> (Structure, Arc<Document>) {
     let analysis = RustAnalyzer::new()
         .unwrap()
         .analyze(text.as_bytes())
         .unwrap();
+    captured_fixture("rust", "lib.rs", text, analysis)
+}
+
+fn captured_fixture(
+    language: &str,
+    path: &str,
+    text: &str,
+    analysis: Analysis,
+) -> (Structure, Arc<Document>) {
+    let workspace = WorkspaceId::derive(&[b"call actions"]);
     let doc = Arc::new(
         Document::capture(
             workspace.clone(),
-            "lib.rs".into(),
+            path.into(),
             text.as_bytes(),
             vec![analysis],
             Classification::Assigned {
-                language: "rust".into(),
-                provenance: Provenance::Extension {
-                    extension: "rs".into(),
-                },
+                language: language.into(),
+                provenance: Provenance::ExplicitScope { scope: ".".into() },
             },
         )
         .unwrap(),
     );
-    Structure::new(
-        &Snapshot::new(workspace, vec![doc], CapturePolicyId::derive(&[b"fixture"])).unwrap(),
+    let snapshot = Snapshot::new(
+        workspace,
+        vec![doc.clone()],
+        CapturePolicyId::derive(&[b"fixture"]),
     )
+    .unwrap();
+    (Structure::new(&snapshot), doc)
 }
 #[test]
 fn annotations_locate_the_identifier_after_unicode_and_line_wrapping() {
@@ -91,6 +106,112 @@ fn annotations_are_bounded_paged_and_owned_by_the_selected_declaration() {
     assert!(index.actions(&owner.id, 1, 0, 0).is_err());
     assert!(index.actions(&owner.id, 1, 97, 0).is_err());
     assert!(index.actions("missing", 1, 1, 0).is_err());
+}
+
+#[test]
+fn source_actions_include_calls_and_function_names_within_the_window() {
+    let (index, doc) = fixture(
+        "fn start() { step(); } struct Entry;\nfn step() { finish(); }\nfn outside() { skip(); }",
+    );
+    let page = index.source_actions(&doc, 1, 2, 0).unwrap();
+    assert_eq!(page.coverage.available_files, 1);
+    let actions = page
+        .items
+        .iter()
+        .map(|action| match action {
+            SourceAction::Call(action) => {
+                let call = index.call(&action.id).unwrap();
+                assert!(call.invocation.owner.is_some());
+                (
+                    "call",
+                    action.name.as_str(),
+                    action.position.line,
+                    action.position.start,
+                )
+            }
+            SourceAction::Function { id, name, position } => {
+                assert_eq!(index.resolve(None, id).unwrap().name, *name);
+                ("function", name.as_str(), position.line, position.start)
+            }
+        })
+        .collect::<Vec<_>>();
+    assert_eq!(
+        actions,
+        [
+            ("call", "step", 1, 13),
+            ("call", "finish", 2, 12),
+            ("function", "start", 1, 3),
+            ("function", "step", 2, 3)
+        ]
+    );
+    assert!(index.source_actions(&doc, 1, 97, 0).is_err());
+}
+
+#[test]
+fn source_actions_require_the_captured_document_version() {
+    let (index, original) = fixture("fn start() { step(); }");
+    let (_, edited) = fixture("fn start() { stop(); }");
+    assert_eq!(original.id(), edited.id());
+    assert!(
+        index
+            .source_actions(&edited, 1, 1, 0)
+            .unwrap()
+            .items
+            .is_empty()
+    );
+}
+
+#[test]
+fn source_actions_skip_a_function_name_spanning_multiple_lines() {
+    let text = "struct Worker { int run(); };\nint Worker::\nrun() { return 1; }";
+    let analysis = Languages::builtin()
+        .unwrap()
+        .select("cpp")
+        .unwrap()
+        .create()
+        .unwrap()
+        .analyze(text.as_bytes())
+        .unwrap();
+    let (index, doc) = captured_fixture("cpp", "lib.cpp", text, analysis);
+    let definition = index
+        .inventory("lib.cpp", "Worker::", 0)
+        .unwrap()
+        .items
+        .remove(0)
+        .symbol;
+    assert!(index.identifier(&definition.id).is_some());
+    assert!(
+        index
+            .source_actions(&doc, 2, 2, 0)
+            .unwrap()
+            .items
+            .is_empty()
+    );
+}
+
+#[test]
+fn source_actions_only_offer_calls_with_an_openable_caller() {
+    let text = "def destination():\n    pass\ndestination()\n";
+    let analysis = Languages::builtin()
+        .unwrap()
+        .select("python")
+        .unwrap()
+        .create()
+        .unwrap()
+        .analyze(text.as_bytes())
+        .unwrap();
+    let (index, doc) = captured_fixture("python", "lib.py", text, analysis);
+    let call = index
+        .call_at("lib.py", text.rfind("destination").unwrap())
+        .unwrap();
+    assert!(call.invocation.owner.is_none());
+    assert!(
+        index
+            .source_actions(&doc, 3, 1, 0)
+            .unwrap()
+            .items
+            .is_empty()
+    );
 }
 
 #[test]

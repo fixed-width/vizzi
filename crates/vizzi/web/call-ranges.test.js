@@ -17,4 +17,11 @@ assert.equal(callRanges(line,[{...at(1,8,11),id:null},{...at(1,4,5),name:undefin
 assert.equal(callRanges({number:4,text:'run'},[at(1,0,4)]).length,0);
 assert.equal(callRanges({number:4,text:'a'.repeat(234)},[at(1,1,234,'a'.repeat(233)),at(1,12,34,'a'.repeat(22))]).length,0);
 assert.deepEqual(callRanges({number:4,text:'foobar'},[at(1,0,3,'foo'),at(2,3,6,'bar')]).map(r=>r.start),[0,3]);
+const column=32768,later={number:4,text:'🙂 run()',column,left:true,right:true};
+assert.deepEqual(callRanges(later,[at(1,column+5,column+8),at(2,column-1,column+4),at(3,column+8,column+11)]).map(r=>[r.id,r.start,r.end]),[[id(1),5,8]]);
+assert.deepEqual(callRanges({...line,column:-1},[at(1,7,10)]),[]);
+assert.deepEqual(callRanges({...line,column:1.5},[at(1,10,13)]),[]);
+const declaration={...at(1,column+5,column+8,'qualified::run'),kind:'function'};
+assert.deepEqual(callRanges(later,[declaration]).map(r=>[r.name,r.start,r.end]),[['qualified::run',5,8]]);
+
 console.log('call ranges: exact Unicode byte identifiers, repetition, clipping, malformed metadata, ambiguity and adjacent ranges');

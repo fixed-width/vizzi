@@ -13,7 +13,7 @@ import {LiveUpdates} from '/live-updates.js';
 import {DefinitionWarmup} from '/definition-warmup.js';
 import {SourcePane} from '/source-pane.js';
 import {functionIndent} from '/source-margin.js';
-import {renderCallText,createCallMenu,retargetCalls} from '/call-actions.js';
+import {renderCallText,createCallMenu,retargetCalls,requestSourceActions} from '/call-actions.js';
 import {installAppearance} from '/appearance.js';
 import {createMessage} from '/messages.js';
 import {followChanges} from '/updates.js';
@@ -148,9 +148,9 @@ function liveRefreshFailed(error){
 }
 const live=new LiveUpdates({capture:refreshCapture,request:requestLiveRefresh,apply:applyLive,blocked:()=>busy||[...mounted.values()].some(r=>r.loading||r.sourcePane.selected()),pending:snapshot=>{if(model){clearTimeout(livePendingTimer);model.markSnapshot(snapshot);geometry();if(model.stale)livePendingTimer=setTimeout(()=>{for(const r of mounted.values()){r.awaitingLive=model.stale;updateFragmentStatus(r);}},150);}},failed:liveRefreshFailed});
 function refreshLive(){if(model&&currentSnapshot)live.changed(currentSnapshot,true);}
-const prepareEditorCall=createCallPreparation({read:()=>model,
- bind:(action,signal)=>post('/api/editor/call',{snapshot:action.snapshot,query:{kind:'invocation',call:action.call}},signal),
- resolve:async(site,signal,snapshot)=>{await definitionCapabilities;return resolveCallChoice(site,{snapshot,provider:definitionProvider,warmup:()=>definitionWarmup.wait(),request:(snapshot,call,signal)=>post('/api/call-definition',{snapshot,call},signal),signal});},
+const prepareCall=createCallPreparation({read:()=>model,
+ bind:(action,signal)=>post('/api/editor/call',{snapshot:action.snapshot,query:{kind:'invocation',call:action.call,file:action.file}},signal),
+ resolve:async(site,signal,snapshot,path)=>{await definitionCapabilities;return resolveCallChoice(site,{snapshot,provider:definitionProvider,warmup:()=>definitionWarmup.wait(),request:(snapshot,call,signal)=>post('/api/call-definition',{snapshot,call,path},signal),signal});},
  source:prepareFragmentSource,
  apply:({caller,target,choice,sources})=>{
   geometry();mount(caller,sources.get(model.view(caller).symbol.id));
@@ -159,9 +159,27 @@ const prepareEditorCall=createCallPreparation({read:()=>model,
   else {focus([caller]);showDestinations(caller,choice);}
   save();
  }});
+async function prepareFunction(action,{signal}){
+ const workspace=model;
+ const verify=()=>{
+  signal.throwIfAborted();
+  if(model!==workspace||model.stale||model.snapshot!==action.snapshot)throw new Error('Source changed since the function was selected. Select it again.');
+ };
+ verify();
+ const {snapshot,symbol}=await post('/api/structure',{snapshot:action.snapshot,query:{kind:'function',file:action.file,symbol:action.symbol}},signal);
+ if(snapshot!==action.snapshot||symbol?.id!==action.symbol||symbol.kind!=='function'||symbol.source?.file!==action.file)throw new Error('The selected function differs from current captured source');
+ verify();
+ const reading=workspace.views.find(view=>view.symbol.id===symbol.id)?.reading??{section:symbol.source.line};
+ const prepared=await prepareFragmentSource(symbol,reading,signal,action.snapshot);
+ verify();
+ return {commit(){verify();openFunction(symbol,prepared);}};
+}
 const editorCalls=installWorkspaceDelivery({mode:'call',
  ready:action=>Boolean(size().w>=1&&size().h>=1&&(action.kind==='reveal'||model&&!model.stale)),
- prepare:(action,context)=>action.kind==='reveal'?Promise.resolve({commit(){}}):prepareEditorCall(action,context),failed:fail,
+ async prepare(action,context){
+  if(action.kind==='reveal')return {commit(){}};
+  return action.kind==='function'?prepareFunction(action,context):prepareCall(action,context);
+ },failed:fail,
  changed:pending=>{if(pending){closeRevisionPicker();closeLineagePicker();closeCrossFilePicker();callMenu.hide();hideDestinations();window.getSelection()?.removeAllRanges();for(const r of mounted.values()){r.navigation=(r.navigation??0)+1;r.historyTicket=(r.historyTicket??0)+1;r.historyController?.abort();if(r.historyLoading)r.comparing=r.historyLoading=r.loading=false;r.resolving=false;updateFragmentStatus(r);}geometry();live.resume();}}
 });
 document.addEventListener('selectionchange',()=>live.resume());
@@ -723,7 +741,7 @@ async function prepareFragmentSource(symbol,reading,signal,snapshot) {
  const count=Math.min(96,s.end_line-start+1),query=new URLSearchParams({snapshot:expected,file:s.file,version:s.version,line_start:String(start),line_count:String(count),outline_count:'1',reflow:'true'});
  const header=start===s.line?Promise.resolve(null):transport(endpoint+'?'+new URLSearchParams({snapshot:expected,file:s.file,version:s.version,line_start:String(s.line),line_count:'1',outline_count:'1'}),{signal});
  const [data,origin,actions]=await Promise.all([transport(endpoint+'?'+query,{signal}),header,optionalActions(symbol,start,count,snapshot,signal)]);
- if(data.snapshot!==expected||data.file!==s.file||data.version!==s.version||!Array.isArray(data.lines)||!data.lines.length||data.lines.length>96)throw new Error('Captured source for the requested function is unavailable');
+ if(data.snapshot!==expected||data.file!==s.file||data.version!==s.version||!Array.isArray(data.lines)||!data.lines.length||data.lines.length>count||data.lines.some((line,index)=>line?.number!==start+index))throw new Error('Captured source for the requested function is unavailable');
  if(origin&&(origin.snapshot!==expected||origin.file!==s.file||origin.version!==s.version||origin.lines?.length!==1||origin.lines[0].number!==s.line||origin.lines[0].left||origin.lines[0].column!==0))throw new Error('Fragment indentation source differs');
  return {data,actions,start,margin:functionIndent(origin?.lines[0]??data.lines.find(line=>line.number===s.line))};
 }
@@ -854,14 +872,8 @@ function applyPreparedSource(id,prepared) {
  }
  if(r.restoreAnchor)void extendSource(r,false);
 }
-async function requestActions(symbol,start,count,snapshot,signal) {
- const actions=[];let offset=0;
- for(let page=0;page<16;page++){
-  const data=await post('/api/structure',{snapshot,path:symbol.origin?undefined:symbol.source.path,query:{kind:'actions',symbol:symbol.id,line_start:start,line_count:count,offset}},signal);
-  if(data.snapshot!==snapshot||!Array.isArray(data.items)||data.items.length>256||!Number.isSafeInteger(data.matching)||data.matching>4096)throw new Error('Invalid captured call actions');
-  actions.push(...data.items);if(data.next===null)return actions;if(!Number.isSafeInteger(data.next)||data.next<=offset)throw new Error('Invalid call-action continuation');offset=data.next;
- }
- throw new Error('Call-action allowance exceeded');
+function requestActions(symbol,start,count,snapshot,signal) {
+ return requestSourceActions(post,snapshot,{kind:'actions',symbol:symbol.id,line_start:start,line_count:count},signal,symbol.origin?undefined:symbol.source.path);
 }
 async function optionalActions(symbol,start,count,snapshot,signal){
  try{return await requestActions(symbol,start,count,snapshot,signal);}
@@ -961,6 +973,11 @@ function resetFragmentResults(){
  el('fragment-search-status').textContent='';
  el('more-fragment-results').hidden=true;
 }
+function openFunction(symbol,prepared){
+ const path=symbol.source.path,id=model.openRoot(symbol,path.split('/').slice(0,-1).join('/')||path);
+ if(prepared&&model.view(id).collapsed)model.collapse(id);
+ mount(id,prepared);focus([id]);
+}
 async function findFragments(offset=0){
  resetFragmentResults();
  const ticket=paletteTicket,snapshot=model?.snapshot;
@@ -980,8 +997,7 @@ async function findFragments(offset=0){
    const b=button([...symbol.parents,symbol.name].join('::'),null,()=>{
     if(model.stale||model.snapshot!==snapshot){resetFragmentResults();status.textContent='Source changed. Search again.';return;}
     editorCalls.manual();
-    const path=symbol.source.path, id=model.openRoot(symbol,path.split('/').slice(0,-1).join('/')||path);
-    mount(id);focus([id]);save();el('fragment-dialog').close();
+    openFunction(symbol);el('fragment-dialog').close();
    });
    b.dataset.addSymbol=symbol.id;b.dataset.name=symbol.name;
    b.append(node('small',`${symbol.source.path}:${symbol.source.line}`));el('fragment-results').append(b);

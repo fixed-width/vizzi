@@ -76,7 +76,13 @@ export function installWorkspaceDelivery({
   function legacy(hash) {
     const values = new URLSearchParams(hash.replace(/^#/, ''));
     let action, keys;
-    if (mode === 'call' && values.has('editor-call')) {
+    if (mode === 'call' && values.has('source-function')) {
+      action = {kind:'function', snapshot:values.get('snapshot'), file:values.get('file'), symbol:values.get('source-function')};
+      keys = ['source-function', 'snapshot', 'file'];
+    } else if (mode === 'call' && values.has('source-call')) {
+      action = {kind:'call', snapshot:values.get('snapshot'), file:values.get('file'), call:values.get('source-call')};
+      keys = ['source-call', 'snapshot', 'file'];
+    } else if (mode === 'call' && values.has('editor-call')) {
       action = {
         kind: 'call',
         snapshot: values.get('snapshot'),
