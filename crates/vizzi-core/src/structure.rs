@@ -67,6 +67,9 @@ pub struct SourceOrigin {
     /// Captured from a source archive rather than a plain file.
     #[serde(skip_serializing_if = "std::ops::Not::not")]
     pub archive: bool,
+    /// A Java archive with a virtual document available through VS Code.
+    #[serde(skip_serializing_if = "std::ops::Not::not")]
+    pub editor_archive: bool,
 }
 /// Projection allowances and unavailable capability, not a completeness guarantee.
 #[derive(Default, Clone, Debug, Serialize)]

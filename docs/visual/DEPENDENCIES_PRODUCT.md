@@ -33,12 +33,15 @@ its version from local metadata. Calls and references can continue from that cap
 An absent package or a link whose target leaves the installation scope appears as
 outside source. Dependency capture uses the shared catalog bounds.
 
-Managed Java can open attached JDK and library archive entries reached through JDT LS.
+Managed JDT LS and VS Code Java sharing can open attached JDK and library archive entries.
 Vizzi checks the returned source against the local archive before opening a bubble.
 The capture can reopen from the archive. After a restart, it can resume semantic
 navigation by replaying its unchanged caller trail against the available
 classpath and checking each resulting archive member. Archive entries use the
-captured source view for reading and copying.
+captured source view for reading and copying. VS Code sharing can follow calls and
+references from a verified archive document and reopen it at the captured line
+in the originating VS Code window. If the provider's document or attachment changes,
+follow the original call again.
 
 Validate exact source/location binding, dependency-to-dependency call steps, same-named
 files, stale replies/configuration, unavailable sources, bounded retention, reload and

@@ -1,5 +1,5 @@
 //! Launch-pinned editor callback; semantic discovery never redirects navigation.
-use super::{Editor, EditorError, EditorLocation};
+use super::{ArchiveEditorLocation, Editor, EditorError, EditorLocation};
 use serde::{Deserialize, Serialize};
 use std::{
     fs::OpenOptions,
@@ -33,6 +33,12 @@ struct Request<'a> {
     path: &'a Path,
     line: usize,
     source: &'a super::SourceWitness,
+    #[serde(rename = "providerUri", skip_serializing_if = "Option::is_none")]
+    provider_uri: Option<&'a str>,
+    #[serde(rename = "archiveBinary", skip_serializing_if = "Option::is_none")]
+    archive_binary: Option<&'a Path>,
+    #[serde(rename = "archiveCapture", skip_serializing_if = "Option::is_none")]
+    archive_capture: Option<&'a str>,
     expires_at_ms: u64,
 }
 #[derive(Deserialize)]
@@ -52,6 +58,7 @@ struct Response {
 /// A verified-location adapter permanently bound to one launching editor instance.
 pub struct OriginEditor {
     connection: Connection,
+    java_archives: bool,
 }
 fn error(message: impl Into<String>) -> EditorError {
     EditorError(message.into())
@@ -129,14 +136,18 @@ impl OriginEditor {
                 "Invalid originating editor protocol, root or identity",
             ));
         }
-        Ok(Self { connection })
+        let java_archives = std::env::var("VIZZI_ORIGIN_JAVA_ARCHIVE_SESSION")
+            .is_ok_and(|session| session == connection.session);
+        Ok(Self {
+            connection,
+            java_archives,
+        })
     }
-}
-impl Editor for OriginEditor {
-    fn name(&self) -> &str {
-        &self.connection.editor
-    }
-    fn open(&self, location: &EditorLocation) -> Result<(), EditorError> {
+    fn present(
+        &self,
+        location: &EditorLocation,
+        archive: Option<&ArchiveEditorLocation>,
+    ) -> Result<(), EditorError> {
         if !location.path.is_absolute()
             || location.path.as_os_str().as_encoded_bytes().len() > 4096
             || location.line == 0
@@ -165,6 +176,9 @@ impl Editor for OriginEditor {
             path: &location.path,
             line: location.line,
             source: &location.source,
+            provider_uri: archive.map(|value| value.uri.as_str()),
+            archive_binary: archive.map(|value| value.binary.as_path()),
+            archive_capture: archive.map(|value| value.capture.as_str()),
             expires_at_ms,
         };
         let mut frame = serde_json::to_vec(&request).map_err(|e| error(e.to_string()))?;
@@ -246,5 +260,35 @@ impl Editor for OriginEditor {
             )),
             _ => Err(error("Invalid originating editor acknowledgment")),
         }
+    }
+}
+
+impl Editor for OriginEditor {
+    fn name(&self) -> &str {
+        &self.connection.editor
+    }
+    fn open(&self, location: &EditorLocation) -> Result<(), EditorError> {
+        self.present(location, None)
+    }
+    fn opens_java_archives(&self) -> bool {
+        self.java_archives
+    }
+    fn open_archive(&self, location: &ArchiveEditorLocation) -> Result<(), EditorError> {
+        if !self.opens_java_archives() {
+            return Err(error(
+                "The originating editor cannot open a Java archive document",
+            ));
+        }
+        if !hex(&location.capture)
+            || !location.binary.is_absolute()
+            || location.binary.as_os_str().as_encoded_bytes().len() > 4096
+            || url::Url::parse(&location.uri)
+                .ok()
+                .and_then(|uri| crate::java_archive::destination(&uri))
+                .is_none()
+        {
+            return Err(error("Invalid verified Java archive destination"));
+        }
+        self.present(&location.source, Some(location))
     }
 }

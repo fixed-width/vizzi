@@ -265,6 +265,14 @@ pub struct Capture {
     document: Arc<Document>,
     declaration: Option<Declaration>,
     pub(crate) archive_caller: Option<ArchiveCaller>,
+    pub(crate) editor_archive: Option<EditorArchive>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub(crate) struct EditorArchive {
+    pub uri: String,
+    pub binary: PathBuf,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -327,6 +335,7 @@ fn capture(
     input: Input,
     declaration: Option<Declaration>,
     archive_caller: Option<ArchiveCaller>,
+    editor_archive: Option<EditorArchive>,
 ) -> Result<Arc<Capture>, String> {
     if !input.root.is_absolute()
         || fs::canonicalize(&input.root).map_err(|e| e.to_string())? != input.root
@@ -345,6 +354,18 @@ fn capture(
         if input.archive.is_none() || !valid {
             return Err("Invalid archive caller".into());
         }
+    }
+    if let Some(editor) = &editor_archive
+        && (input.archive.is_none()
+            || input.language != "java"
+            || !editor.binary.is_absolute()
+            || editor.binary.as_os_str().as_encoded_bytes().len() > 4096
+            || url::Url::parse(&editor.uri)
+                .ok()
+                .and_then(|uri| crate::java_archive::destination(&uri))
+                .is_none())
+    {
+        return Err("Invalid editor archive context".into());
     }
     let bytes = read(&input)?;
     let analysis = ANALYZERS.with_borrow_mut(|analyzers| {
@@ -408,6 +429,13 @@ fn capture(
             capture_policy.push(uri.as_bytes());
         }
     }
+    if let Some(editor) = &editor_archive {
+        capture_policy.extend([
+            b"editor-archive",
+            editor.uri.as_bytes(),
+            editor.binary.as_os_str().as_encoded_bytes(),
+        ]);
+    }
     let snapshot = Arc::new(
         Snapshot::new(
             scope.clone(),
@@ -424,6 +452,7 @@ fn capture(
         version: input.version.clone(),
         language: input.language.clone(),
         archive: input.archive.is_some(),
+        editor_archive: editor_archive.is_some(),
     };
     Ok(Arc::new(Capture {
         snapshot,
@@ -433,6 +462,7 @@ fn capture(
         document: doc,
         declaration,
         archive_caller,
+        editor_archive,
     }))
 }
 #[derive(Serialize, Deserialize)]
@@ -444,6 +474,8 @@ struct Reference {
     declaration: Option<Declaration>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     archive_caller: Option<ArchiveCaller>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    editor_archive: Option<EditorArchive>,
 }
 #[derive(Default)]
 struct State {
@@ -533,7 +565,8 @@ impl Catalog {
                 if !opaque(&r.capture) {
                     return Err("Invalid dependency capture reference".into());
                 }
-                if let Ok(source) = capture(r.input, r.declaration, r.archive_caller)
+                if let Ok(source) =
+                    capture(r.input, r.declaration, r.archive_caller, r.editor_archive)
                     && source.origin.capture == r.capture
                 {
                     admit(state, source);
@@ -557,6 +590,7 @@ impl Catalog {
                 input: s.input.clone(),
                 declaration: s.declaration.clone(),
                 archive_caller: s.archive_caller.clone(),
+                editor_archive: s.editor_archive.clone(),
             })
             .collect::<Vec<_>>();
         let mut file = tempfile::NamedTempFile::new_in(parent).map_err(|e| e.to_string())?;
@@ -567,7 +601,7 @@ impl Catalog {
     }
     /// Captures one provider-admitted file; existing captured bytes are never mutated.
     pub fn capture(&self, input: Input) -> Result<Arc<Capture>, String> {
-        self.capture_inner(input, None, None)
+        self.capture_inner(input, None, None, None)
     }
     /// Captures source with a checked provider range when raw syntax cannot identify a function.
     pub fn capture_with_declaration(
@@ -575,7 +609,7 @@ impl Catalog {
         input: Input,
         declaration: Declaration,
     ) -> Result<Arc<Capture>, String> {
-        self.capture_inner(input, Some(declaration), None)
+        self.capture_inner(input, Some(declaration), None, None)
     }
     pub(crate) fn capture_archive(
         &self,
@@ -583,23 +617,33 @@ impl Catalog {
         caller: Option<ArchiveCaller>,
         snapshot: &Snapshot,
     ) -> Result<Arc<Capture>, String> {
-        self.capture_inner(input, None, caller.map(|caller| (caller, snapshot)))
+        self.capture_inner(input, None, caller.map(|caller| (caller, snapshot)), None)
+    }
+    pub(crate) fn capture_editor_archive(
+        &self,
+        input: Input,
+        editor: EditorArchive,
+    ) -> Result<Arc<Capture>, String> {
+        self.capture_inner(input, None, None, Some(editor))
     }
     fn capture_inner(
         &self,
         input: Input,
         declaration: Option<Declaration>,
         archive_caller: Option<(ArchiveCaller, &Snapshot)>,
+        editor_archive: Option<EditorArchive>,
     ) -> Result<Arc<Capture>, String> {
         let mut state = self
             .state
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner);
         self.load(&mut state)?;
-        let existing = state
-            .sources
-            .iter()
-            .rposition(|s| s.input == input && s.declaration == declaration && s.verify().is_ok());
+        let existing = state.sources.iter().rposition(|s| {
+            s.input == input
+                && s.declaration == declaration
+                && s.editor_archive == editor_archive
+                && s.verify().is_ok()
+        });
         let previous = existing.map(|index| state.sources[index].as_ref());
         let archive_caller = archive_caller.and_then(|(caller, snapshot)| {
             let available = |witness| {
@@ -627,7 +671,7 @@ impl Catalog {
             state.sources.push(source.clone());
             return Ok(source);
         }
-        let source = capture(input, declaration, archive_caller)?;
+        let source = capture(input, declaration, archive_caller, editor_archive)?;
         admit(&mut state, source.clone());
         self.persist(&state)?;
         Ok(source)

@@ -5,10 +5,10 @@ use super::{
     project::Profile,
 };
 use crate::{
-    dependency_sources::{ARCHIVE_BYTES, FILE_BYTES, Input, matching_archive_member, open_archive},
+    dependency_sources::{ARCHIVE_BYTES, FILE_BYTES, Input, open_archive},
+    java_archive::{self, destination as archive_destination},
     lsp::{Client, DocumentSync, Readiness, Setup},
 };
-use percent_encoding::percent_decode_str;
 use serde_json::json;
 use std::{
     collections::BTreeSet,
@@ -19,7 +19,7 @@ use std::{
     time::{Duration, Instant},
 };
 use vizzi_core::{
-    model::{ContentId, Document, Snapshot},
+    model::{Document, Snapshot},
     policy::{Classification, JAVA_PROJECT_METADATA, SourceOnlyReason},
 };
 
@@ -226,9 +226,9 @@ impl Profile for JdtLs {
         uri: &url::Url,
         configuration: &str,
     ) -> Result<Option<Input>, String> {
-        let Some((library, package, file)) = archive_destination(uri) else {
+        if archive_destination(uri).is_none() {
             return Ok(None);
-        };
+        }
         let attachment = client.request(
             "workspace/executeCommand",
             json!({
@@ -241,50 +241,15 @@ impl Profile for JdtLs {
         let Some(source) = attributes["sourceAttachmentPath"].as_str().map(Path::new) else {
             return Ok(None);
         };
-        if !source.is_absolute()
-            || !matches!(
-                source.extension().and_then(|ext| ext.to_str()),
-                Some("jar" | "zip")
-            )
-        {
+        let binary = attributes["jarPath"]
+            .as_str()
+            .map(Path::new)
+            .ok_or("JDT LS did not identify the library")?;
+        if !java_archive::is_source_archive(source) {
             return Ok(None);
         }
-        let binary_name = attributes["jarPath"]
-            .as_str()
-            .and_then(|path| Path::new(path).file_name())
-            .and_then(|name| name.to_str())
-            .ok_or("JDT LS did not identify the library")?;
-        let modular_jdk = binary_name == "jrt-fs.jar";
-        let mut path = PathBuf::new();
-        if modular_jdk {
-            path.push(&library);
-        }
-        if !package.is_empty() {
-            path.push(package.replace('.', "/"));
-        }
-        path.push(file);
-        let member = path
-            .to_str()
-            .ok_or("Archive entry is not UTF-8")?
-            .replace('\\', "/");
-        let root = source.canonicalize().map_err(|e| e.to_string())?;
         let text = archive_text(client, uri.as_str())?;
-        let path = matching_archive_member(&root, &member, text.as_bytes())?;
-        Ok(Some(Input {
-            root,
-            path,
-            language: "java".into(),
-            package: if modular_jdk {
-                library
-            } else {
-                binary_name.into()
-            },
-            version: None,
-            configuration: configuration.into(),
-            mirror_path: None,
-            installation: None,
-            archive: Some(ContentId::derive(&[text.as_bytes()])),
-        }))
+        java_archive::input(uri, source, binary, &text, configuration).map(Some)
     }
 
     fn verify_archive(&self, client: &mut Client, uri: &str, text: &str) -> Result<(), String> {
@@ -400,37 +365,6 @@ fn fingerprint_library(path: &Path, hash: &mut blake3::Hasher) -> Result<(), Str
     hash.update(name);
     hash.update(content.finalize().as_bytes());
     Ok(())
-}
-
-fn archive_destination(uri: &url::Url) -> Option<(String, String, String)> {
-    if uri.scheme() != "jdt" || uri.host_str() != Some("contents") || uri.as_str().len() > 16 * 1024
-    {
-        return None;
-    }
-    let mut segments = uri.path_segments()?;
-    let decode = |part| {
-        let value = percent_decode_str(part).decode_utf8().ok()?;
-        (!value.contains(['/', '\\', ':', '\0']) && !matches!(value.as_ref(), "." | ".."))
-            .then(|| value.into_owned())
-    };
-    let library = decode(segments.next()?)?;
-    let next = decode(segments.next()?)?;
-    let (package, file) = match segments.next() {
-        Some(file) => (next, decode(file)?),
-        None => (String::new(), next),
-    };
-    if library.is_empty()
-        || (!package.is_empty() && package.split('.').any(str::is_empty))
-        || segments.next().is_some()
-    {
-        return None;
-    }
-    let file = if file.ends_with(".java") {
-        file
-    } else {
-        format!("{}.java", file.strip_suffix(".class")?.split('$').next()?)
-    };
-    Some((library, package, file))
 }
 
 fn archive_text(client: &mut Client, uri: &str) -> Result<String, String> {

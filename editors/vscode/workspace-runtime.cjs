@@ -76,7 +76,16 @@ function createWorkspaceRuntime(vscode, context, output) {
       if (error.code !== 'ENOENT') throw error;
     });
     signal.throwIfAborted();
-    return vscode.window.withProgress({
+    let workspace;
+    async function verifyArchive(capture,handOffSignal) {
+      if (!workspace) throw new Error('The Java archive verifier is unavailable');
+      const response = await fetch(new URL('/api/dependency/verify-archive',workspace.url),{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({capture}),signal:handOffSignal,redirect:'error'
+      });
+      if (response.status !== 204) throw new Error('Saved Java archive changed or is unavailable; reopen it from its caller');
+    }
+    workspace = await vscode.window.withProgress({
       location: vscode.ProgressLocation.Notification,
       title: 'Starting Vizzi'
     }, () => startWorkspace({
@@ -90,12 +99,15 @@ function createWorkspaceRuntime(vscode, context, output) {
         root: project.root,
         storage: path.join(context.globalStorageUri.fsPath, 'origin-connections'),
         name: 'VS Code',
+        javaArchives: true,
         open: createEditorNavigator(vscode, {
           root: project.root,
-          editorRoot: project.editorRoot
+          editorRoot: project.editorRoot,
+          verifyArchive
         })
       })
     }));
+    return workspace;
   }
   return {
     resolveProject,

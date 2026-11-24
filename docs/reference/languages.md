@@ -58,8 +58,8 @@ Workspace menu can import a Maven or Gradle classpath from captured build
 descriptors and local caches. A
 [shared VS Code Java provider](../how-to/configure-language-servers.md#java-with-vs-code)
 uses the editor's project configuration. Vizzi checks results against captured
-workspace files. Managed JDT LS can open local JDK and dependency source archives
-in independent bubbles. [Configure Java library source](../how-to/configure-language-servers.md#open-java-library-source)
+workspace files. Managed JDT LS and VS Code sharing can open local JDK and dependency
+source archives in independent bubbles. [Configure Java library source](../how-to/configure-language-servers.md#open-java-library-source)
 
 ## Python
 

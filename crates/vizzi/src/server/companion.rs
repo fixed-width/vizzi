@@ -54,6 +54,7 @@ pub(super) fn router(
     let capabilities = structure.clone();
     let dependency_windows = structure.clone();
     let dependency_locations = structure.clone();
+    let dependency_verification = structure.clone();
     let dependency_editor = app.clone();
     let editor_calls = structure.clone();
     Router::new()
@@ -68,7 +69,10 @@ pub(super) fn router(
         .route("/api/function-history/window",get(move |Query(binding):Query<HistoryWindow>,Query(query):Query<vizzi_core::projection::WindowQuery>|{let history=history.clone();async move{work(move||history.window(&binding.token,&binding.snapshot,&binding.file,&binding.version,&query)).await}}))
         .route("/api/editor/call",post(move|Json(request):Json<crate::structural::editor::Request>|{let structure=editor_calls.clone();async move{work(move||structure.editor_call(&request)).await}}).layer(DefaultBodyLimit::max(16*1024*1024)))
         .route("/api/dependency/window",get(move |Query(binding):Query<DependencyWindow>,Query(query):Query<vizzi_core::projection::WindowQuery>|{let app=dependency_windows.clone();async move{dependency_read(move||app.dependency_window(&binding.snapshot,&binding.file,&binding.version,&query)).await}}))
-        .route("/api/dependency/editor",post(move |Json(request):Json<OpenSource>|{let structure=dependency_locations.clone();let app=dependency_editor.clone();async move{editor_handoff(move||app.open_verified_location(&structure.dependency_location(&request)?)).await}}))
+        .route("/api/dependency/editor",post(move |Json(request):Json<OpenSource>|{let structure=dependency_locations.clone();let app=dependency_editor.clone();async move{editor_handoff(move||app.open_verified_location(&structure.dependency_editor_location(&request)?)).await}}))
+        .route("/api/dependency/verify-archive",post(move |Json(request):Json<ArchiveVerification>|{let structure=dependency_verification.clone();async move{
+            dependency_read(move||structure.verify_editor_archive(&request.capture)).await.map(|_|StatusCode::NO_CONTENT)
+        }}))
         .route("/api/investigation", get(view).post(edit))
         .route("/api/discovery", get(discover))
         .route("/api/structure", get(move || {let capabilities=capabilities.clone();async move {Json(serde_json::json!({"trial":true,"resolution":"candidate_only","call_languages":capabilities.call_languages(),"definition_provider":capabilities.definitions_available(),"java_project_import":capabilities.supports_java_project_import()}))}}).post(move |Json(request):Json<crate::structural::Request>| {let structure=structure.clone();async move {work(move ||structure.query(&request)).await}}))
@@ -164,6 +168,11 @@ struct DependencyWindow {
     snapshot: String,
     file: String,
     version: String,
+}
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ArchiveVerification {
+    capture: String,
 }
 #[derive(Deserialize)]
 struct HistoryWindow {

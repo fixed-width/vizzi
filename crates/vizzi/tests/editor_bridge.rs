@@ -202,6 +202,7 @@ fn editor_java_queries_preserve_overload_and_utf16_positions() {
     static int speak(String value) { return value.length(); }
     static void run() { /* 😀 */ Engine.speak("hello"); }
 }
+
 "#;
     let fixture = Fixture::with_source(PATH, JAVA);
     let provider = fixture.provider();
@@ -250,6 +251,136 @@ fn editor_java_queries_preserve_overload_and_utf16_positions() {
         panic!("expected one captured Java reference");
     };
     assert_eq!(serde_json::to_value(reference.position).unwrap(), usage);
+}
+
+#[tokio::test]
+async fn editor_java_archive_targets_require_matching_source_and_support_follow_up_queries() {
+    use axum::{
+        body::Body,
+        http::{Request, StatusCode},
+    };
+    use tower::ServiceExt;
+    use vizzi::{
+        companion::Companion,
+        editor::VsCode,
+        host::{Host, HostOptions},
+        review_application::ReviewApplication,
+        review_source::CaptureLimits,
+        server::router_with_definitions,
+    };
+
+    let caller = "class Caller { int run() { return lib.Helper.answer(); } }\n";
+    let fixture = Fixture::with_source("Caller.java", caller);
+    let directory = fixture.directory.path().canonicalize().unwrap();
+    let archive = directory.join("helper-sources.jar");
+    let binary = directory.join("helper.jar");
+    fs::write(&binary, b"binary library").unwrap();
+    let helper = "package lib;\nclass Helper { static int answer() { return 1; } }\n";
+    let write_archive = |path: &std::path::Path, text: &str| {
+        let mut zip = zip::ZipWriter::new(fs::File::create(path).unwrap());
+        zip.start_file(
+            "src/main/java/lib/Helper.java",
+            zip::write::SimpleFileOptions::default(),
+        )
+        .unwrap();
+        zip.write_all(text.as_bytes()).unwrap();
+        zip.finish().unwrap();
+    };
+    write_archive(&archive, helper);
+    let uri = "jdt://contents/helper.jar/lib/Helper.class?project";
+    let index = Structure::new(&fixture.snapshot);
+    let run = &index.functions("Caller.java", "run", 0).unwrap().items[0].symbol;
+    let site = &index.outgoing(&run.id, "Caller.java", 0).unwrap().items[0];
+    let call = index.call(&site.id).unwrap();
+    let provider = fixture.provider();
+    let target = |text| {
+        json!({"version":1,"status":"ok","session":"java-session","epoch":1,"outside":0,
+        "locations":[{"path":archive,"archiveBinary":binary,"providerUri":uri,"text":text,
+        "position":{"line":1,"character":26}}]})
+    };
+    let reply = target("decompiled or changed source");
+    let peer = Peer::start(&fixture, move |_| frame(reply));
+    let changed = provider.resolve(fixture.snapshot.clone(), &call).unwrap();
+    peer.finish();
+    assert!(changed.locations.is_empty());
+    assert_eq!(changed.outside, 1);
+
+    let reply = target(helper);
+    let peer = Peer::start(&fixture, move |_| frame(reply));
+    let admitted = provider.resolve(fixture.snapshot.clone(), &call).unwrap();
+    peer.finish();
+    let location = &admitted.locations[0];
+    let capture = provider
+        .dependencies()
+        .unwrap()
+        .get(location.capture.as_deref().unwrap())
+        .unwrap()
+        .unwrap();
+    assert_eq!(capture.origin.label, "helper.jar");
+    assert_eq!(capture.doc().path(), "src/main/java/lib/Helper.java");
+    let byte = vizzi::definitions::byte_offset(helper, location.position).unwrap();
+    let symbol = capture.symbol(
+        capture
+            .index
+            .definition(capture.doc().path(), byte)
+            .unwrap(),
+    );
+    drop(provider);
+    let restored = fixture.provider();
+    let response = json!({"version":1,"status":"ok","session":"java-session","epoch":1,"outside":0,
+        "locations":[{"path":fixture.root.join("Caller.java"),"text":caller,"position":{"line":0,"character":44}}]});
+    let peer = Peer::start(&fixture, move |_| frame(response));
+    let refs = restored
+        .references(fixture.snapshot.clone(), &symbol, byte)
+        .unwrap();
+    let request = peer.finish();
+    assert_eq!(request["method"], "dependency-references");
+    assert_eq!(request["providerUri"], uri);
+    assert_eq!(request["path"], archive.to_str().unwrap());
+    assert_eq!(request["archiveBinary"], binary.to_str().unwrap());
+    assert_eq!(refs.locations[0].path, "Caller.java");
+
+    let host = Arc::new(
+        Host::start_with_options(
+            Engine::new(
+                Directory::open(&fixture.root).unwrap(),
+                Cache::new(directory.join("http-cache")),
+                1,
+            )
+            .unwrap(),
+            HostOptions {
+                watch: false,
+                reconcile_interval: Duration::from_secs(3600),
+                idle_maintenance: false,
+            },
+        )
+        .unwrap(),
+    );
+    let review =
+        Arc::new(ReviewApplication::start(host.clone(), CaptureLimits::default()).unwrap());
+    let companion = Arc::new(
+        Companion::new(host.clone(), None, Arc::new(VsCode::new("unused".into()))).unwrap(),
+    );
+    let router = router_with_definitions(host, review, companion, Some(Arc::new(restored)));
+    let verify = || {
+        Request::post("/api/dependency/verify-archive")
+            .header("content-type", "application/json")
+            .body(Body::from(
+                json!({"capture": capture.origin.capture}).to_string(),
+            ))
+            .unwrap()
+    };
+    assert_eq!(
+        router.clone().oneshot(verify()).await.unwrap().status(),
+        StatusCode::NO_CONTENT
+    );
+    let replacement = directory.join("new-sources.jar");
+    write_archive(&replacement, &helper.replace("return 1", "return 2"));
+    fs::rename(&replacement, &archive).unwrap();
+    assert_eq!(
+        router.oneshot(verify()).await.unwrap().status(),
+        StatusCode::CONFLICT
+    );
 }
 
 #[test]

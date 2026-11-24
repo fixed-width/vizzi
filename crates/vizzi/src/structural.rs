@@ -191,6 +191,11 @@ impl Cached {
             .map(|index| project(&index)))
     }
 }
+pub(crate) enum DependencyEditorLocation {
+    File(crate::editor::EditorLocation),
+    Archive(crate::editor::ArchiveEditorLocation),
+}
+
 /// Current repository metadata and one on-demand file projection.
 pub struct StructureHost {
     reference_sets: Mutex<Vec<references::ReferenceSet>>,
@@ -249,17 +254,26 @@ impl StructureHost {
         value["snapshot"] = snapshot.into();
         Ok(value)
     }
-    /// Verifies an explicit dependency editor location against the captured bytes.
+    /// Verifies an explicit file-backed dependency editor location against the captured bytes.
     pub fn dependency_location(
         &self,
         request: &crate::companion::OpenSource,
     ) -> Result<crate::editor::EditorLocation, CompanionError> {
+        match self.dependency_editor_location(request)? {
+            DependencyEditorLocation::File(location) => Ok(location),
+            DependencyEditorLocation::Archive(_) => Err(CompanionError::Unavailable(
+                "Archive source has no local editor file".into(),
+            )),
+        }
+    }
+
+    pub(crate) fn dependency_editor_location(
+        &self,
+        request: &crate::companion::OpenSource,
+    ) -> Result<DependencyEditorLocation, CompanionError> {
         let source = self
             .dependency(&request.snapshot)?
             .ok_or_else(|| CompanionError::Conflict("Dependency capture expired".into()))?;
-        let path = source.path().ok_or_else(|| {
-            CompanionError::Unavailable("Archive source has no local editor file".into())
-        })?;
         if source.doc().id().as_str() != request.file
             || source.doc().version().as_str() != request.version
             || request.line == 0
@@ -276,11 +290,40 @@ impl StructureHost {
             .read_text(2 * 1024 * 1024)
             .map_err(|e| CompanionError::Unavailable(e.to_string()))?
             .ok_or_else(|| CompanionError::Invalid("Dependency source is not UTF-8".into()))?;
-        Ok(crate::editor::EditorLocation {
-            path,
-            line: request.line,
-            source: crate::editor::SourceWitness::from_bytes(text.as_bytes()),
-        })
+        let source_witness = crate::editor::SourceWitness::from_bytes(text.as_bytes());
+        if let Some(archive) = &source.editor_archive {
+            return Ok(DependencyEditorLocation::Archive(
+                crate::editor::ArchiveEditorLocation {
+                    capture: source.origin.capture.clone(),
+                    source: crate::editor::EditorLocation {
+                        path: source.input.root.clone(),
+                        line: request.line,
+                        source: source_witness,
+                    },
+                    binary: archive.binary.clone(),
+                    uri: archive.uri.clone(),
+                },
+            ));
+        }
+        let path = source.path().ok_or_else(|| {
+            CompanionError::Unavailable("Archive source has no local editor file".into())
+        })?;
+        Ok(DependencyEditorLocation::File(
+            crate::editor::EditorLocation {
+                path,
+                line: request.line,
+                source: source_witness,
+            },
+        ))
+    }
+    pub(crate) fn verify_editor_archive(&self, capture: &str) -> Result<(), CompanionError> {
+        let source = self
+            .dependency(capture)?
+            .filter(|source| source.editor_archive.is_some())
+            .ok_or_else(|| {
+                CompanionError::Conflict("Editor archive capture is unavailable".into())
+            })?;
+        source.verify().map_err(CompanionError::Conflict)
     }
     /// Creates an idle projection adapter without source reads or parsing.
     pub fn new(host: Arc<Host>) -> Self {

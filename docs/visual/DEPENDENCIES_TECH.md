@@ -40,9 +40,18 @@ identity or its archive capture ID, plus the source and destination positions.
 Vizzi can refresh an expired trail when a new lookup reaches the same source.
 It keeps a valid direct repository caller when navigating through another archive.
 A fresh JDT LS session replays up to eight retained steps and checks each archive,
-entry, content, and library origin before using its new virtual URI. The browser
-gets the package origin and an archive flag to disable physical editor handoff.
+entry, content, and library origin before using its new virtual URI.
 Source archives and explicitly configured library JARs are limited to 256 MiB each.
+
+VS Code's Java provider returns a `jdt:` document and its local binary and source
+attachment paths. The native bridge uses the same exact ZIP member admission as
+managed JDT LS. It retains the editor's virtual URI and canonical binary path
+in the capture. Follow-up calls and references verify the archive and recheck the
+provider's attachment and document text. If the editor URI expires, the reader
+can follow the call again. The originating VS Code adapter can open the verified
+virtual document and rechecks its attachment and displayed text before selecting
+the line. The browser receives only capture IDs and capability flags.
+[VS Code Java source attachment protocol](https://github.com/redhat-developer/vscode-java/blob/main/src/standardLanguageClient.ts)
 
 Each capture has its own source scope, snapshot, parsed document and structural projection.
 A public origin descriptor identifies package/language/version and the capture reference;

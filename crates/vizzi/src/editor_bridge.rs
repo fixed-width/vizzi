@@ -1,6 +1,6 @@
 //! Editor-owned analysis over a bounded, authenticated local connection.
 use crate::definitions::{self, Answer, Location, Position, Provider};
-use crate::dependency_sources::{Capture, Catalog, Declaration};
+use crate::dependency_sources::{Capture, Catalog, Declaration, EditorArchive};
 use serde::{Deserialize, Serialize};
 use std::{
     fs::File,
@@ -39,6 +39,8 @@ struct Request<'a> {
     position: Position,
     #[serde(rename = "providerUri", skip_serializing_if = "Option::is_none")]
     provider_uri: Option<&'a str>,
+    #[serde(rename = "archiveBinary", skip_serializing_if = "Option::is_none")]
+    archive_binary: Option<&'a Path>,
 }
 #[derive(Deserialize)]
 struct Response {
@@ -68,6 +70,8 @@ struct Target {
     declaration: Option<EditorDeclaration>,
     #[serde(rename = "providerUri", default)]
     provider_uri: Option<String>,
+    #[serde(rename = "archiveBinary", default)]
+    archive_binary: Option<PathBuf>,
 }
 
 #[derive(Deserialize)]
@@ -123,6 +127,46 @@ impl Bridge {
             active: Mutex::new(()),
             sources,
         }
+    }
+    fn archive_target(
+        &self,
+        target: &Target,
+        binary: &Path,
+        configuration: &str,
+    ) -> Result<Option<Arc<Capture>>, String> {
+        let Some(uri) = target
+            .provider_uri
+            .as_ref()
+            .and_then(|uri| url::Url::parse(uri).ok())
+        else {
+            return Ok(None);
+        };
+        if !binary.is_absolute()
+            || binary.extension().is_none_or(|ext| ext != "jar")
+            || binary.canonicalize().ok().as_deref() != Some(binary)
+            || !binary.is_file()
+            || target.path.canonicalize().ok().as_deref() != Some(target.path.as_path())
+        {
+            return Ok(None);
+        }
+        let Ok(input) =
+            crate::java_archive::input(&uri, &target.path, binary, &target.text, configuration)
+        else {
+            return Ok(None);
+        };
+        definitions::byte_offset(&target.text, target.position)?;
+        self.sources
+            .capture_editor_archive(
+                input,
+                EditorArchive {
+                    uri: target
+                        .provider_uri
+                        .clone()
+                        .ok_or("Editor archive URI is unavailable")?,
+                    binary: binary.to_owned(),
+                },
+            )
+            .map(Some)
     }
     fn dependency_target(
         &self,
@@ -207,6 +251,12 @@ impl Bridge {
 
     fn verify_dependency(&self, capture: &Capture, editor_root: &Path) -> Result<(), String> {
         capture.verify()?;
+        if let Some(editor) = &capture.editor_archive
+            && (editor.binary.canonicalize().ok().as_ref() != Some(&editor.binary)
+                || !editor.binary.is_file())
+        {
+            return Err("Editor archive library changed; reopen it from its caller".into());
+        }
         if let Some(uri) = capture
             .input
             .installation
@@ -329,11 +379,16 @@ impl Bridge {
             self.verify_dependency(source, &connection.root)?;
         }
         let text = source(doc)?;
+        let archive = dependency.and_then(|source| source.editor_archive.as_ref());
         let external_path = dependency
             .map(|source| {
-                source
-                    .path()
-                    .ok_or("Editor dependency source needs a local file")
+                if archive.is_some() {
+                    Ok(source.input.root.clone())
+                } else {
+                    source
+                        .path()
+                        .ok_or("Editor dependency source needs a local file")
+                }
             })
             .transpose()?;
         let query_path = external_path
@@ -356,9 +411,12 @@ impl Bridge {
                 path: query_path,
                 text: &text,
                 position: definitions::position(&text, byte)?,
-                provider_uri: dependency
-                    .and_then(|source| source.input.installation.as_ref())
-                    .and_then(|package| package.editor_uri.as_deref()),
+                provider_uri: archive.map(|archive| archive.uri.as_str()).or_else(|| {
+                    dependency
+                        .and_then(|source| source.input.installation.as_ref())
+                        .and_then(|package| package.editor_uri.as_deref())
+                }),
+                archive_binary: archive.map(|archive| archive.binary.as_path()),
             },
         )?;
         if response.version != 1 {
@@ -385,6 +443,24 @@ impl Bridge {
         let mut locations = vec![];
         let mut captured_targets = vec![];
         for target in targets {
+            if let Some(binary) = &target.archive_binary {
+                let captured = if doc.classification().assigned_language() == Some("java") {
+                    self.archive_target(&target, binary, configuration.as_str())?
+                } else {
+                    None
+                };
+                if let Some(captured) = captured {
+                    locations.push(Location {
+                        capture: Some(captured.origin.capture.clone()),
+                        path: captured.doc().path().into(),
+                        position: target.position,
+                    });
+                    captured_targets.push(captured);
+                } else {
+                    outside += 1;
+                }
+                continue;
+            }
             if !target.path.is_absolute() {
                 return Err("Editor target must be an absolute file path".into());
             }

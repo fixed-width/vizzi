@@ -23,6 +23,45 @@ test('clean matching target is shown without a selection and selected only after
   const f=await fixture(t);await f.open(f.request,{signal:f.controller.signal});
   assert.equal(f.shown.length,1);assert.equal(f.shown[0].options.selection,undefined);assert.equal(f.selections.length,1);assert.equal(f.selections[0].active.line,1);assert.equal(f.revealed.length,1);assert.equal(await fs.readFile(f.file,'utf8'),f.text);
 });
+test('the originating window verifies a Java archive before opening and again before selecting the line',async t=>{
+  const f=await fixture(t,'package demo;\nclass Helper {}\n');
+  const archive=path.join(f.directory,'helper-sources.jar'),binary=path.join(f.directory,'helper.jar');
+  await fs.writeFile(archive,'source archive');await fs.writeFile(binary,'binary archive');
+  const providerUri='jdt://contents/helper.jar/demo/Helper.class?project';
+  const target={scheme:'jdt',authority:'contents',toString:()=>providerUri};
+  f.document.uri=target;
+  f.document.languageId='java';
+  f.vscode.Uri.parse=value=>{assert.equal(value,providerUri);return target;};
+  let attachment=archive;
+  f.vscode.commands={executeCommand:async(command,method,params)=>{
+    assert.deepEqual([command,method,JSON.parse(params)],['java.execute.workspaceCommand',
+      'java.project.resolveSourceAttachment',{classFileUri:providerUri}]);
+    return {attributes:{sourceAttachmentPath:attachment,jarPath:binary}};
+  }};
+  const archiveCapture='c'.repeat(64);
+  const request={...f.request,path:archive,archiveBinary:binary,providerUri,archiveCapture};
+  const open=createEditorNavigator(f.vscode,{root:f.root,verifyArchive:async capture=>{
+    assert.equal(capture,archiveCapture);
+    if (await fs.readFile(archive,'utf8') !== 'source archive') throw new Error('Saved Java archive changed');
+  }});
+  await open(request,{signal:f.controller.signal});
+  assert.equal(f.shown[0].doc.uri,target);
+  assert.equal(f.selections[0].active.line,1);
+  f.onShow(async()=>{attachment=undefined;});
+  await assert.rejects(open(request,{signal:f.controller.signal}),/attachment changed/i);
+  assert.equal(f.selections.length,1);
+  attachment=archive;
+  f.onShow(async()=>{
+    await fs.writeFile(archive+'.next','changed archive');
+    await fs.rename(archive+'.next',archive);
+  });
+  await assert.rejects(open(request,{signal:f.controller.signal}),/archive changed/i);
+  assert.equal(f.selections.length,1);
+  await fs.writeFile(archive,'source archive');
+  f.document.getText=()=>f.text+'changed';
+  await assert.rejects(open(request,{signal:f.controller.signal}),/differs from captured/i);
+  assert.equal(f.shown.length,3);
+});
 test('dirty target is refused while unrelated dirty documents do not block navigation',async t=>{
   const f=await fixture(t);f.document.isDirty=true;await assert.rejects(f.open(f.request,{signal:f.controller.signal}),/unsaved|dirty/i);assert.equal(f.shown.length,0);
   f.document.isDirty=false;const other=path.join(f.root,'other.rs');await fs.writeFile(other,'other');f.vscode.workspace.textDocuments.push({uri:uri(other),isDirty:true,getText:()=> 'unsaved'});

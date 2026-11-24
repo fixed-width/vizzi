@@ -126,7 +126,10 @@ Right-click a saved Java call name and choose **Vizzi: Explore Call**, or follow
 call from a method bubble. Use **Find references** on a Java declaration to query
 the shared provider. The editor's project configuration determines which overloads,
 imports, and references it resolves. Vizzi verifies results against captured
-workspace files. [Install and use the Vizzi extension](../../editors/vscode/INSTALL.md)
+workspace files. The Red Hat Java extension can also supply attached JDK and
+library source. Follow calls and references from those bubbles and use **Open in
+VS Code** to return to the verified source line in the launching window.
+[Install and use the Vizzi extension](../../editors/vscode/INSTALL.md)
 
 ## Python with Pyright
 

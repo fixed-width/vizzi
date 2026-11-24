@@ -2,6 +2,7 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const {savedSource} = require('./editor-source.cjs');
+const {isJavaArchive,verifyJavaDocument} = require('./java-archive.cjs');
 
 const failure = (code,message)=>Object.assign(new Error(message),{code});
 function contains(root,file) {
@@ -9,7 +10,7 @@ function contains(root,file) {
   return relative === '' || relative !== '..' && !relative.startsWith('..'+path.sep) && !path.isAbsolute(relative);
 }
 
-function createEditorNavigator(vscode,{root,editorRoot=root,read=savedSource,now=Date.now}) {
+function createEditorNavigator(vscode,{root,editorRoot=root,read=savedSource,now=Date.now,verifyArchive}) {
   return async function open(request,{signal}={}) {
     function alive() {
       if (signal?.aborted) throw failure('origin_unavailable','Originating editor request was cancelled or its connection closed');
@@ -21,6 +22,38 @@ function createEditorNavigator(vscode,{root,editorRoot=root,read=savedSource,now
         || !Number.isSafeInteger(request.source?.bytes) || request.source.bytes < 0
         || request.source.bytes > 16*1024*1024 || !/^[0-9a-f]{64}$/.test(request.source.sha256)) {
       throw failure('invalid_request','Invalid verified editor location');
+    }
+    async function present(document,verify) {
+      await verify();
+      const visible = vscode.window.visibleTextEditors?.find(editor=>editor.document === document);
+      const editor = await vscode.window.showTextDocument(document,{preview:false,preserveFocus:false,
+        ...(visible?.viewColumn ? {viewColumn:visible.viewColumn} : {})});
+      alive();
+      if (editor.document !== document) throw failure('source_changed','The editor displayed a different target document');
+      await verify();
+      alive();
+      const point = new vscode.Position(request.line-1,0);
+      editor.selection = new vscode.Selection(point,point);
+      editor.revealRange(new vscode.Range(point,point),vscode.TextEditorRevealType.InCenterIfOutsideViewport);
+    }
+    if (request.archiveBinary !== undefined) {
+      if (!verifyArchive) throw failure('target_unavailable','The Java archive verifier is unavailable');
+      const uri = vscode.Uri.parse(request.providerUri,true);
+      if (!isJavaArchive(uri)) throw failure('invalid_request','Invalid Java archive document URI');
+      const document = await vscode.workspace.openTextDocument(uri);
+      return present(document,async()=>{
+        alive();
+        const text = document.getText();
+        await verifyJavaDocument(vscode,document,request,text);
+        await verifyArchive(request.archiveCapture,signal);
+        alive();
+        const bytes = Buffer.from(text,'utf8');
+        if (document.isDirty || document.getText() !== text || bytes.length !== request.source.bytes
+            || crypto.createHash('sha256').update(bytes).digest('hex') !== request.source.sha256
+            || request.line > document.lineCount) {
+          throw failure('source_changed','The Java archive editor buffer differs from captured source');
+        }
+      });
     }
     const canonical = await fs.realpath(request.path).catch(()=>{
       throw failure('target_unavailable','The verified target file is unavailable');
@@ -83,17 +116,7 @@ function createEditorNavigator(vscode,{root,editorRoot=root,read=savedSource,now
       }
       if (request.line > document.lineCount) throw failure('source_changed','The captured line is outside the target editor buffer');
     }
-    await verify();
-    const visible = vscode.window.visibleTextEditors?.find(editor=>editor.document === document);
-    const editor = await vscode.window.showTextDocument(document,{preview:false,preserveFocus:false,
-      ...(visible?.viewColumn ? {viewColumn:visible.viewColumn} : {})});
-    alive();
-    if (editor.document !== document) throw failure('source_changed','The editor displayed a different target document');
-    await verify();
-    alive();
-    const point = new vscode.Position(request.line-1,0);
-    editor.selection = new vscode.Selection(point,point);
-    editor.revealRange(new vscode.Range(point,point),vscode.TextEditorRevealType.InCenterIfOutsideViewport);
+    await present(document,verify);
   };
 }
 module.exports = {createEditorNavigator};

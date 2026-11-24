@@ -130,8 +130,9 @@ set `VIZZI_NVIM_BROWSER=1` to exercise the browser's **Editor** button.
 - Read the manifest for every lookup rather than caching its endpoint/token. Never send
   LSP initialization, synchronization, execution or lifecycle messages to editor providers.
   Native admission accepts reached Rust dependencies and supported JavaScript and
-  TypeScript source in canonical workspace installations. Other external and non-file
-  locations are counted as outside. An editor package location can supply its original
+  TypeScript source in canonical workspace installations and verified Java source
+  attachments reached through `jdt:` documents. Other external and non-file locations
+  are counted as outside. An editor package location can supply its original
   provider URI. The bridge retains it in the capture and verifies its canonical
   destination on follow-up requests. [Dependency source contract](../visual/DEPENDENCIES_TECH.md)
 

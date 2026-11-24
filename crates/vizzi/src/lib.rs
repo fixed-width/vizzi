@@ -13,6 +13,7 @@ pub mod engine;
 pub mod handoff;
 pub mod host;
 mod invalidation;
+mod java_archive;
 mod maintenance;
 pub mod question_search;
 pub mod review;
