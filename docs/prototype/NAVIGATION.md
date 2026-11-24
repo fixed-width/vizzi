@@ -14,12 +14,14 @@ After a failed return, an accepted explicit action branches from the requested h
 position, including a filter action that re-establishes the displayed location.
 
 Each visit records opaque file/declaration identities, document version, observed snapshot,
-path, filter, inspector position and map camera. Positions include horizontal/fragment
-and outline-cursor state. No source bodies, facts or snapshot leases are retained.
+path, filter, directory page, inspector position and map camera. Positions include
+horizontal/fragment and outline-cursor state. No source bodies, facts or snapshot leases
+are retained.
 
 Returns query the latest published snapshot. When file, declaration and document version
-still match, restore the recorded inspector position and filter. Restore the camera only
-when the whole snapshot matches; otherwise reframe the current overview.
+still match, restore the recorded inspector position, filter and directory page. Restore
+the camera when the snapshot, page and map layout still match. Reframe the current
+overview when these differ.
 Coordinates clamp to the current pane dimensions.
 When source changed, show a notice and reveal the current matching declaration, or the
 current file start if the declaration is gone. Never show an old label over new bytes.

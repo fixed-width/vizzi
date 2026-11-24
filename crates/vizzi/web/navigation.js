@@ -1,7 +1,13 @@
 export function createNavigation({ capture, load, prepare:prepareView, history, onState = () => {}, onNotice = () => {} }) {
   const session = crypto.randomUUID();
   let entries = [], cursor = 0, shown, active;
-  const query = entry => ({ file: entry.file, entity: entry.entity, filter: entry.filter });
+  const query = entry => ({ file: entry.file, entity: entry.entity, filter: entry.filter,
+    ...(entry.directory === undefined ? {} : { directory: entry.directory, offset: entry.offset }) });
+  function requestedQuery(current, patch) {
+    const requested = { ...query(current), ...patch };
+    if (requested.offset !== undefined && requested.filter !== current.filter) requested.offset = 0;
+    return requested;
+  }
   const copy = value => structuredClone(value);
   const marker = key => ({ vizziNavigation: { schema: 1, session, key } });
   function notify() {
@@ -56,14 +62,14 @@ export function createNavigation({ capture, load, prepare:prepareView, history, 
   function navigate(patch,anchor) {
     saveShown();
     const before = copy(capture());
-    return request({ before, pending: true, ...(anchor?{anchor:copy(anchor)}:{}) }, { ...query(before), ...patch });
+    return request({ before, pending: true, ...(anchor?{anchor:copy(anchor)}:{}) }, requestedQuery(before, patch));
   }
   async function prepare(patch,anchor,{signal,replaceHistory=false}={}) {
     saveShown();
     const before=copy(capture()),intent={before,pending:true,anchor:copy(anchor),replaceHistory,editor:true};
     active=intent;onNotice(null);notify();let prepared,committed=false;
     try {
-      prepared=await prepareView({...query(before),...patch},intent,signal);
+      prepared=await prepareView(requestedQuery(before, patch),intent,signal);
       if(signal?.aborted || active!==intent)throw new DOMException('Editor navigation cancelled','AbortError');
       if(!allow(prepared.view,intent))throw new Error('Requested source changed. Retry the editor action.');
     } catch(error) {prepared?.cancel();intent.pending=false;if(active===intent)active=undefined;notify();throw error;}

@@ -19,7 +19,7 @@ strings. HTTP responses disable caching. The host serves `/`, `/app.js`, `/contr
 | --- | --- | --- |
 | `GET /api/status` | None | Workspace name, generation, snapshot, readiness, foreground pending flag, measurements, recovery metadata, refresh error, observation mode |
 | `POST /api/workspace/start` | JSON `{}` | Activate live indexing or retry an initial failure; **202** with current status |
-| `GET /api/view` | Optional `snapshot`, `file`, `entity`, `filter`, `limit` | One snapshot's bounded overview, selection, captured source, and outlines |
+| `GET /api/view` | Optional `snapshot`, `file`, `entity`, `filter`, `limit`, `directory`, `offset` | One snapshot's bounded overview, selection, captured source, and outlines |
 | `GET /api/window` | Required `snapshot`, `file`, `version`; optional source/outline ranges | Bounded text fragments, declaration page, and logical cursor from that exact pin |
 | `GET /api/source` | Required `snapshot`, `file` | Captured source from the requested retained observation |
 | `GET /api/events` | None; `Last-Event-ID` does not request replay | Latest-state `workspace` events over SSE, followed by changes |
@@ -49,6 +49,17 @@ existing eager constructors, `--once` and `--stdio` retain initial capture on st
 to 1–2,000. `total` counts all discovered supported source files; `matching` counts matches before
 limiting. The view includes world-space tile rectangles, directory cards (`path`, `x`, `y`, `width`, `height`), and overall height. Cards are
 packed deterministically across shelves sized from total tile/card area.
+
+`directory` opts into paged browsing when the snapshot exceeds 2,000 files. Use `.`
+for the root. The optional `browse` object identifies the resolved directory, full
+file count, total entries, actual offset, page size, directory cards with subtree
+counts, and captured landmarks in the current directory. Its fixed 100-entry pages order
+directories before files and sort paths within each group. A path filter selects
+repository-wide matches and uses the same paging. `matching` counts all scoped files
+or search matches in this mode. An unavailable directory resolves to the nearest
+available ancestor, and an offset past the end resolves to the last page. The
+selected file and its captured source may be outside the current page.
+
 `workspace` is the stable opaque workspace identity, independent of snapshots, for
 scoping local presentation preferences. `policy` identifies capture policy, including empty snapshots. `analyzed` counts all
 captured files with analysis records; `source_only` counts those without records.

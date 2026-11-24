@@ -35,11 +35,17 @@ let updates, viewFilter = "",mapModel,scene,mapWorkspace;
 const dismissible=new Set(["navigation-notice","error","map-notice"]);
 const messages=Object.fromEntries([["status","workspace status"],["navigation-notice","navigation notice"],["coverage","source status"],["diagnostics","source diagnostics"],["error","workspace error"],["map-notice","map notice"]].map(([id,label])=>[id,dismissible.has(id)?createMessage(element(id),{label:`Dismiss ${label}`}):textRow(element(id))]));
 let palette=mapPalette(canvas);
-const directories=createDirectoryControls({tree:element("directory-tree"),breadcrumbs:element("map-breadcrumbs"),onChange:()=>{refreshScene();saveMap();fit(true);}});
-function refreshScene(){scene=mapModel.project();directories.apply(mapModel);metrics.scene=scene;renderCounts();}
-function renderCounts(){if(!view)return;element("counts").textContent=fileCount(view.files.length,view.matching,view.total)+(scene?.focus!=="."?` · ${scene?.files.length ?? 0} drawn here`:"")+(scene?.hiddenFiles?` · ${scene.hiddenFiles} inside groups`:"")+(view.deferred?` · ${view.deferred} awaiting analysis`:"");}
+const directories=createDirectoryControls({tree:element("directory-tree"),breadcrumbs:element("map-breadcrumbs"),onOpen:openDirectory,onChange:()=>{refreshScene();saveMap();fit(true);}});
+function refreshScene(){scene=mapModel.project();directories.apply(mapModel);metrics.scene=scene;renderCounts();renderLandmarks();}
+function renderCounts(){
+  if(!view)return;
+  const page=view.browse;
+  const count=page?fileCount(page.files,page.files,view.total):fileCount(view.files.length,view.matching,view.total);
+  element("counts").textContent=count+(!page && scene?.focus!=="."?` · ${scene?.files.length ?? 0} drawn here`:"")+
+    (scene?.hiddenFiles?` · ${scene.hiddenFiles} inside groups`:"")+(view.deferred?` · ${view.deferred} awaiting analysis`:"");
+}
 function saveMap(){try{const value=JSON.stringify(mapModel.preferences());if(new TextEncoder().encode(value).length>65536)throw new Error("layout size");localStorage.setItem(`vizzi.map.v1.${mapWorkspace}`,value);messages["map-notice"].show(null);}catch{messages["map-notice"].show("Map preferences could not be saved. The current layout is kept until reload.");}}
-element("reset-map").addEventListener("click",()=>{if(!mapModel)return;mapModel.reset();refreshScene();saveMap();fit(true);});
+element("reset-map").addEventListener("click",()=>{if(!mapModel)return;if(view.browse){openDirectory(".");return;}mapModel.reset();refreshScene();saveMap();fit(true);});
 installAppearance(element("theme"),{onChange:()=>{palette=mapPalette(canvas);invalidate();}});
 const fetchJSON = async (uri, options) => {
   const start = performance.now();
@@ -58,7 +64,8 @@ const inspector = createInspector({source,space,outline:element("outline"),trans
 const navigation = createNavigation({
   capture: () => ({ file:view?.selection.file ?? null,entity:view?.selection.entity ?? null,
     path:view?.source?.path ?? null,version:view?.source?.version ?? null,snapshot:view?.snapshot ?? null,
-    filter:viewFilter,position:{inspector:inspector.position(),camera:{...camera},layoutRevision:mapModel?.revision,fitMode,mapSize} }),
+    filter:viewFilter,directory:view?.browse?.directory ?? ".",offset:view?.browse?.offset ?? 0,
+    position:{inspector:inspector.position(),camera:{...camera},layoutRevision:mapModel?.revision,fitMode,mapSize} }),
   load: (query,intent) => controller.load(query,{intent,rollbackOnFailure:Boolean(intent.returning || intent.anchor)}),
   prepare: (query,intent,signal) => controller.prepare(query,{intent,signal,rollbackOnFailure:true}),
   history: {push:state=>history.pushState(state,""),replace:state=>history.replaceState(state,""),go:delta=>history.go(delta)},
@@ -66,25 +73,39 @@ const navigation = createNavigation({
   onNotice: notice => messages["navigation-notice"].show(notice),
 });
 function navigate(patch) { editorFiles.manual();clearTimeout(filterTimer);return navigation.navigate({filter:element("filter").value,...patch}); }
+function openDirectory(directory) {
+  element("filter").value="";
+  return navigate({directory,offset:0});
+}
+function changePage(direction) {
+  const page=view?.browse;
+  if(!page)return;
+  return navigate({offset:Math.max(0,page.offset+direction*page.size)});
+}
 const controller = createController({
   viewSchema: 3,
   acceptView: (next,info) => navigation.allow(next,info.intent),
   transport: async (uri, options) => {
-    const next=await fetchJSON(`${uri}&projection=summary`,options);
+    const url=new URL(uri,location.origin);
+    url.searchParams.set("projection","summary");
+    if(!url.searchParams.has("directory"))url.searchParams.set("directory",".");
+    const next=await fetchJSON(url,options);
     const restore=navigation.restoration(next,options.intent);
     return inspector.prepare(next,{...options,restore:restore?.position.inspector,line:options.intent?.anchor?.line,reveal:Boolean(options.intent?.anchor || options.intent?.returning && !restore)});
   },
   onView: (next,info) => {
     const previousSelection=view?.selection.file;
     const first = !view, changedFilter=viewFilter!==(info.query.filter ?? "");
+    const changedPage=view?.browse?.directory!==next.browse?.directory || view?.browse?.offset!==next.browse?.offset;
     view = next;keepEvidence.disabled=!next.source;
     viewFilter=info.query.filter ?? "";
     if(info.intent?.returning || info.intent?.anchor)element("filter").value=viewFilter;
-    if(mapWorkspace!==next.workspace){let preferences={};try{const saved=localStorage.getItem(`vizzi.map.v1.${next.workspace}`);if(saved && saved.length<=65536 && new TextEncoder().encode(saved).length<=65536)preferences=JSON.parse(saved);}catch{}mapModel=createMapModel(next.files,preferences);mapWorkspace=next.workspace;}
-    else mapModel.setFiles(next.files);
+    if(mapWorkspace!==next.workspace){let preferences={};try{const saved=localStorage.getItem(`vizzi.map.v1.${next.workspace}`);if(saved && saved.length<=65536 && new TextEncoder().encode(saved).length<=65536)preferences=JSON.parse(saved);}catch{}mapModel=createMapModel(next.files,preferences,next.browse);mapWorkspace=next.workspace;}
+    else mapModel.setFiles(next.files,next.browse);
     if(!first && previousSelection!==next.selection.file || info.intent?.anchor)mapModel.reveal(next.selection.file);
     refreshScene();
-    element("empty").hidden = next.files.length > 0;
+    element("empty").hidden = (next.browse?.entries ?? next.files.length) > 0;
+    renderPage();
     element("file-title").textContent = next.source?.path ?? "Choose a file";
     element("snapshot").textContent = next.snapshot.slice(0, 8);
     element("snapshot").title = `Captured observation ${next.snapshot}`;
@@ -93,9 +114,10 @@ const controller = createController({
     messages.diagnostics.show(diagnostics.join(". "),next.source?.version);
     inspector.apply(next); renderFileList();
     const restore=navigation.restoration(next,info.intent);
-    const sameScene=restore && restore.snapshot===next.snapshot && restore.position.layoutRevision===mapModel.revision;
+    const sameScene=restore && restore.snapshot===next.snapshot && restore.position.layoutRevision===mapModel.revision &&
+      restore.filter===viewFilter && restore.directory===(next.browse?.directory ?? ".") && restore.offset===(next.browse?.offset ?? 0);
     if(sameScene){camera={...restore.position.camera};fitMode=restore.position.fitMode ?? null;const old=restore.position.mapSize;if(old)camera=jumpCamera(camera,{x:(old.width/2-camera.x)/camera.scale,y:(old.height/2-camera.y)/camera.scale},canvas.clientWidth,canvas.clientHeight);invalidate();}
-    else if(first || changedFilter || info.intent?.returning)fit(true);else invalidate();
+    else if(first || changedFilter || changedPage || info.intent?.returning)fit(true);else invalidate();
     if(!first && previousSelection!==next.selection.file && !info.intent?.returning){const file=scene.files.find(f=>f.id===next.selection.file);if(file){const x=camera.x+(file.rect.x+file.rect.width/2)*camera.scale,y=camera.y+(file.rect.y+file.rect.height/2)*camera.scale;if(x<12 || y<12 || x>canvas.clientWidth-12 || y>canvas.clientHeight-12){camera=jumpCamera(camera,{x:file.rect.x+file.rect.width/2,y:file.rect.y+file.rect.height/2},canvas.clientWidth,canvas.clientHeight);fitMode=null;invalidate();}}}
     if(info.intent || !editorFiles.pending())navigation.observe(info.intent);
     void editorFiles.resume();
@@ -121,6 +143,38 @@ const editorFiles=installWorkspaceDelivery({mode:'file',
   },failed:showError,changed:pending=>{if(!pending && view)navigation.observe();}});
 function showError(error) { messages.error.show(`${error.message || error} · ${view?"Keeping the last captured view; retrying.":"No source observation is available. Retry indexing."}`); }
 
+function renderLandmarks() {
+  const list=element("landmark-files");
+  const direct=file=>file.path.slice(0,file.path.lastIndexOf("/")+1)===(scene.focus==="."?"":`${scene.focus}/`);
+  const files=viewFilter?[]:view.browse?.landmarks ?? view.files.filter(file=>file.landmark && direct(file));
+  const readme=files.find(file=>(file.kind ?? file.landmark)==="readme");
+  const landmarks=files.filter(file=>(file.kind ?? file.landmark)==="manifest");
+  if(readme)landmarks.unshift(readme);
+  const key=JSON.stringify(landmarks.map(file=>[file.id,file.path]));
+  if(list.dataset.files===key)return;
+  list.dataset.files=key;
+  element("map-landmarks").hidden=!landmarks.length;
+  list.replaceChildren(...landmarks.map(file=>{
+    const button=document.createElement("button");
+    button.type="button";
+    button.textContent=file.path.split("/").at(-1);
+    button.title=file.path;
+    button.onclick=()=>navigate({file:file.id,entity:null});
+    return button;
+  }));
+}
+
+function renderPage() {
+  const page=view.browse,pager=element("map-pages");
+  pager.hidden=!page || page.entries<=page.size;
+  if(pager.hidden)return;
+  const end=Math.min(page.offset+page.size,page.entries);
+  const range=`${(page.offset+1).toLocaleString()}–${end.toLocaleString()} of ${page.entries.toLocaleString()} ${viewFilter?"matches":"entries"}`;
+  if(element("map-page-range").textContent!==range)element("map-page-range").textContent=range;
+  element("map-page-previous").disabled=page.offset===0;
+  element("map-page-next").disabled=end===page.entries;
+}
+
 function renderFileList() {
   const list = element("file-list"); list.replaceChildren();
   if (!list.closest("details").open || !view) return;
@@ -138,6 +192,29 @@ function fit(readable = false) {
   camera = fitCamera(bounds.width,bounds.height,canvas.clientWidth,canvas.clientHeight,readable);
   invalidate();
 }
+function drawDirectorySummary(group,x,y,width,height) {
+  const available=width-12;
+  if(available<18 || height<18)return;
+  let label=group.label;
+  context.font="600 11px 'DejaVu Sans', sans-serif";
+  if(context.measureText(label).width>available){
+    const characters=Array.from(label);
+    let low=0,high=characters.length;
+    while(low<high){
+      const middle=Math.ceil((low+high)/2);
+      if(context.measureText(characters.slice(0,middle).join("")+"…").width<=available)low=middle;
+      else high=middle-1;
+    }
+    label=characters.slice(0,low).join("")+"…";
+  }
+  context.fillStyle=palette.text;
+  context.fillText(label,x+6,y+14);
+  if(height>=33){
+    context.font="10px 'DejaVu Sans', sans-serif";
+    const count=`${group.count.toLocaleString()} ${group.count===1?"file":"files"}`;
+    context.fillText(count,x+6,y+27,available);
+  }
+}
 function draw(timestamp) {
   scheduled = false; const start = performance.now();
   if (drag && previousFrame !== null) sample(metrics.interactionFrameMs, timestamp - previousFrame);
@@ -152,7 +229,8 @@ function draw(timestamp) {
       const r=group.rect,x=camera.x+r.x*camera.scale,y=camera.y+r.y*camera.scale,w=r.width*camera.scale,h=r.height*camera.scale;
       if(x+w<0 || y+h<0 || x>width || y>height)continue;
       context.fillStyle=palette.group;context.fillRect(x,y,w,h);context.strokeStyle=palette.border;context.lineWidth=1;context.strokeRect(x+.5,y+.5,Math.max(0,w-1),Math.max(0,h-1));
-      const title=`${group.collapsed?"▸":"▾"} ${group.label} (${group.count})`;
+      if(group.summary){drawDirectorySummary(group,x,y,w,h);continue;}
+      const title=`${group.collapsed?"▸":"▾"} ${group.label} (${group.count.toLocaleString()})`;
       context.font="600 11px 'DejaVu Sans', sans-serif";
       const band={x:x+3,y,width:Math.max(0,w-6),height:Math.min(h,group.header*camera.scale)},placement=headingPlacement(band,context.measureText(title));
       if(placement){context.save();context.beginPath();context.rect(band.x,band.y,band.width,band.height);context.clip();context.fillStyle=palette.text;context.fillText(title,placement.x,placement.baseline);context.restore();}
@@ -179,12 +257,17 @@ function draw(timestamp) {
 }
 function worldBounds() { return {width:scene?.width ?? 1,height:scene?.height ?? 1}; }
 function drawOverview(dpr) {
+  const world=worldBounds();
+  overview.hidden=Boolean(scene?.paged && camera.x>=0 && camera.y>=0 &&
+    camera.x+world.width*camera.scale<=canvas.clientWidth && camera.y+world.height*camera.scale<=canvas.clientHeight);
+  if(overview.hidden){overviewTransform=null;return;}
   const width=overview.clientWidth,height=overview.clientHeight;
   overview.width=Math.round(width*dpr);overview.height=Math.round(height*dpr);
   overviewContext.setTransform(dpr,0,0,dpr,0,0);overviewContext.clearRect(0,0,width,height);
   if(!view)return;
-  const world=worldBounds(),scale=Math.min((width-12)/world.width,(height-12)/world.height);
+  const scale=Math.min((width-12)/world.width,(height-12)/world.height);
   const x=(width-world.width*scale)/2,y=(height-world.height*scale)/2;overviewTransform={x,y,scale};
+  for(const group of scene.groups){if(!group.summary)continue;const r=group.rect;overviewContext.fillStyle=palette.group;overviewContext.fillRect(x+r.x*scale,y+r.y*scale,Math.max(1,r.width*scale-1),Math.max(1,r.height*scale-1));}
   for(const file of scene.files){const r=file.rect;overviewContext.fillStyle=file.id===view.selection.file?palette.selected:palette.file;overviewContext.fillRect(x+r.x*scale,y+r.y*scale,Math.max(1,r.width*scale),Math.max(1,r.height*scale));}
   overviewContext.strokeStyle=palette.focus;overviewContext.lineWidth=1.5;
   overviewContext.strokeRect(x-camera.x/camera.scale*scale,y-camera.y/camera.scale*scale,canvas.clientWidth/camera.scale*scale,canvas.clientHeight/camera.scale*scale);
@@ -208,17 +291,30 @@ function hit(x, y) {
   sample(metrics.pickingMs, performance.now() - start);
   return file;
 }
-function groupAt(x,y,header=false){if(!scene)return null;const wx=(x-camera.x)/camera.scale,wy=(y-camera.y)/camera.scale;return [...scene.groups].reverse().find(g=>wx>=g.rect.x && wx<=g.rect.x+g.rect.width && wy>=g.rect.y && wy<=g.rect.y+(header?g.header:g.rect.height));}
+function groupAt(x,y,header=false){if(!scene)return null;const wx=(x-camera.x)/camera.scale,wy=(y-camera.y)/camera.scale;return [...scene.groups].reverse().find(g=>wx>=g.rect.x && wx<=g.rect.x+g.rect.width && wy>=g.rect.y && wy<=g.rect.y+(header && !g.summary?g.header:g.rect.height));}
 function point(event) { const bounds = canvas.getBoundingClientRect(); return { x: event.clientX - bounds.left, y: event.clientY - bounds.top }; }
 canvas.addEventListener("pointerdown", event => { if (event.button !== 0) return; const p = point(event); drag = { ...p, startX: p.x, startY: p.y, moved: false, group:groupAt(p.x,p.y,true)?.path }; canvas.setPointerCapture(event.pointerId); element("tooltip").hidden = true; });
 canvas.addEventListener("pointermove", event => {
   const p = point(event);
   if (drag) { if(!drag.group){fitMode=null;camera.x += p.x - drag.x; camera.y += p.y - drag.y;} drag.moved ||= Math.hypot(p.x - drag.startX, p.y - drag.startY) > 4; drag.x = p.x; drag.y = p.y; invalidate(); return; }
   const file = hit(p.x, p.y), tooltip = element("tooltip"); tooltip.hidden = !file;
-  if (!file){const group=groupAt(p.x,p.y);if(group){tooltip.hidden=false;tooltip.textContent=`${group.path}\n${group.count} files · ${group.limited?"click header to focus":group.collapsed?"click header to expand":"click header to collapse"}`;tooltip.style.left=`${Math.min(p.x+12,canvas.clientWidth*.45)}px`;tooltip.style.top=`${Math.min(p.y+12,canvas.clientHeight-65)}px`;}}
+  if (!file){const group=groupAt(p.x,p.y);if(group){tooltip.hidden=false;tooltip.textContent=`${group.path}\n${group.count.toLocaleString()} files · ${group.summary?"click to open":group.limited?"click header to focus":group.collapsed?"click header to expand":"click header to collapse"}`;tooltip.style.left=`${Math.min(p.x+12,canvas.clientWidth*.45)}px`;tooltip.style.top=`${Math.min(p.y+12,canvas.clientHeight-65)}px`;}}
   if (file) { tooltip.textContent = `${file.path}\n${file.bytes.toLocaleString()} bytes · ${coverageLabel(file.coverage,file.classification.kind === "source_only")}`; tooltip.style.left = `${Math.min(p.x + 12, canvas.clientWidth * .45)}px`; tooltip.style.top = `${Math.max(0, Math.min(p.y + 12, canvas.clientHeight - 65))}px`; }
 });
-canvas.addEventListener("pointerup",event=>{const p=point(event);if(drag?.group){const target=groupAt(p.x,p.y,true);if(drag.moved){if(target && mapModel.move(drag.group,target.path)){refreshScene();saveMap();fit(true);}}else {if(target?.limited)mapModel.focus(drag.group);else mapModel.toggle(drag.group);refreshScene();saveMap();fit(true);}}else if(drag && !drag.moved){const file=hit(p.x,p.y);if(file)navigate({file:file.id,entity:null});}drag=null;previousFrame=null;});
+canvas.addEventListener("pointerup",event=>{
+  const p=point(event);
+  if(drag?.group){
+    const target=groupAt(p.x,p.y,true);
+    if(target?.summary && !drag.moved && target.path===drag.group)openDirectory(target.path);
+    else if(target && !target.summary){
+      const changed=drag.moved?mapModel.move(drag.group,target.path):target.limited?mapModel.focus(drag.group):mapModel.toggle(drag.group);
+      if(changed){refreshScene();saveMap();fit(true);}
+    }
+  }else if(drag && !drag.moved){
+    const file=hit(p.x,p.y);if(file)navigate({file:file.id,entity:null});
+  }
+  drag=null;previousFrame=null;
+});
 canvas.addEventListener("pointercancel", () => { drag = null; previousFrame = null; });
 canvas.addEventListener("pointerleave", () => { element("tooltip").hidden = true; });
 canvas.addEventListener("wheel", event => {
@@ -228,6 +324,8 @@ canvas.addEventListener("wheel", event => {
 canvas.addEventListener("keydown", event => { const direction = { ArrowLeft: [40, 0], ArrowRight: [-40, 0], ArrowUp: [0, 40], ArrowDown: [0, -40] }[event.key]; if (direction) { event.preventDefault();fitMode=null; camera.x += direction[0]; camera.y += direction[1]; invalidate(); } else if (event.key === "Home") { event.preventDefault(); fit(); } });
 element("fit").addEventListener("click", () => fit());
 element("filter").addEventListener("input", event => { editorFiles.manual();clearTimeout(filterTimer); filterTimer = setTimeout(() => navigate({ filter: event.target.value }), 160); });
+element("map-page-previous").addEventListener("click",()=>changePage(-1));
+element("map-page-next").addEventListener("click",()=>changePage(1));
 element("nav-back").addEventListener("click",()=>{editorFiles.manual();clearTimeout(filterTimer);navigation.move(-1);});
 element("nav-forward").addEventListener("click",()=>{editorFiles.manual();clearTimeout(filterTimer);navigation.move(1);});
 window.addEventListener("popstate",event=>{editorFiles.manual();clearTimeout(filterTimer);void navigation.traverse(event.state);});

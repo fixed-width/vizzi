@@ -8,6 +8,8 @@ remains in Git and the project documentation.
 
 ### Added
 
+- Browse every captured file in large repositories through directory cards and pages.
+  Open captured READMEs and project manifests from the map's landmarks.
 - Browse Java files with syntax colors, outlines, and written-call candidates. Use a
   shared VS Code Java provider to resolve definitions and references in workspace source.
 - Run Eclipse JDT LS directly from Vizzi with `--jdtls` for Java definitions and references

@@ -24,7 +24,7 @@ no separate mock is supplied. Research rationale belongs in
   Collapse/expand a directory, focus it, return to ancestors, and reorder siblings by
   dragging or keyboard controls. Reordering changes this view, never repository paths.
 - A directory tree complements spatial navigation. Keep tree DOM and canvas/data work
-  bounded for the existing 2,000-file projection. Preserve selected source when collapsing
+  bounded. Preserve selected source when collapsing
   its directory. A new file selection can reveal its ancestors. Keep collapse/order
   preferences scoped to a stable workspace identity, with reset and storage-refusal fallback.
 - Reordering, collapse, focus, hit testing and the overview navigator use the same scene.
@@ -50,3 +50,25 @@ small scales. Declaration names stay aligned. A compact enclosing-scope line and
 indicator expose lexical structure without unbounded indentation. Keep 48-pixel virtual
 rows and the source/outline payload limits. Language adapters supply parent links; do not
 infer semantic ownership from names or arbitrary overlapping source ranges.
+
+## Browsing large repositories
+
+Every captured file has a route from the repository root without typing a path. Keep
+the nested map for repositories of up to 2,000 captured files. In larger repositories,
+show the current directory's immediate children. Directory cards show full subtree file
+counts. Open a card from the map or the directory controls and use breadcrumbs to return
+to an ancestor. Keep the selected source open as the reader moves between directories.
+
+Page immediate children in alphabetical order within directories and files, with
+directories first. The map and accessible file list display the same page, and the
+controls show its range and total. Path search still covers the whole repository and
+pages through large result sets. Clearing the filter returns to directory browsing.
+
+Surface captured READMEs and recognized project manifests for the current directory near
+the top of the map pane. A landmark opens its captured text like any file. Capture
+conventional README names as source-only, subject to the workspace's source exclusions.
+
+Verify with a fixture containing a directory absent from the initial file slice and a
+directory with more than one page of files. Open a late file, navigate back to the root,
+and open both a README and a manifest. Check the existing small-repository map interactions
+as well.

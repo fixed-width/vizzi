@@ -15,6 +15,89 @@ before(async () => {
 });
 after(async () => { await chromium?.close(); await host?.close(); await input?.close(); });
 
+test("a large repository exposes every directory, file page and local landmark", async () => {
+  const files = Object.fromEntries(Array.from({ length: 2001 }, (_, index) => [
+    `bulk/file-${String(index).padStart(4, "0")}.rs`, "",
+  ]));
+  const fixture = await workspace({ files: {
+    ...files,
+    "README.md": "# Project orientation\n",
+    "z-late/README.md": "# Late subsystem\n",
+    "z-late/Cargo.toml": '[package]\nname = "late"\nversion = "0.1.0"\n',
+    "z-late/target.rs": "fn late_target() {}\n",
+  } });
+  let localHost, session;
+  try {
+    localHost = await startHost(fixture);
+    session = await openWorkspace(chromium, localHost);
+    const { page } = session;
+    await page.locator("#map-landmarks").getByRole("button", { name: "README.md" }).click({ timeout: 5000 });
+    await page.waitForFunction(() => document.getElementById("source").textContent.includes("Project orientation"));
+    assert.match(await page.locator("#coverage").textContent(), /Source only · README/);
+    const late = page.getByRole("button", { name: "Open directory z-late, 3 files", exact: true });
+    await late.focus();
+    await page.keyboard.press("Enter");
+    await page.getByRole("button", { name: "z-late", exact: true }).waitFor();
+    await paint(page);
+    assert.equal(await page.locator("#map-breadcrumbs button[aria-current=location]").evaluate(button => button === document.activeElement), true);
+    assert.equal(await page.locator("#file-title").textContent(), "README.md");
+    await page.locator("#map-landmarks").getByRole("button", { name: "Cargo.toml" }).click();
+    await page.waitForFunction(() => document.getElementById("file-title").textContent === "z-late/Cargo.toml");
+    await page.getByRole("button", { name: "Repository root", exact: true }).click();
+    await page.getByRole("button", { name: "Open directory bulk, 2,001 files", exact: true }).waitFor();
+    await paint(page);
+    const bulkCard = await page.evaluate(() => {
+      const { rect } = vizziMetrics.scene.groups.find(group => group.path === "bulk");
+      const { camera } = vizziMetrics.lastFrame;
+      return { x: camera.x + (rect.x + rect.width / 2) * camera.scale,
+        y: camera.y + (rect.y + rect.height / 2) * camera.scale };
+    });
+    await page.locator("#map").click({ position: bulkCard });
+    await page.getByText("1–100 of 2,001 entries", { exact: true }).waitFor();
+    await page.getByText("Accessible file list", { exact: true }).click();
+    await page.getByRole("button", { name: "Next page", exact: true }).click();
+    await page.getByText("101–200 of 2,001 entries", { exact: true }).waitFor();
+    assert.equal(await page.locator("#file-list button").count(), 100);
+    await page.getByRole("button", { name: "bulk/file-0199.rs", exact: true }).click();
+    await page.waitForFunction(() => document.getElementById("file-title").textContent === "bulk/file-0199.rs");
+    assert.equal(await page.evaluate(() => vizziMetrics.scene.files.some(file => file.path === "bulk/file-0199.rs")), true);
+    await page.getByRole("button", { name: "Zoom in", exact: true }).click();
+    await paint(page);
+    const saved = await page.evaluate(() => vizziMetrics.lastFrame.camera);
+    await page.getByRole("button", { name: "bulk/file-0198.rs", exact: true }).click();
+    await page.waitForFunction(() => document.getElementById("file-title").textContent === "bulk/file-0198.rs");
+    await page.getByRole("button", { name: "Previous page", exact: true }).click();
+    await page.getByText("1–100 of 2,001 entries", { exact: true }).waitFor();
+    await page.locator("#nav-back").click();
+    await page.getByText("101–200 of 2,001 entries", { exact: true }).waitFor();
+    await page.waitForFunction(() => document.getElementById("file-title").textContent === "bulk/file-0199.rs");
+    await paint(page);
+    const restored = await page.evaluate(() => vizziMetrics.lastFrame.camera);
+    for (const key of ["x", "y", "scale"]) assert.ok(Math.abs(saved[key] - restored[key]) < 0.01, `camera ${key} restored`);
+    await page.evaluate(() => {
+      const filter = document.getElementById("filter");
+      filter.value = ".rs";
+      filter.dispatchEvent(new Event("input", { bubbles: true }));
+      document.querySelector("#file-list button[aria-current=true]").click();
+    });
+    await page.getByText("1–100 of 2,002 matches", { exact: true }).waitFor();
+    await page.getByRole("searchbox", { name: "Find a file" }).fill("target.rs");
+    await page.getByRole("button", { name: "z-late/target.rs", exact: true }).click();
+    await page.waitForFunction(() => document.getElementById("file-title").textContent === "z-late/target.rs");
+    await page.getByRole("searchbox", { name: "Find a file" }).fill("");
+    await page.getByText("1–100 of 2,001 entries", { exact: true }).waitFor();
+    await page.getByRole("button", { name: "Next page", exact: true }).click();
+    await page.getByRole("button", { name: "bulk/file-0199.rs", exact: true }).waitFor();
+    await page.getByRole("button", { name: "Previous page", exact: true }).click();
+    await page.getByRole("button", { name: "bulk/file-0099.rs", exact: true }).waitFor();
+    assert.deepEqual(session.errors, []);
+  } finally {
+    await session?.close();
+    await localHost?.close();
+    await fixture.close();
+  }
+});
+
 test("a benchmark browser can isolate its desktop bus and still load the workspace", { skip: process.platform !== "linux" }, async () => {
   const parentBus = process.env.DBUS_SESSION_BUS_ADDRESS;
   const isolated = await browser({ desktopBus: false });

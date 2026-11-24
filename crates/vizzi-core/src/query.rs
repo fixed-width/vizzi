@@ -10,6 +10,11 @@ use crate::{
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
+mod browse;
+pub use browse::{BrowsePage, DirectorySummary, Landmark, LandmarkKind};
+
+const MAX_MAP_FILES: usize = 2000;
+
 /// Selected-document projection; bulk views remain available for diagnostics.
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
@@ -32,6 +37,11 @@ pub struct ViewQuery {
     pub limit: Option<usize>,
     /// Request schema-3 metadata without complete text/declarations.
     pub projection: Option<Projection>,
+    /// Opt into directory browsing for large snapshots. `.` selects the repository root.
+    pub directory: Option<String>,
+    /// Requested offset in a directory or path search.
+    #[serde(default)]
+    pub offset: usize,
 }
 /// A rectangle in overview world coordinates.
 #[derive(Clone, Debug, Serialize)]
@@ -52,6 +62,9 @@ pub struct FileTile {
     pub id: FileId,
     /// Relative source path.
     pub path: String,
+    /// Landmark role for this file, if recognized.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub landmark: Option<LandmarkKind>,
     /// Captured source size.
     pub bytes: usize,
     /// Combined syntax coverage.
@@ -155,6 +168,9 @@ pub struct View {
     pub source_only: usize,
     /// Number of files matching the filter before limiting.
     pub matching: usize,
+    /// Scoped page for directory browsing or search in a large snapshot.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub browse: Option<BrowsePage>,
     /// Bounded overview tiles.
     pub files: Vec<FileTile>,
     /// Directory labels.
@@ -179,20 +195,30 @@ impl Snapshot {
         source_limit: usize,
     ) -> Result<View, SourceReadError> {
         let filter = query.filter.to_lowercase();
-        let matching: Vec<_> = self
-            .documents()
-            .iter()
-            .filter(|file| file.path().to_lowercase().contains(&filter))
-            .collect();
-        let count = matching.len();
-        let limited: Vec<_> = matching
-            .into_iter()
-            .take(query.limit.unwrap_or(2000).clamp(1, 2000))
-            .collect();
+        let (count, limited, browse) = match &query.directory {
+            Some(path) if self.documents().len() > MAX_MAP_FILES => {
+                let (page, documents) = browse::project(self, path, &filter, query.offset);
+                (page.files, documents, Some(page))
+            }
+            _ => {
+                let matching: Vec<_> = self
+                    .documents()
+                    .iter()
+                    .filter(|file| {
+                        filter.is_empty() || file.path().to_lowercase().contains(&filter)
+                    })
+                    .map(std::sync::Arc::as_ref)
+                    .collect();
+                let count = matching.len();
+                let mut limited = matching;
+                limited.truncate(query.limit.unwrap_or(MAX_MAP_FILES).clamp(1, MAX_MAP_FILES));
+                (count, limited, None)
+            }
+        };
         let selected = query
             .file
             .as_ref()
-            .and_then(|id| self.file(id))
+            .and_then(|id| self.file(id).map(std::sync::Arc::as_ref))
             .or_else(|| limited.first().copied());
         let source = selected
             .map(|file| -> Result<SourceView, SourceReadError> {
@@ -332,6 +358,7 @@ impl Snapshot {
                 files.push(FileTile {
                     id: file.id().clone(),
                     path: file.path().into(),
+                    landmark: LandmarkKind::for_path(file.path()),
                     bytes: file.bytes(),
                     coverage,
                     classification: file.classification().clone(),
@@ -346,6 +373,9 @@ impl Snapshot {
             x += width;
             shelf_height = shelf_height.max(height);
         }
+        if browse.is_some() {
+            files.sort_unstable_by(|a, b| a.path.cmp(&b.path));
+        }
         Ok(View {
             workspace: self.workspace().clone(),
             deferred: self.deferred_files(),
@@ -356,6 +386,7 @@ impl Snapshot {
             analyzed: self.analyzed_files(),
             source_only: self.documents().len() - self.analyzed_files(),
             matching: count,
+            browse,
             files,
             groups,
             height: y + shelf_height,
@@ -389,6 +420,66 @@ mod tests {
         let b = crate::model::fixture_document(workspace.clone(), "other/b.rs".into(), b"", vec![])
             .unwrap();
         crate::model::fixture_snapshot(workspace, vec![Arc::new(a), Arc::new(b)]).unwrap()
+    }
+
+    #[test]
+    fn directory_browsing_counts_all_captured_paths_and_pages_flat_children() {
+        let workspace = WorkspaceId::derive(&[b"browse"]);
+        let paths = (0..2001)
+            .map(|number| format!("bulk/file-{number:04}.rs"))
+            .chain(["late/README.md".into(), "late/src/main.rs".into()])
+            .chain((0..99).map(|number| format!("wide/dir-{number:02}/lib.rs")))
+            .chain([
+                "wide/Cargo.toml".into(),
+                "wide/README.md".into(),
+                "wide/z.rs".into(),
+            ]);
+        let documents = paths
+            .map(|path| {
+                Arc::new(
+                    crate::model::fixture_document(workspace.clone(), path, b"", vec![]).unwrap(),
+                )
+            })
+            .collect();
+        let snapshot = crate::model::fixture_snapshot(workspace, documents).unwrap();
+        let view = |params| {
+            let query: ViewQuery = serde_json::from_value(params).unwrap();
+            serde_json::to_value(snapshot.view(&query).unwrap()).unwrap()
+        };
+
+        let root = view(serde_json::json!({"directory": "."}));
+        assert_eq!(
+            root["browse"]["directories"],
+            serde_json::json!([
+                {"path": "bulk", "files": 2001}, {"path": "late", "files": 2},
+                {"path": "wide", "files": 102}
+            ])
+        );
+        assert_eq!(root["files"].as_array().unwrap().len(), 0);
+        let last = view(serde_json::json!({"directory": "bulk", "offset": 2000}));
+        assert_eq!(last["browse"]["offset"], 2000);
+        assert_eq!(last["browse"]["entries"], 2001);
+        assert_eq!(last["files"][0]["path"], "bulk/file-2000.rs");
+        let late = view(serde_json::json!({"directory": "late", "offset": 2000}));
+        assert_eq!(late["browse"]["offset"], 0);
+        assert_eq!(late["browse"]["landmarks"][0]["path"], "late/README.md");
+        assert_eq!(late["browse"]["directories"][0]["path"], "late/src");
+        let wide = view(serde_json::json!({"directory": "wide"}));
+        assert_eq!(wide["browse"]["directories"].as_array().unwrap().len(), 99);
+        assert_eq!(wide["files"].as_array().unwrap().len(), 1);
+        assert_eq!(wide["browse"]["landmarks"][1]["path"], "wide/Cargo.toml");
+        let next_wide = view(serde_json::json!({"directory": "wide", "offset": 100}));
+        assert_eq!(next_wide["files"][0]["path"], "wide/README.md");
+        assert_eq!(next_wide["files"][1]["path"], "wide/z.rs");
+        let fallback = view(serde_json::json!({"directory": "late/removed"}));
+        assert_eq!(fallback["browse"]["directory"], "late");
+        let root_fallback = view(serde_json::json!({"directory": "missing"}));
+        assert_eq!(root_fallback["browse"]["directory"], ".");
+        let searched = view(serde_json::json!({"directory": "bulk", "filter": "main.rs"}));
+        assert_eq!(searched["files"][0]["path"], "late/src/main.rs");
+        let search_page =
+            view(serde_json::json!({"directory": "late", "filter": "FILE-", "offset": 1999}));
+        assert_eq!(search_page["files"][0]["path"], "bulk/file-1900.rs");
     }
     #[test]
     fn selection_uses_frozen_source_and_survives_position_changes() {

@@ -134,16 +134,17 @@ npm test -- --measure --reference-only --profile /tmp/vizzi-browser-profile.json
 ```
 
 `--reference-only` skips the synthetic workload. Reference files are copied before
-editing. Full-profile inventory recognizes the declared raw candidate suffixes and
-explicit exclusions; its count must agree with the native captured count. The largest
-three assigned files drive background work; Python uses `#` probes, other supported
-languages use `//`. CUDA source-only files are not used as parse workloads.
+editing. The independent full-profile inventory honors source exclusions and includes
+captured READMEs, project metadata, and CUDA in the count and fingerprint. Its count
+must agree with the native captured count. The three largest parser inputs drive
+background work. Source-only files are excluded from parser workloads.
 
 The browser collects steady/refresh pan/zoom frames, draw CPU times, picking, ordinary
 edit visibility, large-file opening/editing, long frames, renderer heap, native RSS,
 request counts, and clean-capture agreement. Header opening is timed after filter
 results are ready. The large-source operation uses actual UI selection and records
-rendered line/outline counts. The overview remains bounded to 2,000 tiles.
+rendered line/outline counts. On large repositories, the driver opens a populated
+directory page before pan/zoom and picking. The page contains up to 100 entries.
 Each run records a UUID in `options.probeId` and its source-edit comments so seeded
 caches cannot reuse earlier probe inputs. Use `--probe-id` only for deliberate replay.
 

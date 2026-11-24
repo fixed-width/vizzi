@@ -14,18 +14,24 @@ Select a file in the repository map. Its source and declaration outline open tog
 Selecting a declaration reveals its lines; kind badges distinguish types, functions and
 other declarations. **Line N** is the declaration's starting line.
 
-Use **Find a file** to filter paths. The expandable **Accessible file list** provides a
-keyboard-selectable alternative to map picking. The map is bounded; narrow the filter
-when it reports that some matching files are not shown.
+In a large repository, start with **Landmarks** to open a README or project manifest
+when one is available. Select a directory card on the map or a directory name in the
+list to see what's inside. Each directory shows its total captured file count. Use the
+breadcrumbs to return to a parent directory.
+
+Use **Next page** and **Previous page** to see more entries in a large directory.
+The expandable **Accessible file list** shows the files on the same page as the map.
+Use **Find a file** to search paths across the repository, including directories you
+haven't opened.
 
 Drag the map background to pan. Wheel scrolling zooms this map; **Fit map** resets the
 framing. The small overview navigator jumps to a different region. Arrow keys move a
 focused map or navigator. These gestures differ from the call workspace's background
 wheel panning.
 
-Use directory controls to collapse, focus or reorder groups. Breadcrumbs return to
-parent areas. Drag rows/headers or use their up/down controls to reorder siblings.
-**Reset map** restores the default order and expansion. This changes the view only.
+On the nested map, use directory controls to collapse, focus or reorder groups. Drag
+rows or headers, or use their up/down controls to reorder siblings. **Reset map**
+restores the default order and expansion.
 
 ## Adjust the reading panes
 

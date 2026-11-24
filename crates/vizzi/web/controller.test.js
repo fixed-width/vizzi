@@ -90,6 +90,21 @@ test("notifications pin queries and order decimal revisions without numeric prec
   assert.equal(stream.receive(change("18446744073709551615", "s1", { status: state("s1", { pending: true }) })), true); await flush();
   assert.equal(requests.length, 1); assert.equal(views.length, 1); assert.equal(statuses.length, 2); assert.equal(statuses[1].pending, true);
 });
+test("a refreshed map keeps the server's resolved directory and page", async () => {
+  const requests = [];
+  const controller = createController({ transport: async uri => {
+    const query = new URL(uri, "http://local").searchParams;
+    requests.push([query.get("directory"), query.get("offset")]);
+    return { ...view("a", query.get("snapshot")), browse: { directory: "src", offset: 100 } };
+  } });
+  const updates = controller.updates();
+  updates.receive(change());
+  await flush();
+  await controller.load({ directory: "src/removed", offset: 200 });
+  updates.receive(change("2", "s2"));
+  await flush();
+  assert.deepEqual(requests.slice(-2), [["src/removed", "200"], ["src", "100"]]);
+});
 test("snapshots coalesce during a fetch without applying an obsolete selection fallback", async () => {
   const pending = [], views = []; let queue = false;
   const c = createController({ transport: uri => { if (!queue) return Promise.resolve(view()); const p = deferred(); pending.push({ uri, ...p }); return p.promise; }, onView: v => views.push(v) });

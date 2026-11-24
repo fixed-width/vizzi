@@ -58,7 +58,8 @@ export function createController({ transport, onView = () => {}, onStatus = () =
         commit() {
           if(!current())return false;
           if(!acceptView(next,info)){record.rejected=true;rollback(record);return false;}
-          query={...info.query,file:next.selection.file,entity:next.selection.entity};
+          const browse=next.browse?{directory:next.browse.directory,offset:next.browse.offset}:{};
+          query={...info.query,...browse,file:next.selection.file,entity:next.selection.entity};
           acceptedQuery={...query};requestedOptions=undefined;displayedSnapshot=next.snapshot;
           record.committed=true;completedViewRequest=request;
           onView(next,{...info,query:{...query}});
