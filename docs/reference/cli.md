@@ -32,6 +32,9 @@ and launch examples without starting the server or creating cache data.
 | `--python-path INTERPRETER` | Server default | Python interpreter/environment; requires `--pyright`. |
 | `--clangd EXECUTABLE` | Disabled | C/C++ language server; source scopes and compilation context remain explicit. |
 | `--typescript-server EXECUTABLE` | Disabled | Native language server from the installed TypeScript 7 or newer `tsc` executable. |
+| `--jdtls EXECUTABLE` | Disabled | Eclipse JDT LS launcher for Java definitions and references over captured source. |
+| `--java-source-root SCOPE` | `.` | Repeatable source directory relative to `--root`. Requires `--jdtls`. |
+| `--java-library JAR` | None | Repeatable local binary JAR for JDT LS. Paths must omit glob characters. A sibling `-sources.jar` supplies attached source when available. |
 | `--compile-commands FILE` | Root database or flags file | Captured compilation database; requires `--clangd`. |
 | `--help`, `-h` | — | Print usage and exit. |
 

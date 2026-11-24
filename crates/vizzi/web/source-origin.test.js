@@ -12,3 +12,11 @@ test('origin byte bounds and token delimiters survive persistence without coerci
  assert.equal(validOrigin({...origin,label:'é'.repeat(128),language:'x'.repeat(64),version:'v'.repeat(128)}),true);assert.equal(originLabel(null),'');
  for(const bad of [{...origin,id:[origin.id]},{...origin,id:'0'+origin.id},{...origin,capture:origin.capture+'0'},{...origin,label:['helper']},{...origin,label:'bad\nlabel'},{...origin,label:'é'.repeat(129)},{...origin,language:'bad\0language'}])assert.equal(validOrigin(bad),false);
 });
+test('only a Java archive may carry the virtual editor capability',()=>{
+ const archive={...origin,language:'java',archive:true};
+ assert.equal(validOrigin(archive),true);
+ assert.equal(validOrigin({...archive,editor_archive:true}),true);
+ assert.equal(validOrigin({...archive,editor_archive:'true'}),false);
+ assert.equal(validOrigin({...origin,archive:true,editor_archive:true}),false);
+ assert.equal(validOrigin({...archive,archive:false,editor_archive:true}),false);
+});

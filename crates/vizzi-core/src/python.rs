@@ -11,6 +11,7 @@ const CALLS: CallRules = CallRules {
     expressions: &[CallExpression {
         kind: "call",
         callee_field: "function",
+        receiver_field: None,
         unwrap_callee: None,
         name_kinds: &["identifier"],
         name_fields: &[("attribute", "attribute")],

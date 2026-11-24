@@ -129,6 +129,7 @@ pub(crate) fn input(workspace: &Path, file: &Path, configuration: &str) -> Resul
         version: label("version", 128),
         configuration: configuration.into(),
         mirror_path: None,
+        archive: None,
         installation: Some(PackageContext {
             manifest: ContentId::derive(&[&bytes]),
             importer: None,

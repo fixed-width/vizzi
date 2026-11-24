@@ -405,6 +405,292 @@ test("JavaScript and TypeScript outlines and written calls work in the captured 
   }
 });
 
+test("Java source outlines and call trails work without a language server", async () => {
+  const fixture = await workspace({
+    files: {
+      "Caller.java": "class Caller {\n    int run() {\n        var pair = new Pair(1, 2);\n        return Counter.seed()\n            .next()\n            .finish();\n    }\n}\n",
+      "Counter.java": "class Counter {\n    static Counter seed() { return new Counter(); }\n    Counter next() { return this; }\n    int finish() { return 1; }\n}\n",
+      "Pair.java": "record Pair(int x, int y) {}\n",
+    },
+  });
+  let live, session;
+  try {
+    live = await startHost(fixture);
+    session = await openWorkspace(chromium, live);
+    const { page } = session;
+    await page.getByText("Accessible file list", { exact: true }).click();
+    await page.getByRole("button", { name: "Caller.java", exact: true }).click();
+    await page.locator("#outline button[data-declaration]").filter({ hasText: "run" }).waitFor();
+    assert.match(await page.locator("#coverage").textContent(), /java: syntax parsed/);
+    assert.match(await page.locator("#source .syntax-keyword").first().textContent(), /class/);
+
+    await page.goto(live.url);
+    await page.waitForFunction(() => document.querySelector("#visual-source-status").textContent.includes("ready"));
+    await page.getByRole("button", { name: "Add bubble", exact: true }).click();
+    await page.getByLabel("Find a function", { exact: true }).fill("run");
+    await page.getByRole("button", { name: "Find functions", exact: true }).click();
+    await page.locator('[data-add-symbol][data-name="run"]').click();
+    const run = page.locator('[data-view][data-name="run"]');
+    await run.getByRole("button", { name: "Calls", exact: true }).click();
+    await run.getByRole("button", { name: "next · line 5", exact: true }).waitFor();
+    await run.getByRole("button", { name: "finish · line 6", exact: true }).click();
+    const finish = page.locator('[data-view][data-name="finish"]');
+    await finish.locator(".code-line").first().waitFor();
+    assert.match(await finish.textContent(), /return 1/);
+    assert.deepEqual(await run.locator(".is-call").evaluateAll(lines => lines.map(line => line.dataset.line)), ["6"]);
+    const link = page.locator('#workspace-links [data-kind="candidate"]');
+    await link.waitFor({ state: "attached" });
+    assert.match(await link.getAttribute("aria-label"), /→ Counter::finish/);
+    await page.getByRole("button", { name: "Fit workspace", exact: true }).click();
+    await finish.locator(".fragment-header").hover();
+    await paint(page);
+    assert.deepEqual(await run.locator(".is-linked-call").evaluateAll(lines => lines.map(line => line.dataset.line)), ["4", "5", "6"]);
+
+    await run.getByRole("button", { name: "Calls", exact: true }).click();
+    await run.getByRole("button", { name: "Pair · line 3", exact: true }).click();
+    const pair = page.locator('[data-view][data-name="Pair"]');
+    await pair.locator(".code-line").first().waitFor();
+    assert.match(await pair.textContent(), /record Pair/);
+    assert.deepEqual(session.errors, []);
+  } finally {
+    await session?.close();
+    await live?.close();
+    await fixture.close();
+  }
+});
+
+test("Java package cues group calls and track captured module descriptors without JDT LS", async () => {
+  const fixture = await workspace({
+    files: {
+      "module-info.java": "module example.app { exports demo; }\n",
+      "demo/Caller.java": "package demo; class Caller { int startJava() { return Peer.finishJava(); } }\n",
+      "demo/Peer.java": "package demo; class Peer { static int finishJava() { return 1; } }\n",
+      "Loose.java": "package loose; class Loose { int standaloneJava() { return 2; } }\n",
+    },
+  });
+  let host, session;
+  try {
+    host = await startHost(fixture);
+    session = await openWorkspace(chromium, host);
+    const { page } = session;
+    await page.goto(host.url);
+    await page.waitForFunction(() => document.querySelector("#visual-source-status").textContent.includes("ready"));
+    const open = async name => {
+      await page.getByRole("button", { name: "Add bubble", exact: true }).click();
+      await page.getByLabel("Find a function", { exact: true }).fill(name);
+      await page.getByRole("button", { name: "Find functions", exact: true }).click();
+      await page.locator(`[data-add-symbol][data-name="${name}"]`).click();
+      const bubble = page.locator(`[data-view][data-name="${name}"]`);
+      await bubble.locator(".code-line").first().waitFor();
+      return bubble;
+    };
+    const start = await open("startJava");
+    await start.getByRole("button", { name: "Calls", exact: true }).click();
+    await start.getByRole("button", { name: "finishJava · line 1", exact: true }).click();
+    const finish = page.locator('[data-view][data-name="finishJava"]');
+    await finish.locator(".code-line").first().waitFor();
+    const id = await start.getAttribute("data-module-id");
+    assert.ok(id);
+    assert.equal(await finish.getAttribute("data-module-id"), id);
+    assert.equal(await start.locator(".module-tag").textContent(), "example.app/demo");
+    assert.equal(await finish.locator(".module-tag").textContent(), "example.app/demo");
+    await start.locator(".fragment-header").focus();
+    await page.keyboard.press("Tab");
+    await paint(page);
+    assert.equal(await page.locator(".fragment.is-module-peer").count(), 2);
+    assert.equal(await page.locator("#overview-map .is-module-peer").count(), 2);
+    await page.locator("#workspace-settings > summary").click();
+    await page.getByLabel("Module outlines", { exact: true }).check();
+    await page.keyboard.press("Escape");
+    await page.locator("#module-outlines .module-outline").waitFor({ state: "attached" });
+
+    await writeFile(join(fixture.root, "module-info.java"), "// generated descriptor\rmodule example.\\u0072enamed { exports demo; }\r");
+    await page.waitForFunction(() =>
+      document.querySelector('[data-name="startJava"] .module-tag')?.textContent === "example.renamed/demo"
+      && document.querySelector('[data-name="finishJava"] .module-tag')?.textContent === "example.renamed/demo"
+    );
+    assert.equal(await start.getAttribute("data-module-id"), id);
+    await page.reload();
+    await start.locator(".code-line").first().waitFor();
+    await finish.locator(".code-line").first().waitFor();
+    assert.equal(await start.getAttribute("data-module-id"), id);
+    assert.equal(await finish.locator(".module-tag").textContent(), "example.renamed/demo");
+
+    const standalone = await open("standaloneJava");
+    assert.equal(await standalone.locator(".module-tag").textContent(), "loose");
+    assert.match(await standalone.locator(".module-tag").getAttribute("title"), /Java package\nRoot: \.$/);
+    assert.notEqual(await standalone.getAttribute("data-module-id"), id);
+    assert.deepEqual(session.errors, []);
+  } finally {
+    await session?.close();
+    await host?.close();
+    await fixture.close();
+  }
+});
+
+const managedJava = process.env.VIZZI_JDTLS;
+const gradleWrapperUrl = process.env.VIZZI_TEST_GRADLE_WRAPPER_URL;
+const gradleJavaHome = process.env.VIZZI_TEST_GRADLE_JAVA_HOME;
+
+test("the workspace action imports a Gradle Java classpath explicitly", {
+  skip: !managedJava || !(gradleWrapperUrl || process.env.GRADLE_HOME),
+}, async () => {
+  const fixture = await workspace({
+    files: {
+      "settings.gradle": "rootProject.name = 'vizzi_browser'\n",
+      "build.gradle": "plugins { id 'java' }\nsourceSets.main.java.setSrcDirs(['sources'])\n",
+      ...(gradleWrapperUrl && { "gradle/wrapper/gradle-wrapper.properties": `distributionUrl=${gradleWrapperUrl}\n` }),
+      ...(gradleJavaHome && { "gradle.properties": `org.gradle.java.home=${gradleJavaHome.replaceAll("\\", "\\\\")}\n` }),
+      "sources/demo/Caller.java": "package demo; class Caller { int run() { return Counter.next(); } }\n",
+      "sources/demo/Counter.java": "package demo; class Counter { static int next() { return 1; } }\n",
+      "script.py": "def python_leaf(): pass\ndef invoke():\n" + "    python_leaf()\n".repeat(10),
+    },
+    sourceArguments: ["--jdtls", managedJava],
+  });
+  let host, context;
+  try {
+    host = await startHost(fixture);
+    context = await chromium.newContext();
+    const page = await context.newPage();
+    const imports = [];
+    page.on("request", request => {
+      if (request.method() === "POST" && new URL(request.url()).pathname === "/api/java-project") {
+        imports.push(request);
+      }
+    });
+    await page.goto(host.url);
+    await page.getByText("Workspace", { exact: true }).click();
+    const action = page.getByRole("button", { name: "Import Gradle classpath", exact: true });
+    await action.waitFor();
+    assert.equal(imports.length, 0);
+    const rejected = await page.request.post(host.url + "/api/java-project", { data: { snapshot: "foreign" } });
+    assert.equal(rejected.status(), 400);
+    assert.match(await rejected.text(), /same-origin/);
+    const { snapshot } = await (await page.request.get(host.url + "/api/java-project")).json();
+    const inventory = await page.request.post(host.url + "/api/structure", {
+      data: { snapshot, query: { kind: "inventory", area: "script.py", search: "python_leaf", offset: 0, functions_only: true } },
+    });
+    assert.equal(inventory.status(), 200);
+    const [{ symbol }] = (await inventory.json()).items;
+    const refRequest = { snapshot, symbol: symbol.id, kind: "references" };
+    const first = await page.request.post(host.url + "/api/references", { data: refRequest });
+    assert.equal(first.status(), 200);
+    const { query, next } = await first.json();
+    assert.equal(next, 8);
+
+    await page.route("**/api/java-project", route => route.fulfill({
+      status: 503, json: { message: "Fixture import failed." },
+    }), { times: 1 });
+    await action.click();
+    await page.getByText("Fixture import failed.", { exact: true }).waitFor();
+    assert.equal(await page.locator("#visual-notice").isHidden(), true);
+    await page.getByText("Workspace", { exact: true }).click();
+    const completed = page.waitForResponse(response =>
+      response.request().method() === "POST" && new URL(response.url()).pathname === "/api/java-project",
+      { timeout: 120000 },
+    );
+    await action.click();
+    const result = await completed;
+    assert.equal(result.status(), 200, await result.text());
+    await page.getByText("Java project classpath imported.", { exact: true }).waitFor({ timeout: 60000 });
+    assert.equal(imports.length, 2);
+    const nextPage = await page.request.post(host.url + "/api/references", {
+      data: { ...refRequest, query, offset: next },
+    });
+    assert.equal(nextPage.status(), 200);
+    assert.equal((await nextPage.json()).items.length, 2);
+
+    await page.getByRole("button", { name: "Add bubble", exact: true }).click();
+    await page.getByLabel("Find a function", { exact: true }).fill("run");
+    await page.getByRole("button", { name: "Find functions", exact: true }).click();
+    await page.locator('[data-add-symbol][data-name="run"]').click();
+    const caller = page.locator('[data-view][data-name="run"]');
+    await caller.getByRole("button", { name: "Calls", exact: true }).click();
+    await caller.getByRole("button", { name: "next · line 1", exact: true }).click();
+    await page.locator('[data-view][data-name="next"] .code-line').first().waitFor();
+    assert.equal(await page.locator("#workspace-links .link-stroke").getAttribute("data-kind"), "definition");
+  } finally {
+    await context?.close();
+    await host?.close();
+    await fixture.close();
+  }
+});
+
+test("managed Java resolves an overload and its references across source roots", {
+  skip: !managedJava,
+}, async () => {
+  const fixture = await workspace({
+    files: {
+      "src/main/java/demo/Engine.java": `package demo;
+class Engine {
+    static int speak(int value) { return value; }
+    static int speak(String value) { return value.length(); }
+}
+`,
+      "src/test/java/demo/Caller.java": `package demo;
+class Caller { int run() { return Engine.speak("hello") + "abc".length(); } }
+`,
+      "pom.xml": "Build metadata is outside the source-root profile.",
+    },
+    sourceArguments: [
+      "--jdtls", managedJava,
+      "--java-source-root", "src/main/java",
+      "--java-source-root", "src/test/java",
+    ],
+  });
+  let live, session;
+  try {
+    live = await startHost(fixture);
+    session = await openWorkspace(chromium, live);
+    const { page } = session;
+    await page.goto(live.url);
+    await page.waitForFunction(() => document.querySelector("#visual-source-status").textContent.includes("ready"));
+    await page.getByRole("button", { name: "Add bubble", exact: true }).click();
+    await page.getByLabel("Find a function", { exact: true }).fill("run");
+    await page.getByRole("button", { name: "Find functions", exact: true }).click();
+    await page.locator('[data-add-symbol][data-name="run"]').click();
+    const caller = page.locator('[data-view][data-name="run"]');
+    await caller.getByRole("button", { name: "Calls", exact: true }).click();
+    await caller.getByRole("button", { name: "speak · line 2", exact: true }).click();
+    const target = page.locator('[data-view][data-name="speak"]');
+    await target.locator(".code-line").first().waitFor();
+    assert.match(await target.locator(".code-pane").textContent(), /String value/);
+    assert.equal(await page.locator("#workspace-links .link-stroke").getAttribute("data-kind"), "definition");
+    await target.getByRole("button", { name: "Actions for speak bubble", exact: true }).click();
+    await page.getByRole("menuitem", { name: "Find references", exact: true }).click();
+    const stack = page.locator("[data-reference-stack]");
+    await stack.getByRole("status").filter({ hasText: "Language references" }).waitFor();
+    assert.equal(await stack.locator("[data-reference-row]").count(), 1);
+    assert.match(await stack.locator("[data-reference-row]").textContent(), /Caller\.java/);
+    await caller.getByRole("button", { name: "Calls", exact: true }).click();
+    await caller.getByRole("button", { name: "length · line 2", exact: true }).click();
+    const length = page.locator('[data-view][data-name="length"]');
+    await length.locator(".code-line").first().waitFor();
+    assert.match(await length.locator(".fragment-heading").textContent(), /java\.base.*String\.java/);
+    assert.match(await length.locator(".code-pane").textContent(), /coder\(\)/);
+    assert.equal(await length.getByRole("button", { name: /^Open in/ }).isDisabled(), true);
+
+    await caller.getByRole("button", { name: "Close bubble", exact: true }).press("Enter");
+    await target.getByRole("button", { name: "Close bubble", exact: true }).press("Enter");
+    const port = Number(new URL(live.url).port);
+    await live.close();
+    live = await startHost(fixture, 4, port);
+    await page.reload();
+    await length.locator(".code-line").first().waitFor();
+    assert.equal(await page.locator('[data-view]').count(), 1);
+    await length.getByRole("button", { name: "Actions for coder", exact: true }).press("Control+Enter");
+    const coder = page.locator('[data-view][data-name="coder"]');
+    await coder.locator(".code-line").first().waitFor();
+    assert.match(await coder.locator(".fragment-heading").textContent(), /java\.base.*String\.java/);
+    assert.equal(await page.locator("#workspace-links .link-stroke").getAttribute("data-kind"), "definition");
+    assert.deepEqual(session.errors, []);
+  } finally {
+    await session?.close();
+    await live?.close();
+    await fixture.close();
+  }
+});
+
 const managedTypeScript = process.env.VIZZI_TYPESCRIPT_SERVER;
 
 test("managed TypeScript opens installed package source beside its caller", {

@@ -19,6 +19,17 @@ from that manifest supplies a shared package descriptor across all three grammar
 contexts. The workspace and manifest path determine its identity across package name
 changes. A closest manifest with invalid, capped, or unavailable contents yields
 neutral membership.
+Java reads the top-level `package` declaration from captured Java syntax. When
+the file's directory ends in the declared package path, the corresponding source
+root can supply a captured `module-info.java`. A valid descriptor qualifies the
+label with its declared module name. Missing or invalid descriptors leave the
+package label available. Cue extraction applies Java Unicode escapes and line
+terminators before parsing and checks the entire module descriptor.
+[Java lexical translations](https://docs.oracle.com/javase/specs/jls/se25/html/jls-3.html#jls-3.2)
+
+Package IDs bind the workspace, package name, and directory or descriptor path.
+A module rename at the same descriptor updates
+the label while preserving the ID. The repository root uses `.` as a display path.
 Conflicting contexts,
 missing/capped/nonresident inputs and unsupported languages return no membership.
 
@@ -36,6 +47,12 @@ Only resident captured text is eligible. Reaching a limit yields neutral members
 this is a bounded visual capability, not whole-repository module coverage.
 Package resolution checks up to 64 ancestor directories per file and parses up to
 8 MiB of resident manifests across the observation, with the same 128 KiB per-file limit.
+Java admits resident files up to 1 MiB, descriptors up to 128 KiB, and at most
+8 MiB of Java text per observation. Only files with Java syntax declarations
+consume the source allowance. The index checks each package's matching descriptor
+before advancing to later files and charges each descriptor once. When the
+remaining budget cannot cover that descriptor, the cue stays neutral. The cache
+retains only extracted names by captured content identity.
 
 Native module rules choose the evidence needed for membership. Function history supplies
 bounded file captures and regular-path checks from the selected Git commit. Ruby uses
@@ -52,6 +69,8 @@ The declaration parser skips their contents. Historical Python labels use regula
 of Git metadata. Python package labels depend on initializer presence.
 JavaScript and TypeScript history checks the ancestor paths for regular package
 manifests, then reads the closest eligible manifest with a 128 KiB limit.
+Java history reads the selected file's package and checks the one corresponding
+`module-info.java` path in the same Git commit.
 Each history source observation is bound to its commit. History and comparison owners retain
 the selected file's module bindings for captured calls.
 

@@ -71,6 +71,20 @@ test('module validation fails closed before native kinds are configured', async 
  assert.equal(validateUnconfigured(module(1)), false);
 });
 
+test('the repository root is a valid source scope for a native package cue', () => {
+ const java = {language:'java', basis:'java_package', tooltip:'Java package'};
+ configureModuleKinds([...kinds, java]);
+ try {
+  const descriptor = {...module(1, 'demo', '.'), language:java.language, basis:java.basis};
+  assert.equal(validModule(descriptor), true);
+  const bubble = view(1, descriptor);
+  assert.match(modulePresentation(bubble, [bubble]).title, /Java package\nRoot: \.$/);
+  assert.equal(validModule({...descriptor, root:'./demo'}), false);
+ } finally {
+  configureModuleKinds(kinds);
+ }
+});
+
 test('layout views without source symbols stay outside module presentation', () => {
  const source = view(1, module(1));
  const group = {id:'g1',kind:'group',x:500,y:200,w:440,h:54};

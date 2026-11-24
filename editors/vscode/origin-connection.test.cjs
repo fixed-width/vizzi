@@ -8,6 +8,16 @@ test('two windows on one root have independent pinned sessions',async t=>{
   assert.notEqual(d.session,f.descriptor.session);assert.notEqual(d.token,f.descriptor.token);assert.equal((await call(f.descriptor,request(f.descriptor))).status,'opened');assert.equal(a,1);assert.equal(b,0);
   await f.origin.dispose();assert.equal((await call(d,request(d))).status,'opened');assert.equal(b,1);
 });
+test('the Java archive listener publishes an unchanged v1 descriptor for older executables',async t=>{
+  const f=await fixture(t);
+  const origin=await startOriginEditor({root:f.root,storage:path.join(f.directory,'storage'),
+    name:'VS Code',javaArchives:true,open:async()=>{}});
+  t.after(()=>origin.dispose());
+  const descriptor=JSON.parse(await fs.readFile(origin.file,'utf8'));
+  assert.deepEqual(Object.keys(descriptor).sort(),['editor','port','protocol','root','session','token','version']);
+  assert.equal(origin.javaArchiveSession,descriptor.session);
+  assert.equal((await call(descriptor,request(descriptor))).status,'opened');
+});
 test('wrong credentials, sessions, roots, commands and expired requests never open source',async t=>{
   let count=0;const f=await fixture(t,async()=>{count++;});
   for(const changed of [{token:'b'.repeat(64)},{session:'b'.repeat(64)},{root:'/other'},{command:'anything'},{expires_at_ms:0},{version:2}]){const response=await call(f.descriptor,{...request(f.descriptor),...changed});assert.equal(response.status,'error');}

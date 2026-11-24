@@ -38,6 +38,29 @@ Managed TypeScript and VS Code sharing can open installed JavaScript or TypeScri
 package declarations in independent dependency bubbles. The selected provider
 determines whether a definition points to an implementation or a declaration file.
 
+## Java
+
+Vizzi captures `.java` files by default. Syntax coloring, outlines, and written-call
+navigation work without a JDK or project build. Outlines include classes, interfaces,
+enums, records, annotation types, methods, and constructors. Use **Add bubble** to
+open methods and constructors with bodies.
+
+Bubbles show their declared Java package and share a cue with other bubbles in
+the same package directory. A captured `module-info.java` at the corresponding
+source root qualifies the label as `module/package`. The cues also work in
+function history and comparisons. [Module cues](../visual/MODULES_PRODUCT.md)
+
+Written method calls and `new` expressions provide name candidates, including
+separate candidates for overloaded declarations. An implicit record constructor
+can lead to its record declaration. A [managed JDT LS server](../how-to/configure-language-servers.md#java-with-a-managed-server)
+can resolve overloads and references across configured source roots. The
+Workspace menu can import a Maven or Gradle classpath from captured build
+descriptors and local caches. A
+[shared VS Code Java provider](../how-to/configure-language-servers.md#java-with-vs-code)
+uses the editor's project configuration. Vizzi checks results against captured
+workspace files. Managed JDT LS and VS Code sharing can open local JDK and dependency
+source archives in independent bubbles. [Configure Java library source](../how-to/configure-language-servers.md#open-java-library-source)
+
 ## Python
 
 Python does not need a runtime, virtual environment or language server for syntax browsing.
@@ -127,7 +150,8 @@ Large-repository interaction and cross-browser support are still being qualified
 current user documentation is checked on Linux with Chromium, not a performance or
 platform guarantee for every repository.
 
-The Python/Ruby/C-family semantic mirror currently admits up to 8 MiB per source file and
-128 MiB of source per provider workspace. Exceeding these bounds makes semantic lookup
-unavailable; ordinary captured-source browsing has separate limits. Local dependency
-captures retain at most 2 MiB per file, 32 MiB total and 32 retained captures.
+The shared Python, Ruby, C-family, Java, and TypeScript semantic mirror admits up
+to 8 MiB per source file and 128 MiB of source per provider workspace. Semantic
+lookup is unavailable above those bounds. Ordinary captured-source browsing has
+separate limits. Local dependency captures retain at most 2 MiB per file, 32 MiB
+total and 32 retained captures.

@@ -14,13 +14,13 @@ function message(error) {
   while (Buffer.byteLength(text) > 512) text = text.slice(0,-1);
   return text;
 }
-function validate(request,{root,session,token}) {
+function validate(request,{root,session,token,javaArchives}) {
   if (request?.protocol !== 'vizzi-origin' || request.version !== 1 || request.root !== root
       || request.session !== session || !hex(request.token)
       || !crypto.timingSafeEqual(Buffer.from(request.token),Buffer.from(token))) {
     throw issue('invalid_connection','Invalid originating editor connection');
   }
-  if (!keys(request,['protocol','version','root','session','token','request','path','line','source','expires_at_ms'])
+  if (!keys(request,['protocol','version','root','session','token','request','path','line','source','expires_at_ms','providerUri','archiveBinary','archiveCapture'])
       || !hex(request.request) || typeof request.path !== 'string' || !path.isAbsolute(request.path)
       || Buffer.byteLength(request.path) > 4096 || !Number.isSafeInteger(request.line) || request.line < 1
       || !keys(request.source,['bytes','sha256']) || !Number.isSafeInteger(request.source.bytes)
@@ -28,10 +28,16 @@ function validate(request,{root,session,token}) {
       || !Number.isSafeInteger(request.expires_at_ms)) {
     throw issue('invalid_request','Invalid verified editor request');
   }
+  if ((request.providerUri !== undefined || request.archiveBinary !== undefined || request.archiveCapture !== undefined)
+      && (!javaArchives || typeof request.providerUri !== 'string' || Buffer.byteLength(request.providerUri) > 16*1024
+        || typeof request.archiveBinary !== 'string' || !path.isAbsolute(request.archiveBinary)
+        || Buffer.byteLength(request.archiveBinary) > 4096 || !hex(request.archiveCapture))) {
+    throw issue('invalid_request','Invalid verified Java archive request');
+  }
   if (request.expires_at_ms <= Date.now()) throw issue('expired','Originating editor request expired');
 }
 
-async function startOriginEditor({root,storage,name,open}) {
+async function startOriginEditor({root,storage,name,open,javaArchives=false}) {
   if (typeof name !== 'string' || !name || Buffer.byteLength(name) > 64 || /[\x00-\x1f\x7f]/.test(name)) {
     throw new Error('Invalid originating editor name');
   }
@@ -75,7 +81,7 @@ async function startOriginEditor({root,storage,name,open}) {
       try {
         if (frame.indexOf(10) !== frame.length-1) throw issue('invalid_request','Expected one originating editor frame');
         request = JSON.parse(frame.subarray(0,-1).toString('utf8'));
-        validate(request,{root,session,token});
+        validate(request,{root,session,token,javaArchives});
         if (busy) throw issue('busy','Originating editor navigation is busy; retry');
         busy = true;
         owned = true;
@@ -122,6 +128,6 @@ async function startOriginEditor({root,storage,name,open}) {
     await fs.rm(temporary,{force:true}).catch(()=>{});
     throw error;
   }
-  return {file,dispose};
+  return {file,dispose,javaArchiveSession:javaArchives?session:undefined};
 }
 module.exports = {startOriginEditor};

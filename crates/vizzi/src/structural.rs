@@ -191,6 +191,11 @@ impl Cached {
             .map(|index| project(&index)))
     }
 }
+pub(crate) enum DependencyEditorLocation {
+    File(crate::editor::EditorLocation),
+    Archive(crate::editor::ArchiveEditorLocation),
+}
+
 /// Current repository metadata and one on-demand file projection.
 pub struct StructureHost {
     reference_sets: Mutex<Vec<references::ReferenceSet>>,
@@ -249,11 +254,23 @@ impl StructureHost {
         value["snapshot"] = snapshot.into();
         Ok(value)
     }
-    /// Verifies an explicit dependency editor location against the captured bytes.
+    /// Verifies an explicit file-backed dependency editor location against the captured bytes.
     pub fn dependency_location(
         &self,
         request: &crate::companion::OpenSource,
     ) -> Result<crate::editor::EditorLocation, CompanionError> {
+        match self.dependency_editor_location(request)? {
+            DependencyEditorLocation::File(location) => Ok(location),
+            DependencyEditorLocation::Archive(_) => Err(CompanionError::Unavailable(
+                "Archive source has no local editor file".into(),
+            )),
+        }
+    }
+
+    pub(crate) fn dependency_editor_location(
+        &self,
+        request: &crate::companion::OpenSource,
+    ) -> Result<DependencyEditorLocation, CompanionError> {
         let source = self
             .dependency(&request.snapshot)?
             .ok_or_else(|| CompanionError::Conflict("Dependency capture expired".into()))?;
@@ -273,11 +290,40 @@ impl StructureHost {
             .read_text(2 * 1024 * 1024)
             .map_err(|e| CompanionError::Unavailable(e.to_string()))?
             .ok_or_else(|| CompanionError::Invalid("Dependency source is not UTF-8".into()))?;
-        Ok(crate::editor::EditorLocation {
-            path: source.path(),
-            line: request.line,
-            source: crate::editor::SourceWitness::from_bytes(text.as_bytes()),
-        })
+        let source_witness = crate::editor::SourceWitness::from_bytes(text.as_bytes());
+        if let Some(archive) = &source.editor_archive {
+            return Ok(DependencyEditorLocation::Archive(
+                crate::editor::ArchiveEditorLocation {
+                    capture: source.origin.capture.clone(),
+                    source: crate::editor::EditorLocation {
+                        path: source.input.root.clone(),
+                        line: request.line,
+                        source: source_witness,
+                    },
+                    binary: archive.binary.clone(),
+                    uri: archive.uri.clone(),
+                },
+            ));
+        }
+        let path = source.path().ok_or_else(|| {
+            CompanionError::Unavailable("Archive source has no local editor file".into())
+        })?;
+        Ok(DependencyEditorLocation::File(
+            crate::editor::EditorLocation {
+                path,
+                line: request.line,
+                source: source_witness,
+            },
+        ))
+    }
+    pub(crate) fn verify_editor_archive(&self, capture: &str) -> Result<(), CompanionError> {
+        let source = self
+            .dependency(capture)?
+            .filter(|source| source.editor_archive.is_some())
+            .ok_or_else(|| {
+                CompanionError::Conflict("Editor archive capture is unavailable".into())
+            })?;
+        source.verify().map_err(CompanionError::Conflict)
     }
     /// Creates an idle projection adapter without source reads or parsing.
     pub fn new(host: Arc<Host>) -> Self {
@@ -506,6 +552,40 @@ impl StructureHost {
     /// Whether type-aware navigation is explicitly configured.
     pub fn definitions_available(&self) -> bool {
         self.definitions.is_some()
+    }
+    pub(crate) fn supports_java_project_import(&self) -> bool {
+        self.definitions
+            .as_ref()
+            .is_some_and(|provider| provider.supports_java_project_import())
+    }
+    pub(crate) fn java_project(&self) -> Option<serde_json::Value> {
+        let snapshot = self.host.application().snapshot()?;
+        let kind = self.definitions.as_ref()?.java_project_kind(&snapshot)?;
+        Some(serde_json::json!({"snapshot":snapshot.id().as_str(), "kind":kind}))
+    }
+    pub(crate) fn import_java_project(&self, expected: &str) -> Result<(), CompanionError> {
+        let snapshot = self
+            .host
+            .application()
+            .snapshot()
+            .ok_or_else(|| CompanionError::Unavailable("Wait for source indexing".into()))?;
+        if snapshot.id().as_str() != expected {
+            return Err(CompanionError::Conflict(
+                "Source changed before Java project import".into(),
+            ));
+        }
+        self.definitions
+            .as_ref()
+            .ok_or_else(|| {
+                CompanionError::Unavailable("Java project import requires managed JDT LS".into())
+            })?
+            .import_java_project(snapshot, &|| self.host.application().snapshot())
+            .map_err(CompanionError::Unavailable)?;
+        self.reference_sets
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
+            .retain(|set| !set.uses_java);
+        Ok(())
     }
     pub(crate) fn call_languages(&self) -> &[String] {
         self.host.call_languages()

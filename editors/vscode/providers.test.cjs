@@ -44,6 +44,68 @@ test('definitions and references query existing providers with UTF-16 positions 
   assert.deepEqual((await f.provider.query({...f.request,method:'references'})).locations,[]);
 });
 
+test('Java archive definitions and follow-up queries recheck the editor source attachment', async t => {
+  const f = await fixture(t);
+  f.doc.languageId = 'java';
+  const archive = path.join(f.root,'helper-sources.jar');
+  const binary = path.join(f.root,'helper.jar');
+  await fs.writeFile(archive,'source archive');
+  await fs.writeFile(binary,'binary archive');
+  const providerUri = 'jdt://contents/helper.jar/demo/Helper.class?project';
+  const uri = {scheme:'jdt',authority:'contents',toString:()=>providerUri};
+  const text = 'package demo;\nclass Helper { static int answer() { return 1; } }\n';
+  const target = {...f.doc,uri,getText:()=>text,lineAt:line=>({text:text.split('\n')[line]})};
+  f.vscode.Uri.parse = value=>{assert.equal(value,providerUri);return uri;};
+  f.vscode.workspace.openTextDocument = async value=>value===uri?target:f.doc;
+  let attachment = archive;
+  f.setExecute(async(command,value,arg)=>{
+    if (command==='java.execute.workspaceCommand') {
+      assert.equal(value,'java.project.resolveSourceAttachment');
+      assert.deepEqual(JSON.parse(arg),{classFileUri:providerUri});
+      return {attributes:{jarPath:binary,sourceAttachmentPath:attachment}};
+    }
+    return value===uri?[{uri:f.uri,range:{start:{line:2,character:11}}}]:[
+      {targetUri:uri,targetSelectionRange:{start:{line:1,character:26}}}
+    ];
+  });
+  const answer = await f.provider.query(f.request);
+  assert.equal(answer.outside,0);
+  assert.deepEqual(answer.locations[0],{path:archive,archiveBinary:binary,providerUri,text,position:{line:1,character:26}});
+  const request = {...answer.locations[0],method:'dependency-references'};
+  assert.equal((await f.provider.query(request)).locations[0].path,f.uri.fsPath);
+  attachment = undefined;
+  await assert.rejects(f.provider.query(request),/attachment/i);
+  assert.deepEqual(await f.provider.query(f.request),{epoch:0,locations:[],outside:1});
+});
+
+test('the Java reference lookup limit counts archive documents and retains every position in an admitted document', async t => {
+  const f = await fixture(t);
+  f.doc.languageId = 'java';
+  const archive = path.join(f.root,'helper-sources.jar');
+  const binary = path.join(f.root,'helper.jar');
+  await fs.writeFile(archive,'source archive');
+  await fs.writeFile(binary,'binary archive');
+  const uris = Array.from({length:5},(_,n)=>({scheme:'jdt',authority:'contents',
+    toString:()=>`jdt://contents/helper.jar/demo/Helper${n}.class?project`}));
+  const opens = new Map();
+  const text = 'package demo;\nclass Helper { static int answer() { return 1; } }\n';
+  f.vscode.workspace.openTextDocument = async uri=>{
+    if (uri===f.uri) return f.doc;
+    opens.set(uri,(opens.get(uri)||0)+1);
+    return {...f.doc,uri,getText:()=>text,lineAt:line=>({text:text.split('\n')[line]})};
+  };
+  f.setExecute(async command=>command==='java.execute.workspaceCommand'
+    ? {attributes:{jarPath:binary,sourceAttachmentPath:archive}}
+    : [...uris.map(uri=>({uri,range:{start:{line:1,character:26}}})),
+      ...[27,28,29,30].map(character=>({uri:uris[0],range:{start:{line:1,character}}}))]);
+  const answer = await f.provider.query({...f.request,method:'references'});
+  assert.equal(answer.outside,1);
+  assert.equal(answer.locations.length,8);
+  assert.deepEqual(answer.locations.filter(location=>location.providerUri===uris[0].toString())
+    .map(location=>location.position.character),[26,27,28,29,30]);
+  assert.deepEqual([...opens.values()],[1,1,1,1]);
+});
+
 async function rustDependency(t,f) {
   const directory = await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(),'vizzi-provider-rust-')));
   t.after(()=>fs.rm(directory,{recursive:true,force:true}));

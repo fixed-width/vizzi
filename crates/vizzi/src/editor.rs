@@ -41,6 +41,17 @@ pub struct EditorLocation {
     /// Saved content expected in the target editor buffer.
     pub source: SourceWitness,
 }
+/// A verified virtual Java source in a local archive owned by the editor's provider.
+pub struct ArchiveEditorLocation {
+    /// Opaque native archive capture to recheck immediately before selecting the line.
+    pub capture: String,
+    /// Canonical archive path, one-based source line, and captured bytes witness.
+    pub source: EditorLocation,
+    /// Local binary JAR to which the provider attached the source.
+    pub binary: PathBuf,
+    /// Provider-owned JDT class document URI.
+    pub uri: String,
+}
 /// Refused or failed editor command.
 #[derive(Debug, thiserror::Error)]
 #[error("{0}")]
@@ -49,6 +60,16 @@ pub struct EditorError(pub String);
 pub trait Editor: Send + Sync {
     /// Requests display of a verified location; the adapter defines presentation confirmation.
     fn open(&self, location: &EditorLocation) -> Result<(), EditorError>;
+    /// Reports whether this adapter can display an editor-owned Java archive.
+    fn opens_java_archives(&self) -> bool {
+        false
+    }
+    /// Displays a verified Java archive through an adapter that owns virtual documents.
+    fn open_archive(&self, _location: &ArchiveEditorLocation) -> Result<(), EditorError> {
+        Err(EditorError(
+            "This editor cannot open a Java archive document".into(),
+        ))
+    }
     /// User-facing adapter name.
     fn name(&self) -> &str;
 }

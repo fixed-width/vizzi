@@ -12,6 +12,7 @@ const CALLS: CallRules = CallRules {
     expressions: &[CallExpression {
         kind: "call_expression",
         callee_field: "function",
+        receiver_field: None,
         unwrap_callee: None,
         name_kinds: &["identifier", "field_identifier", "type_identifier"],
         name_fields: &[

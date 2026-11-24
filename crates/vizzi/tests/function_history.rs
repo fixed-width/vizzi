@@ -578,6 +578,12 @@ fn historical_cross_file_names_use_the_same_commit_in_every_written_call_adapter
             "def helper\n  17\nend\n",
         ),
         (
+            "java",
+            "java",
+            "class Caller { void target() { Callee.helper(); } }\n",
+            "class Callee { static int helper() { return 17; } }\n",
+        ),
+        (
             "c",
             "c",
             "void target() { helper(); }\n",
@@ -1274,6 +1280,61 @@ fn historical_typescript_labels_use_the_package_name_at_each_revision() {
     let first = history.start(&request).unwrap();
     let older = history.step(&step(&first["token"], 1)).unwrap();
     assert!(older["symbol"]["module"].is_null());
+}
+
+#[test]
+fn historical_java_package_cues_use_the_descriptor_from_each_revision() {
+    let root = tempfile::tempdir().unwrap();
+    let cache = tempfile::tempdir().unwrap();
+    let repo = root.path();
+    git(repo, &["init", "-q"]);
+    let path = "src/demo/Service.java";
+    let descriptor = "src/module-info.java";
+    let source = |value| {
+        format!(
+            "package demo; class Service {{ int target() {{ return helper({value}); }} int helper(int value) {{ return value; }} }}\n"
+        )
+    };
+    std::fs::create_dir_all(repo.join("src/demo")).unwrap();
+    std::fs::write(repo.join(path), source(0)).unwrap();
+    git(repo, &["add", "--", path]);
+    commit_staged(repo);
+    std::fs::write(
+        repo.join(descriptor),
+        "module example.previous { exports demo; }",
+    )
+    .unwrap();
+    std::fs::write(repo.join(path), source(1)).unwrap();
+    git(repo, &["add", "--", path, descriptor]);
+    commit_staged(repo);
+    std::fs::write(
+        repo.join(descriptor),
+        "module example.live { exports demo; }",
+    )
+    .unwrap();
+    std::fs::write(repo.join(path), source(2)).unwrap();
+
+    let host = history_host(repo, cache.path(), None);
+    let (request, live) = module_request(&host, path);
+    assert_eq!(live["label"], "example.live/demo");
+    let history = FunctionHistory::new(host);
+    let pair = history.compare(&compare_current(&request)).unwrap();
+    assert_eq!(pair["newer"]["symbol"]["module"], live);
+    let old = &pair["older"]["symbol"]["module"];
+    assert_eq!(old["label"], "example.previous/demo");
+    assert_eq!(old["id"], live["id"]);
+    let captured = captured_source(
+        &pair["older"],
+        json!({"kind":"comparison","token":pair["token"],"side":"older"}),
+    );
+    assert_eq!(
+        &open_module_helper(&history, &captured)["symbol"]["module"],
+        old
+    );
+    let first = history.start(&request).unwrap();
+    let earliest = history.step(&step(&first["token"], 1)).unwrap();
+    assert_eq!(earliest["symbol"]["module"]["label"], "demo");
+    assert_eq!(earliest["symbol"]["module"]["root"], "src/demo");
 }
 
 #[test]

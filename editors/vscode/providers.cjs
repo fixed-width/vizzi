@@ -1,8 +1,10 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const {savedSource} = require('./editor-source.cjs');
+const {isJavaArchive,javaAttachment,verifyJavaDocument} = require('./java-archive.cjs');
 
 const FILE_BYTES = 4 * 1024 * 1024;
+const ARCHIVES_PER_LOOKUP = 4;
 const PACKAGE_SOURCE_SUFFIXES = new Set(['.js','.jsx','.mjs','.cjs','.ts','.tsx','.mts','.cts']);
 function within(root, file) {
   const relative = path.relative(root,file);
@@ -89,8 +91,14 @@ function createProvider(vscode, root, editorRoot = root) {
     if (!['definition','references','dependency-definition','dependency-references'].includes(request.method)) throw new Error('Unsupported editor operation');
     const dependency = request.method.startsWith('dependency-');
     const method = dependency?request.method.slice('dependency-'.length):request.method;
+    const archive = request.archiveBinary !== undefined;
     if (typeof request.path !== 'string') throw new Error('Invalid editor source path');
-    if (dependency) {
+    if (archive) {
+      if (!dependency || !path.isAbsolute(request.path) || typeof request.archiveBinary !== 'string'
+          || Buffer.byteLength(request.path)>4096 || !path.isAbsolute(request.archiveBinary)
+          || Buffer.byteLength(request.archiveBinary)>4096 || typeof request.providerUri !== 'string'
+          || Buffer.byteLength(request.providerUri)>16*1024) throw new Error('Invalid Java archive source request');
+    } else if (dependency) {
       const rust = !within(root,request.path) && path.extname(request.path)==='.rs';
       if (!path.isAbsolute(request.path) || (!rust && !installedPackageSource(root,request.path))) {
         throw new Error('Dependency queries require captured Rust or installed package source');
@@ -103,7 +111,10 @@ function createProvider(vscode, root, editorRoot = root) {
     const before = epoch;
     await clean();
     let uri = vscode.Uri.file(dependency?file:path.join(editorRoot,request.path));
-    if (request.providerUri !== undefined) {
+    if (archive) {
+      uri = vscode.Uri.parse(request.providerUri,true);
+      if (!isJavaArchive(uri)) throw new Error('Invalid Java archive source URI');
+    } else if (request.providerUri !== undefined) {
       if (!dependency || !installedPackageSource(root,file) || typeof request.providerUri !== 'string') {
         throw new Error('Invalid package resolution path');
       }
@@ -115,7 +126,8 @@ function createProvider(vscode, root, editorRoot = root) {
       }
     }
     const document = await vscode.workspace.openTextDocument(uri);
-    await verifyDocument(document,file);
+    if (archive) await verifyJavaDocument(vscode,document,request,request.text);
+    else await verifyDocument(document,file);
     if (document.getText() !== request.text) throw new Error('Editor query differs from captured source');
     if (!validPosition(document,request.position)) throw new Error('Invalid editor source position');
     const position = new vscode.Position(request.position.line,request.position.character);
@@ -127,11 +139,44 @@ function createProvider(vscode, root, editorRoot = root) {
     const seen = new Set();
     let outside = 0;
     let bytes = 0;
-    const witnesses = [{doc:document,file,text:request.text,alias:request.providerUri === undefined ? undefined : uri.fsPath}];
+    const archiveDocuments = new Map();
+    const witnesses = [archive ? {doc:document,archive:request,text:request.text} :
+      {doc:document,file,text:request.text,alias:request.providerUri === undefined ? undefined : uri.fsPath}];
     for (const location of raw) {
       const target = location.targetUri || location.uri;
       const start = (location.targetSelectionRange || location.targetRange || location.range)?.start;
       if (!target || !start) throw new Error('Invalid editor location');
+      if (document.languageId === 'java' && isJavaArchive(target)) {
+        const uri = target.toString();
+        const key = `${uri}:${start.line}:${start.character}`;
+        if ((method === 'references' && archive && uri === request.providerUri
+              && start.line === position.line && start.character === position.character) || seen.has(key)) continue;
+        seen.add(key);
+        if (!archiveDocuments.has(uri)) {
+          if (archiveDocuments.size >= ARCHIVES_PER_LOOKUP) {outside++; continue;}
+          const attachment = await javaAttachment(vscode,target);
+          archiveDocuments.set(uri,null);
+          if (attachment) {
+            const doc = await vscode.workspace.openTextDocument(target);
+            if (doc.isDirty || doc.languageId !== 'java') throw new Error('Invalid Java archive target document');
+            const text = doc.getText();
+            const size = Buffer.byteLength(text);
+            if (size <= 2*1024*1024) {
+              const witness = {doc,archive:attachment,text,size};
+              archiveDocuments.set(uri,witness);
+              witnesses.push(witness);
+            }
+          }
+        }
+        const matched = archiveDocuments.get(uri);
+        if (!matched) {outside++; continue;}
+        const {doc,archive:attachment,text,size} = matched;
+        if (!validPosition(doc,start)) throw new Error('Invalid Java archive target position');
+        bytes += size;
+        if (bytes > 8*1024*1024) throw new Error('Editor target text exceeds allowance');
+        locations.push({...attachment,text,position:{line:start.line,character:start.character}});
+        continue;
+      }
       if (target.scheme !== 'file') {outside++; continue;}
       if (!within(root,target.fsPath) && !within(editorRoot,target.fsPath) && path.extname(target.fsPath)!=='.rs') {outside++;continue;}
       const packageAlias = inInstallation(root,target.fsPath) || inInstallation(editorRoot,target.fsPath);
@@ -167,6 +212,10 @@ function createProvider(vscode, root, editorRoot = root) {
     }
     await clean();
     for (const witness of witnesses) {
+      if (witness.archive) {
+        await verifyJavaDocument(vscode,witness.doc,witness.archive,witness.text);
+        continue;
+      }
       if (witness.alias && await fs.realpath(witness.alias).catch(()=>null) !== witness.file) {
         throw new Error('Package resolution path changed during editor analysis');
       }

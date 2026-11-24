@@ -8,7 +8,7 @@ use std::{
     thread,
     time::Duration,
 };
-use vizzi::editor::{Editor, EditorLocation, OriginEditor, SourceWitness};
+use vizzi::editor::{ArchiveEditorLocation, Editor, EditorLocation, OriginEditor, SourceWitness};
 
 fn descriptor(root: &Path, port: u16, session: &str, token: &str) -> Value {
     json!({"protocol":"vizzi-origin","version":1,"root":root,"editor":"Fixture editor","session":session,"port":port,"token":token})
@@ -75,6 +75,38 @@ fn source_witness_uses_standard_sha256_and_literal_byte_length() {
     assert_eq!(
         witness.sha256,
         "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9"
+    );
+}
+
+#[test]
+fn archive_navigation_requires_an_advertised_origin_session() {
+    let temp = tempfile::tempdir().unwrap();
+    let directory = temp.path().canonicalize().unwrap();
+    let root = directory.join("project");
+    std::fs::create_dir(&root).unwrap();
+    let file = directory.join("origin.json");
+    write_descriptor(
+        &file,
+        &descriptor(&root, 1, &"1".repeat(64), &"2".repeat(64)),
+    );
+    let editor = OriginEditor::from_file(&root, &file).unwrap();
+    assert!(!editor.opens_java_archives());
+    let location = ArchiveEditorLocation {
+        capture: "a".repeat(64),
+        source: EditorLocation {
+            path: directory.join("helper-sources.jar"),
+            line: 2,
+            source: SourceWitness::from_bytes(b"package demo;\nclass Helper {}\n"),
+        },
+        binary: directory.join("helper.jar"),
+        uri: "jdt://contents/helper.jar/demo/Helper.class?project".into(),
+    };
+    assert!(
+        editor
+            .open_archive(&location)
+            .unwrap_err()
+            .to_string()
+            .contains("cannot open")
     );
 }
 

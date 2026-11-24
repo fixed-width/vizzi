@@ -43,9 +43,11 @@ and declines dirty/disk-divergent workspace buffers or concurrent changes.
 The VS Code adapter uses bounded file reads and limits open workspace inputs to 8192
 files and 128 MiB in aggregate.
 
-The optional Rust dependency extension adds `dependency-definition` and
-`dependency-references`. For these methods only, `path` is the canonical absolute file
-path held by a native dependency capture. The query text must match that saved Rust file.
+Dependency queries use `dependency-definition` and `dependency-references`. For
+file-backed dependencies, `path` is the canonical absolute path held by the native
+capture. For an editor-provided Java archive, it is the canonical source archive.
+The request carries the captured `providerUri` and `archiveBinary` so VS Code can
+recheck the same JDT document and attachment. Its text must match the capture.
 Older adapters reject these distinct methods rather than treating a dependency-relative
 filename as repository source. Root authentication and all byte/position checks still apply.
 
@@ -65,9 +67,14 @@ limited to 4 MiB, with an 8 MiB aggregate text limit in the VS Code adapter. Pos
 identify exact identifiers; LSP LocationLink selection ranges are supported. References
 exclude the queried declaration. The adapter removes duplicate locations.
 
-Repository-local captured targets and bounded local Rust dependency files are admitted.
-The editor counts non-file locations as `outside`; Vizzi also counts excluded repository
-paths and unsupported external languages. External Rust target text must match disk.
+Repository-local targets, bounded Rust dependencies, workspace JavaScript and TypeScript
+packages, and reached Java archive documents can be admitted. Java replies include
+`providerUri`, canonical source archive `path`, and canonical `archiveBinary` with the
+document text and position. The native host verifies the text against the unique
+archive member. Unsupported virtual locations, excluded files and unsupported external
+languages count as `outside`. Up to four distinct JDT documents can enter a lookup,
+and every returned position still counts toward the result and text limits.
+External Rust target text must match disk.
 An optional target `declaration` contains a function `range`, identifier `selection`
 (both with UTF-16 `start`/`end` positions), and its exact source `name`, supplied by the
 editor's document-symbol provider. Native admission validates all ranges and the content

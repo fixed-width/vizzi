@@ -155,6 +155,9 @@ pub struct CompanionView {
     pub persistent: bool,
     /// Selected native editor adapter name.
     pub editor: String,
+    /// Whether the selected adapter supports verified Java archive documents.
+    #[serde(skip_serializing_if = "std::ops::Not::not")]
+    pub editor_java_archives: bool,
     /// Per-card current-index freshness, not a new source observation.
     pub freshness: Vec<(u32, SourceState)>,
 }
@@ -287,6 +290,7 @@ impl Companion {
             board,
             persistent: self.file.is_some(),
             editor: self.editor.name().into(),
+            editor_java_archives: self.editor.opens_java_archives(),
             freshness,
         }
     }
@@ -457,9 +461,14 @@ impl Companion {
     }
     pub(crate) fn open_verified_location(
         &self,
-        location: &EditorLocation,
+        location: &crate::structural::DependencyEditorLocation,
     ) -> Result<(), CompanionError> {
-        self.editor.open(location).map_err(CompanionError::Editor)
+        use crate::structural::DependencyEditorLocation;
+        match location {
+            DependencyEditorLocation::File(file) => self.editor.open(file),
+            DependencyEditorLocation::Archive(archive) => self.editor.open_archive(archive),
+        }
+        .map_err(CompanionError::Editor)
     }
     fn open_working(&self, doc: &Document, line: usize) -> Result<(), CompanionError> {
         let path = ReviewPath::parse(doc.path().as_bytes().to_vec())

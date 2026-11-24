@@ -9,7 +9,8 @@ async function startWorkspace({binary,root,connectionFile,configFile,output,onEx
   if (origin) args.push('--editor-connection',origin.file);
   output.appendLine(`Starting Vizzi for ${root}`);
   let child;
-  try {child = spawn(binary,args,{cwd:root,stdio:['ignore','ignore','pipe'],windowsHide:true});}
+  try {child = spawn(binary,args,{cwd:root,stdio:['ignore','ignore','pipe'],windowsHide:true,
+    env:{...process.env,VIZZI_ORIGIN_JAVA_ARCHIVE_SESSION:origin?.javaArchiveSession}});}
   catch(error) {await origin?.dispose();throw error;}
   let stopped = false;
   let exited = false;

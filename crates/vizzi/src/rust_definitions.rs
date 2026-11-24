@@ -349,8 +349,11 @@ impl Provider for RustAnalyzer {
                 return Err("Dependencies changed; reopen the target from its caller".into());
             }
             source.verify()?;
-            workspace.open_external(&source.path(), &text, doc.version().as_str())?;
-            source.path()
+            let path = source
+                .path()
+                .ok_or("Rust dependency source needs a local file")?;
+            workspace.open_external(&path, &text, doc.version().as_str())?;
+            path
         } else {
             if !workspace.opened.contains_key(&symbol.source.path) {
                 workspace.open(&symbol.source.path, &text)?;
@@ -359,9 +362,12 @@ impl Provider for RustAnalyzer {
         };
         let captures = self.sources.sources()?;
         for source in &captures {
-            if source.input.configuration == configuration && source.verify().is_ok() {
+            if source.input.configuration == configuration
+                && source.verify().is_ok()
+                && let Some(path) = source.path()
+            {
                 workspace.open_external(
-                    &source.path(),
+                    &path,
                     &crate::rust_definitions::text(source.doc())?,
                     source.doc().version().as_str(),
                 )?;
@@ -385,7 +391,9 @@ impl Provider for RustAnalyzer {
                     position,
                 });
             } else if let Some(source) = captures.iter().find(|s| {
-                s.path() == path && s.input.configuration == configuration && s.verify().is_ok()
+                s.path().as_ref() == Some(&path)
+                    && s.input.configuration == configuration
+                    && s.verify().is_ok()
             }) {
                 locations.push(Location {
                     capture: Some(source.origin.capture.clone()),
@@ -454,10 +462,13 @@ impl Provider for RustAnalyzer {
         if external.is_none() && !workspace.opened.contains_key(&source.path) {
             workspace.open(&source.path, &caller)?;
         }
-        let caller_path = external
-            .as_ref()
-            .map(|s| s.path())
-            .unwrap_or_else(|| workspace.directory.path().join(&source.path));
+        let caller_path = if let Some(capture) = &external {
+            capture
+                .path()
+                .ok_or("Rust dependency source needs a local file")?
+        } else {
+            workspace.directory.path().join(&source.path)
+        };
         if let Some(source) = &external {
             if source.input.configuration != configuration || source.verify().is_err() {
                 let context = workspace.context(&snapshot);
@@ -521,7 +532,9 @@ impl Provider for RustAnalyzer {
                 match captured {
                     Ok(capture) => {
                         changed |= workspace.open_external(
-                            &capture.path(),
+                            &capture
+                                .path()
+                                .ok_or("Rust dependency source needs a local file")?,
                             &text(capture.doc())?,
                             capture.doc().version().as_str(),
                         )?;
@@ -555,7 +568,7 @@ impl Provider for RustAnalyzer {
             .sources
             .sources()?
             .iter()
-            .map(|s| s.path())
+            .filter_map(|s| s.path())
             .collect::<BTreeSet<_>>();
         for path in workspace
             .external_opened

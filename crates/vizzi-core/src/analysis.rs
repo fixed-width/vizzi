@@ -4,6 +4,7 @@ pub use crate::syntax_state::{AnalysisResult, SyntaxState};
 use crate::{
     c_family::{CAdapter, CppAdapter},
     ecmascript::Dialect,
+    java::JavaAdapter,
     model::{Analysis, Context, ModelError},
     python::PythonAdapter,
     ruby::RubyAdapter,
@@ -124,6 +125,7 @@ impl Languages {
             Arc::new(RustAdapter),
             Arc::new(PythonAdapter),
             Arc::new(RubyAdapter),
+            Arc::new(JavaAdapter),
             Arc::new(CAdapter),
             Arc::new(CppAdapter),
             Arc::new(Dialect::JavaScript),

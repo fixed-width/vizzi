@@ -124,6 +124,13 @@ pub(crate) enum DocumentSync {
     Ordered,
 }
 
+pub(crate) enum Readiness {
+    Immediate,
+    RustAnalyzer,
+    Progress(String),
+    JdtLs,
+}
+
 pub(crate) struct Client {
     child: Child,
     input: Option<ChildStdin>,
@@ -132,10 +139,10 @@ pub(crate) struct Client {
     next: u64,
     options: Value,
     initialization: Value,
-    status_notifications: bool,
-    progress_token: Option<String>,
+    readiness: Readiness,
     pub(crate) document_sync: DocumentSync,
     diagnostics: BTreeMap<String, i32>,
+    maven_errors: BTreeMap<PathBuf, String>,
     ready: bool,
     pub version: String,
 }
@@ -143,8 +150,7 @@ pub(crate) struct Setup {
     pub arguments: Vec<String>,
     pub initialization: Value,
     pub configuration: Value,
-    pub status_notifications: bool,
-    pub progress_token: Option<String>,
+    pub readiness: Readiness,
     pub document_sync: DocumentSync,
     pub environment: Vec<(std::ffi::OsString, Option<std::ffi::OsString>)>,
 }
@@ -158,8 +164,7 @@ impl Client {
                 arguments: vec![],
                 initialization: options.clone(),
                 configuration: json!({"rust-analyzer":options}),
-                status_notifications: true,
-                progress_token: None,
+                readiness: Readiness::RustAnalyzer,
                 document_sync: DocumentSync::Diagnostics,
                 environment: vec![],
             },
@@ -235,7 +240,7 @@ impl Client {
                 }
             }
         });
-        let ready = !setup.status_notifications && setup.progress_token.is_none();
+        let ready = matches!(setup.readiness, Readiness::Immediate);
         let mut client = Self {
             child,
             input: Some(input),
@@ -244,14 +249,16 @@ impl Client {
             next: 0,
             options: setup.configuration,
             initialization: setup.initialization,
-            status_notifications: setup.status_notifications,
-            progress_token: setup.progress_token,
+            readiness: setup.readiness,
             document_sync: setup.document_sync,
             diagnostics: BTreeMap::new(),
+            maven_errors: BTreeMap::new(),
             ready,
             version: String::new(),
         };
-        let result=client.request("initialize",json!({"processId":null,"rootUri":uri(root)?,"workspaceFolders":[{"uri":uri(root)?,"name":"captured source"}],"capabilities":{"general":{"positionEncodings":["utf-16"]},"textDocument":{"definition":{"linkSupport":true},"references":{},"publishDiagnostics":{"versionSupport":true}},"window":{"workDoneProgress":client.progress_token.is_some()},"experimental":{"serverStatusNotification":client.status_notifications},"workspace":{"configuration":true}},"initializationOptions":client.initialization}),Duration::from_secs(20))?;
+        let progress = matches!(client.readiness, Readiness::Progress(_));
+        let rust_status = matches!(client.readiness, Readiness::RustAnalyzer);
+        let result=client.request("initialize",json!({"processId":null,"rootUri":uri(root)?,"workspaceFolders":[{"uri":uri(root)?,"name":"captured source"}],"capabilities":{"general":{"positionEncodings":["utf-16"]},"textDocument":{"definition":{"linkSupport":true},"references":{},"publishDiagnostics":{"versionSupport":true}},"window":{"workDoneProgress":progress},"experimental":{"serverStatusNotification":rust_status},"workspace":{"configuration":true}},"initializationOptions":client.initialization}),Duration::from_secs(20))?;
         if !result["capabilities"]["definitionProvider"].is_object()
             && result["capabilities"]["definitionProvider"] != true
         {
@@ -295,15 +302,20 @@ impl Client {
         let Some(method) = message["method"].as_str() else {
             return Ok(());
         };
-        if self.status_notifications && method == "experimental/serverStatus" {
-            self.ready = message["params"]["quiescent"] == true;
-        }
-        if method == "$/progress"
-            && self.progress_token.as_deref() == message["params"]["token"].as_str()
-            && self.progress_token.is_some()
-            && message["params"]["value"]["kind"] == "end"
-        {
-            self.ready = true;
+        let params = &message["params"];
+        match (&self.readiness, method) {
+            (Readiness::RustAnalyzer, "experimental/serverStatus") => {
+                self.ready = params["quiescent"] == true;
+            }
+            (Readiness::Progress(token), "$/progress")
+                if params["token"] == token.as_str() && params["value"]["kind"] == "end" =>
+            {
+                self.ready = true;
+            }
+            (Readiness::JdtLs, "language/status") if params["type"] == "ServiceReady" => {
+                self.ready = true;
+            }
+            _ => {}
         }
         if method == "textDocument/publishDiagnostics"
             && let (Some(uri), Some(version)) = (
@@ -314,6 +326,28 @@ impl Client {
             && let Some(current) = self.diagnostics.get_mut(uri)
         {
             *current = (*current).max(version);
+        }
+        if method == "textDocument/publishDiagnostics"
+            && matches!(self.readiness, Readiness::JdtLs)
+            && let Some(path) = params["uri"]
+                .as_str()
+                .and_then(|value| Url::parse(value).ok())
+                .and_then(|uri| uri.to_file_path().ok())
+            && path.file_name().is_some_and(|name| name == "pom.xml")
+            && let Some(diagnostics) = params["diagnostics"].as_array()
+        {
+            if let Some(error) = diagnostics
+                .iter()
+                .find(|diagnostic| diagnostic["severity"] == 1)
+                .and_then(|diagnostic| diagnostic["message"].as_str())
+            {
+                if self.maven_errors.len() < 64 || self.maven_errors.contains_key(&path) {
+                    self.maven_errors
+                        .insert(path, error.chars().take(384).collect());
+                }
+            } else {
+                self.maven_errors.remove(&path);
+            }
         }
         if let Some(id) = message.get("id") {
             let result = match method {
@@ -348,6 +382,17 @@ impl Client {
             self.send(&json!({"jsonrpc":"2.0","id":id,"result":result}))?;
         }
         Ok(())
+    }
+    pub(crate) fn maven_error(&self, root: &Path) -> Option<&str> {
+        self.maven_errors
+            .iter()
+            .find_map(|(path, message)| path.starts_with(root).then_some(message.as_str()))
+    }
+    pub(crate) fn is_open(&mut self) -> bool {
+        self.reader
+            .as_ref()
+            .is_some_and(|reader| !reader.is_finished())
+            && self.child.try_wait().is_ok_and(|status| status.is_none())
     }
     fn receive(&mut self, deadline: Instant) -> Result<Value, String> {
         self.messages
@@ -385,7 +430,11 @@ impl Client {
         }
     }
     pub(crate) fn wait_ready(&mut self) -> Result<(), String> {
-        let deadline = Instant::now() + Duration::from_secs(20);
+        self.wait_ready_for(Duration::from_secs(20))
+    }
+
+    pub(crate) fn wait_ready_for(&mut self, timeout: Duration) -> Result<(), String> {
+        let deadline = Instant::now() + timeout;
         while !self.ready {
             let message = self.receive(deadline)?;
             self.event(message)?;
@@ -423,31 +472,54 @@ impl Client {
         path: &Path,
         position: Position,
     ) -> Result<Vec<(Option<PathBuf>, Position)>, String> {
-        self.wait_ready()?;
-        let result = self.request(
-            "textDocument/definition",
-            json!({"textDocument":{"uri":uri(path)?},"position":position}),
-            Duration::from_secs(10),
-        )?;
-        locations(result)
+        Ok(file_locations(self.lookup_locations(
+            &uri(path)?,
+            position,
+            false,
+        )?))
     }
     pub(crate) fn references(
         &mut self,
         path: &Path,
         position: Position,
     ) -> Result<Vec<(Option<PathBuf>, Position)>, String> {
+        Ok(file_locations(self.lookup_locations(
+            &uri(path)?,
+            position,
+            true,
+        )?))
+    }
+    pub(crate) fn lookup_locations(
+        &mut self,
+        uri: &str,
+        position: Position,
+        references: bool,
+    ) -> Result<Vec<(Url, Position)>, String> {
         self.wait_ready()?;
-        let result=self.request("textDocument/references",json!({"textDocument":{"uri":uri(path)?},"position":position,"context":{"includeDeclaration":false}}),Duration::from_secs(10))?;
-        locations_with_limit(result, 1024)
+        let mut params = json!({"textDocument":{"uri":uri},"position":position});
+        let (method, limit) = if references {
+            params["context"] = json!({"includeDeclaration":false});
+            ("textDocument/references", 1024)
+        } else {
+            ("textDocument/definition", 64)
+        };
+        locations_with_limit(
+            self.request(method, params, Duration::from_secs(10))?,
+            limit,
+        )
     }
 }
-fn locations(result: Value) -> Result<Vec<(Option<PathBuf>, Position)>, String> {
-    locations_with_limit(result, 64)
+fn file_locations(locations: Vec<(Url, Position)>) -> Vec<(Option<PathBuf>, Position)> {
+    locations
+        .into_iter()
+        .map(|(uri, position)| (uri.to_file_path().ok(), position))
+        .collect()
 }
-fn locations_with_limit(
-    result: Value,
-    limit: usize,
-) -> Result<Vec<(Option<PathBuf>, Position)>, String> {
+#[cfg(test)]
+fn locations(result: Value) -> Result<Vec<(Option<PathBuf>, Position)>, String> {
+    Ok(file_locations(locations_with_limit(result, 64)?))
+}
+fn locations_with_limit(result: Value, limit: usize) -> Result<Vec<(Url, Position)>, String> {
     let items = match result {
         Value::Null => vec![],
         Value::Array(v) => v,
@@ -467,11 +539,10 @@ fn locations_with_limit(
         };
         let uri =
             Url::parse(uri.as_str().ok_or("Missing definition URI")?).map_err(|e| e.to_string())?;
-        let path = uri.to_file_path().ok();
         let position =
             serde_json::from_value::<Position>(point.clone()).map_err(|e| e.to_string())?;
         if seen.insert((uri.to_string(), position.line, position.character)) {
-            output.push((path, position));
+            output.push((uri, position));
         }
     }
     Ok(output)
@@ -671,8 +742,7 @@ while True:
                 arguments: vec!["--stdio".into()],
                 initialization: json!({"mode":"python"}),
                 configuration: json!({"python":{"analysis":{"useLibraryCodeForTypes":true}}}),
-                status_notifications: false,
-                progress_token: None,
+                readiness: Readiness::Immediate,
                 document_sync: DocumentSync::Diagnostics,
                 environment: vec![],
             },
@@ -743,8 +813,7 @@ while sys.stdin.buffer.read(1):pass
                 arguments: vec![],
                 initialization: json!({}),
                 configuration: json!({}),
-                status_notifications: false,
-                progress_token: Some("indexing-progress".into()),
+                readiness: Readiness::Progress("indexing-progress".into()),
                 document_sync: DocumentSync::ReopenWithSymbols,
                 environment: vec![
                     ("PATH".into(), None),

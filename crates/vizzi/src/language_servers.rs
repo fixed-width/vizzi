@@ -10,7 +10,9 @@ use vizzi_core::{
     structure::{CallLookup, Symbol},
 };
 mod c_family;
+mod gradle;
 mod inputs;
+mod java;
 mod project;
 mod python;
 mod ruby;
@@ -32,6 +34,14 @@ pub struct Configuration {
     pub ruby_lsp: Option<PathBuf>,
     /// Optional TypeScript compiler executable with the native LSP.
     pub typescript_server: Option<PathBuf>,
+    /// Optional Eclipse JDT LS launcher.
+    pub jdtls: Option<PathBuf>,
+    /// Java source roots relative to the workspace, defaulting to the workspace root.
+    #[serde(rename = "java-source-root")]
+    pub java_source_roots: Vec<String>,
+    /// Local binary JARs on the managed Java classpath.
+    #[serde(rename = "java-library")]
+    pub java_libraries: Vec<PathBuf>,
     /// Optional interpreter/environment used by the Python server.
     pub python_path: Option<PathBuf>,
     /// Optional compilation database, otherwise root/compile_commands.json.
@@ -47,6 +57,9 @@ impl Configuration {
                 || self.ruby_lsp.is_some()
                 || self.clangd.is_some()
                 || self.typescript_server.is_some()
+                || self.jdtls.is_some()
+                || !self.java_source_roots.is_empty()
+                || !self.java_libraries.is_empty()
                 || self.python_path.is_some()
                 || self.compilation_database.is_some())
         {
@@ -58,6 +71,15 @@ impl Configuration {
         if self.compilation_database.is_some() && self.clangd.is_none() {
             return Err("--compile-commands requires --clangd".into());
         }
+        if !self.java_source_roots.is_empty() {
+            if self.jdtls.is_none() {
+                return Err("--java-source-root requires --jdtls".into());
+            }
+            java::source_roots(&self.java_source_roots)?;
+        }
+        if !self.java_libraries.is_empty() && self.jdtls.is_none() {
+            return Err("--java-library requires --jdtls".into());
+        }
         Ok(())
     }
     /// Whether no semantic language server has been selected.
@@ -68,6 +90,7 @@ impl Configuration {
             && self.clangd.is_none()
             && self.ruby_lsp.is_none()
             && self.typescript_server.is_none()
+            && self.jdtls.is_none()
     }
 }
 
@@ -94,7 +117,7 @@ impl Servers {
                 connection,
                 servers.sources.clone(),
             ));
-            for language in ["rust", "python", "ruby", "c", "cpp"]
+            for language in ["rust", "python", "ruby", "c", "cpp", "java"]
                 .into_iter()
                 .chain(ECMASCRIPT_LANGUAGES.iter().copied())
             {
@@ -138,6 +161,17 @@ impl Servers {
                 executable,
                 c_family::Clangd {
                     database: configuration.compilation_database,
+                },
+            );
+        }
+        if let Some(executable) = configuration.jdtls {
+            servers.add_project(
+                root.clone(),
+                cache.join("java"),
+                executable,
+                java::JdtLs {
+                    roots: java::source_roots(&configuration.java_source_roots)?,
+                    libraries: configuration.java_libraries,
                 },
             );
         }
@@ -210,5 +244,20 @@ impl Provider for Servers {
     }
     fn dependencies(&self) -> Option<&Catalog> {
         Some(&self.sources)
+    }
+    fn supports_java_project_import(&self) -> bool {
+        self.provider("java")
+            .is_ok_and(Provider::supports_java_project_import)
+    }
+    fn java_project_kind(&self, snapshot: &Snapshot) -> Option<&'static str> {
+        self.provider("java").ok()?.java_project_kind(snapshot)
+    }
+    fn import_java_project(
+        &self,
+        snapshot: Arc<Snapshot>,
+        current: &dyn Fn() -> Option<Arc<Snapshot>>,
+    ) -> Result<(), String> {
+        self.provider("java")?
+            .import_java_project(snapshot, current)
     }
 }

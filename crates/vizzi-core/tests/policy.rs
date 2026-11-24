@@ -13,6 +13,32 @@ fn policy(config: PolicyConfig) -> SourcePolicy {
 }
 
 #[test]
+fn java_build_descriptors_are_captured_as_inert_project_inputs() {
+    let rules = policy(PolicyConfig::default());
+    for path in [
+        "pom.xml",
+        "module/pom.xml",
+        "settings.gradle.kts",
+        "module/build.gradle",
+        "gradle.properties",
+        "gradle/libs.versions.toml",
+        "gradle/wrapper/gradle-wrapper.properties",
+    ] {
+        assert!(
+            matches!(
+                rules.classify(path).unwrap(),
+                Some(Classification::SourceOnly {
+                    reason: SourceOnlyReason::ProjectMetadata,
+                    language: Some(language),
+                    ..
+                }) if language == "java-project"
+            ),
+            "{path}"
+        );
+    }
+}
+
+#[test]
 fn default_source_files_keep_provenance_with_or_without_analyzers() {
     let config = PolicyConfig {
         exclusions: vec!["vendor".into()],

@@ -3,7 +3,7 @@ use super::{
     inputs::{InputFiles, Inputs, absolute, save},
     project::{ExternalSource, Profile},
 };
-use crate::lsp::{DocumentSync, Setup};
+use crate::lsp::{DocumentSync, Readiness, Setup};
 use serde_json::{Value, json};
 use std::{
     collections::BTreeMap,
@@ -231,8 +231,7 @@ impl PythonInputs {
             arguments: vec!["--stdio".into()],
             initialization: json!({}),
             configuration: json!({"python":python}),
-            status_notifications: false,
-            progress_token: None,
+            readiness: Readiness::Immediate,
             document_sync: DocumentSync::Diagnostics,
             environment: vec![],
         })
@@ -362,7 +361,7 @@ mod tests {
         let digest = inputs.digest().to_owned();
         let setup = inputs.prepare(mirror.path()).unwrap().setup;
         assert_eq!(setup.arguments, ["--stdio"]);
-        assert!(!setup.status_notifications);
+        assert!(matches!(setup.readiness, Readiness::Immediate));
         assert_eq!(setup.configuration["python"]["pythonPath"], "python3");
         let output: Value =
             serde_json::from_slice(&fs::read(mirror.path().join("pyrightconfig.json")).unwrap())

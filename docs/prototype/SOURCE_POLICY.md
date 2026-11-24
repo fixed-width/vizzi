@@ -7,8 +7,8 @@ apply the same frozen policy during discovery, hint verification, and event filt
 ## Configuration and classification
 
 `PolicyConfig` contains enabled `c_family_roots`, `exclusions`, and explicit C/C++
-`assignments`. Rust, Python, Ruby, JavaScript, and TypeScript (including TSX) are selected
-by default through exact filenames and suffixes defined in `vizzi_core::policy`. See the
+`assignments`. Rust, Python, Ruby, Java, JavaScript, and TypeScript (including TSX) are
+selected by default through exact filenames and suffixes defined in `vizzi_core::policy`. See the
 [language reference](../reference/languages.md) for the supported names. Family scopes
 add the candidate suffixes in [the C-family policy](C_FAMILY_POLICY.md), including
 `.c++` and `.h++`. Assigned C/C++ inputs receive [raw declaration extraction](C_FAMILY_SYNTAX.md).

@@ -94,6 +94,7 @@ pub struct ReferencePage {
 pub(super) struct ReferenceSet {
     page: ReferencePage,
     rows: Vec<ReferenceRow>,
+    pub(super) uses_java: bool,
 }
 fn opaque(value: &str) -> bool {
     value.len() == 64
@@ -518,6 +519,13 @@ impl StructureHost {
         .to_hex()
         .to_string();
         let set = ReferenceSet {
+            uses_java: if let Some(origin) = &target.origin {
+                origin.language == "java"
+            } else {
+                snapshot
+                    .file(&target.source.file)
+                    .is_some_and(|doc| doc.classification().assigned_language() == Some("java"))
+            },
             page: ReferencePage {
                 snapshot: request.snapshot.clone(),
                 target,

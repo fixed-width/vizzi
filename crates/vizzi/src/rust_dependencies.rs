@@ -53,6 +53,7 @@ pub(crate) fn input(path: &Path, configuration: &str) -> Result<Input, String> {
                         .map(str::to_owned),
                     configuration: configuration.into(),
                     mirror_path: None,
+                    archive: None,
                     installation: None,
                 });
             }
@@ -74,6 +75,7 @@ pub(crate) fn input(path: &Path, configuration: &str) -> Result<Input, String> {
         version: None,
         configuration: configuration.into(),
         mirror_path: None,
+        archive: None,
         installation: None,
     })
 }

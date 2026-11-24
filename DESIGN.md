@@ -73,7 +73,7 @@ shared model. Preserve an integration path for other source-control systems.
 
 Support mixed-language workspaces and differing analysis capabilities. Preserve
 source locations, provenance, configuration, and analysis coverage. Semantic navigation
-uses configured language servers. rust-analyzer, Pyright, Ruby LSP, clangd and
+uses configured language servers. rust-analyzer, Pyright, Ruby LSP, clangd, JDT LS and
 the native TypeScript server share captured-source result checks and an editor-neutral
 definition/reference interface. Name matching remains an explicit fallback. See [language servers](docs/visual/LANGUAGE_SERVERS_TECH.md). Language-specific
 findings should retain their meaning when presented through shared views.

@@ -4,6 +4,7 @@ const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
 const {startWorkspace} = require('./launcher.cjs');
+const {startOriginEditor} = require('./origin-connection.cjs');
 
 async function fixture(t) {
   const directory = await fs.mkdtemp(path.join(os.tmpdir(),'vizzi-launch-'));
@@ -30,6 +31,20 @@ test('a project-local config launches the native workspace and shutdown closes i
   await workspace.dispose();
   await assert.rejects(fetch(workspace.url));
 });
+
+test('the launcher gives its child Java archive capability without extending the v1 descriptor',
+  {skip:process.platform==='win32'}, async t=>{
+    const f=await fixture(t),binary=path.join(f.directory,'strict-v1');
+    await fs.writeFile(binary,`#!${process.execPath}\nconst fs=require('node:fs'),assert=require('node:assert/strict');
+      const descriptor=JSON.parse(fs.readFileSync(process.argv[process.argv.indexOf('--editor-connection')+1],'utf8'));
+      assert.deepEqual(Object.keys(descriptor).sort(),['editor','port','protocol','root','session','token','version']);
+      assert.equal(process.env.VIZZI_ORIGIN_JAVA_ARCHIVE_SESSION,descriptor.session);
+      process.stderr.write('Vizzi: http://127.0.0.1:12345\\n');setInterval(()=>{},1000);\n`,{mode:0o755});
+    const session=await startWorkspace({...f,binary,createOrigin:()=>startOriginEditor({
+      root:f.root,storage:path.join(f.directory,'editor'),name:'VS Code',javaArchives:true,open:async()=>{}
+    })});
+    await session.dispose();
+  });
 
 test('native configuration errors reach the user and a failed start leaves no running workspace',async t=>{
   const f = await fixture(t);

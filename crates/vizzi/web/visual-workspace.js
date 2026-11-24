@@ -22,8 +22,12 @@ import {createCallPreparation,resolveCallChoice,directDestination} from '/call-d
 installAppHeader(document.querySelector('body > header'));
 const el=id=>document.getElementById(id),node=(tag,text='')=>{const n=document.createElement(tag);n.textContent=text;return n;},svg=(tag,attrs={})=>{const n=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const[k,v]of Object.entries(attrs))n.setAttribute(k,String(v));return n;};
 const error=createMessage(el('visual-error'),{label:'Dismiss workspace error'}),notice=createMessage(el('visual-notice'),{label:'Dismiss workspace notice'});
-let definitionProvider=false;const definitionCapabilities=transport('/api/structure').then(c=>{definitionProvider=c.definition_provider===true;}).catch(()=>{});
-let model,currentSnapshot,taskControls,board,editorName='editor',busy=false,saveTimer,paletteTicket=0,jobs=Promise.resolve(),demoOpened=false,livePendingTimer;
+let definitionProvider=false,javaImportAvailable=false;
+const definitionCapabilities=transport('/api/structure').then(c=>{
+ definitionProvider=c.definition_provider===true;
+ javaImportAvailable=c.java_project_import===true;
+}).catch(()=>{});
+let model,currentSnapshot,taskControls,board,editorName='editor',editorJavaArchives=false,busy=false,saveTimer,paletteTicket=0,jobs=Promise.resolve(),demoOpened=false,livePendingTimer;
 let revisionPicker,lineagePicker,crossFilePicker;
 const mounted=new Map();
 const returnPending=r=>r.liveReturn==='pending';
@@ -49,6 +53,31 @@ el('code-layout').value=smartReflow?'smart':'original';el('code-layout').onchang
 const fail=e=>error.show(e?.message??String(e));
 async function transport(path,options){const response=await fetchRead(path,options);if(!response.ok){let text=await response.text();try{text=JSON.parse(text).message??text;}catch{}const error=new Error(text);error.status=response.status;throw error;}return response.json();}
 const post=(path,body,signal)=>transport(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal});
+const javaImportButton=el('import-java-project');
+let javaProject;
+async function updateJavaProject(snapshot){
+ await definitionCapabilities;
+ if(!javaImportAvailable||currentSnapshot!==snapshot)return;
+ try{
+  const project=await transport('/api/java-project');
+  if(currentSnapshot!==snapshot)return;
+  javaProject=project?.snapshot===snapshot&&['Maven','Gradle'].includes(project.kind)?project:null;
+  javaImportButton.hidden=!javaProject;
+  if(javaProject)javaImportButton.textContent=`Import ${javaProject.kind} classpath`;
+ }catch{}
+}
+javaImportButton.onclick=async()=>{
+ const project=javaProject;
+ if(!project||project.snapshot!==currentSnapshot||javaImportButton.disabled)return;
+ javaImportButton.disabled=true;
+ el('workspace-actions').open=false;
+ notice.show(`Importing Java classpath with ${project.kind}…`);
+ try{
+  await post('/api/java-project',{snapshot:project.snapshot});
+  notice.show('Java project classpath imported.');
+ }catch(e){notice.show(null);fail(e);}
+ finally{javaImportButton.disabled=false;}
+};
 const definitionWarmup=new DefinitionWarmup((snapshot,call,path)=>post('/api/call-definition',{snapshot,call,path}));
 function refreshCapture(){
  const views=model.views.filter(v=>v.mode==='live');const key=JSON.stringify([views.map(v=>[v.id,v.symbol.id,v.mode,mounted.get(v.id)?.sourceTicket,v.reading]),model.links.map(l=>[l.id,l.state])]);
@@ -624,7 +653,7 @@ function links(){
 }
 function geometry(){
  if(!model)return;for(const[id,r]of mounted)if(!model.views.some(v=>v.id===id)){r.controller.abort();r.historyController?.abort();r.sourcePane.dispose();r.element.remove();mounted.delete(id);}const c=model.camera;el('workspace-world').style.transform=`translate(${-c.x*c.scale}px,${-c.y*c.scale}px) scale(${c.scale})`;el('visual-zoom').textContent=Math.round(c.scale*100)+'%';el('visual-empty').hidden=model.items().length>0;el('visual-stale').hidden=!model.views.some(v=>v.state==='unresolved'&&!mounted.get(v.id)?.liveReturn);
- for(const v of model.views){const r=mounted.get(v.id);if(!r)continue;r.element.hidden=!model.isVisible(v.id);Object.assign(r.element.style,{left:v.x+'px',top:v.y+'px',width:v.w+'px',height:(v.collapsed?54:v.h)+'px'});const membership=modulePresentation(v,model.views);r.element.classList.toggle('has-module',Boolean(membership));const moduleKey=JSON.stringify(membership);if(moduleKey!==r.moduleKey){r.moduleKey=moduleKey;r.moduleTag.hidden=!membership;if(membership){r.element.dataset.moduleId=membership.id;r.moduleTag.dataset.moduleId=membership.id;r.moduleTag.textContent=membership.label;r.moduleTag.title=membership.title;r.element.style.setProperty('--module-accent',`var(--module-${membership.colour})`);r.element.style.setProperty('--module-tint',`var(--module-tint-${membership.colour})`);}else{delete r.element.dataset.moduleId;delete r.moduleTag.dataset.moduleId;r.moduleTag.textContent='';r.element.style.removeProperty('--module-accent');r.element.style.removeProperty('--module-tint');}}r.body.hidden=v.collapsed;r.collapse.textContent=v.collapsed?'▾':'▴';r.collapse.setAttribute('aria-label',v.collapsed?'Expand bubble':'Collapse bubble');r.element.classList.toggle('is-selected',v.id===model.selected);r.element.classList.toggle('is-stale',!model.usable(v.id));r.prev.disabled=r.next.disabled=Boolean(r.historyLoading);r.callsButton.disabled=!model.navigable(v.id)||r.historyLoading;r.referenceActions.disabled=r.historyLoading||(!model.usable(v.id)&&!(!r.loading&&!returnPending(r)&&(canFindEarlier(v)||v.comparison&&canChooseRevision(v))));r.fitHeight.disabled=r.fitWidth.disabled=r.loading||!r.lines?.length||v.collapsed;inlineAvailability(r.code,v.id);r.keep.disabled=Boolean(v.symbol.origin)||!model.usable(v.id)||r.historyLoading||!board||busy;r.keep.title=v.symbol.origin?'Dependency locations stay in this workspace.':'Save location';r.editor.disabled=!model.usable(v.id)||r.historyLoading||busy;historyControls(r,v);comparisonControls(r,v);updateFragmentStatus(r);restoreVisibleReading(r,v);}
+ for(const v of model.views){const r=mounted.get(v.id);if(!r)continue;r.element.hidden=!model.isVisible(v.id);Object.assign(r.element.style,{left:v.x+'px',top:v.y+'px',width:v.w+'px',height:(v.collapsed?54:v.h)+'px'});const membership=modulePresentation(v,model.views);r.element.classList.toggle('has-module',Boolean(membership));const moduleKey=JSON.stringify(membership);if(moduleKey!==r.moduleKey){r.moduleKey=moduleKey;r.moduleTag.hidden=!membership;if(membership){r.element.dataset.moduleId=membership.id;r.moduleTag.dataset.moduleId=membership.id;r.moduleTag.textContent=membership.label;r.moduleTag.title=membership.title;r.element.style.setProperty('--module-accent',`var(--module-${membership.colour})`);r.element.style.setProperty('--module-tint',`var(--module-tint-${membership.colour})`);}else{delete r.element.dataset.moduleId;delete r.moduleTag.dataset.moduleId;r.moduleTag.textContent='';r.element.style.removeProperty('--module-accent');r.element.style.removeProperty('--module-tint');}}r.body.hidden=v.collapsed;r.collapse.textContent=v.collapsed?'▾':'▴';r.collapse.setAttribute('aria-label',v.collapsed?'Expand bubble':'Collapse bubble');r.element.classList.toggle('is-selected',v.id===model.selected);r.element.classList.toggle('is-stale',!model.usable(v.id));r.prev.disabled=r.next.disabled=Boolean(r.historyLoading);r.callsButton.disabled=!model.navigable(v.id)||r.historyLoading;r.referenceActions.disabled=r.historyLoading||(!model.usable(v.id)&&!(!r.loading&&!returnPending(r)&&(canFindEarlier(v)||v.comparison&&canChooseRevision(v))));r.fitHeight.disabled=r.fitWidth.disabled=r.loading||!r.lines?.length||v.collapsed;inlineAvailability(r.code,v.id);r.keep.disabled=Boolean(v.symbol.origin)||!model.usable(v.id)||r.historyLoading||!board||busy;r.keep.title=v.symbol.origin?'Dependency locations stay in this workspace.':'Save location';r.editor.disabled=Boolean(v.symbol.origin?.archive&&(!editorJavaArchives||!v.symbol.origin.editor_archive))||!model.usable(v.id)||r.historyLoading||busy;historyControls(r,v);comparisonControls(r,v);updateFragmentStatus(r);restoreVisibleReading(r,v);}
  if(model.stale)callMenu.hide();links();overview();outlines.refresh();highlights.refresh();taskGroups.refresh();referenceStacks.refresh();
 }
 function button(text,label,handler){const b=node('button',text);b.type='button';if(label)b.setAttribute('aria-label',label);b.onclick=()=>{try{handler();}catch(e){fail(e);}};return b;}
@@ -859,12 +888,13 @@ async function loadCalls(id,offset){
  const r=mounted.get(id);if(!r||!model.navigable(id))return;const v=model.view(id),source=frozenSource(v),expected=source?.snapshot??model.snapshot,binding=JSON.stringify([v.snapshot,v.symbol.id,source]);
  try{const data=source?await post('/api/captured-functions',{source,query:{kind:'calls',offset}},r.controller.signal):await post('/api/structure',{snapshot:expected,path:v.symbol.origin?undefined:v.symbol.source.path,query:{kind:'calls',symbol:v.symbol.id,area:v.area||v.symbol.source.path,offset}},r.controller.signal);if(mounted.get(id)!==r||!model.navigable(id)||JSON.stringify([model.view(id).snapshot,model.view(id).symbol.id,frozenSource(model.view(id))])!==binding)return;if(data.snapshot!==expected||!Array.isArray(data.items)||data.items.length>8)throw new Error('Call response differs');r.sites=offset===0?data.items:[...r.sites,...data.items];r.nextCalls=data.next;r.matching=data.matching;r.callsReady=true;renderCalls(id);if(!source)void prepareDefinitions(id);}catch(error){if(error.name!=='AbortError'){r.callsReady=true;r.popup.replaceChildren(node('p',error.message));}}
 }
+function callLine(site){return site.identifier_line??site.source.line;}
 function renderCalls(id){
  const r=mounted.get(id);if(!r)return;
  const view=model.view(id);
  r.popup.replaceChildren(node('p',`${r.sites.length} of ${r.matching} written calls.`));
  for(const site of r.sites){
-  const action=button(`${site.name??'Dynamic call'} · line ${site.source.line}`,null,()=>chooseCall(id,site));
+  const action=button(`${site.name??'Dynamic call'} · line ${callLine(site)}`,null,()=>chooseCall(id,site));
   if(!canLookInFile(view,site)){r.popup.append(action);continue;}
   const row=node('div');row.className='captured-call-row';
   row.append(action,button('Look in another file…',`Look for ${site.name} in another file`,()=>void chooseCapturedCall(id,site,{anotherFile:true})));
@@ -890,7 +920,7 @@ async function chooseCall(id,site,opener){
  try{verify();}catch{return;}
  highlightCall(id,choice.site);const target=directDestination(choice);if(target){follow(id,choice.site,target);return;}showDestinations(id,choice);
 }
-function highlightCall(id,site){const r=mounted.get(id);r.popup.hidden=true;for(const line of r.code.querySelectorAll('.is-call'))line.classList.remove('is-call');r.code.querySelector(`[data-line="${site.source.line}"]`)?.classList.add('is-call');}
+function highlightCall(id,site){const r=mounted.get(id);r.popup.hidden=true;for(const line of r.code.querySelectorAll('.is-call'))line.classList.remove('is-call');r.code.querySelector(`[data-line="${callLine(site)}"]`)?.classList.add('is-call');}
 function showDestinations(id,{site,note,semantic,captured}) {
  highlightCall(id,site);const candidates=site.candidates,stack=el('destination-stack'),v=model.view(id);
  stack.replaceChildren(node('h2',site.spelling),node('p',candidates.length?`Choose among ${site.candidate_count} ${semantic?'definition locations':'terminal-name matches'}. ${candidates.length} captured destinations are shown.${note?' '+note:''}`:note||'No indexed destination. Dynamic or external calls remain unresolved.'));stack.append(button('Close choices',null,hideDestinations));
@@ -913,7 +943,10 @@ function replaceTask(next){
 }
 function receive(status){
  el('visual-source-status').textContent=status.snapshot?'Source ready':status.error?'Source unavailable':'Mapping source…';
- if(!status.snapshot)return;currentSnapshot=status.snapshot;
+ if(!status.snapshot)return;
+ const changed=currentSnapshot!==status.snapshot;
+ currentSnapshot=status.snapshot;
+ if(changed)void updateJavaProject(currentSnapshot);
  if(!model){
   try{model=taskControls.load(status.name??'source',currentSnapshot);}catch(e){model=new Workspace(currentSnapshot);fail(e);}
   for(const v of model.views)mount(v.id);geometry();save();
@@ -981,7 +1014,7 @@ taskControls=installTaskControls({read:()=>model,replace:replaceTask,snapshot:()
 if (location.pathname === '/' && location.hash === '#saved') {
  location.replace('/investigate#saved');
 } else {
- void transport('/api/investigation').then(view=>{board=view.board;editorName=view.editor;for(const[id,r]of mounted){r.editor.setAttribute('aria-label',`Open in ${editorName}`);r.editor.title=`Open in ${editorName}`;const v=model.view(id),kept=board.evidence.find(e=>e.source.file===v.symbol.source.file&&e.source.version===v.symbol.source.version&&e.source.line===v.symbol.source.line);r.kept=kept?.id??null;}geometry();}).catch(fail);
+ void transport('/api/investigation').then(view=>{board=view.board;editorName=view.editor;editorJavaArchives=view.editor_java_archives===true;for(const[id,r]of mounted){r.editor.setAttribute('aria-label',`Open in ${editorName}`);r.editor.title=`Open in ${editorName}`;const v=model.view(id),kept=board.evidence.find(e=>e.source.file===v.symbol.source.file&&e.source.version===v.symbol.source.version&&e.source.line===v.symbol.source.line);r.kept=kept?.id??null;}geometry();}).catch(fail);
  followChanges({session:()=>({receive(change){receive(change.status);return true;},close(e){if(e)notice.show('Source updates disconnected; the visual layout is retained.');}})});
  void post('/api/workspace/start',{}).catch(fail);
 }

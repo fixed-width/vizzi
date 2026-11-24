@@ -13,8 +13,12 @@ Source content, copying, navigation, pinning and fitting remain available.
 Membership comes from native language-aware analysis, not enclosing class names or generic
 directory grouping. Cues cover Cargo Rust targets and declared Rust modules, Python
 modules and explicit package chains, Ruby namespaces, and JavaScript and TypeScript
-packages with a captured `package.json` name. Unavailable,
-unsupported or multiply bound membership remains neutral. Raw syntax membership makes
+packages with a captured `package.json` name. Java uses explicit `package` declarations.
+Files in the same directory with the same declared package share a cue, and equal
+package names in different directories stay distinct. When `module-info.java` at
+the matching source root declares a named module, the label shows `module/package`.
+A package cue needs no Java server or build import. The unnamed package stays neutral.
+Unavailable, unsupported or multiply bound membership remains neutral. Raw syntax membership makes
 no claim about compiled configuration, imports, runtime identity or macro expansion.
 
 Cargo manifests are immutable captured project inputs. Editing a manifest or a module

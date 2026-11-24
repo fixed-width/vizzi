@@ -8,6 +8,15 @@ remains in Git and the project documentation.
 
 ### Added
 
+- Browse Java files with syntax colors, outlines, and written-call candidates. Use a
+  shared VS Code Java provider to resolve definitions and references in workspace source.
+- Run Eclipse JDT LS directly from Vizzi with `--jdtls` for Java definitions and references
+  across configured source roots.
+- Open JDK and local Java library source from attached archives in dependency bubbles.
+- Import Maven and Gradle Java classpaths from the Workspace menu without listing individual JARs.
+- Reuse cached Gradle Wrapper distributions and resume Java archive navigation after JDT LS restarts.
+- Show Java package and named module cues in live, historical, and comparison bubbles.
+- Follow Java dependency and JDK source through VS Code sharing and reopen archive bubbles in VS Code.
 - Open Vizzi from Neovim and jump back to verified saved source in the launching split.
 - Find and confirm an earlier declaration across a simple rename or file move in Git
   function history, with exact before and after source evidence.
@@ -28,6 +37,8 @@ remains in Git and the project documentation.
 
 ### Fixed
 
+- Resolve language-server locations in files with LF, CRLF, and bare CR line endings.
+- Use the callee name's line in the Calls list and selection highlight for multiline calls.
 - Refresh installed JavaScript and TypeScript resolutions after package manifest edits.
   Restore package references after restart and preserve VS Code package aliases.
 - Managed TypeScript preserves alias precedence, scopes config errors to affected

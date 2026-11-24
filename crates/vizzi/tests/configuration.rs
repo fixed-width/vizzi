@@ -52,6 +52,45 @@ fn help_does_not_open_the_selected_config() {
 }
 
 #[test]
+fn managed_java_configuration_loads_without_launching_the_server() {
+    let temp = tempfile::tempdir().unwrap();
+    let config = temp.path().join("vizzi.toml");
+    let root = temp.path().join("project");
+    fs::create_dir(&root).unwrap();
+    fs::write(root.join("Example.java"), "class Example {}\n").unwrap();
+    fs::write(
+        &config,
+        "[language-servers]\njdtls = './missing-jdtls'\njava-source-root = ['.']\njava-library = ['lib/config.jar']\n",
+    )
+    .unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_vizzi"))
+        .arg("--root")
+        .arg(&root)
+        .arg("--cache")
+        .arg(temp.path().join("cache"))
+        .arg("--config")
+        .arg(config)
+        .args([
+            "--once",
+            "--jdtls",
+            "missing-override",
+            "--java-source-root",
+            ".",
+            "--java-library",
+            "lib/cli.jar",
+        ])
+        .output()
+        .unwrap();
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let status: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(status["measurements"]["files"], 1);
+}
+
+#[test]
 fn invalid_configurations_fail_before_creating_analysis_storage() {
     let temp = tempfile::tempdir().unwrap();
     let config = temp.path().join("vizzi.toml");
@@ -70,6 +109,10 @@ fn invalid_configurations_fail_before_creating_analysis_storage() {
         "[language-servers]\nunknown = 'tool'",
         "[language-servers]\npython-path = 'python'",
         "[language-servers]\ncompile-commands = 'commands.json'",
+        "[language-servers]\njava-source-root = ['src']",
+        "[language-servers]\njava-library = ['helper.jar']",
+        "[language-servers]\njdtls = 'jdtls'\njava-source-root = ['../outside']",
+        "[language-servers]\njdtls = 'jdtls'\nvscode-connection = 'bridge.json'",
         "[language-servers]\nvscode-connection = 'bridge.json'\nrust-analyzer = 'rust-analyzer'",
         "root = [",
     ] {

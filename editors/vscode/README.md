@@ -65,10 +65,10 @@ stable. It cannot authenticate to a stopped bridge, and the next sharing command
 
 Vizzi never starts a managed fallback server for an unavailable editor connection.
 VS Code may activate its normal language extension when a provider is queried. Captured
-source must match saved files. Shared Rust definitions can open locally installed
-dependency and standard-library functions in independent captures. Other external languages
-remain outside results. Use [managed language servers](../../docs/how-to/configure-language-servers.md)
-when you need captured older source or external source in other languages.
+source must match saved files. Shared definitions can open local Rust dependencies,
+installed JavaScript and TypeScript packages, and attached Java library and JDK
+source in independent captures. VS Code can return to the captured line in an
+attached Java source archive. [Configure semantic navigation](../../docs/how-to/configure-language-servers.md)
 
 ## Verify changes
 

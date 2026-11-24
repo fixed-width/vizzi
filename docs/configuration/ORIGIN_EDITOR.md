@@ -20,6 +20,8 @@ the user, and browser requests cannot select a connection or executable.
 Descriptors are regular files, at most 4096 bytes, with private Unix permissions. Native
 startup reads and validates the descriptor once against its canonical root, then pins
 its values. File replacement, provider sharing and other windows cannot redirect it.
+VS Code gives a capable origin's session ID to its child in
+`VIZZI_ORIGIN_JAVA_ARCHIVE_SESSION`. The launch descriptor keeps the v1 fields.
 The unique launch descriptor has no root-wide latest-window alias. A new extension-host
 instance requires a new Vizzi launch; an old association is not rediscovered.
 
@@ -43,6 +45,11 @@ one-based, column one. The witness hashes the exact captured UTF-8 bytes, includ
 and line endings; it supplements existing native content identity. Preserve the existing
 16 MiB project return limit and 2 MiB dependency admission limit. SHA-256 uses native
 `sha2` 0.11.1 and Node's built-in crypto; no Node runtime dependency is needed.
+
+For a Java archive, `path` is the canonical source archive. The request also
+carries `providerUri` for the JDT document, `archiveBinary` for its local binary
+JAR and the opaque `archiveCapture`. Native code verifies the archive member
+before requesting presentation.
 
 Successful replies echo the pinned session and request:
 
@@ -70,6 +77,12 @@ selection, await that preparation, then recheck saved bytes, target buffers, exp
 connection availability. With no further await, set selection and reveal the captured
 line. Never save, reload or edit buffers. A tab can already be visible if its document
 changes during preparation; refusal prevents the captured-line jump.
+
+For a Java virtual document, VS Code rechecks the current attachment paths and
+buffer witness before opening the tab and again before selecting the line. Both
+checks also ask the launched host to reread the exact ZIP member through
+`POST /api/dependency/verify-archive`, with only the opaque capture ID. This uses
+the originating window's Java provider, even after Stop Sharing.
 
 Use the selected editor's display name consistently in source views and saved locations.
 Successful navigation is silent; the native browser error path owns refusal messages.

@@ -2,12 +2,13 @@
 
 Use a language server when you want type-aware definition and reference lookup rather
 than written-name candidates. Vizzi supports rust-analyzer for Rust, Pyright for Python,
-Ruby LSP for Ruby, clangd for C/C++, and the native TypeScript server for JavaScript
-and TypeScript. Several can be configured in one mixed-language workspace.
+Ruby LSP for Ruby, clangd for C/C++, JDT LS for Java, and the native TypeScript
+server for JavaScript and TypeScript. Several can be configured in one
+mixed-language workspace.
 Basic syntax browsing remains available without them.
 
 To save these settings in TOML, see [save launch settings](configure-vizzi.md).
-Vizzi-managed servers use captured-source mirrors. JavaScript and TypeScript also
+Vizzi-managed servers use captured-source mirrors. Java, JavaScript, and TypeScript
 work through VS Code's shared provider.
 
 ## JavaScript and TypeScript with a managed server
@@ -51,6 +52,84 @@ The editor's active project configuration determines its imports, types and alia
 Save workspace buffers before looking up definitions or references. Vizzi verifies
 locations against captured source and can open provider-reached source from the
 workspace's installed packages.
+
+## Java with a managed server
+
+Install Eclipse JDT LS and a JDK supported by that release. Select the JDK with
+`JAVA_HOME` or the launcher's normal runtime selection. Vizzi was verified on
+Linux with JDT LS 1.63.0 and Java 25. Use the distribution's `bin/jdtls` launcher.
+[Eclipse JDT LS downloads and launcher instructions](https://github.com/eclipse-jdtls/eclipse.jdt.ls#installation)
+
+### Use a Maven or Gradle classpath
+
+Open the build root with `vizzi --jdtls jdtls`. In the call workspace's
+**Workspace** menu, choose **Import Maven classpath** or **Import Gradle classpath**.
+This action runs build configuration using captured project descriptors and the
+local plugin and dependency caches. Gradle import reuses the exact distribution
+already cached for the project's Wrapper. For a build without a Wrapper, it
+uses `GRADLE_HOME` or `PATH`. A configured `org.gradle.java.home` selects the
+Java runtime for Gradle. Maven reports missing cached dependencies as an incomplete import.
+
+Import again after changing a build file or installing new dependencies. Java
+source edits use the imported session directly. Select a root with a single build
+system. For builds that require extra scripts or plugins outside the captured
+descriptors, use VS Code sharing.
+
+### Explore a source folder directly
+
+```sh
+vizzi --root /path/to/project --jdtls jdtls \
+  --java-source-root src/main/java \
+  --java-source-root src/test/java
+```
+
+Each source root is relative to the selected workspace. Omit the flags for
+sources whose package paths start at the workspace root. The equivalent TOML
+keys under `[language-servers]` are `jdtls` and `java-source-root`, an array of paths.
+The managed profile resolves definitions and references across these roots using
+captured source and the JDK. Java files outside the roots remain browsable and
+use written-name candidates. In source-root mode, JDT LS starts on the first
+lookup with project import and automatic builds disabled. A saved change to
+Java source under a configured root starts a fresh server on
+the next lookup. JDT LS can check Gradle version metadata during startup.
+Navigation also works with the network unavailable.
+
+### Open Java library source
+
+Install the JDK's `src.zip` to follow definitions into the standard library.
+Maven and Gradle projects use the imported classpath for library resolution. For
+an unmanaged folder, a local binary JAR and its matching `-sources.jar` can be
+configured directly.
+
+```sh
+vizzi --jdtls jdtls --java-source-root src/main/java \
+  --java-library lib/example.jar
+```
+
+Repeat `--java-library` for several JARs. Flag paths are relative to the workspace
+root. The TOML key `java-library` is an array under `[language-servers]` with paths
+relative to the config file. Use paths without glob characters. Vizzi opens
+the matching source entry, including when the archive has a source-root prefix.
+The dependency bubble can reopen from the same archive after a restart. With
+the classpath available, Vizzi can resume navigation by replaying an unchanged
+caller trail. Follow the call again if its source has changed or a capture in
+the trail is no longer available.
+
+## Java with VS Code
+
+Open a trusted local folder with the Vizzi extension and a Java extension that
+provides definitions and references. Let the Java extension finish loading the
+project and save your workspace files. Run **Vizzi: Open Workspace** to share the
+editor's language providers.
+
+Right-click a saved Java call name and choose **Vizzi: Explore Call**, or follow a
+call from a method bubble. Use **Find references** on a Java declaration to query
+the shared provider. The editor's project configuration determines which overloads,
+imports, and references it resolves. Vizzi verifies results against captured
+workspace files. The Red Hat Java extension can also supply attached JDK and
+library source. Follow calls and references from those bubbles and use **Open in
+VS Code** to return to the verified source line in the launching window.
+[Install and use the Vizzi extension](../../editors/vscode/INSTALL.md)
 
 ## Python with Pyright
 

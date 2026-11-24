@@ -2,9 +2,13 @@
 use super::inputs::Inputs;
 use crate::{
     definitions::{self, Answer, Location, Position, Provider},
-    dependency_sources::{Capture, Catalog, FILES as DEPENDENCY_FILES, Input},
+    dependency_sources::{
+        ARCHIVE_REPLAY_DEPTH, ArchiveCaller, ArchiveCallerSource, Capture, Catalog,
+        FILES as DEPENDENCY_FILES, Input,
+    },
     ecmascript_dependencies::manifest_id,
     lsp::{Client, DocumentSync},
+    review_source::{DirectoryInput, ReadEntry, ReviewInput},
 };
 use serde_json::json;
 use std::{
@@ -12,14 +16,17 @@ use std::{
     fs,
     path::{Path, PathBuf},
     sync::{Arc, Mutex},
+    time::Duration,
 };
 use vizzi_core::{
+    comparison::{EntryKind, ReviewPath},
     model::{ContentId, Document, Snapshot},
     structure::{CallLookup, Symbol},
 };
 
 const FILE_BYTES: usize = 8 * 1024 * 1024;
 const WORKSPACE_BYTES: usize = 128 * 1024 * 1024;
+const ARCHIVES_PER_LOOKUP: usize = 4;
 
 pub(super) trait Profile: Send + Sync {
     fn languages(&self) -> &'static [&'static str];
@@ -28,7 +35,33 @@ pub(super) trait Profile: Send + Sync {
         self.languages().contains(&language)
     }
 
+    fn includes_path(&self, _path: &str) -> bool {
+        true
+    }
+
+    fn includes_document(&self, doc: &Document) -> bool {
+        self.includes_path(doc.path()) && language(doc).is_some_and(|lang| self.accepts(lang))
+    }
+
     fn inputs<'a>(&'a self, root: &'a Path, snapshot: &'a Snapshot) -> Result<Inputs<'a>, String>;
+    fn java_project_kind(&self, _snapshot: &Snapshot) -> Option<&'static str> {
+        None
+    }
+    fn imported_inputs<'a>(
+        &'a self,
+        _root: &'a Path,
+        _snapshot: &'a Snapshot,
+    ) -> Result<Inputs<'a>, String> {
+        Err("Java project import is unavailable".into())
+    }
+    fn verify_import(
+        &self,
+        _client: &mut Client,
+        _mirror: &Path,
+        _snapshot: &Snapshot,
+    ) -> Result<(), String> {
+        Err("Java project import is unavailable".into())
+    }
     fn external_source<'a>(&self, _path: &'a Path, _hint: &'a str) -> Option<ExternalSource<'a>> {
         None
     }
@@ -63,8 +96,22 @@ pub(super) trait Profile: Send + Sync {
             version: None,
             configuration: configuration.into(),
             mirror_path: None,
+            archive: None,
             installation: None,
         })
+    }
+
+    fn archive_input(
+        &self,
+        _client: &mut Client,
+        _uri: &url::Url,
+        _configuration: &str,
+    ) -> Result<Option<Input>, String> {
+        Ok(None)
+    }
+
+    fn verify_archive(&self, _client: &mut Client, _uri: &str, _text: &str) -> Result<(), String> {
+        Err("Archive lookup is unavailable for this language".into())
     }
 
     fn document_language<'a>(&self, _path: &Path, language: &'a str) -> &'a str {
@@ -105,18 +152,37 @@ pub(super) struct ProjectServer {
     executable: PathBuf,
     profile: Box<dyn Profile>,
     sources: Arc<Catalog>,
-    state: Mutex<Option<Workspace>>,
+    state: Mutex<Session>,
+    import_gate: Mutex<()>,
+}
+#[derive(Default)]
+struct Session {
+    workspace: Option<Workspace>,
+    imported: bool,
 }
 struct Workspace {
-    directory: tempfile::TempDir,
     client: Client,
+    directory: tempfile::TempDir,
+    _private_state: Option<tempfile::TempDir>,
     configuration: String,
     rejected_configs: BTreeMap<PathBuf, String>,
     files: BTreeMap<String, String>,
     opened: BTreeSet<PathBuf>,
     external: BTreeSet<PathBuf>,
+    archives: BTreeMap<String, String>,
     reached_manifests: BTreeMap<PathBuf, ContentId>,
     next: i32,
+}
+
+struct Lookup<'a> {
+    snapshot: &'a Snapshot,
+    doc: &'a Document,
+    text: &'a str,
+    position: Position,
+    language: &'a str,
+    external: Option<&'a Capture>,
+    references: bool,
+    imported: bool,
 }
 
 type DefinitionLocations = Vec<(Option<PathBuf>, Position)>;
@@ -175,6 +241,25 @@ fn source(doc: &Document) -> Result<String, String> {
         .map(|text| text.into_owned())
         .ok_or_else(|| "Captured semantic source is not UTF-8".into())
 }
+fn verify_mirror_source(reader: &mut DirectoryInput, doc: &Document) -> Result<(), String> {
+    let path = ReviewPath::parse(doc.path().as_bytes().to_vec()).map_err(|e| e.to_string())?;
+    let entry = reader
+        .read(&path, FILE_BYTES, &|| false)
+        .map_err(|e| e.to_string())?;
+    if let ReadEntry::Present {
+        kind: EntryKind::Regular { .. },
+        bytes,
+        ..
+    } = entry
+        && ContentId::derive(&[&bytes]) == *doc.content()
+    {
+        return Ok(());
+    }
+    Err(format!(
+        "Java project source differs from the capture: {}",
+        doc.path()
+    ))
+}
 fn language(doc: &Document) -> Option<&str> {
     doc.analyses()
         .first()
@@ -207,7 +292,8 @@ impl ProjectServer {
             executable,
             profile: Box::new(profile),
             sources,
-            state: Mutex::new(None),
+            state: Mutex::new(Session::default()),
+            import_gate: Mutex::new(()),
         }
     }
     fn workspace(&self, snapshot: &Snapshot, inputs: Inputs<'_>) -> Result<Workspace, String> {
@@ -222,7 +308,7 @@ impl ProjectServer {
         for doc in snapshot
             .documents()
             .iter()
-            .filter(|doc| language(doc).is_some_and(|lang| self.profile.accepts(lang)))
+            .filter(|doc| self.profile.includes_document(doc))
         {
             let text = source(doc)?;
             total += text.len();
@@ -238,19 +324,147 @@ impl ProjectServer {
         Ok(Workspace {
             directory,
             client,
+            _private_state: prepared.private_state,
             configuration,
             rejected_configs: prepared.rejected_configs,
             files,
             opened: BTreeSet::new(),
             external: BTreeSet::new(),
+            archives: BTreeMap::new(),
             reached_manifests: BTreeMap::new(),
             next: 0,
         })
+    }
+    fn lookup_source(&self, doc: &Document, external: bool) -> Result<String, String> {
+        if !external && !self.profile.includes_path(doc.path()) {
+            return Err("Captured source is outside the configured source roots".into());
+        }
+        source(doc)
+    }
+    fn archive_uri(
+        &self,
+        workspace: &mut Workspace,
+        snapshot: &Snapshot,
+        capture: &Capture,
+        text: &str,
+        imported: bool,
+        remaining: usize,
+    ) -> Result<String, String> {
+        capture.verify()?;
+        if let Some(uri) = workspace
+            .archives
+            .iter()
+            .find_map(|(uri, id)| (id == &capture.origin.capture).then(|| uri.clone()))
+        {
+            self.profile
+                .verify_archive(&mut workspace.client, &uri, text)?;
+            return Ok(uri);
+        }
+        if remaining == 0 {
+            return Err(
+                "Archive caller trail exceeds the replay allowance; reopen from its caller".into(),
+            );
+        }
+        let witness = capture
+            .archive_caller
+            .as_ref()
+            .ok_or("Reopen archive source from its caller to continue navigation")?;
+        let caller_uri = match &witness.source {
+            ArchiveCallerSource::Repository { path, content } => {
+                let doc = snapshot
+                    .file_by_path(path)
+                    .filter(|doc| self.profile.includes_document(doc) && doc.content() == content)
+                    .ok_or("Archive caller changed or is unavailable; reopen from its caller")?;
+                if imported {
+                    let mut reader = DirectoryInput::open(workspace.directory.path())
+                        .map_err(|e| e.to_string())?;
+                    verify_mirror_source(&mut reader, doc)?;
+                }
+                let path = workspace.directory.path().join(doc.path());
+                let caller_text = source(doc)?;
+                definitions::byte_offset(&caller_text, witness.position)?;
+                workspace.open(
+                    &path,
+                    self.profile
+                        .document_language(&path, &capture.input.language),
+                    &caller_text,
+                )?;
+                crate::lsp::uri(&path)?
+            }
+            ArchiveCallerSource::Archive { capture: id } => {
+                let parent = self
+                    .sources
+                    .get(id)?
+                    .filter(|parent| {
+                        parent.input.archive.is_some()
+                            && parent.input.language == capture.input.language
+                    })
+                    .ok_or("Archive caller expired; reopen it from the repository")?;
+                let caller_text = source(parent.doc())?;
+                definitions::byte_offset(&caller_text, witness.position)?;
+                self.archive_uri(
+                    workspace,
+                    snapshot,
+                    &parent,
+                    &caller_text,
+                    imported,
+                    remaining - 1,
+                )?
+            }
+        };
+        let results = workspace
+            .client
+            .lookup_locations(&caller_uri, witness.position, false)?;
+        let candidates = results
+            .into_iter()
+            .filter(|(uri, position)| uri.scheme() != "file" && *position == witness.destination)
+            .take(ARCHIVES_PER_LOOKUP + 1)
+            .collect::<Vec<_>>();
+        if candidates.len() > ARCHIVES_PER_LOOKUP {
+            return Err("Archive caller has too many destinations; reopen from its caller".into());
+        }
+        let mut matched = None;
+        for (uri, _) in candidates {
+            let Ok(Some(input)) =
+                self.profile
+                    .archive_input(&mut workspace.client, &uri, &workspace.configuration)
+            else {
+                continue;
+            };
+            if input.root != capture.input.root
+                || input.path != capture.input.path
+                || input.archive != capture.input.archive
+                || input.language != capture.input.language
+                || input.package != capture.input.package
+                || input.version != capture.input.version
+            {
+                continue;
+            }
+            if matched.replace(String::from(uri)).is_some() {
+                return Err(
+                    "Archive caller has multiple matching destinations; reopen from its caller"
+                        .into(),
+                );
+            }
+        }
+        let uri = matched.ok_or("Archive destination changed; reopen from its caller")?;
+        workspace
+            .archives
+            .insert(uri.clone(), capture.origin.capture.clone());
+        Ok(uri)
+    }
+    fn inputs<'a>(&'a self, snapshot: &'a Snapshot, imported: bool) -> Result<Inputs<'a>, String> {
+        if imported {
+            self.profile.imported_inputs(&self.root, snapshot)
+        } else {
+            self.profile.inputs(&self.root, snapshot)
+        }
     }
     fn lookup(
         &self,
         snapshot: Arc<Snapshot>,
         doc: &Document,
+        text: &str,
         byte: usize,
         external: Option<&Capture>,
         references: bool,
@@ -259,15 +473,36 @@ impl ProjectServer {
         if !self.profile.accepts(lang) {
             return Err("Unsupported semantic language".into());
         }
-        let text = source(doc)?;
-        let position = definitions::position(&text, byte)?;
-        let inputs = self.profile.inputs(&self.root, &snapshot)?;
-        let configuration = inputs.digest().to_owned();
+        let position = definitions::position(text, byte)?;
+        let archived = external.filter(|capture| capture.input.archive.is_some());
         let mut state = self
             .state
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner);
-        let mut workspace = match state.take() {
+        let imported = state.imported;
+        if imported
+            && state
+                .workspace
+                .as_mut()
+                .is_none_or(|workspace| !workspace.client.is_open())
+        {
+            state.workspace = None;
+            return Err("The imported Java server stopped. Import the project again".into());
+        }
+        let inputs = self.inputs(&snapshot, imported)?;
+        let configuration = inputs.digest().to_owned();
+        if archived
+            .and_then(|capture| capture.archive_caller.as_ref())
+            .is_some_and(|caller| caller.imported && !imported)
+        {
+            return Err("Import the Java project before continuing from this archive".into());
+        }
+        if external.is_some_and(|capture| {
+            capture.archive_caller.is_none() && capture.input.configuration != configuration
+        }) {
+            return Err("Dependency configuration changed; reopen from its caller".into());
+        }
+        let mut workspace = match state.workspace.take() {
             Some(workspace)
                 if workspace.configuration == configuration
                     && workspace.reached_manifests.len() < DEPENDENCY_FILES
@@ -275,9 +510,68 @@ impl ProjectServer {
             {
                 workspace
             }
+            previous if imported => {
+                state.workspace = previous;
+                return Err("Java build configuration changed; import the project again".into());
+            }
+            previous if archived.is_some_and(|capture| capture.archive_caller.is_none()) => {
+                state.workspace = previous;
+                return Err("Reopen archive source from its caller to continue navigation".into());
+            }
             _ => self.workspace(&snapshot, inputs)?,
         };
-        workspace.sync(&snapshot, self.profile.as_ref())?;
+        let mut keep_on_error = false;
+        let answer = self.lookup_workspace(
+            &mut workspace,
+            Lookup {
+                snapshot: &snapshot,
+                doc,
+                text,
+                position,
+                language: lang,
+                external,
+                references,
+                imported,
+            },
+            &mut keep_on_error,
+        );
+        if imported && !workspace.client.is_open() {
+            return answer.map_err(|error| format!("{error}. Import the Java project again"));
+        }
+        if imported || keep_on_error || answer.is_ok() {
+            state.workspace = Some(workspace);
+        }
+        answer
+    }
+
+    fn lookup_workspace(
+        &self,
+        workspace: &mut Workspace,
+        query: Lookup<'_>,
+        keep_on_error: &mut bool,
+    ) -> Result<Answer, String> {
+        let Lookup {
+            snapshot,
+            doc,
+            text,
+            position,
+            language: lang,
+            external,
+            references,
+            imported,
+        } = query;
+        let configuration = workspace.configuration.clone();
+        let archived = external.filter(|capture| capture.input.archive.is_some());
+        workspace.sync(snapshot, self.profile.as_ref())?;
+        let mut imported_source = imported
+            .then(|| DirectoryInput::open(workspace.directory.path()))
+            .transpose()
+            .map_err(|e| e.to_string())?;
+        if let Some(reader) = &mut imported_source
+            && external.is_none()
+        {
+            verify_mirror_source(reader, doc)?;
+        }
         let importer = external.map_or(Some(doc.path()), |capture| {
             capture
                 .input
@@ -285,45 +579,62 @@ impl ProjectServer {
                 .as_ref()
                 .and_then(|package| package.importer.as_deref())
         });
-        let path = if let Some(capture) = external {
-            if capture.input.configuration != configuration {
-                return Err("Dependency configuration changed; reopen from its caller".into());
-            }
-            capture.verify()?;
-            let path = workspace.dependency_path(capture)?;
-            if let Some(importer) = importer {
-                let document = snapshot
-                    .file_by_path(importer)
-                    .ok_or("The package importer is outside the current capture")?;
-                let lang = language(document)
-                    .filter(|lang| self.profile.accepts(lang))
-                    .ok_or("The package importer's language changed")?;
-                let importer = workspace.directory.path().join(importer);
-                workspace.open(
-                    &importer,
-                    self.profile.document_language(&importer, lang),
-                    &source(document)?,
-                )?;
-            }
-            workspace.remember_manifest(&capture.input)?;
-            workspace.external.insert(path.clone());
-            path
+        let (path, request_uri) = if let Some(capture) = archived {
+            let uri = self
+                .archive_uri(
+                    workspace,
+                    snapshot,
+                    capture,
+                    text,
+                    imported,
+                    ARCHIVE_REPLAY_DEPTH,
+                )
+                .inspect_err(|_| {
+                    *keep_on_error = workspace.client.is_open();
+                })?;
+            (None, uri)
         } else {
-            workspace.directory.path().join(doc.path())
+            let path = if let Some(capture) = external {
+                capture.verify()?;
+                let path = workspace.dependency_path(capture)?;
+                if let Some(importer) = importer {
+                    let document = snapshot
+                        .file_by_path(importer)
+                        .ok_or("The package importer is outside the current capture")?;
+                    let lang = language(document)
+                        .filter(|lang| self.profile.accepts(lang))
+                        .ok_or("The package importer's language changed")?;
+                    let importer = workspace.directory.path().join(importer);
+                    workspace.open(
+                        &importer,
+                        self.profile.document_language(&importer, lang),
+                        &source(document)?,
+                    )?;
+                }
+                workspace.remember_manifest(&capture.input)?;
+                workspace.external.insert(path.clone());
+                path
+            } else {
+                workspace.directory.path().join(doc.path())
+            };
+            workspace.open(&path, self.profile.document_language(&path, lang), text)?;
+            if let Some(error) = self.profile.project_error(
+                &mut workspace.client,
+                &path,
+                &workspace.rejected_configs,
+            )? {
+                *keep_on_error = true;
+                return Err(error);
+            }
+            let uri = crate::lsp::uri(&path)?;
+            (Some(path), uri)
         };
-        workspace.open(&path, self.profile.document_language(&path, lang), &text)?;
-        if let Some(error) =
-            self.profile
-                .project_error(&mut workspace.client, &path, &workspace.rejected_configs)?
-        {
-            *state = Some(workspace);
-            return Err(error);
-        }
         let captures = self.sources.sources()?;
         let retained = captures
             .iter()
             .filter(|capture| {
                 self.profile.accepts(&capture.input.language)
+                    && capture.input.archive.is_none()
                     && capture.input.configuration == configuration
                     && capture.verify().is_ok()
             })
@@ -332,6 +643,7 @@ impl ProjectServer {
         workspace.prune_external(&retained)?;
         for capture in captures {
             if self.profile.accepts(&capture.input.language)
+                && capture.input.archive.is_none()
                 && capture.input.configuration == configuration
                 && capture.verify().is_ok()
                 && let Ok(path) = workspace.dependency_path(&capture)
@@ -342,20 +654,72 @@ impl ProjectServer {
         let mut locations = vec![];
         let mut outside = 0;
         let mut signatures = 0;
+        let mut archive_budget = ARCHIVES_PER_LOOKUP;
         let mut stable = false;
+        let caller_position = position;
         for _ in 0..3 {
-            let raw = if references {
-                workspace.client.references(&path, position)?
-            } else {
-                workspace.client.definitions(&path, position)?
-            };
+            let raw = workspace
+                .client
+                .lookup_locations(&request_uri, position, references)?;
             locations.clear();
             outside = 0;
             signatures = 0;
             let mut changed = false;
             for (target, position) in raw {
-                let Some(reported) = target else {
-                    outside += 1;
+                let Ok(reported) = target.to_file_path() else {
+                    let caller_source = match (references, external) {
+                        (false, None) => Some(ArchiveCallerSource::Repository {
+                            path: doc.path().into(),
+                            content: doc.content().clone(),
+                        }),
+                        (false, Some(parent)) if parent.archive_caller.is_some() => {
+                            Some(ArchiveCallerSource::Archive {
+                                capture: parent.origin.capture.clone(),
+                            })
+                        }
+                        _ => None,
+                    };
+                    let caller = caller_source.map(|source| ArchiveCaller {
+                        source,
+                        position: caller_position,
+                        destination: position,
+                        imported,
+                    });
+                    let captured = if let Some(id) = workspace.archives.get(target.as_str())
+                        && let Some(capture) = self.sources.get(id)?
+                        && capture.verify().is_ok()
+                    {
+                        if caller.is_some() && caller != capture.archive_caller {
+                            self.sources
+                                .capture_archive(capture.input.clone(), caller, snapshot)
+                                .ok()
+                        } else {
+                            Some(capture)
+                        }
+                    } else if !references && archive_budget > 0 {
+                        archive_budget -= 1;
+                        self.profile
+                            .archive_input(&mut workspace.client, &target, &configuration)
+                            .ok()
+                            .flatten()
+                            .and_then(|input| {
+                                self.sources.capture_archive(input, caller, snapshot).ok()
+                            })
+                    } else {
+                        None
+                    };
+                    if let Some(capture) = captured {
+                        workspace
+                            .archives
+                            .insert(target.into(), capture.origin.capture.clone());
+                        locations.push(Location {
+                            capture: Some(capture.origin.capture.clone()),
+                            path: capture.doc().path().into(),
+                            position,
+                        });
+                    } else {
+                        outside += 1;
+                    }
                     continue;
                 };
                 let target = fs::canonicalize(&reported).unwrap_or_else(|_| reported.clone());
@@ -368,7 +732,12 @@ impl ProjectServer {
                         .to_str()
                         .ok_or("Semantic path is not UTF-8")?
                         .replace('\\', "/");
-                    if snapshot.file_by_path(&relative).is_some() {
+                    if self.profile.includes_path(&relative)
+                        && let Some(document) = snapshot.file_by_path(&relative)
+                    {
+                        if let Some(reader) = &mut imported_source {
+                            verify_mirror_source(reader, document)?;
+                        }
                         locations.push(Location {
                             capture: None,
                             path: relative,
@@ -429,7 +798,9 @@ impl ProjectServer {
         for location in locations {
             if let Some(id) = &location.capture
                 && !self.sources.get(id)?.is_some_and(|source| {
-                    source.verify().is_ok() && workspace.dependency_path(&source).is_ok()
+                    source.verify().is_ok()
+                        && (source.input.archive.is_some()
+                            || workspace.dependency_path(&source).is_ok())
                 })
             {
                 outside += 1;
@@ -450,25 +821,28 @@ impl ProjectServer {
         if locations.is_empty() {
             outside += signatures;
         }
-        if references {
+        if references && let Some(path) = &path {
             locations = self.profile.filter_references(
                 ReferenceLookup {
-                    path: &path,
+                    path,
                     position,
                     language: lang,
-                    snapshot: &snapshot,
+                    snapshot,
                     sources: &self.sources,
-                    workspace: &mut workspace,
+                    workspace,
                 },
                 locations,
             )?;
         }
-        let retained = self
-            .sources
-            .sources()?
+        let sources = self.sources.sources()?;
+        workspace
+            .archives
+            .retain(|_, id| sources.iter().any(|source| &source.origin.capture == id));
+        let retained = sources
             .into_iter()
             .filter(|capture| {
                 self.profile.accepts(&capture.input.language)
+                    && capture.input.archive.is_none()
                     && capture.input.configuration == configuration
                     && capture.verify().is_ok()
             })
@@ -481,7 +855,7 @@ impl ProjectServer {
                     .into(),
             );
         }
-        if self.profile.inputs(&self.root, &snapshot)?.digest() != configuration {
+        if self.inputs(snapshot, imported)?.digest() != configuration {
             return Err("Project inputs changed during semantic lookup".into());
         }
         let mut hash = blake3::Hasher::new();
@@ -512,7 +886,6 @@ impl ProjectServer {
             hash.update(manifest.as_str().as_bytes());
         }
         let context = hash.finalize().to_hex().to_string();
-        *state = Some(workspace);
         Ok(Answer {
             locations,
             outside,
@@ -521,6 +894,53 @@ impl ProjectServer {
     }
 }
 impl Provider for ProjectServer {
+    fn supports_java_project_import(&self) -> bool {
+        self.profile.accepts("java")
+    }
+
+    fn java_project_kind(&self, snapshot: &Snapshot) -> Option<&'static str> {
+        self.profile.java_project_kind(snapshot)
+    }
+
+    fn import_java_project(
+        &self,
+        snapshot: Arc<Snapshot>,
+        current: &dyn Fn() -> Option<Arc<Snapshot>>,
+    ) -> Result<(), String> {
+        let _import = self
+            .import_gate
+            .try_lock()
+            .map_err(|_| "A Java project import is already running")?;
+        let inputs = self.profile.imported_inputs(&self.root, &snapshot)?;
+        let mut workspace = self.workspace(&snapshot, inputs)?;
+        workspace.client.wait_ready_for(Duration::from_secs(120))?;
+        self.profile
+            .verify_import(&mut workspace.client, workspace.directory.path(), &snapshot)?;
+        let mut source =
+            DirectoryInput::open(workspace.directory.path()).map_err(|e| e.to_string())?;
+        for doc in snapshot
+            .documents()
+            .iter()
+            .filter(|doc| self.profile.includes_document(doc))
+        {
+            verify_mirror_source(&mut source, doc)?;
+        }
+        let mut state = self
+            .state
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        let current =
+            current().ok_or("Source capture is unavailable; retry Java project import")?;
+        if self.profile.imported_inputs(&self.root, &current)?.digest() != workspace.configuration {
+            return Err(
+                "Java build configuration changed during import; import the project again".into(),
+            );
+        }
+        state.imported = true;
+        state.workspace = Some(workspace);
+        Ok(())
+    }
+
     fn dependencies(&self) -> Option<&Catalog> {
         Some(&self.sources)
     }
@@ -549,12 +969,14 @@ impl Provider for ProjectServer {
             .identifier
             .as_ref()
             .ok_or("Captured call identifier is unavailable")?;
-        if source(doc)?.get(span.clone()) != call.invocation.name.as_deref() {
+        let text = self.lookup_source(doc, external.is_some())?;
+        if text.get(span.clone()) != call.invocation.name.as_deref() {
             return Err("Captured call identifier differs".into());
         }
         self.lookup(
             snapshot.clone(),
             doc,
+            &text,
             span.start,
             external.as_deref(),
             false,
@@ -594,8 +1016,9 @@ impl Provider for ProjectServer {
             })
             .map(|fact| fact.name.as_str())
             .ok_or("Reference declaration is unavailable")?;
+        let text = self.lookup_source(doc, external.is_some())?;
         if !name.starts_with(&symbol.name)
-            || source(doc)?.get(identifier..identifier.saturating_add(name.len())) != Some(name)
+            || text.get(identifier..identifier.saturating_add(name.len())) != Some(name)
         {
             return Err("Reference target identifier differs".into());
         }
@@ -603,6 +1026,7 @@ impl Provider for ProjectServer {
         self.lookup(
             snapshot.clone(),
             doc,
+            &text,
             identifier + offset,
             external.as_deref(),
             true,
@@ -638,7 +1062,9 @@ impl Workspace {
         {
             return Err("Installed package manifest changed; reopen it from its caller".into());
         }
-        let file = capture.path();
+        let file = capture
+            .path()
+            .ok_or("Dependency source needs a local file")?;
         let Some(relative) = &capture.input.mirror_path else {
             return Ok(file);
         };
@@ -713,7 +1139,7 @@ impl Workspace {
         let docs = snapshot
             .documents()
             .iter()
-            .filter(|doc| language(doc).is_some_and(|lang| profile.accepts(lang)))
+            .filter(|doc| profile.includes_document(doc))
             .collect::<Vec<_>>();
         let current = docs.iter().map(|doc| doc.path()).collect::<BTreeSet<_>>();
         let deleted = self

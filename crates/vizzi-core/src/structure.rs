@@ -64,6 +64,12 @@ pub struct SourceOrigin {
     pub version: Option<String>,
     /// Supplying language.
     pub language: String,
+    /// Captured from a source archive rather than a plain file.
+    #[serde(skip_serializing_if = "std::ops::Not::not")]
+    pub archive: bool,
+    /// A Java archive with a virtual document available through VS Code.
+    #[serde(skip_serializing_if = "std::ops::Not::not")]
+    pub editor_archive: bool,
 }
 /// Projection allowances and unavailable capability, not a completeness guarantee.
 #[derive(Default, Clone, Debug, Serialize)]
@@ -132,7 +138,10 @@ pub struct Invocation {
     pub spelling: String,
     /// Terminal callee name when recognizable.
     pub name: Option<String>,
-    /// Captured call-site location.
+    /// One-based line of the terminal identifier, when captured.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub identifier_line: Option<usize>,
+    /// Captured location of the full callee spelling.
     pub source: Source,
     /// Nearest emitted enclosing declaration, if admitted.
     pub owner: Option<String>,
@@ -258,7 +267,7 @@ fn bounded(text: &str) -> String {
 fn call_candidate(symbol: &Symbol) -> bool {
     matches!(
         symbol.kind.as_str(),
-        "function" | "struct" | "enum" | "type" | "class"
+        "function" | "struct" | "enum" | "type" | "class" | "record"
     )
 }
 impl Structure {
@@ -663,6 +672,7 @@ impl Structure {
         area: &str,
         additional: Option<&Self>,
     ) -> Invocation {
+        let identifier_line = site.position.as_ref().map(|position| position.line);
         if let Some((id, basis)) = &site.target
             && let Ok(target) = self.symbol(id)
         {
@@ -672,6 +682,7 @@ impl Structure {
                 binding: Some(*basis),
                 spelling: site.spelling.clone(),
                 name: site.name.clone(),
+                identifier_line,
                 source: site.source.clone(),
                 owner: site.owner.clone(),
                 candidates: vec![target.clone()],
@@ -710,6 +721,7 @@ impl Structure {
             binding: None,
             spelling: site.spelling.clone(),
             name: site.name.clone(),
+            identifier_line,
             source: site.source.clone(),
             owner: site.owner.clone(),
             candidates: candidates.into_iter().take(SITES).cloned().collect(),

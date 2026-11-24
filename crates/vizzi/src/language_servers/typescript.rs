@@ -7,7 +7,7 @@ use super::{
 use crate::{
     dependency_sources::Input,
     ecmascript_dependencies::{self, Installations},
-    lsp::{Client, DocumentSync, Setup, uri},
+    lsp::{Client, DocumentSync, Readiness, Setup, uri},
 };
 use jsonc_parser::cst::{CstInputValue, CstRootNode};
 use serde_json::{Map, Value, json};
@@ -187,8 +187,7 @@ fn prepare(mirror: &Path, metadata: &[&Document]) -> Result<PreparedInputs, Stri
         configuration: json!({
             "js/ts": {"tsserver": {"automaticTypeAcquisition": {"enabled": false}}}
         }),
-        status_notifications: false,
-        progress_token: None,
+        readiness: Readiness::Immediate,
         document_sync: DocumentSync::Ordered,
         environment: ["NODE_OPTIONS", "NODE_PATH"]
             .into_iter()
@@ -198,6 +197,7 @@ fn prepare(mirror: &Path, metadata: &[&Document]) -> Result<PreparedInputs, Stri
     Ok(PreparedInputs {
         setup,
         rejected_configs,
+        private_state: None,
     })
 }
 

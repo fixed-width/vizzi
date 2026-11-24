@@ -39,6 +39,14 @@ written-call support. Individual files still report their own analysis coverage.
 | C++ | C++ suffix hints or explicit assignment inside enabled family scopes | C forms plus named classes/namespaces, using aliases, methods/operators with bodies | No template instantiation or overload resolution |
 | JavaScript | `.js`, `.mjs`, `.cjs`, `.jsx` | Named functions, function-valued variable declarators, named classes and their methods | Raw syntax, including JSX, with written-call candidates |
 | TypeScript and TSX | `.ts`, `.mts`, `.cts`, `.tsx` | JavaScript forms plus interfaces, enums and type aliases | Distinct grammars with shared extraction and candidate behavior. See the [adapter contract](ECMASCRIPT_TECH.md). |
+| Java | `.java` | Named classes, interfaces, enums, records, annotation types, methods, and constructors | Raw syntax and written-call candidates. VS Code sharing can resolve calls and references in verified workspace source. |
+
+Java browsing works without a JDK or a project build. Methods and constructors with
+bodies open as function bubbles. Bodyless methods appear in the outline and can be
+semantic destinations. Raw call evidence covers written method invocations and
+constructor expressions. Overloads keep separate source ranges and remain ambiguous
+in name-only lookup. Test the raw adapter, call trail, and editor sharing against
+captured Java source, including an overloaded method and UTF-16 positions.
 
 Only UTF-8 source supports declarations. Python encoding cookies do not enable other
 decoders. Grammar recovery sets `partial`; undecodable source sets `unavailable` and
