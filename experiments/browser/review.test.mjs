@@ -14,7 +14,7 @@ let chromium,host,context;
 try {
   git("init","--quiet","--initial-branch=main","--template=");git("add",".");git("commit","--quiet","-m","base");
   await writeFile(join(input.root,"a.rs"),"fn after() {}\nfn context() {}\n");
-  await writeFile(join(input.root,"notes.md"),"# Notes\n<img src=x onerror=window.injected=true>\n");
+  await writeFile(join(input.root,"notes.md"),"# Notes\n\n<!-- note --> visible text\n\n<img src=x onerror=window.injected=true>\n");
   await writeFile(join(input.root,"binary.bin"),Buffer.from([0,255]));await rm(join(input.root,"removed.txt"));
   host=await startHost(input,1);chromium=await browser({desktopBus:false});context=await chromium.newContext({viewport:{width:1440,height:1000}});const page=await context.newPage(),errors=[],windows=[];
   page.on("pageerror",error=>errors.push(error.message));
@@ -43,6 +43,9 @@ try {
   await page.getByLabel("Filter paths",{exact:true}).fill("");await page.waitForFunction(()=>document.querySelector("#review-file-list").textContent.includes("removed.txt"));
   await choose("removed.txt");assert.match(await page.locator("#base-source").textContent(),/before/);assert.match(await page.locator("#working-evidence").textContent(),/Absent/);
   await choose("notes.md");assert.equal(await page.locator("#base-source .code-line").count(),0);assert.match(await page.locator("#working-source").textContent(),/<img/);assert.equal(await page.locator("#working-source img").count(),0);assert.equal(await page.evaluate(()=>window.injected),undefined);
+  assert.equal(await page.locator("#working-source .syntax-keyword").textContent(),"# Notes");
+  assert.equal(await page.locator("#working-source .syntax-comment").textContent(),"<!-- note -->");
+  assert.match(await page.locator("#working-source").textContent(),/<!-- note --> visible text/);
   await choose("binary.bin");assert.match(await page.locator("#diff-note").textContent(),/unavailable/i);assert.match(await page.locator("#working-evidence").textContent(),/binary|unsupported/);
   await page.getByRole("button",{name:"Refresh working",exact:true}).click();await page.waitForFunction(token=>document.querySelector("#review-workspace").dataset.token!==token,token);
   const replacement=await page.locator("#review-workspace").getAttribute("data-token");

@@ -24,6 +24,8 @@ test("a large repository exposes every directory, file page and local landmark",
     "README.md": "# Project orientation\n",
     "z-late/README.md": "# Late subsystem\n",
     "z-late/Cargo.toml": '[package]\nname = "late"\nversion = "0.1.0"\n',
+    "z-late/settings.toml": "enabled = true # Toggle\n",
+    "z-late/guide.markdown": "See **this** and `🙂code`.\n",
     "z-late/target.rs": "fn late_target() {}\n",
   } });
   let localHost, session;
@@ -32,9 +34,9 @@ test("a large repository exposes every directory, file page and local landmark",
     session = await openWorkspace(chromium, localHost);
     const { page } = session;
     await page.locator("#map-landmarks").getByRole("button", { name: "README.md" }).click({ timeout: 5000 });
-    await page.waitForFunction(() => document.getElementById("source").textContent.includes("Project orientation"));
+    await page.locator("#source .syntax-keyword").getByText("# Project orientation", { exact: true }).waitFor();
     assert.match(await page.locator("#coverage").textContent(), /Source only · README/);
-    const late = page.getByRole("button", { name: "Open directory z-late, 3 files", exact: true });
+    const late = page.getByRole("button", { name: "Open directory z-late, 5 files", exact: true });
     await late.focus();
     await page.keyboard.press("Enter");
     await page.getByRole("button", { name: "z-late", exact: true }).waitFor();
@@ -42,7 +44,15 @@ test("a large repository exposes every directory, file page and local landmark",
     assert.equal(await page.locator("#map-breadcrumbs button[aria-current=location]").evaluate(button => button === document.activeElement), true);
     assert.equal(await page.locator("#file-title").textContent(), "README.md");
     await page.locator("#map-landmarks").getByRole("button", { name: "Cargo.toml" }).click();
-    await page.waitForFunction(() => document.getElementById("file-title").textContent === "z-late/Cargo.toml");
+    await page.locator("#source .syntax-type").getByText("[package]", { exact: true }).waitFor();
+    assert.equal(await page.locator("#file-title").textContent(), "z-late/Cargo.toml");
+    await page.getByText("Accessible file list", { exact: true }).click();
+    await page.locator("#file-list").getByRole("button", { name: "z-late/settings.toml", exact: true }).click();
+    await page.locator("#source .syntax-constant").getByText("true", { exact: true }).waitFor();
+    await page.locator("#file-list").getByRole("button", { name: "z-late/guide.markdown", exact: true }).click();
+    await page.locator("#source .syntax-string").getByText("`🙂code`", { exact: true }).waitFor();
+    assert.equal(await page.locator("#source .syntax-attribute").textContent(), "**this**");
+    await page.getByText("Accessible file list", { exact: true }).click();
     await page.getByRole("button", { name: "Repository root", exact: true }).click();
     await page.getByRole("button", { name: "Open directory bulk, 2,001 files", exact: true }).waitFor();
     await paint(page);

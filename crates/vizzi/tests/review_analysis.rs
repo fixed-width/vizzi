@@ -346,7 +346,7 @@ fn c_family_assignment_stays_explicit_and_review_docs_survive_analysis_exclusion
         ("native/b.cpp", "int cpp_function() { return 0; }"),
         ("native/h.h", "int declared();"),
         ("legacy/a.c", "LPC source"),
-        ("doc.md", "text"),
+        ("doc.md", "# Review notes"),
     ];
     let store = ReviewStore::open(4096).unwrap();
     let ticket = store.request().unwrap();
@@ -390,22 +390,24 @@ fn c_family_assignment_stays_explicit_and_review_docs_survive_analysis_exclusion
             ..
         }
     ));
-    for name in ["legacy/a.c", "doc.md"] {
+    for (name, expected_reason, coloring) in [
+        (
+            "legacy/a.c",
+            SourceOnlyReason::OutsideAnalysisScope,
+            "unavailable",
+        ),
+        ("doc.md", SourceOnlyReason::AnalysisNotRequested, "ready"),
+    ] {
         assert!(matches!(
             lease.classification(Side::Base, &path(name)).unwrap(),
-            Classification::SourceOnly {
-                reason: SourceOnlyReason::OutsideAnalysisScope,
-                ..
-            }
+            Classification::SourceOnly { reason, .. } if *reason == expected_reason
         ));
         assert!(lease.analyses(Side::Base, &path(name)).unwrap().is_empty());
-        assert_eq!(
-            lease
-                .window(Side::Base, &path(name), &WindowQuery::default())
-                .unwrap()
-                .outline_total,
-            0
-        );
+        let window = lease
+            .window(Side::Base, &path(name), &WindowQuery::default())
+            .unwrap();
+        assert_eq!(window.outline_total, 0);
+        assert_eq!(window.coloring, coloring);
     }
 }
 
