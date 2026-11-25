@@ -7,9 +7,9 @@ Contributor standards belong in [AGENTS.md](AGENTS.md).
 
 ## Product role
 
-The visual call workspace is Vizzi's main mode and opens at the launch URL. Shared header
-navigation connects it to review changes, the source browser and saved locations. Existing
-prototype routes remain available; see the [header contract](docs/visual/HEADER_PRODUCT.md).
+The source browser opens at the launch URL. The shared header links to Source browser,
+Call workspace, Review changes, and Saved locations in that order.
+See the [header contract](docs/visual/HEADER_PRODUCT.md).
 
 Vizzi is a visual workspace beside an editor for understanding unfamiliar source and
 reviewing changes across files and revisions. The maintainer's closest reference is

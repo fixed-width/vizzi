@@ -1,7 +1,7 @@
 const views = [
- {id: 'calls', label: 'Call workspace', href: '/'},
+ {id: 'source', label: 'Source browser', href: '/'},
+ {id: 'calls', label: 'Call workspace', href: '/workspace'},
  {id: 'review', label: 'Review changes', href: '/review'},
- {id: 'source', label: 'Source browser', href: '/explore'},
  {id: 'locations', label: 'Saved locations', href: '/investigate#saved'},
 ];
 

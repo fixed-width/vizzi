@@ -455,7 +455,7 @@ test("JavaScript and TypeScript outlines and written calls work in the captured 
     assert.equal(await page.locator("#source .syntax-attribute").textContent(), "title");
     assert.match(await page.locator("#counts").textContent(), /5 files/);
 
-    await page.goto(live.url);
+    await page.goto(live.url+"/workspace");
     await page.waitForFunction(() => document.querySelector("#visual-source-status").textContent.includes("ready"));
     await page.getByRole("button", { name: "Add bubble", exact: true }).click();
     await page.getByLabel("Find a function", { exact: true }).fill("start");
@@ -517,7 +517,7 @@ test("Java source outlines and call trails work without a language server", asyn
     assert.match(await page.locator("#coverage").textContent(), /java: syntax parsed/);
     assert.match(await page.locator("#source .syntax-keyword").first().textContent(), /class/);
 
-    await page.goto(live.url);
+    await page.goto(live.url+"/workspace");
     await page.waitForFunction(() => document.querySelector("#visual-source-status").textContent.includes("ready"));
     await page.getByRole("button", { name: "Add bubble", exact: true }).click();
     await page.getByLabel("Find a function", { exact: true }).fill("run");
@@ -566,7 +566,7 @@ test("Java package cues group calls and track captured module descriptors withou
     host = await startHost(fixture);
     session = await openWorkspace(chromium, host);
     const { page } = session;
-    await page.goto(host.url);
+    await page.goto(host.url+"/workspace");
     await page.waitForFunction(() => document.querySelector("#visual-source-status").textContent.includes("ready"));
     const open = async name => {
       await page.getByRole("button", { name: "Add bubble", exact: true }).click();
@@ -651,7 +651,7 @@ test("the workspace action imports a Gradle Java classpath explicitly", {
         imports.push(request);
       }
     });
-    await page.goto(host.url);
+    await page.goto(host.url+"/workspace");
     await page.getByText("Workspace", { exact: true }).click();
     const action = page.getByRole("button", { name: "Import Gradle classpath", exact: true });
     await action.waitFor();
@@ -736,7 +736,7 @@ class Caller { int run() { return Engine.speak("hello") + "abc".length(); } }
     live = await startHost(fixture);
     session = await openWorkspace(chromium, live);
     const { page } = session;
-    await page.goto(live.url);
+    await page.goto(live.url+"/workspace");
     await page.waitForFunction(() => document.querySelector("#visual-source-status").textContent.includes("ready"));
     await page.getByRole("button", { name: "Add bubble", exact: true }).click();
     await page.getByLabel("Find a function", { exact: true }).fill("run");
@@ -804,7 +804,7 @@ test("managed TypeScript opens installed package source beside its caller", {
     session = await openWorkspace(chromium, live);
     const { page } = session;
     assert.match(await page.locator("#counts").textContent(), /1 files?/);
-    await page.goto(live.url);
+    await page.goto(live.url+"/workspace");
     await page.waitForFunction(() => document.querySelector("#visual-source-status").textContent.includes("ready"));
     await page.getByRole("button", { name: "Add bubble", exact: true }).click();
     await page.getByLabel("Find a function", { exact: true }).fill("launch");
@@ -851,7 +851,7 @@ test("managed TypeScript follows project aliases and exposes semantic references
     live = await startHost(fixture);
     session = await openWorkspace(chromium, live);
     const { page } = session;
-    await page.goto(live.url);
+    await page.goto(live.url+"/workspace");
     await page.waitForFunction(() => document.querySelector("#visual-source-status").textContent.includes("ready"));
     await page.getByRole("button", { name: "Add bubble", exact: true }).click();
     await page.getByLabel("Find a function", { exact: true }).fill("launch");

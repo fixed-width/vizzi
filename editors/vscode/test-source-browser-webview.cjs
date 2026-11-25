@@ -50,7 +50,7 @@ exports.verifySourceBrowser=async({port,report})=>{
     await frame.getByRole('button',{name:'Forward',exact:true}).click();
     await frame.waitForFunction(()=>document.querySelector('#file-title').textContent==='b.py');
     await frame.getByRole('link',{name:'Call workspace',exact:true}).click();
-    const deadline2=Date.now()+10000;while(!allFrames().find(f=>f.url()===workspace.url)){assert.ok(Date.now()<deadline2,'Call workspace did not load');await pause();}
+    const deadline2=Date.now()+10000;while(!allFrames().find(f=>f.url()===workspace.url+'workspace')){assert.ok(Date.now()<deadline2,'Call workspace did not load');await pause();}
     await menu(async()=>{await tab('a.py').click();await page.screenshot({path:report+'.call-focused.png'});await tab('b.py').click({button:'right'});},'.tab-from-call.png');await command().locator('.action-label').click();
     while(!(frame=allFrames().find(f=>f.url()===workspace.url+'explore'))){assert.ok(Date.now()<deadline2+10000,'Source browser did not reopen');await pause();}
     await frame.waitForFunction(()=>document.querySelector('#file-title').textContent==='b.py');

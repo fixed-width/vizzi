@@ -19,7 +19,8 @@ cp -R docs/tutorials/first-call-trail-cpp/. "$vizzi_demo/"
   --workers 1
 ```
 
-Open the printed address in your browser. Wait for **Source ready** in the Call workspace.
+Open the printed address in your browser, choose **Call workspace** in the header, and
+wait for **Source ready**.
 The `--c-family-root .` option includes C/C++ source in this example's reading scope.
 Vizzi reads the files; it does not compile or run them.
 

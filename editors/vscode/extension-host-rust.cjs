@@ -95,7 +95,7 @@ async function verify() {
           await new Promise(resolve=>setTimeout(resolve,100));
         }
       }
-      await writeSignal(process.env.VIZZI_TEST_REPORT+'.workspace',{url:workspace.url,caller:'convert',callee:'ok_or_else',editorCall:Boolean(process.env.VIZZI_TEST_EDITOR_CALL)});
+      await writeSignal(process.env.VIZZI_TEST_REPORT+'.workspace',{url:workspace.url,file:'a.rs',caller:'convert',callee:'ok_or_else',editorCall:Boolean(process.env.VIZZI_TEST_EDITOR_CALL)});
       await inspect();
       if(process.env.VIZZI_TEST_EDITOR_CALL) {
         const editor=await vscode.window.showTextDocument(document);

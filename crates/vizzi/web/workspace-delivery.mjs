@@ -271,7 +271,7 @@ export function createDeliveryClient({
   };
 }
 const routes = {
-  call: '/',
+  call: '/workspace',
   file: '/explore',
   review: '/review'
 };
@@ -439,7 +439,7 @@ export function createDeliveryPage({
       current = record;
       record.timer = schedule(() => refuse(record, new Error('Could not confirm workspace navigation before its deadline')), record.expires - now());
       changed(true);
-      const target = action.kind === 'reveal' ? mode === 'landing' ? 'call' : mode : action.kind === 'function' ? 'call' : action.kind;
+      const target = action.kind === 'reveal' ? mode === 'landing' ? 'file' : mode : action.kind === 'function' ? 'call' : action.kind;
       if (target !== mode) {
         record.routing = true;
         record.transition = record.id;

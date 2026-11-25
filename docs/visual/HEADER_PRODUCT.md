@@ -2,10 +2,13 @@
 
 For contributors maintaining Vizzi's shared browser interface.
 
-Every viewing mode has the same navigation row: the Vizzi home link, **Call workspace**,
-**Review changes**, **Source browser**, **Saved locations**, and **Settings**. The current
-view is visibly selected and exposed with `aria-current="page"`. Links navigate in the
-same tab. The call workspace remains the launch view; `/workspace` remains an alias.
+The shared navigation row places the Vizzi home link before **Source browser**, **Call
+workspace**, **Review changes**, and **Saved locations**, followed by **Settings**. The
+current view is visibly selected and exposed with `aria-current="page"`. Links navigate
+in the same tab. Source browser opens at the launch URL and at `/explore`. Call workspace
+opens at `/workspace`. A newly opened VS Code tab also defaults to Source browser when
+no specific destination was requested. Opening the tab is confirmed as soon as the header
+is visible. Opening a specific file waits for captured source and space in the code pane.
 Saved locations opens `/investigate#saved`; the existing repository discovery and
 structural-trial routes remain available within that view.
 

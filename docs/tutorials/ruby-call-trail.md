@@ -17,7 +17,8 @@ cp -R docs/tutorials/first-call-trail-ruby/. "$vizzi_demo/"
   --workers 1
 ```
 
-Open the printed address in your browser. Wait for **Source ready** in the Call workspace.
+Open the printed address in your browser, choose **Call workspace** in the header, and
+wait for **Source ready**.
 Ruby files are included by default. Vizzi reads `greeting.rb`; it does not run the program.
 
 ## 2. Open the caller

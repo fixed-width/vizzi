@@ -100,7 +100,7 @@ pub fn router(application: Arc<Application>) -> Router {
     Router::new()
         .route("/api/status", get(status)).route("/api/view", get(view)).route("/api/source", get(source))
         .route("/api/events", get(events)).route("/api/window",get(window))
-        .route("/", get(visual_workspace))
+        .route("/", get(source_browser))
         .route("/workspace", get(visual_workspace))
         .route("/visual.css", get(|| async { asset("text/css; charset=utf-8", include_str!("../web/visual.css")) }))
         .route("/reflow.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/reflow.js")) }))
@@ -134,7 +134,7 @@ pub fn router(application: Arc<Application>) -> Router {
         .route("/reference-stacks.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/reference-stacks.js")) }))
         .route("/visual-model.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/visual-model.js")) }))
         .route("/visual-workspace.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/visual-workspace.js")) }))
-        .route("/explore", get(|| async { asset("text/html; charset=utf-8", include_str!("../web/index.html")) }))
+        .route("/explore", get(source_browser))
         .route("/investigate", get(|| async { asset("text/html; charset=utf-8", include_str!("../web/companion.html")) }))
         .route("/companion.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/companion.js")) }))
         .route("/discovery.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/discovery.js")) }))
@@ -175,6 +175,12 @@ pub fn router(application: Arc<Application>) -> Router {
             response
         }))
         .with_state(application)
+}
+async fn source_browser() -> Response {
+    asset(
+        "text/html; charset=utf-8",
+        include_str!("../web/index.html"),
+    )
 }
 async fn visual_workspace() -> Response {
     asset(
@@ -440,10 +446,10 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn launch_url_serves_the_call_workspace_and_direct_modes_remain_available() {
+    async fn launch_url_serves_the_source_browser_and_direct_modes_remain_available() {
         let app = router(Arc::new(Application::new("fixture".into()).unwrap()));
         for (path, marker) in [
-            ("/", "id=\"workspace-canvas\""),
+            ("/", "id=\"map\""),
             ("/workspace", "id=\"workspace-canvas\""),
             ("/investigate", "id=\"discovery-panel\""),
             ("/explore", "id=\"map\""),

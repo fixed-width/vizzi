@@ -42,6 +42,11 @@ remains in Git and the project documentation.
 - JavaScript and TypeScript outlines show variable-bound object methods, anonymous
   argument callbacks, and named TypeScript signatures.
 
+### Changed
+
+- Open Vizzi in the Source browser by default. The header lists Source browser, Call
+  workspace, Review changes, and Saved locations in that order.
+
 ### Fixed
 
 - Resolve language-server locations in files with LF, CRLF, and bare CR line endings.

@@ -5,9 +5,9 @@ and Settings menu across views; each view's controls occupy the row below it.
 
 | View | Direct route | Purpose |
 | --- | --- | --- |
-| Call workspace | `/` (`/workspace` is an alias) | Source bubbles, call trails, result stacks and tasks |
+| Source browser | `/` (also `/explore`) | Repository map, files and declaration outlines |
+| Call workspace | `/workspace` | Source bubbles, call trails, result stacks and tasks |
 | Review changes | `/review` | A scoped Git comparison and paired source |
-| Source browser | `/explore` | Repository map, files and declaration outlines |
 | Saved locations | `/investigate#saved` | Source anchors, notes and reader connections |
 
 `/investigate` opens the repository-discovery part of Saved locations. The experimental

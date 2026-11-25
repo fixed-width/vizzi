@@ -20,7 +20,7 @@ try {
   let page;
   try{
    page=await chrome.newPage({viewport:{width:1600,height:1100}});page.setDefaultTimeout(30000);
-   const errors=[];page.on('pageerror',error=>errors.push(error.message));await page.goto(host.url);await page.waitForFunction(()=>document.querySelector('#visual-source-status').textContent.includes('ready'));
+   const errors=[];page.on('pageerror',error=>errors.push(error.message));await page.goto(host.url+'/workspace');await page.waitForFunction(()=>document.querySelector('#visual-source-status').textContent.includes('ready'));
    await page.getByRole('button',{name:'Add bubble',exact:true}).click();await page.getByLabel('Find a function',{exact:true}).fill(language==='python'?'Service::run':language==='ruby'?'Audio::run':'run');await page.getByRole('button',{name:'Find functions',exact:true}).click();await page.locator('[data-add-symbol][data-name="run"]').filter({hasText:language==='python'?'app.py':language==='ruby'?'app.rb':'app.cpp'}).click();
    const caller=page.locator('[data-view][data-name="run"]');await caller.locator('.code-line').first().waitFor();await caller.getByRole('button',{name:'Actions for process',exact:true}).click({modifiers:['Control']});
    const target=page.locator('[data-view][data-name="process"]');await target.locator('.code-line').first().waitFor();assert.match(await target.locator('.fragment-heading strong').textContent(),/Meter::process/);assert.equal(await page.locator('#destination-stack').isVisible(),false);assert.equal(await page.locator('[data-view]').count(),2);assert.equal(await page.locator('#workspace-links .link-stroke').getAttribute('data-kind'),'definition');

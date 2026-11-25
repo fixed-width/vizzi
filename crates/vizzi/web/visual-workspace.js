@@ -1027,10 +1027,6 @@ const referenceStacks=installReferenceStacks(el('reference-layer'),{
 });
 const taskGroups=installTaskGroups(el('task-group-layer'),{read:()=>model,changed:()=>{geometry();save();},edit:id=>taskControls.showGroups(id),failed:fail});
 taskControls=installTaskControls({read:()=>model,replace:replaceTask,snapshot:()=>currentSnapshot,changed:()=>{geometry();save();},failed:fail});
-if (location.pathname === '/' && location.hash === '#saved') {
- location.replace('/investigate#saved');
-} else {
- void transport('/api/investigation').then(view=>{board=view.board;editorName=view.editor;editorJavaArchives=view.editor_java_archives===true;for(const[id,r]of mounted){r.editor.setAttribute('aria-label',`Open in ${editorName}`);r.editor.title=`Open in ${editorName}`;const v=model.view(id),kept=board.evidence.find(e=>e.source.file===v.symbol.source.file&&e.source.version===v.symbol.source.version&&e.source.line===v.symbol.source.line);r.kept=kept?.id??null;}geometry();}).catch(fail);
- followChanges({session:()=>({receive(change){receive(change.status);return true;},close(e){if(e)notice.show('Source updates disconnected; the visual layout is retained.');}})});
- void post('/api/workspace/start',{}).catch(fail);
-}
+void transport('/api/investigation').then(view=>{board=view.board;editorName=view.editor;editorJavaArchives=view.editor_java_archives===true;for(const[id,r]of mounted){r.editor.setAttribute('aria-label',`Open in ${editorName}`);r.editor.title=`Open in ${editorName}`;const v=model.view(id),kept=board.evidence.find(e=>e.source.file===v.symbol.source.file&&e.source.version===v.symbol.source.version&&e.source.line===v.symbol.source.line);r.kept=kept?.id??null;}geometry();}).catch(fail);
+followChanges({session:()=>({receive(change){receive(change.status);return true;},close(e){if(e)notice.show('Source updates disconnected; the visual layout is retained.');}})});
+void post('/api/workspace/start',{}).catch(fail);

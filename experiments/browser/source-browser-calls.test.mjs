@@ -24,7 +24,7 @@ try{
  page.on('pageerror',error=>errors.push(error.message));
  const bubble=name=>page.locator(`[data-view][data-name="${name}"]`);
  const header=page.getByRole('navigation',{name:'View modes'});
- await page.goto(host.url);
+ await page.goto(host.url+'/workspace');
  await page.waitForFunction(()=>document.querySelector('#visual-source-status').textContent.includes('ready'));
  await page.getByRole('button',{name:'Add bubble',exact:true}).click();
  await page.getByLabel('Find a function',{exact:true}).fill('retained');
@@ -108,7 +108,7 @@ try{
  const failWindow=route=>route.fulfill({status:410,body:'Requested function source expired'});
  await page.route(/\/api\/window\?.*line_start=9(?:&|$)/,failWindow);
  await action('function','failed_handoff').press('Control+Enter');
- await page.waitForURL(host.url+'/');
+ await page.waitForURL(host.url+'/workspace');
  await page.getByRole('alert').filter({hasText:'Requested function source expired'}).waitFor();
  assert.equal(await bubble('failed_handoff').count(),0);
  assert.equal(await bubble('retained').getAttribute('data-view'),retained);
