@@ -1,3 +1,4 @@
+use super::MapFilter;
 use crate::{
     model::{Document, FileId, Snapshot},
     policy::is_readme,
@@ -83,25 +84,25 @@ pub struct Landmark {
 pub(super) fn project<'a>(
     snapshot: &'a Snapshot,
     directory: &str,
-    filter: &str,
+    filter: &mut MapFilter<'_>,
     offset: usize,
 ) -> (BrowsePage, Vec<&'a Document>) {
     let (directory, docs, prefix_len) = scope(snapshot.documents(), directory);
     let mut page = BrowsePage {
         directory: directory.into(),
-        files: docs.len(),
+        files: 0,
         size: PAGE_SIZE,
         entries: 0,
         offset: 0,
         directories: vec![],
         landmarks: vec![],
     };
-    if !filter.is_empty() {
+    if !filter.path.is_empty() {
         let matches: Vec<_> = snapshot
             .documents()
             .iter()
             .map(Arc::as_ref)
-            .filter(|doc| doc.path().to_lowercase().contains(filter))
+            .filter(|doc| filter.collect_type_and_match(doc))
             .collect();
         page.files = matches.len();
         page.entries = matches.len();
@@ -117,7 +118,12 @@ pub(super) fn project<'a>(
     let mut directories = BTreeMap::<&str, usize>::new();
     let mut files = Vec::new();
     let mut readme = None;
-    for doc in docs.iter().map(Arc::as_ref) {
+    for doc in docs
+        .iter()
+        .map(Arc::as_ref)
+        .filter(|doc| filter.collect_type_and_match(doc))
+    {
+        page.files += 1;
         let path = doc.path();
         if let Some(slash) = path[prefix_len..].find('/') {
             *directories.entry(&path[..prefix_len + slash]).or_default() += 1;

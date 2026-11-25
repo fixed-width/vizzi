@@ -27,6 +27,11 @@ The expandable **Accessible file list** shows the files on the same page as the 
 Use **Find a file** to search paths across the repository, including directories you
 haven't opened.
 
+Select file types in the map legend to show files of any selected type. Select a type
+again to remove it from the filter. Directory counts reflect the matching files.
+With **Find a file**, the results must also match the path you entered. Choose **Clear
+filters** to clear the type selections and path search.
+
 Drag the map background to pan. Wheel scrolling zooms this map; **Fit map** resets the
 framing. The small overview navigator jumps to a different region. Arrow keys move a
 focused map or navigator. These gestures differ from the call workspace's background

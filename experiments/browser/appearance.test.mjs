@@ -29,33 +29,9 @@ test('dismissed messages stay closed for the same identity, new contexts reopen,
  }finally{await page.close();}
 });
 function luminance(rgb){const c=rgb.match(/[\d.]+/g).slice(0,3).map(Number).map(v=>v/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4);return c[0]*.2126+c[1]*.7152+c[2]*.0722;}
-test('map file types follow capture classification and keep tile text readable in both themes', async () => {
+test('map file type colors keep tile text readable in both themes', async () => {
  const page = await fixture();
  try {
-  const labels = await page.evaluate(async () => {
-   const { mapFileType, mapFileTypes } = await import('/appearance.js');
-   return [
-    ...['c', 'java', 'javascript', 'python', 'ruby', 'rust'].map(language => ({
-     classification: { kind: 'assigned', language },
-    })),
-    { path: 'include/assigned.h', classification: { kind: 'assigned', language: 'cpp' } },
-    { path: 'include/other.h', classification: { kind: 'source_only', reason: 'language_unassigned' } },
-    { classification: { kind: 'assigned', language: 'tsx' } },
-    { classification: { kind: 'source_only', language: 'cuda', reason: 'dialect_unsupported' } },
-    { classification: { kind: 'source_only', language: 'json' } },
-    { classification: { kind: 'source_only', language: 'toml' } },
-    { classification: { kind: 'source_only', language: 'markdown' } },
-    { classification: { kind: 'source_only', reason: 'documentation' } },
-    { classification: { kind: 'source_only', language: 'cargo', reason: 'project_metadata' } },
-    { classification: { kind: 'assigned', language: 'unknown' } },
-    {},
-   ].map(file => mapFileTypes[mapFileType(file)]);
-  });
-  assert.deepEqual(labels, [
-   'C', 'Java', 'JavaScript', 'Python', 'Ruby', 'Rust', 'C++', 'Other files',
-   'TypeScript', 'CUDA', 'JSON', 'TOML', 'Documentation', 'Documentation',
-   'Project metadata', 'Other files', 'Other files',
-  ]);
   for (const theme of ['light', 'dark']) {
    await page.locator('#theme').selectOption(theme);
    const { text, types } = await page.evaluate(() => palette());

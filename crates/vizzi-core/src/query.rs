@@ -5,11 +5,11 @@ use crate::{
         BULK_SOURCE_LIMIT, CapturePolicyId, Context, Coverage, Document, DocumentVersion, EntityId,
         FileId, Snapshot, SnapshotId, SourceEncoding, SourceReadError,
     },
-    policy::Classification,
+    policy::{Classification, SourceOnlyReason},
     projection::Summary,
 };
 use serde::{Deserialize, Serialize};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 mod browse;
 pub use browse::{BrowsePage, DirectorySummary, Landmark, LandmarkKind};
@@ -34,6 +34,9 @@ pub struct ViewQuery {
     /// Case-insensitive path substring.
     #[serde(default)]
     pub filter: String,
+    /// Comma-separated map file types. A file may match any selected type.
+    #[serde(default)]
+    pub types: String,
     /// Maximum visible files, clamped to 1–2,000.
     pub limit: Option<usize>,
     /// Request schema-3 metadata without complete text/declarations.
@@ -72,6 +75,8 @@ pub struct FileTile {
     pub coverage: Coverage,
     /// Source selection and assignment evidence.
     pub classification: Classification,
+    /// File type used by the map legend and filter.
+    pub file_type: &'static str,
     /// World-space geometry supplied by the engine.
     pub rect: Rect,
 }
@@ -169,6 +174,8 @@ pub struct View {
     pub source_only: usize,
     /// Number of files matching the filter before limiting.
     pub matching: usize,
+    /// File types available in the map scope before filtering or paging.
+    pub file_types: Vec<&'static str>,
     /// Scoped page for directory browsing or search in a large snapshot.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub browse: Option<BrowsePage>,
@@ -182,6 +189,47 @@ pub struct View {
     pub selection: Selection,
     /// Selected captured source.
     pub source: Option<SourceView>,
+}
+
+struct MapFilter<'a> {
+    path: String,
+    types: BTreeSet<&'a str>,
+    available_types: BTreeSet<&'static str>,
+}
+
+impl MapFilter<'_> {
+    fn collect_type_and_match(&mut self, doc: &Document) -> bool {
+        let file_type = map_file_type(doc.classification());
+        self.available_types.insert(file_type);
+        (self.types.is_empty() || self.types.contains(file_type))
+            && (self.path.is_empty() || doc.path().to_lowercase().contains(&self.path))
+    }
+}
+
+fn map_file_type(classification: &Classification) -> &'static str {
+    let (language, reason) = match classification {
+        Classification::Assigned { language, .. } => (Some(language.as_str()), None),
+        Classification::SourceOnly {
+            language, reason, ..
+        } => (language.as_deref(), Some(*reason)),
+    };
+    match (language, reason) {
+        (Some("tsx"), _) => "typescript",
+        (Some("markdown"), _) | (_, Some(SourceOnlyReason::Documentation)) => "documentation",
+        (_, Some(SourceOnlyReason::ProjectMetadata)) => "metadata",
+        (Some("c"), _) => "c",
+        (Some("cpp"), _) => "cpp",
+        (Some("cuda"), _) => "cuda",
+        (Some("java"), _) => "java",
+        (Some("javascript"), _) => "javascript",
+        (Some("json"), _) => "json",
+        (Some("python"), _) => "python",
+        (Some("ruby"), _) => "ruby",
+        (Some("rust"), _) => "rust",
+        (Some("toml"), _) => "toml",
+        (Some("typescript"), _) => "typescript",
+        _ => "other",
+    }
 }
 
 impl Document {
@@ -248,20 +296,26 @@ impl Snapshot {
         query: &ViewQuery,
         source_limit: usize,
     ) -> Result<View, SourceReadError> {
-        let filter = query.filter.to_lowercase();
+        let mut filter = MapFilter {
+            path: query.filter.to_lowercase(),
+            types: query
+                .types
+                .split(',')
+                .filter(|kind| !kind.is_empty())
+                .collect(),
+            available_types: BTreeSet::new(),
+        };
         let (count, limited, browse) = match &query.directory {
             Some(path) if self.documents().len() > MAX_MAP_FILES => {
-                let (page, documents) = browse::project(self, path, &filter, query.offset);
+                let (page, documents) = browse::project(self, path, &mut filter, query.offset);
                 (page.files, documents, Some(page))
             }
             _ => {
                 let matching: Vec<_> = self
                     .documents()
                     .iter()
-                    .filter(|file| {
-                        filter.is_empty() || file.path().to_lowercase().contains(&filter)
-                    })
                     .map(std::sync::Arc::as_ref)
+                    .filter(|file| filter.collect_type_and_match(file))
                     .collect();
                 let count = matching.len();
                 let mut limited = matching;
@@ -369,6 +423,7 @@ impl Snapshot {
                     bytes: file.bytes(),
                     coverage,
                     classification: file.classification().clone(),
+                    file_type: map_file_type(file.classification()),
                     rect: Rect {
                         x: x + (i % cols) as f64 * 178.0,
                         y: y + 30.0 + (i / cols) as f64 * 56.0,
@@ -393,6 +448,7 @@ impl Snapshot {
             analyzed: self.analyzed_files(),
             source_only: self.documents().len() - self.analyzed_files(),
             matching: count,
+            file_types: filter.available_types.into_iter().collect(),
             browse,
             files,
             groups,
@@ -583,6 +639,131 @@ mod tests {
                 .source
                 .is_none()
         );
+    }
+
+    fn classified_snapshot(paths: impl IntoIterator<Item = String>) -> Snapshot {
+        let workspace = WorkspaceId::derive(&[b"map-types"]);
+        let policy = crate::policy::SourcePolicy::new(
+            crate::policy::PolicyConfig {
+                c_family_roots: vec!["include".into()],
+                ..Default::default()
+            },
+            [],
+        )
+        .unwrap();
+        let documents = paths
+            .into_iter()
+            .map(|path| {
+                let classification = policy.classify(&path).unwrap().unwrap();
+                Arc::new(
+                    Document::capture(workspace.clone(), path, b"", vec![], classification)
+                        .unwrap(),
+                )
+            })
+            .collect();
+        crate::model::fixture_snapshot(workspace, documents).unwrap()
+    }
+
+    #[test]
+    fn map_tiles_expose_classified_types_for_legend_colors() {
+        let expected = [
+            ("Example.java", "java"),
+            ("README", "documentation"),
+            ("config.toml", "toml"),
+            ("data.json", "json"),
+            ("guide.markdown", "documentation"),
+            ("include/a.c", "c"),
+            ("include/b.cc", "cpp"),
+            ("include/c.cuh", "cuda"),
+            ("include/d.h", "other"),
+            ("main.js", "javascript"),
+            ("main.py", "python"),
+            ("main.rb", "ruby"),
+            ("main.rs", "rust"),
+            ("main.ts", "typescript"),
+            ("main.tsx", "typescript"),
+            ("package.json", "metadata"),
+        ];
+        let snapshot = classified_snapshot(expected.map(|(path, _)| path.to_owned()));
+        let view = snapshot.view(&ViewQuery::default()).unwrap();
+        let tiles: BTreeMap<_, _> = view
+            .files
+            .iter()
+            .map(|tile| (tile.path.as_str(), tile.file_type))
+            .collect();
+        assert_eq!(tiles, BTreeMap::from(expected));
+    }
+
+    #[test]
+    fn map_type_union_combines_with_path_search_and_preserves_legend_choices() {
+        let snapshot = classified_snapshot(
+            [
+                "src/Cargo.toml",
+                "src/README.txt",
+                "src/example.tsx",
+                "src/guide.md",
+                "src/program.py",
+                "src/settings.toml",
+                "tests/example.ts",
+            ]
+            .map(str::to_owned),
+        );
+        let query = serde_json::from_value(serde_json::json!({
+            "types": "typescript,documentation",
+            "filter": "SRC/"
+        }))
+        .unwrap();
+        let view = serde_json::to_value(snapshot.view(&query).unwrap()).unwrap();
+        assert_eq!(view["matching"], 3);
+        let tiles = view["files"].as_array().unwrap();
+        assert_eq!(
+            tiles
+                .iter()
+                .map(|tile| (
+                    tile["path"].as_str().unwrap(),
+                    tile["file_type"].as_str().unwrap()
+                ))
+                .collect::<Vec<_>>(),
+            [
+                ("src/README.txt", "documentation"),
+                ("src/example.tsx", "typescript"),
+                ("src/guide.md", "documentation"),
+            ]
+        );
+        assert_eq!(
+            view["file_types"],
+            serde_json::json!(["documentation", "metadata", "python", "toml", "typescript"])
+        );
+    }
+
+    #[test]
+    fn directory_type_filter_runs_before_paging_and_counts_matching_descendants() {
+        let snapshot = classified_snapshot(
+            (0..2001)
+                .map(|i| format!("bulk/file-{i:04}.rs"))
+                .chain(["bulk/z.py", "mixed/README.md", "mixed/main.rs"].map(str::to_owned)),
+        );
+        let view = |params| {
+            let query = serde_json::from_value(params).unwrap();
+            serde_json::to_value(snapshot.view(&query).unwrap()).unwrap()
+        };
+        let root = view(serde_json::json!({"directory": ".", "types": "python"}));
+        assert_eq!(root["browse"]["files"], 1);
+        assert_eq!(
+            root["browse"]["directories"],
+            serde_json::json!([{"path": "bulk", "files": 1}])
+        );
+        let bulk =
+            view(serde_json::json!({"directory": "bulk", "types": "python", "offset": 2000}));
+        assert_eq!(bulk["browse"]["offset"], 0);
+        assert_eq!(bulk["files"][0]["path"], "bulk/z.py");
+        assert_eq!(bulk["file_types"], serde_json::json!(["python", "rust"]));
+        let mixed = view(serde_json::json!({"directory": "mixed", "types": "rust"}));
+        assert_eq!(mixed["browse"]["landmarks"], serde_json::json!([]));
+        let searched =
+            view(serde_json::json!({"directory": "mixed", "types": "python", "filter": "bulk/"}));
+        assert_eq!(searched["browse"]["entries"], 1);
+        assert_eq!(searched["files"][0]["path"], "bulk/z.py");
     }
 
     #[test]

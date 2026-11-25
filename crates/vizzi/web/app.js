@@ -4,7 +4,7 @@ import {workspaceLabel} from "/view-status.js";
 import {createMapModel} from "/map-scene.js";
 import {createDirectoryControls} from "/directory-controls.js";
 import {createMessage,textRow} from "/messages.js";
-import {installAppearance,mapFileType,mapFileTypes,mapPalette} from "/appearance.js";
+import {installAppearance,mapFileTypes,mapPalette} from "/appearance.js";
 import {coverageLabel,fileCount} from "/presentation.js";
 import {fitCamera,zoomCamera,jumpCamera} from "/camera.js";
 import {installSplitter} from "/splitter.js";
@@ -21,6 +21,7 @@ import {fetchRead} from "/read-retry.js";
 const header = document.querySelector('body > header');
 installAppHeader(header);
 const element = id => document.getElementById(id);
+const pathFilter = element("filter"), clearFilters = element("clear-filters");
 const canvas = element("map"), context = canvas.getContext("2d");
 const overview=element("map-overview"),overviewContext=overview.getContext("2d");
 let overviewTransform,overviewDrag=false;
@@ -38,13 +39,14 @@ function sample(series, value) { series.push(value); if (series.length > 512) se
 let view = null, camera = { x: 20, y: 20, scale: 1 };
 let scheduled = false, drag = null, previousFrame = null, filterTimer = null,fitMode="readable",mapSize;
 let updates, viewFilter = "",mapModel,scene,mapWorkspace;
+let viewTypes = "", selectedTypes = new Set();
 const dismissible=new Set(["navigation-notice","error","map-notice"]);
 const messages=Object.fromEntries([["status","workspace status"],["navigation-notice","navigation notice"],["coverage","source status"],["diagnostics","source diagnostics"],["error","workspace error"],["map-notice","map notice"]].map(([id,label])=>[id,dismissible.has(id)?createMessage(element(id),{label:`Dismiss ${label}`}):textRow(element(id))]));
 let palette=mapPalette(canvas);
 const directories=createDirectoryControls({tree:element("directory-tree"),breadcrumbs:element("map-breadcrumbs"),onOpen:openDirectory,onChange:()=>{refreshScene();saveMap();fit(true);}});
 function refreshScene() {
   const projection = mapModel.project();
-  const files = projection.files.map(file => ({ ...file, type: mapFileType(file), marker: coverageMarker(file) }));
+  const files = projection.files.map(file => ({ ...file, type: file.file_type, marker: coverageMarker(file) }));
   scene = { ...projection, files };
   directories.apply(mapModel);
   metrics.scene = scene;
@@ -60,30 +62,59 @@ function coverageMarker(file) {
   return null;
 }
 function fileDescription(file) {
-  const type = mapFileTypes[mapFileType(file)];
+  const type = mapFileTypes[file.file_type];
   const coverage = coverageLabel(file.coverage, file.classification?.kind === "source_only");
   return `${type} · ${coverage}`;
 }
 function renderMapLegend() {
   const legend = element("map-legend");
-  const types = new Set(scene?.files.map(file => file.type));
+  const types = new Set(view?.file_types);
+  for (const type of selectedTypes) types.add(type);
   const markers = new Set(scene?.files.map(file => file.marker));
   const entries = Object.entries(mapFileTypes)
     .filter(([type]) => types.has(type))
-    .map(([type, label]) => [label, palette.types[type]]);
-  if (markers.has("partial")) entries.push(["Syntax recovery", palette.partial, true]);
-  if (markers.has("unavailable")) entries.push(["Analysis deferred or unavailable", palette.unavailable, true]);
+    .map(([type, label]) => [label, palette.types[type], type]);
+  if (markers.has("partial")) entries.push(["Syntax recovery", palette.partial]);
+  if (markers.has("unavailable")) entries.push(["Analysis deferred or unavailable", palette.unavailable]);
   const key = JSON.stringify(entries);
-  if (legend.dataset.entries === key) return;
-  legend.dataset.entries = key;
-  legend.hidden = !entries.length;
-  legend.replaceChildren(...entries.map(([label, color, status]) => {
-    const item = document.createElement("li");
-    if (status) item.className = "map-status";
-    item.textContent = label;
-    item.style.setProperty("--swatch", color);
-    return item;
-  }));
+  const focused = document.activeElement;
+  const focusedType = legend.contains(focused) ? focused.dataset.mapType : undefined;
+  const rebuild = legend.dataset.entries !== key;
+  if (rebuild) {
+    legend.dataset.entries = key;
+    legend.hidden = !entries.length;
+    legend.replaceChildren(...entries.map(([label, color, type]) => {
+      const item = document.createElement("li");
+      item.style.setProperty("--swatch", color);
+      if (type) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.dataset.mapType = type;
+        button.textContent = label;
+        button.addEventListener("click", () => {
+          if (!selectedTypes.delete(type)) selectedTypes.add(type);
+          renderMapLegend();
+          void navigate({});
+        });
+        item.append(button);
+      } else {
+        item.className = "map-status";
+        item.textContent = label;
+      }
+      return item;
+    }));
+  }
+  const buttons = [...legend.querySelectorAll("button")];
+  for (const button of buttons) {
+    button.setAttribute("aria-pressed", String(selectedTypes.has(button.dataset.mapType)));
+  }
+  if (rebuild && focusedType) {
+    const nextFocus = buttons.find(button => button.dataset.mapType === focusedType) ?? buttons[0] ?? pathFilter;
+    nextFocus.focus({ preventScroll: true });
+  }
+}
+function updateClearFilters() {
+  clearFilters.hidden = !pathFilter.value && !selectedTypes.size;
 }
 function renderCounts(){
   if(!view)return;
@@ -134,7 +165,7 @@ const inspector = createInspector({
 const navigation = createNavigation({
   capture: () => ({ file:view?.selection.file ?? null,entity:view?.selection.entity ?? null,
     path:view?.source?.path ?? null,version:view?.source?.version ?? null,snapshot:view?.snapshot ?? null,
-    filter:viewFilter,directory:view?.browse?.directory ?? ".",offset:view?.browse?.offset ?? 0,
+    filter:viewFilter,types:viewTypes,directory:view?.browse?.directory ?? ".",offset:view?.browse?.offset ?? 0,
     position:{inspector:inspector.position(),camera:{...camera},layoutRevision:mapModel?.revision,fitMode,mapSize} }),
   load: (query,intent) => controller.load(query,{intent,rollbackOnFailure:Boolean(intent.returning || intent.anchor)}),
   prepare: (query,intent,signal) => controller.prepare(query,{intent,signal,rollbackOnFailure:true}),
@@ -142,9 +173,14 @@ const navigation = createNavigation({
   onState: state => {element("nav-back").disabled=!state.canBack;element("nav-forward").disabled=!state.canForward;element("navigation").setAttribute("aria-busy",String(state.pending));},
   onNotice: notice => messages["navigation-notice"].show(notice),
 });
-function navigate(patch) { editorFiles.manual();clearTimeout(filterTimer);return navigation.navigate({filter:element("filter").value,...patch}); }
+function navigate(patch) {
+  editorFiles.manual();
+  clearTimeout(filterTimer);
+  updateClearFilters();
+  return navigation.navigate({filter:pathFilter.value,types:[...selectedTypes].sort().join(","),...patch});
+}
 function openDirectory(directory) {
-  element("filter").value="";
+  pathFilter.value="";
   return navigate({directory,offset:0});
 }
 function changePage(direction) {
@@ -163,6 +199,7 @@ const controller = createController({
     if(current && file && file!==current.selection.file && snapshot===current.snapshot &&
        options.intent?.before && !options.intent.anchor && !url.searchParams.has("entity") &&
        (url.searchParams.get("filter") ?? "")===viewFilter &&
+       (url.searchParams.get("types") ?? "")===viewTypes &&
        url.searchParams.get("directory")===(current.browse?.directory ?? ".") &&
        Number(url.searchParams.get("offset"))===(current.browse?.offset ?? 0)) {
       const query=new URLSearchParams({file,snapshot});
@@ -178,12 +215,15 @@ const controller = createController({
   },
   onView: (next,info) => {
     const previousSelection=view?.selection.file;
-    const first = !view, changedFilter=viewFilter!==(info.query.filter ?? "");
+    const first = !view, changedFilter=viewFilter!==(info.query.filter ?? "") || viewTypes!==(info.query.types ?? "");
     const changedMap=view?.files!==next.files;
     const changedPage=view?.browse?.directory!==next.browse?.directory || view?.browse?.offset!==next.browse?.offset;
     view = next;keepEvidence.disabled=!next.source;
     viewFilter=info.query.filter ?? "";
-    if(info.intent?.returning || info.intent?.anchor)element("filter").value=viewFilter;
+    viewTypes=info.query.types ?? "";
+    selectedTypes=new Set(viewTypes ? viewTypes.split(",") : []);
+    if(info.intent?.returning || info.intent?.anchor)pathFilter.value=viewFilter;
+    updateClearFilters();
     if(mapWorkspace!==next.workspace){let preferences={};try{const saved=localStorage.getItem(`vizzi.map.v1.${next.workspace}`);if(saved && saved.length<=65536 && new TextEncoder().encode(saved).length<=65536)preferences=JSON.parse(saved);}catch{}mapModel=createMapModel(next.files,preferences,next.browse);mapWorkspace=next.workspace;}
     else if(changedMap)mapModel.setFiles(next.files,next.browse);
     const layoutRevision=mapModel.revision;
@@ -200,7 +240,7 @@ const controller = createController({
     callMenu.hide();inspector.apply(next); renderFileList();
     const restore=navigation.restoration(next,info.intent);
     const sameScene=restore && restore.snapshot===next.snapshot && restore.position.layoutRevision===mapModel.revision &&
-      restore.filter===viewFilter && restore.directory===(next.browse?.directory ?? ".") && restore.offset===(next.browse?.offset ?? 0);
+      restore.filter===viewFilter && restore.types===viewTypes && restore.directory===(next.browse?.directory ?? ".") && restore.offset===(next.browse?.offset ?? 0);
     if(sameScene){camera={...restore.position.camera};fitMode=restore.position.fitMode ?? null;const old=restore.position.mapSize;if(old)camera=jumpCamera(camera,{x:(old.width/2-camera.x)/camera.scale,y:(old.height/2-camera.y)/camera.scale},canvas.clientWidth,canvas.clientHeight);invalidate();}
     else if(first || changedFilter || changedPage || info.intent?.returning)fit(true);else invalidate();
     if(!first && previousSelection!==next.selection.file && !info.intent?.returning){const file=scene.files.find(f=>f.id===next.selection.file);if(file){const x=camera.x+(file.rect.x+file.rect.width/2)*camera.scale,y=camera.y+(file.rect.y+file.rect.height/2)*camera.scale;if(x<12 || y<12 || x>canvas.clientWidth-12 || y>canvas.clientHeight-12){camera=jumpCamera(camera,{x:file.rect.x+file.rect.width/2,y:file.rect.y+file.rect.height/2},canvas.clientWidth,canvas.clientHeight);fitMode=null;invalidate();}}}
@@ -226,7 +266,7 @@ const editorFiles=installWorkspaceDelivery({mode:'file',
   prepare:async(action,{signal,replaceHistory})=>{
     if(action.kind==='reveal')return {commit(){}};
     clearTimeout(filterTimer);
-    return navigation.prepare({file:action.file,entity:null,filter:''},action,{signal,replaceHistory});
+    return navigation.prepare({file:action.file,entity:null,filter:'',types:''},action,{signal,replaceHistory});
   },failed:showError,changed:pending=>{if(!pending && view)navigation.observe();}});
 function showError(error) { messages.error.show(`${error.message || error} · ${view?"Keeping the last captured view; retrying.":"No source observation is available. Retry indexing."}`); }
 
@@ -438,7 +478,19 @@ canvas.addEventListener("wheel", event => {
 }, { passive: false });
 canvas.addEventListener("keydown", event => { const direction = { ArrowLeft: [40, 0], ArrowRight: [-40, 0], ArrowUp: [0, 40], ArrowDown: [0, -40] }[event.key]; if (direction) { event.preventDefault();fitMode=null; camera.x += direction[0]; camera.y += direction[1]; invalidate(); } else if (event.key === "Home") { event.preventDefault(); fit(); } });
 element("fit").addEventListener("click", () => fit());
-element("filter").addEventListener("input", event => { editorFiles.manual();clearTimeout(filterTimer); filterTimer = setTimeout(() => navigate({ filter: event.target.value }), 160); });
+pathFilter.addEventListener("input", () => {
+  editorFiles.manual();
+  clearTimeout(filterTimer);
+  updateClearFilters();
+  filterTimer = setTimeout(() => navigate({}), 160);
+});
+clearFilters.addEventListener("click", () => {
+  pathFilter.value = "";
+  pathFilter.focus();
+  selectedTypes.clear();
+  renderMapLegend();
+  void navigate({});
+});
 element("map-page-previous").addEventListener("click",()=>changePage(-1));
 element("map-page-next").addEventListener("click",()=>changePage(1));
 element("nav-back").addEventListener("click",()=>{editorFiles.manual();clearTimeout(filterTimer);navigation.move(-1);});
