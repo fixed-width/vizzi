@@ -569,15 +569,25 @@ test("a live client resynchronises after host restart without polling or losing 
     const before = await page.locator("#file-title").textContent();
     const port = new URL(host.url).port;
     await host.close();
-    await page.locator("#error").waitFor({ state: "visible" });
+    const alert = page.locator("#error");
+    await alert.getByText(/Live updates disconnected/).waitFor();
+    const alertLayers = await page.getByRole("separator").evaluateAll(splitters => {
+      const alert = document.getElementById("error");
+      const { top, height } = alert.getBoundingClientRect();
+      return splitters.map(splitter => {
+        const { left, width } = splitter.getBoundingClientRect();
+        return alert.contains(document.elementFromPoint(left + width / 2, top + height / 2));
+      });
+    });
     assert.equal(await page.locator("#file-title").textContent(), before);
     await writeFile(join(input.root, "src/b.rs"), "// changed while disconnected\nfn beta() {}");
     host = await startHost(input, 4, port);
-    await page.locator("#error").waitFor({ state: "hidden", timeout: 5000 });
+    await alert.waitFor({ state: "hidden", timeout: 5000 });
     await page.waitForFunction(() => document.getElementById("source").textContent.includes("changed while disconnected"));
     assert.ok((await page.locator("#outline [aria-current=true]").textContent()).startsWith("beta"));
     assert.equal(session.requests.filter(path => path === "/api/status").length, 0);
     assert.ok(session.requests.filter(path => path === "/api/events").length >= 2);
+    assert.deepEqual(alertLayers, [true, true], "the disconnect alert should cover both pane separators");
   } finally { await session.close(); }
 });
 
