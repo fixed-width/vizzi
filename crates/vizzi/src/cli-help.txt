@@ -94,9 +94,11 @@ Diagnostics (--once and --stdio are mutually exclusive):
   --stdio
       Run live JSON diagnostics through stdin/stdout instead of HTTP.
 
-Help:
+Help and version:
   -h, --help
       Show this help and exit.
+  --version
+      Print the build version and exit.
 
 Examples:
   vizzi

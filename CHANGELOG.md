@@ -8,6 +8,7 @@ remains in Git and the project documentation.
 
 ### Added
 
+- Report the installed build with `vizzi --version`.
 - Open highlighted function definitions and written calls in the Call workspace from
   the Source browser.
 - Browse every captured file in large repositories through directory cards and pages.

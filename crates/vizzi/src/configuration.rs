@@ -142,18 +142,27 @@ impl Options {
     }
 }
 
-pub(super) fn load(arguments: impl Iterator<Item = String>) -> Result<Option<Options>, String> {
+pub(super) enum Invocation {
+    Help,
+    Version,
+    Launch(Box<Options>),
+}
+
+pub(super) fn load(arguments: impl Iterator<Item = String>) -> Result<Invocation, String> {
     let arguments: Vec<_> = arguments.collect();
     if arguments
         .iter()
         .any(|arg| matches!(arg.as_str(), "--help" | "-h"))
     {
-        return Ok(None);
+        return Ok(Invocation::Help);
     }
     let mut arguments = arguments.into_iter();
     let mut overrides = Vec::new();
     let mut config = None;
     while let Some(argument) = arguments.next() {
+        if argument == "--version" {
+            return Ok(Invocation::Version);
+        }
         if matches!(argument.as_str(), "--once" | "--stdio") {
             overrides.push((argument, String::new()));
             continue;
@@ -259,7 +268,7 @@ pub(super) fn load(arguments: impl Iterator<Item = String>) -> Result<Option<Opt
         }
     }
     options.language_servers.validate()?;
-    Ok(Some(options))
+    Ok(Invocation::Launch(Box::new(options)))
 }
 
 #[cfg(test)]
@@ -267,9 +276,12 @@ mod tests {
     use super::*;
 
     fn load_args(arguments: &[&str]) -> Options {
-        load(arguments.iter().map(|arg| (*arg).to_owned()))
-            .unwrap()
-            .unwrap()
+        let Invocation::Launch(options) =
+            load(arguments.iter().map(|arg| (*arg).to_owned())).unwrap()
+        else {
+            panic!("expected launch options for {arguments:?}");
+        };
+        *options
     }
 
     #[test]
@@ -557,11 +569,7 @@ typescript-server = './bin/tsc'
             "--analysis-input-mib",
             "--source-spool-mib",
         ] {
-            assert!(
-                load([option.to_owned(), valid.clone()].into_iter())
-                    .unwrap()
-                    .is_some()
-            );
+            load_args(&[option, &valid]);
             let error = load([option.to_owned(), invalid.clone()].into_iter())
                 .err()
                 .unwrap();
