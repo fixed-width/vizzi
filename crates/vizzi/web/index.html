@@ -9,7 +9,13 @@
 <section id="map-landmarks" aria-label="Landmarks" hidden><strong>Landmarks</strong><div id="landmark-files"></div></section><div class="directory-heading"><strong>Directories</strong><button id="reset-map" type="button">Reset map</button></div><div id="directory-tree" tabindex="0"></div><nav id="map-breadcrumbs" aria-label="Map location"></nav><nav id="map-pages" aria-label="Map pages" hidden><button id="map-page-previous" type="button">Previous page</button><span id="map-page-range" role="status"></span><button id="map-page-next" type="button">Next page</button></nav><div class="map-surface"><canvas id="map" tabindex="0" aria-label="Repository map. Drag to pan and scroll to zoom. Use the directory controls and file list for keyboard navigation."></canvas><canvas id="map-overview" tabindex="0" aria-label="Map overview navigator. Click or drag to jump; arrow keys move the viewport."></canvas><div id="tooltip" hidden></div><div id="empty" hidden>No source files match this filter.</div></div>
 <div class="map-legend-controls" role="group" aria-label="Map filters and legend">
   <ul id="map-legend" role="list" aria-label="File type filters and map analysis status" hidden></ul>
-  <button id="clear-filters" type="button" hidden>Clear filters</button>
+  <button id="clear-filters" type="button" hidden>
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+      <path d="M2 3h12L9 8v2.5L7 12V8Z" />
+      <path d="m11 11 3.5 3.5m0-3.5L11 14.5" />
+    </svg>
+    Clear filters
+  </button>
 </div>
 <div class="map-footer" id="map-help"><span>Drag background to pan · wheel to zoom</span><span>Outline marks selection</span></div>
 <details><summary>Accessible file list</summary><nav id="file-list" aria-label="Files"></nav></details></section>

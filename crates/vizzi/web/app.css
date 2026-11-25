@@ -1,5 +1,6 @@
 :root { font-family: "Noto Sans", "DejaVu Sans", sans-serif; color: var(--text); background: var(--background); font-size: 13px; }
 .map-panel {
+  container: map-panel / inline-size;
   --map-c-light: #b8c6db; --map-c-dark: #3c516a;
   --map-cpp-light: #c8bef0; --map-cpp-dark: #56467b;
   --map-cuda-light: #d3dd9c; --map-cuda-dark: #4c592f;
@@ -42,10 +43,14 @@ canvas:focus-visible { outline-offset: -3px; }
 .map-footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; padding: 8px 0; font-size: 10px; color: var(--subdued); }
 .map-legend-controls { display: flex; align-items: flex-start; gap: 12px; padding-top: 8px; font-size: 11px; }
 .map-legend-controls:not(:has(> :not([hidden]))) { display: none; }
+@container map-panel (max-width: 230px) {
+  .map-legend-controls { flex-wrap: wrap; row-gap: 4px; }
+}
 #map-legend { display: flex; flex-wrap: wrap; min-width: 0; gap: 4px 12px; margin: 0; padding: 0; list-style: none; }
-#map-legend button, #map-legend .map-status { display: inline-flex; align-items: center; gap: 5px; }
+#map-legend button, #map-legend .map-status, #clear-filters { display: inline-flex; align-items: center; gap: 5px; }
 #map-legend button, #clear-filters { min-height: 24px; padding: 3px 7px; }
 #clear-filters { flex: none; }
+#clear-filters svg { width: 14px; height: 14px; }
 #map-legend button[aria-pressed="true"] { background: var(--selected-bg); color: var(--selected-text); border-color: var(--focus); }
 #map-legend button::before, #map-legend .map-status::before { content: ""; width: 12px; height: 9px; background: var(--swatch); border: 1px solid var(--border); border-radius: 2px; forced-color-adjust: none; }
 #map-legend .map-status::before { border: 0; border-radius: 0; clip-path: polygon(100% 0, 100% 100%, 0 100%); }

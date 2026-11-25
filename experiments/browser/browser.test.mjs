@@ -237,6 +237,30 @@ test("map legend toggles combine file types and Clear filters restores the full 
   } finally { await session.close(); }
 });
 
+test("Clear filters remains separate from long file type labels at the minimum map width", async () => {
+  const fixture = await workspace({ files: { "README.md": "# Example repository\n" } });
+  let localHost, session;
+  try {
+    localHost = await startHost(fixture);
+    session = await openWorkspace(chromium, localHost);
+    const { page } = session;
+    await page.getByRole("separator", { name: "Repository map and source widths" }).press("Home");
+    const documentation = page.getByRole("button", { name: "Documentation", exact: true });
+    await documentation.click();
+    const clear = page.getByRole("button", { name: "Clear filters", exact: true });
+    await clear.waitFor();
+    const typeBounds = await documentation.boundingBox();
+    const clearBounds = await clear.boundingBox();
+    assert.ok(typeBounds.x + typeBounds.width <= clearBounds.x || typeBounds.y + typeBounds.height <= clearBounds.y);
+    await clear.click();
+    assert.equal(await documentation.getAttribute("aria-pressed"), "false");
+  } finally {
+    await session?.close();
+    await localHost?.close();
+    await fixture.close();
+  }
+});
+
 test("forced colors preserves the map swatches and adapts legend text", async () => {
   const session = await openWorkspace(chromium, host);
   const { page } = session;
