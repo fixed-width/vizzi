@@ -15,7 +15,7 @@ before(async () => {
 });
 after(async () => { await chromium?.close(); await host?.close(); await input?.close(); });
 
-test("opening a map tile fetches the first source screen without reloading the map", async () => {
+test("opening a map tile keeps the cursor steady and fetches only the first source screen", async () => {
   const session = await openWorkspace(chromium, host);
   try {
     const { page, requests } = session;
@@ -29,8 +29,15 @@ test("opening a map tile fetches the first source screen without reloading the m
         y: camera.y + (rect.y + rect.height / 2) * camera.scale,
       };
     });
+    const map = page.locator("#map");
+    await map.hover({ position });
+    const hoverCursor = await map.evaluate(canvas => getComputedStyle(canvas).cursor);
     const start = requests.length;
-    await page.locator("#map").click({ position });
+    await page.mouse.down();
+    const pressedCursor = await map.evaluate(canvas => getComputedStyle(canvas).cursor);
+    await page.mouse.up();
+    assert.equal(hoverCursor, "grab");
+    assert.equal(pressedCursor, hoverCursor);
     await page.locator("#source .code-line").filter({ hasText: "fn beta() {}" }).waitFor();
     assert.equal(await page.locator("#file-title").textContent(), "src/b.rs");
     assert.match(await page.locator("#outline").textContent(), /beta/);
