@@ -30,8 +30,7 @@
   --tooltip-bg: #183044;
   --tooltip-text: #ffffff;
   --map-file: #c6d7eb;
-  --map-partial: #ebce91;
-  --map-unavailable: #cbd4df;
+  --map-partial: #885300;
   --map-group: #e3eaf3;
   --keyword: #7620b7;
   --type: #006b73;
@@ -76,8 +75,7 @@
   --tooltip-bg: #e1ecf9;
   --tooltip-text: #102034;
   --map-file: #294463;
-  --map-partial: #67532e;
-  --map-unavailable: #39495f;
+  --map-partial: #ffd082;
   --map-group: #162438;
   --keyword: #e294ff;
   --type: #5be4c4;
@@ -123,8 +121,7 @@
   --tooltip-bg: #e1ecf9;
   --tooltip-text: #102034;
   --map-file: #294463;
-  --map-partial: #67532e;
-  --map-unavailable: #39495f;
+  --map-partial: #ffd082;
   --map-group: #162438;
   --keyword: #e294ff;
   --type: #5be4c4;

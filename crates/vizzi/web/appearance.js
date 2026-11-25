@@ -12,7 +12,43 @@ export function installAppearance(select,{root=document.documentElement,storage=
   root.ownerDocument.defaultView.addEventListener('storage',event=>{if(event.key==='vizzi.theme.v1')apply(event.newValue);});
 }
 
+export const mapFileTypes = {
+  c: 'C',
+  cpp: 'C++',
+  cuda: 'CUDA',
+  java: 'Java',
+  javascript: 'JavaScript',
+  python: 'Python',
+  ruby: 'Ruby',
+  rust: 'Rust',
+  typescript: 'TypeScript',
+  documentation: 'Documentation',
+  json: 'JSON',
+  toml: 'TOML',
+  metadata: 'Project metadata',
+  other: 'Other files',
+};
+
+export function mapFileType({ classification }) {
+  const language = classification?.language;
+  if (language === 'tsx') return 'typescript';
+  if (language === 'markdown' || classification?.reason === 'documentation') return 'documentation';
+  if (classification?.reason === 'project_metadata') return 'metadata';
+  return Object.hasOwn(mapFileTypes, language) ? language : 'other';
+}
+
 export function mapPalette(canvas) {
-  const styles=getComputedStyle(canvas),read=name=>styles.getPropertyValue(`--${name}`).trim();
-  return {text:read('text'),muted:read('muted'),selected:read('accent-fill'),onSelected:read('on-accent'),file:read('map-file'),partial:read('map-partial'),unavailable:read('map-unavailable'),group:read('map-group'),border:read('border'),focus:read('focus')};
+  const styles = getComputedStyle(canvas);
+  const read = name => styles.getPropertyValue(`--${name}`);
+  const types = Object.fromEntries(Object.keys(mapFileTypes).map(type =>
+    [type, read(`map-${type}-${styles.colorScheme}`)]));
+  return {
+    types,
+    text: read('text'),
+    partial: read('map-partial'),
+    unavailable: read('muted'),
+    group: read('map-group'),
+    border: read('border'),
+    focus: read('focus'),
+  };
 }

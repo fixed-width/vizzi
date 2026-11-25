@@ -9,7 +9,7 @@ async function fixture({theme='dark',saved,denied=false}={}){
   if(saved!==undefined)localStorage.setItem('vizzi.theme.v1',saved);
   if(denied)Object.defineProperty(window,'localStorage',{get(){throw new Error('denied');}});
  },{saved,denied,namespace:stryker.NAMESPACE,field:stryker.ACTIVE_MUTANT,active:process.env[stryker.ACTIVE_MUTANT_ENV_VARIABLE],hitCount:stryker.HIT_COUNT,hitLimit:stryker.HIT_LIMIT});
- await page.route('http://fixture/**',async route=>{const path=new URL(route.request().url()).pathname;if(path==='/')return route.fulfill({contentType:'text/html',body:'<meta charset="utf-8"><script src="/theme-init.js"></script><link rel="stylesheet" href="/theme.css"><link rel="stylesheet" href="/app.css"><select id="theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select><div id="message" role="alert">Initial</div><div id="source"><span class="syntax-keyword">pub</span> <span class="syntax-type">Type</span> <span class="syntax-function">call</span> <span class="syntax-string">"text"</span> <span class="syntax-number">42</span> <span class="syntax-comment">// note</span></div><canvas id="map" style="display:none"></canvas>'});return route.fulfill({contentType:path.endsWith('.css')?'text/css; charset=utf-8':'text/javascript; charset=utf-8',body:await readFile(resolve('crates/vizzi/web'+path),'utf8')});});
+ await page.route('http://fixture/**',async route=>{const path=new URL(route.request().url()).pathname;if(path==='/')return route.fulfill({contentType:'text/html',body:'<meta charset="utf-8"><script src="/theme-init.js"></script><link rel="stylesheet" href="/theme.css"><link rel="stylesheet" href="/app.css"><select id="theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select><div id="message" role="alert">Initial</div><div id="source"><span class="syntax-keyword">pub</span> <span class="syntax-type">Type</span> <span class="syntax-function">call</span> <span class="syntax-string">"text"</span> <span class="syntax-number">42</span> <span class="syntax-comment">// note</span></div><div class="map-panel"><canvas id="map" style="display:none"></canvas></div>'});return route.fulfill({contentType:path.endsWith('.css')?'text/css; charset=utf-8':'text/javascript; charset=utf-8',body:await readFile(resolve('crates/vizzi/web'+path),'utf8')});});
  await page.goto('http://fixture/');page.bootChoice=await page.evaluate(()=>document.documentElement.dataset.theme ?? null);assert.deepEqual(page.testErrors,[]);await page.evaluate(async()=>{const {installAppearance,mapPalette}=await import('/appearance.js'),{createMessage}=await import('/messages.js');window.changes=[];installAppearance(document.getElementById('theme'),{onChange:mode=>changes.push(mode)});window.message=createMessage(document.getElementById('message'),{label:'Dismiss alert'});window.palette=()=>mapPalette(document.getElementById('map'));});return page;
 }
 test('System follows CSS/media; valid overrides persist and invalid/stored-refused settings degrade to System',async()=>{
@@ -29,11 +29,51 @@ test('dismissed messages stay closed for the same identity, new contexts reopen,
  }finally{await page.close();}
 });
 function luminance(rgb){const c=rgb.match(/[\d.]+/g).slice(0,3).map(Number).map(v=>v/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4);return c[0]*.2126+c[1]*.7152+c[2]*.0722;}
+test('map file types follow capture classification and keep tile text readable in both themes', async () => {
+ const page = await fixture();
+ try {
+  const labels = await page.evaluate(async () => {
+   const { mapFileType, mapFileTypes } = await import('/appearance.js');
+   return [
+    ...['c', 'java', 'javascript', 'python', 'ruby', 'rust'].map(language => ({
+     classification: { kind: 'assigned', language },
+    })),
+    { path: 'include/assigned.h', classification: { kind: 'assigned', language: 'cpp' } },
+    { path: 'include/other.h', classification: { kind: 'source_only', reason: 'language_unassigned' } },
+    { classification: { kind: 'assigned', language: 'tsx' } },
+    { classification: { kind: 'source_only', language: 'cuda', reason: 'dialect_unsupported' } },
+    { classification: { kind: 'source_only', language: 'json' } },
+    { classification: { kind: 'source_only', language: 'toml' } },
+    { classification: { kind: 'source_only', language: 'markdown' } },
+    { classification: { kind: 'source_only', reason: 'documentation' } },
+    { classification: { kind: 'source_only', language: 'cargo', reason: 'project_metadata' } },
+    { classification: { kind: 'assigned', language: 'unknown' } },
+    {},
+   ].map(file => mapFileTypes[mapFileType(file)]);
+  });
+  assert.deepEqual(labels, [
+   'C', 'Java', 'JavaScript', 'Python', 'Ruby', 'Rust', 'C++', 'Other files',
+   'TypeScript', 'CUDA', 'JSON', 'TOML', 'Documentation', 'Documentation',
+   'Project metadata', 'Other files', 'Other files',
+  ]);
+  for (const theme of ['light', 'dark']) {
+   await page.locator('#theme').selectOption(theme);
+   const { text, types } = await page.evaluate(() => palette());
+   const fills = Object.values(types);
+   assert.equal(new Set(fills).size, fills.length);
+   const lightness = hex => luminance(hex.slice(1).match(/../g).map(byte => parseInt(byte, 16)).join(', '));
+   for (const fill of fills) {
+    const a = lightness(text), b = lightness(fill);
+    assert.ok((Math.max(a, b) + .05) / (Math.min(a, b) + .05) >= 4.5, `${theme}: ${text} on ${fill}`);
+   }
+  }
+ } finally { await page.close(); }
+});
 test('syntax hues, weight and contrast remain distinct on plain, selection and diff backgrounds in both themes',async()=>{
  const page=await fixture();try{for(const theme of ['light','dark']){
   await page.locator('#theme').selectOption(theme);
   const values=await page.evaluate(()=>{const styles=getComputedStyle(document.documentElement),probe=document.createElement('span');document.body.append(probe);const colors=['paper','active-bg','removed-bg','added-bg'].map(name=>{probe.style.background=`var(--${name})`;return getComputedStyle(probe).backgroundColor;});probe.remove();return {backgrounds:colors,syntax:[...document.querySelectorAll('#source > span')].map(n=>({colour:getComputedStyle(n).color,weight:getComputedStyle(n).fontWeight})),palette:palette()};});
-  assert.equal(new Set(values.syntax.map(s=>s.colour)).size,6);assert.ok(Number(values.syntax[1].weight)>=650);assert.ok(values.palette.file.startsWith('#'));assert.notEqual(values.palette.file,values.palette.group);
+  assert.equal(new Set(values.syntax.map(s=>s.colour)).size,6);assert.ok(Number(values.syntax[1].weight)>=650);assert.notEqual(values.palette.types.other,values.palette.group);
   for(const span of values.syntax)for(const background of values.backgrounds){const a=luminance(span.colour),b=luminance(background),contrast=(Math.max(a,b)+.05)/(Math.min(a,b)+.05);assert.ok(contrast>=4.5,`${theme}: ${span.colour} on ${background}: ${contrast}`);}
  }}finally{await page.close();}
 });
@@ -50,8 +90,8 @@ test('theme callbacks report the effective mode, ignore unrelated storage and re
 });
 test('canvas palettes resolve every shared token in both modes',async()=>{
  const page=await fixture();try{
-  const expected={light:{text:'#183044',muted:'#526477',selected:'#265dc5',onSelected:'#ffffff',file:'#c6d7eb',partial:'#ebce91',unavailable:'#cbd4df',group:'#e3eaf3',border:'#b8c7d6',focus:'#265dc5'},dark:{text:'#d9e4f0',muted:'#a9bbd0',selected:'#2863b9',onSelected:'#ffffff',file:'#294463',partial:'#67532e',unavailable:'#39495f',group:'#162438',border:'#3c536d',focus:'#8abdff'}};
-  for(const mode of ['light','dark']){await page.locator('#theme').selectOption(mode);assert.deepEqual(await page.evaluate(()=>palette()),expected[mode]);}
+  const expected={light:{text:'#183044',partial:'#885300',unavailable:'#526477',group:'#e3eaf3',border:'#b8c7d6',focus:'#265dc5'},dark:{text:'#d9e4f0',partial:'#ffd082',unavailable:'#a9bbd0',group:'#162438',border:'#3c536d',focus:'#8abdff'}};
+  for(const mode of ['light','dark']){await page.locator('#theme').selectOption(mode);assert.deepEqual(await page.evaluate(()=>{const {types,...shared}=palette();return shared;}),expected[mode]);}
  }finally{await page.close();}
 });
 test('initially empty or hidden messages remain quiet, reuse supplied actions and do not submit forms',async()=>{
