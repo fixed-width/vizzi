@@ -21,8 +21,9 @@ describes which data each storage mechanism retains.
 ## Save and annotate a location
 
 Choose **Save** on a repository source bubble, or **Save location** in the Source browser.
-Then choose **Saved locations** in the shared header. Open **Inspect location** on a
-saved card to read its captured excerpt or edit your interpretation and choose **Save note**.
+Then choose **Saved locations** in the shared header. Choose **Add notes** on a saved
+card to open its inspector and start typing. Choose **Inspect location** to read the
+captured excerpt or edit existing notes. Choose **Save note** to keep your changes.
 
 Choose **Open in Source browser** or **Open in Call workspace** on a saved card to
 return to the view where you saved it. Vizzi reveals the saved line in the Source

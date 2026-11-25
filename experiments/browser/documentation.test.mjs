@@ -53,9 +53,9 @@ try{
    }
    await page.getByRole('navigation',{name:'View modes',exact:true}).getByRole('link',{name:'Saved locations',exact:true}).click();await page.getByRole('heading',{name:'Saved locations',exact:true}).waitFor();await page.locator('#locations-actions > summary').click();assert.equal(await page.getByRole('button',{name:'Add a location',exact:true}).isVisible(),true);assert.equal(await page.getByRole('button',{name:'Export locations',exact:true}).isVisible(),true);
    if(kind==='python'){
-    await page.keyboard.press('Escape');await page.getByRole('button',{name:'Inspect location',exact:true}).click();await page.getByLabel('Your interpretation',{exact:true}).fill('A greeting task');await page.getByRole('button',{name:'Save note',exact:true}).click();
+    await page.keyboard.press('Escape');await page.getByRole('button',{name:'Inspect location',exact:true}).click();await page.getByLabel('Notes',{exact:true}).fill('A greeting task');await page.getByRole('button',{name:'Save note',exact:true}).click();
     await page.waitForFunction(()=>!document.querySelector('#note-form button[type=submit]').disabled);const state=JSON.parse(await readFile(join(dirname(input.cache),'state','locations.json'),'utf8'));assert.equal(state.evidence.length,1);assert.equal(state.evidence[0].note,'A greeting task');
-    await host.close();host=await startHost(input,1);await page.goto(host.url+'/investigate#saved');await page.getByRole('button',{name:'Inspect location',exact:true}).click();assert.equal(await page.getByLabel('Your interpretation',{exact:true}).inputValue(),'A greeting task');
+    await host.close();host=await startHost(input,1);await page.goto(host.url+'/investigate#saved');await page.getByRole('button',{name:'Inspect location',exact:true}).click();assert.equal(await page.getByLabel('Notes',{exact:true}).inputValue(),'A greeting task');
    }
    if(kind==='rust'&&process.argv.includes('--with-rust-analyzer')){
     await host.close();input.sourceArguments.push('--rust-analyzer','rust-analyzer');host=await startHost(input,1);
