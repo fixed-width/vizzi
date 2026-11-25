@@ -89,6 +89,7 @@ fn help_describes_optional_paths_without_creating_cache_data() {
     let text = String::from_utf8(output.stdout).unwrap();
     assert!(text.contains("[--root DIR]"));
     assert!(text.contains("[--cache DIR]"));
+    assert!(text.contains("--version"));
     assert!(text.contains("current directory"));
     let (_, language_options) = text.split_once("--ruby-lsp EXECUTABLE").unwrap();
     let (ruby, typescript) = language_options
@@ -97,6 +98,25 @@ fn help_describes_optional_paths_without_creating_cache_data() {
     let (typescript, _) = typescript.split_once("--clangd EXECUTABLE").unwrap();
     assert!(ruby.contains("Uses local gems"));
     assert!(!typescript.contains("gems"));
+    assert!(!fixture.directory.path().join("system-cache").exists());
+}
+
+#[test]
+fn version_prints_the_embedded_build_version_without_loading_configuration() {
+    let fixture = Fixture::new();
+    let output = fixture
+        .command(&fixture.source)
+        .args(["--config", "missing.toml", "--version"])
+        .output()
+        .unwrap();
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let version = env!("VIZZI_VERSION");
+    assert_eq!(output.stdout, format!("vizzi {version}\n").as_bytes());
+    assert!(output.stderr.is_empty());
     assert!(!fixture.directory.path().join("system-cache").exists());
 }
 

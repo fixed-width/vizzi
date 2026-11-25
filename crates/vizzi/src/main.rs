@@ -14,9 +14,16 @@ mod configuration;
 
 #[tokio::main(worker_threads = 2)]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let Some(options) = configuration::load(std::env::args().skip(1))? else {
-        print!("{}", include_str!("cli-help.txt"));
-        return Ok(());
+    let options = match configuration::load(std::env::args().skip(1))? {
+        configuration::Invocation::Help => {
+            print!("{}", include_str!("cli-help.txt"));
+            return Ok(());
+        }
+        configuration::Invocation::Version => {
+            println!("vizzi {}", env!("VIZZI_VERSION"));
+            return Ok(());
+        }
+        configuration::Invocation::Launch(options) => *options,
     };
     let policy = options.policy()?;
     let configuration::Options {

@@ -37,10 +37,16 @@ and launch examples without starting the server or creating cache data.
 | `--java-library JAR` | None | Repeatable local binary JAR for JDT LS. Paths must omit glob characters. A sibling `-sources.jar` supplies attached source when available. |
 | `--compile-commands FILE` | Root database or flags file | Captured compilation database; requires `--clangd`. |
 | `--help`, `-h` | — | Print usage and exit. |
+| `--version` | — | Print the build version and exit. |
 
 Relative root/cache overrides resolve against the process's current directory.
 Paths supplied by a config file resolve against its directory; source scopes still use
-the selected root. `--help` does not open the file.
+the selected root. `--help` and `--version` exit before opening the config file.
+
+`vizzi --version` prints `vizzi VERSION`. Release builds use the release tag without its
+leading `v`. Local builds use Git's description of the source revision and append
+`-dirty` when tracked files have changed. Builds without Git metadata use the Cargo
+package version.
 
 ## Source selection
 

@@ -72,6 +72,9 @@ jobs:
         run: codesign --force --sign - "target/$RELEASE_TARGET/release/vizzi"
       - name: Smoke-test the release executable
         run: |
+          version=$("target/$RELEASE_TARGET/release/vizzi" --version)
+          echo "$version"
+          test "$version" = "vizzi ${RELEASE_TAG#v}"
           "target/$RELEASE_TARGET/release/vizzi" --help
           "target/$RELEASE_TARGET/release/vizzi" --once --workers 1 --root docs/tutorials/first-call-trail-ruby --cache "$RUNNER_TEMP/release-smoke-cache"
       - name: Create archive and checksum
