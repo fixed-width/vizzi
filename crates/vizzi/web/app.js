@@ -4,7 +4,7 @@ import {workspaceLabel} from "/view-status.js";
 import {createMapModel} from "/map-scene.js";
 import {createDirectoryControls} from "/directory-controls.js";
 import {createMessage,textRow} from "/messages.js";
-import {installAppearance,mapPalette} from "/appearance.js";
+import {installAppearance,mapFileType,mapFileTypes,mapPalette} from "/appearance.js";
 import {coverageLabel,fileCount} from "/presentation.js";
 import {fitCamera,zoomCamera,jumpCamera} from "/camera.js";
 import {installSplitter} from "/splitter.js";
@@ -42,7 +42,49 @@ const dismissible=new Set(["navigation-notice","error","map-notice"]);
 const messages=Object.fromEntries([["status","workspace status"],["navigation-notice","navigation notice"],["coverage","source status"],["diagnostics","source diagnostics"],["error","workspace error"],["map-notice","map notice"]].map(([id,label])=>[id,dismissible.has(id)?createMessage(element(id),{label:`Dismiss ${label}`}):textRow(element(id))]));
 let palette=mapPalette(canvas);
 const directories=createDirectoryControls({tree:element("directory-tree"),breadcrumbs:element("map-breadcrumbs"),onOpen:openDirectory,onChange:()=>{refreshScene();saveMap();fit(true);}});
-function refreshScene(){scene=mapModel.project();directories.apply(mapModel);metrics.scene=scene;renderCounts();renderLandmarks();}
+function refreshScene() {
+  const projection = mapModel.project();
+  const files = projection.files.map(file => ({ ...file, type: mapFileType(file), marker: coverageMarker(file) }));
+  scene = { ...projection, files };
+  directories.apply(mapModel);
+  metrics.scene = scene;
+  renderCounts();
+  renderLandmarks();
+  renderMapLegend();
+}
+function coverageMarker(file) {
+  if (file.coverage === "partial") return "partial";
+  if (file.coverage === "deferred" || (file.coverage === "unavailable" && file.classification?.kind !== "source_only")) {
+    return "unavailable";
+  }
+  return null;
+}
+function fileDescription(file) {
+  const type = mapFileTypes[mapFileType(file)];
+  const coverage = coverageLabel(file.coverage, file.classification?.kind === "source_only");
+  return `${type} · ${coverage}`;
+}
+function renderMapLegend() {
+  const legend = element("map-legend");
+  const types = new Set(scene?.files.map(file => file.type));
+  const markers = new Set(scene?.files.map(file => file.marker));
+  const entries = Object.entries(mapFileTypes)
+    .filter(([type]) => types.has(type))
+    .map(([type, label]) => [label, palette.types[type]]);
+  if (markers.has("partial")) entries.push(["Syntax recovery", palette.partial, true]);
+  if (markers.has("unavailable")) entries.push(["Analysis deferred or unavailable", palette.unavailable, true]);
+  const key = JSON.stringify(entries);
+  if (legend.dataset.entries === key) return;
+  legend.dataset.entries = key;
+  legend.hidden = !entries.length;
+  legend.replaceChildren(...entries.map(([label, color, status]) => {
+    const item = document.createElement("li");
+    if (status) item.className = "map-status";
+    item.textContent = label;
+    item.style.setProperty("--swatch", color);
+    return item;
+  }));
+}
 function renderCounts(){
   if(!view)return;
   const page=view.browse;
@@ -52,7 +94,7 @@ function renderCounts(){
 }
 function saveMap(){try{const value=JSON.stringify(mapModel.preferences());if(new TextEncoder().encode(value).length>65536)throw new Error("layout size");localStorage.setItem(`vizzi.map.v1.${mapWorkspace}`,value);messages["map-notice"].show(null);}catch{messages["map-notice"].show("Map preferences could not be saved. The current layout is kept until reload.");}}
 element("reset-map").addEventListener("click",()=>{if(!mapModel)return;if(view.browse){openDirectory(".");return;}mapModel.reset();refreshScene();saveMap();fit(true);});
-installAppearance(element("theme"),{onChange:()=>{palette=mapPalette(canvas);invalidate();}});
+installAppearance(element("theme"),{onChange:()=>{palette=mapPalette(canvas);renderMapLegend();invalidate();}});
 const fetchJSON = async (uri, options) => {
   const start = performance.now();
   try { const response = await fetch(uri, options); if (!response.ok) throw new Error(await response.text()); return await response.json(); }
@@ -211,6 +253,7 @@ function renderFileList() {
   for (const file of view.files) {
     const button = document.createElement("button"); button.textContent = file.path;
     button.setAttribute("aria-current", String(file.id === view.selection.file));
+    button.setAttribute("aria-description", fileDescription(file));
     button.addEventListener("click", () => navigate({ file: file.id, entity: null })); list.append(button);
   }
 }
@@ -245,6 +288,31 @@ function drawDirectorySummary(group,x,y,width,height) {
     context.fillText(count,x+6,y+27,available);
   }
 }
+function drawFileTile(ctx, file, x, y, width, height) {
+  ctx.fillStyle = palette.types[file.type];
+  ctx.fillRect(x, y, width, height);
+  if (file.id === view.selection.file) {
+    const stroke = Math.min(3, width / 3, height / 3);
+    ctx.strokeStyle = palette.focus;
+    ctx.lineWidth = stroke;
+    ctx.strokeRect(x + stroke / 2, y + stroke / 2, width - stroke, height - stroke);
+  }
+  if (!file.marker) return;
+
+  ctx.fillStyle = palette[file.marker];
+  const corner = Math.min(10, Math.min(width, height) / 3);
+  if (corner < 4) {
+    const bandWidth = Math.min(8, width * 2 / 3), bandHeight = Math.min(2, height);
+    ctx.fillRect(x + width - bandWidth, y + height - bandHeight, bandWidth, bandHeight);
+    return;
+  }
+  const right = x + width - 3, bottom = y + height - 3;
+  ctx.beginPath();
+  ctx.moveTo(right, bottom - corner);
+  ctx.lineTo(right, bottom);
+  ctx.lineTo(right - corner, bottom);
+  ctx.fill();
+}
 function draw(timestamp) {
   scheduled = false; const start = performance.now();
   if (drag && previousFrame !== null) sample(metrics.interactionFrameMs, timestamp - previousFrame);
@@ -269,13 +337,12 @@ function draw(timestamp) {
       const rect = file.rect, x = camera.x + rect.x * camera.scale, y = camera.y + rect.y * camera.scale, w = rect.width * camera.scale, h = rect.height * camera.scale;
       if (x + w < 0 || y + h < 0 || x > width || y > height) continue;
       visibleFiles++;
-      const selected = file.id === view.selection.file;
-      context.fillStyle = selected ? palette.selected : file.coverage === "partial" ? palette.partial : ["unavailable", "deferred"].includes(file.coverage) ? palette.unavailable : palette.file;
-      context.fillRect(x, y, w, h);
+      drawFileTile(context, file, x, y, w, h);
       if (w > 32 && h > 18) {
         labels++;
-        context.save(); context.beginPath(); context.rect(x + 5, y, w - 10, h); context.clip();
-        context.fillStyle = selected ? palette.onSelected : palette.text; context.font = "10px 'DejaVu Sans Mono', monospace";
+        const rightPadding = file.marker && h < 32 ? 13 : 5;
+        context.save(); context.beginPath(); context.rect(x + 5, y, w - 5 - rightPadding, h); context.clip();
+        context.fillStyle = palette.text; context.font = "10px 'DejaVu Sans Mono', monospace";
         context.fillText(file.path.split("/").at(-1), x + 7, y + Math.min(h - 5, 17));
         context.restore();
       }
@@ -298,7 +365,10 @@ function drawOverview(dpr) {
   const scale=Math.min((width-12)/world.width,(height-12)/world.height);
   const x=(width-world.width*scale)/2,y=(height-world.height*scale)/2;overviewTransform={x,y,scale};
   for(const group of scene.groups){if(!group.summary)continue;const r=group.rect;overviewContext.fillStyle=palette.group;overviewContext.fillRect(x+r.x*scale,y+r.y*scale,Math.max(1,r.width*scale-1),Math.max(1,r.height*scale-1));}
-  for(const file of scene.files){const r=file.rect;overviewContext.fillStyle=file.id===view.selection.file?palette.selected:palette.file;overviewContext.fillRect(x+r.x*scale,y+r.y*scale,Math.max(1,r.width*scale),Math.max(1,r.height*scale));}
+  for (const file of scene.files) {
+    const r = file.rect;
+    drawFileTile(overviewContext, file, x + r.x * scale, y + r.y * scale, Math.max(1, r.width * scale), Math.max(1, r.height * scale));
+  }
   overviewContext.strokeStyle=palette.focus;overviewContext.lineWidth=1.5;
   overviewContext.strokeRect(x-camera.x/camera.scale*scale,y-camera.y/camera.scale*scale,canvas.clientWidth/camera.scale*scale,canvas.clientHeight/camera.scale*scale);
 }
@@ -329,7 +399,7 @@ canvas.addEventListener("pointermove", event => {
   if (drag) { if(!drag.group){fitMode=null;camera.x += p.x - drag.x; camera.y += p.y - drag.y;} drag.moved ||= Math.hypot(p.x - drag.startX, p.y - drag.startY) > 4; drag.x = p.x; drag.y = p.y; invalidate(); return; }
   const file = hit(p.x, p.y), tooltip = element("tooltip"); tooltip.hidden = !file;
   if (!file){const group=groupAt(p.x,p.y);if(group){tooltip.hidden=false;tooltip.textContent=`${group.path}\n${group.count.toLocaleString()} files · ${group.summary?"click to open":group.limited?"click header to focus":group.collapsed?"click header to expand":"click header to collapse"}`;tooltip.style.left=`${Math.min(p.x+12,canvas.clientWidth*.45)}px`;tooltip.style.top=`${Math.min(p.y+12,canvas.clientHeight-65)}px`;}}
-  if (file) { tooltip.textContent = `${file.path}\n${file.bytes.toLocaleString()} bytes · ${coverageLabel(file.coverage,file.classification.kind === "source_only")}`; tooltip.style.left = `${Math.min(p.x + 12, canvas.clientWidth * .45)}px`; tooltip.style.top = `${Math.max(0, Math.min(p.y + 12, canvas.clientHeight - 65))}px`; }
+  if (file) { tooltip.textContent = `${file.path}\n${file.bytes.toLocaleString()} bytes · ${fileDescription(file)}`; tooltip.style.left = `${Math.min(p.x + 12, canvas.clientWidth * .45)}px`; tooltip.style.top = `${Math.max(0, Math.min(p.y + 12, canvas.clientHeight - 65))}px`; }
 });
 canvas.addEventListener("pointerup",event=>{
   const p=point(event);

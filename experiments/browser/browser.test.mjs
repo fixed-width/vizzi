@@ -15,6 +15,146 @@ before(async () => {
 });
 after(async () => { await chromium?.close(); await host?.close(); await input?.close(); });
 
+test("map tiles retain their language fills through selection, recovery and theme changes", async () => {
+  const session = await openWorkspace(chromium, host);
+  const { page } = session;
+  const legend = page.locator("#map-legend");
+  const tileColors = () => page.evaluate(paths => {
+    const { scene, lastFrame: { camera } } = vizziMetrics;
+    const map = document.getElementById("map");
+    const overview = document.getElementById("map-overview");
+    const scale = Math.min((overview.clientWidth - 12) / scene.width, (overview.clientHeight - 12) / scene.height);
+    const left = (overview.clientWidth - scene.width * scale) / 2;
+    const top = (overview.clientHeight - scene.height * scale) / 2;
+    function pixel(canvas, x, y) {
+      const bytes = canvas.getContext("2d").getImageData(Math.floor(x), Math.floor(y), 1, 1).data;
+      return "#" + Array.from(bytes.slice(0, 3), byte => byte.toString(16).padStart(2, "0")).join("");
+    }
+    return Object.fromEntries(paths.map(path => {
+      const { rect } = scene.files.find(file => file.path === path);
+      const x = camera.x + rect.x * camera.scale, y = camera.y + rect.y * camera.scale;
+      const width = rect.width * camera.scale, height = rect.height * camera.scale;
+      return [path, {
+        fill: pixel(map, x + width * .5, y + height * .7),
+        outline: pixel(map, x + 1, y + height * .7),
+        corner: pixel(map, x + width - 5, y + height - 4),
+        overview: pixel(overview, left + (rect.x + rect.width * .5) * scale, top + (rect.y + rect.height * .5) * scale),
+      }];
+    }));
+  }, ["src/b.rs", "src/partial.rs", "src/encoding.rs", "src/z.py", "include/example.c++", "include/assigned/defs.h", "include/shared.h"]);
+  const swatch = label => legend.getByText(label, { exact: true }).evaluate(item => item.style.getPropertyValue("--swatch"));
+  try {
+    await page.emulateMedia({ colorScheme: "light" });
+    await page.getByText("Accessible file list", { exact: true }).click();
+    const partial = page.getByRole("button", { name: "src/partial.rs", exact: true });
+    await partial.click();
+    await page.waitForFunction(() => document.getElementById("file-title").textContent === "src/partial.rs");
+    assert.equal(await partial.getAttribute("aria-description"), "Rust · Syntax with recovery");
+    await page.getByRole("button", { name: "Fit map", exact: true }).click();
+    await paint(page);
+    const light = await tileColors();
+    assert.equal(light["src/b.rs"].fill, await swatch("Rust"));
+    assert.equal(light["src/partial.rs"].fill, light["src/b.rs"].fill);
+    assert.notEqual(light["src/partial.rs"].outline, light["src/partial.rs"].fill);
+    assert.equal(light["src/partial.rs"].corner, await swatch("Syntax recovery"));
+    assert.equal(light["src/encoding.rs"].fill, light["src/b.rs"].fill);
+    assert.equal(light["src/encoding.rs"].corner, await swatch("Analysis deferred or unavailable"));
+    assert.equal(light["src/z.py"].fill, await swatch("Python"));
+    assert.notEqual(light["src/z.py"].fill, light["src/b.rs"].fill);
+    assert.equal(light["include/assigned/defs.h"].fill, await swatch("C++"));
+    assert.equal(light["include/example.c++"].fill, light["include/assigned/defs.h"].fill);
+    assert.equal(light["include/shared.h"].fill, await swatch("Other files"));
+    for (const tile of Object.values(light)) assert.equal(tile.overview, tile.fill);
+    await page.emulateMedia({ colorScheme: "dark" });
+    await paint(page);
+    const dark = await tileColors();
+    assert.equal(dark["src/b.rs"].fill, await swatch("Rust"));
+    assert.notEqual(dark["src/b.rs"].fill, light["src/b.rs"].fill);
+    for (const tile of Object.values(dark)) assert.equal(tile.overview, tile.fill);
+    await page.getByRole("searchbox", { name: "Find a file" }).fill("src/z.py");
+    await page.waitForFunction(() => document.getElementById("map-legend").textContent === "Python");
+    await page.getByRole("searchbox", { name: "Find a file" }).fill("no-matching-path");
+    await legend.waitFor({ state: "hidden" });
+    assert.deepEqual(session.errors, []);
+  } finally { await session.close(); }
+});
+
+test("a fitted dense map shows analysis on tiles under twelve pixels", async () => {
+  const files = Object.fromEntries(Array.from({ length: 1024 }, (_, index) => [
+    `normal-${String(index).padStart(4, "0")}.rs`, "",
+  ]));
+  const fixture = await workspace({ files: {
+    ...files,
+    "a-recovery.rs": "fn broken( {",
+    "unavailable.rs": Buffer.from([255]),
+  } });
+  let localHost, session;
+  try {
+    localHost = await startHost(fixture);
+    session = await openWorkspace(chromium, localHost, { width: 980, height: 720 });
+    const { page } = session;
+    assert.equal(await page.locator("#file-title").textContent(), "a-recovery.rs");
+    await page.getByRole("button", { name: "Fit map", exact: true }).click();
+    await paint(page);
+    const tiles = await page.evaluate(() => {
+      const { scene, lastFrame: { camera } } = vizziMetrics;
+      const ctx = document.getElementById("map").getContext("2d");
+      return Object.fromEntries([
+        ["normal-0001.rs", "Rust"],
+        ["a-recovery.rs", "Syntax recovery"],
+        ["unavailable.rs", "Analysis deferred or unavailable"],
+      ].map(([path, label]) => {
+        const { rect } = scene.files.find(file => file.path === path);
+        const x = camera.x + rect.x * camera.scale, y = camera.y + rect.y * camera.scale;
+        const width = rect.width * camera.scale, height = rect.height * camera.scale;
+        const swatch = [...document.querySelectorAll("#map-legend li")].find(item => item.textContent === label);
+        const color = parseInt(swatch.style.getPropertyValue("--swatch").slice(1), 16);
+        const left = Math.ceil(x), top = Math.ceil(y);
+        const pixels = ctx.getImageData(left, top, Math.floor(x + width) - left, Math.floor(y + height) - top).data;
+        let containsSwatch = false;
+        for (let i = 0; i < pixels.length; i += 4) {
+          if (pixels[i] * 65536 + pixels[i + 1] * 256 + pixels[i + 2] === color && pixels[i + 3] === 255) {
+            containsSwatch = true;
+            break;
+          }
+        }
+        return [path, { containsSwatch, shortestSide: Math.min(width, height) }];
+      }));
+    });
+    for (const [path, tile] of Object.entries(tiles)) {
+      assert.ok(tile.shortestSide < 12, `${path} should be under twelve pixels in the fitted view`);
+      assert.ok(tile.containsSwatch, `${path} should show the color from its legend swatch`);
+    }
+  } finally {
+    await session?.close();
+    await localHost?.close();
+    await fixture.close();
+  }
+});
+
+test("forced colors preserves the map swatches and adapts legend text", async () => {
+  const session = await openWorkspace(chromium, host);
+  const { page } = session;
+  try {
+    await page.emulateMedia({ forcedColors: "active" });
+    await paint(page);
+    const legend = page.locator("#map-legend");
+    for (const label of ["Rust", "Syntax recovery", "Analysis deferred or unavailable"]) {
+      const colors = await legend.getByText(label, { exact: true }).evaluate(item => {
+        const hex = item.style.getPropertyValue("--swatch");
+        const expected = hex.slice(1).match(/../g).map(byte => parseInt(byte, 16));
+        return {
+          expected: `rgb(${expected.join(", ")})`,
+          swatch: getComputedStyle(item, "::before").backgroundColor,
+          textAdjustment: getComputedStyle(item).forcedColorAdjust,
+        };
+      });
+      assert.equal(colors.swatch, colors.expected, label);
+      assert.equal(colors.textAdjustment, "auto", label);
+    }
+  } finally { await session.close(); }
+});
+
 test("a large repository exposes every directory, file page and local landmark", async () => {
   const files = Object.fromEntries(Array.from({ length: 2001 }, (_, index) => [
     `bulk/file-${String(index).padStart(4, "0")}.rs`, "",
@@ -41,6 +181,7 @@ test("a large repository exposes every directory, file page and local landmark",
     await page.keyboard.press("Enter");
     await page.getByRole("button", { name: "z-late", exact: true }).waitFor();
     await paint(page);
+    assert.deepEqual(await page.locator("#map-legend li").allTextContents(), ["Rust", "Documentation", "TOML", "Project metadata"]);
     assert.equal(await page.locator("#map-breadcrumbs button[aria-current=location]").evaluate(button => button === document.activeElement), true);
     assert.equal(await page.locator("#file-title").textContent(), "README.md");
     await page.locator("#map-landmarks").getByRole("button", { name: "Cargo.toml" }).click();
@@ -178,7 +319,7 @@ test("source-only headers expose reasons, encoding, and pinned metadata without 
     const camera = await page.evaluate(() => window.vizziMetrics.lastFrame.camera);
     await page.mouse.move(bounds.x + camera.x + (tile.rect.x + tile.rect.width / 2) * camera.scale, bounds.y + camera.y + (tile.rect.y + tile.rect.height / 2) * camera.scale);
     await page.waitForFunction(() => !document.getElementById("tooltip").hidden);
-    assert.ok((await page.locator("#tooltip").textContent()).toLowerCase().includes("source only"));
+    assert.match(await page.locator("#tooltip").textContent(), /Other files · Source only/);
     const pinned = `${host.url}/api/source?snapshot=${view.snapshot}&file=${view.selection.file}`;
     const snapshot = await page.locator("#snapshot").getAttribute("title");
     await writeFile(join(input.root, "include/shared.h"), "struct Updated;");

@@ -12,6 +12,8 @@ the Command Palette. Unsaved buffers are never saved automatically; save the fil
 ## Select a file and read its structure
 
 Select a file in the repository map. Its source and declaration outline open together.
+The legend below the map identifies file colors. An outline marks the selected file,
+and corner marks show syntax recovery and deferred or unavailable analysis.
 Selecting a declaration reveals its lines; kind badges distinguish types, functions and
 other declarations. **Line N** is the declaration's starting line.
 
