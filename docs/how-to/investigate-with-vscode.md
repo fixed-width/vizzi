@@ -24,6 +24,11 @@ Choose **Save** on a repository source bubble, or **Save location** in the Sourc
 Then choose **Saved locations** in the shared header. Open **Inspect location** on a
 saved card to read its captured excerpt or edit your interpretation and choose **Save note**.
 
+Choose **Open in Source browser** or **Open in Call workspace** on a saved card to
+return to the view where you saved it. Vizzi reveals the saved line in the Source
+browser or the bubble in the active Call workspace task. If the source
+has changed, the saved card still has its captured excerpt and notes.
+
 To find another location, choose **Explore repository** within this view. Select a source
 area or use **Find a name or file**, inspect a result and choose **Save location**.
 This lookup matches names and paths, not full source text. **Locations → Add a location**

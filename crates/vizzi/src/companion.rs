@@ -71,6 +71,9 @@ pub struct PinEvidence {
     pub line: usize,
     /// Reader-assigned title.
     pub title: String,
+    /// View from which the reader saved the location.
+    #[serde(default)]
+    pub origin: Option<EvidenceOrigin>,
 }
 /// Current captured location for an editor handoff, independent of saved evidence.
 #[derive(Deserialize)]
@@ -261,8 +264,10 @@ impl Companion {
         }
         let mut next = current.clone();
         let result = change(&mut next)?;
-        self.save(&next)?;
-        *current = next;
+        if next.data().revision != revision {
+            self.save(&next)?;
+            *current = next;
+        }
         Ok(result)
     }
     /// Returns saved interpretation and separate current-source freshness.
@@ -390,7 +395,21 @@ impl Companion {
             excerpt,
             truncated,
         };
-        self.update(request.revision, |b| Ok(b.add(request.title, source)?))
+        self.update(request.revision, |board| {
+            if let Some(origin @ EvidenceOrigin::CallWorkspace { .. }) = request.origin.as_ref()
+                && let Some(existing) = board.data().evidence.iter().find(|evidence| {
+                    (
+                        &evidence.source.file,
+                        &evidence.source.version,
+                        evidence.source.line,
+                        evidence.origin.as_ref(),
+                    ) == (&source.file, &source.version, source.line, Some(origin))
+                })
+            {
+                return Ok(existing.id);
+            }
+            Ok(board.add_from(request.title, source, request.origin)?)
+        })
     }
     /// Applies a reader edit without acquiring source or changing anchors.
     pub fn edit(&self, edit: EditInvestigation) -> Result<(), CompanionError> {
@@ -417,24 +436,54 @@ impl Companion {
     }
     /// Verifies current captured and working bytes before requesting a local editor location.
     pub fn open(&self, id: u32) -> Result<(), CompanionError> {
-        let evidence = lock(&self.board)
+        let evidence = self.saved_evidence(id)?;
+        let snapshot = self.snapshot()?;
+        let doc = Self::saved_document(&snapshot, &evidence.source)?;
+        self.open_working(doc, evidence.source.line)
+    }
+    pub(crate) fn return_target(
+        &self,
+        id: u32,
+    ) -> Result<(EvidenceOrigin, OpenSource), CompanionError> {
+        let evidence = self.saved_evidence(id)?;
+        let origin = evidence
+            .origin
+            .ok_or_else(|| CompanionError::Invalid("This location has no saved view".into()))?;
+        let snapshot = self.snapshot()?;
+        let doc = Self::saved_document(&snapshot, &evidence.source)?;
+        Ok((
+            origin,
+            OpenSource {
+                snapshot: snapshot.id().as_str().into(),
+                file: doc.id().as_str().into(),
+                version: doc.version().as_str().into(),
+                line: evidence.source.line,
+            },
+        ))
+    }
+    fn saved_evidence(&self, id: u32) -> Result<Evidence, CompanionError> {
+        lock(&self.board)
             .evidence(id)
             .cloned()
-            .ok_or_else(|| CompanionError::Invalid("Evidence is absent".into()))?;
-        let snapshot = self.snapshot()?;
-        let doc = snapshot
-            .file(evidence.source.file.as_str())
-            .ok_or_else(|| {
-                CompanionError::Conflict("Saved source is absent from the current index".into())
-            })?;
-        if evidence.source.line > doc.captured().line_count()
-            || doc.content() != &evidence.source.content
-            || doc.path() != evidence.source.path
-            || snapshot.workspace() != &evidence.source.workspace
+            .ok_or_else(|| CompanionError::Invalid("Evidence is absent".into()))
+    }
+    fn saved_document<'a>(
+        snapshot: &'a Snapshot,
+        source: &SourceEvidence,
+    ) -> Result<&'a Document, CompanionError> {
+        let doc = snapshot.file(source.file.as_str()).ok_or_else(|| {
+            CompanionError::Conflict("Saved source is absent from the current index".into())
+        })?;
+        if source.line > doc.captured().line_count()
+            || doc.content() != &source.content
+            || doc.path() != source.path
+            || snapshot.workspace() != &source.workspace
         {
-            return Err(CompanionError::Conflict("Saved source has changed. Keep the captured excerpt or add fresh evidence; the editor location was not opened.".into()));
+            return Err(CompanionError::Conflict(
+                "Saved source has changed. The captured excerpt is still available.".into(),
+            ));
         }
-        self.open_working(doc, evidence.source.line)
+        Ok(doc)
     }
     /// Opens an exactly current source location without reading or changing the investigation.
     pub fn open_source(&self, request: &OpenSource) -> Result<(), CompanionError> {

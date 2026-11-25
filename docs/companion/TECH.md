@@ -37,6 +37,16 @@ Lookup/pin uses exact snapshot/file/version validation. Source freshness is a pr
 it does not mutate saved anchors. The application optionally stores a validated JSON
 file atomically outside the source root, keeping it separate from analysis cache data.
 Use revision checks to refuse obsolete board edits rather than losing another edit.
+The Call workspace reads the current board before saving. Under the same revision
+check as other edits, the host reuses a matching card with the same declaration, file,
+version and line. It creates a new card if the previous one was removed.
+
+An optional card origin identifies the Source browser or a Call workspace declaration.
+The call origin stores a declaration tracking identity that survives unrelated index
+updates. The return endpoint checks the saved file and content in the current index
+and builds a link to the originating view. That view verifies the observation before
+revealing the line or resolving the declaration and revealing its bubble. Records
+without an origin load as before.
 
 The source host verifies a captured location against the current document and a no-follow
 working-file read. Direct fragment and saved-evidence handoffs share that verification;

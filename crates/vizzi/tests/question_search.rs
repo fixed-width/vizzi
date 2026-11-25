@@ -134,7 +134,8 @@ fn changed_capture_invalidates_results_and_current_only_pins() {
             file: hit.file.clone(),
             version: hit.version.clone(),
             line: hit.line,
-            title: hit.title.clone()
+            title: hit.title.clone(),
+            origin: None,
         })
         .is_err()
     );

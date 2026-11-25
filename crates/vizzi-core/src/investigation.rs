@@ -1,5 +1,5 @@
 //! Bounded reader-authored investigations over immutable source anchors.
-use crate::model::{ContentId, DocumentVersion, FileId, SnapshotId, WorkspaceId};
+use crate::model::{ContentId, DocumentVersion, EntityId, FileId, SnapshotId, WorkspaceId};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;
 /// Maximum source cards in one investigation.
@@ -35,6 +35,18 @@ pub struct SourceEvidence {
     /// Additional source exists beyond the stored excerpt.
     pub truncated: bool,
 }
+/// The view from which a reader saved a location.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "view", rename_all = "snake_case", deny_unknown_fields)]
+pub enum EvidenceOrigin {
+    /// A line viewed in the source browser.
+    SourceBrowser,
+    /// A source bubble viewed in the call workspace.
+    CallWorkspace {
+        /// Declaration identity independent of unrelated observations.
+        declaration: EntityId,
+    },
+}
 /// A source card with reader-supplied interpretation.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -47,6 +59,9 @@ pub struct Evidence {
     pub note: String,
     /// Immutable source anchor and excerpt.
     pub source: SourceEvidence,
+    /// View that supplied the location, when recorded.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub origin: Option<EvidenceOrigin>,
 }
 /// A reader assertion, never an inferred dependency or call.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -102,6 +117,19 @@ fn relative(path: &str) -> bool {
         && path.len() <= 4096
         && !path.contains(['\\', '\0'])
         && path.split('/').all(|p| !matches!(p, "" | "." | ".."))
+}
+fn validate_origin(origin: Option<&EvidenceOrigin>) -> Result<(), InvestigationError> {
+    if let Some(EvidenceOrigin::CallWorkspace { declaration }) = origin {
+        let id = declaration.as_str();
+        require(
+            id.len() == 64
+                && id
+                    .bytes()
+                    .all(|byte| matches!(byte, b'0'..=b'9' | b'a'..=b'f')),
+            "Invalid saved declaration identity",
+        )?;
+    }
+    Ok(())
 }
 impl Investigation {
     /// Starts an empty question workspace without source owners or platform state.
@@ -165,11 +193,21 @@ impl Investigation {
         value: String,
         source: SourceEvidence,
     ) -> Result<u32, InvestigationError> {
+        self.add_from(value, source, None)
+    }
+    /// Adds a verified source copy and its originating view when known.
+    pub fn add_from(
+        &mut self,
+        value: String,
+        source: SourceEvidence,
+        origin: Option<EvidenceOrigin>,
+    ) -> Result<u32, InvestigationError> {
         require(
             self.data.evidence.len() < EVIDENCE_LIMIT && title(&value),
             "Evidence limit reached or invalid title",
         )?;
         self.validate_source(&source)?;
+        validate_origin(origin.as_ref())?;
         let id = self.data.next_id;
         let next = id
             .checked_add(1)
@@ -180,6 +218,7 @@ impl Investigation {
                 title: value,
                 note: String::new(),
                 source,
+                origin,
             });
             data.next_id = next;
         })?;
@@ -277,6 +316,7 @@ impl Investigation {
                 "Invalid evidence identity or text",
             )?;
             board.validate_source(&e.source)?;
+            validate_origin(e.origin.as_ref())?;
         }
         let mut links = BTreeSet::new();
         for c in &d.connections {

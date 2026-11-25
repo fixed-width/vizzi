@@ -38,6 +38,14 @@ export function deliveryAction(value) {
     file: value.file,
     symbol: value.symbol
   };
+  if (value.kind === 'bubble' && fields(value, ['kind', 'snapshot', 'file', 'version', 'line', 'declaration']) && [value.snapshot, value.file, value.version, value.declaration].every(captured) && Number.isSafeInteger(value.line) && value.line >= 1) return {
+    kind: 'bubble',
+    snapshot: value.snapshot,
+    file: value.file,
+    version: value.version,
+    line: value.line,
+    declaration: value.declaration
+  };
   if (value.kind === 'file' && fields(value, ['kind', 'snapshot', 'file', 'version', 'line']) && [value.snapshot, value.file, value.version].every(captured) && Number.isSafeInteger(value.line) && value.line >= 1) return {
     kind: 'file',
     snapshot: value.snapshot,
@@ -439,7 +447,7 @@ export function createDeliveryPage({
       current = record;
       record.timer = schedule(() => refuse(record, new Error('Could not confirm workspace navigation before its deadline')), record.expires - now());
       changed(true);
-      const target = action.kind === 'reveal' ? mode === 'landing' ? 'file' : mode : action.kind === 'function' ? 'call' : action.kind;
+      const target = action.kind === 'reveal' ? mode === 'landing' ? 'file' : mode : ['function', 'bubble'].includes(action.kind) ? 'call' : action.kind;
       if (target !== mode) {
         record.routing = true;
         record.transition = record.id;

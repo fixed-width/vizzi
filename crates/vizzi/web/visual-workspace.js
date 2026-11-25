@@ -159,26 +159,44 @@ const prepareCall=createCallPreparation({read:()=>model,
   else {focus([caller]);showDestinations(caller,choice);}
   save();
  }});
-async function prepareFunction(action,{signal}){
+async function prepareBubble(action,{signal}){
  const workspace=model;
+ const saved=action.kind==='bubble';
  const verify=()=>{
   signal.throwIfAborted();
-  if(model!==workspace||model.stale||model.snapshot!==action.snapshot)throw new Error('Source changed since the function was selected. Select it again.');
+  if(model!==workspace||model.stale||model.snapshot!==action.snapshot)throw new Error('Source changed before opening this bubble. Select the location again.');
  };
  verify();
- const {snapshot,symbol}=await post('/api/structure',{snapshot:action.snapshot,query:{kind:'function',file:action.file,symbol:action.symbol}},signal);
- if(snapshot!==action.snapshot||symbol?.id!==action.symbol||symbol.kind!=='function'||symbol.source?.file!==action.file)throw new Error('The selected function differs from current captured source');
+ const query=saved?
+  {kind:'saved_declaration',file:action.file,version:action.version,line:action.line,declaration:action.declaration}:
+  {kind:'function',file:action.file,symbol:action.symbol};
+ const {snapshot,symbol}=await post('/api/structure',{snapshot:action.snapshot,query},signal);
+ const matches=saved?
+  symbol?.tracking===action.declaration&&symbol.source?.version===action.version&&symbol.source.line===action.line:
+  symbol?.id===action.symbol&&symbol.kind==='function';
+ if(snapshot!==action.snapshot||!matches||symbol.source?.file!==action.file)throw new Error('The selected declaration differs from current captured source');
  verify();
- const reading=workspace.views.find(view=>view.symbol.id===symbol.id)?.reading??{section:symbol.source.line};
+ const savedView=()=>saved ? workspace.views.find(view=>
+  view.state==='current'&&!frozenSource(view)&&!view.symbol.origin&&
+  view.symbol.tracking===action.declaration&&view.symbol.source.file===action.file&&
+  view.symbol.source.version===action.version&&view.symbol.source.line===action.line) : undefined;
+ const existing=savedView()??workspace.views.find(view=>view.symbol.id===symbol.id);
+ const reading=existing?.reading??{section:symbol.source.line};
  const prepared=await prepareFragmentSource(symbol,reading,signal,action.snapshot);
  verify();
- return {commit(){verify();openFunction(symbol,prepared);}};
+ return {commit(){
+  verify();
+  const target=savedView();
+  if(!target){openFunction(symbol,prepared);return;}
+  const source=workspace.usable(target.id)?prepared:{...prepared,actions:[]};
+  revealBubble(target.id,source);
+ }};
 }
 const editorCalls=installWorkspaceDelivery({mode:'call',
  ready:action=>Boolean(size().w>=1&&size().h>=1&&(action.kind==='reveal'||model&&!model.stale)),
  async prepare(action,context){
   if(action.kind==='reveal')return {commit(){}};
-  return action.kind==='function'?prepareFunction(action,context):prepareCall(action,context);
+  return action.kind==='call'?prepareCall(action,context):prepareBubble(action,context);
  },failed:fail,
  changed:pending=>{if(pending){closeRevisionPicker();closeLineagePicker();closeCrossFilePicker();callMenu.hide();hideDestinations();window.getSelection()?.removeAllRanges();for(const r of mounted.values()){r.navigation=(r.navigation??0)+1;r.historyTicket=(r.historyTicket??0)+1;r.historyController?.abort();if(r.historyLoading)r.comparing=r.historyLoading=r.loading=false;r.resolving=false;updateFragmentStatus(r);}geometry();live.resume();}}
 });
@@ -671,7 +689,7 @@ function links(){
 }
 function geometry(){
  if(!model)return;for(const[id,r]of mounted)if(!model.views.some(v=>v.id===id)){r.controller.abort();r.historyController?.abort();r.sourcePane.dispose();r.element.remove();mounted.delete(id);}const c=model.camera;el('workspace-world').style.transform=`translate(${-c.x*c.scale}px,${-c.y*c.scale}px) scale(${c.scale})`;el('visual-zoom').textContent=Math.round(c.scale*100)+'%';el('visual-empty').hidden=model.items().length>0;el('visual-stale').hidden=!model.views.some(v=>v.state==='unresolved'&&!mounted.get(v.id)?.liveReturn);
- for(const v of model.views){const r=mounted.get(v.id);if(!r)continue;r.element.hidden=!model.isVisible(v.id);Object.assign(r.element.style,{left:v.x+'px',top:v.y+'px',width:v.w+'px',height:(v.collapsed?54:v.h)+'px'});const membership=modulePresentation(v,model.views);r.element.classList.toggle('has-module',Boolean(membership));const moduleKey=JSON.stringify(membership);if(moduleKey!==r.moduleKey){r.moduleKey=moduleKey;r.moduleTag.hidden=!membership;if(membership){r.element.dataset.moduleId=membership.id;r.moduleTag.dataset.moduleId=membership.id;r.moduleTag.textContent=membership.label;r.moduleTag.title=membership.title;r.element.style.setProperty('--module-accent',`var(--module-${membership.colour})`);r.element.style.setProperty('--module-tint',`var(--module-tint-${membership.colour})`);}else{delete r.element.dataset.moduleId;delete r.moduleTag.dataset.moduleId;r.moduleTag.textContent='';r.element.style.removeProperty('--module-accent');r.element.style.removeProperty('--module-tint');}}r.body.hidden=v.collapsed;r.collapse.textContent=v.collapsed?'▾':'▴';r.collapse.setAttribute('aria-label',v.collapsed?'Expand bubble':'Collapse bubble');r.element.classList.toggle('is-selected',v.id===model.selected);r.element.classList.toggle('is-stale',!model.usable(v.id));r.prev.disabled=r.next.disabled=Boolean(r.historyLoading);r.callsButton.disabled=!model.navigable(v.id)||r.historyLoading;r.referenceActions.disabled=r.historyLoading||(!model.usable(v.id)&&!(!r.loading&&!returnPending(r)&&(canFindEarlier(v)||v.comparison&&canChooseRevision(v))));r.fitHeight.disabled=r.fitWidth.disabled=r.loading||!r.lines?.length||v.collapsed;inlineAvailability(r.code,v.id);r.keep.disabled=Boolean(v.symbol.origin)||!model.usable(v.id)||r.historyLoading||!board||busy;r.keep.title=v.symbol.origin?'Dependency locations stay in this workspace.':'Save location';r.editor.disabled=Boolean(v.symbol.origin?.archive&&(!editorJavaArchives||!v.symbol.origin.editor_archive))||!model.usable(v.id)||r.historyLoading||busy;historyControls(r,v);comparisonControls(r,v);updateFragmentStatus(r);restoreVisibleReading(r,v);}
+ for(const v of model.views){const r=mounted.get(v.id);if(!r)continue;r.element.hidden=!model.isVisible(v.id);Object.assign(r.element.style,{left:v.x+'px',top:v.y+'px',width:v.w+'px',height:(v.collapsed?54:v.h)+'px'});const membership=modulePresentation(v,model.views);r.element.classList.toggle('has-module',Boolean(membership));const moduleKey=JSON.stringify(membership);if(moduleKey!==r.moduleKey){r.moduleKey=moduleKey;r.moduleTag.hidden=!membership;if(membership){r.element.dataset.moduleId=membership.id;r.moduleTag.dataset.moduleId=membership.id;r.moduleTag.textContent=membership.label;r.moduleTag.title=membership.title;r.element.style.setProperty('--module-accent',`var(--module-${membership.colour})`);r.element.style.setProperty('--module-tint',`var(--module-tint-${membership.colour})`);}else{delete r.element.dataset.moduleId;delete r.moduleTag.dataset.moduleId;r.moduleTag.textContent='';r.element.style.removeProperty('--module-accent');r.element.style.removeProperty('--module-tint');}}r.body.hidden=v.collapsed;r.collapse.textContent=v.collapsed?'▾':'▴';r.collapse.setAttribute('aria-label',v.collapsed?'Expand bubble':'Collapse bubble');r.element.classList.toggle('is-selected',v.id===model.selected);r.element.classList.toggle('is-stale',!model.usable(v.id));r.prev.disabled=r.next.disabled=Boolean(r.historyLoading);r.callsButton.disabled=!model.navigable(v.id)||r.historyLoading;r.referenceActions.disabled=r.historyLoading||(!model.usable(v.id)&&!(!r.loading&&!returnPending(r)&&(canFindEarlier(v)||v.comparison&&canChooseRevision(v))));r.fitHeight.disabled=r.fitWidth.disabled=r.loading||!r.lines?.length||v.collapsed;inlineAvailability(r.code,v.id);r.keep.disabled=Boolean(v.symbol.origin)||!v.symbol.tracking||!model.usable(v.id)||r.historyLoading||!board||busy;r.keep.title=v.symbol.origin?'Dependency locations stay in this workspace.':'Save location';r.editor.disabled=Boolean(v.symbol.origin?.archive&&(!editorJavaArchives||!v.symbol.origin.editor_archive))||!model.usable(v.id)||r.historyLoading||busy;historyControls(r,v);comparisonControls(r,v);updateFragmentStatus(r);restoreVisibleReading(r,v);}
  if(model.stale)callMenu.hide();links();overview();outlines.refresh();highlights.refresh();taskGroups.refresh();referenceStacks.refresh();
 }
 function button(text,label,handler){const b=node('button',text);b.type='button';if(label)b.setAttribute('aria-label',label);b.onclick=()=>{try{handler();}catch(e){fail(e);}};return b;}
@@ -707,8 +725,7 @@ function mount(id,prepared){
  historyRow.append(historyPrevious,editPrevious,historyLabel,historyNext,editNext,compareButton,chooseRevision);const section=node('div');section.className='source-section';const sectionLabel=node('span','Loading captured source…');const prev=button('Previous section',null,()=>jumpSource(id,true)),next=button('Next section',null,()=>jumpSource(id,false));prev.hidden=true;next.hidden=true;section.append(sectionLabel,prev,next);
  const code=node('div');code.className='code-pane';code.tabIndex=0;code.setAttribute('aria-label',`${v.symbol.name} captured code`);code.append(node('p','Loading source…'));const footer=node('div');footer.className='fragment-footer';const callsButton=button('Calls','Calls',()=>toggleCalls(id)),state=node('span','Captured source');state.setAttribute('role','status');const keep=button('Save','Save location',()=>void keepLocation(id)),editor=button('Editor',`Open in ${editorName}`,()=>void openEditor(id));editor.disabled=true;footer.append(callsButton,state,pin,keep,editor);
  const popup=node('div');popup.className='calls-popover';popup.hidden=true;body.append(historyRow,section,code,popup,footer);const resize=button('','Resize bubble',()=>{});resize.title='Drag or use arrow keys to resize';resize.className='resize-handle';body.append(resize);bindDrag(resize,id,true);bindLayoutKeys(resize,id,true);element.append(body);el('fragment-layer').append(element);
- const kept=board?.evidence.find(e=>e.source.file===v.symbol.source.file&&e.source.version===v.symbol.source.version&&e.source.line===v.symbol.source.line)?.id??null;
- const record={id,compareButton,editPrevious,editNext,historyRow,historyPrevious,historyNext,historyLabel,chooseRevision,referenceActions,moduleTag,pin,fitHeight,fitWidth,loading:true,liveReturn:(v.captured??v.comparison??v.history)?.returning?'waiting':null,element,body,code,collapse,sectionLabel,prev,next,callsButton,popup,state,keep,editor,sites:[],nextCalls:0,matching:0,callsReady:false,controller:new AbortController(),kept};setSections(record,[]);record.sourcePane=new SourcePane(code,(text,line,plan,margin)=>{renderCallText(text,line,record.actionsByLine.get(line.number)??[],(action,button,direct,keyboard)=>inlineAction(id,action,button,direct,keyboard),plan,margin);inlineAvailability(text,id);});record.sourcePane.setReflow(smartReflow);mounted.set(id,record);
+ const record={id,compareButton,editPrevious,editNext,historyRow,historyPrevious,historyNext,historyLabel,chooseRevision,referenceActions,moduleTag,pin,fitHeight,fitWidth,loading:true,liveReturn:(v.captured??v.comparison??v.history)?.returning?'waiting':null,element,body,code,collapse,sectionLabel,prev,next,callsButton,popup,state,keep,editor,sites:[],nextCalls:0,matching:0,callsReady:false,controller:new AbortController()};setSections(record,[]);record.sourcePane=new SourcePane(code,(text,line,plan,margin)=>{renderCallText(text,line,record.actionsByLine.get(line.number)??[],(action,button,direct,keyboard)=>inlineAction(id,action,button,direct,keyboard),plan,margin);inlineAvailability(text,id);});record.sourcePane.setReflow(smartReflow);mounted.set(id,record);
  element.addEventListener('pointerdown',()=>{model.selected=id;geometry();});code.addEventListener('scroll',()=>{
   callMenu.hide();if(mounted.get(id)!==record||!code.clientHeight)return;
   const before=code.scrollTop<record.scrollTop,moved=code.scrollTop!==record.scrollTop;
@@ -941,8 +958,23 @@ function showDestinations(id,{site,note,semantic,captured}) {
 }
 function follow(parent,site,target){editorCalls.manual();try{const id=model.follow(parent,site,target);hideDestinations();const record=mounted.get(id);mount(id);if(target.origin&&record&&(record.element.classList.contains('is-stale')||!record.lines?.length)){void loadSource(id,model.view(id).reading.section);record.callsReady=false;void loadCalls(id,0);}focus([parent,id]);save();}catch(e){fail(e);}}
 async function keepLocation(id){
- const r=mounted.get(id),v=model.view(id);if(!r||!board||busy||!model.usable(id))return null;const existing=board.evidence.find(e=>e.source.file===v.symbol.source.file&&e.source.version===v.symbol.source.version&&e.source.line===v.symbol.source.line);if(existing){r.kept=existing.id;geometry();return existing.id;}
- busy=true;geometry();try{const s=v.symbol.source,result=await post('/api/search/evidence',{revision:board.revision,snapshot:model.snapshot,file:s.file,version:s.version,line:s.line,title:v.symbol.name});board=result.view.board;r.kept=result.id;notice.show('Location saved.');return r.kept;}catch(e){fail(e);return null;}finally{busy=false;geometry();live.resume();}
+ if(!mounted.has(id)||!board||busy||!model.usable(id))return;
+ const {snapshot,symbol}=model.view(id),{file,version,line}=symbol.source;
+ if(symbol.origin||!symbol.tracking)return;
+ busy=true;geometry();
+ try{
+  board=(await transport('/api/investigation')).board;
+  const result=await post('/api/search/evidence',{
+   revision:board.revision,snapshot,file,version,line,title:symbol.name,
+   origin:{view:'call_workspace',declaration:symbol.tracking},
+  });
+  board=result.view.board;notice.show('Location saved.');
+ }catch(error){
+  fail(error);
+  if(error.status===409){
+   try{board=(await transport('/api/investigation')).board;}catch(refreshError){fail(refreshError);}
+  }
+ }finally{busy=false;geometry();live.resume();}
 }
 async function openEditor(id){const r=mounted.get(id);if(!r||busy||!model.usable(id))return;const s=model.view(id).symbol.source;busy=true;geometry();try{await post(model.view(id).symbol.origin?'/api/dependency/editor':'/api/editor/open',{snapshot:model.view(id).symbol.origin?.capture??model.snapshot,file:s.file,version:s.version,line:s.line});}catch(e){fail(e);}finally{busy=false;geometry();live.resume();}}
 function openReferences(id,query){editorCalls.manual();try{if(!model.usable(id))throw new Error('Open a current function before finding references.');const stack=model.addReferences(model.view(id).symbol,query,id);geometry();focus([id,stack]);save();}catch(e){fail(e);}}
@@ -975,6 +1007,10 @@ function resetFragmentResults(){
 }
 function openFunction(symbol,prepared){
  const path=symbol.source.path,id=model.openRoot(symbol,path.split('/').slice(0,-1).join('/')||path);
+ revealBubble(id,prepared);
+}
+function revealBubble(id,prepared){
+ model.selected=id;
  if(prepared&&model.view(id).collapsed)model.collapse(id);
  mount(id,prepared);focus([id]);
 }
@@ -1027,6 +1063,6 @@ const referenceStacks=installReferenceStacks(el('reference-layer'),{
 });
 const taskGroups=installTaskGroups(el('task-group-layer'),{read:()=>model,changed:()=>{geometry();save();},edit:id=>taskControls.showGroups(id),failed:fail});
 taskControls=installTaskControls({read:()=>model,replace:replaceTask,snapshot:()=>currentSnapshot,changed:()=>{geometry();save();},failed:fail});
-void transport('/api/investigation').then(view=>{board=view.board;editorName=view.editor;editorJavaArchives=view.editor_java_archives===true;for(const[id,r]of mounted){r.editor.setAttribute('aria-label',`Open in ${editorName}`);r.editor.title=`Open in ${editorName}`;const v=model.view(id),kept=board.evidence.find(e=>e.source.file===v.symbol.source.file&&e.source.version===v.symbol.source.version&&e.source.line===v.symbol.source.line);r.kept=kept?.id??null;}geometry();}).catch(fail);
+void transport('/api/investigation').then(view=>{board=view.board;editorName=view.editor;editorJavaArchives=view.editor_java_archives===true;for(const r of mounted.values()){r.editor.setAttribute('aria-label',`Open in ${editorName}`);r.editor.title=`Open in ${editorName}`;}geometry();}).catch(fail);
 followChanges({session:()=>({receive(change){receive(change.status);return true;},close(e){if(e)notice.show('Source updates disconnected; the visual layout is retained.');}})});
 void post('/api/workspace/start',{}).catch(fail);

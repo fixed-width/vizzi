@@ -14,6 +14,45 @@ fn source() -> SourceEvidence {
         truncated: false,
     }
 }
+
+#[test]
+fn saved_view_survives_roundtrip_alongside_locations_without_a_view() {
+    let mut board = Investigation::new(source().workspace);
+    let older = board.add("Older location".into(), source()).unwrap();
+    let origin = EvidenceOrigin::CallWorkspace {
+        declaration: EntityId::derive(&[b"function"]),
+    };
+    let current = board
+        .add_from("Saved function".into(), source(), Some(origin.clone()))
+        .unwrap();
+
+    let restored = Investigation::decode(&board.encode().unwrap()).unwrap();
+    assert_eq!(restored.evidence(older).unwrap().origin, None);
+    assert_eq!(restored.evidence(current).unwrap().origin, Some(origin));
+}
+
+#[test]
+fn invalid_saved_declaration_id_cannot_be_added_or_restored() {
+    let mut board = Investigation::new(source().workspace);
+    let id = board.add("Saved function".into(), source()).unwrap();
+    let mut data = serde_json::to_value(board.data()).unwrap();
+    for declaration in ["short", &"g".repeat(64)] {
+        let origin = serde_json::json!({"view": "call_workspace", "declaration": declaration});
+        assert!(
+            board
+                .add_from(
+                    "Invalid function".into(),
+                    source(),
+                    Some(serde_json::from_value(origin.clone()).unwrap()),
+                )
+                .is_err()
+        );
+        data["evidence"][0]["origin"] = origin;
+        assert!(Investigation::decode(&serde_json::to_vec(&data).unwrap()).is_err());
+    }
+    assert_eq!(board.data().revision, 1);
+    assert_eq!(board.evidence(id).unwrap().origin, None);
+}
 #[test]
 fn questions_evidence_and_reader_connections_roundtrip_with_stable_ids() {
     let mut board = Investigation::new(source().workspace);
