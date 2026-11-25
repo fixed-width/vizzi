@@ -25,8 +25,9 @@ cargo build --locked --release -p vizzi
   --workers 1
 ```
 
-Open the printed address, normally <http://127.0.0.1:7474/>. Select **Add bubble**, find a
-function, and follow a highlighted call. With `vizzi` on your `PATH`, you can run it
+Open the printed address, normally <http://127.0.0.1:7474/>, to browse source. To follow
+a call, choose **Call workspace** in the header, then select **Add bubble** and find a
+function. With `vizzi` on your `PATH`, you can run it
 without arguments from the project directory. `--root` selects another directory;
 `--cache` overrides the automatically chosen [workspace cache](docs/reference/storage.md#cache-location).
 Stop the server with Ctrl-C.

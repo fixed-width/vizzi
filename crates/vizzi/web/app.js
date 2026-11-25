@@ -18,7 +18,8 @@ import {installWorkspaceDelivery} from "/editor-delivery.js";
 import {createCallMenu,requestSourceActions} from "/call-actions.js";
 import {fetchRead} from "/read-retry.js";
 
-installAppHeader(document.querySelector('body > header'));
+const header = document.querySelector('body > header');
+installAppHeader(header);
 const element = id => document.getElementById(id);
 const canvas = element("map"), context = canvas.getContext("2d");
 const overview=element("map-overview"),overviewContext=overview.getContext("2d");
@@ -81,7 +82,7 @@ const inspector = createInspector({
     const open=()=>{
       if(!trigger.isConnected || captured.snapshot!==view?.snapshot || captured.source.id!==view.source?.id)return;
       const hash=new URLSearchParams({[isFunction?"source-function":"source-call"]:action.id,snapshot:captured.snapshot,file:captured.source.id});
-      location.assign(`/#${hash}`);
+      location.assign(`/workspace#${hash}`);
     };
     if(direct){callMenu.hide();open();return;}
     callMenu.show(trigger,action.name,[{label:isFunction?"Open in Call workspace":"Open definition in Call workspace",hint:"Ctrl/⌘-click",run:open}],keyboard);
@@ -162,7 +163,9 @@ const controller = createController({
   onResync: () => updates?.restart(),
 });
 const editorFiles=installWorkspaceDelivery({mode:'file',
-  ready:action=>Boolean(canvas.clientWidth>0 && source.clientHeight>0 && (action.kind==='reveal' || view)),
+  ready:action=>action.kind==='reveal'
+    ? header.clientWidth>0 && header.clientHeight>0
+    : Boolean(view && canvas.clientWidth>0 && source.clientHeight>0),
   prepare:async(action,{signal,replaceHistory})=>{
     if(action.kind==='reveal')return {commit(){}};
     clearTimeout(filterTimer);
@@ -368,4 +371,25 @@ const viewportObserver = new ResizeObserver(()=>{
 });
 viewportObserver.observe(canvas);
 viewportObserver.observe(source);
-updates = followChanges({ session: () => controller.updates() });
+viewportObserver.observe(header);
+function legacyLaunchDestination() {
+  if (location.pathname !== '/') return;
+  if (location.hash === '#saved') return '/investigate#saved';
+
+  const fragment = new URLSearchParams(location.hash.slice(1));
+  const demo = new URLSearchParams(location.search).get('demo');
+  if (demo === 'minitosis' || ['source-function', 'source-call', 'editor-call'].some(key => fragment.has(key))) {
+    return `/workspace${location.search}${location.hash}`;
+  }
+}
+
+const destination = legacyLaunchDestination();
+if (destination) {
+  location.replace(destination);
+} else {
+  if (location.pathname === '/') window.addEventListener('hashchange', () => {
+    const destination = legacyLaunchDestination();
+    if (destination) location.replace(destination);
+  });
+  updates = followChanges({ session: () => controller.updates() });
+}

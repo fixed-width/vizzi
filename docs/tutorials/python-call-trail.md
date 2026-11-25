@@ -17,7 +17,8 @@ cp -R docs/tutorials/first-call-trail-python/. "$vizzi_demo/"
   --workers 1
 ```
 
-Open the printed address in your browser. Wait for **Source ready** in the Call workspace.
+Open the printed address in your browser, choose **Call workspace** in the header, and
+wait for **Source ready**.
 Vizzi reads `greeting.py`; it does not run the program or install its dependencies.
 
 ## 2. Open the caller

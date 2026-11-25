@@ -27,9 +27,9 @@ For a Python project with a virtual environment inside the root, add
 or vendored directories you do not want to explore. Vizzi uses its own source policy;
 being ignored by Git does not by itself define the reading scope.
 
-Open the printed address, normally `http://127.0.0.1:7474/`. Wait for **Source ready**,
-then use **Add bubble** to find a function. [Follow calls](follow-a-call-trail.md) or
-[manage a reading task](manage-tasks.md) from there.
+Open the printed address, normally `http://127.0.0.1:7474/`, to browse the repository's
+files and declarations. Choose **Call workspace** in the header to
+[follow calls](follow-a-call-trail.md) or [manage a reading task](manage-tasks.md).
 
 The server binds to loopback. If the port is occupied, add `--port 7475` and use the new
 printed address. Use a stable address and port when returning to saved browser tasks.
@@ -39,9 +39,9 @@ Stop the server with Ctrl-C. The [CLI reference](../reference/cli.md) lists all 
 
 Use the shared header:
 
+- **Source browser** shows the repository map, files and declaration outlines.
 - **Call workspace** keeps functions, branches and result stacks together on a canvas.
 - **Review changes** compares a working tree or two existing Git commits.
-- **Source browser** shows the repository map, files and declaration outlines.
 - **Saved locations** holds source anchors, notes and reader-authored connections.
 
 Opening the call workspace or a browsing view starts live indexing. To begin with a

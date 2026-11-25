@@ -8,8 +8,8 @@ reference, with no separate design mock.
 
 Workspace controls use **bubble** for a canvas view and **saved location** for a retained
 source anchor. Workspace actions (tasks, task shelf and groups) have their own menu.
-The [shared header](HEADER_PRODUCT.md) connects Call workspace, Review changes, Source
-browser and Saved locations. Settings contains Theme, Code layout and optional Module
+The [shared header](HEADER_PRODUCT.md) connects Source browser, Call workspace, Review
+changes and Saved locations. Settings contains Theme, Code layout and optional Module
 outlines. The example button is absent from the header.
 Call arrows have a continuous 20-screen-pixel inspection target across dash gaps and zoom
 levels, with an information cursor. Arrow inspection does not start canvas dragging;

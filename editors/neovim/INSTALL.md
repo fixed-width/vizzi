@@ -14,10 +14,10 @@ vim.g.vizzi_executable = '/path/to/vizzi/target/release/vizzi'
 1. Restart Neovim and run `:VizziOpen` from the project directory. To select a
    directory explicitly, run `:VizziOpen /path/to/project`. Escape spaces in
    the path with a backslash.
-2. In the browser, wait for **Source ready** and use **Add bubble** to open a
-   function. Click **Editor** on the bubble to jump to its saved line in the
-   Neovim split that launched Vizzi. Switch back to Neovim to see the selected
-   line. If the target has unsaved changes, save it and retry once the browser
+2. In the browser, choose **Call workspace**, wait for **Source ready**, and use
+   **Add bubble** to open a function. Click **Editor** on the bubble to jump to
+   its saved line in the Neovim split that launched Vizzi. Switch back to see the
+   selected line. If the target has unsaved changes, save it and retry once the browser
    has refreshed the source.
 3. Run `:VizziStop` to stop the local server. Closing the launching split or
    quitting Neovim also stops it.

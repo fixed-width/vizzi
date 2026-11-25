@@ -1,7 +1,7 @@
 # Vizzi for VS Code
 
 Install the bundled extension, open your project, and choose **Vizzi: Open Workspace**.
-The extension starts Vizzi and opens its visual workspace in an editor tab, using VS
+The extension starts Vizzi and opens the Source browser in a new editor tab, using VS
 Code's existing definition and reference providers. The extension creates or refreshes
 its connection and passes it directly to Vizzi on every launch; you never need to copy
 a `vscode-connection` path into project settings.
@@ -35,10 +35,11 @@ alongside native archives; local source builds are described below.
 2. **Click Vizzi in the status bar**, or open the Command Palette with **Ctrl+Shift+P**
    (**Cmd+Shift+P** on macOS) and run **Vizzi: Open Workspace**. If several folders are
    open, select the one to inspect. Output opens immediately with startup information.
-3. **Use the Vizzi editor tab that opens.** Wait for **Source ready**, choose **Add bubble**,
-   enter a function name, select **Find functions**, and choose a result. Click a
-   highlighted call and choose **Open definition** to open the called function beside
-   it. Use a bubble's **⋯ → Find references** to find its references through VS Code.
+3. **Use the Vizzi editor tab that opens.** Browse files, or choose **Call workspace**
+   in the header and wait for **Source ready**. Choose **Add bubble**, enter a function
+   name, select **Find functions**, and choose a result. Click a highlighted call and
+   choose **Open definition** to open the called function beside it. Use a bubble's
+   **⋯ → Find references** to find its references through VS Code.
 
 Keep VS Code open while using the workspace. Opening the same project again reuses its
 running Vizzi process and reveals its tab. You can move the tab into another editor

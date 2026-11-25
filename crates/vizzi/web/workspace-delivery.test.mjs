@@ -76,6 +76,20 @@ test('mode routing prepares in the new document and verifies source only after i
  client=createDeliveryClient({send:m=>queueMicrotask(()=>pages.get(m.document)?.receive(m)),makeId:()=>id(1)});t.after(()=>{client.dispose();for(const page of pages.values())page.dispose();});
  make('call',id(2)).connect();const result=await client.deliver({kind:'file',snapshot:native(1),file:native(2),version:native(3),line:5},{validate:async()=>order.push('verify')});assert.equal(result.state,'applied');assert.deepEqual(order,['prepare file','verify','commit file']);
 });
+test('opening a fresh editor tab reveals the Source browser',async t=>{
+ const pages=new Map(),opened=[];let client;
+ const make=(mode,document,transition=null)=>{
+  const page=createDeliveryPage({mode,document,transition,ready:()=>true,
+   prepare:async()=>({commit(){opened.push(mode);}}),send:message=>queueMicrotask(()=>client.receive(message)),
+   navigate:(path,ticket)=>{assert.equal(path,'/explore');page.depart();make('file',id(4),ticket).connect();}});
+  pages.set(document,page);return page;
+ };
+ client=createDeliveryClient({send:message=>queueMicrotask(()=>pages.get(message.document)?.receive(message)),makeId:()=>id(1)});
+ t.after(()=>{client.dispose();for(const page of pages.values())page.dispose();});
+ make('landing',id(2)).connect();
+ assert.equal((await client.deliver({kind:'reveal'})).state,'applied');
+ assert.deepEqual(opened,['file']);
+});
 test('unexpected page replacement cancels a prepared action and does not replay it',async t=>{
  const gate=deferred(),started=deferred(),f=fixture({validate:async()=>{started.resolve();await gate.promise;}});t.after(()=>f.close());const request=f.deliver(call);await started.promise;
  f.client.receive({protocol:'vizzi-delivery',version:1,type:'connected',document:id(9),mode:'file',transition:null});assert.equal((await request).state,'cancelled');gate.resolve();await turn();assert.deepEqual(f.applied,[]);
@@ -118,7 +132,7 @@ test('manual cancellation of an arriving continuation also rejects the latest re
 
 test('a newer different-mode action survives the first switch and routes again to its own destination',async t=>{
  const pages=new Map(),applied=[],routed=deferred();let client,nextDocument=3,counter=0,arrival,routes=0;
- const make=(mode,document,transition=null)=>{const page=createDeliveryPage({mode,document,transition,ready:()=>true,prepare:async action=>({commit(){applied.push(action);}}),send:m=>queueMicrotask(()=>client.receive(m)),navigate:(path,ticket)=>{page.depart();const target=path==='/'?'call':'file';const connect=()=>make(target,id(++nextDocument),ticket).connect();if(++routes===1){arrival=connect;routed.resolve();}else connect();}});pages.set(document,page);return page;};
+ const make=(mode,document,transition=null)=>{const page=createDeliveryPage({mode,document,transition,ready:()=>true,prepare:async action=>({commit(){applied.push(action);}}),send:m=>queueMicrotask(()=>client.receive(m)),navigate:(path,ticket)=>{page.depart();const target=path==='/workspace'?'call':'file';assert.equal(path,routes===0?'/explore':'/workspace');const connect=()=>make(target,id(++nextDocument),ticket).connect();if(++routes===1){arrival=connect;routed.resolve();}else connect();}});pages.set(document,page);return page;};
  client=createDeliveryClient({makeId:()=>id(++counter),send:m=>queueMicrotask(()=>pages.get(m.document)?.receive(m))});t.after(()=>{client.dispose();for(const page of pages.values())page.dispose();});
  make('call',id(3)).connect();const old=client.deliver({kind:'file',snapshot:native(1),file:native(2),version:native(3),line:1});await routed.promise;const latest=client.deliver(call);arrival();assert.equal((await old).state,'cancelled');assert.equal((await latest).state,'applied');assert.deepEqual(applied,[call]);assert.equal(routes,2);
 });

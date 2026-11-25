@@ -12,7 +12,7 @@ try {
   const body=path==='/'?`<link rel="stylesheet" href="/theme.css"><link rel="stylesheet" href="/app-header.css"><style>body{margin:0;font:13px sans-serif}</style><header data-app-view="${url.searchParams.get('view')}"><div data-header-controls><details id="actions" class="app-menu"><summary>Actions</summary><div><button id="action">Run action</button></div></details><span>Mode controls</span></div>${url.searchParams.get('view')==='calls'?'<template data-header-settings><label>Extra setting<input id="extra"></label></template>':''}</header><button id="outside">Outside header</button>`:await readFile('crates/vizzi/web'+path,'utf8');
   await route.fulfill({contentType:path==='/'?'text/html':path.endsWith('.css')?'text/css':'text/javascript',body});
  });
- const modes=[['calls','Call workspace','/'],['review','Review changes','/review'],['source','Source browser','/explore'],['locations','Saved locations','/investigate#saved']];
+ const modes=[['source','Source browser','/'],['calls','Call workspace','/workspace'],['review','Review changes','/review'],['locations','Saved locations','/investigate#saved']];
  for(const [mode,label] of modes){
   await page.goto('http://fixture/?view='+mode);
   await page.evaluate(async()=>{

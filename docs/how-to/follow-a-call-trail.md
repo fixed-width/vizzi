@@ -8,7 +8,8 @@ Start Vizzi [on your project](run-workspace.md), or use the guided
 
 ## Open a function
 
-Choose **Add bubble**, enter a function or qualified name, and select **Find functions**.
+Choose **Call workspace** in the header, then select **Add bubble**, enter a function
+or qualified name, and select **Find functions**.
 Choose the result using its name and source path. Qualified Rust names such as
 `Greeter::greet` are accepted; supported separator forms are in the
 [workspace reference](../reference/workspace.md).

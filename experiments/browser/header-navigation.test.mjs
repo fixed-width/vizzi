@@ -11,14 +11,14 @@ try {
  page.on('pageerror',error=>errors.push(error.message));
  if(process.argv.includes('--source-assets'))await page.route('**/*',async route=>{
   const path=new URL(route.request().url()).pathname;
-  const html={'/':'visual.html','/review':'review.html','/explore':'index.html','/investigate':'companion.html'};
+  const html={'/':'index.html','/workspace':'visual.html','/review':'review.html','/explore':'index.html','/investigate':'companion.html'};
   const file=html[path]??(/^\/[a-z-]+\.(?:js|css)$/.test(path)?path.slice(1):null);
   if(!file)return route.continue();
   await route.fulfill({contentType:file.endsWith('.html')?'text/html':file.endsWith('.css')?'text/css':'text/javascript',body:await readFile('crates/vizzi/web/'+file,'utf8')});
  });
  await page.goto(host.url);
- await page.waitForFunction(()=>document.querySelector('#visual-source-status').textContent.includes('ready'));
- const modes=[['Call workspace','/','calls'],['Review changes','/review','review'],['Source browser','/explore','source'],['Saved locations','/investigate#saved','locations']];
+ await page.waitForFunction(()=>document.querySelector('#snapshot')?.textContent.length===8);
+ const modes=[['Source browser','/','source'],['Call workspace','/workspace','calls'],['Review changes','/review','review'],['Saved locations','/investigate#saved','locations']];
  async function checkHeader(mode){
   const navigation=page.getByRole('navigation',{name:'View modes',exact:true});
   await navigation.waitFor({timeout:5000});
@@ -33,6 +33,9 @@ try {
   assert.equal(await page.getByLabel('Theme',{exact:true}).isVisible(),false);
   assert.equal(await page.locator('#workspace-settings > summary').evaluate(n=>n===document.activeElement),true);
  }
+ await checkHeader('Source browser');
+ await page.getByRole('navigation',{name:'View modes',exact:true}).getByRole('link',{name:'Call workspace',exact:true}).click();
+ await page.waitForFunction(()=>document.querySelector('#visual-source-status')?.textContent.includes('ready'));
  await checkHeader('Call workspace');
  await page.getByRole('button',{name:'Add bubble',exact:true}).click();
  await page.getByLabel('Find a function',{exact:true}).fill('start');
@@ -43,7 +46,7 @@ try {
  await page.locator('#workspace-settings > summary').click();
  await page.getByLabel('Theme',{exact:true}).selectOption('dark');
  await page.keyboard.press('Escape');
- for(const [label,,mode] of modes.slice(1)){
+ for(const [label,,mode] of modes.filter(([, ,mode])=>mode!=='calls')){
   await page.getByRole('navigation',{name:'View modes',exact:true}).getByRole('link',{name:label,exact:true}).click();
   await page.locator(`header[data-app-view="${mode}"]`).waitFor();
   await checkHeader(label);
@@ -76,6 +79,8 @@ try {
  await page.setViewportSize({width:360,height:1000});await paint(page);
  assert.equal(await page.locator('header').evaluate(n=>[...n.querySelectorAll('a,summary,button')].filter(e=>e.getClientRects().length).every(e=>{const r=e.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth;})),true);
  await page.screenshot({path:'/tmp/vizzi-header-calls-360.png'});
+ await page.getByRole('link',{name:'Vizzi home',exact:true}).click();
+ await checkHeader('Source browser');
  assert.deepEqual(errors,[]);
  console.log('shared header: four-view navigation, selected mode, consistent settings, keyboard dismissal, theme persistence, narrow layout and task restoration');
 }finally{await chrome?.close();await host?.close();await input.close();}

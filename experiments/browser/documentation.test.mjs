@@ -28,7 +28,7 @@ try{
     execFileSync('c++',['-std=c++17','-Wall','-Wextra','-Werror',join(input.root,'processor.cpp'),driver,object,'-o',executable]);execFileSync(executable);
    }
    host=await startHost(input,1);page=await chrome.newPage({viewport:{width:1440,height:900},colorScheme:'light'});page.setDefaultTimeout(10000);
-   const errors=[];page.on('pageerror',error=>errors.push(error.message));await page.goto(host.url);await page.waitForFunction(()=>document.querySelector('#visual-source-status').textContent.includes('ready'));
+   const errors=[];page.on('pageerror',error=>errors.push(error.message));await page.goto(host.url);await page.getByRole('link',{name:'Call workspace',exact:true}).click();await page.waitForFunction(()=>document.querySelector('#visual-source-status').textContent.includes('ready'));
    await page.getByRole('button',{name:'Add bubble',exact:true}).click();await page.getByLabel('Find a function',{exact:true}).fill(kind==='rust'?'Greeter::greet':kind==='ruby'?'Greetings::Greeter#greet':callerName);await page.getByRole('button',{name:'Find functions',exact:true}).click();await page.locator(`[data-add-symbol][data-name="${callerName}"]`).click();
    const caller=page.locator(`[data-view][data-name="${callerName}"]`);await caller.locator('.code-line').first().waitFor();
    await caller.getByRole('button',{name:`Actions for ${firstName}`,exact:true}).click();await page.getByRole('menuitem',{name:'Open definition',exact:false}).click();await page.locator(`[data-view][data-name="${firstName}"] .code-line`).first().waitFor();

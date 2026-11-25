@@ -20,7 +20,7 @@ try{
   if(path.includes('#saved'))assert.equal(await page.getByRole('heading',{name:'Saved locations',exact:true}).isVisible(),true);
   else if(!path.includes('trial=structure'))await page.locator('#discovery-panel').waitFor({state:'visible'});
  }
- await page.goto(host.url);await page.getByRole('button',{name:'Add bubble',exact:true}).waitFor();assert.equal(await page.locator('#source-question-form,#question-form').count(),0);
+ await page.goto(host.url+'/workspace');await page.getByRole('button',{name:'Add bubble',exact:true}).waitFor();assert.equal(await page.locator('#source-question-form,#question-form').count(),0);
  for(const path of ['/question-search.js','/question-state.js'])assert.equal((await fetch(host.url+path)).status,404);
  assert.equal(requests.includes('/question-search.js'),false);assert.equal(requests.includes('/question-state.js'),false);assert.equal(requests.includes('/api/search'),false);
  assert.deepEqual(await board(),before,'opening retired URLs preserves all saved investigation data');assert.deepEqual(errors,[]);

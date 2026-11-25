@@ -1,6 +1,7 @@
 # Browse files and declarations
 
-Choose **Source browser** in the header after [starting Vizzi](run-workspace.md).
+Open the address printed when you [start Vizzi](run-workspace.md), or choose
+**Source browser** in the header.
 This view is useful when you know an area or file rather than a function name.
 
 With the VS Code extension, right-click inside a saved project file or on its editor

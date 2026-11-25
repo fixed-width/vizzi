@@ -17,7 +17,8 @@ cp -R docs/tutorials/first-call-trail-rust/. "$vizzi_demo/"
   --workers 1
 ```
 
-Open the printed address in your browser. Wait for **Source ready** in the Call workspace.
+Open the printed address in your browser, choose **Call workspace** in the header, and
+wait for **Source ready**.
 You do not need to build the example or install rust-analyzer.
 
 ## 2. Open the caller

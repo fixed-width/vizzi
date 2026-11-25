@@ -68,10 +68,15 @@ async function verifyWebview({port,report,editorCall=false}) {
     }
   }
   const frame = await findFrame();
+  if(!workspace.editorCall) {
+    await frame.locator('header[data-app-view="source"]').waitFor();
+    await frame.getByRole('link',{name:'Call workspace',exact:true}).click();
+  }
   await frame.waitForFunction(()=>document.querySelector('#visual-source-status')?.textContent.includes('ready'));
   if(!workspace.editorCall) {
     await frame.getByRole('button',{name:'Add bubble',exact:true}).click();
     await frame.getByLabel('Find a function',{exact:true}).fill(callerName);
+    await frame.getByLabel('Source file path (optional)',{exact:true}).fill(workspace.file || 'a.py');
     await frame.getByRole('button',{name:'Find functions',exact:true}).click();
     await frame.locator(`[data-add-symbol][data-name="${callerName}"]`).click();
     const caller = frame.locator(`[data-view][data-name="${callerName}"]`);
@@ -102,6 +107,8 @@ async function verifyWebview({port,report,editorCall=false}) {
   }
   await read(report+'.reopened');
   const reopened = await findFrame(frame);
+  await reopened.locator('header[data-app-view="source"]').waitFor();
+  await reopened.getByRole('link',{name:'Call workspace',exact:true}).click();
   await reopened.locator(`[data-view][data-name="${calleeName}"] .code-line`).first().waitFor();
   assert.equal(await reopened.locator('[data-view]').count(),2);
   assert.equal(await reopened.locator('#task-title').textContent(),'Embedded reading');

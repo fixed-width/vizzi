@@ -25,6 +25,8 @@ async function verify() {
   const storage = await fs.mkdtemp(path.join(os.tmpdir(),'vizzi-extension-native-'));
   let child;
   try {
+    const automaticConfig = `root = "."\ncache = ${JSON.stringify(path.join(storage,'browser-cache'))}\nport = 0\n`;
+    await fs.writeFile(path.join(root.fsPath,'vizzi.toml'),automaticConfig);
     const connection = await vscode.commands.executeCommand('vizzi.shareLanguageProviders');
     assert.ok(connection?.connectionFile,'sharing command did not publish a connection');
     const config = path.join(storage,'vizzi.toml');
@@ -152,8 +154,6 @@ async function verify() {
       await vscode.workspace.getConfiguration('vizzi').update('executablePath',
         process.env.VIZZI_TEST_EXTENSION_PATH ? undefined : process.env.VIZZI_TEST_BINARY,
         vscode.ConfigurationTarget.Global);
-      const automaticConfig = `root = "."\ncache = ${JSON.stringify(path.join(storage,'browser-cache'))}\nport = 0\n`;
-      await fs.writeFile(path.join(root.fsPath,'vizzi.toml'),automaticConfig);
       const openedWorkspace = await vscode.commands.executeCommand('vizzi.openWorkspace');
       assert.ok(openedWorkspace?.url,'Open Workspace did not start the native server');
       assert.deepEqual(opened,[],'default opening must stay inside the editor');
