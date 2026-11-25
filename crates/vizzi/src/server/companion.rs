@@ -9,6 +9,7 @@ use axum::{
 };
 use serde::Deserialize;
 use std::sync::Arc;
+use vizzi_core::investigation::EvidenceOrigin;
 static DEPENDENCY_READS: tokio::sync::Semaphore = tokio::sync::Semaphore::const_new(4);
 static WORK: tokio::sync::Semaphore = tokio::sync::Semaphore::const_new(2);
 static EDITORS: tokio::sync::Semaphore = tokio::sync::Semaphore::const_new(1);
@@ -101,6 +102,7 @@ pub(super) fn router(
         .route("/api/search/evidence", post(pin_current))
         .route("/api/investigation/lookup", get(lookup))
         .route("/api/investigation/evidence", post(pin))
+        .route("/api/investigation/evidence/{id}/return", get(return_destination))
         .route("/api/investigation/evidence/{id}/open", post(open))
         .route("/api/editor/open", post(open_source))
         .layer(DefaultBodyLimit::max(16 * 1024))
@@ -244,6 +246,32 @@ async fn pin_current(
         Ok(serde_json::json!({"id":id,"view":app.view()}))
     })
     .await
+}
+async fn return_destination(
+    State(app): State<Arc<Companion>>,
+    Path(id): Path<u32>,
+) -> Result<Json<serde_json::Value>, Error> {
+    let (origin, target) = app.return_target(id)?;
+    let mut fragment = url::form_urlencoded::Serializer::new(String::new());
+    fragment
+        .append_pair("snapshot", &target.snapshot)
+        .append_pair("version", &target.version)
+        .append_pair("line", &target.line.to_string());
+    let page = match origin {
+        EvidenceOrigin::SourceBrowser => {
+            fragment.append_pair("editor-file", &target.file);
+            "/explore"
+        }
+        EvidenceOrigin::CallWorkspace { declaration } => {
+            fragment
+                .append_pair("file", &target.file)
+                .append_pair("saved-bubble", declaration.as_str());
+            "/workspace"
+        }
+    };
+    Ok(Json(
+        serde_json::json!({"href": format!("{page}#{}", fragment.finish())}),
+    ))
 }
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]

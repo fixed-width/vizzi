@@ -10,7 +10,7 @@ pub mod editor;
 use serde_json::Value;
 use std::sync::{Arc, Mutex, TryLockError};
 use vizzi_core::{
-    model::{Document, Snapshot},
+    model::{Document, EntityId, Snapshot},
     modules::{ModuleCache, ModuleIndex},
     structure::Structure,
 };
@@ -59,6 +59,17 @@ pub enum Operation {
         file: String,
         /// Observation-bound function identity.
         symbol: String,
+    },
+    /// Resolve a saved bubble declaration in the current capture of the same source.
+    SavedDeclaration {
+        /// Exact captured file identity.
+        file: String,
+        /// Document version verified for the return.
+        version: String,
+        /// First line of the saved declaration.
+        line: usize,
+        /// Declaration identity across observations.
+        declaration: EntityId,
     },
     /// Find source directories/files.
     Areas {
@@ -396,7 +407,9 @@ impl StructureHost {
             .as_mut()
             .ok_or_else(|| CompanionError::Unavailable("Structure is unavailable".into()))?;
         let source_doc = match &request.query {
-            Operation::SourceActions { file, .. } | Operation::Function { file, .. } => {
+            Operation::SourceActions { file, .. }
+            | Operation::Function { file, .. }
+            | Operation::SavedDeclaration { file, .. } => {
                 Some(snapshot.file(file).ok_or_else(|| {
                     CompanionError::Invalid("File is absent from this observation".into())
                 })?)
@@ -412,7 +425,9 @@ impl StructureHost {
             Operation::Actions { symbol, .. } => {
                 cache.for_symbol(&snapshot, symbol, request.path.as_deref())?
             }
-            Operation::SourceActions { .. } | Operation::Function { .. } => match source_doc {
+            Operation::SourceActions { .. }
+            | Operation::Function { .. }
+            | Operation::SavedDeclaration { .. } => match source_doc {
                 Some(doc) => cache.for_evidence(&snapshot, doc.path())?,
                 None => None,
             },
@@ -467,6 +482,26 @@ impl StructureHost {
                         CompanionError::Invalid("Function is absent from this captured file".into())
                     })?;
                 Ok(serde_json::json!({"snapshot":request.snapshot,"symbol":function}))
+            }
+            Operation::SavedDeclaration {
+                file,
+                version,
+                line,
+                declaration,
+            } => {
+                let symbol = index
+                    .resolve(Some(declaration.as_str()), "")
+                    .filter(|symbol| {
+                        symbol.source.file == *file
+                            && symbol.source.version == *version
+                            && symbol.source.line == *line
+                    })
+                    .ok_or_else(|| {
+                        CompanionError::Conflict(
+                            "The saved declaration is unavailable in the current index".into(),
+                        )
+                    })?;
+                Ok(serde_json::json!({"snapshot":request.snapshot,"symbol":symbol}))
             }
             Operation::Areas { search, offset } => serde_json::to_value(
                 index

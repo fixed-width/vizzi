@@ -32,7 +32,30 @@ const callMenu = createCallMenu(element("call-action-menu"));
 source.addEventListener("wheel",()=>callMenu.hide(),{passive:true});
 source.addEventListener("touchmove",()=>callMenu.hide(),{passive:true});
 const keepEvidence=document.createElement("button");keepEvidence.type="button";keepEvidence.id="keep-evidence";keepEvidence.textContent="Save location";keepEvidence.disabled=true;element("snapshot").before(keepEvidence);
-keepEvidence.addEventListener("click",async()=>{if(!view?.source)return;keepEvidence.disabled=true;try{const response=await fetch('/api/investigation');if(!response.ok)throw new Error(await response.text());const state=await response.json();const active=view.source.summary.active;const kept=await fetch('/api/investigation/evidence',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({revision:state.board.revision,snapshot:view.snapshot,file:view.source.id,version:view.source.version,line:active?.start_line ?? 1,title:active?.name ?? view.source.path})});if(!kept.ok)throw new Error(await kept.text());location.assign('/investigate#saved');}catch(e){showError(e);keepEvidence.disabled=false;}});
+keepEvidence.addEventListener("click", async () => {
+  const captured = view;
+  if (!captured?.source) return;
+  keepEvidence.disabled = true;
+  try {
+    const response = await fetch('/api/investigation');
+    if (!response.ok) throw new Error(await response.text());
+    const state = await response.json();
+    const {id, version, path, summary: {active}} = captured.source;
+    const kept = await fetch('/api/investigation/evidence', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        revision: state.board.revision, snapshot: captured.snapshot, file: id, version,
+        line: active?.start_line ?? 1, title: active?.name ?? path, origin: {view: 'source_browser'},
+      }),
+    });
+    if (!kept.ok) throw new Error(await kept.text());
+    location.assign('/investigate#saved');
+  } catch (error) {
+    showError(error);
+    keepEvidence.disabled = !view?.source;
+  }
+});
 const metrics = { drawCpuMs: [], interactionFrameMs: [], requestMs: [], pickingMs: [], lastFrame: null };
 window.vizziMetrics = metrics;
 function sample(series, value) { series.push(value); if (series.length > 512) series.shift(); }

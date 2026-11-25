@@ -8,6 +8,8 @@ remains in Git and the project documentation.
 
 ### Added
 
+- Reopen a saved location at its line in the Source browser or its bubble in the
+  Call workspace, based on where it was saved.
 - Report the installed build with `vizzi --version`.
 - Open highlighted function definitions and written calls in the Call workspace from
   the Source browser.

@@ -36,6 +36,49 @@ impl Editor for Recording {
     }
 }
 #[test]
+fn call_workspace_saves_reuse_current_cards_and_recreate_deleted_cards() {
+    use vizzi_core::{investigation::EvidenceOrigin, model::EntityId};
+
+    let (_root, _cache, host) = setup();
+    let app = Companion::new(host, None, Arc::new(Recording(Mutex::new(vec![])))).unwrap();
+    let target = app.lookup("src/a.rs").unwrap();
+    let pin = |revision| PinEvidence {
+        revision,
+        snapshot: target.snapshot.clone(),
+        file: target.file.clone(),
+        version: target.version.clone(),
+        line: 1,
+        title: "Entry".into(),
+        origin: Some(EvidenceOrigin::CallWorkspace {
+            declaration: EntityId::derive(&[b"entry"]),
+        }),
+    };
+
+    let id = app.pin_current(pin(0)).unwrap();
+    app.edit(EditInvestigation::Annotate {
+        revision: 1,
+        id,
+        note: "Keep this note".into(),
+    })
+    .unwrap();
+
+    assert_eq!(app.pin_current(pin(2)).unwrap(), id);
+    let board = app.view().board;
+    assert_eq!(board.revision, 2);
+    assert_eq!(board.evidence.len(), 1);
+    assert_eq!(board.evidence[0].note, "Keep this note");
+
+    app.edit(EditInvestigation::Remove { revision: 2, id })
+        .unwrap();
+    assert!(matches!(
+        app.pin_current(pin(2)),
+        Err(CompanionError::Conflict(_))
+    ));
+    assert_ne!(app.pin_current(pin(3)).unwrap(), id);
+    assert_eq!(app.view().board.evidence.len(), 1);
+}
+
+#[test]
 fn source_evidence_is_frozen_and_only_matching_working_content_is_handed_to_the_editor() {
     let (root, cache, host) = setup();
     let editor = Arc::new(Recording(Mutex::new(vec![])));
@@ -54,6 +97,7 @@ fn source_evidence_is_frozen_and_only_matching_working_content_is_handed_to_the_
             version: target.version,
             line: 1,
             title: "Entry".into(),
+            origin: None,
         })
         .unwrap();
     app.open(id).unwrap();
@@ -111,7 +155,8 @@ fn persistence_roundtrips_and_invalid_pin_versions_or_lines_fail() {
                 file: target.file.clone(),
                 version: target.version,
                 line: 1,
-                title: "bad".into()
+                title: "bad".into(),
+                origin: None,
             })
             .is_err()
         );
@@ -123,7 +168,8 @@ fn persistence_roundtrips_and_invalid_pin_versions_or_lines_fail() {
                 file: target.file.clone(),
                 version: target.version.clone(),
                 line: 999,
-                title: "bad".into()
+                title: "bad".into(),
+                origin: None,
             })
             .is_err()
         );
@@ -134,6 +180,7 @@ fn persistence_roundtrips_and_invalid_pin_versions_or_lines_fail() {
             version: target.version,
             line: 1,
             title: "Entry".into(),
+            origin: None,
         })
         .unwrap();
     }
@@ -155,6 +202,7 @@ fn symlink_replacement_cannot_be_opened_as_saved_evidence() {
             version: t.version,
             line: 1,
             title: "a".into(),
+            origin: None,
         })
         .unwrap();
     std::fs::write(
@@ -201,6 +249,7 @@ fn captured_excerpts_report_omitted_lines_and_respect_utf8_byte_limits() {
                 version: target.version.clone(),
                 line,
                 title: "Excerpt".into(),
+                origin: None,
             })
             .unwrap();
         let evidence = app
@@ -271,6 +320,7 @@ fn index_freshness_is_separate_from_saved_evidence_and_editor_disk_verification(
             version: target.version,
             line: 1,
             title: "Entry".into(),
+            origin: None,
         })
         .unwrap();
     let saved = app.view().board;
@@ -329,6 +379,7 @@ fn line_boundaries_are_exact_and_imported_anchors_cannot_bypass_verification() {
         version: target.version.clone(),
         line,
         title: "Boundary".into(),
+        origin: None,
     };
     assert!(app.pin(pin(0, 0)).is_err());
     assert!(app.pin(pin(target.lines + 1, 0)).is_err());
@@ -371,6 +422,7 @@ fn editor_handoff_verifies_complete_large_working_files() {
             version: target.version,
             line: 1,
             title: "Large source".into(),
+            origin: None,
         })
         .unwrap();
     app.open(id).unwrap();
@@ -395,6 +447,7 @@ fn an_exact_byte_budget_excerpt_is_accepted_without_an_extra_newline() {
         version: target.version,
         line: 1,
         title: "Full excerpt".into(),
+        origin: None,
     })
     .unwrap();
     let saved = app.view().board;

@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';import {spawnSync} from 'node:child_process';import {writeFile,readFile,chmod,mkdir} from 'node:fs/promises';import {join} from 'node:path';
 import {buildHost,browser,startHost,workspace,paint} from './support.mjs';
 if(!process.argv.includes('--no-build'))buildHost();
-const input=await workspace({files:{'src/entry.rs':'pub fn entry() {}\n','src/reader.rs':'pub trait Reader { fn read(&self); }\n'}});const record=join(input.cache,'editor-arguments'),editor=join(input.cache,'record-editor'),state=join(input.cache,'..','investigation.json');await mkdir(input.cache,{recursive:true});
+const input=await workspace({files:{'src/entry.rs':'pub fn entry() {}\n','src/reader.rs':'pub trait Reader { fn read(&self); }\n','src/target.rs':'\n'.repeat(120)+'pub fn resume_here() {}\n'}});const record=join(input.cache,'editor-arguments'),editor=join(input.cache,'record-editor'),state=join(input.cache,'..','investigation.json');await mkdir(input.cache,{recursive:true});
 await writeFile(editor,`#!/bin/sh\nprintf '%s\\n' "$@" >> '${record}'\n`);await chmod(editor,0o700);input.sourceArguments=['--editor-code',editor,'--investigation-file',state];
 const bad=spawnSync('target/release/vizzi',['--root',input.root,'--cache',input.cache,'--investigation-file',join(input.cache,'investigation.json'),'--port','0'],{encoding:'utf8',timeout:1500});assert.match(bad.stderr,/Investigation file must be outside the analysis cache/);
 let host,chromium;
 try{
- host=await startHost(input,1);const legacyQuestion='How does the reader fit into source lookup?';const before=await (await fetch(host.url+'/api/investigation')).json();const seed=await fetch(host.url+'/api/investigation',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'question',revision:before.board.revision,text:legacyQuestion})});assert.ok(seed.ok);chromium=await browser({desktopBus:false});const page=await chromium.newPage({viewport:{width:1600,height:1000}}),errors=[];page.setDefaultTimeout(10000);page.on('pageerror',e=>errors.push(e.message));
+ host=await startHost(input,1);const legacyQuestion='How does the reader fit into source lookup?';const before=await (await fetch(host.url+'/api/investigation')).json();const seed=await fetch(host.url+'/api/investigation',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'question',revision:before.board.revision,text:legacyQuestion})});assert.ok(seed.ok);chromium=await browser({desktopBus:false});const context=await chromium.newContext({viewport:{width:1600,height:1000}}),page=await context.newPage(),errors=[];page.setDefaultTimeout(10000);page.on('pageerror',e=>errors.push(e.message));
  await page.route('**/api/investigation',async route=>{const response=await route.fetch();await route.fulfill({response,json:{...await response.json(),editor:'Fixture editor'}});});
  await page.goto(host.url+'/investigate');await page.waitForFunction(()=>document.querySelector('#save-mode').textContent);assert.equal(await page.locator('#source').count(),0);assert.equal(await page.locator('#outline').count(),0);await page.waitForFunction(()=>document.querySelectorAll('.discovery-entry').length>0);await page.locator('#show-saved').click();assert.equal(await page.locator('#question-form,#question').count(),0);assert.equal(await page.locator('#investigation-title').textContent(),'Saved locations');
  const known=async()=>{await page.locator('#locations-actions > summary').click();await page.getByRole('button',{name:'Add a location',exact:true}).click();};
@@ -20,8 +20,87 @@ try{
  const saved=JSON.parse(await readFile(state,'utf8'));assert.equal(saved.evidence.length,2);assert.equal(saved.connections.length,1);await page.reload();await page.waitForFunction(()=>document.querySelectorAll('.evidence-card').length===2);assert.equal(await page.locator('#investigation-title').textContent(),'Saved locations');assert.equal(saved.question,legacyQuestion);
  await page.getByRole('button',{name:'Remove connection',exact:true}).click();await page.waitForFunction(()=>document.querySelectorAll('#connection-list li').length===0);assert.equal(await page.locator('.evidence-card').count(),2);assert.equal(await page.locator('#evidence-links path').count(),0);
  await writeFile(join(input.root,'src/entry.rs'),'pub fn changed() {}\n');await page.locator('.evidence-card').filter({hasText:'Entry point'}).getByRole('button',{name:'Open in Fixture editor',exact:true}).click();await page.waitForFunction(()=>!document.querySelector('#investigation-error').hidden);assert.match(await page.locator('#investigation-error').textContent(),/changed|differs/);assert.equal(await readFile(record,'utf8'),launched);assert.match(JSON.parse(await readFile(state,'utf8')).evidence[0].source.excerpt,/entry/);
- await page.goto(host.url+'/explore');await page.waitForFunction(()=>!document.querySelector('#keep-evidence').disabled);await page.getByRole('button',{name:'Save location',exact:true}).click();await page.waitForURL(host.url+'/investigate#saved');await page.waitForFunction(()=>document.querySelectorAll('.evidence-card').length===3);
+ await page.goto(host.url+'/explore');
+ await page.getByText('Accessible file list',{exact:true}).click();
+ await page.getByRole('navigation',{name:'Files',exact:true}).getByRole('button',{name:'src/target.rs',exact:true}).click();
+ await page.getByRole('button',{name:'Reveal function resume_here starting at Line 121'}).click();
+ await page.getByRole('button',{name:'Save location',exact:true}).click();
+ await page.waitForURL(host.url+'/investigate#saved');
+ const sourceCard=page.locator('.evidence-card').filter({has:page.getByRole('button',{name:'Open in Source browser',exact:true})});
+ const callCard=page.locator('.evidence-card').filter({has:page.getByRole('button',{name:'Open in Call workspace',exact:true})});
+ assert.equal(await page.locator('.evidence-card').filter({hasText:'Reader contract'}).getByRole('button',{name:/Open in (Source browser|Call workspace)/}).count(),0);
+ await sourceCard.getByRole('button',{name:'Open in Source browser',exact:true}).click();
+ await page.waitForURL('**/explore');
+ await page.waitForFunction(()=>{
+  const container=document.querySelector('#source');
+  const line=[...container.querySelectorAll('.line-no')].find(label=>label.textContent==='121')?.parentElement;
+  return document.querySelector('#file-title').textContent==='src/target.rs' &&
+   line && line.getBoundingClientRect().top>=container.getBoundingClientRect().top &&
+   line.getBoundingClientRect().bottom<=container.getBoundingClientRect().bottom;
+ });
+ await page.getByRole('link',{name:'Call workspace',exact:true}).click();
+ await page.getByRole('button',{name:'Add bubble',exact:true}).first().click();
+ await page.locator('#fragment-search').fill('resume_here');
+ await page.locator('#fragment-form button[type=submit]').click();
+ await page.locator('[data-add-symbol][data-name="resume_here"]').click();
+ const bubble=page.locator('[data-view][data-name="resume_here"]');
+ await bubble.getByRole('button',{name:'Save location',exact:true}).click();
+ await page.waitForFunction(()=>document.querySelector('#visual-notice').textContent.includes('Location saved.'));
+ const pinnedId=await bubble.getAttribute('data-view');
+ const savedSnapshot=JSON.parse(await readFile(state,'utf8')).evidence.at(-1).source.snapshot;
+ await bubble.getByRole('button',{name:'Pin version',exact:true}).click();
+ await bubble.getByRole('button',{name:'Collapse bubble',exact:true}).click();
+ await writeFile(join(input.root,'src/entry.rs'),'pub fn unrelated_live_refresh() {}\n');
+ await page.waitForFunction(async previous=>{
+  const status=await (await fetch('/api/status')).json();
+  return status.snapshot && status.snapshot!==previous;
+ },savedSnapshot);
+ await page.getByRole('link',{name:'Saved locations',exact:true}).click();
+ await callCard.getByRole('button',{name:'Open in Call workspace',exact:true}).click();
+ await page.waitForURL('**/workspace');
+ await bubble.locator('.code-line').filter({hasText:'pub fn resume_here()'}).waitFor();
+ assert.deepEqual(await bubble.evaluateAll(nodes=>nodes.map(node=>node.dataset.view)),[pinnedId]);
+ assert.equal(await bubble.getByRole('button',{name:'Follow live changes',exact:true}).count(),1);
+ await bubble.getByRole('button',{name:'Close bubble',exact:true}).click();
+
+ await host.close();
+ await writeFile(join(input.root,'src/entry.rs'),'pub fn unrelated_refresh() {}\n');
+ host=await startHost(input,1);
+ await page.goto(host.url+'/investigate#saved');
+ await callCard.getByRole('button',{name:'Inspect location',exact:true}).click();
+ await page.locator('#evidence-detail').getByRole('button',{name:'Open in Call workspace',exact:true}).click();
+ await page.waitForURL('**/workspace');
+ await bubble.locator('.code-line').filter({hasText:'pub fn resume_here()'}).waitFor();
+ assert.equal(await bubble.count(),1);
+ const current=await (await fetch(host.url+'/api/status')).json();
+ assert.notEqual(current.snapshot,savedSnapshot);
+
+ const other=await page.context().newPage();
+ await other.goto(host.url+'/investigate#saved');
+ const otherCard=other.locator('.evidence-card').filter({has:other.getByRole('button',{name:'Open in Call workspace',exact:true})});
+ const removedId=await otherCard.getAttribute('data-evidence');
+ await otherCard.getByRole('button',{name:'Inspect location',exact:true}).click();
+ await other.getByRole('button',{name:'Remove location and its connections',exact:true}).click();
+ await otherCard.waitFor({state:'detached'});
+ await other.close();
+
+ await bubble.getByRole('button',{name:'Save location',exact:true}).click();
+ await page.waitForFunction(()=>document.querySelector('#visual-notice').textContent.includes('Location saved.'));
+ const readCard=async()=>(await (await fetch(host.url+'/api/investigation')).json()).board.evidence
+  .filter(evidence=>evidence.origin?.view==='call_workspace');
+ const restored=await readCard();
+ assert.equal(restored.length,1);
+ assert.notEqual(String(restored[0].id),removedId);
+
+ await page.getByRole('link',{name:'Saved locations',exact:true}).click();
+ await writeFile(join(input.root,'src/target.rs'),'pub fn other_function() {}\n');
+ await sourceCard.getByText(/Source changed/).waitFor();
+ await callCard.getByRole('button',{name:'Open in Call workspace',exact:true}).click();
+ await page.getByText(/Saved source has changed/).waitFor();
+ assert.equal(new URL(page.url()).pathname,'/investigate');
+ await callCard.getByRole('button',{name:'Inspect location',exact:true}).click();
+ assert.match(await page.locator('#detail-excerpt').textContent(),/pub fn resume_here/);
  await page.setViewportSize({width:600,height:900});await paint(page);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);assert.deepEqual(errors,[]);
  if(process.argv.includes('--screenshots')){const dir=process.argv[process.argv.indexOf('--screenshots')+1];await mkdir(dir,{recursive:true});await page.setViewportSize({width:1600,height:1000});await page.screenshot({path:join(dir,'investigation.png'),fullPage:true});}
- console.log('companion browser: evidence/assertions and legacy data preservation, on-demand preview, literal verified editor arguments, changed-source refusal, persistence and narrow layout passed');
+ console.log('companion browser: saved line and bubble return, persistence, legacy data, editor handoff, changed-source refusal and narrow layout passed');
 }finally{await chromium?.close();await host?.close();await input.close();}

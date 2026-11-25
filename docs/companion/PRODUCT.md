@@ -28,6 +28,16 @@ the exact snapshot, file/content/document identities, line and literal bounded e
 Normal source reading and editing still belong in VS Code. Existing saved data remains
 available through **Saved locations**; the landing overview does not overwrite it.
 
+Locations saved in the Source browser or Call workspace offer an **Open in** action
+for that view on the card and in its detail. The Source browser reveals the saved line.
+The Call workspace reveals the matching bubble in the active task, including a pinned
+bubble with the same source version. It opens a bubble if needed. The action works
+across index refreshes when the saved file's bytes still match and the destination
+can be resolved. When the current index shows a changed or missing file, the user
+stays in Saved locations with the captured excerpt and notes available.
+Cards saved through repository discovery or manual entry and older cards without
+origin information retain their inspection and editor actions.
+
 Notes are available when inspecting one saved item, and connection controls only on request
 when at least two items exist. Export and advanced path entry live under secondary controls.
 The initial page must not show an empty investigation form or require the reader to
