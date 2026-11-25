@@ -29,14 +29,6 @@ export const mapFileTypes = {
   other: 'Other files',
 };
 
-export function mapFileType({ classification }) {
-  const language = classification?.language;
-  if (language === 'tsx') return 'typescript';
-  if (language === 'markdown' || classification?.reason === 'documentation') return 'documentation';
-  if (classification?.reason === 'project_metadata') return 'metadata';
-  return Object.hasOwn(mapFileTypes, language) ? language : 'other';
-}
-
 export function mapPalette(canvas) {
   const styles = getComputedStyle(canvas);
   const read = name => styles.getPropertyValue(`--${name}`);

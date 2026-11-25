@@ -93,7 +93,7 @@ test("map tiles retain their language fills through selection, recovery and them
       }];
     }));
   }, ["src/b.rs", "src/partial.rs", "src/encoding.rs", "src/z.py", "include/example.c++", "include/assigned/defs.h", "include/shared.h"]);
-  const swatch = label => legend.getByText(label, { exact: true }).evaluate(item => item.style.getPropertyValue("--swatch"));
+  const swatch = label => legend.getByText(label, { exact: true }).evaluate(item => getComputedStyle(item).getPropertyValue("--swatch"));
   try {
     await page.emulateMedia({ colorScheme: "light" });
     await page.getByText("Accessible file list", { exact: true }).click();
@@ -123,9 +123,11 @@ test("map tiles retain their language fills through selection, recovery and them
     assert.notEqual(dark["src/b.rs"].fill, light["src/b.rs"].fill);
     for (const tile of Object.values(dark)) assert.equal(tile.overview, tile.fill);
     await page.getByRole("searchbox", { name: "Find a file" }).fill("src/z.py");
-    await page.waitForFunction(() => document.getElementById("map-legend").textContent === "Python");
+    await legend.getByText("Syntax recovery", { exact: true }).waitFor({ state: "hidden" });
+    assert.equal(await legend.getByRole("button", { name: "Rust" }).isVisible(), true);
     await page.getByRole("searchbox", { name: "Find a file" }).fill("no-matching-path");
-    await legend.waitFor({ state: "hidden" });
+    await page.locator("#empty").waitFor({ state: "visible" });
+    assert.equal(await legend.isVisible(), true);
     assert.deepEqual(session.errors, []);
   } finally { await session.close(); }
 });
@@ -183,6 +185,82 @@ test("a fitted dense map shows analysis on tiles under twelve pixels", async () 
   }
 });
 
+test("map legend toggles combine file types and Clear filters restores the full map", async () => {
+  const session = await openWorkspace(chromium, host);
+  try {
+    const { page } = session;
+    const legend = page.locator("#map-legend");
+    const rust = legend.getByRole("button", { name: "Rust", exact: true });
+    const python = legend.getByRole("button", { name: "Python", exact: true });
+    const search = page.getByRole("searchbox", { name: "Find a file" });
+    const clear = page.getByRole("group", { name: "Map filters and legend" })
+      .getByRole("button", { name: "Clear filters" });
+    const mapTypes = () => [...new Set(vizziMetrics.scene.files.map(file => file.type))].sort().join(",");
+    const initialTypes = await page.evaluate(mapTypes);
+    assert.equal(await clear.isVisible(), false);
+    assert.equal(await python.getAttribute("aria-pressed", { timeout: 3000 }), "false");
+    await python.press("Space");
+    await page.waitForFunction(() => vizziMetrics.scene.files.map(file => file.path).join() === "src/z.py");
+    await clear.waitFor({ state: "visible", timeout: 3000 });
+    assert.equal(await python.getAttribute("aria-pressed"), "true");
+    assert.equal(await python.evaluate(button => button === document.activeElement), true);
+    await rust.click();
+    await page.waitForFunction(() => new Set(vizziMetrics.scene.files.map(file => file.type)).size === 2);
+    assert.equal(await page.evaluate(mapTypes), "python,rust");
+    await page.getByText("Accessible file list", { exact: true }).click();
+    await page.locator("#file-list button").first().waitFor();
+    assert.deepEqual(await page.locator("#file-list button").allTextContents(), [
+      "src/a.rs", "src/b.rs", "src/encoding.rs", "src/partial.rs", "src/z.py", "zzz/large.rs",
+    ]);
+    await python.click();
+    await page.waitForFunction(() => vizziMetrics.scene.files.length === 5 &&
+      vizziMetrics.scene.files.every(file => file.type === "rust"));
+    await search.fill("src/z.py");
+    await page.locator("#empty").waitFor({ state: "visible" });
+    assert.equal(await page.locator("#file-list button").count(), 0);
+    assert.equal(await rust.getAttribute("aria-pressed"), "true");
+    await clear.press("Enter");
+    await page.locator("#empty").waitFor({ state: "hidden" });
+    assert.equal(await page.evaluate(mapTypes), initialTypes);
+    assert.equal(await search.inputValue(), "");
+    assert.equal(await rust.getAttribute("aria-pressed"), "false");
+    assert.equal(await clear.isVisible(), false);
+    assert.equal(await legend.getByRole("button").first().evaluate(button => button === document.activeElement), true);
+
+    await search.fill("src/z.py");
+    await page.waitForFunction(() => vizziMetrics.scene.files.map(file => file.path).join() === "src/z.py");
+    await clear.click();
+    await page.waitForFunction(() => vizziMetrics.scene.files.some(file => file.type === "rust"));
+    assert.equal(await search.inputValue(), "");
+    assert.equal(await search.evaluate(input => input === document.activeElement), true);
+    assert.deepEqual(session.errors, []);
+  } finally { await session.close(); }
+});
+
+test("Clear filters remains separate from long file type labels at the minimum map width", async () => {
+  const fixture = await workspace({ files: { "README.md": "# Example repository\n" } });
+  let localHost, session;
+  try {
+    localHost = await startHost(fixture);
+    session = await openWorkspace(chromium, localHost);
+    const { page } = session;
+    await page.getByRole("separator", { name: "Repository map and source widths" }).press("Home");
+    const documentation = page.getByRole("button", { name: "Documentation", exact: true });
+    await documentation.click();
+    const clear = page.getByRole("button", { name: "Clear filters", exact: true });
+    await clear.waitFor();
+    const typeBounds = await documentation.boundingBox();
+    const clearBounds = await clear.boundingBox();
+    assert.ok(typeBounds.x + typeBounds.width <= clearBounds.x || typeBounds.y + typeBounds.height <= clearBounds.y);
+    await clear.click();
+    assert.equal(await documentation.getAttribute("aria-pressed"), "false");
+  } finally {
+    await session?.close();
+    await localHost?.close();
+    await fixture.close();
+  }
+});
+
 test("forced colors preserves the map swatches and adapts legend text", async () => {
   const session = await openWorkspace(chromium, host);
   const { page } = session;
@@ -192,7 +270,7 @@ test("forced colors preserves the map swatches and adapts legend text", async ()
     const legend = page.locator("#map-legend");
     for (const label of ["Rust", "Syntax recovery", "Analysis deferred or unavailable"]) {
       const colors = await legend.getByText(label, { exact: true }).evaluate(item => {
-        const hex = item.style.getPropertyValue("--swatch");
+        const hex = getComputedStyle(item).getPropertyValue("--swatch");
         const expected = hex.slice(1).match(/../g).map(byte => parseInt(byte, 16));
         return {
           expected: `rgb(${expected.join(", ")})`,
@@ -292,6 +370,36 @@ test("a large repository exposes every directory, file page and local landmark",
     await page.getByRole("button", { name: "bulk/file-0199.rs", exact: true }).waitFor();
     await page.getByRole("button", { name: "Previous page", exact: true }).click();
     await page.getByRole("button", { name: "bulk/file-0099.rs", exact: true }).waitFor();
+    await page.getByRole("button", { name: "Next page", exact: true }).click();
+    await page.getByRole("button", { name: "bulk/file-0199.rs", exact: true }).waitFor();
+    const legend = page.locator("#map-legend");
+    const rust = legend.getByRole("button", { name: "Rust", exact: true });
+    await rust.click();
+    await page.getByText("1–100 of 2,001 entries", { exact: true }).waitFor();
+    await page.getByRole("button", { name: "Repository root", exact: true }).click();
+    const documentation = legend.getByRole("button", { name: "Documentation", exact: true });
+    await documentation.click();
+    await page.getByRole("button", { name: "Open directory z-late, 3 files", exact: true }).waitFor();
+    await rust.click();
+    const filteredDirectory = page.getByRole("button", { name: "Open directory z-late, 2 files", exact: true });
+    await filteredDirectory.waitFor();
+    assert.equal(await page.getByRole("button", { name: /Open directory bulk/ }).count(), 0);
+    await filteredDirectory.click();
+    await page.locator("#file-list").getByRole("button", { name: "z-late/guide.markdown", exact: true }).waitFor();
+    assert.deepEqual(await page.locator("#file-list button").allTextContents(), ["z-late/README.md", "z-late/guide.markdown"]);
+    await page.getByRole("button", { name: "Clear filters" }).click();
+    await page.locator("#file-list").getByRole("button", { name: "z-late/Cargo.toml", exact: true }).waitFor();
+
+    await page.getByRole("button", { name: "Repository root", exact: true }).click();
+    await rust.click();
+    await documentation.click();
+    await page.getByRole("button", { name: "Open directory bulk, 2,001 files", exact: true }).click();
+    await page.getByText("1–100 of 2,001 entries", { exact: true }).waitFor();
+    assert.equal(await documentation.getAttribute("aria-pressed"), "true");
+    await documentation.press("Space");
+    await documentation.waitFor({ state: "hidden" });
+    assert.equal(await rust.evaluate(button => button === document.activeElement), true,
+      "Removing a type absent from the open directory moves focus to a remaining filter");
     assert.deepEqual(session.errors, []);
   } finally {
     await session?.close();

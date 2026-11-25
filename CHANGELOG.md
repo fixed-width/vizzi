@@ -15,6 +15,8 @@ remains in Git and the project documentation.
   Open captured READMEs and project manifests from the map's landmarks.
 - Color file tiles by language or type in the Source browser repository map
   and overview navigator.
+- Select multiple file types in the Source browser map legend to show files matching
+  any selected type. Use **Clear filters** beside the legend to reset type and path filters.
 - Browse TOML and Markdown files with syntax coloring, including project manifests and READMEs.
 - Browse JSON files, including test fixtures, with syntax coloring in the Source browser.
 - Browse Java files with syntax colors, outlines, and written-call candidates. Use a

@@ -2,10 +2,11 @@ export function createNavigation({ capture, load, prepare:prepareView, history, 
   const session = crypto.randomUUID();
   let entries = [], cursor = 0, shown, active;
   const query = entry => ({ file: entry.file, entity: entry.entity, filter: entry.filter,
+    ...(entry.types === undefined ? {} : { types: entry.types }),
     ...(entry.directory === undefined ? {} : { directory: entry.directory, offset: entry.offset }) });
   function requestedQuery(current, patch) {
     const requested = { ...query(current), ...patch };
-    if (requested.offset !== undefined && requested.filter !== current.filter) requested.offset = 0;
+    if (requested.offset !== undefined && (requested.filter !== current.filter || requested.types !== current.types)) requested.offset = 0;
     return requested;
   }
   const copy = value => structuredClone(value);
