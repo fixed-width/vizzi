@@ -51,6 +51,7 @@ remains in Git and the project documentation.
 
 ### Fixed
 
+- Keep the repository map cursor steady during a press to avoid delayed file clicks in Brave.
 - Open files from the repository map without fetching the same map again.
 - Resolve language-server locations in files with LF, CRLF, and bare CR line endings.
 - Use the callee name's line in the Calls list and selection highlight for multiline calls.
