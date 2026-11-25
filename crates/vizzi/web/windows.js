@@ -43,9 +43,12 @@ export function createWindowReader({ transport, onWindow = () => {}, onError = (
     const {id, version, summary} = source;
     if (!opaque(id) || !opaque(version) || !summary) throw new Error("Invalid captured document summary");
     if (!integer(summary.lines) || !integer(summary.declarations)) throw new Error("Invalid captured document summary");
-    const params = new URLSearchParams(Object.entries({ ...query, snapshot:view.snapshot, file:source.id, version:source.version }).filter(([,value]) => value != null));
-    const window=await transport(`/api/window?${params}`,options);
-    if(window?.snapshot!==view.snapshot)throw new Error("Mismatched captured window");
+    let window = options.initialWindow;
+    if (window === undefined) {
+      const params = new URLSearchParams(Object.entries({ ...query, snapshot:view.snapshot, file:id, version }).filter(([,value]) => value != null));
+      window = await transport(`/api/window?${params}`,options);
+    }
+    if (window?.snapshot !== view.snapshot) throw new Error("Mismatched captured window");
     return validateDocumentWindow(source, window);
   }
   return {

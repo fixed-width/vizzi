@@ -228,15 +228,19 @@ async function openFilePage(page, directory) {
 }
 
 async function inspectAndPick(page) {
-  const frame = await page.evaluate(() => window.vizziMetrics.lastFrame);
+  const { frame, scene, currentFile } = await page.evaluate(() => ({
+    frame: window.vizziMetrics.lastFrame,
+    scene: window.vizziMetrics.scene,
+    currentFile: document.getElementById("file-title").textContent,
+  }));
   const bounds = await page.locator("#map").boundingBox();
-  const scene=await page.evaluate(()=>window.vizziMetrics.scene);
-  const target = scene.files.find(file => {
+  const candidates = scene.files.filter(file => {
     const { x, y, width, height } = file.rect, { camera } = frame;
     const centerX = camera.x + (x + width / 2) * camera.scale, centerY = camera.y + (y + height / 2) * camera.scale;
     return file.classification.kind === "assigned" && file.coverage !== "unavailable" && file.bytes > 0 && file.bytes < 131072 &&
       centerX >= 0 && centerX < frame.width - 20 && centerY >= 0 && centerY < frame.height - 20;
   });
+  const target = candidates.find(file => file.path !== currentFile) ?? candidates[0];
   assert.ok(target);
   const x = bounds.x + frame.camera.x + (target.rect.x + target.rect.width / 2) * frame.camera.scale;
   const y = bounds.y + frame.camera.y + (target.rect.y + target.rect.height / 2) * frame.camera.scale;
@@ -327,14 +331,24 @@ async function qualify(chromium, definition) {
     const payloads = [], payloadJobs = [], payloadErrors = [];
     session.page.on("response", response => {
       const url = new URL(response.url());
-      if (!["/api/view", "/api/window"].includes(url.pathname) || response.status() !== 200) return;
+      const overview = url.pathname === "/api/view";
+      const bundled = url.pathname === "/api/inspection";
+      if ((!overview && !bundled && url.pathname !== "/api/window") || response.status() !== 200) return;
       payloadJobs.push(response.body().then(body => {
         const data = JSON.parse(body.toString());
-        if (url.pathname === "/api/view") {
-          assert.equal(url.searchParams.get("projection"), "summary", "browser fetched bulk source");
-          assert.ok(!data.source || (data.source.text === null && data.source.outlines.every(outline => outline.declarations.length === 0)));
-        } else assert.ok(body.length < 512 * 1024, "window exceeded serialized payload bound");
-        payloads.push({ path:url.pathname, bytes:body.length, schema:data.schema, snapshot:data.snapshot, version:data.version ?? data.source?.version ?? null });
+        if (overview) assert.equal(url.searchParams.get("projection"), "summary", "browser fetched bulk source");
+        if (bundled || (overview && data.source)) {
+          assert.ok(data.source?.summary && data.source.text === null &&
+            data.source.outlines.every(outline => outline.declarations.length === 0),
+            "invalid source summary or unexpected bulk data");
+        }
+        const payload = bundled ? data.window : data;
+        if (!overview) {
+          assert.equal(payload?.schema, 1, "invalid document window schema");
+          const windowBytes = bundled ? Buffer.byteLength(JSON.stringify(payload)) : body.length;
+          assert.ok(windowBytes < 512 * 1024, "window exceeded serialized payload bound");
+        }
+        payloads.push({ path:url.pathname, bytes:body.length, schema:payload.schema, snapshot:payload.snapshot, version:payload.version ?? data.source?.version ?? null });
       }).catch(error => { if (!/closed|aborted|No data found|No resource with given identifier/.test(error.message)) payloadErrors.push(error.message); }));
     });
     const files = await capturedFiles(input.root, input.root, [], definition.profile);

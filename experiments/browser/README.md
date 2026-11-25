@@ -114,6 +114,8 @@ status-observed pending intervals, label counts, picking costs, heap samples, na
 RSS, browser request counts, and five single-file update observations. The driver still
 queries status from Node to classify pending periods; this is separate from the
 browser client, which consumes change notifications. Screenshots accompany the JSON report.
+The payload audit records complete browser response sizes, including the bundled response
+for a file switch, and checks the source summaries and document-window size limits.
 
 Use `--during-recovery` to replace the five spaced single-file observations with ten
 writes, each triggered after Node observes a different active private periodic pass.

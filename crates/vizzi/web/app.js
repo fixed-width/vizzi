@@ -159,6 +159,19 @@ const controller = createController({
     const url=new URL(uri,location.origin);
     url.searchParams.set("projection","summary");
     if(!url.searchParams.has("directory"))url.searchParams.set("directory",".");
+    const current=view, file=url.searchParams.get("file"), snapshot=url.searchParams.get("snapshot");
+    if(current && file && file!==current.selection.file && snapshot===current.snapshot &&
+       options.intent?.before && !options.intent.anchor && !url.searchParams.has("entity") &&
+       (url.searchParams.get("filter") ?? "")===viewFilter &&
+       url.searchParams.get("directory")===(current.browse?.directory ?? ".") &&
+       Number(url.searchParams.get("offset"))===(current.browse?.offset ?? 0)) {
+      const query=new URLSearchParams({file,snapshot});
+      const {source,window:initialWindow}=await fetchJSON(`/api/inspection?${query}`,options);
+      if(source?.id!==file || initialWindow?.line_start!==1 || initialWindow?.outline_start!==0)
+        throw new Error("Mismatched initial inspection");
+      const next={...current,source,selection:{file,entity:null}};
+      return inspector.prepare(next,{...options,initialWindow});
+    }
     const next=await fetchJSON(url,options);
     const restore=navigation.restoration(next,options.intent);
     return inspector.prepare(next,{...options,restore:restore?.position.inspector,line:options.intent?.anchor?.line,reveal:Boolean(options.intent?.anchor || options.intent?.returning && !restore)});
@@ -166,14 +179,16 @@ const controller = createController({
   onView: (next,info) => {
     const previousSelection=view?.selection.file;
     const first = !view, changedFilter=viewFilter!==(info.query.filter ?? "");
+    const changedMap=view?.files!==next.files;
     const changedPage=view?.browse?.directory!==next.browse?.directory || view?.browse?.offset!==next.browse?.offset;
     view = next;keepEvidence.disabled=!next.source;
     viewFilter=info.query.filter ?? "";
     if(info.intent?.returning || info.intent?.anchor)element("filter").value=viewFilter;
     if(mapWorkspace!==next.workspace){let preferences={};try{const saved=localStorage.getItem(`vizzi.map.v1.${next.workspace}`);if(saved && saved.length<=65536 && new TextEncoder().encode(saved).length<=65536)preferences=JSON.parse(saved);}catch{}mapModel=createMapModel(next.files,preferences,next.browse);mapWorkspace=next.workspace;}
-    else mapModel.setFiles(next.files,next.browse);
+    else if(changedMap)mapModel.setFiles(next.files,next.browse);
+    const layoutRevision=mapModel.revision;
     if(!first && previousSelection!==next.selection.file || info.intent?.anchor)mapModel.reveal(next.selection.file);
-    refreshScene();
+    if(changedMap || mapModel.revision!==layoutRevision)refreshScene();
     element("empty").hidden = (next.browse?.entries ?? next.files.length) > 0;
     renderPage();
     element("file-title").textContent = next.source?.path ?? "Choose a file";

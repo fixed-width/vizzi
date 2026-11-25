@@ -14,7 +14,7 @@ use axum::{
 };
 use serde::Deserialize;
 use std::sync::{Arc, OnceLock};
-use vizzi_core::query::{View, ViewQuery};
+use vizzi_core::query::{SourceView, View, ViewQuery};
 use vizzi_core::{
     model::SnapshotId,
     projection::{Window, WindowQuery},
@@ -100,6 +100,7 @@ pub fn router(application: Arc<Application>) -> Router {
     Router::new()
         .route("/api/status", get(status)).route("/api/view", get(view)).route("/api/source", get(source))
         .route("/api/events", get(events)).route("/api/window",get(window))
+        .route("/api/inspection", get(inspection))
         .route("/", get(source_browser))
         .route("/workspace", get(visual_workspace))
         .route("/visual.css", get(|| async { asset("text/css; charset=utf-8", include_str!("../web/visual.css")) }))
@@ -272,6 +273,37 @@ struct PinnedWindow {
     snapshot: SnapshotId,
     #[serde(flatten)]
     window: Window,
+}
+#[derive(serde::Serialize)]
+struct Inspection {
+    source: SourceView,
+    window: PinnedWindow,
+}
+async fn inspection(
+    State(app): State<Arc<Application>>,
+    Query(query): Query<SourceQuery>,
+) -> Result<Json<Inspection>, ApiError> {
+    let snapshot = app.pinned(&query.snapshot).ok_or((
+        StatusCode::CONFLICT,
+        "Snapshot expired or unknown; reload inspection".into(),
+    ))?;
+    let file = snapshot.file(&query.file).cloned().ok_or((
+        StatusCode::NOT_FOUND,
+        "File is absent from this snapshot".into(),
+    ))?;
+    let snapshot_id = snapshot.id().clone();
+    Ok(Json(
+        source_work(move || {
+            Ok(Inspection {
+                source: file.source_summary(None),
+                window: PinnedWindow {
+                    snapshot: snapshot_id,
+                    window: file.window(&WindowQuery::default(), None)?,
+                },
+            })
+        })
+        .await?,
+    ))
 }
 async fn window(
     State(app): State<Arc<Application>>,
@@ -490,6 +522,7 @@ mod tests {
             view["snapshot"].as_str().unwrap(),
             view["source"]["id"].as_str().unwrap()
         );
+        let inspection_uri = pinned_uri.replacen("/api/source", "/api/inspection", 1);
         std::fs::write(root.path().join("a.rs"), "fn edited() {}").unwrap();
         let ticket = application.request();
         application.publish(
@@ -506,6 +539,20 @@ mod tests {
             serde_json::from_str::<serde_json::Value>(&pinned.body).unwrap()["text"],
             "fn original() {}"
         );
+        let inspection = diagnostic(router.clone(), serde_json::json!(7), &inspection_uri)
+            .await
+            .unwrap();
+        assert_eq!(inspection.status, 200);
+        let inspection: serde_json::Value = serde_json::from_str(&inspection.body).unwrap();
+        assert_eq!(inspection["window"]["snapshot"], view["snapshot"]);
+        assert_eq!(inspection["window"]["file"], inspection["source"]["id"]);
+        assert_eq!(
+            inspection["window"]["version"],
+            inspection["source"]["version"]
+        );
+        assert_eq!(inspection["window"]["lines"][0]["text"], "fn original() {}");
+        assert_eq!(inspection["window"]["outline"][0]["name"], "original");
+        assert_eq!(inspection["source"]["summary"]["declarations"], 1);
         let pinned_view = diagnostic(
             router.clone(),
             serde_json::json!(6),

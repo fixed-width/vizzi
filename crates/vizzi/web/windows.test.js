@@ -27,6 +27,9 @@ test("preparation is side-effect free; current errors report once and absent sou
   const applied=[],errors=[],calls=[];const v=view();
   const reader=createWindowReader({transport:async(uri)=>{calls.push(uri);return windowFor(v);},onWindow:w=>applied.push(w),onError:e=>errors.push(e)});
   assert.equal((await reader.prepare(v,{})).version,"v1");assert.equal(applied.length,0);assert.equal(await reader.prepare({snapshot:"one",source:null},{}),null);assert.equal(calls.length,1);
+  const bundled = windowFor(v);
+  assert.equal(await reader.prepare(v, {}, { initialWindow: bundled }), bundled);
+  assert.equal(calls.length, 1);
   reader.activate(v);assert.equal(await reader.request({}),true);assert.equal(applied.length,1);
   const errorReader=createWindowReader({transport:async()=>{throw new Error("offline");},onError:e=>errors.push(e)});errorReader.activate(v);assert.equal(await errorReader.request({}),false);assert.equal(errors.length,1);
 });
@@ -52,6 +55,7 @@ test("independently invalid metadata, row types and aggregate budgets cannot be 
   const reader=createWindowReader({transport:async uri=>{lastUri=uri;return data;}});
   for(const change of [v=>v.snapshot="",v=>v.snapshot=7,v=>v.source.id="x".repeat(257),v=>v.source.id={length:1},v=>v.source.version="",v=>v.source.summary.lines=-1,v=>v.source.summary.declarations=1.5]){
     v=view();change(v);data=windowFor(v);await assert.rejects(reader.prepare(v,{}),/summary/);
+    await assert.rejects(reader.prepare(v, {}, { initialWindow: data }), /summary/);
   }
   v=view();data=windowFor(v);await reader.prepare(v,{line_start:undefined,column_line:null,column:0});
   const query=new URL(lastUri,"http://local").searchParams;assert.equal(query.has("line_start"),false);assert.equal(query.has("column_line"),false);assert.equal(query.get("column"),"0");
