@@ -485,10 +485,12 @@ pathFilter.addEventListener("input", () => {
   filterTimer = setTimeout(() => navigate({}), 160);
 });
 clearFilters.addEventListener("click", () => {
+  const hadTypeFilters = selectedTypes.size > 0;
   pathFilter.value = "";
-  pathFilter.focus();
   selectedTypes.clear();
   renderMapLegend();
+  const nextFocus = hadTypeFilters ? element("map-legend").querySelector("button") : null;
+  (nextFocus ?? pathFilter).focus();
   void navigate({});
 });
 element("map-page-previous").addEventListener("click",()=>changePage(-1));

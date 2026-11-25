@@ -193,13 +193,15 @@ test("map legend toggles combine file types and Clear filters restores the full 
     const rust = legend.getByRole("button", { name: "Rust", exact: true });
     const python = legend.getByRole("button", { name: "Python", exact: true });
     const search = page.getByRole("searchbox", { name: "Find a file" });
-    const clear = page.getByRole("button", { name: "Clear filters" });
+    const clear = page.getByRole("group", { name: "Map filters and legend" })
+      .getByRole("button", { name: "Clear filters" });
     const mapTypes = () => [...new Set(vizziMetrics.scene.files.map(file => file.type))].sort().join(",");
     const initialTypes = await page.evaluate(mapTypes);
     assert.equal(await clear.isVisible(), false);
     assert.equal(await python.getAttribute("aria-pressed", { timeout: 3000 }), "false");
     await python.press("Space");
     await page.waitForFunction(() => vizziMetrics.scene.files.map(file => file.path).join() === "src/z.py");
+    await clear.waitFor({ state: "visible", timeout: 3000 });
     assert.equal(await python.getAttribute("aria-pressed"), "true");
     assert.equal(await python.evaluate(button => button === document.activeElement), true);
     await rust.click();
@@ -217,12 +219,20 @@ test("map legend toggles combine file types and Clear filters restores the full 
     await page.locator("#empty").waitFor({ state: "visible" });
     assert.equal(await page.locator("#file-list button").count(), 0);
     assert.equal(await rust.getAttribute("aria-pressed"), "true");
-    await clear.click();
+    await clear.press("Enter");
     await page.locator("#empty").waitFor({ state: "hidden" });
     assert.equal(await page.evaluate(mapTypes), initialTypes);
     assert.equal(await search.inputValue(), "");
     assert.equal(await rust.getAttribute("aria-pressed"), "false");
     assert.equal(await clear.isVisible(), false);
+    assert.equal(await legend.getByRole("button").first().evaluate(button => button === document.activeElement), true);
+
+    await search.fill("src/z.py");
+    await page.waitForFunction(() => vizziMetrics.scene.files.map(file => file.path).join() === "src/z.py");
+    await clear.click();
+    await page.waitForFunction(() => vizziMetrics.scene.files.some(file => file.type === "rust"));
+    assert.equal(await search.inputValue(), "");
+    assert.equal(await search.evaluate(input => input === document.activeElement), true);
     assert.deepEqual(session.errors, []);
   } finally { await session.close(); }
 });
