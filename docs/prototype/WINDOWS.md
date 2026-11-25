@@ -21,6 +21,11 @@ derived identity index lazily once per immutable document. That first lookup rem
 linear in declaration count and retains its index with that document. It does not
 copy full source or every declaration name into each response.
 
+When switching files within the displayed snapshot and map page, the Source browser
+keeps the overview and requests `GET /api/inspection?snapshot=…&file=…`. The response
+contains the selected `source` summary and its first pinned `window`, with no active
+declaration. A missing file returns **404** and an expired snapshot returns **409**.
+
 ## Pinned windows
 
 `GET /api/window` requires `snapshot`, `file`, and `version`. The response identifies

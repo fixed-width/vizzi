@@ -51,6 +51,7 @@ remains in Git and the project documentation.
 
 ### Fixed
 
+- Open files from the repository map without fetching the same map again.
 - Resolve language-server locations in files with LF, CRLF, and bare CR line endings.
 - Use the callee name's line in the Calls list and selection highlight for multiline calls.
 - Refresh installed JavaScript and TypeScript resolutions after package manifest edits.

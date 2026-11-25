@@ -2,10 +2,11 @@
 
 use crate::{
     model::{
-        BULK_SOURCE_LIMIT, CapturePolicyId, Context, Coverage, DocumentVersion, EntityId, FileId,
-        Snapshot, SnapshotId, SourceEncoding, SourceReadError,
+        BULK_SOURCE_LIMIT, CapturePolicyId, Context, Coverage, Document, DocumentVersion, EntityId,
+        FileId, Snapshot, SnapshotId, SourceEncoding, SourceReadError,
     },
     policy::Classification,
+    projection::Summary,
 };
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
@@ -123,7 +124,7 @@ pub struct Outline {
 pub struct SourceView {
     /// Present only in schema-3 summary views.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub summary: Option<crate::projection::Summary>,
+    pub summary: Option<Summary>,
     /// Captured document version, permitting reuse across unchanged source projections.
     pub version: DocumentVersion,
     /// Opaque file identity.
@@ -183,6 +184,59 @@ pub struct View {
     pub source: Option<SourceView>,
 }
 
+impl Document {
+    /// Projects the source metadata needed to inspect this captured document.
+    pub fn source_summary(&self, entity: Option<&str>) -> SourceView {
+        let summary = Summary {
+            lines: self.captured().line_count(),
+            declarations: self.declaration_count(),
+            active: entity
+                .and_then(|id| self.entity_position(id))
+                .and_then(|index| self.entry(index)),
+        };
+        self.source_view(Some(summary), None)
+    }
+
+    fn source_view(&self, summary: Option<Summary>, text: Option<String>) -> SourceView {
+        let declaration_limit = if summary.is_some() { 0 } else { usize::MAX };
+        SourceView {
+            summary,
+            text,
+            version: self.version().clone(),
+            id: self.id().clone(),
+            path: self.path().into(),
+            encoding: self.encoding(),
+            classification: self.classification().clone(),
+            outlines: self
+                .analyses()
+                .iter()
+                .map(|analysis| Outline {
+                    mode: "raw_syntax",
+                    configuration_coverage: "unknown",
+                    context: analysis.context.clone(),
+                    coverage: analysis.coverage.clone(),
+                    diagnostics: analysis.diagnostics.clone(),
+                    declarations: analysis
+                        .facts
+                        .iter()
+                        .take(declaration_limit)
+                        .map(|fact| {
+                            let lines = self.lines(&fact.span);
+                            Declaration {
+                                id: self.entity_id(analysis, fact),
+                                name: fact.name.clone(),
+                                kind: fact.kind.clone(),
+                                start_line: lines.start,
+                                end_line: lines.end,
+                            }
+                        })
+                        .collect(),
+                })
+                .collect(),
+        }
+    }
+}
+
 impl Snapshot {
     /// Computes a linked view without reading mutable source files.
     pub fn view(&self, query: &ViewQuery) -> Result<View, SourceReadError> {
@@ -222,61 +276,14 @@ impl Snapshot {
             .or_else(|| limited.first().copied());
         let source = selected
             .map(|file| -> Result<SourceView, SourceReadError> {
-                Ok(SourceView {
-                    summary: (query.projection == Some(Projection::Summary)).then(|| {
-                        crate::projection::Summary {
-                            lines: file.captured().line_count(),
-                            declarations: file.declaration_count(),
-                            active: query
-                                .entity
-                                .as_deref()
-                                .and_then(|id| file.entity_position(id))
-                                .and_then(|index| file.entry(index)),
-                        }
-                    }),
-                    version: file.version().clone(),
-                    id: file.id().clone(),
-                    path: file.path().into(),
-                    text: if query.projection.is_some() {
-                        None
-                    } else {
-                        file.captured()
-                            .read_text(source_limit)?
-                            .map(|text| text.into_owned())
-                    },
-                    encoding: file.encoding(),
-                    classification: file.classification().clone(),
-                    outlines: file
-                        .analyses()
-                        .iter()
-                        .map(|analysis| Outline {
-                            mode: "raw_syntax",
-                            configuration_coverage: "unknown",
-                            context: analysis.context.clone(),
-                            coverage: analysis.coverage.clone(),
-                            diagnostics: analysis.diagnostics.clone(),
-                            declarations: analysis
-                                .facts
-                                .iter()
-                                .take(if query.projection.is_none() {
-                                    usize::MAX
-                                } else {
-                                    0
-                                })
-                                .map(|fact| {
-                                    let lines = file.lines(&fact.span);
-                                    Declaration {
-                                        id: file.entity_id(analysis, fact),
-                                        name: fact.name.clone(),
-                                        kind: fact.kind.clone(),
-                                        start_line: lines.start,
-                                        end_line: lines.end,
-                                    }
-                                })
-                                .collect(),
-                        })
-                        .collect(),
-                })
+                if query.projection == Some(Projection::Summary) {
+                    return Ok(file.source_summary(query.entity.as_deref()));
+                }
+                let text = file
+                    .captured()
+                    .read_text(source_limit)?
+                    .map(|text| text.into_owned());
+                Ok(file.source_view(None, text))
             })
             .transpose()?;
         let entity = source

@@ -15,6 +15,50 @@ before(async () => {
 });
 after(async () => { await chromium?.close(); await host?.close(); await input?.close(); });
 
+test("opening a map tile fetches the first source screen without reloading the map", async () => {
+  const session = await openWorkspace(chromium, host);
+  try {
+    const { page, requests } = session;
+    await page.getByRole("button", { name: "Fit map", exact: true }).click();
+    await paint(page);
+    const position = await page.evaluate(() => {
+      const { rect } = vizziMetrics.scene.files.find(file => file.path === "src/b.rs");
+      const { camera } = vizziMetrics.lastFrame;
+      return {
+        x: camera.x + (rect.x + rect.width / 2) * camera.scale,
+        y: camera.y + (rect.y + rect.height / 2) * camera.scale,
+      };
+    });
+    const start = requests.length;
+    await page.locator("#map").click({ position });
+    await page.locator("#source .code-line").filter({ hasText: "fn beta() {}" }).waitFor();
+    assert.equal(await page.locator("#file-title").textContent(), "src/b.rs");
+    assert.match(await page.locator("#outline").textContent(), /beta/);
+    assert.deepEqual(requests.slice(start).filter(path => path !== "/api/structure"), ["/api/inspection"]);
+    assert.deepEqual(session.errors, []);
+  } finally { await session.close(); }
+});
+
+test("a bundled inspection with a missing version keeps the current file visible", async () => {
+  const session = await openWorkspace(chromium, host);
+  try {
+    const { page } = session;
+    const title = page.locator("#file-title");
+    const previous = await title.textContent();
+    await page.route("**/api/inspection?**", async route => {
+      const response = await route.fetch();
+      const data = await response.json();
+      data.source.version = "";
+      data.window.version = "";
+      await route.fulfill({ response, json: data });
+    });
+    await page.getByText("Accessible file list", { exact: true }).click();
+    await page.locator("#file-list").getByRole("button", { name: "src/b.rs", exact: true }).click();
+    await page.locator("#error").getByText(/Invalid captured document summary/).waitFor({ timeout: 3000 });
+    assert.equal(await title.textContent(), previous);
+  } finally { await session.close(); }
+});
+
 test("map tiles retain their language fills through selection, recovery and theme changes", async () => {
   const session = await openWorkspace(chromium, host);
   const { page } = session;
