@@ -4,7 +4,7 @@ use crate::{
     analysis::{Analyzer, LanguageAdapter},
     calls::CallExpression,
     model::{Context, ContextId, ModelError},
-    syntax::{CallRules, Declaration, SyntaxAnalyzer},
+    syntax::{CallRules, Declaration, SyntaxAnalyzer, unparenthesized},
 };
 use tree_sitter::Node;
 
@@ -87,19 +87,68 @@ impl LanguageAdapter for Dialect {
                 [HIGHLIGHTS_QUERY, HIGHLIGHT_QUERY, JSX_HIGHLIGHT_QUERY].join("\n"),
             ),
         };
-        Ok(Box::new(SyntaxAnalyzer::new(
-            grammar.into(),
-            &highlights,
-            self.context(),
-            collect,
-            scope,
-            CALLS,
-        )?))
+        Ok(Box::new(
+            SyntaxAnalyzer::new(
+                grammar.into(),
+                &highlights,
+                self.context(),
+                collect,
+                scope,
+                CALLS,
+            )?
+            .with_entry_point(entry_point),
+        ))
     }
 
     fn supports_written_calls(&self) -> bool {
         CALLS.supported()
     }
+}
+
+fn entry_point(node: Node<'_>, text: &str) -> bool {
+    if node.kind() != "if_statement"
+        || node
+            .parent()
+            .is_none_or(|parent| parent.kind() != "program")
+    {
+        return false;
+    }
+    let Some(condition) = node.child_by_field_name("condition").map(unparenthesized) else {
+        return false;
+    };
+    if let Some(object) = main_member_object(condition, text) {
+        return object.kind() == "meta_property"
+            && object
+                .children(&mut object.walk())
+                .any(|token| token.kind() == "import");
+    }
+    condition.kind() == "binary_expression"
+        && condition
+            .child_by_field_name("operator")
+            .is_some_and(|operator| operator.kind() == "===")
+        && condition
+            .child_by_field_name("left")
+            .zip(condition.child_by_field_name("right"))
+            .is_some_and(|(left, right)| {
+                let (left, right) = (unparenthesized(left), unparenthesized(right));
+                commonjs_guard(left, right, text) || commonjs_guard(right, left, text)
+            })
+}
+
+fn main_member_object<'tree>(node: Node<'tree>, text: &str) -> Option<Node<'tree>> {
+    if node.kind() != "member_expression" || node.child_by_field_name("optional_chain").is_some() {
+        return None;
+    }
+    let property = node.child_by_field_name("property")?;
+    (text.get(property.byte_range()) == Some("main")).then_some(node.child_by_field_name("object")?)
+}
+
+fn commonjs_guard(member: Node<'_>, module: Node<'_>, text: &str) -> bool {
+    module.kind() == "identifier"
+        && text.get(module.byte_range()) == Some("module")
+        && main_member_object(member, text).is_some_and(|object| {
+            object.kind() == "identifier" && text.get(object.byte_range()) == Some("require")
+        })
 }
 
 fn is_class_declaration(node: Node<'_>) -> bool {

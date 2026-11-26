@@ -164,6 +164,9 @@ pub struct Analysis {
     pub facts: Vec<Fact>,
     /// Recovery or availability explanations.
     pub diagnostics: Vec<String>,
+    /// Whether the captured syntax contains a recognized execution entry point.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub has_entry_point: bool,
 }
 
 /// Rejected inconsistent or ambiguous input.
@@ -275,6 +278,12 @@ impl Document {
                 return Err(ModelError(
                     "deferred analysis cannot contain facts or styles".into(),
                 ));
+            }
+            if analysis.has_entry_point
+                && (!matches!(analysis.coverage, Coverage::Syntax | Coverage::Partial)
+                    || text.is_none_or(str::is_empty))
+            {
+                return Err(ModelError("entry point requires captured syntax".into()));
             }
             let analysis_start = outline_depths.len();
             for (ordinal, fact) in analysis.facts.iter().enumerate() {
@@ -611,6 +620,7 @@ mod tests {
         Analysis {
             calls: None,
             coloring: None,
+            has_entry_point: false,
             content: ContentId::derive(&[text]),
             context: Context {
                 language: "rust".into(),
@@ -631,6 +641,23 @@ mod tests {
             }],
             diagnostics: vec![],
         }
+    }
+    #[test]
+    fn cached_entry_point_facts_default_to_absent_and_round_trip() {
+        let mut recorded = analysis(b"fn f() {}");
+        let legacy = serde_json::to_value(&recorded).unwrap();
+        assert!(legacy.get("has_entry_point").is_none());
+        assert_eq!(
+            serde_json::from_value::<Analysis>(legacy).unwrap(),
+            recorded
+        );
+
+        recorded.has_entry_point = true;
+        let encoded = serde_json::to_value(&recorded).unwrap();
+        assert_eq!(
+            serde_json::from_value::<Analysis>(encoded).unwrap(),
+            recorded
+        );
     }
     #[test]
     fn rejects_facts_for_different_source_or_invalid_spans() {
@@ -717,6 +744,7 @@ mod tests {
         let changed = Analysis {
             calls: None,
             coloring: None,
+            has_entry_point: false,
             content: ContentId::derive(&[b""]),
             facts: vec![],
             ..analysis(b"")

@@ -462,7 +462,7 @@ impl Snapshot {
                 files.push(FileTile {
                     id: file.id().clone(),
                     path: file.path().into(),
-                    landmark: LandmarkKind::for_path(file.path()),
+                    landmark: LandmarkKind::for_document(file),
                     bytes: file.bytes(),
                     coverage,
                     classification: file.classification().clone(),

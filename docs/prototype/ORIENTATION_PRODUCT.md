@@ -64,11 +64,20 @@ directories first. The map and accessible file list display the same page, and t
 controls show its range and total. Path search still covers the whole repository and
 pages through large result sets. Clearing the filter returns to directory browsing.
 
-Surface captured READMEs and recognized project manifests for the current directory near
-the top of the map pane. A landmark opens its captured text like any file. Capture
-conventional README names as source-only, subject to the workspace's source exclusions.
+Surface the current directory's captured README, recognized project manifests, and files
+with recognized execution entry points near the top of the map pane. Ruby gem specifications
+use the `.gemspec` suffix. List each file once, even if it contains several entry points.
+A landmark opens its captured text like any file. Directory paging leaves these links available.
+Capture conventional README names as source-only, subject to the workspace's source exclusions.
+
+Entry points are based on source conventions. Recognize top-level Rust `main` functions,
+global C/C++ `main` definitions, Java launcher-style `main` methods, Python `__main__.py`
+modules and top-level `__name__` guards, top-level Ruby direct-launch guards, and top-level
+CommonJS or ECMAScript main-module guards in JavaScript and TypeScript. A helper named `main`
+in an ordinary scope is insufficient. These links describe captured source. The actual
+entry point of a particular build or launch depends on that project's configuration and runtime.
 
 Verify with a fixture containing a directory absent from the initial file slice and a
 directory with more than one page of files. Open a late file, navigate back to the root,
-and open both a README and a manifest. Check the existing small-repository map interactions
-as well.
+and open a README, a manifest and an entry-point file. Check the existing small-repository
+map interactions as well.

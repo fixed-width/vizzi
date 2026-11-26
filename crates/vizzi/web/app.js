@@ -346,8 +346,9 @@ function renderLandmarks() {
   const list=element("landmark-files");
   const direct=file=>file.path.slice(0,file.path.lastIndexOf("/")+1)===(scene.focus==="."?"":`${scene.focus}/`);
   const files=viewFilter?[]:view.browse?.landmarks ?? view.files.filter(file=>file.landmark && direct(file));
-  const readme=files.find(file=>(file.kind ?? file.landmark)==="readme");
-  const landmarks=files.filter(file=>(file.kind ?? file.landmark)==="manifest");
+  const isReadme=file=>(file.kind ?? file.landmark)==="readme";
+  const readme=files.find(isReadme);
+  const landmarks=files.filter(file=>!isReadme(file));
   if(readme)landmarks.unshift(readme);
   const key=JSON.stringify(landmarks.map(file=>[file.id,file.path]));
   if(list.dataset.files===key)return;

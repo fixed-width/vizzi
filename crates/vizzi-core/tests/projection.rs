@@ -20,6 +20,7 @@ fn document(text: &str, names: &[String]) -> Arc<Document> {
             vec![Analysis {
                 calls: None,
                 coloring: None,
+                has_entry_point: false,
                 content: ContentId::derive(&[text.as_bytes()]),
                 context: Context {
                     language: "fixture".into(),

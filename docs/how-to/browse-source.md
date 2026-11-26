@@ -17,7 +17,7 @@ and corner marks show syntax recovery and deferred or unavailable analysis.
 Selecting a declaration reveals its lines; kind badges distinguish types, functions and
 other declarations. **Line N** is the declaration's starting line.
 
-In a large repository, start with **Landmarks** to open a README or project manifest
+In a large repository, start with **Landmarks** to open a README, project manifest, or entry-point file
 when one is available. Select a directory card on the map or a directory name in the
 list to see what's inside. Each directory shows its total captured file count. Use the
 breadcrumbs to return to a parent directory.

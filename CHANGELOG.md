@@ -18,6 +18,8 @@ remains in Git and the project documentation.
   the Source browser.
 - Browse every captured file in large repositories through directory cards and pages.
   Open captured READMEs and project manifests from the map's landmarks.
+- Open Ruby gem specifications and files with recognized execution entry points from
+  the Source browser's landmarks.
 - Color file tiles by language or type in the Source browser repository map
   and overview navigator.
 - Select multiple file types in the Source browser map legend to show files matching

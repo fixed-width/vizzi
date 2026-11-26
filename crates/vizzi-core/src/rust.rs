@@ -7,6 +7,8 @@ use crate::{
     syntax::{CallRules, Declaration, SyntaxAnalyzer},
 };
 
+use tree_sitter::Node;
+
 const CALLS: CallRules = CallRules {
     expressions: &[CallExpression {
         kind: "call_expression",
@@ -53,7 +55,8 @@ impl RustAnalyzer {
                 collect,
                 declaration,
                 CALLS,
-            )?,
+            )?
+            .with_entry_point(entry_point),
         })
     }
     /// Identifies the current grammar, configuration, and source implementation.
@@ -102,6 +105,48 @@ impl Analyzer for RustAnalyzer {
         self.syntax
             .analyze_with_state(bytes, previous, retain_weight, cancelled)
     }
+}
+
+fn entry_point(node: Node<'_>, text: &str) -> bool {
+    if node.kind() != "function_item"
+        || node
+            .child_by_field_name("name")
+            .and_then(|name| text.get(name.byte_range()))
+            .map(|name| name.strip_prefix("r#").unwrap_or(name))
+            != Some("main")
+    {
+        return false;
+    }
+    let Some(root) = node
+        .parent()
+        .filter(|parent| parent.kind() == "source_file")
+    else {
+        return false;
+    };
+    node.child_by_field_name("type_parameters").is_none()
+        && node
+            .child_by_field_name("parameters")
+            .is_some_and(|parameters| {
+                parameters
+                    .named_children(&mut parameters.walk())
+                    .all(|child| child.is_extra())
+            })
+        && !node
+            .named_children(&mut node.walk())
+            .any(|child| child.kind() == "where_clause")
+        && !root
+            .named_children(&mut root.walk())
+            .filter(|child| !child.is_extra() && child.kind() != "shebang")
+            .take_while(|child| child.kind() == "inner_attribute_item")
+            .filter_map(|item| item.named_child(0))
+            .any(|attr| {
+                attr.child_by_field_name("arguments").is_none()
+                    && attr.child_by_field_name("value").is_none()
+                    && attr
+                        .named_child(0)
+                        .and_then(|name| text.get(name.byte_range()))
+                        == Some("no_main")
+            })
 }
 
 fn collect(node: tree_sitter::Node<'_>, text: &str, output: &mut Vec<Declaration>) {

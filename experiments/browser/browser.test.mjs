@@ -284,6 +284,33 @@ test("forced colors preserves the map swatches and adapts legend text", async ()
   } finally { await session.close(); }
 });
 
+test("landmarks in the nested map reflect current entry-point syntax", async () => {
+  const fixture = await workspace({ files: {
+    "my-tools.gemspec": "Gem::Specification.new {}\n",
+    "start.py": "if __name__ == '__main__' and enabled:\n    run()\n",
+    "helper.py": "def main(): pass\n",
+  } });
+  let localHost, session;
+  try {
+    localHost = await startHost(fixture);
+    session = await openWorkspace(chromium, localHost);
+    const { page } = session;
+    const landmarks = page.locator("#map-landmarks");
+    const entry = landmarks.getByRole("button", { name: "start.py", exact: true });
+    await entry.waitFor();
+    assert.deepEqual(await landmarks.getByRole("button").allTextContents(), ["my-tools.gemspec", "start.py"]);
+    await entry.click();
+    await page.waitForFunction(() => document.getElementById("file-title").textContent === "start.py");
+    await writeFile(join(fixture.root, "start.py"), "def main(): pass\n");
+    await entry.waitFor({ state: "hidden" });
+    assert.deepEqual(await landmarks.getByRole("button").allTextContents(), ["my-tools.gemspec"]);
+  } finally {
+    await session?.close();
+    await localHost?.close();
+    await fixture.close();
+  }
+});
+
 test("a large repository exposes every directory, file page and local landmark", async () => {
   const files = Object.fromEntries(Array.from({ length: 2001 }, (_, index) => [
     `bulk/file-${String(index).padStart(4, "0")}.rs`, "",
@@ -291,17 +318,22 @@ test("a large repository exposes every directory, file page and local landmark",
   const fixture = await workspace({ files: {
     ...files,
     "README.md": "# Project orientation\n",
+    "toolkit.gemspec": "Gem::Specification.new { |spec| spec.name = 'toolkit' }\n",
     "z-late/README.md": "# Late subsystem\n",
     "z-late/Cargo.toml": '[package]\nname = "late"\nversion = "0.1.0"\n',
     "z-late/settings.toml": "enabled = true # Toggle\n",
     "z-late/guide.markdown": "See **this** and `🙂code`.\n",
-    "z-late/target.rs": "fn late_target() {}\n",
+    "z-late/target.rs": "fn r#main() {}\n",
   } });
   let localHost, session;
   try {
     localHost = await startHost(fixture);
     session = await openWorkspace(chromium, localHost);
     const { page } = session;
+    const landmarks = page.locator("#map-landmarks");
+    await landmarks.getByRole("button", { name: "toolkit.gemspec", exact: true }).click();
+    await page.waitForFunction(() => document.getElementById("file-title").textContent === "toolkit.gemspec");
+    assert.equal(await landmarks.getByRole("button", { name: "target.rs", exact: true }).count(), 0);
     await page.locator("#map-landmarks").getByRole("button", { name: "README.md" }).click({ timeout: 5000 });
     await page.locator("#source .syntax-keyword").getByText("# Project orientation", { exact: true }).waitFor();
     assert.match(await page.locator("#coverage").textContent(), /Source only · README/);
@@ -316,6 +348,8 @@ test("a large repository exposes every directory, file page and local landmark",
     await page.locator("#map-landmarks").getByRole("button", { name: "Cargo.toml" }).click();
     await page.locator("#source .syntax-type").getByText("[package]", { exact: true }).waitFor();
     assert.equal(await page.locator("#file-title").textContent(), "z-late/Cargo.toml");
+    await landmarks.getByRole("button", { name: "target.rs", exact: true }).click();
+    await page.waitForFunction(() => document.getElementById("file-title").textContent === "z-late/target.rs");
     await page.getByText("Accessible file list", { exact: true }).click();
     await page.locator("#file-list").getByRole("button", { name: "z-late/settings.toml", exact: true }).click();
     await page.locator("#source .syntax-constant").getByText("true", { exact: true }).waitFor();

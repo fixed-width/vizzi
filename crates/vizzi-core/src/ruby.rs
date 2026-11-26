@@ -2,7 +2,7 @@
 use crate::{
     analysis::{Analyzer, LanguageAdapter},
     model::{Context, ContextId, ModelError},
-    syntax::{CallRules, Declaration, SyntaxAnalyzer},
+    syntax::{CallRules, Declaration, SyntaxAnalyzer, unparenthesized},
 };
 use tree_sitter::Node;
 
@@ -35,19 +35,54 @@ impl LanguageAdapter for RubyAdapter {
         }
     }
     fn create(&self) -> Result<Box<dyn Analyzer>, ModelError> {
-        Ok(Box::new(SyntaxAnalyzer::new(
-            tree_sitter_ruby::LANGUAGE.into(),
-            include_str!("ruby-highlights.scm"),
-            self.context(),
-            collect,
-            scope,
-            CALLS,
-        )?))
+        Ok(Box::new(
+            SyntaxAnalyzer::new(
+                tree_sitter_ruby::LANGUAGE.into(),
+                include_str!("ruby-highlights.scm"),
+                self.context(),
+                collect,
+                scope,
+                CALLS,
+            )?
+            .with_entry_point(entry_point),
+        ))
     }
     fn supports_written_calls(&self) -> bool {
         CALLS.supported()
     }
 }
+fn entry_point(node: Node<'_>, text: &str) -> bool {
+    if !matches!(node.kind(), "if" | "if_modifier")
+        || node
+            .parent()
+            .is_none_or(|parent| parent.kind() != "program")
+    {
+        return false;
+    }
+    let Some(condition) = node
+        .child_by_field_name("condition")
+        .map(unparenthesized)
+        .filter(|node| node.kind() == "binary")
+    else {
+        return false;
+    };
+    condition
+        .child_by_field_name("operator")
+        .is_some_and(|operator| operator.kind() == "==")
+        && condition
+            .child_by_field_name("left")
+            .zip(condition.child_by_field_name("right"))
+            .is_some_and(|(left, right)| {
+                let left = text.get(left.byte_range());
+                let right = text.get(right.byte_range());
+                matches!(
+                    (left, right),
+                    (Some("__FILE__"), Some("$0" | "$PROGRAM_NAME"))
+                        | (Some("$0" | "$PROGRAM_NAME"), Some("__FILE__"))
+                )
+            })
+}
+
 fn declaration(node: Node<'_>, text: &str) -> Option<(&'static str, String)> {
     if node.kind() == "assignment" {
         let left = node.child_by_field_name("left")?;

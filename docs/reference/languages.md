@@ -13,6 +13,20 @@ are separate capabilities; recognising a declaration does not imply resolving it
 | Source outside the configured repository | Locally available Python/stub captures through Pyright | Local captures through rust-analyzer | Local Ruby source reached through Ruby LSP | Local C/C++ captures through clangd |
 | Language module/package cues | Recognised Python modules/packages | Captured Cargo target/module structure | Declared Ruby modules, including reopened namespaces | Not available |
 
+## Execution entry-point landmarks
+
+| Language | Recognised source convention |
+| --- | --- |
+| Rust | Top-level `fn main` without parameters or generics, including async runtime attributes |
+| C and C++ | Global `int main` definitions with the conventional no-argument or `argc`/`argv` signatures |
+| Java | Non-private `void main` methods with a body and either no arguments or a single `String[]` or varargs parameter. Instance entry points require a class that needs no enclosing instance. No-argument and instance entry points require a compatible Java runtime. |
+| Python | `__main__.py` and top-level `if` guards that require `__name__ == "__main__"`, including guards joined with other conditions by `and` |
+| Ruby | Top-level guards comparing `__FILE__` with `$PROGRAM_NAME` or `$0` |
+| JavaScript and TypeScript | Top-level `if (require.main === module)` and `if (import.meta.main)` guards |
+
+These landmarks describe captured source. The active target, runtime version, and
+conditional compilation can affect where a program actually starts.
+
 ## JavaScript and TypeScript
 
 Default source capture includes `.js`, `.jsx`, `.mjs`, `.cjs`, `.ts`, `.mts`, `.cts` and
