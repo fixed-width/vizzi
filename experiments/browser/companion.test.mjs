@@ -13,10 +13,45 @@ try{
  const add=async(path,title)=>{await known();await page.getByLabel('Workspace-relative path',{exact:true}).fill(path);await page.getByLabel('What does this location contribute?',{exact:true}).fill(title);await page.waitForFunction(()=>!document.querySelector('#pin-source').disabled);await page.getByRole('button',{name:'Save location',exact:true}).click();await page.waitForFunction(title=>[...document.querySelectorAll('.evidence-card h2')].some(n=>n.textContent===title),title);};
  await known();await page.getByLabel('Workspace-relative path',{exact:true}).fill('src/missing.rs');await page.getByLabel('What does this location contribute?',{exact:true}).fill('Missing');await page.waitForFunction(()=>!document.querySelector('#pin-source').disabled);await page.getByRole('button',{name:'Save location',exact:true}).click();await page.locator('#source-dialog-error').waitFor({state:'visible'});assert.match(await page.locator('#source-dialog-error').textContent(),/not in the current source index/);await page.getByRole('button',{name:'Cancel',exact:true}).click();
  await add('src/entry.rs','Entry point');await add('src/reader.rs','Reader contract');assert.equal(await page.locator('.evidence-card').count(),2);assert.equal(await page.locator('#evidence-detail').isVisible(),false);
- await page.locator('.evidence-card').filter({hasText:'Entry point'}).getByRole('button',{name:'Inspect location',exact:true}).click();await page.getByLabel('Your interpretation',{exact:true}).fill('The entry relies on this reader contract.');await page.getByRole('button',{name:'Save note',exact:true}).click();await page.waitForFunction(()=>document.querySelector('.evidence-summary').textContent==='The entry relies on this reader contract.');
+ const entryCard=page.locator('.evidence-card').filter({hasText:'Entry point'});
+ await entryCard.getByRole('button',{name:'Add notes',exact:true}).click();
+ const inspector=page.getByRole('complementary',{name:'Location details'});
+ const notes=inspector.getByRole('textbox',{name:'Notes',exact:true});
+ assert.equal(await inspector.getByRole('heading',{name:'Entry point',exact:true}).isVisible(),true);
+ assert.equal(await notes.evaluate(field=>field===document.activeElement),true);
+ await notes.fill('The entry relies on this reader contract.');
+ await inspector.getByRole('button',{name:'Save note',exact:true}).click();
+ await entryCard.getByText('The entry relies on this reader contract.',{exact:true}).waitFor();
+ assert.equal(await entryCard.getByRole('button',{name:'Add notes',exact:true}).count(),0);
  await page.locator('#captured-evidence summary').click();assert.match(await page.locator('#detail-excerpt').textContent(),/pub fn entry/);assert.equal(await page.locator('#detail-excerpt img').count(),0);await page.getByRole('button',{name:'Close location',exact:true}).click();
  await page.getByText('Explain a connection',{exact:true}).click();await page.getByLabel('From',{exact:true}).selectOption('1');await page.getByLabel('To',{exact:true}).selectOption('2');await page.getByLabel('What connects them?',{exact:true}).fill('Uses the contract while obtaining source.');await page.getByRole('button',{name:'Connect evidence',exact:true}).click();await page.waitForFunction(()=>document.querySelectorAll('#connection-list li').length===1);assert.match(await page.locator('#connection-list').textContent(),/Your assertion/);assert.equal(await page.locator('#evidence-links path').count(),1);
- if(await page.locator('#investigation-notice').isVisible())await page.getByRole('button',{name:'Dismiss investigation notice',exact:true}).click();const handoff=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/investigation/evidence/1/open');await page.locator('.evidence-card').filter({hasText:'Entry point'}).getByRole('button',{name:'Open in Fixture editor',exact:true}).click();assert.equal((await handoff).status(),200);await page.waitForFunction(()=>!document.querySelector('#detail-editor').disabled);assert.equal(await page.locator('#investigation-notice').isVisible(),false,'successful editor navigation should be silent');const launched=await readFile(record,'utf8');assert.equal(launched,`--reuse-window\n--goto\n${join(input.root,'src/entry.rs')}:1:1\n`);
+ if(await page.locator('#investigation-notice').isVisible())await page.getByRole('button',{name:'Dismiss investigation notice',exact:true}).click();
+ const readerNotes=page.locator('.evidence-card').filter({hasText:'Reader contract'}).getByRole('button',{name:'Add notes',exact:true});
+ const handoffPath='/api/investigation/evidence/1/open';
+ const releaseHandoff=Promise.withResolvers();
+ const holdHandoff=async route=>{const response=await route.fetch();await releaseHandoff.promise;await route.fulfill({response});};
+ await page.route(`**${handoffPath}`,holdHandoff);
+ try{
+  const requested=page.waitForRequest(request=>new URL(request.url()).pathname===handoffPath);
+  const handoff=page.waitForResponse(response=>new URL(response.url()).pathname===handoffPath);
+  await entryCard.getByRole('button',{name:'Open in Fixture editor',exact:true}).click();
+  await requested;
+  const disabledDuringHandoff=await readerNotes.isDisabled();
+  releaseHandoff.resolve();
+  assert.equal((await handoff).status(),200);
+  assert.equal(disabledDuringHandoff,true,'Add notes should wait for the editor handoff');
+ }finally{
+  releaseHandoff.resolve();
+  await page.unroute(`**${handoffPath}`,holdHandoff);
+ }
+ await page.waitForFunction(()=>!document.querySelector('#detail-editor').disabled);
+ assert.equal(await readerNotes.isEnabled(),true);
+ assert.equal(await page.locator('#investigation-notice').isVisible(),false,'successful editor navigation should be silent');
+ await readerNotes.click();
+ assert.equal(await inspector.getByRole('heading',{name:'Reader contract',exact:true}).isVisible(),true);
+ assert.equal(await notes.evaluate(field=>field===document.activeElement),true);
+ await inspector.getByRole('button',{name:'Close location',exact:true}).click();
+ const launched=await readFile(record,'utf8');assert.equal(launched,`--reuse-window\n--goto\n${join(input.root,'src/entry.rs')}:1:1\n`);
  const saved=JSON.parse(await readFile(state,'utf8'));assert.equal(saved.evidence.length,2);assert.equal(saved.connections.length,1);await page.reload();await page.waitForFunction(()=>document.querySelectorAll('.evidence-card').length===2);assert.equal(await page.locator('#investigation-title').textContent(),'Saved locations');assert.equal(saved.question,legacyQuestion);
  await page.getByRole('button',{name:'Remove connection',exact:true}).click();await page.waitForFunction(()=>document.querySelectorAll('#connection-list li').length===0);assert.equal(await page.locator('.evidence-card').count(),2);assert.equal(await page.locator('#evidence-links path').count(),0);
  await writeFile(join(input.root,'src/entry.rs'),'pub fn changed() {}\n');await page.locator('.evidence-card').filter({hasText:'Entry point'}).getByRole('button',{name:'Open in Fixture editor',exact:true}).click();await page.waitForFunction(()=>!document.querySelector('#investigation-error').hidden);assert.match(await page.locator('#investigation-error').textContent(),/changed|differs/);assert.equal(await readFile(record,'utf8'),launched);assert.match(JSON.parse(await readFile(state,'utf8')).evidence[0].source.excerpt,/entry/);

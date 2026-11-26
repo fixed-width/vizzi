@@ -26,7 +26,13 @@ element('show-saved').onclick=()=>showMode(true);element('show-discovery').oncli
 const fresh=()=>new Map(view?.freshness ?? []),stateText=state=>({current:'Saved source unchanged in the current index',changed:'Source changed · saved location retained',missing:'Source absent from current index · saved location retained',unchecked:'Source not checked · start the index'}[state] ?? 'Source not checked');
 const returnLabel=evidence=>({source_browser:'Open in Source browser',call_workspace:'Open in Call workspace'}[evidence.origin?.view]);
 async function transport(uri,options){const response=await fetch(uri,options);if(!response.ok){let message=await response.text();try{message=JSON.parse(message).message ?? message;}catch{}throw Object.assign(new Error(message),{status:response.status});}return response.json();}
-function setBusy(value){busy=value;for(const b of document.querySelectorAll('button[type="submit"],#add-source,#remove-evidence,#detail-editor,form input,form textarea,form select'))b.disabled=value;if(view && view.board.evidence.length<2)element('connection-form').querySelector('button').disabled=true;updateSourceControls();}
+function setBusy(value){
+ busy=value;
+ const controls=document.querySelectorAll('button[type="submit"],#add-source,#remove-evidence,#detail-editor,.add-notes,form input,form textarea,form select');
+ for(const control of controls)control.disabled=value;
+ if(view && view.board.evidence.length<2)element('connection-form').querySelector('button').disabled=true;
+ updateSourceControls();
+}
 function showError(e){error.show(e.message ?? String(e));}
 async function load(){const token=++request;try{const next=await transport('/api/investigation');if(token===request)apply(next);}catch(e){showError(e);}}
 async function mutate(uri,body,report=showError){if(busy)return null;setBusy(true);++request;error.show(null);try{const result=await transport(uri,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});apply(result.view ?? result);return result;}catch(e){report(e);if(e.status===409)await load();return null;}finally{setBusy(false);}}
@@ -37,7 +43,21 @@ function render(){
  element('investigation-counts').textContent=`${board.evidence.length} locations · ${board.connections.length} reader connections`;
  element('show-saved').textContent=`Saved locations (${board.evidence.length})`;element('connection-tools').hidden=board.evidence.length<2;element('connection-list-panel').hidden=board.connections.length===0;
  const cards=element('evidence-cards');cards.replaceChildren();element('empty-investigation').hidden=board.evidence.length>0;
- for(const evidence of board.evidence){const card=node('article','');card.className='evidence-card';card.dataset.evidence=evidence.id;card.append(node('h2',evidence.title));const path=node('p',`${evidence.source.path}:${evidence.source.line}`);path.className='evidence-path';const state=node('span','');state.className='source-freshness';const summary=node('p',evidence.note);summary.className='evidence-summary';const actions=node('div','');actions.className='card-actions';const inspect=node('button','Inspect location');inspect.type='button';inspect.onclick=()=>openDetail(evidence.id);const editor=node('button',`Open in ${view.editor}`);editor.type='button';editor.onclick=()=>openEditor(evidence.id);actions.append(inspect);
+ for(const evidence of board.evidence){
+  const card=node('article','');card.className='evidence-card';card.dataset.evidence=evidence.id;card.append(node('h2',evidence.title));
+  const path=node('p',`${evidence.source.path}:${evidence.source.line}`);path.className='evidence-path';
+  const state=node('span','');state.className='source-freshness';
+  const summary=node('p',evidence.note);summary.className='evidence-summary';
+  if(!evidence.note){
+   const addNotes=node('button','Add notes');addNotes.type='button';
+   addNotes.className='add-notes';addNotes.disabled=busy;
+   addNotes.setAttribute('aria-controls','evidence-detail');
+   addNotes.onclick=()=>openDetail(evidence.id,{focusNote:true});
+   summary.append(addNotes);
+  }
+  const actions=node('div','');actions.className='card-actions';
+  const inspect=node('button','Inspect location');inspect.type='button';inspect.onclick=()=>openDetail(evidence.id);actions.append(inspect);
+  const editor=node('button',`Open in ${view.editor}`);editor.type='button';editor.onclick=()=>openEditor(evidence.id);
   const label=returnLabel(evidence);
   if(label){
    const resume=node('button',label);resume.type='button';resume.className='return-location';
@@ -51,7 +71,11 @@ function render(){
  if(selected && !board.evidence.some(e=>e.id===selected)){selected=undefined;element('evidence-detail').hidden=true;}if(selected)renderDetail();renderFreshness();requestAnimationFrame(drawConnections);
 }
 function renderFreshness(){const states=fresh();for(const card of element('evidence-cards').children){const state=states.get(Number(card.dataset.evidence));card.dataset.sourceState=state;card.querySelector('.source-freshness').textContent=stateText(state);}if(selected)element('detail-freshness').textContent=stateText(states.get(selected));}
-function openDetail(id){if(noteDirty && selected!==id){notice.show('Save the current evidence note before switching cards.');return;}selected=id;element('evidence-detail').hidden=false;renderDetail();}
+function openDetail(id,{focusNote=false}={}){
+ if(noteDirty && selected!==id){notice.show('Save the current evidence note before switching cards.');return;}
+ selected=id;element('evidence-detail').hidden=false;renderDetail();
+ if(focusNote)element('evidence-note').focus();
+}
 function renderDetail(){const evidence=view.board.evidence.find(e=>e.id===selected);if(!evidence)return;element('detail-title').textContent=evidence.title;element('detail-location').textContent=`${evidence.source.path}:${evidence.source.line}–${evidence.source.end_line}`;if(!noteDirty)element('evidence-note').value=evidence.note;element('detail-editor').textContent=`Open in ${view.editor}`;element('detail-version').textContent=`Saved source ${evidence.source.content.slice(0,8)} · document ${evidence.source.version.slice(0,8)}${evidence.source.truncated?' · excerpt shortened':''}`;element('detail-excerpt').textContent=evidence.source.excerpt;element('detail-freshness').textContent=stateText(fresh().get(selected));
  const label=returnLabel(evidence),resume=element('detail-return');
  resume.textContent=label??'';resume.hidden=!label;

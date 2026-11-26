@@ -50,6 +50,7 @@ remains in Git and the project documentation.
 
 ### Changed
 
+- Choose **Add notes** on a saved location to open its inspector and focus the **Notes** field.
 - Open Vizzi in the Source browser by default. The header lists Source browser, Call
   workspace, Review changes, and Saved locations in that order.
 

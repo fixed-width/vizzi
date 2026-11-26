@@ -74,7 +74,7 @@ try {
   for (const [title, path, line, note] of locations) {
     const card = page.locator('.evidence-card').filter({has: page.getByRole('heading', {name: title, exact: true})});
     await card.getByRole('button', {name: 'Inspect location', exact: true}).click();
-    await page.getByLabel('Your interpretation', {exact: true}).fill(note);
+    await page.getByLabel('Notes', {exact: true}).fill(note);
     await page.getByRole('button', {name: 'Save note', exact: true}).click();
     await page.waitForFunction(note => [...document.querySelectorAll('.evidence-summary')].some(n => n.textContent === note), note);
     await page.getByRole('button', {name: 'Close location', exact: true}).click();
@@ -93,8 +93,11 @@ try {
     await page.getByRole('button', {name: 'Connect evidence', exact: true}).click();
     await page.waitForFunction(() => document.querySelector('#connection-text').value === '');
   }
-  await page.locator('.evidence-card').first().getByRole('button', {name: 'Open in VS Code', exact: true}).click();
-  await page.waitForFunction(() => !document.querySelector('#investigation-notice').hidden);
+  const [handoff] = await Promise.all([
+    page.waitForResponse('**/api/investigation/evidence/1/open'),
+    page.locator('.evidence-card').first().getByRole('button', {name: 'Open in VS Code', exact: true}).click(),
+  ]);
+  assert.equal(handoff.status(), 200);
   report.recordedEditorArguments = (await readFile(editor + '.args', 'utf8')).trimEnd().split('\n');
   assert.deepEqual(report.recordedEditorArguments, ['--reuse-window', '--goto', join(input.root, 'src/compiler/mod.rs') + ':140:1']);
   const board = JSON.parse(await readFile(join(output, 'investigation.json'), 'utf8'));
