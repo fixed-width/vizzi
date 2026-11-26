@@ -46,6 +46,79 @@ test("opening a map tile keeps the cursor steady and fetches only the first sour
   } finally { await session.close(); }
 });
 
+test("collapsing the directory list gives its space to the map", async () => {
+  const session = await openWorkspace(chromium, host);
+  try {
+    const { page } = session;
+    const toggle = page.getByRole("button", { name: "Directories", exact: true });
+    const tree = page.getByRole("tree", { name: "Map directories" });
+    const map = page.locator("#map");
+    await toggle.waitFor({ timeout: 2000 });
+    const expandedHeight = await map.evaluate(canvas => canvas.clientHeight);
+    const rows = await tree.getByRole("treeitem").count();
+    assert.ok(rows > 0);
+    assert.equal(await toggle.getAttribute("aria-expanded"), "true");
+
+    await toggle.press("Space");
+    assert.equal(await toggle.getAttribute("aria-expanded"), "false");
+    assert.equal(await tree.isVisible(), false);
+    assert.ok(await map.evaluate(canvas => canvas.clientHeight) > expandedHeight);
+    await page.getByRole("button", { name: "Repository root", exact: true }).waitFor();
+
+    const search = page.getByRole("searchbox", { name: "Find source" });
+    await search.fill("definitely_missing_source_file");
+    await page.getByText("No source files match this filter.", { exact: true }).waitFor();
+    assert.equal(await toggle.isVisible(), false);
+    assert.equal(await page.getByRole("button", { name: "Reset map", exact: true }).isVisible(), false);
+    await search.fill("");
+    await toggle.waitFor();
+    assert.equal(await toggle.getAttribute("aria-expanded"), "false");
+
+    await toggle.press("Enter");
+    await paint(page);
+    assert.equal(await toggle.getAttribute("aria-expanded"), "true");
+    assert.equal(await tree.getByRole("treeitem").count(), rows);
+    assert.equal(await map.evaluate(canvas => canvas.clientHeight), expandedHeight);
+    assert.deepEqual(session.errors, []);
+  } finally { await session.close(); }
+});
+
+test("reopening the directory list resets scroll only after paging", async () => {
+  const files = Object.fromEntries(Array.from({ length: 2100 }, (_, index) => {
+    const directory = String(Math.floor(index / 15)).padStart(3, "0");
+    return [`dir-${directory}/file-${index % 15}.rs`, "fn example() {}\n"];
+  }));
+  const fixture = await workspace({ files });
+  let live, session;
+  try {
+    live = await startHost(fixture);
+    session = await openWorkspace(chromium, live);
+    const { page } = session;
+    const toggle = page.getByRole("button", { name: "Directories", exact: true });
+    const tree = page.getByRole("tree", { name: "Map directories" });
+    const scrollTop = () => tree.evaluate(element => element.scrollTop);
+    await page.getByText("1–100 of 140 entries", { exact: true }).waitFor();
+    await tree.evaluate(element => { element.scrollTop = 400; });
+    await toggle.click();
+    await toggle.click();
+    await paint(page);
+    assert.equal(await scrollTop(), 400);
+
+    await toggle.click();
+    await page.getByRole("button", { name: "Next page", exact: true }).click();
+    await page.getByText("101–140 of 140 entries", { exact: true }).waitFor();
+    await toggle.click();
+    await paint(page);
+    assert.equal(await scrollTop(), 0);
+    await tree.getByRole("treeitem", { name: "dir-100", exact: true }).waitFor();
+    assert.deepEqual(session.errors, []);
+  } finally {
+    await session?.close();
+    await live?.close();
+    await fixture.close();
+  }
+});
+
 test("a bundled inspection with a missing version keeps the current file visible", async () => {
   const session = await openWorkspace(chromium, host);
   try {
@@ -80,6 +153,7 @@ test("files without declarations use the full source width", async () => {
       .getByRole("status").filter({ hasText: /^No declarations extracted$/ });
     const declaration = outline.getByRole("button", { name: /Reveal function example/ });
     await declaration.waitFor();
+    assert.equal(await page.getByText("Directories", { exact: true }).isVisible(), false);
     await divider.press("ArrowRight");
     const resizedWidth = await divider.getAttribute("aria-valuenow");
 
