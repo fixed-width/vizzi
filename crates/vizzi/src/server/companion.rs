@@ -102,6 +102,7 @@ pub(super) fn router(
         .route("/api/search/evidence", post(pin_current))
         .route("/api/investigation/lookup", get(lookup))
         .route("/api/investigation/evidence", post(pin))
+        .route("/api/investigation/evidence/{id}/source", get(saved_source))
         .route("/api/investigation/evidence/{id}/return", get(return_destination))
         .route("/api/investigation/evidence/{id}/open", post(open))
         .route("/api/editor/open", post(open_source))
@@ -246,6 +247,12 @@ async fn pin_current(
         Ok(serde_json::json!({"id":id,"view":app.view()}))
     })
     .await
+}
+async fn saved_source(
+    State(app): State<Arc<Companion>>,
+    Path(id): Path<u32>,
+) -> Result<Json<Vec<crate::companion::SavedSourceLine>>, Error> {
+    work(move || app.saved_source(id)).await
 }
 async fn return_destination(
     State(app): State<Arc<Companion>>,

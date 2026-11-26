@@ -19,7 +19,7 @@ export function kindGroup(kind) {
   return 'other';
 }
 export function renderStyledText(node,line) {
-  const document=node.ownerDocument,bytes=new TextEncoder().encode(line.text),decoder=new TextDecoder('utf-8',{fatal:true});
+  const document=node.ownerDocument,bytes=new TextEncoder().encode(line.text),decoder=new TextDecoder('utf-8',{fatal:true,ignoreBOM:true});
   const children=[];let start=0;
   if(line.left)children.push(document.createTextNode('…'));
   for(const style of line.styles ?? []) {

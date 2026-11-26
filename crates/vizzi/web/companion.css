@@ -50,7 +50,13 @@
 #note-form { display:flex;flex-direction:column;gap:10px;margin-top:24px; }
 #note-form button { align-self:start; }
 #captured-evidence { margin-top:22px; }
-#detail-excerpt { font:11px/1.65 "DejaVu Sans Mono",monospace;overflow:auto;max-height:330px;tab-size:4; }
+#detail-excerpt { font:11px/1.65 "DejaVu Sans Mono",monospace;overflow:auto;max-height:330px;tab-size:4;padding-inline:14px 8px;scrollbar-gutter:stable;font-variant-ligatures:none;font-kerning:none; }
+#detail-excerpt:has(.reflow-segment) { white-space:normal; }
+#detail-excerpt .saved-source-line { display:block; }
+#detail-excerpt .reflow-segment { display:block;position:relative;min-height:1lh;white-space:pre; }
+#detail-excerpt .reflow-marker { position:absolute;left:-13px;font-size:10px;color:var(--gutter);user-select:none; }
+#detail-excerpt .reflow-marker::before { content:'↪'; }
+#detail-excerpt .source-chunk > span { font-weight:inherit;font-style:inherit; }
 #remove-evidence { margin-top:22px;font-size:10px;color:var(--error-text); }
 #source-dialog { background:var(--paper);color:var(--text);border:1px solid var(--border);border-radius:5px;max-width:min(520px,90vw);width:520px;padding:24px; }
 #source-dialog::backdrop { background:#0006; }
