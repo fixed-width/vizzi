@@ -27,7 +27,12 @@ const canvas = element("map"), context = canvas.getContext("2d");
 const overview=element("map-overview"),overviewContext=overview.getContext("2d");
 let overviewTransform,overviewDrag=false;
 installSplitter(element("explore-workspace"),{key:"explore",label:"Repository map and source widths",initial:.43,minBefore:240,minAfter:320});
-installSplitter(element("outline").closest(".source-layout"),{key:"explore-outline",label:"Declarations and source widths",initial:.3,minBefore:100,minAfter:200});
+const outline = element("outline"), outlinePane = outline.closest(".outline");
+const sourceLayout = outlinePane.parentElement;
+installSplitter(sourceLayout,{key:"explore-outline",label:"Declarations and source widths",initial:.3,minBefore:100,minAfter:200});
+const outlineDivider = sourceLayout.querySelector(".splitter");
+const outlineStatus = element("outline-status");
+outlinePane.hidden = true;
 const source = element("source"), space = element("source-space");
 const callMenu = createCallMenu(element("call-action-menu"));
 source.addEventListener("wheel",()=>callMenu.hide(),{passive:true});
@@ -162,7 +167,7 @@ const startup=createStartup({transport:fetchJSON,onError:showError,onState:state
 }});
 element("start-index").addEventListener("click",()=>startup.activate());
 const inspector = createInspector({
-  source,space,outline:element("outline"),transport:fetchJSON,
+  source,space,outline,transport:fetchJSON,
   onError:error=>{showError(error);updates?.restart();},
   select:async fact=>{if(await navigate({entity:fact.id}))await inspector.revealActive();},
   loadActions:async (captured,window,signal)=>{
@@ -308,6 +313,14 @@ const controller = createController({
     const { coverage, diagnostics } = describeSource(next.source);
     messages.coverage.show(coverage,next.source?.id);
     messages.diagnostics.show(diagnostics.join(". "),next.source?.version);
+    const hideOutline = !next.source?.summary.declarations;
+    const outlineMessage = next.source && hideOutline ? "No declarations extracted" : "";
+    if (outlineStatus.textContent !== outlineMessage) outlineStatus.textContent = outlineMessage;
+    const focused = document.activeElement;
+    if (hideOutline && (outlinePane.contains(focused) || focused === outlineDivider)) {
+      source.focus({ preventScroll: true });
+    }
+    outlinePane.hidden = hideOutline;
     callMenu.hide();inspector.apply(next); renderFileList();
     const restore=navigation.restoration(next,info.intent);
     const sameScene=restore && restore.snapshot===next.snapshot && restore.position.layoutRevision===mapModel.revision &&

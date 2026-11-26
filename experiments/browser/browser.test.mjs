@@ -66,6 +66,50 @@ test("a bundled inspection with a missing version keeps the current file visible
   } finally { await session.close(); }
 });
 
+test("files without declarations use the full source width", async () => {
+  const fixture = await workspace({ files: { "a.rs": "fn example() {}\n", "b.rs": "// comment only\n" } });
+  let live, session;
+  try {
+    live = await startHost(fixture);
+    session = await openWorkspace(chromium, live);
+    const { page } = session;
+    const source = page.getByRole("region", { name: "Source code" });
+    const outline = page.getByRole("navigation", { name: "Declaration outline" });
+    const divider = page.getByRole("separator", { name: "Declarations and source widths" });
+    const emptyStatus = page.getByRole("region", { name: "Captured source inspector" })
+      .getByRole("status").filter({ hasText: /^No declarations extracted$/ });
+    const declaration = outline.getByRole("button", { name: /Reveal function example/ });
+    await declaration.waitFor();
+    await divider.press("ArrowRight");
+    const resizedWidth = await divider.getAttribute("aria-valuenow");
+
+    await page.getByText("Accessible file list", { exact: true }).click();
+    await page.getByRole("button", { name: "b.rs", exact: true }).click();
+    await source.getByText("// comment only", { exact: true }).waitFor();
+    assert.equal(await outline.isVisible(), false);
+    assert.equal(await divider.isVisible(), false);
+    assert.equal(await emptyStatus.isVisible(), true);
+    assert.ok(await source.evaluate(node =>
+      node.getBoundingClientRect().width === node.parentElement.getBoundingClientRect().width));
+
+    await page.getByRole("button", { name: "Back", exact: true }).click();
+    await declaration.waitFor();
+    assert.equal(await emptyStatus.isVisible(), false);
+    assert.equal(await divider.getAttribute("aria-valuenow"), resizedWidth);
+    await declaration.focus();
+    await writeFile(join(fixture.root, "a.rs"), "// removed declaration\n");
+    await source.getByText("// removed declaration", { exact: true }).waitFor();
+    assert.equal(await outline.isVisible(), false);
+    assert.equal(await emptyStatus.isVisible(), true);
+    assert.equal(await source.evaluate(node => node === document.activeElement), true);
+    await writeFile(join(fixture.root, "a.rs"), "fn example() {}\n");
+    await declaration.waitFor();
+    assert.equal(await emptyStatus.isVisible(), false);
+    assert.equal(await divider.getAttribute("aria-valuenow"), resizedWidth);
+    assert.deepEqual(session.errors, []);
+  } finally { await session?.close(); await live?.close(); await fixture.close(); }
+});
+
 test("map tiles retain their language fills through selection, recovery and theme changes", async () => {
   const session = await openWorkspace(chromium, host);
   const { page } = session;
