@@ -8,6 +8,9 @@ remains in Git and the project documentation.
 
 ### Added
 
+- Search file paths and declaration names from **Find source**. The repository map
+  narrows to matching files, and the Matches list opens functions, modules and other
+  declarations at their source lines.
 - Reopen a saved location at its line in the Source browser or its bubble in the
   Call workspace, based on where it was saved.
 - Report the installed build with `vizzi --version`.
@@ -50,6 +53,7 @@ remains in Git and the project documentation.
 
 ### Changed
 
+- Open Saved locations directly and use the Source browser to find new locations.
 - Resize the Saved locations inspector on wider screens and close it with the standard X.
 - Open Settings from the cog in the shared header.
 - Choose **Add notes** on a saved location to open its inspector and focus the **Notes** field.

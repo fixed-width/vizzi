@@ -1,8 +1,8 @@
 # Companion architecture and first slice
 
-This document describes the existing prototype slice. The active product direction is
-[visual working sets](../explanation/visual-working-sets.md); search/list navigation is
-supporting infrastructure rather than the primary experience.
+This document records the original companion architecture. The
+[Source browser search contract](../prototype/SOURCE_SEARCH_TECH.md) describes the
+current repository browsing and search entry point.
 
 The [question-search browser adapter](SEARCH_TECH.md) is retired. Native retrieval and
 offline evaluation helpers remain separate from metadata-only discovery. Saved context

@@ -50,7 +50,7 @@ try {
   await page.getByRole('navigation',{name:'View modes',exact:true}).getByRole('link',{name:label,exact:true}).click();
   await page.locator(`header[data-app-view="${mode}"]`).waitFor();
   await checkHeader(label);
-  if(mode==='locations')assert.equal(await page.locator('#show-saved').evaluate(n=>getComputedStyle(n).backgroundColor!==getComputedStyle(document.querySelector('#show-discovery')).backgroundColor),true);
+  if(mode==='locations')assert.equal(await page.getByRole('navigation',{name:'Location views'}).count(),0);
   assert.equal(await page.locator('html').getAttribute('data-theme'),'dark');
   for(const width of [1440,360]){
    await page.setViewportSize({width,height:1000});await paint(page);

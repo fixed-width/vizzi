@@ -20,7 +20,8 @@ describes which data each storage mechanism retains.
 
 ## Save and annotate a location
 
-Choose **Save** on a repository source bubble, or **Save location** in the Source browser.
+Choose **Save** on a source bubble, or use **Find source** in the Source browser and
+choose **Save location** at the file or declaration.
 Then choose **Saved locations** in the shared header. Choose **Add notes** on a saved
 card to open its inspector and start typing. Choose **Inspect location** to read the
 captured excerpt or edit existing notes. Choose **Save note** to keep your changes.
@@ -30,10 +31,8 @@ return to the view where you saved it. Vizzi reveals the saved line in the Sourc
 browser or the bubble in the active Call workspace task. If the source
 has changed, the saved card still has its captured excerpt and notes.
 
-To find another location, choose **Explore repository** within this view. Select a source
-area or use **Find a name or file**, inspect a result and choose **Save location**.
-This lookup matches names and paths, not full source text. **Locations → Add a location**
-provides a path/line/title form for a location you already know.
+**Locations → Add a location** provides a path, line and title form for a location
+you already know.
 
 Once two locations exist, **Explain a connection** lets you record why they matter
 together. These connections are your assertions, not analysed calls or proof of impact.

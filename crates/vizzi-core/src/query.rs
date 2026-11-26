@@ -12,7 +12,9 @@ use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 
 mod browse;
+mod search;
 pub use browse::{BrowsePage, DirectorySummary, Landmark, LandmarkKind};
+pub use search::{Match, MatchPage};
 
 const MAX_MAP_FILES: usize = 2000;
 
@@ -34,6 +36,17 @@ pub struct ViewQuery {
     /// Case-insensitive path substring.
     #[serde(default)]
     pub filter: String,
+    /// Match declaration names as well as file paths.
+    #[serde(default)]
+    pub find: bool,
+    /// Exact directory scope for source search. Absent means repository-wide.
+    pub search_directory: Option<String>,
+    /// Offset into the ranked search results, independently of the map page.
+    #[serde(default)]
+    pub results_offset: usize,
+    /// Show the map page containing the explicitly selected search match.
+    #[serde(default)]
+    pub reveal_match: bool,
     /// Comma-separated map file types. A file may match any selected type.
     #[serde(default)]
     pub types: String,
@@ -179,6 +192,9 @@ pub struct View {
     /// Scoped page for directory browsing or search in a large snapshot.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub browse: Option<BrowsePage>,
+    /// Ranked matches for the current source search.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub matches: Option<MatchPage>,
     /// Bounded overview tiles.
     pub files: Vec<FileTile>,
     /// Directory labels.
@@ -198,10 +214,14 @@ struct MapFilter<'a> {
 }
 
 impl MapFilter<'_> {
-    fn collect_type_and_match(&mut self, doc: &Document) -> bool {
+    fn collect_type(&mut self, doc: &Document) -> bool {
         let file_type = map_file_type(doc.classification());
         self.available_types.insert(file_type);
-        (self.types.is_empty() || self.types.contains(file_type))
+        self.types.is_empty() || self.types.contains(file_type)
+    }
+
+    fn collect_type_and_match(&mut self, doc: &Document) -> bool {
+        self.collect_type(doc)
             && (self.path.is_empty() || doc.path().to_lowercase().contains(&self.path))
     }
 }
@@ -305,7 +325,30 @@ impl Snapshot {
                 .collect(),
             available_types: BTreeSet::new(),
         };
+        let mut matches = None;
         let (count, limited, browse) = match &query.directory {
+            _ if query.find && !query.filter.trim().is_empty() => {
+                let path = query.search_directory.as_deref().unwrap_or(".");
+                let (results, mut files) = search::project(
+                    browse::exact_scope(self.documents(), path),
+                    &mut filter,
+                    &query.filter,
+                    query.results_offset,
+                );
+                matches = Some(results);
+                let count = files.len();
+                if self.documents().len() > MAX_MAP_FILES {
+                    let reveal = query
+                        .reveal_match
+                        .then_some(query.file.as_deref())
+                        .flatten();
+                    let (page, files) = browse::file_page(path, files, query.offset, reveal);
+                    (count, files, Some(page))
+                } else {
+                    files.truncate(query.limit.unwrap_or(MAX_MAP_FILES).clamp(1, MAX_MAP_FILES));
+                    (count, files, None)
+                }
+            }
             Some(path) if self.documents().len() > MAX_MAP_FILES => {
                 let (page, documents) = browse::project(self, path, &mut filter, query.offset);
                 (page.files, documents, Some(page))
@@ -450,6 +493,7 @@ impl Snapshot {
             matching: count,
             file_types: filter.available_types.into_iter().collect(),
             browse,
+            matches,
             files,
             groups,
             height: y + shelf_height,
@@ -483,6 +527,50 @@ mod tests {
         let b = crate::model::fixture_document(workspace.clone(), "other/b.rs".into(), b"", vec![])
             .unwrap();
         crate::model::fixture_snapshot(workspace, vec![Arc::new(a), Arc::new(b)]).unwrap()
+    }
+
+    #[test]
+    fn source_search_projects_ranked_declarations_and_distinct_matching_files() {
+        let snapshot = snapshot("fn read_extra() {}\nmod reader { fn read() {} }");
+        let view = |query| {
+            let query = serde_json::from_value(query).unwrap();
+            serde_json::to_value(snapshot.view(&query).unwrap()).unwrap()
+        };
+        let qualified = view(serde_json::json!({"filter": "READER.read", "find": true}));
+        assert_eq!(qualified["matching"], 1);
+        assert_eq!(qualified["files"][0]["path"], "src/a.rs");
+        let row = &qualified["matches"]["items"][0];
+        assert_eq!(row["name"], "reader::read");
+        assert_eq!(row["line"], 2);
+        let picked = view(serde_json::json!({
+            "projection": "summary", "file": row["file"], "entity": row["entity"]
+        }));
+        assert_eq!(picked["selection"]["entity"], row["entity"]);
+        assert_eq!(picked["source"]["summary"]["active"]["name"], "read");
+
+        let ranked = view(serde_json::json!({"filter": "read", "find": true}));
+        assert_eq!(ranked["matching"], 1);
+        assert_eq!(ranked["matches"]["total"], 3);
+        assert_eq!(ranked["matches"]["items"][0]["name"], "reader::read");
+        assert!(
+            ranked["matches"]["items"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|row| row["kind"] == "module")
+        );
+
+        let path = view(serde_json::json!({"filter": "other/b", "find": true}));
+        assert_eq!(path["matches"]["total"], 1);
+        assert_eq!(path["matches"]["items"][0]["kind"], "file");
+        let scoped = view(serde_json::json!({
+            "filter": "read", "find": true, "search_directory": "other"
+        }));
+        assert_eq!(scoped["matches"]["total"], 0);
+        assert_eq!(scoped["matching"], 0);
+        let filtered = view(serde_json::json!({"filter": "read", "find": true, "types": "python"}));
+        assert_eq!(filtered["matches"]["total"], 0);
+        assert_eq!(filtered["matching"], 0);
     }
 
     #[test]
@@ -543,6 +631,25 @@ mod tests {
         let search_page =
             view(serde_json::json!({"directory": "late", "filter": "FILE-", "offset": 1999}));
         assert_eq!(search_page["files"][0]["path"], "bulk/file-1900.rs");
+        let ranked = view(serde_json::json!({
+            "find": true, "filter": "file-", "search_directory": "bulk",
+            "results_offset": 1999
+        }));
+        assert_eq!(ranked["matches"]["offset"], 1992);
+        assert_eq!(ranked["matches"]["total"], 2001);
+        assert_eq!(ranked["browse"]["offset"], 0);
+        let selected = ranked["matches"]["items"]
+            .as_array()
+            .unwrap()
+            .last()
+            .unwrap();
+        let revealed = view(serde_json::json!({
+            "find": true, "filter": "file-", "search_directory": "bulk",
+            "results_offset": 1999, "file": selected["file"], "reveal_match": true
+        }));
+        assert_eq!(revealed["browse"]["offset"], 2000);
+        assert_eq!(revealed["files"][0]["path"], "bulk/file-2000.rs");
+        assert_eq!(revealed["matches"]["items"], ranked["matches"]["items"]);
     }
     #[test]
     fn selection_uses_frozen_source_and_survives_position_changes() {

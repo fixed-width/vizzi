@@ -5,13 +5,13 @@ and Settings menu across views; each view's controls occupy the row below it.
 
 | View | Direct route | Purpose |
 | --- | --- | --- |
-| Source browser | `/` (also `/explore`) | Repository map, files and declaration outlines |
+| Source browser | `/` (also `/explore`) | Repository map, file and declaration search, captured source |
 | Call workspace | `/workspace` | Source bubbles, call trails, result stacks and tasks |
 | Review changes | `/review` | A scoped Git comparison and paired source |
 | Saved locations | `/investigate#saved` | Source anchors, notes and reader connections |
 
-`/investigate` opens the repository-discovery part of Saved locations. The experimental
-structural view remains a contributor prototype, not the main reading workflow.
+`/investigate` also opens Saved locations. The contributor structural trial is available
+at `/investigate?trial=structure`.
 
 ## Call workspace
 

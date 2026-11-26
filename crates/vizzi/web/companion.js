@@ -3,7 +3,7 @@ import {installAppHeader} from '/app-header.js';
 import {installAppearance} from '/appearance.js';
 import {createMessage,textRow} from '/messages.js';
 import {followChanges} from '/updates.js';
-import {installDiscovery} from '/discovery.js';
+import {installStructuralPreview} from '/structural-preview.js';
 import {installSplitter} from '/splitter.js';
 import {installStructure} from '/structure.js';
 installAppHeader(document.querySelector('body > header'));
@@ -17,17 +17,22 @@ installSplitter(document.querySelector('.companion-main'),{
 const error=createMessage(element('investigation-error'),{label:'Dismiss investigation error'}),notice=createMessage(element('investigation-notice'),{label:'Dismiss investigation notice'}),sourceLabel=textRow(element('source-state'));
 let view,sourceStatus,selected,request=0,busy=false,noteDirty=false,wantIndex=false,updates;
 const trialStructure=new URLSearchParams(location.search).get('trial')==='structure';
-const keepLocation=location=>mutate(trialStructure?'/api/search/evidence':'/api/investigation/evidence',{revision:view.board.revision,snapshot:location.snapshot,file:location.file,version:location.version,line:location.line,title:location.title});
-const discovery=installDiscovery({transport,openEditor,showError,keep:keepLocation,browseEnabled:!trialStructure});
-const structure=installStructure({enabled:trialStructure,transport,inspect:discovery.inspect,showError});
+const keepLocation=location=>mutate('/api/search/evidence',{revision:view.board.revision,snapshot:location.snapshot,file:location.file,version:location.version,line:location.line,title:location.title});
+const preview=trialStructure ? installStructuralPreview({transport,openEditor,showError,keep:keepLocation}) : null;
+const structure=installStructure({enabled:trialStructure,transport,inspect:preview?.inspect,showError});
 function showMode(saved){
  if(noteDirty && !saved){notice.show('Save the current note before changing views.');return;}
- element('saved-workspace').hidden=!saved;element('discovery-panel').hidden=saved||trialStructure;element('structure-panel').hidden=saved||!trialStructure;
- element('show-saved').setAttribute('aria-pressed',String(saved));element('show-discovery').setAttribute('aria-pressed',String(!saved));
- discovery.closePreview();if(!saved)element('evidence-detail').hidden=true;
+ element('saved-workspace').hidden=!saved;element('structure-panel').hidden=saved;
+ element('show-saved').setAttribute('aria-pressed',String(saved));element('show-structure').setAttribute('aria-pressed',String(!saved));
+ preview.close();if(!saved)element('evidence-detail').hidden=true;
  history.replaceState(null,'',saved?'#saved':location.pathname+location.search);
 }
-element('show-saved').onclick=()=>showMode(true);element('show-discovery').onclick=()=>showMode(false);
+if(trialStructure){
+ element('structure-views').hidden=false;
+ element('show-saved').onclick=()=>showMode(true);
+ element('show-structure').onclick=()=>showMode(false);
+ showMode(location.hash==='#saved');
+}
 const fresh=()=>new Map(view?.freshness ?? []),stateText=state=>({current:'Saved source unchanged in the current index',changed:'Source changed · saved location retained',missing:'Source absent from current index · saved location retained',unchecked:'Source not checked · start the index'}[state] ?? 'Source not checked');
 const returnLabel=evidence=>({source_browser:'Open in Source browser',call_workspace:'Open in Call workspace'}[evidence.origin?.view]);
 async function transport(uri,options){const response=await fetch(uri,options);if(!response.ok){let message=await response.text();try{message=JSON.parse(message).message ?? message;}catch{}throw Object.assign(new Error(message),{status:response.status});}return response.json();}
@@ -41,7 +46,7 @@ function setBusy(value){
 function showError(e){error.show(e.message ?? String(e));}
 async function load(){const token=++request;try{const next=await transport('/api/investigation');if(token===request)apply(next);}catch(e){showError(e);}}
 async function mutate(uri,body,report=showError){if(busy)return null;setBusy(true);++request;error.show(null);try{const result=await transport(uri,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});apply(result.view ?? result);return result;}catch(e){report(e);if(e.status===409)await load();return null;}finally{setBusy(false);}}
-function apply(next){if(!next?.board || next.board.schema!==1 || !Array.isArray(next.board.evidence) || next.board.evidence.length>32 || !Array.isArray(next.board.connections) || next.board.connections.length>64)throw new Error('Invalid bounded investigation');if(view && next.board.revision<view.board.revision)return;const changed=!view || view.board.revision!==next.board.revision;view=next;if(changed){render();}else renderFreshness();discovery.saved(view);}
+function apply(next){if(!next?.board || next.board.schema!==1 || !Array.isArray(next.board.evidence) || next.board.evidence.length>32 || !Array.isArray(next.board.connections) || next.board.connections.length>64)throw new Error('Invalid bounded investigation');if(view && next.board.revision<view.board.revision)return;const changed=!view || view.board.revision!==next.board.revision;view=next;if(changed){render();}else renderFreshness();preview?.saved(view);}
 function render(){
  const board=view.board;
  element('save-mode').textContent=view.persistent?'Saved locally.':'Session investigation · export to keep a copy after the host stops.';
@@ -87,7 +92,7 @@ function renderDetail(){const evidence=view.board.evidence.find(e=>e.id===select
 }
 function drawConnections(){if(!view)return;const svg=element('evidence-links'),bounds=element('evidence-map').getBoundingClientRect();svg.replaceChildren();for(const connection of view.board.connections){const from=element('evidence-cards').querySelector(`[data-evidence="${connection.from}"]`),to=element('evidence-cards').querySelector(`[data-evidence="${connection.to}"]`);if(!from || !to)continue;const a=from.getBoundingClientRect(),b=to.getBoundingClientRect(),x=a.left+a.width/2-bounds.left,y=a.bottom-bounds.top,tx=b.left+b.width/2-bounds.left,ty=b.top-bounds.top,mid=(y+ty)/2;const path=document.createElementNS('http://www.w3.org/2000/svg','path');path.setAttribute('d',`M ${x} ${y} C ${x} ${mid} ${tx} ${mid} ${tx} ${ty}`);svg.append(path);}}
 async function startIndex(){wantIndex=true;try{await transport('/api/workspace/start',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});}catch(e){showError(e);}}
-function updateSourceControls(){const ready=Boolean(sourceStatus?.snapshot);element('pin-source').disabled=busy || !ready;element('index-source').disabled=Boolean(sourceStatus?.pending);element('index-source').hidden=ready || !sourceStatus?.error;element('source-dialog-state').textContent=ready?'The saved excerpt will use the current captured version.':sourceStatus?.error?sourceStatus.error:wantIndex?'Preparing the source index…':'Start the source index to capture evidence.';if(sourceStatus)sourceLabel.show(ready?'Source ready':sourceStatus.error?'Source indexing failed':'Mapping source…');
+function updateSourceControls(){const ready=Boolean(sourceStatus?.snapshot);element('pin-source').disabled=busy || !ready;element('source-dialog-state').textContent=ready?'The saved excerpt will use the current captured version.':sourceStatus?.error?sourceStatus.error:wantIndex?'Preparing the source index…':'Start the source index to capture evidence.';if(sourceStatus)sourceLabel.show(ready?'Source ready':sourceStatus.error?'Source indexing failed':'Mapping source…');
  for(const control of document.querySelectorAll('#detail-return,.return-location'))control.disabled=busy||!ready;
 }
 function showSourceError(e){element('source-dialog-error').textContent=e?.message ?? '';element('source-dialog-error').hidden=!e;}
@@ -117,9 +122,8 @@ element('note-form').addEventListener('submit',async event=>{event.preventDefaul
 element('connection-form').addEventListener('submit',async event=>{event.preventDefault();const result=await mutate('/api/investigation',{action:'connect',revision:view.board.revision,from:Number(element('connection-from').value),to:Number(element('connection-to').value),explanation:element('connection-text').value});if(result)element('connection-text').value='';});
 element('remove-evidence').addEventListener('click',async()=>{if(!selected)return;const result=await mutate('/api/investigation',{action:'remove',revision:view.board.revision,id:selected});if(result)noteDirty=false;});
 element('close-detail').addEventListener('click',()=>{if(noteDirty){notice.show('Save the current note before closing its detail.');return;}selected=undefined;element('evidence-detail').hidden=true;});element('detail-editor').addEventListener('click',()=>openEditor(selected));
-element('add-source').addEventListener('click',addSource);element('empty-add-source').addEventListener('click',()=>showMode(false));element('index-source').addEventListener('click',startIndex);element('cancel-source').addEventListener('click',()=>element('source-dialog').close());
+element('add-source').addEventListener('click',addSource);element('cancel-source').addEventListener('click',()=>element('source-dialog').close());
 element('export').addEventListener('click',()=>{if(!view)return;const url=URL.createObjectURL(new Blob([JSON.stringify(view.board,null,2)+'\n'],{type:'application/json'}));const link=node('a','');link.href=url;link.download='investigation.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),0);});
 new ResizeObserver(()=>requestAnimationFrame(drawConnections)).observe(element('evidence-map'));
-updates=followChanges({session:()=>({receive(change){const old=sourceStatus?.snapshot;sourceStatus=change.status;updateSourceControls();discovery.receiveStatus(sourceStatus);structure.receiveStatus(sourceStatus);if(old!==sourceStatus.snapshot && view)void load();return true;},close(e){if(e)sourceLabel.show('Source updates disconnected; saved investigation is kept');}})});
-showMode(location.hash==='#saved');
+updates=followChanges({session:()=>({receive(change){const old=sourceStatus?.snapshot;sourceStatus=change.status;updateSourceControls();structure.receiveStatus(sourceStatus);if(old!==sourceStatus.snapshot && view)void load();return true;},close(e){if(e)sourceLabel.show('Source updates disconnected; saved investigation is kept');}})});
 void load();void startIndex();

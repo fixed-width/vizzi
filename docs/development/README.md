@@ -38,6 +38,8 @@ For people extending Vizzi or investigating its implementation. The
 - [Native host architecture](../prototype/TECH.md), [API](../prototype/API.md),
   [source policy](../prototype/SOURCE_POLICY.md), [comparison architecture](../prototype/COMPARISON_TECH.md)
   and [comparison API](../prototype/COMPARISON_API.md)
+- Source browser search [behaviour](../prototype/SOURCE_SEARCH_PRODUCT.md) and
+  [implementation](../prototype/SOURCE_SEARCH_TECH.md)
 
 The existing [prototype contracts](../prototype/), [visual contracts](../visual/),
 [companion contracts](../companion/), [structural trial](../structure/) and

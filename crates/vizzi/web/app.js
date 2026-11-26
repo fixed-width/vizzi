@@ -22,6 +22,7 @@ const header = document.querySelector('body > header');
 installAppHeader(header);
 const element = id => document.getElementById(id);
 const pathFilter = element("filter"), clearFilters = element("clear-filters");
+const searchWithin = element("search-within"), matchPanel = element("source-matches");
 const canvas = element("map"), context = canvas.getContext("2d");
 const overview=element("map-overview"),overviewContext=overview.getContext("2d");
 let overviewTransform,overviewDrag=false;
@@ -63,6 +64,7 @@ let view = null, camera = { x: 20, y: 20, scale: 1 };
 let scheduled = false, drag = null, previousFrame = null, filterTimer = null,fitMode="readable",mapSize;
 let updates, viewFilter = "",mapModel,scene,mapWorkspace;
 let viewTypes = "", selectedTypes = new Set();
+let browseMap, searchOrigin, viewSearchDirectory = null;
 const dismissible=new Set(["navigation-notice","error","map-notice"]);
 const messages=Object.fromEntries([["status","workspace status"],["navigation-notice","navigation notice"],["coverage","source status"],["diagnostics","source diagnostics"],["error","workspace error"],["map-notice","map notice"]].map(([id,label])=>[id,dismissible.has(id)?createMessage(element(id),{label:`Dismiss ${label}`}):textRow(element(id))]));
 let palette=mapPalette(canvas);
@@ -146,7 +148,7 @@ function renderCounts(){
   element("counts").textContent=count+(!page && scene?.focus!=="."?` · ${scene?.files.length ?? 0} drawn here`:"")+
     (scene?.hiddenFiles?` · ${scene.hiddenFiles} inside groups`:"")+(view.deferred?` · ${view.deferred} awaiting analysis`:"");
 }
-function saveMap(){try{const value=JSON.stringify(mapModel.preferences());if(new TextEncoder().encode(value).length>65536)throw new Error("layout size");localStorage.setItem(`vizzi.map.v1.${mapWorkspace}`,value);messages["map-notice"].show(null);}catch{messages["map-notice"].show("Map preferences could not be saved. The current layout is kept until reload.");}}
+function saveMap(){if(view?.matches)return;try{const value=JSON.stringify(mapModel.preferences());if(new TextEncoder().encode(value).length>65536)throw new Error("layout size");localStorage.setItem(`vizzi.map.v1.${mapWorkspace}`,value);messages["map-notice"].show(null);}catch{messages["map-notice"].show("Map preferences could not be saved. The current layout is kept until reload.");}}
 element("reset-map").addEventListener("click",()=>{if(!mapModel)return;if(view.browse){openDirectory(".");return;}mapModel.reset();refreshScene();saveMap();fit(true);});
 installAppearance(element("theme"),{onChange:()=>{palette=mapPalette(canvas);renderMapLegend();invalidate();}});
 const fetchJSON = async (uri, options) => {
@@ -185,24 +187,46 @@ const inspector = createInspector({
   },
 });
 
+const mapPosition = () => ({camera:{...camera},layoutRevision:mapModel?.revision,fitMode,mapSize});
+function restoreMapPosition(position) {
+  camera={...position.camera};
+  fitMode=position.fitMode ?? null;
+  const old=position.mapSize;
+  mapSize={width:canvas.clientWidth,height:canvas.clientHeight};
+  if(old)camera=jumpCamera(camera,{x:(old.width/2-camera.x)/camera.scale,y:(old.height/2-camera.y)/camera.scale},mapSize.width,mapSize.height);
+  invalidate();
+}
 const navigation = createNavigation({
   capture: () => ({ file:view?.selection.file ?? null,entity:view?.selection.entity ?? null,
     path:view?.source?.path ?? null,version:view?.source?.version ?? null,snapshot:view?.snapshot ?? null,
     filter:viewFilter,types:viewTypes,directory:view?.browse?.directory ?? ".",offset:view?.browse?.offset ?? 0,
-    position:{inspector:inspector.position(),camera:{...camera},layoutRevision:mapModel?.revision,fitMode,mapSize} }),
+    find:true,searchDirectory:viewSearchDirectory,resultsOffset:view?.matches?.offset ?? 0,searchOrigin,
+    position:{inspector:inspector.position(),...mapPosition()} }),
   load: (query,intent) => controller.load(query,{intent,rollbackOnFailure:Boolean(intent.returning || intent.anchor)}),
   prepare: (query,intent,signal) => controller.prepare(query,{intent,signal,rollbackOnFailure:true}),
   history: {push:state=>history.pushState(state,""),replace:state=>history.replaceState(state,""),go:delta=>history.go(delta)},
   onState: state => {element("nav-back").disabled=!state.canBack;element("nav-forward").disabled=!state.canForward;element("navigation").setAttribute("aria-busy",String(state.pending));},
   onNotice: notice => messages["navigation-notice"].show(notice),
 });
-function navigate(patch) {
+function selectedTypeQuery() { return [...selectedTypes].sort().join(","); }
+function navigate(patch, anchor) {
   editorFiles.manual();
   clearTimeout(filterTimer);
   updateClearFilters();
-  return navigation.navigate({filter:pathFilter.value,types:[...selectedTypes].sort().join(","),...patch});
+  const filter=pathFilter.value.trim(),types=selectedTypeQuery();
+  if(filter && !searchOrigin)searchOrigin={directory:scene?.focus ?? ".",offset:view?.browse?.offset ?? 0,position:mapPosition()};
+  const searchDirectory=filter && searchWithin.checked ? searchOrigin?.directory ?? null : null;
+  const changed=filter!==viewFilter || types!==viewTypes || searchDirectory!==viewSearchDirectory;
+  const map=filter && changed ? {directory:searchDirectory ?? ".",offset:0}
+    : !filter && searchOrigin ? {directory:searchOrigin.directory,offset:searchOrigin.offset} : {};
+  return navigation.navigate({filter,types,search_directory:searchDirectory, ...map,
+    ...(changed ? {results_offset:0} : {}), ...patch},anchor,{replaceHistory:false});
 }
 function openDirectory(directory) {
+  if(view?.matches && view.browse){
+    searchWithin.checked=directory===searchOrigin?.directory && directory!==".";
+    return navigate({offset:0});
+  }
   pathFilter.value="";
   return navigate({directory,offset:0});
 }
@@ -223,6 +247,8 @@ const controller = createController({
        options.intent?.before && !options.intent.anchor && !url.searchParams.has("entity") &&
        (url.searchParams.get("filter") ?? "")===viewFilter &&
        (url.searchParams.get("types") ?? "")===viewTypes &&
+       url.searchParams.get("search_directory")===viewSearchDirectory &&
+       Number(url.searchParams.get("results_offset"))===(current.matches?.offset ?? 0) &&
        url.searchParams.get("directory")===(current.browse?.directory ?? ".") &&
        Number(url.searchParams.get("offset"))===(current.browse?.offset ?? 0)) {
       const query=new URLSearchParams({file,snapshot});
@@ -238,22 +264,44 @@ const controller = createController({
   },
   onView: (next,info) => {
     const previousSelection=view?.selection.file;
-    const first = !view, changedFilter=viewFilter!==(info.query.filter ?? "") || viewTypes!==(info.query.types ?? "");
+    const wasSearching=Boolean(view?.matches), searching=Boolean(next.matches);
+    const searchDirectory=info.query.search_directory ?? null;
+    const first = !view, changedFilter=viewFilter!==(info.query.filter ?? "") || viewTypes!==(info.query.types ?? "") || viewSearchDirectory!==searchDirectory;
     const changedMap=view?.files!==next.files;
     const changedPage=view?.browse?.directory!==next.browse?.directory || view?.browse?.offset!==next.browse?.offset;
     view = next;keepEvidence.disabled=!next.source;
     viewFilter=info.query.filter ?? "";
     viewTypes=info.query.types ?? "";
+    viewSearchDirectory=searchDirectory;
     selectedTypes=new Set(viewTypes ? viewTypes.split(",") : []);
-    if(info.intent?.returning || info.intent?.anchor)pathFilter.value=viewFilter;
+    if(info.intent?.returning || info.intent?.editor)pathFilter.value=viewFilter;
+    if(info.intent?.returning && searching)searchOrigin=info.intent.target.searchOrigin;
+    const leavingSearch=searching ? null : searchOrigin;
+    const restoreSearchMap=wasSearching && leavingSearch && !info.intent?.returning && !info.intent?.anchor;
+    if(!searching && !pathFilter.value.trim())searchOrigin=null;
+    searchWithin.checked=Boolean(viewSearchDirectory);
     updateClearFilters();
-    if(mapWorkspace!==next.workspace){let preferences={};try{const saved=localStorage.getItem(`vizzi.map.v1.${next.workspace}`);if(saved && saved.length<=65536 && new TextEncoder().encode(saved).length<=65536)preferences=JSON.parse(saved);}catch{}mapModel=createMapModel(next.files,preferences,next.browse);mapWorkspace=next.workspace;}
+    if(mapWorkspace!==next.workspace){
+      let preferences={};
+      try{const saved=localStorage.getItem(`vizzi.map.v1.${next.workspace}`);if(saved && saved.length<=65536 && new TextEncoder().encode(saved).length<=65536)preferences=JSON.parse(saved);}catch{}
+      browseMap=createMapModel(searching?[]:next.files,preferences,searching?null:next.browse);
+      mapModel=searching?createMapModel(next.files,{},next.browse):browseMap;
+      mapWorkspace=next.workspace;
+    }
+    else if(searching!==wasSearching){
+      mapModel=searching?createMapModel(next.files,{},next.browse):browseMap;
+      if(!searching)mapModel.setFiles(next.files,next.browse);
+    }
     else if(changedMap)mapModel.setFiles(next.files,next.browse);
+    if(restoreSearchMap && !next.browse && !mapModel.focus(leavingSearch.directory))mapModel.focus(".");
+    if(searching && changedFilter && !next.browse)mapModel.focus(".");
     const layoutRevision=mapModel.revision;
-    if(!first && previousSelection!==next.selection.file || info.intent?.anchor)mapModel.reveal(next.selection.file);
+    const revealSelection=!restoreSearchMap && (!first && previousSelection!==next.selection.file || info.intent?.anchor);
+    if(revealSelection)mapModel.reveal(next.selection.file,{focusDeep:searching});
     if(changedMap || mapModel.revision!==layoutRevision)refreshScene();
     element("empty").hidden = (next.browse?.entries ?? next.files.length) > 0;
     renderPage();
+    renderMatches(next);
     element("file-title").textContent = next.source?.path ?? "Choose a file";
     element("snapshot").textContent = next.snapshot.slice(0, 8);
     element("snapshot").title = `Captured observation ${next.snapshot}`;
@@ -264,9 +312,10 @@ const controller = createController({
     const restore=navigation.restoration(next,info.intent);
     const sameScene=restore && restore.snapshot===next.snapshot && restore.position.layoutRevision===mapModel.revision &&
       restore.filter===viewFilter && restore.types===viewTypes && restore.directory===(next.browse?.directory ?? ".") && restore.offset===(next.browse?.offset ?? 0);
-    if(sameScene){camera={...restore.position.camera};fitMode=restore.position.fitMode ?? null;const old=restore.position.mapSize;if(old)camera=jumpCamera(camera,{x:(old.width/2-camera.x)/camera.scale,y:(old.height/2-camera.y)/camera.scale},canvas.clientWidth,canvas.clientHeight);invalidate();}
+    if(sameScene)restoreMapPosition(restore.position);
+    else if(restoreSearchMap)restoreMapPosition(leavingSearch.position);
     else if(first || changedFilter || changedPage || info.intent?.returning)fit(true);else invalidate();
-    if(!first && previousSelection!==next.selection.file && !info.intent?.returning){const file=scene.files.find(f=>f.id===next.selection.file);if(file){const x=camera.x+(file.rect.x+file.rect.width/2)*camera.scale,y=camera.y+(file.rect.y+file.rect.height/2)*camera.scale;if(x<12 || y<12 || x>canvas.clientWidth-12 || y>canvas.clientHeight-12){camera=jumpCamera(camera,{x:file.rect.x+file.rect.width/2,y:file.rect.y+file.rect.height/2},canvas.clientWidth,canvas.clientHeight);fitMode=null;invalidate();}}}
+    if(revealSelection && !first && !info.intent?.returning){const file=scene.files.find(f=>f.id===next.selection.file);if(file){const x=camera.x+(file.rect.x+file.rect.width/2)*camera.scale,y=camera.y+(file.rect.y+file.rect.height/2)*camera.scale;if(x<12 || y<12 || x>canvas.clientWidth-12 || y>canvas.clientHeight-12){camera=jumpCamera(camera,{x:file.rect.x+file.rect.width/2,y:file.rect.y+file.rect.height/2},canvas.clientWidth,canvas.clientHeight);fitMode=null;invalidate();}}}
     if(info.intent || !editorFiles.pending())navigation.observe(info.intent);
     void editorFiles.resume();
   },
@@ -289,7 +338,7 @@ const editorFiles=installWorkspaceDelivery({mode:'file',
   prepare:async(action,{signal,replaceHistory})=>{
     if(action.kind==='reveal')return {commit(){}};
     clearTimeout(filterTimer);
-    return navigation.prepare({file:action.file,entity:null,filter:'',types:''},action,{signal,replaceHistory});
+    return navigation.prepare({file:action.file,entity:null,filter:'',types:'',search_directory:null,results_offset:0},action,{signal,replaceHistory});
   },failed:showError,changed:pending=>{if(!pending && view)navigation.observe();}});
 function showError(error) { messages.error.show(`${error.message || error} · ${view?"Keeping the last captured view; retrying.":"No source observation is available. Retry indexing."}`); }
 
@@ -323,6 +372,65 @@ function renderPage() {
   if(element("map-page-range").textContent!==range)element("map-page-range").textContent=range;
   element("map-page-previous").disabled=page.offset===0;
   element("map-page-next").disabled=end===page.entries;
+}
+
+function renderSearchScope() {
+  const directory=searchOrigin?.directory ?? scene?.focus ?? ".";
+  const label=element("search-directory");
+  element("search-scope").hidden=!pathFilter.value.trim() || directory===".";
+  label.textContent=directory;
+  label.title=directory;
+}
+
+function renderMatches(next) {
+  renderSearchScope();
+  const page=next.matches;
+  matchPanel.hidden=!page;
+  if(!page)return;
+  const list=element("match-list");
+  const key=JSON.stringify([next.snapshot,viewFilter,viewTypes,viewSearchDirectory,page.offset]);
+  if(list.dataset.page!==key){
+    list.dataset.page=key;
+    list.replaceChildren(...page.items.map(result=>{
+      const row=document.createElement("li"),button=document.createElement("button");
+      button.type="button";
+      button.className="match-row";
+      const kind=document.createElement("span"),name=document.createElement("code"),path=document.createElement("small");
+      kind.classList.add("kind-badge");
+      if(["function","module","type","constant"].includes(result.kind))kind.classList.add(`kind-${result.kind}`);
+      kind.textContent=result.kind;
+      name.textContent=result.name;
+      path.textContent=result.entity ? `${result.path}:${result.line}` : result.path;
+      button.title=`${result.name}\n${path.textContent}`;
+      button.append(kind,name,path);
+      button.onclick=()=>{
+        if(pathFilter.value.trim()!==viewFilter || selectedTypeQuery()!==viewTypes || searchWithin.checked!==Boolean(viewSearchDirectory))return;
+        void navigate({file:result.file,entity:result.entity,reveal_match:true},
+          {snapshot:next.snapshot,file:result.file,version:result.version,entity:result.entity,line:result.line});
+      };
+      row.append(button);
+      return row;
+    }));
+    list.scrollTop=0;
+  }
+  page.items.forEach((result,index)=>{
+    const active=result.file===next.selection.file && result.entity===next.selection.entity;
+    list.children[index].firstElementChild.setAttribute("aria-current",active?"location":"false");
+  });
+  const end=page.offset+page.items.length;
+  const count=page.total>page.size ? `${page.offset+1}–${end} of ${page.total.toLocaleString()}`
+    : page.total ? page.total.toLocaleString() : "No matches";
+  if(element("match-count").textContent!==count)element("match-count").textContent=count;
+  element("match-pages").hidden=page.total<=page.size;
+  const focused=document.activeElement;
+  element("match-previous").disabled=page.offset===0;
+  element("match-next").disabled=end>=page.total;
+  if(focused?.disabled && focused.parentElement===element("match-pages"))list.querySelector("button")?.focus();
+}
+
+function changeMatchPage(direction) {
+  const page=view?.matches;
+  if(page)void navigate({results_offset:Math.max(0,page.offset+direction*page.size)});
 }
 
 function renderFileList() {
@@ -505,8 +613,12 @@ pathFilter.addEventListener("input", () => {
   editorFiles.manual();
   clearTimeout(filterTimer);
   updateClearFilters();
+  renderSearchScope();
   filterTimer = setTimeout(() => navigate({}), 160);
 });
+searchWithin.addEventListener("change",()=>void navigate({}));
+element("match-previous").addEventListener("click",()=>changeMatchPage(-1));
+element("match-next").addEventListener("click",()=>changeMatchPage(1));
 clearFilters.addEventListener("click", () => {
   const hadTypeFilters = selectedTypes.size > 0;
   pathFilter.value = "";

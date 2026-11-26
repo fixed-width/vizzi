@@ -4,11 +4,9 @@ This procedure is for contributors checking the bounded companion slice. Use the
 [human comparison protocol](../../docs/companion/TRIAL.md) to assess usefulness.
 The scripted replay knows the answer and does not measure comprehension.
 
-The [discovery correction](DISCOVERY_RESULTS.md) supersedes the form-first landing page.
-Check it with `npm test -- --discovery --no-build`: automatic orientation, one visible
-text input, clickable areas/names and one-click keep. Authoring controls must remain
-closed until requested. Both this flow and the advanced saved-context flow run in the
-default browser suite.
+The [discovery correction](DISCOVERY_RESULTS.md) records the former repository explorer.
+Its replacement runs in the default browser suite. Run the replacement on its own
+with `npm test -- --source-search --no-build`.
 
 Build an optimized host with one compiler job:
 
@@ -26,7 +24,8 @@ It uses a recording executable for editor handoff. It checks the primary questio
 cards/notes/connections, source chooser, persistence, changed-source refusal, errors
 inside the source dialog and narrow layout. No real editor is launched.
 
-Prepare the pinned lpc-rs learning source as described in the
+For the original companion replay, use a host and scripts built from
+`506d7187806785f1a2ddfa04ec56a90792e7cc17`. Prepare the pinned lpc-rs learning source as described in the
 [trial kit](../usability/README.md), then run the reference-aware replay with a new
 output directory:
 

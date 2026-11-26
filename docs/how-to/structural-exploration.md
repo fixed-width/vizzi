@@ -13,9 +13,7 @@ CARGO_BUILD_JOBS=1 cargo run --release -p vizzi -- \
   --root /path/to/repository --cache /tmp/vizzi-structure-analysis --workers 1
 ```
 
-Open the printed address with `/investigate?trial=structure` appended, or choose
-**Locations → Try structural exploration** from the companion. The default repository overview
-remains available.
+Open the printed address with `/investigate?trial=structure` appended.
 
 Enter a literal source-area or declaration name. Choose a returned directory/file to
 see its inventory. A name filter stays applied when its file opens; **Area inventory**
