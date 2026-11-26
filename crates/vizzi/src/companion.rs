@@ -69,7 +69,7 @@ pub struct PinEvidence {
     pub version: String,
     /// One-based first evidence line.
     pub line: usize,
-    /// Reader-assigned title.
+    /// Saved location title from the reader or the originating view.
     pub title: String,
     /// View from which the reader saved the location.
     #[serde(default)]
@@ -406,7 +406,9 @@ impl Companion {
                     ) == (&source.file, &source.version, source.line, Some(origin))
                 })
             {
-                return Ok(existing.id);
+                let id = existing.id;
+                board.retitle(id, request.title)?;
+                return Ok(id);
             }
             Ok(board.add_from(request.title, source, request.origin)?)
         })

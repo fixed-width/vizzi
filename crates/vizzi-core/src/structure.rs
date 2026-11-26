@@ -13,7 +13,9 @@ const ITEMS: usize = 65536;
 const AREAS: usize = 8192;
 const PAGE: usize = 24;
 const SITES: usize = 8;
+const MAX_PARENTS: usize = 16;
 pub(crate) const NAME_BYTES: usize = 128;
+pub(crate) const QUALIFIED_NAME_BYTES: usize = NAME_BYTES + MAX_PARENTS * (NAME_BYTES + 2);
 /// Exact native document/context location, independent of a display label.
 #[derive(Clone, Debug, Serialize)]
 pub struct Source {
@@ -453,7 +455,7 @@ impl Structure {
                 let id = hash.finalize().to_hex().to_string();
                 let mut parents = vec![];
                 let mut parent = fact.parent;
-                for _ in 0..16 {
+                for _ in 0..MAX_PARENTS {
                     let Some(p) = parent.and_then(|n| analysis.facts.get(n)) else {
                         break;
                     };

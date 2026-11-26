@@ -39,43 +39,68 @@ impl Editor for Recording {
 fn call_workspace_saves_reuse_current_cards_and_recreate_deleted_cards() {
     use vizzi_core::{investigation::EvidenceOrigin, model::EntityId};
 
-    let (_root, _cache, host) = setup();
-    let app = Companion::new(host, None, Arc::new(Recording(Mutex::new(vec![])))).unwrap();
+    let (_root, cache, host) = setup();
+    let path = cache.path().join("investigation.json");
+    let editor = Arc::new(Recording(Mutex::new(vec![])));
+    let app = Companion::new(host.clone(), Some(path.clone()), editor.clone()).unwrap();
     let target = app.lookup("src/a.rs").unwrap();
-    let pin = |revision| PinEvidence {
+    let pin = |revision, title: &str| PinEvidence {
         revision,
         snapshot: target.snapshot.clone(),
         file: target.file.clone(),
         version: target.version.clone(),
         line: 1,
-        title: "Entry".into(),
+        title: title.into(),
         origin: Some(EvidenceOrigin::CallWorkspace {
             declaration: EntityId::derive(&[b"entry"]),
         }),
     };
 
-    let id = app.pin_current(pin(0)).unwrap();
+    let id = app.pin_current(pin(0, "entry")).unwrap();
     app.edit(EditInvestigation::Annotate {
         revision: 1,
         id,
         note: "Keep this note".into(),
     })
     .unwrap();
-
-    assert_eq!(app.pin_current(pin(2)).unwrap(), id);
-    let board = app.view().board;
-    assert_eq!(board.revision, 2);
-    assert_eq!(board.evidence.len(), 1);
-    assert_eq!(board.evidence[0].note, "Keep this note");
-
-    app.edit(EditInvestigation::Remove { revision: 2, id })
+    let reader = app
+        .pin_current(PinEvidence {
+            line: 2,
+            origin: None,
+            ..pin(2, "Reader")
+        })
         .unwrap();
+    app.edit(EditInvestigation::Connect {
+        revision: 3,
+        from: id,
+        to: reader,
+        explanation: "Entry uses the reader".into(),
+    })
+    .unwrap();
+
+    let mut expected = app.view().board;
+    assert_eq!(app.pin_current(pin(4, "entry")).unwrap(), id);
+    assert_eq!(app.view().board, expected);
+    assert_eq!(app.pin_current(pin(4, "module::entry")).unwrap(), id);
+    expected.revision = 5;
+    expected.evidence[0].title = "module::entry".into();
+    assert_eq!(app.view().board, expected);
     assert!(matches!(
-        app.pin_current(pin(2)),
+        app.pin_current(pin(5, " ")),
+        Err(CompanionError::Invalid(_))
+    ));
+    assert!(matches!(
+        app.pin_current(pin(4, "Outdated title")),
         Err(CompanionError::Conflict(_))
     ));
-    assert_ne!(app.pin_current(pin(3)).unwrap(), id);
-    assert_eq!(app.view().board.evidence.len(), 1);
+    assert_eq!(app.view().board, expected);
+    let restored = Companion::new(host, Some(path), editor).unwrap();
+    assert_eq!(restored.view().board, expected);
+
+    app.edit(EditInvestigation::Remove { revision: 5, id })
+        .unwrap();
+    assert_ne!(app.pin_current(pin(6, "module::entry")).unwrap(), id);
+    assert_eq!(app.view().board.evidence.len(), 2);
 }
 
 #[test]

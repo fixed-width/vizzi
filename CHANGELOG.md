@@ -73,6 +73,8 @@ remains in Git and the project documentation.
 
 ### Fixed
 
+- Use the full code bubble title, including namespaces, when saving or re-saving a
+  location from the Call workspace.
 - Keep the Source browser’s Declarations pane at its current scroll position when
   selecting a declaration.
 - Keep Source browser error banners visible above both pane separators.
