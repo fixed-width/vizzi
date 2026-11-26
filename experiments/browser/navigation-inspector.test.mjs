@@ -120,6 +120,7 @@ test("inspector restores source, outline and cursor with bounded windows; normal
     assert.equal(saved.cursorIndex,49);
     await page.evaluate(()=>window.show(window.meta("c")));
     assert.equal(await page.locator("#outline").evaluate(n=>n.scrollTop),0);
+    assert.equal(await page.locator('#outline button[data-index="0"]').getAttribute("data-declaration"), "c-e0");
     await page.evaluate(()=>window.show(window.meta("b")));
     assert.equal(await page.locator("#source").evaluate(n=>n.scrollTop),0);
     await page.evaluate(saved=>window.show(window.meta("a"),saved),saved);
@@ -265,20 +266,47 @@ test("pending keyboard activation waits for the remote cursor, stays focused and
   } finally {await page.close();}
 });
 
-test("revealActive fetches missing source and outline, avoids redundant reads and is safe before any source exists",async()=>{
-  const page=await fixture(null);try {
-    await page.evaluate(async()=>{await window.widget.revealActive();window.widget.apply({source:null,selection:{}});window.widget.apply({source:null,selection:{}});await window.widget.revealActive();});
-    await page.evaluate(()=>window.show(window.meta("a","a","s",30)));
-    await page.locator("#source").evaluate(n=>{n.scrollTop=0;});await page.locator("#outline").evaluate(n=>{n.scrollTop=0;});await paint(page);await page.waitForFunction(()=>[...document.querySelectorAll("#source .source-text")].some(n=>n.textContent==="line a 1"));
-    const revealed=await page.evaluate(async()=>{await window.widget.revealActive();return {top:document.querySelector("#source").scrollTop,text:document.querySelector("#source").textContent,outline:document.querySelector("#outline").scrollTop};});
-    assert.equal(revealed.top,237*22);assert.ok(revealed.text.includes("line a 241"));assert.ok(revealed.outline>0);
-    const count=await page.evaluate(()=>window.calls.length);await page.evaluate(()=>window.widget.revealActive());assert.equal(await page.evaluate(()=>window.calls.length),count);
-    await page.locator("#source").evaluate(n=>{n.scrollTop=4334;});await page.locator("#outline").evaluate(n=>{n.scrollTop=0;});await paint(page);await page.waitForFunction(()=>[...document.querySelectorAll("#source .source-text")].some(n=>n.textContent==="line a 198"));
-    const cached=await page.evaluate(async()=>{const before=window.calls.length;await window.widget.revealActive();return{queries:window.calls.length-before,source:document.querySelector("#source").textContent,outline:document.querySelector("#outline").textContent};});
-    assert.equal(cached.queries,0);assert.ok(cached.source.includes("line a 241"));assert.ok(cached.outline.includes("item_26"));
-    await page.evaluate(()=>window.show(window.meta("b")));const before=await page.evaluate(()=>window.calls.length);await page.evaluate(()=>window.widget.revealActive());assert.equal(await page.evaluate(()=>window.calls.length),before);assert.deepEqual(await page.evaluate(()=>window.errors),[]);
-  } finally {await page.close();}
+test("a prepared selection keeps newer outline rows and scroll position", async () => {
+  const page = await fixture("many", {reflow: true});
+  try {
+    const prepared = await page.evaluate(() => {
+      document.getElementById("outline").scrollTop = 28 * 48;
+      return window.widget.prepare(window.meta("many", "many", "s", 30), {fromOutline: true});
+    });
+    const outline = page.locator("#outline");
+    await outline.evaluate(node => { node.scrollTop = 400 * 48; });
+    const newerRow = outline.getByRole("button", {name: "Reveal function item_400 starting at Line 3201"});
+    await newerRow.waitFor();
+    const keptRow = await newerRow.evaluate((node, next) => {
+      window.widget.apply(next);
+      return node.isConnected;
+    }, prepared);
+    assert.equal(keptRow, true, "applying the selection keeps the currently visible declaration mounted");
+    await paint(page);
+    assert.equal(await outline.evaluate(node => node.scrollTop), 400 * 48);
+    assert.equal(await outline.locator('[aria-current="true"] .declaration-name').textContent(), "item_30");
+    assert.equal(await page.locator("#source").evaluate(node => node.scrollTop), (241 - 4) * 22);
+    assert.deepEqual(await page.evaluate(() => window.errors), []);
+  } finally { await page.close(); }
 });
+
+test("a capture for another file replaces the previous outline when the pane grows", async () => {
+  const page = await fixture();
+  try {
+    const ids = await page.evaluate(async () => {
+      const next = await window.widget.prepare(window.meta("c"), {
+        restore: {...window.widget.position(), outlineTop: 45 * 48, cursorIndex: 45},
+      });
+      const outline = document.getElementById("outline");
+      outline.style.height = `${20 * 48}px`;
+      window.widget.apply(next);
+      return Array.from(outline.querySelectorAll("button[data-declaration]"), button => button.dataset.declaration);
+    });
+    assert.ok(ids.includes("c-e45"));
+    assert.ok(ids.every(id => id.startsWith("c-")), "outline rows belong to the applied file");
+  } finally { await page.close(); }
+});
+
 test("restored positions clamp to the viewport; changed-version anchor adjustment and empty views remain coherent",async()=>{
   const page=await fixture();try{
     const prepared=await page.evaluate(()=>window.widget.prepare(window.meta("a"),{restore:{sourceTop:1e6,sourceLeft:0,outlineTop:1e6,cursorIndex:49,column:0}}));

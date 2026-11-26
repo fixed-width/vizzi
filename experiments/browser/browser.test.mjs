@@ -611,6 +611,48 @@ test("a benchmark browser can isolate its desktop bus and still load the workspa
   } finally { await session?.close(); await isolated.close(); }
 });
 
+test("clicking a declaration keeps the outline in place and reveals its source", async () => {
+  const session = await openWorkspace(chromium, host);
+  const { page } = session;
+  try {
+    await page.getByText("Accessible file list", { exact: true }).click();
+    await page.getByRole("button", { name: "zzz/large.rs", exact: true }).click();
+    await page.locator("#file-title").getByText("zzz/large.rs", { exact: true }).waitFor();
+    const outline = page.getByRole("list", { name: "Declarations" });
+    const declaration = outline.getByRole("button", { name: /^Reveal function item_00411 / });
+    const source = page.getByRole("region", { name: "Source code" });
+    const waitForSource = () => page.waitForFunction(() => {
+      const source = document.getElementById("source");
+      const line = source.querySelector(".code-line.active .source-text");
+      if (line?.textContent !== "fn item_00411() {}") return false;
+      const row = line.getBoundingClientRect(), viewport = source.getBoundingClientRect();
+      return row.top >= viewport.top && row.bottom <= viewport.bottom;
+    });
+    const outlineTop = await outline.evaluate(node => {
+      node.scrollTop = 410 * 48 + 12;
+      return node.scrollTop;
+    });
+    await declaration.click();
+    await waitForSource();
+    await paint(page);
+    assert.equal(await declaration.getAttribute("aria-current"), "true");
+    assert.equal(await outline.evaluate(node => node.scrollTop), outlineTop);
+
+    await source.evaluate(node => { node.scrollTop = 0; });
+    await source.getByText("fn item_00000() {}", { exact: true }).waitFor();
+    const partialRowTop = await outline.evaluate(node => {
+      node.scrollTop += 48;
+      return node.scrollTop;
+    });
+    const row = await declaration.boundingBox();
+    await page.mouse.click(row.x + row.width / 2, row.y + row.height / 2);
+    await waitForSource();
+    await paint(page);
+    assert.equal(await outline.evaluate(node => node.scrollTop), partialRowTop);
+    assert.deepEqual(session.errors, []);
+  } finally { await session.close(); }
+});
+
 test("a large outline keeps bounded DOM and keyboard/source identity across edits", async () => {
   const session = await openWorkspace(chromium, host); const { page } = session;
   try {

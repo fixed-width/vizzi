@@ -73,6 +73,8 @@ remains in Git and the project documentation.
 
 ### Fixed
 
+- Keep the Source browser’s Declarations pane at its current scroll position when
+  selecting a declaration.
 - Keep Source browser error banners visible above both pane separators.
 - Keep the repository map cursor steady during a press to avoid delayed file clicks in Brave.
 - Open files from the repository map without fetching the same map again.

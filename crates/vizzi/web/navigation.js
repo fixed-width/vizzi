@@ -64,10 +64,10 @@ export function createNavigation({ capture, load, prepare:prepareView, history, 
       notify();
     }
   }
-  function navigate(patch,anchor,{replaceHistory=true}={}) {
+  function navigate(patch,anchor,{replaceHistory=true,fromOutline=false}={}) {
     saveShown();
     const before = copy(capture());
-    return request({ before, pending: true, ...(anchor?{anchor:copy(anchor),replaceHistory}:{}) }, requestedQuery(before, patch));
+    return request({ before, pending: true, fromOutline, ...(anchor?{anchor:copy(anchor),replaceHistory}:{}) }, requestedQuery(before, patch));
   }
   async function prepare(patch,anchor,{signal,replaceHistory=false}={}) {
     saveShown();
