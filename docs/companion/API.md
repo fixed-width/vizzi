@@ -2,8 +2,9 @@
 
 The companion uses one validated investigation per configured workspace. Portable data
 has schema 1. At most 32 evidence cards, 64 reader connections and 512 KiB encoded state
-are admitted. Excerpts cap at 4,096 UTF-8 bytes, titles at 128, question/notes at 2,048 and
-connection explanations at 512. Native state is outside the source checkout.
+are admitted. Excerpts cap at 4,096 UTF-8 bytes, titles at 128 (2,208 for Call workspace
+bubble titles), question/notes at 2,048 and connection explanations at 512. Native state
+is outside the source checkout.
 
 | Request | Input/result |
 | --- | --- |

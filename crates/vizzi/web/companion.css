@@ -18,7 +18,7 @@
 #evidence-map { position:relative;min-height:340px; }
 #evidence-cards { position:relative;display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:46px 24px;align-items:start; }
 .evidence-card { min-width:0;position:relative;border:1px solid var(--border);border-top:3px solid var(--accent-fill);padding:14px 15px;background:var(--paper);min-height:170px; }
-.evidence-card h2 { font:650 15px/1.4 "Noto Sans",sans-serif;white-space:normal;margin:0 0 10px; }
+.evidence-card h2 { font:650 15px/1.4 "Noto Sans",sans-serif;white-space:normal;overflow-wrap:anywhere;margin:0 0 10px; }
 .evidence-card .evidence-path { font:10px/1.5 "DejaVu Sans Mono",monospace;overflow-wrap:anywhere;color:var(--muted);margin:0; }
 .evidence-card .evidence-summary { font-size:12px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere;margin:12px 0; }
 .evidence-card .add-notes { font:inherit;padding:0;border:0;background:transparent;color:var(--link);text-decoration:underline; }

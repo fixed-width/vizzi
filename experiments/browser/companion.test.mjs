@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';import {spawnSync} from 'node:child_process';import {writeFile,readFile,chmod,mkdir} from 'node:fs/promises';import {join} from 'node:path';
 import {buildHost,browser,startHost,workspace,paint} from './support.mjs';
 if(!process.argv.includes('--no-build'))buildHost();
-const input=await workspace({files:{'src/entry.rs':'pub fn entry() {}\n','src/reader.rs':'pub trait Reader { fn read(&self); }\n','src/target.rs':'\n'.repeat(120)+'pub fn resume_here() {}\n'}});const record=join(input.cache,'editor-arguments'),editor=join(input.cache,'record-editor'),state=join(input.cache,'..','investigation.json');await mkdir(input.cache,{recursive:true});
+const callNamespace='call_namespace_'.repeat(8)+'test';
+const input=await workspace({files:{'src/entry.rs':'pub fn entry() {}\n','src/reader.rs':'pub trait Reader { fn read(&self); }\n','src/target.rs':'\n'.repeat(119)+`mod ${callNamespace} {\n    pub fn resume_here() {}\n}\n`}});const record=join(input.cache,'editor-arguments'),editor=join(input.cache,'record-editor'),state=join(input.cache,'..','investigation.json');await mkdir(input.cache,{recursive:true});
 await writeFile(editor,`#!/bin/sh\nprintf '%s\\n' "$@" >> '${record}'\n`);await chmod(editor,0o700);input.sourceArguments=['--editor-code',editor,'--investigation-file',state];
 const bad=spawnSync('target/release/vizzi',['--root',input.root,'--cache',input.cache,'--investigation-file',join(input.cache,'investigation.json'),'--port','0'],{encoding:'utf8',timeout:1500});assert.match(bad.stderr,/Investigation file must be outside the analysis cache/);
 let host,chromium;
@@ -124,10 +125,18 @@ try{
  await page.locator('#fragment-form button[type=submit]').click();
  await page.locator('[data-add-symbol][data-name="resume_here"]').click();
  const bubble=page.locator('[data-view][data-name="resume_here"]');
- await bubble.getByRole('button',{name:'Save location',exact:true}).click();
- await page.waitForFunction(()=>document.querySelector('#visual-notice').textContent.includes('Location saved.'));
+ const bubbleTitle=await bubble.locator('.fragment-heading strong').textContent();
+ assert.equal(bubbleTitle,`${callNamespace}::resume_here`);
+ const saveCall=async()=>{
+  const saved=page.waitForResponse(response=>new URL(response.url()).pathname==='/api/search/evidence');
+  await bubble.getByRole('button',{name:'Save location',exact:true}).click();
+  assert.equal((await saved).status(),200);
+ };
+ await saveCall();
  const pinnedId=await bubble.getAttribute('data-view');
- const savedSnapshot=JSON.parse(await readFile(state,'utf8')).evidence.at(-1).source.snapshot;
+ const savedCall=JSON.parse(await readFile(state,'utf8')).evidence.at(-1);
+ assert.equal(savedCall.title,bubbleTitle);
+ const savedSnapshot=savedCall.source.snapshot;
  await bubble.getByRole('button',{name:'Pin version',exact:true}).click();
  await bubble.getByRole('button',{name:'Collapse bubble',exact:true}).click();
  await writeFile(join(input.root,'src/entry.rs'),'pub fn unrelated_live_refresh() {}\n');
@@ -145,8 +154,12 @@ try{
 
  await host.close();
  await writeFile(join(input.root,'src/entry.rs'),'pub fn unrelated_refresh() {}\n');
+ const legacyBoard=JSON.parse(await readFile(state,'utf8'));
+ legacyBoard.evidence.find(evidence=>evidence.id===savedCall.id).title='resume_here';
+ await writeFile(state,JSON.stringify(legacyBoard));
  host=await startHost(input,1);
  await page.goto(host.url+'/investigate#saved');
+ assert.equal(await callCard.getByRole('heading').textContent(),'resume_here');
  await callCard.getByRole('button',{name:'Inspect location',exact:true}).click();
  await page.locator('#evidence-detail').getByRole('button',{name:'Open in Call workspace',exact:true}).click();
  await page.waitForURL('**/workspace');
@@ -154,18 +167,23 @@ try{
  assert.equal(await bubble.count(),1);
  const current=await (await fetch(host.url+'/api/status')).json();
  assert.notEqual(current.snapshot,savedSnapshot);
+ await saveCall();
+ const updatedCall=JSON.parse(await readFile(state,'utf8')).evidence.at(-1);
+ assert.deepEqual(updatedCall,savedCall);
 
  const other=await page.context().newPage();
  await other.goto(host.url+'/investigate#saved');
  const otherCard=other.locator('.evidence-card').filter({has:other.getByRole('button',{name:'Open in Call workspace',exact:true})});
+ const callCardTitle=otherCard.getByRole('heading');
+ assert.equal(await callCardTitle.textContent(),bubbleTitle);
+ assert.equal(await callCardTitle.evaluate(heading=>heading.scrollWidth<=heading.clientWidth),true);
  const removedId=await otherCard.getAttribute('data-evidence');
  await otherCard.getByRole('button',{name:'Inspect location',exact:true}).click();
  await other.getByRole('button',{name:'Remove location and its connections',exact:true}).click();
  await otherCard.waitFor({state:'detached'});
  await other.close();
 
- await bubble.getByRole('button',{name:'Save location',exact:true}).click();
- await page.waitForFunction(()=>document.querySelector('#visual-notice').textContent.includes('Location saved.'));
+ await saveCall();
  const readCard=async()=>(await (await fetch(host.url+'/api/investigation')).json()).board.evidence
   .filter(evidence=>evidence.origin?.view==='call_workspace');
  const restored=await readCard();

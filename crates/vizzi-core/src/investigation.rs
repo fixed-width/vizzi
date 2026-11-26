@@ -1,5 +1,6 @@
 //! Bounded reader-authored investigations over immutable source anchors.
 use crate::model::{ContentId, DocumentVersion, EntityId, FileId, SnapshotId, WorkspaceId};
+use crate::structure::QUALIFIED_NAME_BYTES;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;
 /// Maximum source cards in one investigation.
@@ -53,7 +54,7 @@ pub enum EvidenceOrigin {
 pub struct Evidence {
     /// Stable local card identity, never reused after removal.
     pub id: u32,
-    /// Reader-supplied role/title.
+    /// Reader-supplied role or a title derived from the originating view.
     pub title: String,
     /// Reader-supplied interpretation, separate from source.
     pub note: String,
@@ -109,8 +110,12 @@ fn require(ok: bool, message: &str) -> Result<(), InvestigationError> {
         Err(InvestigationError(message.into()))
     }
 }
-fn title(value: &str) -> bool {
-    !value.trim().is_empty() && value.len() <= 128
+fn valid_title(value: &str, origin: Option<&EvidenceOrigin>) -> bool {
+    let max_bytes = match origin {
+        Some(EvidenceOrigin::CallWorkspace { .. }) => QUALIFIED_NAME_BYTES,
+        _ => 128,
+    };
+    !value.trim().is_empty() && value.len() <= max_bytes
 }
 fn relative(path: &str) -> bool {
     !path.is_empty()
@@ -203,7 +208,7 @@ impl Investigation {
         origin: Option<EvidenceOrigin>,
     ) -> Result<u32, InvestigationError> {
         require(
-            self.data.evidence.len() < EVIDENCE_LIMIT && title(&value),
+            self.data.evidence.len() < EVIDENCE_LIMIT && valid_title(&value, origin.as_ref()),
             "Evidence limit reached or invalid title",
         )?;
         self.validate_source(&source)?;
@@ -223,6 +228,24 @@ impl Investigation {
             data.next_id = next;
         })?;
         Ok(id)
+    }
+    /// Updates a saved title while preserving the card and its source anchor.
+    pub fn retitle(&mut self, id: u32, title: String) -> Result<(), InvestigationError> {
+        let (index, evidence) = self
+            .data
+            .evidence
+            .iter()
+            .enumerate()
+            .find(|(_, evidence)| evidence.id == id)
+            .ok_or_else(|| InvestigationError("Evidence is absent".into()))?;
+        require(
+            valid_title(&title, evidence.origin.as_ref()),
+            "Invalid evidence title",
+        )?;
+        if evidence.title == title {
+            return Ok(());
+        }
+        self.update(|data| data.evidence[index].title = title)
     }
     /// Edits the reader's note, never its captured source.
     pub fn annotate(&mut self, id: u32, note: String) -> Result<(), InvestigationError> {
@@ -311,7 +334,7 @@ impl Investigation {
                 e.id > 0
                     && e.id < d.next_id
                     && ids.insert(e.id)
-                    && title(&e.title)
+                    && valid_title(&e.title, e.origin.as_ref())
                     && e.note.len() <= 2048,
                 "Invalid evidence identity or text",
             )?;

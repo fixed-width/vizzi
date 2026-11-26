@@ -16,19 +16,44 @@ fn source() -> SourceEvidence {
 }
 
 #[test]
-fn saved_view_survives_roundtrip_alongside_locations_without_a_view() {
+fn qualified_call_title_survives_roundtrip_alongside_locations_without_a_view() {
     let mut board = Investigation::new(source().workspace);
     let older = board.add("Older location".into(), source()).unwrap();
     let origin = EvidenceOrigin::CallWorkspace {
         declaration: EntityId::derive(&[b"function"]),
     };
+    let segment = "界".repeat(42) + "ab";
+    let title = [segment.as_str(); 17].join("::");
     let current = board
-        .add_from("Saved function".into(), source(), Some(origin.clone()))
+        .add_from(title.clone(), source(), Some(origin.clone()))
         .unwrap();
 
     let restored = Investigation::decode(&board.encode().unwrap()).unwrap();
     assert_eq!(restored.evidence(older).unwrap().origin, None);
-    assert_eq!(restored.evidence(current).unwrap().origin, Some(origin));
+    let saved_call = restored.evidence(current).unwrap();
+    assert_eq!(saved_call.origin, Some(origin));
+    assert_eq!(saved_call.title, title);
+}
+
+#[test]
+fn invalid_call_titles_cannot_be_saved_or_restored() {
+    let mut board = Investigation::new(source().workspace);
+    let origin = EvidenceOrigin::CallWorkspace {
+        declaration: EntityId::derive(&[b"function"]),
+    };
+    board
+        .add_from("Saved function".into(), source(), Some(origin.clone()))
+        .unwrap();
+    let mut data = serde_json::to_value(board.data()).unwrap();
+    for title in ["  ".to_owned(), "x".repeat(2209)] {
+        assert!(
+            board
+                .add_from(title.clone(), source(), Some(origin.clone()))
+                .is_err()
+        );
+        data["evidence"][0]["title"] = title.into();
+        assert!(Investigation::decode(&serde_json::to_vec(&data).unwrap()).is_err());
+    }
 }
 
 #[test]

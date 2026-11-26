@@ -39,7 +39,9 @@ file atomically outside the source root, keeping it separate from analysis cache
 Use revision checks to refuse obsolete board edits rather than losing another edit.
 The Call workspace reads the current board before saving. Under the same revision
 check as other edits, the host reuses a matching card with the same declaration, file,
-version and line. It creates a new card if the previous one was removed.
+version and line. Re-saving updates the title from the bubble while preserving the
+card ID, source anchor, notes and connections. An identical title needs no new revision.
+The host creates a new card if the previous one was removed.
 
 An optional card origin identifies the Source browser or a Call workspace declaration.
 The call origin stores a declaration tracking identity that survives unrelated index
