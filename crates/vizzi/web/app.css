@@ -111,6 +111,16 @@ footer { min-height: 36px; padding: 10px 24px; border-top: 1px solid var(--borde
 .fragment-controls:has(button:not([hidden])) { border-right: 1px solid var(--border); padding-right: 4px; }
 .fragment-controls button { font-size: 9px; line-height: 16px; padding: 0 3px; height: 18px; }
 
+#source.source-reflow { scrollbar-gutter: stable; overflow-anchor: none; font-variant-ligatures: none; font-kerning: none; }
+.source-reflow #source-space { display: flow-root; }
+.source-reflow .code-line { position: relative; display: grid; grid-template-columns: 60px auto minmax(0, 1fr); height: auto; }
+.source-reflow .line-no, .source-reflow .fragment-controls { align-self: start; }
+.source-reflow .source-text { grid-column: 3; min-width: 0; }
+.source-reflow .reflow-segment { display: block; position: relative; height: 22px; }
+.source-reflow .reflow-marker { position: absolute; left: -30px; color: var(--gutter); font-size: 10px; }
+.source-reflow .reflow-marker::before { content: '↪'; }
+.source-reflow .source-clip { color: var(--warning-text); }
+
 .resizable { grid-template-columns:minmax(0,var(--split-first,1fr)) 8px minmax(0,var(--split-second,1fr)); }
 .source-layout:has(> .outline[hidden]) { grid-template-columns: minmax(0, 1fr); }
 .source-layout > .outline[hidden] + .splitter { display: none; }

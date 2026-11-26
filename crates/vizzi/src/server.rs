@@ -294,11 +294,15 @@ async fn inspection(
     let snapshot_id = snapshot.id().clone();
     Ok(Json(
         source_work(move || {
+            let query = WindowQuery {
+                reflow: Some(true),
+                ..WindowQuery::default()
+            };
             Ok(Inspection {
                 source: file.source_summary(None),
                 window: PinnedWindow {
                     snapshot: snapshot_id,
-                    window: file.window(&WindowQuery::default(), None)?,
+                    window: file.window(&query, None)?,
                 },
             })
         })
@@ -551,6 +555,7 @@ mod tests {
             inspection["source"]["version"]
         );
         assert_eq!(inspection["window"]["lines"][0]["text"], "fn original() {}");
+        assert_eq!(inspection["window"]["lines"][0]["ending"], "");
         assert_eq!(inspection["window"]["outline"][0]["name"], "original");
         assert_eq!(inspection["source"]["summary"]["declarations"], 1);
         let pinned_view = diagnostic(

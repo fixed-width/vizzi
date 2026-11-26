@@ -12,6 +12,22 @@ export function installAppearance(select,{root=document.documentElement,storage=
   root.ownerDocument.defaultView.addEventListener('storage',event=>{if(event.key==='vizzi.theme.v1')apply(event.newValue);});
 }
 
+export function installCodeLayout(select,onChange,onError) {
+  const key='vizzi.visual.code-layout';
+  function apply(value){
+    select.value=value==='original'?'original':'smart';
+    onChange(select.value==='smart');
+  }
+  let saved;
+  try{saved=localStorage.getItem(key);}catch{}
+  apply(saved);
+  select.addEventListener('change',()=>{
+    apply(select.value);
+    try{localStorage.setItem(key,select.value);}catch{onError('This browser could not save the code layout preference.');}
+  });
+  select.ownerDocument.defaultView.addEventListener('storage',event=>{if(event.key===key)apply(event.newValue);});
+}
+
 export const mapFileTypes = {
   c: 'C',
   cpp: 'C++',

@@ -57,6 +57,8 @@ remains in Git and the project documentation.
 
 ### Changed
 
+- Wrap long lines in the Source browser using the same syntax-aware layout as
+  code bubbles. Both views share the **Code layout** setting.
 - Sort the Source browser’s file type legend by descending file count, with ties
   ordered alphabetically.
 - Hide the Source browser’s **Directories** section when there are no directory entries.

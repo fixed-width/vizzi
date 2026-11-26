@@ -13,6 +13,17 @@ and Settings menu across views; each view's controls occupy the row below it.
 `/investigate` also opens Saved locations. The contributor structural trial is available
 at `/investigate?trial=structure`.
 
+## Settings
+
+**Theme** is available in every view. **Code layout** is shared by Source browser and
+Call workspace. **Smart reflow** wraps at syntax-aware break points where available.
+**Original lines** displays each captured line on a single row. **Module outlines**
+is available in Call workspace.
+
+Both layouts preserve source line numbers, and copying fully captured rows preserves
+their original whitespace and line endings. Long indivisible tokens and bounded
+source fragments can still require scrolling or paging.
+
 ## Call workspace
 
 | Control or gesture | Result |
@@ -57,11 +68,6 @@ Function history freezes local HEAD when first opened and considers up to 64 fil
 It skips unchanged declarations, stops at missing or ambiguous matches, and does not infer
 renames or moves. Historical bubbles disable current-source actions. See
 [reading function history](../how-to/read-function-history.md).
-
-Settings contains Theme everywhere. Code layout and Module outlines are call-workspace
-settings. Source reflow preserves source line numbers; copying fully captured rows
-preserves their original whitespace and line endings. Long indivisible tokens or bounded
-source fragments can still require scrolling/paging.
 
 ## Other views
 

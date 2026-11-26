@@ -1,9 +1,16 @@
 import {kindGroup,renderStyledText} from "/presentation.js";
 import { createWindowReader } from "/windows.js";
 import { decorateSourceActions } from "/call-actions.js";
+import {planReflow} from "/reflow.js";
+import {codeMeasurementContext,copySourceSelection,measureCode,renderReflowText,sourceSelected} from "/reflow-text.js";
 
-const SOURCE_ROW = 22, OUTLINE_ROW = 48;
-export function createInspector({ source, space, outline, transport, select, onError, makeReader=createWindowReader, decorateLine=()=>{}, loadActions, activateAction, emptyText="Select a file in the repository map." }) {
+const SOURCE_ROW = 22, OUTLINE_ROW = 48, SOURCE_GUTTER = 60, SOURCE_PADDING = 22;
+function coversRows(rows,first,last) {
+  for(let number=first;number<=last;number++)if(!rows.has(number))return false;
+  return true;
+}
+
+export function createInspector({ source, space, outline, transport, select, onError, makeReader=createWindowReader, decorateLine=()=>{}, loadActions, activateAction, reflow=false, emptyText="Select a file in the repository map." }) {
   const outlineSpace = outline.ownerDocument.createElement("div"); outline.replaceChildren(outlineSpace);
   outline.setAttribute("role","list"); outline.setAttribute("aria-label","Declarations");
   outline.style.maxHeight = `${180 * OUTLINE_ROW}px`; source.style.maxHeight = `${64 * SOURCE_ROW}px`;
@@ -11,11 +18,43 @@ export function createInspector({ source, space, outline, transport, select, onE
   let columnLine, column = 0;
   let actionsByLine = new Map(), actionRequest;
   const sourceNodes = new Map(), outlineNodes = new Map();
+  const context=reflow?codeMeasurementContext(source):null;
+  let smartReflow=reflow, wrappedRows=[], pendingRender=false;
+  if(reflow){
+    source.classList.add("source-reflow");
+    document.addEventListener("selectionchange",()=>{if(pendingRender&&!sourceSelected(source))schedule();});
+    document.addEventListener("copy",event=>copySourceSelection(source,[...sourceNodes.values()].sort((a,b)=>a.line.number-b.line.number),event));
+  }
   const emptyNote=document.createElement("p");emptyNote.className="source-empty";
   const emptyOutline=document.createElement("p");emptyOutline.className="outline-empty";
   const focused = () => outline.contains(document.activeElement) ? document.activeElement.closest("button[data-declaration]")?.dataset.declaration : undefined;
-  function ranges(sourceTop = source.scrollTop, outlineTop = outline.scrollTop) {
-    return {line_start:Math.max(1,Math.floor(sourceTop/SOURCE_ROW)-16+1),line_count:96,outline_start:Math.max(0,Math.floor(outlineTop/OUTLINE_ROW)-8),outline_count:200,cursor_index:cursor,column_line:columnLine,column};
+  // Only the current source window contributes continuation heights.
+  function sourceReading(top=source.scrollTop) {
+    let added=0;
+    for(const {top:rowTop,plan} of wrappedRows){
+      if(top<rowTop)break;
+      const segment=Math.floor((top-rowTop)/SOURCE_ROW);
+      if(segment<plan.length)return {sourceTop:top-added-segment*SOURCE_ROW,sourceByte:plan[segment].start};
+      added+=(plan.length-1)*SOURCE_ROW;
+    }
+    return {sourceTop:top-added};
+  }
+  function displayTop(sourceTop,sourceByte=0) {
+    let top=sourceTop;
+    const number=Math.floor(sourceTop/SOURCE_ROW)+1;
+    for(const row of wrappedRows){
+      if(row.number>number)break;
+      const segments=row.number===number?row.plan.findLastIndex(piece=>piece.start<=sourceByte):row.plan.length-1;
+      top+=segments*SOURCE_ROW;
+    }
+    return top;
+  }
+  function restoreSource({sourceTop,sourceByte,sourceLine}) {
+    const top=displayTop(sourceTop,sourceByte);
+    source.scrollTop=sourceLine===undefined?top:Math.max(top,displayTop((sourceLine-1)*SOURCE_ROW)+SOURCE_ROW-source.clientHeight);
+  }
+  function ranges(sourceTop = sourceReading().sourceTop, outlineTop = outline.scrollTop) {
+    return {line_start:Math.max(1,Math.floor(sourceTop/SOURCE_ROW)-16+1),line_count:96,outline_start:Math.max(0,Math.floor(outlineTop/OUTLINE_ROW)-8),outline_count:200,cursor_index:cursor,column_line:columnLine,column,reflow:reflow||undefined};
   }
   function revealOutline(index) {
     const top=index*OUTLINE_ROW;
@@ -37,7 +76,7 @@ export function createInspector({ source, space, outline, transport, select, onE
       renderSource();
     }).catch(()=>{}).finally(()=>{if(actionRequest===request)actionRequest=undefined;});
   }
-  function accept(window, query, intent = {}, retainedFragment) {
+  function accept(window, query, intent = {}, retainedFragment, reading) {
     const hadFocus=outline.contains(document.activeElement);
     if (intent.fragment) {
       for(const row of window.lines)sourceRows.set(row.number,row);
@@ -52,43 +91,91 @@ export function createInspector({ source, space, outline, transport, select, onE
     data=window; entries=new Map(window.outline.map(row=>[row.index,row]));
     if(window.cursor)entries.set(window.cursor.index,window.cursor);
     cursor=window.cursor?.index ?? 0;
-    renderSource();renderOutline();
+    renderSource(reading);renderOutline();
     if(hadFocus)focusCursor();
     if(intent.end)source.scrollLeft=source.scrollWidth;
     if(queuedActivation && entries.has(cursor)) {queuedActivation=false;void select(entries.get(cursor));}
   }
   const reader=makeReader({transport,onWindow:accept,onError});
   function focusCursor() { const row=entries.get(cursor); if(row)outlineNodes.get(row.id)?.button.focus({preventScroll:true}); }
-  function renderSource() {
+  function renderSource(reading) {
+    pendingRender=false;
     if(!view?.source || !view.source.summary.lines) {
-      sourceNodes.clear();space.replaceChildren(emptyNote);emptyNote.textContent=view?.source?"Source encoding is unavailable in this inspector.":emptyText;return;
+      wrappedRows=[];sourceNodes.clear();space.replaceChildren(emptyNote);emptyNote.textContent=view?.source?"Source encoding is unavailable in this inspector.":emptyText;return;
     }
+    if(reflow&&!reading&&sourceSelected(source)){
+      const firstVisible=Math.floor(sourceReading().sourceTop/SOURCE_ROW)+1;
+      const bottom=source.scrollTop+Math.max(0,source.clientHeight-1);
+      const lastVisible=Math.min(view.source.summary.lines,Math.floor(sourceReading(bottom).sourceTop/SOURCE_ROW)+1);
+      if(coversRows(sourceNodes,firstVisible,lastVisible)||!coversRows(sourceRows,firstVisible,lastVisible)){
+        pendingRender=true;
+        return;
+      }
+    }
+    reading??=sourceReading();
     const first=Math.max(1,Math.floor(source.scrollTop/SOURCE_ROW)-16+1),last=Math.min(view.source.summary.lines+1,Math.ceil((source.scrollTop+source.clientHeight)/SOURCE_ROW)+17,first+96);
-    for(const [number,node] of sourceNodes)if(number<first || number>=last || !sourceRows.has(number)){node.row.remove();sourceNodes.delete(number);}
-    for(let number=first;number<last;number++) {
-      const line=sourceRows.get(number);if(!line)continue;
+    const numbers=[...sourceRows.keys()].filter(number=>reflow||number>=first&&number<last).sort((a,b)=>a-b);
+    const wanted=new Set(numbers);
+    for(const [number,node] of sourceNodes)if(!wanted.has(number)){node.row.remove();sourceNodes.delete(number);}
+    const width=source.clientWidth-SOURCE_GUTTER-SOURCE_PADDING;
+    const measure=smartReflow&&context&&width>0?measureCode(context,getComputedStyle(source)):null;
+    wrappedRows=[];
+    let added=0,previousRow=null,previousNumber=0;
+    for(const number of numbers) {
+      const line=sourceRows.get(number);
       let node=sourceNodes.get(number);
       if(!node) {
         const row=document.createElement("div"),label=document.createElement("span"),text=document.createElement("span"),controls=document.createElement("span");row.className="code-line";label.className="line-no";label.setAttribute("aria-hidden","true");text.className="source-text";controls.className="fragment-controls";
+        row.dataset.line=String(number);label.textContent=number;
         const buttons=new Map();
         for(const [action,title] of [["first","First"],["previous","Earlier"],["next","Later"],["last","Last"]]) {
           const button=document.createElement("button");button.textContent=title;button.setAttribute("aria-label",`${title} text on line ${number}`);button.addEventListener("click",()=>fragment(number,action));controls.append(button);buttons.set(action,button);
         }
-        row.append(label,controls,text);space.append(row);node={row,label,text,buttons};sourceNodes.set(number,node);
+        row.append(label,controls,text);node={row,controls,text,buttons};sourceNodes.set(number,node);
       }
-      node.row.style.top=`${(number-1)*SOURCE_ROW}px`;node.label.textContent=number;
+      const nextRow=previousRow?previousRow.nextSibling:space.firstChild;
+      if(nextRow!==node.row)space.insertBefore(node.row,nextRow);
+      previousRow=node.row;
+      for(const [action,button] of node.buttons)button.hidden=action==="first" || action==="previous" ? !line.left : !line.right;
+      if(reflow)node.controls.hidden=!line.left&&!line.right;
+      let layoutWidth=0;
+      if(measure&&line.reflow&&!line.left){
+        layoutWidth=width;
+        if(line.right)layoutWidth-=node.controls.offsetWidth+parseFloat(getComputedStyle(node.controls).marginRight)+measure("…");
+      }
+      const changedLine=node.line!==line;
+      let plan=node.plan;
+      if(changedLine||layoutWidth!==node.layoutWidth){
+        const next=layoutWidth>0?planReflow(line,layoutWidth,measure):null;
+        plan=next?.length>1?next:null;
+        node.layoutWidth=layoutWidth;
+      }
+      const top=(number-1)*SOURCE_ROW+added;
+      if(reflow)node.row.style.marginTop=`${(number-previousNumber-1)*SOURCE_ROW}px`;
+      else node.row.style.top=`${top}px`;
+      previousNumber=number;
+      if(plan){
+        wrappedRows.push({number,top,plan});
+        added+=(plan.length-1)*SOURCE_ROW;
+      }
       const actions=actionsByLine.get(number);
-      if(node.line!==line||node.actions!==actions){
-        if(node.line!==line||node.actions?.length)renderStyledText(node.text,line);
+      const changedPlan=node.plan!==plan&&JSON.stringify(node.plan)!==JSON.stringify(plan);
+      if(changedLine||node.actions!==actions||changedPlan){
+        if(reflow)renderReflowText(node.text,line,plan);
+        else if(changedLine||node.actions?.length)renderStyledText(node.text,line);
         if(activateAction&&actions?.length){
           const captured=view;
           decorateSourceActions(node.text,line,actions,(...args)=>activateAction(captured,...args),"Ctrl/⌘-click opens in Call workspace");
         }
         node.line=line;node.actions=actions;
       }
+      node.plan=plan;
       const active=view.source.summary.active;node.row.classList.toggle("active",Boolean(active && number>=active.start_line && number<=active.end_line));
       decorateLine(node.row,number,view);
-      for(const [action,button] of node.buttons)button.hidden=action==="first" || action==="previous" ? !line.left : !line.right;
+    }
+    if(reflow){
+      space.style.height=`${view.source.summary.lines*SOURCE_ROW+added}px`;
+      restoreSource(reading);
     }
   }
   function renderOutline() {
@@ -115,15 +202,15 @@ export function createInspector({ source, space, outline, transport, select, onE
   function covered(query) {
     if(!data)return false;
     const lines=view.source.summary.lines,decls=view.source.summary.declarations;
-    const lastLine=Math.min(lines,Math.ceil((source.scrollTop+source.clientHeight)/SOURCE_ROW)+16,query.line_start+95);
+    const lastLine=Math.min(lines,Math.ceil(sourceReading(source.scrollTop+source.clientHeight).sourceTop/SOURCE_ROW)+16,query.line_start+95);
     const lastEntry=Math.min(decls,Math.ceil((outline.scrollTop+outline.clientHeight)/OUTLINE_ROW)+8,query.outline_start+199);
-    for(let n=query.line_start;n<=lastLine;n++)if(!sourceRows.has(n))return false;
+    if(!coversRows(sourceRows,query.line_start,lastLine))return false;
     for(let i=query.outline_start;i<lastEntry;i++)if(!entries.has(i))return false;
     return !decls || entries.has(cursor);
   }
   function schedule() {
     if(scheduled)return;scheduled=true;
-    requestAnimationFrame(()=>{scheduled=false;if(!view?.source)return;const query=ranges();reader.activate(view);renderSource();renderOutline();if(!covered(query))void reader.request(query,{focus:false});});
+    requestAnimationFrame(()=>{scheduled=false;if(!view?.source)return;renderSource();renderOutline();const query=ranges();reader.activate(view);if(!covered(query))void reader.request(query,{focus:false});});
   }
   async function fragment(number,action) {
     const row=sourceRows.get(number);if(!row)return;
@@ -146,8 +233,9 @@ export function createInspector({ source, space, outline, transport, select, onE
   source.addEventListener("scroll",()=>{if(source.scrollTop!==sourceTop){sourceTop=source.scrollTop;schedule();}},{passive:true});outline.addEventListener("scroll",schedule,{passive:true});
   const resize=new ResizeObserver(schedule);resize.observe(source);resize.observe(outline);
   return {
+    setReflow(enabled) {smartReflow=enabled;renderSource();},
     position() {
-      return { sourceTop:source.scrollTop, sourceLeft:source.scrollLeft, outlineTop:outline.scrollTop,
+      return { ...sourceReading(), sourceLeft:source.scrollLeft, outlineTop:outline.scrollTop,
         cursorIndex:cursor, columnLine, column };
     },
     async prepare(next,options={}) {
@@ -157,8 +245,9 @@ export function createInspector({ source, space, outline, transport, select, onE
       const active=next.source.summary.active;
       const restore=options.restore;
       const reveal=Boolean(options.reveal);
-      const desiredSourceTop=options.line!==undefined?Math.max(0,(options.line-4)*SOURCE_ROW):restore?restore.sourceTop:active && (changedSelection || reveal)?Math.max(0,(active.start_line-4)*SOURCE_ROW):changedFile || reveal?0:source.scrollTop;
-      const sourceTop=Math.max(0,Math.min(desiredSourceTop,next.source.summary.lines*SOURCE_ROW-source.clientHeight));
+      const sourceLine=options.line??(!restore&&active&&(changedSelection||reveal)?active.start_line:undefined);
+      const reading=sourceLine!==undefined?{sourceTop:Math.max(0,(sourceLine-4)*SOURCE_ROW)}:restore??(changedFile||reveal?{sourceTop:0}:sourceReading());
+      const sourceTop=Math.max(0,Math.min(reading.sourceTop,next.source.summary.lines*SOURCE_ROW-(reflow?1:source.clientHeight)));
       let outlineTop=restore?restore.outlineTop:changedFile || reveal?0:outline.scrollTop;
       if(!restore && (changedSelection || reveal) && active)outlineTop=Math.max(0,active.index*OUTLINE_ROW-outline.clientHeight/2);
       outlineTop=Math.max(0,Math.min(outlineTop,next.source.summary.declarations*OUTLINE_ROW-outline.clientHeight));
@@ -175,7 +264,7 @@ export function createInspector({ source, space, outline, transport, select, onE
       }
       const window=await reader.prepare(next,query,options);
       outlineTop+=(window.outline_start-query.outline_start)*OUTLINE_ROW;
-      return {...next,inspection:window,inspectionPosition:{sourceTop,outlineTop,
+      return {...next,inspection:window,inspectionPosition:{sourceTop,sourceByte:reading.sourceByte,sourceLine,outlineTop,
         sourceLeft:restore?restore.sourceLeft:sameDocument && !reveal?source.scrollLeft:0,
         columnLine:restore?restore.columnLine:sameDocument && !reveal?columnLine:undefined,
         column:restore?restore.column:sameDocument && !reveal?column:0}};
@@ -186,13 +275,19 @@ export function createInspector({ source, space, outline, transport, select, onE
       const retainedFragment=view?.source?.id===next.source?.id && view?.source?.version===next.source?.version?sourceRows.get(position?.columnLine):undefined;
       view=next;queuedActivation=false;reader.activate(view);
       if(!sourceNodes.size)space.replaceChildren();if(!outlineNodes.size)outlineSpace.replaceChildren();sizes();
-      if(next.inspection){source.scrollTop=next.inspectionPosition.sourceTop;outline.scrollTop=next.inspectionPosition.outlineTop;accept(next.inspection,{},{},retainedFragment);columnLine=next.inspectionPosition.columnLine;column=next.inspectionPosition.column;source.scrollLeft=next.inspectionPosition.sourceLeft;}
+      if(next.inspection){
+        if(!reflow)source.scrollTop=position.sourceTop;
+        outline.scrollTop=position.outlineTop;columnLine=position.columnLine;column=position.column;
+        accept(next.inspection,{},{},retainedFragment,reflow?position:undefined);
+        source.scrollLeft=position.sourceLeft;
+        if(reflow)schedule();
+      }
       else {refreshActions();data=null;sourceRows=new Map();entries=new Map();cursor=0;columnLine=undefined;column=0;renderSource();renderOutline();}
       if(hadFocus && !view.source?.summary.declarations)outline.focus({preventScroll:true});
     },
     async revealActive() {
       const active=view?.source?.summary.active;if(!active)return;
-      source.scrollTop=Math.max(0,(active.start_line-4)*SOURCE_ROW);revealOutline(active.index);
+      restoreSource({sourceTop:Math.max(0,(active.start_line-4)*SOURCE_ROW),sourceLine:reflow?active.start_line:undefined});revealOutline(active.index);
       const query=ranges();if(!covered(query))await reader.request(query,{});else {renderSource();renderOutline();}
     },
   };
