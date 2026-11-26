@@ -11,6 +11,8 @@ remains in Git and the project documentation.
 - Search file paths and declaration names from **Find source**. The repository map
   narrows to matching files, and the Matches list opens functions, modules and other
   declarations at their source lines.
+- Enable **Regex** and **Match case** independently when searching in the Source browser.
+  **Clear filters** keeps both settings.
 - Reopen a saved location at its line in the Source browser or its bubble in the
   Call workspace, based on where it was saved.
 - Report the installed build with `vizzi --version`.

@@ -48,10 +48,17 @@ files. Expand **Matches** below the map to choose a file or jump to a declaratio
 Select a match to read its source while keeping the other matches available. A file
 with several matching declarations has one tile and a row for each declaration.
 
+Select **Match case** to distinguish names such as `Reader` and `reader`. Select
+**Regex** to enter a regular expression such as `^read_.*$` for declaration names
+or `^src/.*\.rs$` for file paths. Regex also checks file basenames and qualified
+declaration names such as `Reader::read_file`. The options work independently.
+If a pattern is invalid, Vizzi shows the error below the search field.
+
 Search starts across the repository. If you started inside a directory, select
 **In this directory** to narrow the map and list to that subtree. File types selected
 in the legend apply to both. Clear the search box to return to the previous map
-position, or choose **Clear filters** to reset the search and type selections.
+position. **Clear filters** clears the search text and file-type selections and keeps
+your **Regex** and **Match case** settings.
 
 ## Continue in the Call workspace
 

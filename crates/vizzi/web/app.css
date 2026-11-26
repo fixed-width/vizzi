@@ -33,10 +33,15 @@ h1, h2 { margin: 0; font-size: 18px; letter-spacing: -.35px; font-weight: 650; o
 h2 { font-family: "DejaVu Sans Mono", monospace; font-size: 13px; letter-spacing: -.2px; }
 .panel-heading > div { min-width: 0; }
 .panel-heading p { margin: 7px 0 0; color: var(--subdued); font-size: 11px; }
-.search { display: flex; align-items: center; gap: 14px; padding: 20px 0 16px; font-size: 11px; color: var(--muted); }
-#search-scope { display:flex; align-items:center; gap:6px; margin:-7px 0 10px; color:var(--muted); font-size:11px; }
-#search-scope input { flex:none; width:auto; accent-color:var(--focus); }
+.search { display: flex; align-items: center; gap: 14px; padding: 20px 0 6px; font-size: 11px; color: var(--muted); }
+.search > label { flex:none; }
+.search-options { display:flex; flex-wrap:wrap; gap:2px 12px; margin:0 0 10px; color:var(--muted); font-size:11px; }
+.search-options label { display:flex; align-items:center; gap:6px; min-width:0; min-height:24px; white-space:nowrap; }
+.search-options input { flex:none; width:auto; margin:0; accent-color:var(--focus); }
 #search-directory { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#search-error { margin:0; color:var(--error-text); font-size:11px; overflow-wrap:anywhere; }
+#search-error:not(:empty) { margin:0 0 10px; }
+#filter[aria-invalid="true"] { border-color:var(--error-border); }
 input { flex: 1; width: 0; border: 1px solid var(--border); background: var(--paper); border-radius: 4px; padding: 9px 11px; color: var(--text); }
 .map-surface { flex: 1; min-height: 220px; position: relative; overflow: hidden; border: 1px solid var(--border); background: var(--surface); border-radius: 5px; }
 canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }

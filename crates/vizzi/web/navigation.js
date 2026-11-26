@@ -5,7 +5,8 @@ export function createNavigation({ capture, load, prepare:prepareView, history, 
   let entries = [], cursor = 0, shown, active;
   const query = entry => ({ file: entry.file, entity: entry.entity, filter: entry.filter,
     ...(entry.types === undefined ? {} : { types: entry.types }),
-    ...(entry.find ? { find:true,search_directory:entry.searchDirectory,results_offset:entry.resultsOffset,reveal_match:false } : {}),
+    ...(entry.find ? { find:true,search_directory:entry.searchDirectory,search_regex:entry.searchRegex,
+      search_case_sensitive:entry.searchCaseSensitive,results_offset:entry.resultsOffset,reveal_match:false } : {}),
     ...(entry.directory === undefined ? {} : { directory: entry.directory, offset: entry.offset }) });
   function requestedQuery(current, patch) {
     const requested = { ...query(current), ...patch };

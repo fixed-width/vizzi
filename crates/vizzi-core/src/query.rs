@@ -33,12 +33,18 @@ pub struct ViewQuery {
     pub file: Option<String>,
     /// Selected opaque declaration identity.
     pub entity: Option<String>,
-    /// Case-insensitive path substring.
+    /// Source search text, or a case-insensitive path substring when not finding source.
     #[serde(default)]
     pub filter: String,
     /// Match declaration names as well as file paths.
     #[serde(default)]
     pub find: bool,
+    /// Interpret the source search text as a regular expression.
+    #[serde(default)]
+    pub search_regex: bool,
+    /// Match case in source search.
+    #[serde(default)]
+    pub search_case_sensitive: bool,
     /// Exact directory scope for source search. Absent means repository-wide.
     pub search_directory: Option<String>,
     /// Offset into the ranked search results, independently of the map page.
@@ -326,14 +332,18 @@ impl Snapshot {
             available_types: BTreeSet::new(),
         };
         let mut matches = None;
+        let search_text = if query.search_regex {
+            query.filter.as_str()
+        } else {
+            query.filter.trim()
+        };
         let (count, limited, browse) = match &query.directory {
-            _ if query.find && !query.filter.trim().is_empty() => {
+            _ if query.find && !search_text.is_empty() => {
                 let path = query.search_directory.as_deref().unwrap_or(".");
                 let (results, mut files) = search::project(
                     browse::exact_scope(self.documents(), path),
                     &mut filter,
-                    &query.filter,
-                    query.results_offset,
+                    query,
                 );
                 matches = Some(results);
                 let count = files.len();
@@ -571,6 +581,93 @@ mod tests {
         let filtered = view(serde_json::json!({"filter": "read", "find": true, "types": "python"}));
         assert_eq!(filtered["matches"]["total"], 0);
         assert_eq!(filtered["matching"], 0);
+    }
+
+    #[test]
+    fn source_search_matches_case_in_literal_names_qualification_and_paths() {
+        let snapshot = snapshot("mod Reader { fn read() {} fn Read() {} }");
+        let results = |filter, case_sensitive| {
+            let query = serde_json::from_value(serde_json::json!({
+                "find": true, "filter": filter, "search_case_sensitive": case_sensitive
+            }))
+            .unwrap();
+            snapshot
+                .view(&query)
+                .unwrap()
+                .matches
+                .unwrap()
+                .items
+                .into_iter()
+                .map(|hit| hit.name)
+                .collect::<Vec<_>>()
+        };
+        assert!(results("READER#read", false).contains(&"Reader::Read".into()));
+        assert_eq!(results("Reader.read", true), ["Reader::read"]);
+        assert!(results("reader::read", true).is_empty());
+        assert_eq!(results("src/a.rs", true), ["a.rs"]);
+        assert!(results("SRC/a.rs", true).is_empty());
+    }
+
+    #[test]
+    fn source_search_regex_matches_names_and_paths_with_independent_case_and_scope() {
+        let snapshot = snapshot("mod Reader { fn read() {} fn Read() {} }");
+        let pattern = r"^Reader::Read$|^OTHER/b\.rs$|^a\.rs$";
+        let view = |params| {
+            let query = serde_json::from_value(params).unwrap();
+            serde_json::to_value(snapshot.view(&query).unwrap()).unwrap()
+        };
+        let insensitive =
+            view(serde_json::json!({"find": true, "filter": pattern, "search_regex": true}));
+        assert_eq!(insensitive["matching"], 2);
+        assert_eq!(insensitive["matches"]["total"], 4);
+
+        let sensitive = view(serde_json::json!({
+            "find": true, "filter": pattern, "search_regex": true, "search_case_sensitive": true
+        }));
+        assert_eq!(sensitive["matching"], 1);
+        assert_eq!(sensitive["matches"]["total"], 2);
+        assert_eq!(sensitive["matches"]["items"][0]["name"], "a.rs");
+        assert_eq!(sensitive["matches"]["items"][1]["name"], "Reader::Read");
+
+        let scoped = view(serde_json::json!({
+            "find": true, "filter": pattern, "search_regex": true, "search_directory": "other"
+        }));
+        assert_eq!(scoped["matches"]["total"], 1);
+        assert_eq!(scoped["files"][0]["path"], "other/b.rs");
+
+        let whitespace = view(serde_json::json!({
+            "find": true, "filter": " ", "search_regex": true
+        }));
+        assert_eq!(whitespace["matches"]["total"], 0);
+    }
+
+    #[test]
+    fn source_search_reports_invalid_regex_and_keeps_the_selected_source() {
+        let snapshot = snapshot("fn read() {}");
+        let file = snapshot.documents()[0].id();
+        let view = |params| {
+            let query = serde_json::from_value(params).unwrap();
+            serde_json::to_value(snapshot.view(&query).unwrap()).unwrap()
+        };
+        let invalid = view(serde_json::json!({
+            "find": true, "filter": "[", "search_regex": true, "file": file
+        }));
+        assert!(
+            invalid["matches"]["error"]
+                .as_str()
+                .unwrap()
+                .contains("unclosed character class")
+        );
+        assert_eq!(invalid["files"], serde_json::json!([]));
+        assert_eq!(invalid["matches"]["total"], 0);
+        assert_eq!(invalid["source"]["id"], serde_json::json!(file));
+        let literal = view(serde_json::json!({"find": true, "filter": "["}));
+        assert!(literal["matches"]["error"].is_null());
+        let path_only = view(serde_json::json!({
+            "filter": "SRC", "search_regex": true, "search_case_sensitive": true
+        }));
+        assert!(path_only["matches"].is_null());
+        assert_eq!(path_only["files"][0]["path"], "src/a.rs");
     }
 
     #[test]
