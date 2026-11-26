@@ -195,6 +195,8 @@ pub struct View {
     pub matching: usize,
     /// File types available in the map scope before filtering or paging.
     pub file_types: Vec<&'static str>,
+    /// File counts by type in the map scope before filtering or paging.
+    pub file_type_counts: BTreeMap<&'static str, usize>,
     /// Scoped page for directory browsing or search in a large snapshot.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub browse: Option<BrowsePage>,
@@ -216,13 +218,13 @@ pub struct View {
 struct MapFilter<'a> {
     path: String,
     types: BTreeSet<&'a str>,
-    available_types: BTreeSet<&'static str>,
+    file_type_counts: BTreeMap<&'static str, usize>,
 }
 
 impl MapFilter<'_> {
     fn collect_type(&mut self, doc: &Document) -> bool {
         let file_type = map_file_type(doc.classification());
-        self.available_types.insert(file_type);
+        *self.file_type_counts.entry(file_type).or_default() += 1;
         self.types.is_empty() || self.types.contains(file_type)
     }
 
@@ -329,7 +331,7 @@ impl Snapshot {
                 .split(',')
                 .filter(|kind| !kind.is_empty())
                 .collect(),
-            available_types: BTreeSet::new(),
+            file_type_counts: BTreeMap::new(),
         };
         let mut matches = None;
         let search_text = if query.search_regex {
@@ -501,7 +503,8 @@ impl Snapshot {
             analyzed: self.analyzed_files(),
             source_only: self.documents().len() - self.analyzed_files(),
             matching: count,
-            file_types: filter.available_types.into_iter().collect(),
+            file_types: filter.file_type_counts.keys().copied().collect(),
+            file_type_counts: filter.file_type_counts,
             browse,
             matches,
             files,
@@ -951,6 +954,10 @@ mod tests {
             view["file_types"],
             serde_json::json!(["documentation", "metadata", "python", "toml", "typescript"])
         );
+        assert_eq!(
+            view["file_type_counts"],
+            serde_json::json!({"documentation": 2, "metadata": 1, "python": 1, "toml": 1, "typescript": 2})
+        );
     }
 
     #[test]
@@ -975,6 +982,10 @@ mod tests {
         assert_eq!(bulk["browse"]["offset"], 0);
         assert_eq!(bulk["files"][0]["path"], "bulk/z.py");
         assert_eq!(bulk["file_types"], serde_json::json!(["python", "rust"]));
+        assert_eq!(
+            bulk["file_type_counts"],
+            serde_json::json!({"python": 1, "rust": 2001})
+        );
         let mixed = view(serde_json::json!({"directory": "mixed", "types": "rust"}));
         assert_eq!(mixed["browse"]["landmarks"], serde_json::json!([]));
         let searched =

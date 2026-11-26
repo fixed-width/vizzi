@@ -450,6 +450,9 @@ test("a large repository exposes every directory, file page and local landmark",
     const { page } = session;
     const landmarks = page.locator("#map-landmarks");
     const entryPoints = landmarks.getByRole("combobox", { name: "Entry points" });
+    assert.deepEqual(await page.locator("#map-legend button").allTextContents(), [
+      "Rust", "Documentation", "Project metadata", "Ruby", "TOML",
+    ]);
     await landmarks.getByRole("button", { name: "toolkit.gemspec", exact: true }).click();
     await page.waitForFunction(() => document.getElementById("file-title").textContent === "toolkit.gemspec");
     await entryPoints.selectOption({ label: "z-late/target.rs" });
@@ -463,7 +466,9 @@ test("a large repository exposes every directory, file page and local landmark",
     await page.keyboard.press("Enter");
     await page.getByRole("button", { name: "z-late", exact: true }).waitFor();
     await paint(page);
-    assert.deepEqual(await page.locator("#map-legend li").allTextContents(), ["Rust", "Documentation", "TOML", "Project metadata"]);
+    assert.deepEqual(await page.locator("#map-legend li").allTextContents(), [
+      "Documentation", "Project metadata", "Rust", "TOML",
+    ]);
     assert.equal(await page.locator("#map-breadcrumbs button[aria-current=location]").evaluate(button => button === document.activeElement), true);
     assert.equal(await page.locator("#file-title").textContent(), "README.md");
     await page.locator("#map-landmarks").getByRole("button", { name: "Cargo.toml" }).click();

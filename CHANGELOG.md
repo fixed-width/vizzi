@@ -57,6 +57,8 @@ remains in Git and the project documentation.
 
 ### Changed
 
+- Sort the Source browser’s file type legend by descending file count, with ties
+  ordered alphabetically.
 - Hide the Source browser’s **Directories** section when there are no directory entries.
   Collapse the list from its heading to give the repository map more room.
 - Use the full inspector width for source code when the file has no extracted declarations.
