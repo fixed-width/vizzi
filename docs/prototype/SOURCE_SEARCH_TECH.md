@@ -18,12 +18,13 @@ pattern per request and ranks simple-name and basename matches before
 qualified-name and path-only matches. Compilation errors are returned with the
 empty match page so the inspector can keep its selection.
 
-The browser debounces search input through the linked-view controller. Results and
-map pages have independent offsets. A mode change resets both pages. The match list
-uses the existing inspector and navigation trail, which restores both search options
-when revisiting a result. A result is only applied when the proposed destination agrees
-with its captured identity. The companion uses its existing preview for direct
-structural trial sessions.
+The browser debounces search input through the linked-view controller. Scrolling near
+the end of the match list requests the next results offset from the same snapshot and
+appends the returned rows. Loading more results leaves the map, inspector and navigation
+trail in place. Changing the search resets the list, and a mode change also resets the
+map page. The navigation trail restores both search options when revisiting a result.
+A result is only applied when the proposed destination agrees with its captured identity.
+The companion uses its existing preview for direct structural trial sessions.
 
 ## Validation
 
