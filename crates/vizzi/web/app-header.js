@@ -33,7 +33,13 @@ export function installAppHeader(root) {
  const settings = document.createElement('details');
  settings.id = 'workspace-settings';
  settings.className = 'app-menu';
- settings.innerHTML = '<summary>Settings</summary><div><label>Theme<select id="theme" aria-label="Theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label></div>';
+ settings.innerHTML = `<summary aria-label="Settings" title="Settings">
+   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true" focusable="false">
+    <path d="M10.25 2h3.5l.5 2.75 1.25.5 2.3-1.55 2.5 2.5-1.55 2.3.5 1.25 2.75.5v3.5l-2.75.5-.5 1.25 1.55 2.3-2.5 2.5-2.3-1.55-1.25.5-.5 2.75h-3.5l-.5-2.75-1.25-.5-2.3 1.55-2.5-2.5 1.55-2.3-.5-1.25-2.75-.5v-3.5l2.75-.5.5-1.25-1.55-2.3 2.5-2.5 2.3 1.55 1.25-.5z"/>
+    <circle cx="12" cy="12" r="3.25"/>
+   </svg>
+  </summary>
+  <div><label>Theme<select id="theme" aria-label="Theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label></div>`;
  if (extra) settings.lastElementChild.append(extra.content);
  bar.append(brand, navigation, settings);
  controls.classList.add('mode-toolbar');

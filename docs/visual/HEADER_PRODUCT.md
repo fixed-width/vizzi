@@ -3,7 +3,7 @@
 For contributors maintaining Vizzi's shared browser interface.
 
 The shared navigation row places the Vizzi home link before **Source browser**, **Call
-workspace**, **Review changes**, and **Saved locations**, followed by **Settings**. The
+workspace**, **Review changes**, and **Saved locations**, followed by the **Settings** cog. The
 current view is visibly selected and exposed with `aria-current="page"`. Links navigate
 in the same tab. Source browser opens at the launch URL and at `/explore`. Call workspace
 opens at `/workspace`. A newly opened VS Code tab also defaults to Source browser when

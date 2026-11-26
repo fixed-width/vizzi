@@ -4,11 +4,16 @@ import {installAppearance} from '/appearance.js';
 import {createMessage,textRow} from '/messages.js';
 import {followChanges} from '/updates.js';
 import {installDiscovery} from '/discovery.js';
+import {installSplitter} from '/splitter.js';
 import {installStructure} from '/structure.js';
 installAppHeader(document.querySelector('body > header'));
 installWorkspaceDelivery({mode:'locations',ready:()=>true,prepare:async()=>({commit(){}})});
 const element=id=>document.getElementById(id),node=(tag,text)=>{const n=document.createElement(tag);n.textContent=text;return n;};
 installAppearance(element('theme'));
+installSplitter(document.querySelector('.companion-main'),{
+ key:'saved-locations',label:'Saved locations and inspector widths',
+ initial:extent=>1-330/extent,minBefore:380,minAfter:270,secondary:element('evidence-detail'),
+});
 const error=createMessage(element('investigation-error'),{label:'Dismiss investigation error'}),notice=createMessage(element('investigation-notice'),{label:'Dismiss investigation notice'}),sourceLabel=textRow(element('source-state'));
 let view,sourceStatus,selected,request=0,busy=false,noteDirty=false,wantIndex=false,updates;
 const trialStructure=new URLSearchParams(location.search).get('trial')==='structure';
