@@ -105,10 +105,13 @@ function fileDescription(file) {
 function renderMapLegend() {
   const legend = element("map-legend");
   const types = new Set(view?.file_types);
+  const counts = view?.file_type_counts ?? {};
   for (const type of selectedTypes) types.add(type);
   const markers = new Set(scene?.files.map(file => file.marker));
   const entries = Object.entries(mapFileTypes)
     .filter(([type]) => types.has(type))
+    .sort(([leftType, leftLabel], [rightType, rightLabel]) =>
+      (counts[rightType] ?? 0) - (counts[leftType] ?? 0) || leftLabel.localeCompare(rightLabel))
     .map(([type, label]) => [label, palette.types[type], type]);
   if (markers.has("partial")) entries.push(["Syntax recovery", palette.partial]);
   if (markers.has("unavailable")) entries.push(["Analysis deferred or unavailable", palette.unavailable]);
