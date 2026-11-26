@@ -1,11 +1,11 @@
 # An investigation alongside the editor
 
-This document describes the existing prototype slice. The active product direction is
-[visual working sets](../explanation/visual-working-sets.md); search/list navigation is
-supporting infrastructure rather than the primary experience.
+This document records the companion prototype. Today the
+[Source browser](../prototype/SOURCE_SEARCH_PRODUCT.md) owns repository browsing and
+search, and Saved locations opens directly on the saved cards. The product direction
+is documented in [visual working sets](../explanation/visual-working-sets.md).
 
-The [question-search trial](SEARCH_PRODUCT.md) is retired from the browser. Its entry points
-and saved-question editor are removed; the overview below remains available.
+The [question-search trial](SEARCH_PRODUCT.md) records the retired browser experiment.
 
 This contract implements the maintainer's product-alignment decision after `0968fe4`.
 The primary experience helps an unfamiliar reader discover how source is organised,

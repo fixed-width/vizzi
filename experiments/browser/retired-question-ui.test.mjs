@@ -18,7 +18,7 @@ try{
   assert.equal(await page.locator('a[href*="trial=search"]').count(),0);
   assert.equal(await page.getByRole('heading',{name:legacy,exact:true}).count(),0);
   if(path.includes('#saved'))assert.equal(await page.getByRole('heading',{name:'Saved locations',exact:true}).isVisible(),true);
-  else if(!path.includes('trial=structure'))await page.locator('#discovery-panel').waitFor({state:'visible'});
+  else if(!path.includes('trial=structure'))await page.getByRole('heading',{name:'Saved locations',exact:true}).waitFor();
  }
  await page.goto(host.url+'/workspace');await page.getByRole('button',{name:'Add bubble',exact:true}).waitFor();assert.equal(await page.locator('#source-question-form,#question-form').count(),0);
  for(const path of ['/question-search.js','/question-state.js'])assert.equal((await fetch(host.url+path)).status,404);

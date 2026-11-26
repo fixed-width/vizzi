@@ -3,7 +3,6 @@ export function installStructure({enabled,transport,inspect,showError}) {
  const noop={receiveStatus(){},saved(){}};if(!enabled)return noop;
  const el=id=>document.getElementById(id),node=(tag,text)=>{const n=document.createElement(tag);n.textContent=text;return n;};
  let snapshot=null,ticket=0,controller,pending=false,valid=false,data,area='',trail=[],current;
- el('structure-panel').hidden=false;el('show-discovery').textContent='Structure';
  function sync(){el('structure-results').setAttribute('aria-busy',String(pending));for(const button of el('structure-results').querySelectorAll('button'))button.disabled=!valid||pending;for(const button of el('structure-trail').querySelectorAll('button'))button.disabled=!valid||pending;}
  const action=(label,fn)=>{const b=node('button',label);b.type='button';b.onclick=()=>{if(valid&&!pending)fn();};return b;};
  const itemSource=(source,label,kind)=>({label,path:source.path,snapshot,location:{file:source.file,version:source.version,line:source.line,kind}});

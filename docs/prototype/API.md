@@ -24,6 +24,12 @@ strings. HTTP responses disable caching. The host serves `/`, `/app.js`, `/contr
 | `GET /api/source` | Required `snapshot`, `file` | Captured source from the requested retained observation |
 | `GET /api/events` | None; `Last-Event-ID` does not request replay | Latest-state `workspace` events over SSE, followed by changes |
 
+With `find=true`, a nonempty `filter` searches file paths and lexical declaration
+names. The response includes a ranked `matches` page and map files from the same
+observation. `search_directory` narrows both projections to a subtree. The map
+uses `offset`, the ranked list uses `results_offset`, and `reveal_match=true`
+selects the map page containing the requested file.
+
 `readiness` is an additive status-schema-1 field, derived in this order:
 
 | Value | Condition |
@@ -45,7 +51,7 @@ and content sniffing; completion is reported through status/SSE. Application-onl
 constructors omit activation. Native `Host::prepare`/`activate` expose the same lifecycle;
 existing eager constructors, `--once` and `--stdio` retain initial capture on startup.
 
-`filter` is a case-insensitive path substring. `limit` defaults to 2,000 and is clamped
+By default, `filter` is a case-insensitive path substring. `limit` defaults to 2,000 and is clamped
 to 1–2,000. `total` counts all discovered supported source files; `matching` counts matches before
 limiting. The view includes world-space tile rectangles, directory cards (`path`, `x`, `y`, `width`, `height`), and overall height. Cards are
 packed deterministically across shelves sized from total tile/card area.

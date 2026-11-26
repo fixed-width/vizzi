@@ -104,15 +104,7 @@ pub(super) fn project<'a>(
             .map(Arc::as_ref)
             .filter(|doc| filter.collect_type_and_match(doc))
             .collect();
-        page.files = matches.len();
-        page.entries = matches.len();
-        page.offset = page_offset(offset, page.entries);
-        let files = matches
-            .into_iter()
-            .skip(page.offset)
-            .take(PAGE_SIZE)
-            .collect();
-        return (page, files);
+        return file_page(directory, matches, offset, None);
     }
 
     let mut directories = BTreeMap::<&str, usize>::new();
@@ -169,6 +161,30 @@ fn page_offset(offset: usize, entries: usize) -> usize {
     (offset.min(entries.saturating_sub(1)) / PAGE_SIZE) * PAGE_SIZE
 }
 
+pub(super) fn file_page<'a>(
+    directory: &str,
+    matches: Vec<&'a Document>,
+    offset: usize,
+    reveal: Option<&str>,
+) -> (BrowsePage, Vec<&'a Document>) {
+    let count = matches.len();
+    let offset = reveal
+        .and_then(|id| matches.iter().position(|doc| doc.id().as_str() == id))
+        .unwrap_or(offset);
+    let offset = page_offset(offset, count);
+    let page = BrowsePage {
+        directory: directory.into(),
+        files: count,
+        entries: count,
+        offset,
+        size: PAGE_SIZE,
+        directories: vec![],
+        landmarks: vec![],
+    };
+    let files = matches.into_iter().skip(offset).take(PAGE_SIZE).collect();
+    (page, files)
+}
+
 fn landmark(doc: &Document, kind: LandmarkKind) -> Landmark {
     Landmark {
         id: doc.id().clone(),
@@ -182,14 +198,22 @@ fn scope<'a, 'p>(
     mut path: &'p str,
 ) -> (&'p str, &'a [Arc<Document>], usize) {
     while !matches!(path, "" | ".") {
-        let prefix = format!("{path}/");
-        let start = docs.partition_point(|doc| doc.path() < prefix.as_str());
-        let scoped = &docs[start..];
-        let len = scoped.partition_point(|doc| doc.path().starts_with(&prefix));
-        if len != 0 {
-            return (path, &scoped[..len], prefix.len());
+        let scoped = exact_scope(docs, path);
+        if !scoped.is_empty() {
+            return (path, scoped, path.len() + 1);
         }
         path = path.rsplit_once('/').map_or(".", |(parent, _)| parent);
     }
     (".", docs, 0)
+}
+
+pub(super) fn exact_scope<'a>(docs: &'a [Arc<Document>], path: &str) -> &'a [Arc<Document>] {
+    if matches!(path, "" | ".") {
+        return docs;
+    }
+    let prefix = format!("{path}/");
+    let start = docs.partition_point(|doc| doc.path() < prefix.as_str());
+    let scoped = &docs[start..];
+    let len = scoped.partition_point(|doc| doc.path().starts_with(&prefix));
+    &scoped[..len]
 }

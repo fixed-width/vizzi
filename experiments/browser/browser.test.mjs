@@ -122,10 +122,10 @@ test("map tiles retain their language fills through selection, recovery and them
     assert.equal(dark["src/b.rs"].fill, await swatch("Rust"));
     assert.notEqual(dark["src/b.rs"].fill, light["src/b.rs"].fill);
     for (const tile of Object.values(dark)) assert.equal(tile.overview, tile.fill);
-    await page.getByRole("searchbox", { name: "Find a file" }).fill("src/z.py");
+    await page.getByRole("searchbox", { name: "Find source" }).fill("src/z.py");
     await legend.getByText("Syntax recovery", { exact: true }).waitFor({ state: "hidden" });
     assert.equal(await legend.getByRole("button", { name: "Rust" }).isVisible(), true);
-    await page.getByRole("searchbox", { name: "Find a file" }).fill("no-matching-path");
+    await page.getByRole("searchbox", { name: "Find source" }).fill("no-matching-path");
     await page.locator("#empty").waitFor({ state: "visible" });
     assert.equal(await legend.isVisible(), true);
     assert.deepEqual(session.errors, []);
@@ -192,7 +192,7 @@ test("map legend toggles combine file types and Clear filters restores the full 
     const legend = page.locator("#map-legend");
     const rust = legend.getByRole("button", { name: "Rust", exact: true });
     const python = legend.getByRole("button", { name: "Python", exact: true });
-    const search = page.getByRole("searchbox", { name: "Find a file" });
+    const search = page.getByRole("searchbox", { name: "Find source" });
     const clear = page.getByRole("group", { name: "Map filters and legend" })
       .getByRole("button", { name: "Clear filters" });
     const mapTypes = () => [...new Set(vizziMetrics.scene.files.map(file => file.type))].sort().join(",");
@@ -361,12 +361,11 @@ test("a large repository exposes every directory, file page and local landmark",
       document.querySelector("#file-list button[aria-current=true]").click();
     });
     await page.getByText("1–100 of 2,002 matches", { exact: true }).waitFor();
-    await page.getByRole("searchbox", { name: "Find a file" }).fill("target.rs");
+    await page.getByRole("searchbox", { name: "Find source" }).fill("target.rs");
     await page.getByRole("button", { name: "z-late/target.rs", exact: true }).click();
     await page.waitForFunction(() => document.getElementById("file-title").textContent === "z-late/target.rs");
-    await page.getByRole("searchbox", { name: "Find a file" }).fill("");
-    await page.getByText("1–100 of 2,001 entries", { exact: true }).waitFor();
-    await page.getByRole("button", { name: "Next page", exact: true }).click();
+    await page.getByRole("searchbox", { name: "Find source" }).fill("");
+    await page.getByText("101–200 of 2,001 entries", { exact: true }).waitFor();
     await page.getByRole("button", { name: "bulk/file-0199.rs", exact: true }).waitFor();
     await page.getByRole("button", { name: "Previous page", exact: true }).click();
     await page.getByRole("button", { name: "bulk/file-0099.rs", exact: true }).waitFor();

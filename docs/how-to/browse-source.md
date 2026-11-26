@@ -2,7 +2,7 @@
 
 Open the address printed when you [start Vizzi](run-workspace.md), or choose
 **Source browser** in the header.
-This view is useful when you know an area or file rather than a function name.
+Use the map to explore an area or **Find source** to jump to a file or declaration.
 
 With the VS Code extension, right-click inside a saved project file or on its editor
 tab and choose **Vizzi: Open in Source Browser**. The command starts Vizzi if needed,
@@ -24,13 +24,9 @@ breadcrumbs to return to a parent directory.
 
 Use **Next page** and **Previous page** to see more entries in a large directory.
 The expandable **Accessible file list** shows the files on the same page as the map.
-Use **Find a file** to search paths across the repository, including directories you
-haven't opened.
 
 Select file types in the map legend to show files of any selected type. Select a type
 again to remove it from the filter. Directory counts reflect the matching files.
-With **Find a file**, the results must also match the path you entered. Choose
-**Clear filters** beside the legend to clear the type selections and path search.
 
 Drag the map background to pan. Wheel scrolling zooms this map; **Fit map** resets the
 framing. The small overview navigator jumps to a different region. Arrow keys move a
@@ -40,6 +36,19 @@ wheel panning.
 On the nested map, use directory controls to collapse, focus or reorder groups. Drag
 rows or headers, or use their up/down controls to reorder siblings. **Reset map**
 restores the default order and expansion.
+
+## Find a file or declaration
+
+Enter a file path or a name such as `read_file` in **Find source**. You can also
+enter a qualified name such as `Reader::read_file`. The map narrows to matching
+files. Expand **Matches** below the map to choose a file or jump to a declaration.
+Select a match to read its source while keeping the other matches available. A file
+with several matching declarations has one tile and a row for each declaration.
+
+Search starts across the repository. If you started inside a directory, select
+**In this directory** to narrow the map and list to that subtree. File types selected
+in the legend apply to both. Clear the search box to return to the previous map
+position, or choose **Clear filters** to reset the search and type selections.
 
 ## Continue in the Call workspace
 

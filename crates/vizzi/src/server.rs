@@ -138,7 +138,7 @@ pub fn router(application: Arc<Application>) -> Router {
         .route("/explore", get(source_browser))
         .route("/investigate", get(|| async { asset("text/html; charset=utf-8", include_str!("../web/companion.html")) }))
         .route("/companion.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/companion.js")) }))
-        .route("/discovery.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/discovery.js")) }))
+        .route("/structural-preview.js", get(|| async { asset("text/javascript; charset=utf-8", include_str!("../web/structural-preview.js")) }))
         .route("/structure.js",get(||async{asset("text/javascript; charset=utf-8",include_str!("../web/structure.js"))}))
         .route("/companion.css", get(|| async { asset("text/css; charset=utf-8", include_str!("../web/companion.css")) }))
         .route("/review", get(|| async { asset("text/html; charset=utf-8", include_str!("../web/review.html")) }))
@@ -483,7 +483,7 @@ mod tests {
         for (path, marker) in [
             ("/", "id=\"map\""),
             ("/workspace", "id=\"workspace-canvas\""),
-            ("/investigate", "id=\"discovery-panel\""),
+            ("/investigate", "id=\"saved-workspace\""),
             ("/explore", "id=\"map\""),
             ("/review", "id=\"review-workspace\""),
         ] {

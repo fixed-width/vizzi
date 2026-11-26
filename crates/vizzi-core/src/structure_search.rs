@@ -151,19 +151,51 @@ impl Query {
         self.literal.is_empty()
     }
     pub(crate) fn rank(&self, name: &Name) -> Option<Rank> {
-        let mut qualified_names = std::iter::once(name.qualified.as_str())
+        let qualified_names = std::iter::once(name.qualified.as_str())
             .chain(name.impl_aliases.iter().map(String::as_str));
-        if name.simple == self.literal || qualified_names.clone().any(|text| text == self.qualified)
-        {
+        self.rank_names(&name.simple, qualified_names)
+            .or_else(|| name.path.contains(&self.literal).then_some(Rank::Path))
+    }
+
+    pub(crate) fn uses_qualification(&self) -> bool {
+        self.qualified.contains("::")
+    }
+
+    pub(crate) fn rank_declaration(
+        &self,
+        name: &str,
+        qualified_name: Option<&str>,
+    ) -> Option<Rank> {
+        let qualified_name = qualified_name.map(|name| qualified(std::iter::empty(), name));
+        self.rank_names(&name.to_lowercase(), qualified_name.as_deref().into_iter())
+    }
+
+    pub(crate) fn rank_file(&self, path: &str) -> Option<Rank> {
+        let path = path.to_lowercase();
+        let filename = path.rsplit('/').next().unwrap_or(&path);
+        if path == self.literal {
+            Some(Rank::Exact)
+        } else {
+            self.rank_names(filename, std::iter::empty())
+                .or_else(|| path.contains(&self.literal).then_some(Rank::Path))
+        }
+    }
+
+    fn rank_names<'a>(
+        &self,
+        simple: &str,
+        mut qualified_names: impl Iterator<Item = &'a str> + Clone,
+    ) -> Option<Rank> {
+        if simple == self.literal || qualified_names.clone().any(|text| text == self.qualified) {
             Some(Rank::Exact)
         } else if qualified_names
             .clone()
             .any(|text| text.ends_with(&self.suffix))
         {
             Some(Rank::QualifiedSuffix)
-        } else if name.simple.starts_with(&self.literal) {
+        } else if simple.starts_with(&self.literal) {
             Some(Rank::Prefix)
-        } else if name.simple.contains(&self.literal) {
+        } else if simple.contains(&self.literal) {
             Some(Rank::Substring)
         } else if qualified_names.clone().any(|text| {
             text.starts_with(&self.qualified)
@@ -174,8 +206,6 @@ impl Query {
             Some(Rank::ScopePrefix)
         } else if qualified_names.any(|text| text.contains(&self.qualified)) {
             Some(Rank::ScopeSubstring)
-        } else if name.path.contains(&self.literal) {
-            Some(Rank::Path)
         } else {
             None
         }

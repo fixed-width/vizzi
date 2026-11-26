@@ -9,8 +9,7 @@ in the same tab. Source browser opens at the launch URL and at `/explore`. Call 
 opens at `/workspace`. A newly opened VS Code tab also defaults to Source browser when
 no specific destination was requested. Opening the tab is confirmed as soon as the header
 is visible. Opening a specific file waits for captured source and space in the code pane.
-Saved locations opens `/investigate#saved`; the existing repository discovery and
-structural-trial routes remain available within that view.
+Saved locations opens `/investigate#saved`. The bare `/investigate` route shows the same view.
 
 Mode-specific actions occupy a second row. Workspace task/group, bubble and zoom controls,
 source/review history, and location actions retain their current behaviour. Status text

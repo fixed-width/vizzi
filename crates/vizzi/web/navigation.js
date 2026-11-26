@@ -1,12 +1,15 @@
+const isSearchAnchor = anchor => anchor != null && Object.hasOwn(anchor,"entity");
+
 export function createNavigation({ capture, load, prepare:prepareView, history, onState = () => {}, onNotice = () => {} }) {
   const session = crypto.randomUUID();
   let entries = [], cursor = 0, shown, active;
   const query = entry => ({ file: entry.file, entity: entry.entity, filter: entry.filter,
     ...(entry.types === undefined ? {} : { types: entry.types }),
+    ...(entry.find ? { find:true,search_directory:entry.searchDirectory,results_offset:entry.resultsOffset,reveal_match:false } : {}),
     ...(entry.directory === undefined ? {} : { directory: entry.directory, offset: entry.offset }) });
   function requestedQuery(current, patch) {
     const requested = { ...query(current), ...patch };
-    if (requested.offset !== undefined && (requested.filter !== current.filter || requested.types !== current.types)) requested.offset = 0;
+    if (patch.offset === undefined && requested.offset !== undefined && (requested.filter !== current.filter || requested.types !== current.types || requested.search_directory !== current.searchDirectory)) requested.offset = 0;
     return requested;
   }
   const copy = value => structuredClone(value);
@@ -37,7 +40,7 @@ export function createNavigation({ capture, load, prepare:prepareView, history, 
         } else if (current.version !== intent.target.version) {
           onNotice("This location changed since your visit. Showing current source.");
         } else onNotice(null);
-      } else if (intent.anchor || entries[cursor].key !== shown || current.file !== intent.before.file || current.entity !== intent.before.entity) {
+      } else if (intent.anchor && !isSearchAnchor(intent.anchor) || entries[cursor].key !== shown || current.file !== intent.before.file || current.entity !== intent.before.entity) {
         entries = entries.slice(0, cursor + 1);
         const key = crypto.randomUUID();
         entries.push({ key, location: current });
@@ -60,10 +63,10 @@ export function createNavigation({ capture, load, prepare:prepareView, history, 
       notify();
     }
   }
-  function navigate(patch,anchor) {
+  function navigate(patch,anchor,{replaceHistory=true}={}) {
     saveShown();
     const before = copy(capture());
-    return request({ before, pending: true, ...(anchor?{anchor:copy(anchor)}:{}) }, requestedQuery(before, patch));
+    return request({ before, pending: true, ...(anchor?{anchor:copy(anchor),replaceHistory}:{}) }, requestedQuery(before, patch));
   }
   async function prepare(patch,anchor,{signal,replaceHistory=false}={}) {
     saveShown();
@@ -98,8 +101,9 @@ export function createNavigation({ capture, load, prepare:prepareView, history, 
   function allow(next, intent) {
     if (!intent) return true;
     if (intent !== active) return false;
-    if(intent.anchor && (next.snapshot!==intent.anchor.snapshot || next.selection.file!==intent.anchor.file || next.source?.id!==intent.anchor.file || next.source?.version!==intent.anchor.version)) {
-      if(!intent.editor)onNotice('Requested source changed. The current view is kept; retry the editor action.');return false;
+    const anchor=intent.anchor, search=isSearchAnchor(anchor);
+    if(anchor && (next.snapshot!==anchor.snapshot || next.selection.file!==anchor.file || next.source?.id!==anchor.file || next.source?.version!==anchor.version || search && next.selection.entity!==anchor.entity)) {
+      if(!intent.editor)onNotice(search?"Source changed. Choose a match from the current results.":"Requested source changed. The current view is kept; retry the editor action.");return false;
     }
     if (intent.returning && next.selection.file !== intent.target.file) {
       intent.unavailable = true;

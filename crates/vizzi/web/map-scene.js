@@ -125,7 +125,23 @@ export function createMapModel(initialFiles,preferences={},initialPage=null) {
     toggle(path){if(page || !nodes.has(path))return false;if(collapsed.has(path))collapsed.delete(path);else collapsed.add(path);invalidate();return true;},
     move(path,before){const node=nodes.get(path),target=before===null?null:nodes.get(before);if(page || !node || node.path===ROOT || (before!==null && (!target || target.parent!==node.parent)) || path===before)return false;const siblings=children(nodes.get(node.parent)).map(n=>n.path).filter(p=>p!==path);const index=before===null?siblings.length:siblings.indexOf(before);siblings.splice(index,0,path);order.set(node.parent,siblings);invalidate();return true;},
     focus(path){if(page || !nodes.has(path))return false;if(path!==focusPath || collapsed.has(path)){focusPath=path;collapsed.delete(path);invalidate();}return true;},
-    reveal(id){if(page)return;const file=files.find(f=>f.id===id);if(!file)return;let changed=false,dir=nodes.get(parent(file.path));if(!within(dir.path,focusPath)){focusPath=ROOT;changed=true;}while(dir){changed=collapsed.delete(dir.path)||changed;dir=nodes.get(dir.parent);}if(changed)invalidate();},
+    reveal(id,{focusDeep=false}={}){
+      if(page)return;
+      const file=files.find(f=>f.id===id);
+      if(!file)return;
+      const directory=nodes.get(parent(file.path));
+      let changed=false,depth=0;
+      if(!within(directory.path,focusPath)){focusPath=ROOT;changed=true;}
+      for(let node=directory;node;node=nodes.get(node.parent)){
+        if(focusDeep && node.path===focusPath && depth>=MAX_DEPTH){
+          focusPath=directory.path;
+          changed=true;
+        }
+        changed=collapsed.delete(node.path)||changed;
+        depth++;
+      }
+      if(changed)invalidate();
+    },
     reset(){collapsed.clear();order.clear();focusPath=root.path;invalidate();},
     preferences(){return {collapsed:[...collapsed],order:[...order],focus:focusPath};},
   };
