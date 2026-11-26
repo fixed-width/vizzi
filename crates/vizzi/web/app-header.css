@@ -8,6 +8,9 @@
 .app-bar > .app-menu { margin-left:auto; }
 .app-menu { position:relative;border:0;padding:0;font-size:12px;flex:none; }
 .app-menu > summary { cursor:pointer;padding:7px 0; }
+#workspace-settings > summary { display:grid;place-items:center;width:32px;height:32px;padding:0;list-style:none;border-radius:4px; }
+#workspace-settings > summary::-webkit-details-marker { display:none; }
+#workspace-settings > summary:hover,#workspace-settings[open] > summary { background:var(--hover); }
 .app-menu > div { position:absolute;right:0;top:100%;z-index:20;display:grid;gap:12px;width:240px;max-width:calc(100vw - 32px);padding:16px;background:var(--paper);border:1px solid var(--border);border-radius:4px;box-shadow:0 8px 24px #0002; }
 .app-menu label { display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px; }
 .app-menu select { font:inherit;color:var(--text);background:var(--paper);border:1px solid var(--border);border-radius:4px;padding:5px; }

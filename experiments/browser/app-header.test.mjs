@@ -27,6 +27,10 @@ try {
   for(const [,text,path] of modes)assert.equal(await navigation.getByRole('link',{name:text,exact:true}).getAttribute('href'),path);
   assert.equal(await page.getByRole('link',{name:'Vizzi home',exact:true}).getAttribute('href'),'/');
   assert.equal(await page.getByRole('link',{name:'Vizzi home',exact:true}).textContent(),'vizzi');
+  const settings=page.locator('#workspace-settings > summary');
+  assert.equal((await settings.textContent()).trim(),'');
+  assert.equal(await settings.getAttribute('aria-label'),'Settings');
+  assert.equal(await settings.locator('svg').isVisible(),true);
   assert.deepEqual(await page.evaluate(()=>{
    const brand=document.querySelector('header > div > a'),settings=document.querySelector('#workspace-settings > summary'),current=document.querySelector('[aria-current="page"]'),b=brand.getBoundingClientRect(),s=settings.getBoundingClientRect();
    return {brandSize:getComputedStyle(brand).fontSize,brandWeight:Number(getComputedStyle(brand).fontWeight),selectedBorder:parseFloat(getComputedStyle(current).borderBottomWidth)>0,background:getComputedStyle(document.querySelector('header')).backgroundColor,aligned:Math.abs(b.y+b.height/2-s.y-s.height/2)<2};
