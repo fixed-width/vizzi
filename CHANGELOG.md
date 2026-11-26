@@ -55,6 +55,7 @@ remains in Git and the project documentation.
 
 ### Changed
 
+- Use the full inspector width for source code when the file has no extracted declarations.
 - Open Saved locations directly and use the Source browser to find new locations.
 - Resize the Saved locations inspector on wider screens and close it with the standard X.
 - Open Settings from the cog in the shared header.

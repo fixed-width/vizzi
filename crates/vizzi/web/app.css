@@ -76,6 +76,7 @@ summary { cursor: pointer; }
 #file-list { max-height: 150px; overflow: auto; padding-top: 8px; }
 #file-list button { display: block; width: 100%; border: 0; text-align: left; font-family: monospace; font-size: 11px; overflow-wrap: anywhere; }
 .inspector > .panel-heading { min-height: 87px; padding: 20px 22px; border-bottom: 1px solid var(--faint-border); }
+#outline-status:empty { margin-top: 0; }
 #snapshot { white-space: nowrap; font: 10px "DejaVu Sans Mono", monospace; color: var(--subdued); }
 #diagnostics { margin: 0; padding: 10px 20px; font-size: 11px; color: var(--warning-text); background: var(--warning-bg); border-bottom: 1px solid var(--warning-border); }
 .source-layout { display: grid; grid-template-columns: 175px minmax(0, 1fr); min-height: 0; flex: 1; }
@@ -106,6 +107,8 @@ footer { min-height: 36px; padding: 10px 24px; border-top: 1px solid var(--borde
 .fragment-controls button { font-size: 9px; line-height: 16px; padding: 0 3px; height: 18px; }
 
 .resizable { grid-template-columns:minmax(0,var(--split-first,1fr)) 8px minmax(0,var(--split-second,1fr)); }
+.source-layout:has(> .outline[hidden]) { grid-template-columns: minmax(0, 1fr); }
+.source-layout > .outline[hidden] + .splitter { display: none; }
 .splitter { position:relative;z-index:2;cursor:col-resize;background:var(--surface);touch-action:none;min-height:0; }
 .splitter::after { content:"";position:absolute;left:3px;top:calc(50% - 20px);height:40px;width:2px;background:var(--gutter);border-radius:2px; }
 .splitter:hover,.splitter:focus-visible { background:var(--hover); }

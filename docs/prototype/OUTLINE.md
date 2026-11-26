@@ -16,7 +16,9 @@ reveals only as much scroll as needed and does not move outer-page scroll.
 Source inspection remains linked to reconciled selection from the backend. Clicking
 the current declaration again still reveals its source. Focus is not optimistic
 selection: moving focus does not replace the selected entity until activation succeeds.
-Empty outlines have an accessible empty state and no invented declarations.
+Empty outlines have an accessible empty state and no invented declarations. In the
+Source browser, the inspector status says **No declarations extracted** and the source
+uses the full inspector width when the selected file has no outline.
 
 ## Stable updates and work bounds
 
@@ -27,9 +29,10 @@ conservatively rebuilds instead of assuming unchanged facts.
 
 For a changed document, a surviving top-row identity anchors scroll. A surviving focused
 identity retains its control. If removed, focus moves to the next surviving logical
-neighbor, then a prior neighbor, then the empty viewport as needed. Background updates
-do not steal focus from outside the outline. A selected entity that disappears is
-cleared by the existing backend reconciliation rules.
+neighbor, then a prior neighbor, then the empty viewport as needed. In the Source
+browser, focus moves to the source when an update hides the outline. Background
+updates do not steal focus from outside the outline. A selected entity that disappears
+is cleared by the existing backend reconciliation rules.
 
 Scroll and resize events coalesce into animation-frame work. The DOM contains only
 the window and optional focus pin; row nodes are keyed so scrolling/publication does
