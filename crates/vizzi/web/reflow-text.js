@@ -62,7 +62,7 @@ export function copySourceSelection(element,rows,event) {
 
 // Display segments contain only original bytes; indentation and markers are decoration.
 export function renderReflowText(node,line,plan,margin={bytes:0,columns:0}) {
-    const document=node.ownerDocument,bytes=new TextEncoder().encode(line.text),decoder=new TextDecoder('utf-8',{fatal:true});
+    const document=node.ownerDocument,bytes=new TextEncoder().encode(line.text),decoder=new TextDecoder('utf-8',{fatal:true,ignoreBOM:true});
     const pieces=plan??[{start:0,end:bytes.length,indent:0}];node.replaceChildren();
     for(const [index,piece] of pieces.entries()){
         const segment=document.createElement('span');segment.className='reflow-segment';segment.dataset.start=String(piece.start);segment.dataset.end=String(piece.end);segment.style.paddingLeft=piece.indent+'px';

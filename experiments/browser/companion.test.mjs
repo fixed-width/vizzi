@@ -2,7 +2,8 @@ import assert from 'node:assert/strict';import {spawnSync} from 'node:child_proc
 import {buildHost,browser,startHost,workspace,paint} from './support.mjs';
 if(!process.argv.includes('--no-build'))buildHost();
 const callNamespace='call_namespace_'.repeat(8)+'test';
-const input=await workspace({files:{'src/entry.rs':'pub fn entry() {}\n','src/reader.rs':'pub trait Reader { fn read(&self); }\n','src/target.rs':'\n'.repeat(119)+`mod ${callNamespace} {\n    pub fn resume_here() {}\n}\n`}});const record=join(input.cache,'editor-arguments'),editor=join(input.cache,'record-editor'),state=join(input.cache,'..','investigation.json');await mkdir(input.cache,{recursive:true});
+const entrySource='\uFEFFpub fn entry() { call(first_argument, second_argument, third_argument, fourth_argument, fifth_argument); let html = "<img src=x>"; }\n';
+const input=await workspace({files:{'src/entry.rs':entrySource,'src/reader.rs':'pub trait Reader { fn read(&self); }\n','src/target.rs':'\n'.repeat(119)+`mod ${callNamespace} {\n    pub fn resume_here() {}\n}\n`}});const record=join(input.cache,'editor-arguments'),editor=join(input.cache,'record-editor'),state=join(input.cache,'..','investigation.json');await mkdir(input.cache,{recursive:true});
 await writeFile(editor,`#!/bin/sh\nprintf '%s\\n' "$@" >> '${record}'\n`);await chmod(editor,0o700);input.sourceArguments=['--editor-code',editor,'--investigation-file',state];
 const bad=spawnSync('target/release/vizzi',['--root',input.root,'--cache',input.cache,'--investigation-file',join(input.cache,'investigation.json'),'--port','0'],{encoding:'utf8',timeout:1500});assert.match(bad.stderr,/Investigation file must be outside the analysis cache/);
 let host,chromium;
@@ -63,7 +64,40 @@ try{
  const close=inspector.getByRole('button',{name:'Close location',exact:true});
  assert.equal(await close.textContent(),'');
  assert.equal(await close.evaluate(button=>getComputedStyle(button,'::before').content),'"×"');
- await page.locator('#captured-evidence summary').click();assert.match(await page.locator('#detail-excerpt').textContent(),/pub fn entry/);assert.equal(await page.locator('#detail-excerpt img').count(),0);await close.click();
+ const excerpt=page.locator('#detail-excerpt');
+ await page.locator('#captured-evidence summary').click();
+ await excerpt.locator('.syntax-keyword').first().waitFor();
+ assert.equal(await excerpt.locator('.syntax-string').textContent(),'"<img src=x>"');
+ assert.equal(await excerpt.locator('img').count(),0);
+ assert.ok(await excerpt.locator('.reflow-marker').count()>0,'long saved lines reflow in the inspector');
+ const beforeResize=await excerpt.locator('.reflow-marker').count();
+ await page.setViewportSize({width:800,height:900});
+ await paint(page);
+ assert.ok(await excerpt.locator('.reflow-marker').count()>beforeResize,'narrowing the inspector reflows the saved line');
+ assert.equal(await excerpt.evaluate(code=>code.scrollWidth<=code.clientWidth),true);
+ const savedExcerpt=JSON.parse(await readFile(state,'utf8')).evidence[0].source.excerpt;
+ assert.ok(savedExcerpt.startsWith('\uFEFF'));
+ assert.equal(await excerpt.textContent(),savedExcerpt);
+ const copyExcerpt=()=>excerpt.evaluate(code=>{
+  const range=document.createRange();range.selectNodeContents(code);
+  getSelection().removeAllRanges();getSelection().addRange(range);
+  const data=new DataTransfer();code.dispatchEvent(new ClipboardEvent('copy',{bubbles:true,cancelable:true,clipboardData:data}));
+  getSelection().removeAllRanges();return data.getData('text/plain');
+ });
+ assert.equal(await copyExcerpt(),savedExcerpt);
+ await page.locator('#workspace-settings > summary').click();
+ const codeLayout=page.getByLabel('Code layout',{exact:true});
+ await codeLayout.selectOption('original');
+ await paint(page);
+ assert.equal(await excerpt.locator('.reflow-marker').count(),0);
+ assert.equal(await excerpt.locator('.syntax-string').textContent(),'"<img src=x>"');
+ assert.equal(await copyExcerpt(),savedExcerpt);
+ await codeLayout.selectOption('smart');
+ await paint(page);
+ assert.ok(await excerpt.locator('.reflow-marker').count()>0);
+ await page.keyboard.press('Escape');
+ await page.setViewportSize({width:1600,height:1000});await paint(page);
+ await close.click();
  assert.equal(await inspector.isVisible(),false);
  assert.equal(await splitter.isVisible(),false);
  await page.getByText('Explain a connection',{exact:true}).click();await page.getByLabel('From',{exact:true}).selectOption('1');await page.getByLabel('To',{exact:true}).selectOption('2');await page.getByLabel('What connects them?',{exact:true}).fill('Uses the contract while obtaining source.');await page.getByRole('button',{name:'Connect evidence',exact:true}).click();await page.waitForFunction(()=>document.querySelectorAll('#connection-list li').length===1);assert.match(await page.locator('#connection-list').textContent(),/Your assertion/);assert.equal(await page.locator('#evidence-links path').count(),1);
@@ -158,7 +192,22 @@ try{
  legacyBoard.evidence.find(evidence=>evidence.id===savedCall.id).title='resume_here';
  await writeFile(state,JSON.stringify(legacyBoard));
  host=await startHost(input,1);
- await page.goto(host.url+'/investigate#saved');
+ const startCapture=Promise.withResolvers();
+ await page.route('**/api/workspace/start',async route=>{await startCapture.promise;await route.continue();},{times:1});
+ try{
+  await page.goto(host.url+'/investigate#saved');
+  await callCard.getByRole('button',{name:'Inspect location',exact:true}).click();
+  await page.locator('#captured-evidence summary').click();
+  assert.equal(await excerpt.textContent(),savedCall.source.excerpt);
+  assert.equal(await excerpt.locator('.syntax-keyword').count(),0);
+ }finally{startCapture.resolve();}
+ await excerpt.locator('.syntax-keyword').first().waitFor();
+ const unavailable=page.waitForResponse(response=>new URL(response.url()).pathname==='/api/investigation/evidence/1/source');
+ await entryCard.getByRole('button',{name:'Inspect location',exact:true}).click();
+ assert.deepEqual(await (await unavailable).json(),[]);
+ assert.equal(await excerpt.textContent(),savedExcerpt,'the exact saved excerpt remains available after the file changes and the host restarts');
+ assert.equal(await excerpt.locator('.reflow-segment').count(),0);
+ await close.click();
  assert.equal(await callCard.getByRole('heading').textContent(),'resume_here');
  await callCard.getByRole('button',{name:'Inspect location',exact:true}).click();
  await page.locator('#evidence-detail').getByRole('button',{name:'Open in Call workspace',exact:true}).click();
@@ -209,5 +258,5 @@ try{
  assert.equal(await inspector.isVisible(),false);
  assert.deepEqual(errors,[]);
  if(process.argv.includes('--screenshots')){const dir=process.argv[process.argv.indexOf('--screenshots')+1];await mkdir(dir,{recursive:true});await page.setViewportSize({width:1600,height:1000});await callCard.getByRole('button',{name:'Inspect location',exact:true}).click();await page.screenshot({path:join(dir,'investigation.png'),fullPage:true});}
- console.log('companion browser: inspector controls and width, saved line and bubble return, persistence, legacy data, editor handoff, changed-source refusal and narrow layout passed');
+ console.log('companion browser: saved source colors, smart wrapping and exact copying, inspector controls, saved locations, and verified editor handoff passed');
 }finally{await chromium?.close();await host?.close();await input.close();}

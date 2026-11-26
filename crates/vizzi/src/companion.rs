@@ -12,11 +12,15 @@ use std::{
     sync::{Arc, Mutex, MutexGuard},
 };
 use vizzi_core::{
+    coloring::StyledSpan,
     comparison::{EntryKind, ReviewPath},
     investigation::*,
     model::{ContentId, Document, FileId, Snapshot},
-    projection::WindowQuery,
+    projection::{Line, WindowQuery},
+    reflow::Hints,
 };
+
+const EXCERPT_LINES: usize = 6;
 /// Native application errors with distinct recovery meanings.
 #[derive(Debug, thiserror::Error)]
 pub enum CompanionError {
@@ -164,6 +168,49 @@ pub struct CompanionView {
     /// Per-card current-index freshness, not a new source observation.
     pub freshness: Vec<(u32, SourceState)>,
 }
+/// One literal saved line and its display information.
+#[derive(Serialize)]
+pub struct SavedSourceLine {
+    text: String,
+    ending: &'static str,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    styles: Vec<StyledSpan>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    reflow: Option<Hints>,
+}
+
+fn saved_source_lines(excerpt: &str, rows: Vec<Line>) -> Option<Vec<SavedSourceLine>> {
+    let mut rows = rows.into_iter();
+    excerpt
+        .split_inclusive('\n')
+        .map(|stored| {
+            let (text, ending) = if let Some(text) = stored.strip_suffix("\r\n") {
+                (text, "\r\n")
+            } else if let Some(text) = stored.strip_suffix('\n') {
+                (text, "\n")
+            } else {
+                (stored, "")
+            };
+            let mut row = rows.next()?;
+            if !row.text.starts_with(text) {
+                return None;
+            }
+            row.styles.retain_mut(|style| {
+                style.end = style.end.min(text.len());
+                style.start < style.end
+            });
+            if let Some(hints) = &mut row.reflow {
+                hints.points.retain(|point| point.offset < text.len());
+            }
+            Some(SavedSourceLine {
+                text: text.into(),
+                ending,
+                styles: row.styles,
+                reflow: row.reflow,
+            })
+        })
+        .collect()
+}
 /// One workspace's question/evidence state and editor integration.
 pub struct Companion {
     host: Arc<Host>,
@@ -299,6 +346,35 @@ impl Companion {
             freshness,
         }
     }
+    /// Projects styling and wrap hints from a matching full capture when available.
+    pub fn saved_source(&self, id: u32) -> Result<Vec<SavedSourceLine>, CompanionError> {
+        let source = lock(&self.board)
+            .evidence(id)
+            .ok_or_else(|| CompanionError::Invalid("Unknown saved location".into()))?
+            .source
+            .clone();
+        let application = self.host.application();
+        let snapshot = application
+            .pinned(source.snapshot.as_str())
+            .or_else(|| application.snapshot());
+        let query = WindowQuery {
+            reflow: Some(true),
+            line_start: Some(source.line),
+            line_count: Some(EXCERPT_LINES),
+            outline_count: Some(1),
+            ..Default::default()
+        };
+        if let Some(doc) = snapshot.as_ref().and_then(|s| s.file(source.file.as_str()))
+            && doc.content() == &source.content
+            && let Ok(window) = doc.window(&query, None)
+            && window.coloring == "ready"
+            && let Some(lines) = saved_source_lines(&source.excerpt, window.lines)
+        {
+            return Ok(lines);
+        }
+
+        Ok(Vec::new())
+    }
     /// Resolves a normalised path through the current immutable index.
     pub fn lookup(&self, path: &str) -> Result<SourceMatch, CompanionError> {
         ReviewPath::parse(path.as_bytes().to_vec())
@@ -353,7 +429,7 @@ impl Companion {
             .window(
                 &WindowQuery {
                     line_start: Some(request.line),
-                    line_count: Some(6),
+                    line_count: Some(EXCERPT_LINES),
                     outline_count: Some(1),
                     ..Default::default()
                 },

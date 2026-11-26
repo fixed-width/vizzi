@@ -15,12 +15,13 @@ at `/investigate?trial=structure`.
 
 ## Settings
 
-**Theme** is available in every view. **Code layout** is shared by Source browser and
-Call workspace. **Smart reflow** wraps at syntax-aware break points where available.
-**Original lines** displays each captured line on a single row. **Module outlines**
-is available in Call workspace.
+**Theme** is available in every view. **Code layout** is shared by Source browser,
+Call workspace and the Saved source section of the Saved locations inspector.
+**Smart reflow** wraps at syntax-aware break points where available. **Original lines**
+displays each captured line on a single row. Saved excerpts use plain text when a
+matching source capture is unavailable. **Module outlines** is available in Call workspace.
 
-Both layouts preserve source line numbers, and copying fully captured rows preserves
+Both layouts preserve source line numbers where shown. Copying fully captured rows preserves
 their original whitespace and line endings. Long indivisible tokens and bounded
 source fragments can still require scrolling or paging.
 

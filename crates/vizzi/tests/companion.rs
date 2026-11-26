@@ -296,6 +296,87 @@ fn captured_excerpts_report_omitted_lines_and_respect_utf8_byte_limits() {
     }
 }
 
+#[test]
+fn saved_source_projects_multiline_syntax_and_clips_to_the_stored_utf8_excerpt() {
+    let text = format!(
+        "/*\nlabel {} omitted words\n*/\n{}",
+        "界".repeat(1380),
+        "\n".repeat(100)
+    );
+    let (_root, _cache, host) = setup_with(&text);
+    let app = Companion::new(host, None, Arc::new(Recording(Mutex::new(vec![])))).unwrap();
+    let target = app.lookup("src/a.rs").unwrap();
+    let id = app
+        .pin(PinEvidence {
+            revision: 0,
+            snapshot: target.snapshot,
+            file: target.file,
+            version: target.version,
+            line: 2,
+            title: "Inside comment".into(),
+            origin: None,
+        })
+        .unwrap();
+    let stored = &app.view().board.evidence[0].source.excerpt;
+    let lines = serde_json::to_value(app.saved_source(id).unwrap()).unwrap();
+    assert_eq!(
+        lines,
+        serde_json::json!([{
+            "text": stored,
+            "ending": "",
+            "styles": [{"start": 0, "end": stored.len(), "kind": "comment"}],
+            "reflow": {"leading": 0, "points": [{"offset": 6, "anchor": null, "priority": 4}]}
+        }])
+    );
+}
+
+#[test]
+fn saved_source_uses_plain_text_when_the_context_for_a_multiline_literal_is_gone() {
+    let literal_line =
+        "pub fn example(first: u32, second: u32, third: u32) -> u32 { first + second + third }";
+    let (root, cache, host) =
+        setup_with(&format!("const TEXT: &str = r#\"\n{literal_line}\n\"#;\n"));
+    let board = cache.path().join("investigation.json");
+    let editor = Arc::new(Recording(Mutex::new(vec![])));
+    let app = Companion::new(host, Some(board.clone()), editor.clone()).unwrap();
+    let target = app.lookup("src/a.rs").unwrap();
+    let id = app
+        .pin(PinEvidence {
+            revision: 0,
+            snapshot: target.snapshot,
+            file: target.file,
+            version: target.version,
+            line: 2,
+            title: "Inside raw string".into(),
+            origin: None,
+        })
+        .unwrap();
+    let original = serde_json::to_value(app.saved_source(id).unwrap()).unwrap();
+    assert_eq!(original[0]["styles"][0]["kind"], "string");
+    assert_eq!(original[0]["text"], literal_line);
+
+    drop(app);
+    std::fs::write(
+        root.path().join("src/a.rs"),
+        format!("\n{literal_line}\n\"#;\n"),
+    )
+    .unwrap();
+    let engine = Engine::new(
+        Directory::open(root.path()).unwrap(),
+        Cache::new(cache.path().join("analysis")),
+        1,
+    )
+    .unwrap();
+    let restored = Companion::new(Arc::new(frozen(engine)), Some(board), editor).unwrap();
+    assert!(
+        restored.view().board.evidence[0]
+            .source
+            .excerpt
+            .starts_with(literal_line)
+    );
+    assert!(restored.saved_source(id).unwrap().is_empty());
+}
+
 #[cfg(unix)]
 #[test]
 fn vscode_adapter_reports_recorded_acknowledgement_refusal_and_missing_executable() {
