@@ -64,9 +64,11 @@ directories first. The map and accessible file list display the same page, and t
 controls show its range and total. Path search still covers the whole repository and
 pages through large result sets. Clearing the filter returns to directory browsing.
 
-Surface the current directory's captured README, recognized project manifests, and files
-with recognized execution entry points near the top of the map pane. Ruby gem specifications
-use the `.gemspec` suffix. List each file once, even if it contains several entry points.
+Surface the current directory's captured README and recognized project manifests in Landmarks
+near the top of the map pane. Ruby gem specifications use the `.gemspec` suffix.
+The **Entry points** picker includes matching files in the current directory and its descendants,
+including the whole repository at its root. Show workspace-relative paths so files with the same
+name are distinguishable. List each file once, even if it contains several entry points.
 A landmark opens its captured text like any file. Directory paging leaves these links available.
 Capture conventional README names as source-only, subject to the workspace's source exclusions.
 

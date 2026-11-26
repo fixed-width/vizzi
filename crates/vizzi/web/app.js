@@ -344,16 +344,27 @@ function showError(error) { messages.error.show(`${error.message || error} · ${
 
 function renderLandmarks() {
   const list=element("landmark-files");
-  const direct=file=>file.path.slice(0,file.path.lastIndexOf("/")+1)===(scene.focus==="."?"":`${scene.focus}/`);
-  const files=viewFilter?[]:view.browse?.landmarks ?? view.files.filter(file=>file.landmark && direct(file));
-  const isReadme=file=>(file.kind ?? file.landmark)==="readme";
-  const readme=files.find(isReadme);
-  const landmarks=files.filter(file=>!isReadme(file));
-  if(readme)landmarks.unshift(readme);
-  const key=JSON.stringify(landmarks.map(file=>[file.id,file.path]));
+  const entrySelect=element("entry-point-landmarks");
+  const prefix=scene.focus==="."?"":`${scene.focus}/`;
+  const kind=file=>file.kind ?? file.landmark;
+  const files=viewFilter?[]:view.browse?.landmarks ?? view.files.filter(file=>
+    file.landmark && file.path.startsWith(prefix) &&
+    (kind(file)==="entry_point" || !file.path.slice(prefix.length).includes("/")));
+  const key=JSON.stringify(files.map(file=>[file.id,file.path,kind(file)]));
   if(list.dataset.files===key)return;
   list.dataset.files=key;
-  element("map-landmarks").hidden=!landmarks.length;
+  const entryPoints=files.filter(file=>kind(file)==="entry_point").sort((a,b)=>a.path.localeCompare(b.path));
+  const isReadme=file=>kind(file)==="readme";
+  const readme=files.find(isReadme);
+  const landmarks=files.filter(file=>kind(file)==="manifest");
+  if(readme)landmarks.unshift(readme);
+  element("map-landmarks").hidden=!landmarks.length && !entryPoints.length;
+  list.hidden=!landmarks.length;
+  entrySelect.hidden=!entryPoints.length;
+  const options=document.createDocumentFragment();
+  options.append(new Option(`Entry points (${entryPoints.length.toLocaleString()})`, ""));
+  for(const file of entryPoints)options.append(new Option(file.path,file.id));
+  entrySelect.replaceChildren(options);
   list.replaceChildren(...landmarks.map(file=>{
     const button=document.createElement("button");
     button.type="button";
@@ -363,6 +374,11 @@ function renderLandmarks() {
     return button;
   }));
 }
+element("entry-point-landmarks").addEventListener("change",event=>{
+  const select=event.currentTarget,file=select.value;
+  select.value="";
+  if(file)navigate({file,entity:null});
+});
 
 function renderPage() {
   const page=view.browse,pager=element("map-pages");

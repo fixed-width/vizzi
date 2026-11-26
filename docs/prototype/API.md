@@ -59,7 +59,8 @@ packed deterministically across shelves sized from total tile/card area.
 `directory` opts into paged browsing when the snapshot exceeds 2,000 files. Use `.`
 for the root. The optional `browse` object identifies the resolved directory, full
 file count, total entries, actual offset, page size, directory cards with subtree
-counts, and captured landmarks in the current directory. A landmark has a file ID,
+counts, and captured landmarks. READMEs and manifests belong to the current directory.
+Entry-point landmarks cover its full subtree. A landmark has a file ID,
 path and kind (`readme`, `manifest`, or `entry_point`). File tiles can carry the same
 kind in the optional `landmark` field. Each 100-entry page puts directories before
 files and sorts paths within each group. A path filter selects

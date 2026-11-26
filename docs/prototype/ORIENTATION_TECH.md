@@ -54,4 +54,6 @@ built-in syntax adapters record a file-level entry-point fact during the existin
 using source scopes and syntax for their respective languages. The optional cached fact
 defaults to false in older analysis records, and built-in fingerprints include the analysis
 and adapter implementations. File tiles and paged browse data share one landmark classifier.
-The browser uses those facts to open the same captured file by ID.
+Paged browsing collects entry points while counting a directory's descendants, before slicing the
+page. The nested map applies the same subtree scope to its captured tiles. The entry-point picker
+uses the workspace-relative path as its label and opens the captured file by ID.

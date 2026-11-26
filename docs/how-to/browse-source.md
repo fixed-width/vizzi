@@ -17,10 +17,11 @@ and corner marks show syntax recovery and deferred or unavailable analysis.
 Selecting a declaration reveals its lines; kind badges distinguish types, functions and
 other declarations. **Line N** is the declaration's starting line.
 
-In a large repository, start with **Landmarks** to open a README, project manifest, or entry-point file
-when one is available. Select a directory card on the map or a directory name in the
-list to see what's inside. Each directory shows its total captured file count. Use the
-breadcrumbs to return to a parent directory.
+Use **Landmarks** to open the current directory's README or project manifests. Open the
+**Entry points** picker to find files with launch conventions anywhere under the current
+directory. Start at the repository root to see every captured entry-point file. Select a
+directory card on the map or a directory name in the list to see what's inside. Each
+directory shows its total captured file count. Use the breadcrumbs to return to a parent directory.
 
 Use **Next page** and **Previous page** to see more entries in a large directory.
 The expandable **Accessible file list** shows the files on the same page as the map.

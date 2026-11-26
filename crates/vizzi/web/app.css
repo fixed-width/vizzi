@@ -142,7 +142,8 @@ footer { min-height: 36px; padding: 10px 24px; border-top: 1px solid var(--borde
 .directory-heading button { padding:3px 7px;font-size:10px; }
 .directory-heading:has(+ #directory-tree[hidden]) { display:none; }
 #map-landmarks:not([hidden]), #map-pages:not([hidden]) { display:flex;align-items:center;gap:8px;margin:0 0 8px;font-size:11px; }
-#landmark-files { display:flex;min-width:0;gap:4px;overflow-x:auto; }
+#landmark-files:not([hidden]) { display:flex;min-width:0;gap:4px;overflow-x:auto; }
+#entry-point-landmarks { flex:none;width:12em;max-width:55%;font:inherit;color:var(--text);background:var(--paper);border:1px solid var(--border);border-radius:4px;padding:3px 7px; }
 #landmark-files button, #map-pages button { flex:none;padding:3px 7px;font-size:11px; }
 #map-pages { flex-wrap:wrap; }
 #directory-tree { height:150px;min-height:60px;flex-shrink:0;overflow:auto;position:relative; }

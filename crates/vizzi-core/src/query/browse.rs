@@ -23,7 +23,7 @@ pub struct BrowsePage {
     pub size: usize,
     /// Directory cards on this page.
     pub directories: Vec<DirectorySummary>,
-    /// Recognized files directly in this directory, independent of paging.
+    /// Local documentation and manifests, plus entry points in the subtree.
     pub landmarks: Vec<Landmark>,
 }
 
@@ -110,17 +110,23 @@ pub(super) fn project<'a>(
     {
         page.files += 1;
         let path = doc.path();
-        if let Some(slash) = path[prefix_len..].find('/') {
+        let descendant_slash = path[prefix_len..].find('/');
+        if let Some(slash) = descendant_slash {
             *directories.entry(&path[..prefix_len + slash]).or_default() += 1;
         } else {
             files.push(doc);
-            match LandmarkKind::for_document(doc) {
-                Some(LandmarkKind::Readme) => {
-                    readme.get_or_insert(doc);
-                }
-                Some(kind) => page.landmarks.push(landmark(doc, kind)),
-                None => {}
+        }
+        match LandmarkKind::for_document(doc) {
+            Some(LandmarkKind::EntryPoint) => {
+                page.landmarks.push(landmark(doc, LandmarkKind::EntryPoint));
             }
+            Some(LandmarkKind::Readme) if descendant_slash.is_none() => {
+                readme.get_or_insert(doc);
+            }
+            Some(LandmarkKind::Manifest) if descendant_slash.is_none() => {
+                page.landmarks.push(landmark(doc, LandmarkKind::Manifest));
+            }
+            _ => {}
         }
     }
     if let Some(doc) = readme {

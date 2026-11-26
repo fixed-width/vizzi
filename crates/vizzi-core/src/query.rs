@@ -587,8 +587,16 @@ mod tests {
             ]);
         let documents = paths
             .map(|path| {
+                let (source, analyses): (&[u8], _) = if path == "late/src/main.rs" {
+                    let source = b"fn main() {}";
+                    let analysis = RustAnalyzer::new().unwrap().analyze(source).unwrap();
+                    (source, vec![analysis])
+                } else {
+                    (b"", vec![])
+                };
                 Arc::new(
-                    crate::model::fixture_document(workspace.clone(), path, b"", vec![]).unwrap(),
+                    crate::model::fixture_document(workspace.clone(), path, source, analyses)
+                        .unwrap(),
                 )
             })
             .collect();
@@ -607,10 +615,15 @@ mod tests {
             ])
         );
         assert_eq!(root["files"].as_array().unwrap().len(), 0);
+        let root_landmarks = root["browse"]["landmarks"].as_array().unwrap();
+        assert_eq!(root_landmarks.len(), 1);
+        assert_eq!(root_landmarks[0]["path"], "late/src/main.rs");
+        assert_eq!(root_landmarks[0]["kind"], "entry_point");
         let last = view(serde_json::json!({"directory": "bulk", "offset": 2000}));
         assert_eq!(last["browse"]["offset"], 2000);
         assert_eq!(last["browse"]["entries"], 2001);
         assert_eq!(last["files"][0]["path"], "bulk/file-2000.rs");
+        assert_eq!(last["browse"]["landmarks"], serde_json::json!([]));
         let late = view(serde_json::json!({"directory": "late", "offset": 2000}));
         assert_eq!(late["browse"]["offset"], 0);
         assert_eq!(late["browse"]["landmarks"][0]["path"], "late/README.md");

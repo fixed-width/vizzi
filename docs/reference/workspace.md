@@ -71,10 +71,10 @@ returns through the accepted browsing trail, which is separate from saved visual
 Repositories with up to 2,000 captured files use a nested map. Larger repositories show
 immediate directory contents in pages of 100 entries, with directory cards reporting
 counts for their full subtrees. Repository-wide path search in large repositories is
-also paged. The current directory's README, recognized manifests (including Ruby
-gemspecs), and files with recognized execution entry points appear as landmarks.
-Entry points follow the language's source conventions and may depend on how the
-project is built or launched.
+also paged. The current directory's README and recognized manifests, including Ruby
+gemspecs, appear as landmarks. The **Entry points** picker lists matching files in the
+current directory and its descendants by workspace-relative path. Entry points follow
+the language's source conventions and may depend on how the project is built or launched.
 
 Source/review dividers resize their panes. Left/Right adjusts a focused divider, Shift
 makes a larger step, and Home/End selects a width limit. Declaration outlines support

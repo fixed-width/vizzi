@@ -284,11 +284,12 @@ test("forced colors preserves the map swatches and adapts legend text", async ()
   } finally { await session.close(); }
 });
 
-test("landmarks in the nested map reflect current entry-point syntax", async () => {
+test("landmarks in the nested map expose descendant entry points and reflect edits", async () => {
   const fixture = await workspace({ files: {
     "my-tools.gemspec": "Gem::Specification.new {}\n",
-    "start.py": "if __name__ == '__main__' and enabled:\n    run()\n",
-    "helper.py": "def main(): pass\n",
+    "apps/start.py": "if __name__ == '__main__' and enabled:\n    run()\n",
+    "apps/README.md": "# Apps\n",
+    "apps/helper.py": "def main(): pass\n",
   } });
   let localHost, session;
   try {
@@ -296,13 +297,12 @@ test("landmarks in the nested map reflect current entry-point syntax", async () 
     session = await openWorkspace(chromium, localHost);
     const { page } = session;
     const landmarks = page.locator("#map-landmarks");
-    const entry = landmarks.getByRole("button", { name: "start.py", exact: true });
-    await entry.waitFor();
-    assert.deepEqual(await landmarks.getByRole("button").allTextContents(), ["my-tools.gemspec", "start.py"]);
-    await entry.click();
-    await page.waitForFunction(() => document.getElementById("file-title").textContent === "start.py");
-    await writeFile(join(fixture.root, "start.py"), "def main(): pass\n");
-    await entry.waitFor({ state: "hidden" });
+    const entryPoints = landmarks.getByRole("combobox", { name: "Entry points" });
+    await entryPoints.selectOption({ label: "apps/start.py" }, { timeout: 4000 });
+    await page.waitForFunction(() => document.getElementById("file-title").textContent === "apps/start.py");
+    assert.deepEqual(await entryPoints.locator("option").allTextContents(), ["Entry points (1)", "apps/start.py"]);
+    await writeFile(join(fixture.root, "apps/start.py"), "def main(): pass\n");
+    await entryPoints.waitFor({ state: "hidden" });
     assert.deepEqual(await landmarks.getByRole("button").allTextContents(), ["my-tools.gemspec"]);
   } finally {
     await session?.close();
@@ -331,9 +331,12 @@ test("a large repository exposes every directory, file page and local landmark",
     session = await openWorkspace(chromium, localHost);
     const { page } = session;
     const landmarks = page.locator("#map-landmarks");
+    const entryPoints = landmarks.getByRole("combobox", { name: "Entry points" });
     await landmarks.getByRole("button", { name: "toolkit.gemspec", exact: true }).click();
     await page.waitForFunction(() => document.getElementById("file-title").textContent === "toolkit.gemspec");
-    assert.equal(await landmarks.getByRole("button", { name: "target.rs", exact: true }).count(), 0);
+    await entryPoints.selectOption({ label: "z-late/target.rs" });
+    await page.waitForFunction(() => document.getElementById("file-title").textContent === "z-late/target.rs");
+    assert.equal(await landmarks.getByRole("button", { name: "Cargo.toml", exact: true }).count(), 0);
     await page.locator("#map-landmarks").getByRole("button", { name: "README.md" }).click({ timeout: 5000 });
     await page.locator("#source .syntax-keyword").getByText("# Project orientation", { exact: true }).waitFor();
     assert.match(await page.locator("#coverage").textContent(), /Source only · README/);
@@ -348,7 +351,7 @@ test("a large repository exposes every directory, file page and local landmark",
     await page.locator("#map-landmarks").getByRole("button", { name: "Cargo.toml" }).click();
     await page.locator("#source .syntax-type").getByText("[package]", { exact: true }).waitFor();
     assert.equal(await page.locator("#file-title").textContent(), "z-late/Cargo.toml");
-    await landmarks.getByRole("button", { name: "target.rs", exact: true }).click();
+    await entryPoints.selectOption({ label: "z-late/target.rs" });
     await page.waitForFunction(() => document.getElementById("file-title").textContent === "z-late/target.rs");
     await page.getByText("Accessible file list", { exact: true }).click();
     await page.locator("#file-list").getByRole("button", { name: "z-late/settings.toml", exact: true }).click();
