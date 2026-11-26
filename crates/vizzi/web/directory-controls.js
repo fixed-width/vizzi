@@ -1,16 +1,19 @@
 const ROW=28,LIMIT=64;
-export function createDirectoryControls({tree,breadcrumbs,onChange,onOpen}) {
+export function createDirectoryControls({section,toggle,tree,breadcrumbs,onChange,onOpen}) {
   const document=tree.ownerDocument,space=document.createElement('div');space.className='directory-space';tree.append(space);tree.setAttribute('role','tree');tree.setAttribute('aria-label','Map directories');
-  let model,rows=[],focused,dragging,lastTree,lastBreadcrumbs;
+  let model,rows=[],focused,dragging,lastVisibleRows,lastBreadcrumbs;
   function change(action){if(action()===false)return;render();onChange();}
   function open(path){if(model.project().paged)onOpen(path);else change(()=>model.focus(path));}
   function render(){
     if(!model)return;const scene=model.project();
     const activeElement=document.activeElement;
     const hadFocus=tree.contains(activeElement),breadcrumbFocus=activeElement?.dataset.breadcrumb;
-    if(scene.paged && lastTree!==scene.tree)tree.scrollTop=0;
-    lastTree=scene.tree;rows=scene.tree;space.style.height=`${rows.length*ROW}px`;
-    tree.hidden=scene.paged && !rows.length;
+    rows=scene.tree;space.style.height=`${rows.length*ROW}px`;
+    section.hidden=!rows.length;
+    if(!section.hidden && !tree.hidden && lastVisibleRows!==rows){
+      if(scene.paged)tree.scrollTop=0;
+      lastVisibleRows=rows;
+    }
     const first=Math.max(0,Math.floor(tree.scrollTop/ROW)-4),last=Math.min(rows.length,first+LIMIT,Math.ceil((tree.scrollTop+tree.clientHeight)/ROW)+5);
     const active=rows.some(row=>row.path===focused)?focused:rows[first]?.path;
     const fragment=document.createDocumentFragment();
@@ -45,8 +48,15 @@ export function createDirectoryControls({tree,breadcrumbs,onChange,onOpen}) {
       breadcrumbs.replaceChildren(...buttons);
       if(breadcrumbFocus!==undefined)(buttons.find(button=>button.dataset.breadcrumb===breadcrumbFocus) ?? breadcrumbs.lastElementChild)?.focus({preventScroll:true});
     }
-    if(hadFocus){const node=[...space.querySelectorAll('[data-focus-directory]')].find(b=>b.dataset.focusDirectory===active);(node ?? breadcrumbs.lastElementChild)?.focus({preventScroll:true});}
+    if(section.hidden && section.contains(activeElement))breadcrumbs.lastElementChild?.focus({preventScroll:true});
+    else if(hadFocus){const node=[...space.querySelectorAll('[data-focus-directory]')].find(b=>b.dataset.focusDirectory===active);(node ?? breadcrumbs.lastElementChild)?.focus({preventScroll:true});}
   }
+  toggle.addEventListener('click',()=>{
+    if(tree.contains(document.activeElement))toggle.focus({preventScroll:true});
+    tree.hidden=!tree.hidden;
+    toggle.setAttribute('aria-expanded',String(!tree.hidden));
+    if(!tree.hidden)render();
+  });
   tree.addEventListener('scroll',render,{passive:true});new ResizeObserver(render).observe(tree);
   tree.addEventListener('dragstart',event=>{const row=event.target.closest('[data-directory]');if(!row)return;dragging=row.dataset.directory;event.dataTransfer.setData('text/plain',dragging);event.dataTransfer.effectAllowed='move';});
   tree.addEventListener('dragover',event=>{const row=event.target.closest('[data-directory]');if(row && dragging && rows.find(r=>r.path===dragging)?.parent===rows.find(r=>r.path===row.dataset.directory)?.parent)event.preventDefault();});
@@ -58,5 +68,5 @@ export function createDirectoryControls({tree,breadcrumbs,onChange,onOpen}) {
     if(event.key==='ArrowLeft' || event.key==='ArrowRight'){event.preventDefault();if(dir.summary){if(event.key==='ArrowRight')open(path);}else if((event.key==='ArrowLeft')!==dir.collapsed)change(()=>model.toggle(path));return;}
     const next={ArrowUp:at-1,ArrowDown:at+1,Home:0,End:rows.length-1}[event.key];if(next===undefined)return;event.preventDefault();const index=Math.max(0,Math.min(rows.length-1,next));focused=rows[index].path;tree.scrollTop=Math.max(0,Math.min(index*ROW,Math.max(tree.scrollTop,(index+1)*ROW-tree.clientHeight)));render();[...space.querySelectorAll('[data-focus-directory]')].find(b=>b.dataset.focusDirectory===focused)?.focus({preventScroll:true});
   });
-  return {apply(next){model=next;const scene=model.project();if(scene.tree!==lastTree || scene.breadcrumbs!==lastBreadcrumbs)render();}};
+  return {apply(next){model=next;const scene=model.project();if(scene.tree!==rows || scene.breadcrumbs!==lastBreadcrumbs)render();}};
 }

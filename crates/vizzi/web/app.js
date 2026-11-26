@@ -76,7 +76,10 @@ let viewSearchRegex = false, viewSearchCase = false;
 const dismissible=new Set(["navigation-notice","error","map-notice"]);
 const messages=Object.fromEntries([["status","workspace status"],["navigation-notice","navigation notice"],["coverage","source status"],["diagnostics","source diagnostics"],["error","workspace error"],["map-notice","map notice"]].map(([id,label])=>[id,dismissible.has(id)?createMessage(element(id),{label:`Dismiss ${label}`}):textRow(element(id))]));
 let palette=mapPalette(canvas);
-const directories=createDirectoryControls({tree:element("directory-tree"),breadcrumbs:element("map-breadcrumbs"),onOpen:openDirectory,onChange:()=>{refreshScene();saveMap();fit(true);}});
+const directories=createDirectoryControls({
+  section:element("map-directories"),toggle:element("toggle-directories"),tree:element("directory-tree"),
+  breadcrumbs:element("map-breadcrumbs"),onOpen:openDirectory,onChange:()=>{refreshScene();saveMap();fit(true);},
+});
 function refreshScene() {
   const projection = mapModel.project();
   const files = projection.files.map(file => ({ ...file, type: file.file_type, marker: coverageMarker(file) }));

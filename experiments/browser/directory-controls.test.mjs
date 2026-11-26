@@ -4,11 +4,73 @@ let chromium;before(async()=>{chromium=await browser({desktopBus:false});});afte
 async function fixture(){
  const page=await chromium.newPage();page.setDefaultTimeout(1000);page.errors=[];page.on('pageerror',e=>page.errors.push(e.message));
  await page.addInitScript(({namespace,field,active,hitCount,hitLimit})=>{globalThis[namespace]={[field]:active,[hitCount]:0,[hitLimit]:1000000};},{namespace:stryker.NAMESPACE,field:stryker.ACTIVE_MUTANT,active:process.env[stryker.ACTIVE_MUTANT_ENV_VARIABLE],hitCount:stryker.HIT_COUNT,hitLimit:stryker.HIT_LIMIT});
- await page.route('http://fixture/**',async route=>{const path=new URL(route.request().url()).pathname;if(path==='/')return route.fulfill({contentType:'text/html',body:'<meta charset="utf-8"><link rel="stylesheet" href="/theme.css"><link rel="stylesheet" href="/app.css"><div id="directory-tree" style="width:500px"></div><nav id="breadcrumbs"></nav>'});return route.fulfill({contentType:path.endsWith('.css')?'text/css; charset=utf-8':'text/javascript; charset=utf-8',body:await readFile(resolve('crates/vizzi/web'+path),'utf8')});});
- await page.goto('http://fixture/');await page.evaluate(async()=>{const {createMapModel}=await import('/map-scene.js'),{createDirectoryControls}=await import('/directory-controls.js');window.files=paths=>paths.map((path,i)=>({id:'f'+i,path,bytes:10}));window.model=createMapModel(files(['src/compiler/a.rs','src/runtime/b.rs','tests/test.rs']));window.controls=createDirectoryControls({tree:document.querySelector('#directory-tree'),breadcrumbs:document.querySelector('#breadcrumbs'),onChange:()=>{window.scene=model.project();}});controls.apply(model);window.scene=model.project();});await paint(page);
+ await page.route('http://fixture/**',async route=>{
+  const path=new URL(route.request().url()).pathname;
+  if(path==='/')return route.fulfill({contentType:'text/html',body:`
+   <meta charset="utf-8"><link rel="stylesheet" href="/theme.css"><link rel="stylesheet" href="/app.css">
+   <section id="map-directories" hidden>
+    <button id="toggle-directories" type="button" aria-expanded="true" aria-controls="directory-tree">Directories</button>
+    <div id="directory-tree" style="width:500px"></div>
+   </section><nav id="breadcrumbs"></nav>`});
+  return route.fulfill({
+   contentType:path.endsWith('.css')?'text/css; charset=utf-8':'text/javascript; charset=utf-8',
+   body:await readFile(resolve('crates/vizzi/web'+path),'utf8'),
+  });
+ });
+ await page.goto('http://fixture/');
+ await page.evaluate(async()=>{
+  const {createMapModel}=await import('/map-scene.js'),{createDirectoryControls}=await import('/directory-controls.js');
+  const element=id=>document.getElementById(id);
+  window.files=paths=>paths.map((path,i)=>({id:'f'+i,path,bytes:10}));
+  window.model=createMapModel(files(['src/compiler/a.rs','src/runtime/b.rs','tests/test.rs']));
+  window.controls=createDirectoryControls({
+   section:element('map-directories'),toggle:element('toggle-directories'),tree:element('directory-tree'),
+   breadcrumbs:element('breadcrumbs'),onChange:()=>{window.scene=model.project();},
+  });
+  controls.apply(model);
+  window.scene=model.project();
+ });
+ await paint(page);
+ assert.equal(await page.getByRole('button',{name:'Directories',exact:true}).isVisible(),true);
  const states=await page.locator('[data-directory]').evaluateAll(rows=>rows.map(r=>({path:r.dataset.directory,buttons:[...r.querySelectorAll('button')].map(b=>[b.getAttribute('aria-label'),b.disabled])})));
  assert.equal(states.length,4);for(const row of states){assert.deepEqual(row.buttons.map(b=>b[0]),[`Collapse directory ${row.path}`,`Focus directory ${row.path}`,`Move ${row.path} earlier`,`Move ${row.path} later`]);}return page;
 }
+test('directory disclosure preserves focus and scroll as the rows change',async()=>{
+ const page=await fixture();
+ try {
+  const toggle=page.getByRole('button',{name:'Directories',exact:true});
+  const tree=page.getByRole('tree',{name:'Map directories'});
+  await page.getByRole('button',{name:'Focus directory src',exact:true}).focus();
+  await page.evaluate(()=>{
+   document.body.style.height='2000px';
+   document.documentElement.style.overflowAnchor='none';
+   window.scrollTo(0,600);
+  });
+  await toggle.evaluate(button=>button.click());
+  assert.equal(await toggle.evaluate(button=>document.activeElement===button),true);
+  assert.equal(await page.evaluate(()=>window.scrollY),600);
+  assert.equal(await toggle.getAttribute('aria-expanded'),'false');
+  assert.equal(await tree.isVisible(),false);
+
+  await page.evaluate(()=>{model.setFiles(files(['src/a.rs']));controls.apply(model);});
+  assert.equal(await toggle.evaluate(button=>document.activeElement===button),true);
+  await page.evaluate(()=>{model.setFiles(files(['root.rs']));controls.apply(model);});
+  assert.equal(await toggle.isVisible(),false);
+  const root=page.getByRole('button',{name:'Repository root',exact:true});
+  assert.equal(await root.evaluate(button=>document.activeElement===button),true);
+  assert.equal(await page.evaluate(()=>window.scrollY),600);
+
+  await page.evaluate(()=>{model.setFiles(files(['src/a.rs']));controls.apply(model);});
+  assert.equal(await toggle.isVisible(),true);
+  assert.equal(await tree.isVisible(),false);
+  await toggle.evaluate(button=>button.click());
+  await tree.getByRole('treeitem',{name:'src'}).waitFor();
+  assert.equal(await toggle.getAttribute('aria-expanded'),'true');
+  assert.equal(await root.evaluate(button=>document.activeElement===button),true);
+  assert.deepEqual(page.errors,[]);
+ }finally{await page.close();}
+});
+
 test('directory buttons collapse, expand, focus and reorder the displayed model',async()=>{const page=await fixture();try{
  await page.getByRole('button',{name:'Collapse directory src',exact:true}).click();assert.equal(await page.getByRole('treeitem').count(),2);assert.equal(await page.evaluate(()=>scene.files.length),1);
  await page.getByRole('button',{name:'Expand directory src',exact:true}).click();assert.equal(await page.getByRole('treeitem').count(),4);

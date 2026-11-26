@@ -148,7 +148,9 @@ footer { min-height: 36px; padding: 10px 24px; border-top: 1px solid var(--borde
 
 .directory-heading { display:flex;justify-content:space-between;align-items:center;font-size:11px;margin:0 0 5px; }
 .directory-heading button { padding:3px 7px;font-size:10px; }
-.directory-heading:has(+ #directory-tree[hidden]) { display:none; }
+#toggle-directories { display:inline-flex;align-items:center;gap:5px;font-size:inherit;font-weight:700; }
+#toggle-directories span::before { content:"▸"; }
+#toggle-directories[aria-expanded="true"] span::before { content:"▾"; }
 #map-landmarks:not([hidden]), #map-pages:not([hidden]) { display:flex;align-items:center;gap:8px;margin:0 0 8px;font-size:11px; }
 #landmark-files:not([hidden]) { display:flex;min-width:0;gap:4px;overflow-x:auto; }
 #entry-point-landmarks { flex:none;width:12em;max-width:55%;font:inherit;color:var(--text);background:var(--paper);border:1px solid var(--border);border-radius:4px;padding:3px 7px; }
