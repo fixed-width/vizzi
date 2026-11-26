@@ -715,7 +715,7 @@ function mount(id,prepared){
   ];
   callMenu.show(referenceActions,view.symbol.name,actions,Boolean(view.comparison)||canFindEarlier(view));
  });
- header.append(heading,referenceActions,fitHeight,fitWidth,collapse,close);element.append(header);bindDrag(header,id);
+ header.append(heading,referenceActions,fitWidth,fitHeight,collapse,close);element.append(header);bindDrag(header,id);
  const body=node('div');body.className='fragment-body';const historyRow=node('div');historyRow.className='fragment-history';const historyPrevious=button('Previous change','Previous function change',()=>void changeHistory(id,1)),historyNext=button('Next change','Next function change',()=>{if(newestHistory(model.view(id)))returnHistoryLive(id);else void changeHistory(id,-1);}),historyLabel=node('span');historyLabel.setAttribute('role','status');const compareButton=button('Compare','Compare with previous version',()=>model.view(id).comparison?void changeHistory(id,1):void compareFunction(id)),editPrevious=button('Previous changed block',null,()=>void comparisonEdit(id,-1)),editNext=button('Next changed block',null,()=>void comparisonEdit(id,1));
  const chooseRevision=button('Choose revision…',null,()=>openRevisionPicker(id,chooseRevision));
  chooseRevision.setAttribute('aria-haspopup','dialog');

@@ -39,7 +39,7 @@ source fragments can still require scrolling or paging.
 | Bubble **⋯** | Find callers, find references or edit task-group membership |
 | Drag header / lower-right grip | Move / resize a bubble |
 | Arrow keys on a focused header / grip | Move / resize with the keyboard |
-| ↕ Fit height / ↔ Fit width | Grow or shrink to fit the loaded section |
+| ↔ Fit width / ↕ Fit height | Grow or shrink to fit the loaded section |
 | Background drag or wheel | Pan the call workspace |
 | + / −, or Ctrl/Cmd+wheel | Zoom |
 | Fit workspace | Frame the current working set |

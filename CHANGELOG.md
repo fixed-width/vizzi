@@ -57,6 +57,7 @@ remains in Git and the project documentation.
 
 ### Changed
 
+- Place **Fit width** before **Fit height** on code bubbles.
 - Color and smart-wrap captured excerpts in the Saved locations inspector. Excerpts
   use the shared **Code layout** setting.
 - Wrap long lines in the Source browser using the same syntax-aware layout as
