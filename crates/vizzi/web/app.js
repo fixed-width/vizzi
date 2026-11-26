@@ -4,7 +4,7 @@ import {workspaceLabel} from "/view-status.js";
 import {createMapModel} from "/map-scene.js";
 import {createDirectoryControls} from "/directory-controls.js";
 import {createMessage,textRow} from "/messages.js";
-import {installAppearance,mapFileTypes,mapPalette} from "/appearance.js";
+import {installAppearance,installCodeLayout,mapFileTypes,mapPalette} from "/appearance.js";
 import {coverageLabel,fileCount} from "/presentation.js";
 import {fitCamera,zoomCamera,jumpCamera} from "/camera.js";
 import {installSplitter} from "/splitter.js";
@@ -176,7 +176,7 @@ const startup=createStartup({transport:fetchJSON,onError:showError,onState:state
 }});
 element("start-index").addEventListener("click",()=>startup.activate());
 const inspector = createInspector({
-  source,space,outline,transport:fetchJSON,
+  source,space,outline,transport:fetchJSON,reflow:true,
   onError:error=>{showError(error);updates?.restart();},
   select:async fact=>{if(await navigate({entity:fact.id}))await inspector.revealActive();},
   loadActions:async (captured,window,signal)=>{
@@ -200,6 +200,7 @@ const inspector = createInspector({
     callMenu.show(trigger,action.name,[{label:isFunction?"Open in Call workspace":"Open definition in Call workspace",hint:"Ctrl/⌘-click",run:open}],keyboard);
   },
 });
+installCodeLayout(element("code-layout"),enabled=>inspector.setReflow(enabled),message=>messages.error.show(message));
 
 const mapPosition = () => ({camera:{...camera},layoutRevision:mapModel?.revision,fitMode,mapSize});
 function restoreMapPosition(position) {

@@ -13,16 +13,17 @@ Saved locations opens `/investigate#saved`. The bare `/investigate` route shows 
 
 Mode-specific actions occupy a second row. Workspace task/group, bubble and zoom controls,
 source/review history, and location actions retain their current behaviour. Status text
-belongs beside the controls for the view it describes. Settings always starts with Theme;
-Code layout and Module outlines follow it in the call workspace. Navigation and location
-actions do not appear in Settings. Menu exclusivity, outside dismissal and Escape/focus
-return work consistently across views.
+belongs beside the controls for the view it describes. Settings always starts with
+**Theme**. **Code layout** follows it in Source browser and Call workspace and shares
+one preference across both. **Module outlines** follows **Code layout** in Call workspace.
+Navigation and location actions do not appear in Settings. Menu exclusivity, outside
+dismissal and Escape/focus return work consistently across views.
 
 The shared header module owns link definitions, current-view indication, common settings
 and menu behaviour. Each page supplies its existing controls and any extra settings through
 one installation interface. Theme application stays with the existing appearance module,
-including the source browser's palette callback. Moving between modes retains the existing
-theme preference and saved call-workspace state.
+including the source browser's palette callback. Moving between modes retains theme,
+code layout and saved call-workspace state.
 
 Reuse the existing Noto Sans/DejaVu Sans type and theme variables. The light palette remains
 paper `#ffffff`, background `#f3f6f9`, text `#183044`, muted `#526477`, border `#b8c7d6`

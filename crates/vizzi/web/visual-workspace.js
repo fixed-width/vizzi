@@ -14,7 +14,7 @@ import {DefinitionWarmup} from '/definition-warmup.js';
 import {SourcePane} from '/source-pane.js';
 import {functionIndent} from '/source-margin.js';
 import {renderCallText,createCallMenu,retargetCalls,requestSourceActions} from '/call-actions.js';
-import {installAppearance} from '/appearance.js';
+import {installAppearance,installCodeLayout} from '/appearance.js';
 import {createMessage} from '/messages.js';
 import {followChanges} from '/updates.js';
 import {installWorkspaceDelivery} from '/editor-delivery.js';
@@ -48,8 +48,8 @@ function inlineAction(id,action,element,direct,keyboard){
 }
 function inlineAvailability(code,id){for(const name of code.querySelectorAll('.code-call')){name.setAttribute('aria-disabled',String(!model.navigable(id)||Boolean(mounted.get(id)?.historyLoading)));name.tabIndex=model.navigable(id)&&!mounted.get(id)?.historyLoading?0:-1;if(frozenSource(model.view(id)))name.title='Captured-file call · Ctrl/⌘-click opens a same-file destination';}}
 installAppearance(el('theme'));
-let smartReflow=true;try{smartReflow=localStorage.getItem('vizzi.visual.code-layout')!=='original';}catch{}
-el('code-layout').value=smartReflow?'smart':'original';el('code-layout').onchange=()=>{smartReflow=el('code-layout').value==='smart';for(const r of mounted.values())r.sourcePane.setReflow(smartReflow);try{localStorage.setItem('vizzi.visual.code-layout',smartReflow?'smart':'original');}catch{notice.show('This browser could not save the code layout preference.');}};
+let smartReflow;
+installCodeLayout(el('code-layout'),enabled=>{smartReflow=enabled;for(const r of mounted.values())r.sourcePane.setReflow(enabled);},message=>notice.show(message));
 const fail=e=>error.show(e?.message??String(e));
 async function transport(path,options){const response=await fetchRead(path,options);if(!response.ok){let text=await response.text();try{text=JSON.parse(text).message??text;}catch{}const error=new Error(text);error.status=response.status;throw error;}return response.json();}
 const post=(path,body,signal)=>transport(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal});

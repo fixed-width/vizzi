@@ -1,5 +1,65 @@
 import {renderStyledText} from './presentation.js';
 
+export function codeMeasurementContext(element) {
+    const canvas=element.ownerDocument.createElement('canvas');
+    try{return canvas.getContext('2d');}catch{return null;}
+}
+
+export function measureCode(context,style) {
+    if(context){
+        context.font=`${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+        context.fontKerning='none';
+    }
+    const width=text=>context?context.measureText(text).width:text.length*parseFloat(style.fontSize)*.6;
+    const tab=width('    ');
+    return text=>{
+        let result=0;
+        const parts=text.split('\t');
+        for(const [index,part] of parts.entries()){
+            result+=width(part);
+            if(index<parts.length-1)result=(Math.floor(result/tab)+1)*tab;
+        }
+        return result;
+    };
+}
+
+export function sourceSelected(element) {
+    const selection=element.ownerDocument.getSelection();
+    if(!selection||selection.isCollapsed)return false;
+    for(let i=0;i<selection.rangeCount;i++)if(selection.getRangeAt(i).intersectsNode(element))return true;
+    return false;
+}
+
+export function copySourceSelection(element,rows,event) {
+    const document=element.ownerDocument,selection=document.getSelection();
+    if(!event.clipboardData||!selection||selection.isCollapsed||selection.rangeCount!==1)return;
+    const range=selection.getRangeAt(0);
+    if(!element.contains(range.commonAncestorContainer))return;
+    const selected=rows.filter(row=>range.intersectsNode(row.text));
+    if(!selected.length||selected.some(row=>row.line.left||row.line.right))return;
+    const pieces=[];
+    for(const [index,row] of selected.entries()){
+        const walker=document.createTreeWalker(row.text,4);
+        let node,text='',at=0,first=null;
+        while((node=walker.nextNode())){
+            if(!node.parentElement.closest('.source-chunk'))continue;
+            if(range.intersectsNode(node)){
+                const start=range.startContainer===node?range.startOffset:0;
+                const end=range.endContainer===node?range.endOffset:node.length;
+                if(start<end){first??=at+start;text+=node.textContent.slice(start,end);}
+            }
+            at+=node.length;
+        }
+        if(first===row.margin?.bytes&&first>0)text=row.line.text.slice(0,first)+text;
+        const contents=document.createRange();
+        contents.selectNodeContents(row.text);
+        if(index<selected.length-1||range.compareBoundaryPoints(2,contents)>0)text+=row.line.ending??'\n';
+        pieces.push(text);
+    }
+    event.clipboardData.setData('text/plain',pieces.join(''));
+    event.preventDefault();
+}
+
 // Display segments contain only original bytes; indentation and markers are decoration.
 export function renderReflowText(node,line,plan,margin={bytes:0,columns:0}) {
     const document=node.ownerDocument,bytes=new TextEncoder().encode(line.text),decoder=new TextDecoder('utf-8',{fatal:true});

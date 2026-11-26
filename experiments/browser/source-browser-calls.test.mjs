@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
-import {browser,buildHost,startHost,workspace} from './support.mjs';
+import {browser,buildHost,paint,startHost,workspace} from './support.mjs';
 
 if(!process.argv.includes('--no-build'))buildHost();
+const wrappedLine='    combine("🙂 one, two, three", first_argument, second_argument, third_argument, finish_wrap());';
 const input=await workspace({files:{
  'lib.rs':`fn retained() {}
 fn start() {
@@ -14,6 +15,7 @@ mod second { fn step() {} }
 fn failed_handoff() {}
 `,
  'long.rs':`fn long_line() { /*${'x'.repeat(33000)}🙂*/ tail(); }\nfn tail() {}\n`,
+ 'wrap.rs':['fn wrap_all() {',...Array.from({length:240},(_,i)=>i%4===0?wrappedLine:'    // context'),'}','fn finish_wrap() {}',''].join('\r\n'),
 }});
 let host,chrome;
 try{
@@ -104,6 +106,59 @@ try{
  assert.equal(await tail.textContent(),'tail');
  assert.match(await tail.evaluate(node=>node.closest('.source-text').textContent),/^….*🙂\*\/ tail\(\); }$/s);
 
+ const inspection=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/inspection');
+ await page.getByRole('navigation',{name:'Files',exact:true}).getByRole('button',{name:'wrap.rs',exact:true}).click();
+ assert.ok((await (await inspection).json()).window.lines[1].reflow.points.length>0);
+ await source.evaluate(node=>node.style.width='350px');
+ const wrapRow=source.locator('[data-line="2"]');
+ await wrapRow.locator('.reflow-segment').nth(1).waitFor();
+ assert.equal(await wrapRow.evaluate(row=>row.offsetTop+row.offsetHeight===row.nextElementSibling.offsetTop),true);
+ const laterCall=wrapRow.getByRole('button',{name:'Actions for finish_wrap',exact:true});
+ assert.equal(await laterCall.evaluate(node=>Number(node.closest('.reflow-segment').dataset.start)>0),true);
+ const copied=await source.evaluate(node=>{
+  const range=document.createRange(),selection=getSelection();
+  range.setStart(node.querySelector('[data-line="2"] .source-text'),0);
+  range.setEnd(node.querySelector('[data-line="4"] .source-text'),0);
+  selection.removeAllRanges();
+  selection.addRange(range);
+  const clipboardData=new DataTransfer();
+  const event=new ClipboardEvent('copy',{bubbles:true,cancelable:true,clipboardData});
+  document.dispatchEvent(event);
+  return {text:clipboardData.getData('text/plain'),handled:event.defaultPrevented};
+ });
+ assert.deepEqual(copied,{text:wrappedLine+'\r\n    // context\r\n',handled:true});
+ await source.evaluate(node=>node.style.width='850px');
+ await paint(page);
+ assert.ok(await wrapRow.locator('.reflow-segment').count()>1,'resize preserves the selection');
+ await page.evaluate(()=>getSelection().removeAllRanges());
+ await page.waitForFunction(()=>document.querySelectorAll('#source [data-line="2"] .reflow-segment').length===1);
+ await source.evaluate(node=>{
+  node.style.width='350px';
+  node.scrollTop=(194-1)*22;
+ });
+ const distant=source.locator('[data-line="194"]');
+ await distant.locator('.reflow-segment').nth(1).waitFor();
+ const continuation=await distant.evaluate(row=>row.offsetTop+row.querySelectorAll('.reflow-segment')[1].offsetTop);
+ await source.evaluate((node,top)=>{node.scrollTop=top;},continuation);
+ await paint(page);
+ const topLine=()=>source.evaluate(node=>[...node.querySelectorAll('.code-line')].find(row=>row.offsetTop+row.offsetHeight>node.scrollTop)?.dataset.line);
+ assert.equal(await topLine(),'194');
+ assert.ok(await source.locator('.code-line').count()<=96);
+ await page.getByRole('navigation',{name:'Files',exact:true}).getByRole('button',{name:'lib.rs',exact:true}).click();
+ await source.getByText('retained',{exact:true}).waitFor();
+ await page.getByRole('button',{name:'Back',exact:true}).click();
+ await distant.locator('.reflow-segment').nth(1).waitFor();
+ assert.equal(await source.evaluate(node=>node.scrollTop-node.querySelector('[data-line="194"]').offsetTop),22);
+ const settings=page.locator('#workspace-settings > summary');
+ await settings.click();
+ await page.getByLabel('Code layout',{exact:true}).selectOption('original');
+ await page.waitForFunction(()=>document.querySelectorAll('#source [data-line="194"] .reflow-segment').length===1);
+ assert.equal(await topLine(),'194');
+ assert.ok(await source.evaluate(node=>node.scrollWidth>node.clientWidth));
+ await settings.click();
+ await header.getByRole('link',{name:'Call workspace',exact:true}).click();
+ assert.equal(await page.getByLabel('Code layout',{exact:true}).inputValue(),'original');
+
  await browseCode();
  const failWindow=route=>route.fulfill({status:410,body:'Requested function source expired'});
  await page.route(/\/api\/window\?.*line_start=9(?:&|$)/,failWindow);
@@ -116,7 +171,7 @@ try{
  await bubble('retained').locator('.code-line').waitFor();
  assert.equal(await bubble('failed_handoff').count(),0);
  assert.deepEqual(errors,[]);
- console.log('Source browser handoffs, optional highlighting, long-line actions, failed-source refusal, bubble reuse, and ambiguous destinations passed.');
+ console.log('Source browser smart wrapping, copying and paging, plus handoffs, highlighting, long-line actions, bubble reuse, and ambiguous destinations passed.');
 }finally{
  await chrome?.close();
  await host?.close();

@@ -7,7 +7,7 @@ import { INSTRUMENTER_CONSTANTS as stryker } from "@stryker-mutator/api/core";
 let chromium;
 before(async()=>{chromium=await browser();});
 after(async()=>{await chromium.close();});
-async function fixture(initial="a") {
+async function fixture(initial="a",{reflow=false}={}) {
   const page=await chromium.newPage();
   page.setDefaultTimeout(5000);
   await page.addInitScript(({namespace,field,active,hitCount,hitLimit})=>{
@@ -19,7 +19,7 @@ async function fixture(initial="a") {
     return route.fulfill({contentType:path.endsWith(".css")?"text/css":"text/javascript",body:await readFile(resolve("crates/vizzi/web"+path),"utf8")});
   });
   await page.goto("http://fixture/");
-  await page.evaluate(async initial=>{
+  await page.evaluate(async ({initial,reflow})=>{
     const {createInspector}=await import("/inspector.js");
     const definitions={a:{lines:500,declarations:50},b:{lines:20,declarations:2},c:{lines:500,declarations:50},long:{lines:1,declarations:0},otherlong:{lines:2,declarations:0},many:{lines:5000,declarations:500},wide:{lines:500,declarations:0}};
     const encoder=new TextEncoder(),decoder=new TextDecoder("utf-8",{fatal:true});
@@ -31,7 +31,7 @@ async function fixture(initial="a") {
       const summary={...definitions[file],active:entity===null?null:{id:file+"-e"+entity,index:entity,start_line:entity*8+1,end_line:entity*8+1}};
       return {snapshot,selection:{file,entity:summary.active?.id ?? null},source:{id:file,version,summary}};
     };
-    window.widget=createInspector({source:document.getElementById("source"),space:document.getElementById("source-space"),outline:document.getElementById("outline"),select:row=>window.activations.push(row.id),onError:e=>window.errors.push(e.message),transport:window.transport=async uri=>{
+    window.widget=createInspector({source:document.getElementById("source"),space:document.getElementById("source-space"),outline:document.getElementById("outline"),reflow,select:row=>window.activations.push(row.id),onError:e=>window.errors.push(e.message),transport:window.transport=async uri=>{
       const q=new URL(uri,location.href).searchParams;window.calls.push(Object.fromEntries(q));
       if(q.get("previous_snapshot")===window.expiredPrevious)throw new Error("Expired previous snapshot");
       const file=q.get("file"),def=definitions[file],entry=index=>({index,analysis:0,id:file+"-e"+index,name:"item_"+index,kind:"function",name_truncated:false,kind_truncated:false,start_line:index*8+1,end_line:index*8+1});
@@ -55,9 +55,63 @@ async function fixture(initial="a") {
     }});
     window.show=async(view,restore,reveal)=>{window.current=view;window.widget.apply(await window.widget.prepare(view,{restore,reveal}));};
     if(initial)await window.show(window.meta(initial));
-  },initial);
+  },{initial,reflow});
   await paint(page);return page;
 }
+
+async function selectFirstSourceLine(page) {
+  await page.locator("#source .source-text").first().evaluate(text=>{
+    const range=document.createRange();
+    range.selectNodeContents(text);
+    getSelection().removeAllRanges();
+    getSelection().addRange(range);
+  });
+}
+
+test("a removed file clears its selected source immediately",async()=>{
+  const page=await fixture("a",{reflow:true});
+  try {
+    await selectFirstSourceLine(page);
+    await page.evaluate(()=>window.show({snapshot:"removed",source:null,selection:{file:null,entity:null}}));
+    assert.equal(await page.locator("#source .code-line").count(),0);
+    assert.equal(await page.locator("#source .source-empty").textContent(),"Select a file in the repository map.");
+  } finally {await page.close();}
+});
+
+test("scrolling past selected source renders the new window",async()=>{
+  const page=await fixture("a",{reflow:true});
+  try {
+    const source=page.locator("#source");
+    await selectFirstSourceLine(page);
+    await source.evaluate(node=>{node.scrollTop=200*22;});
+    const row=source.locator('[data-line="201"]');
+    await row.waitFor({state:"attached"});
+    await paint(page);
+    assert.equal(await row.evaluate(node=>node.offsetTop===document.querySelector("#source").scrollTop),true);
+    assert.ok(await source.locator(".code-line").count()<=96);
+  } finally {await page.close();}
+});
+
+test("long-line controls stay in the viewport after jumping to the last fragment",async()=>{
+  const page=await fixture("long",{reflow:true});
+  try {
+    const source=page.locator("#source");
+    await source.getByRole("button",{name:"Last text on line 1"}).click();
+    await source.getByText(/TAIL$/).waitFor();
+    assert.ok(await source.evaluate(node=>node.scrollLeft>0));
+    for(const name of ["First","Earlier"]){
+      const control=source.getByRole("button",{name:`${name} text on line 1`});
+      assert.equal(await control.evaluate(node=>{
+        const button=node.getBoundingClientRect();
+        const source=node.closest("#source").getBoundingClientRect();
+        return button.left>=source.left && button.right<=source.right;
+      }),true,`${name} stays in view at the end of the line`);
+    }
+    await source.getByRole("button",{name:"First text on line 1"}).click();
+    await source.getByText(/^HEAD/).waitFor();
+    assert.equal(await source.evaluate(node=>node.scrollLeft),0);
+  } finally {await page.close();}
+});
 test("inspector restores source, outline and cursor with bounded windows; normal selection still reveals its declaration",async()=>{
   const page=await fixture();try{
     await page.locator("#source").evaluate(n=>{n.scrollTop=880;});
