@@ -653,6 +653,7 @@ fn analysis_coverage_changes_identity_without_inventing_a_content_change() {
                 vec![Analysis {
                     calls: None,
                     coloring: None,
+                    has_entry_point: false,
                     content: ContentId::derive(&[bytes]),
                     context: Context {
                         language: "rust".into(),

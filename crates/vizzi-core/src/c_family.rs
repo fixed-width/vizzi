@@ -4,7 +4,7 @@ use crate::{
     analysis::{Analyzer, LanguageAdapter},
     calls::CallExpression,
     model::{Context, ContextId, ModelError},
-    syntax::{CallRules, Declaration, SyntaxAnalyzer},
+    syntax::{CallRules, Declaration, SyntaxAnalyzer, unparenthesized},
 };
 use tree_sitter::Node;
 
@@ -35,14 +35,17 @@ impl LanguageAdapter for CAdapter {
         )
     }
     fn create(&self) -> Result<Box<dyn Analyzer>, ModelError> {
-        Ok(Box::new(SyntaxAnalyzer::new(
-            tree_sitter_c::LANGUAGE.into(),
-            tree_sitter_c::HIGHLIGHT_QUERY,
-            self.context(),
-            collect,
-            scope,
-            CALLS,
-        )?))
+        Ok(Box::new(
+            SyntaxAnalyzer::new(
+                tree_sitter_c::LANGUAGE.into(),
+                tree_sitter_c::HIGHLIGHT_QUERY,
+                self.context(),
+                collect,
+                scope,
+                CALLS,
+            )?
+            .with_entry_point(entry_point),
+        ))
     }
     fn supports_written_calls(&self) -> bool {
         CALLS.supported()
@@ -58,18 +61,21 @@ impl LanguageAdapter for CppAdapter {
         )
     }
     fn create(&self) -> Result<Box<dyn Analyzer>, ModelError> {
-        Ok(Box::new(SyntaxAnalyzer::new(
-            tree_sitter_cpp::LANGUAGE.into(),
-            &format!(
-                "{}\n{}",
-                tree_sitter_c::HIGHLIGHT_QUERY,
-                tree_sitter_cpp::HIGHLIGHT_QUERY
-            ),
-            self.context(),
-            collect,
-            scope,
-            CALLS,
-        )?))
+        Ok(Box::new(
+            SyntaxAnalyzer::new(
+                tree_sitter_cpp::LANGUAGE.into(),
+                &format!(
+                    "{}\n{}",
+                    tree_sitter_c::HIGHLIGHT_QUERY,
+                    tree_sitter_cpp::HIGHLIGHT_QUERY
+                ),
+                self.context(),
+                collect,
+                scope,
+                CALLS,
+            )?
+            .with_entry_point(entry_point),
+        ))
     }
     fn supports_written_calls(&self) -> bool {
         CALLS.supported()
@@ -93,6 +99,116 @@ fn context(language: &str, description: &str) -> Context {
             include_bytes!("../../../Cargo.lock"),
         ]),
     }
+}
+
+fn entry_point(node: Node<'_>, text: &str) -> bool {
+    if node.kind() != "function_definition" || node.child_by_field_name("body").is_none() {
+        return false;
+    }
+    let Some(declarator) = node.child_by_field_name("declarator").map(unparenthesized) else {
+        return false;
+    };
+    if declarator.kind() != "function_declarator"
+        || declarator
+            .child_by_field_name("declarator")
+            .map(unparenthesized)
+            .is_none_or(|name| {
+                name.kind() != "identifier" || text.get(name.byte_range()) != Some("main")
+            })
+        || node.named_children(&mut node.walk()).any(|child| {
+            child.kind() == "storage_class_specifier"
+                && text.get(child.byte_range()) == Some("static")
+        })
+    {
+        return false;
+    }
+    let return_type = node.child_by_field_name("type");
+    let trailing_return = declarator
+        .named_children(&mut declarator.walk())
+        .find(|child| child.kind() == "trailing_return_type");
+    let returns_int = match trailing_return {
+        Some(trailing) => trailing.named_child(0).is_some_and(|descriptor| {
+            descriptor.child_by_field_name("declarator").is_none()
+                && int_type(descriptor.child_by_field_name("type"), text)
+        }),
+        None => int_type(return_type, text),
+    };
+    if !returns_int {
+        return false;
+    }
+    let mut parent = node.parent();
+    while let Some(scope) = parent {
+        match scope.kind() {
+            "translation_unit" => break,
+            "preproc_if" | "preproc_ifdef" | "preproc_elif" | "preproc_elifdef"
+            | "preproc_else" => {
+                parent = scope.parent();
+            }
+            _ => return false,
+        }
+    }
+    declarator
+        .child_by_field_name("parameters")
+        .is_some_and(|parameters| {
+            let mut cursor = parameters.walk();
+            let mut params = parameters
+                .named_children(&mut cursor)
+                .filter(|child| !child.is_extra());
+            match (params.next(), params.next(), params.next()) {
+                (None, None, None) => true,
+                (Some(only), None, None) => {
+                    only.kind() == "parameter_declaration"
+                        && only
+                            .child_by_field_name("type")
+                            .and_then(|ty| text.get(ty.byte_range()))
+                            == Some("void")
+                        && only.child_by_field_name("declarator").is_none()
+                }
+                (Some(argc), Some(argv), None) => {
+                    argc.kind() == "parameter_declaration"
+                        && int_type(argc.child_by_field_name("type"), text)
+                        && argc
+                            .child_by_field_name("declarator")
+                            .is_none_or(|name| name.kind() == "identifier")
+                        && argv_parameter(argv, text)
+                }
+                _ => false,
+            }
+        })
+}
+
+fn int_type(node: Option<Node<'_>>, text: &str) -> bool {
+    node.and_then(|node| text.get(node.byte_range()))
+        .is_some_and(|ty| matches!(ty, "int" | "signed" | "signed int" | "int signed"))
+}
+
+fn argv_parameter(node: Node<'_>, text: &str) -> bool {
+    if node.kind() != "parameter_declaration"
+        || node
+            .child_by_field_name("type")
+            .and_then(|ty| text.get(ty.byte_range()))
+            != Some("char")
+    {
+        return false;
+    }
+    let declarator = node.child_by_field_name("declarator");
+    let inner = declarator.and_then(|node| node.child_by_field_name("declarator"));
+    let pointer = |node: Option<Node<'_>>| {
+        matches!(
+            node.map(|node| node.kind()),
+            Some("pointer_declarator" | "abstract_pointer_declarator")
+        )
+    };
+    let array = |node: Option<Node<'_>>| {
+        matches!(
+            node.map(|node| node.kind()),
+            Some("array_declarator" | "abstract_array_declarator")
+        )
+    };
+    let leaf = inner.and_then(|node| node.child_by_field_name("declarator"));
+    leaf.is_none_or(|node| node.kind() == "identifier")
+        && ((pointer(declarator) && (pointer(inner) || array(inner)))
+            || (array(declarator) && pointer(inner)))
 }
 
 fn collect(node: Node<'_>, text: &str, output: &mut Vec<Declaration>) {

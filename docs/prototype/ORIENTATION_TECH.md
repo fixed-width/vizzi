@@ -47,3 +47,13 @@ or ancestor-chain traversal occurs during viewport queries. Row height remains 4
 Canvas headings use measured glyph ascent/descent; insufficient header bands suppress the
 label entirely rather than clipping its vertical bounds. Readiness labels stay stable while
 a captured view is usable; pending work has busy state and existing disabled controls.
+
+The source policy's per-language file rules supply manifest and entry-module conventions.
+Recognized source manifests retain their regular analysis and source classification. The
+built-in syntax adapters record a file-level entry-point fact during the existing traversal,
+using source scopes and syntax for their respective languages. The optional cached fact
+defaults to false in older analysis records, and built-in fingerprints include the analysis
+and adapter implementations. File tiles and paged browse data share one landmark classifier.
+Paged browsing collects entry points while counting a directory's descendants, before slicing the
+page. The nested map applies the same subtree scope to its captured tiles. The entry-point picker
+uses the workspace-relative path as its label and opens the captured file by ID.

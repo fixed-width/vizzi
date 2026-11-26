@@ -92,6 +92,7 @@ impl Declaration {
         // Document::capture checks the content digest, ranges and identifier witness.
         let descriptor = serde_json::to_vec(self).map_err(|e| e.to_string())?;
         Ok(Analysis {
+            has_entry_point: false,
             content: self.content.clone(),
             context: Context {
                 language: syntax.context.language.clone(),

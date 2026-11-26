@@ -281,6 +281,7 @@ fn java_cues_keep_descriptor_identity_when_deferred_files_fill_the_source_budget
     let deferred = Analysis {
         calls: None,
         coloring: None,
+        has_entry_point: false,
         content: ContentId::derive(&[content.as_bytes()]),
         context: caller.analyses()[0].context.clone(),
         coverage: Coverage::Deferred,

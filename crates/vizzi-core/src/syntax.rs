@@ -64,6 +64,27 @@ pub(crate) type ScopeFacts = BTreeMap<usize, ScopeFact>;
 
 type Collector = fn(tree_sitter::Node<'_>, &str, &mut Vec<Declaration>);
 type Scope = fn(tree_sitter::Node<'_>, &str) -> Option<(&'static str, String)>;
+type EntryPoint = fn(tree_sitter::Node<'_>, &str) -> bool;
+
+pub(crate) fn unparenthesized(mut node: tree_sitter::Node<'_>) -> tree_sitter::Node<'_> {
+    while matches!(
+        node.kind(),
+        "parenthesized_expression" | "parenthesized_statements" | "parenthesized_declarator"
+    ) {
+        let mut cursor = node.walk();
+        let mut contents = node
+            .named_children(&mut cursor)
+            .filter(|child| !child.is_extra());
+        let Some(inner) = contents.next() else {
+            break;
+        };
+        if contents.next().is_some() {
+            break;
+        }
+        node = inner;
+    }
+    node
+}
 type FinishCalls = fn(
     tree_sitter::Node<'_>,
     &str,
@@ -92,6 +113,7 @@ pub(crate) struct SyntaxAnalyzer {
     declarations: Collector,
     scope: Scope,
     calls: CallRules,
+    entry_point: Option<EntryPoint>,
 }
 impl SyntaxAnalyzer {
     pub(crate) fn new(
@@ -114,7 +136,13 @@ impl SyntaxAnalyzer {
             declarations,
             scope,
             calls,
+            entry_point: None,
         })
+    }
+
+    pub(crate) fn with_entry_point(mut self, entry_point: EntryPoint) -> Self {
+        self.entry_point = Some(entry_point);
+        self
     }
 }
 impl Analyzer for SyntaxAnalyzer {
@@ -220,6 +248,7 @@ impl SyntaxAnalyzer {
             coverage: Coverage::Syntax,
             facts: Vec::new(),
             diagnostics: Vec::new(),
+            has_entry_point: false,
         };
         let Ok(text) = std::str::from_utf8(bytes) else {
             analysis.coverage = Coverage::Unavailable;
@@ -289,6 +318,14 @@ impl SyntaxAnalyzer {
                 return Ok(None);
             }
             let node = cursor.node();
+            if !analysis.has_entry_point
+                && self
+                    .entry_point
+                    .is_some_and(|recognize| recognize(node, text))
+                && !node.has_error()
+            {
+                analysis.has_entry_point = true;
+            }
             (self.declarations)(node, text, &mut declarations);
             if !declarations.is_empty() {
                 let mut scope = Vec::new();

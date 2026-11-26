@@ -52,19 +52,119 @@ impl LanguageAdapter for JavaAdapter {
     }
 
     fn create(&self) -> Result<Box<dyn Analyzer>, ModelError> {
-        Ok(Box::new(SyntaxAnalyzer::new(
-            tree_sitter_java::LANGUAGE.into(),
-            tree_sitter_java::HIGHLIGHTS_QUERY,
-            self.context(),
-            collect,
-            scope,
-            CALLS,
-        )?))
+        Ok(Box::new(
+            SyntaxAnalyzer::new(
+                tree_sitter_java::LANGUAGE.into(),
+                tree_sitter_java::HIGHLIGHTS_QUERY,
+                self.context(),
+                collect,
+                scope,
+                CALLS,
+            )?
+            .with_entry_point(entry_point),
+        ))
     }
 
     fn supports_written_calls(&self) -> bool {
         CALLS.supported()
     }
+}
+
+fn entry_point(node: Node<'_>, text: &str) -> bool {
+    if node.kind() != "method_declaration"
+        || node
+            .child_by_field_name("name")
+            .and_then(|name| text.get(name.byte_range()))
+            != Some("main")
+        || node
+            .child_by_field_name("type")
+            .is_none_or(|ty| ty.kind() != "void_type")
+        || node.child_by_field_name("dimensions").is_some()
+        || node.child_by_field_name("body").is_none()
+        || has_modifier(node, "private")
+        || !(has_modifier(node, "static") || instance_main_owner(node))
+    {
+        return false;
+    }
+    node.child_by_field_name("parameters")
+        .is_some_and(|parameters| {
+            let mut cursor = parameters.walk();
+            let mut params = parameters
+                .named_children(&mut cursor)
+                .filter(|child| !child.is_extra() && child.kind() != "receiver_parameter");
+            match (params.next(), params.next()) {
+                (None, None) => true,
+                (Some(parameter), None) => string_array_parameter(parameter, text),
+                _ => false,
+            }
+        })
+}
+
+fn has_modifier(node: Node<'_>, kind: &str) -> bool {
+    node.named_children(&mut node.walk())
+        .find(|child| child.kind() == "modifiers")
+        .is_some_and(|modifiers| {
+            modifiers
+                .children(&mut modifiers.walk())
+                .any(|modifier| modifier.kind() == kind)
+        })
+}
+
+fn instance_main_owner(method: Node<'_>) -> bool {
+    let Some(body) = method.parent() else {
+        return false;
+    };
+    if body.kind() == "program" {
+        return true;
+    }
+    let Some(owner) = body.parent() else {
+        return false;
+    };
+    match owner.kind() {
+        "record_declaration" => true,
+        "class_declaration" => {
+            has_modifier(owner, "static")
+                || owner.parent().is_some_and(|scope| {
+                    matches!(
+                        scope.kind(),
+                        "program" | "interface_body" | "annotation_type_body"
+                    )
+                })
+        }
+        _ => false,
+    }
+}
+
+fn string_array_parameter(node: Node<'_>, text: &str) -> bool {
+    let is_string = |ty: Node<'_>| {
+        matches!(ty.kind(), "type_identifier" | "scoped_type_identifier")
+            && matches!(
+                text.get(ty.byte_range()),
+                Some("String" | "java.lang.String")
+            )
+    };
+    if node.kind() == "spread_parameter" {
+        return node.named_children(&mut node.walk()).any(is_string);
+    }
+    if node.kind() != "formal_parameter" {
+        return false;
+    }
+    let Some(ty) = node.child_by_field_name("type") else {
+        return false;
+    };
+    let dimensions = |node: Node<'_>| {
+        node.child_by_field_name("dimensions").map_or(0, |dims| {
+            dims.children(&mut dims.walk())
+                .filter(|child| child.kind() == "[")
+                .count()
+        })
+    };
+    let element = if ty.kind() == "array_type" {
+        ty.child_by_field_name("element")
+    } else {
+        Some(ty)
+    };
+    dimensions(node) + dimensions(ty) == 1 && element.is_some_and(is_string)
 }
 
 fn scope(node: Node<'_>, text: &str) -> Option<(&'static str, String)> {

@@ -66,7 +66,7 @@ impl Jobs<'_> {
                                     };
                                     batch.push(Arc::new(Document::capture_source(
                                         self.workspace.clone(), file.path.clone(), file.source.clone(),
-                                        vec![Analysis { calls: None, coloring: None,
+                                        vec![Analysis { calls: None, coloring: None, has_entry_point: false,
 content: content.clone(), context: context.clone(), coverage: Coverage::Deferred, facts: vec![], diagnostics: vec![diagnostic] }],
                                         file.classification.clone(),
                                     )?));

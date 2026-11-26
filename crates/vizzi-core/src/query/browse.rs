@@ -1,7 +1,7 @@
 use super::MapFilter;
 use crate::{
     model::{Document, FileId, Snapshot},
-    policy::is_readme,
+    policy::{is_entry_module, is_manifest, is_readme},
 };
 use serde::Serialize;
 use std::{collections::BTreeMap, sync::Arc};
@@ -23,7 +23,7 @@ pub struct BrowsePage {
     pub size: usize,
     /// Directory cards on this page.
     pub directories: Vec<DirectorySummary>,
-    /// Recognized files directly in this directory, independent of paging.
+    /// Local documentation and manifests, plus entry points in the subtree.
     pub landmarks: Vec<Landmark>,
 }
 
@@ -36,7 +36,7 @@ pub struct DirectorySummary {
     pub files: usize,
 }
 
-/// Recognized repository documentation or project manifest.
+/// Recognized repository documentation, project manifest, or execution entry point.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum LandmarkKind {
@@ -44,26 +44,19 @@ pub enum LandmarkKind {
     Readme,
     /// A recognized project manifest.
     Manifest,
+    /// A file with a recognized source-level execution entry point.
+    EntryPoint,
 }
 
 impl LandmarkKind {
-    pub(super) fn for_path(path: &str) -> Option<Self> {
-        let filename = path.rsplit('/').next().unwrap_or(path);
+    pub(super) fn for_document(doc: &Document) -> Option<Self> {
+        let filename = doc.path().rsplit('/').next().unwrap_or(doc.path());
         if is_readme(filename) {
             Some(Self::Readme)
-        } else if matches!(
-            filename,
-            "Cargo.toml"
-                | "package.json"
-                | "pyproject.toml"
-                | "Gemfile"
-                | "pom.xml"
-                | "settings.gradle"
-                | "settings.gradle.kts"
-                | "build.gradle"
-                | "build.gradle.kts"
-        ) {
+        } else if is_manifest(filename) {
             Some(Self::Manifest)
+        } else if is_entry_module(filename) || doc.analyses().iter().any(|a| a.has_entry_point) {
+            Some(Self::EntryPoint)
         } else {
             None
         }
@@ -117,19 +110,23 @@ pub(super) fn project<'a>(
     {
         page.files += 1;
         let path = doc.path();
-        if let Some(slash) = path[prefix_len..].find('/') {
+        let descendant_slash = path[prefix_len..].find('/');
+        if let Some(slash) = descendant_slash {
             *directories.entry(&path[..prefix_len + slash]).or_default() += 1;
         } else {
             files.push(doc);
-            match LandmarkKind::for_path(path) {
-                Some(LandmarkKind::Readme) => {
-                    readme.get_or_insert(doc);
-                }
-                Some(LandmarkKind::Manifest) => {
-                    page.landmarks.push(landmark(doc, LandmarkKind::Manifest))
-                }
-                None => {}
+        }
+        match LandmarkKind::for_document(doc) {
+            Some(LandmarkKind::EntryPoint) => {
+                page.landmarks.push(landmark(doc, LandmarkKind::EntryPoint));
             }
+            Some(LandmarkKind::Readme) if descendant_slash.is_none() => {
+                readme.get_or_insert(doc);
+            }
+            Some(LandmarkKind::Manifest) if descendant_slash.is_none() => {
+                page.landmarks.push(landmark(doc, LandmarkKind::Manifest));
+            }
+            _ => {}
         }
     }
     if let Some(doc) = readme {

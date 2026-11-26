@@ -12,72 +12,107 @@ pub const JAVA_PROJECT_METADATA: &str = "java-project";
 struct DefaultSourceRules {
     language: &'static str,
     suffixes: &'static [&'static str],
-    filenames: &'static [&'static str],
-    project_metadata: Option<(&'static str, &'static [&'static str])>,
+    files: &'static [NamedFile],
+    metadata_language: Option<&'static str>,
 }
+
+enum NamedFile {
+    Source(&'static str),
+    SourceManifest(&'static str),
+    SourceManifestSuffix(&'static str),
+    Metadata(&'static str),
+    MetadataManifest(&'static str),
+    EntryModule(&'static str),
+}
+
+use NamedFile::*;
 
 const DEFAULT_SOURCE_RULES: &[DefaultSourceRules] = &[
     DefaultSourceRules {
         language: "rust",
         suffixes: &["rs"],
-        filenames: &[],
-        project_metadata: Some(("cargo", &["Cargo.toml", "Cargo.lock"])),
+        files: &[MetadataManifest("Cargo.toml"), Metadata("Cargo.lock")],
+        metadata_language: Some("cargo"),
     },
     DefaultSourceRules {
         language: "python",
         suffixes: &["py", "pyi"],
-        filenames: &[],
-        project_metadata: Some(("python-project", &["pyrightconfig.json", "pyproject.toml"])),
+        files: &[
+            MetadataManifest("pyproject.toml"),
+            Metadata("pyrightconfig.json"),
+            EntryModule("__main__.py"),
+        ],
+        metadata_language: Some("python-project"),
     },
     DefaultSourceRules {
         language: "ruby",
-        suffixes: &["rb", "rake", "gemspec", "ru"],
-        filenames: &["Gemfile", "Rakefile"],
-        project_metadata: Some((
-            "ruby-project",
-            &["Gemfile.lock", ".ruby-version", ".tool-versions"],
-        )),
+        suffixes: &["rb", "rake", "ru"],
+        files: &[
+            SourceManifest("Gemfile"),
+            Source("Rakefile"),
+            SourceManifestSuffix("gemspec"),
+            Metadata("Gemfile.lock"),
+            Metadata(".ruby-version"),
+            Metadata(".tool-versions"),
+        ],
+        metadata_language: Some("ruby-project"),
     },
     DefaultSourceRules {
         language: "java",
         suffixes: &["java"],
-        filenames: &[],
-        project_metadata: Some((
-            JAVA_PROJECT_METADATA,
-            &[
-                "pom.xml",
-                "settings.gradle",
-                "settings.gradle.kts",
-                "build.gradle",
-                "build.gradle.kts",
-                "gradle.properties",
-                "gradle-wrapper.properties",
-                "libs.versions.toml",
-            ],
-        )),
+        files: &[
+            MetadataManifest("pom.xml"),
+            MetadataManifest("settings.gradle"),
+            MetadataManifest("settings.gradle.kts"),
+            MetadataManifest("build.gradle"),
+            MetadataManifest("build.gradle.kts"),
+            Metadata("gradle.properties"),
+            Metadata("gradle-wrapper.properties"),
+            Metadata("libs.versions.toml"),
+        ],
+        metadata_language: Some(JAVA_PROJECT_METADATA),
     },
     DefaultSourceRules {
         language: "javascript",
         suffixes: &["js", "jsx", "mjs", "cjs"],
-        filenames: &[],
-        project_metadata: Some((
-            ECMASCRIPT_PROJECT_METADATA,
-            &["package.json", "tsconfig.json", "jsconfig.json"],
-        )),
+        files: &[
+            MetadataManifest("package.json"),
+            Metadata("tsconfig.json"),
+            Metadata("jsconfig.json"),
+        ],
+        metadata_language: Some(ECMASCRIPT_PROJECT_METADATA),
     },
     DefaultSourceRules {
         language: "typescript",
         suffixes: &["ts", "mts", "cts"],
-        filenames: &[],
-        project_metadata: None,
+        files: &[],
+        metadata_language: None,
     },
     DefaultSourceRules {
         language: "tsx",
         suffixes: &["tsx"],
-        filenames: &[],
-        project_metadata: None,
+        files: &[],
+        metadata_language: None,
     },
 ];
+
+fn named_files() -> impl Iterator<Item = &'static NamedFile> {
+    DEFAULT_SOURCE_RULES.iter().flat_map(|rules| rules.files)
+}
+
+pub(crate) fn is_manifest(filename: &str) -> bool {
+    named_files().any(|rule| match rule {
+        SourceManifest(name) | MetadataManifest(name) => *name == filename,
+        SourceManifestSuffix(suffix) => filename
+            .rsplit_once('.')
+            .is_some_and(|(stem, extension)| !stem.is_empty() && extension == *suffix),
+        _ => false,
+    })
+}
+
+pub(crate) fn is_entry_module(filename: &str) -> bool {
+    named_files().any(|rule| matches!(rule, EntryModule(name) if *name == filename))
+}
 
 pub(crate) fn is_readme(filename: &str) -> bool {
     [
@@ -334,8 +369,12 @@ impl SourcePolicy {
         }
         let metadata = DEFAULT_SOURCE_RULES
             .iter()
-            .filter_map(|rules| rules.project_metadata)
-            .find_map(|(label, names)| names.contains(&filename).then_some(label))
+            .find_map(|rules| {
+                let label = rules.metadata_language?;
+                rules.files.iter().any(|rule| {
+                    matches!(rule, Metadata(name) | MetadataManifest(name) if *name == filename)
+                }).then_some(label)
+            })
             .or_else(|| {
                 let stem = filename.strip_suffix(".json")?;
                 ["tsconfig.", "jsconfig."]
@@ -358,10 +397,11 @@ impl SourcePolicy {
                 reason: SourceOnlyReason::ProjectMetadata,
             }));
         }
-        if let Some(rules) = DEFAULT_SOURCE_RULES
-            .iter()
-            .find(|rules| rules.filenames.contains(&filename))
-        {
+        if let Some(rules) = DEFAULT_SOURCE_RULES.iter().find(|rules| {
+            rules.files.iter().any(
+                |rule| matches!(rule, Source(name) | SourceManifest(name) if *name == filename),
+            )
+        }) {
             return Ok(Some(self.assignment(rules.language, filename_provenance())));
         }
         let Some((stem, extension)) = filename.rsplit_once('.') else {
@@ -380,10 +420,12 @@ impl SourcePolicy {
                 reason: SourceOnlyReason::AnalysisNotRequested,
             }));
         }
-        let language = if let Some(rules) = DEFAULT_SOURCE_RULES
-            .iter()
-            .find(|rules| rules.suffixes.contains(&extension))
-        {
+        let language = if let Some(rules) = DEFAULT_SOURCE_RULES.iter().find(|rules| {
+            rules.suffixes.contains(&extension)
+                || rules.files.iter().any(
+                    |rule| matches!(rule, SourceManifestSuffix(suffix) if *suffix == extension),
+                )
+        }) {
             Some(rules.language)
         } else {
             if !self.roots.iter().any(|scope| within(path, scope)) {
