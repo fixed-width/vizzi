@@ -442,6 +442,31 @@ test("a large repository exposes every directory, file page and local landmark",
       document.querySelector("#file-list button[aria-current=true]").click();
     });
     await page.getByText("1–100 of 2,002 matches", { exact: true }).waitFor();
+    const nextMapPage = page.getByRole("button", { name: "Next page", exact: true });
+    await nextMapPage.click();
+    await page.getByText("101–200 of 2,002 matches", { exact: true }).waitFor();
+    const matchCase = page.getByRole("checkbox", { name: "Match case", exact: true });
+    const modeQuery = url => url.pathname === "/api/view" &&
+      url.searchParams.get("search_case_sensitive") === "true" && url.searchParams.get("offset") === "0";
+    const releaseMode = Promise.withResolvers();
+    const holdModeChange = async route => {
+      await releaseMode.promise;
+      await route.continue();
+    };
+    await page.route(modeQuery, holdModeChange);
+    try {
+      await Promise.all([
+        page.waitForRequest(request => modeQuery(new URL(request.url()))),
+        matchCase.check(),
+      ]);
+      await nextMapPage.click();
+    } finally {
+      releaseMode.resolve();
+    }
+    await page.waitForFunction(() => document.querySelector("#navigation").getAttribute("aria-busy") === "false");
+    assert.equal(await page.locator("#map-page-range").textContent(), "1–100 of 2,002 matches");
+    await page.unroute(modeQuery, holdModeChange);
+    await matchCase.uncheck();
     await page.getByRole("searchbox", { name: "Find source" }).fill("target.rs");
     await page.getByRole("button", { name: "z-late/target.rs", exact: true }).click();
     await page.waitForFunction(() => document.getElementById("file-title").textContent === "z-late/target.rs");

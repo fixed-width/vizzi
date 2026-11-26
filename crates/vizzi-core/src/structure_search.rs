@@ -1,6 +1,6 @@
 //! Lexical declaration matching and ordering; no source reads or semantic resolution.
 use crate::structure::{NAME_BYTES, Symbol};
-use std::collections::BTreeMap;
+use std::{borrow::Cow, collections::BTreeMap};
 use tree_sitter::Node;
 
 #[derive(Default)]
@@ -135,16 +135,22 @@ pub(crate) struct Query {
     literal: String,
     qualified: String,
     suffix: String,
+    case_sensitive: bool,
 }
 impl Query {
     pub(crate) fn new(input: &str) -> Self {
-        let literal = input.trim().to_lowercase();
+        Self::with_case(input, false)
+    }
+
+    pub(crate) fn with_case(input: &str, case_sensitive: bool) -> Self {
+        let literal = case_text(input.trim(), case_sensitive).into_owned();
         let qualified = literal.replace(['.', '#'], "::");
         let suffix = format!("::{qualified}");
         Self {
             literal,
             qualified,
             suffix,
+            case_sensitive,
         }
     }
     pub(crate) fn empty(&self) -> bool {
@@ -166,12 +172,18 @@ impl Query {
         name: &str,
         qualified_name: Option<&str>,
     ) -> Option<Rank> {
-        let qualified_name = qualified_name.map(|name| qualified(std::iter::empty(), name));
-        self.rank_names(&name.to_lowercase(), qualified_name.as_deref().into_iter())
+        let qualified_name = qualified_name.map(|name| name.replace(['.', '#'], "::"));
+        let qualified_name = qualified_name
+            .as_deref()
+            .map(|name| case_text(name, self.case_sensitive));
+        self.rank_names(
+            &case_text(name, self.case_sensitive),
+            qualified_name.as_deref().into_iter(),
+        )
     }
 
     pub(crate) fn rank_file(&self, path: &str) -> Option<Rank> {
-        let path = path.to_lowercase();
+        let path = case_text(path, self.case_sensitive);
         let filename = path.rsplit('/').next().unwrap_or(&path);
         if path == self.literal {
             Some(Rank::Exact)
@@ -209,5 +221,13 @@ impl Query {
         } else {
             None
         }
+    }
+}
+
+fn case_text(text: &str, case_sensitive: bool) -> Cow<'_, str> {
+    if case_sensitive {
+        Cow::Borrowed(text)
+    } else {
+        Cow::Owned(text.to_lowercase())
     }
 }

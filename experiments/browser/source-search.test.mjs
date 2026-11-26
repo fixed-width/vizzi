@@ -104,6 +104,77 @@ try {
   assert.deepEqual(errors, []);
   console.log('Source search coordinates scope, map membership, ranked rows, exact source and reading history.');
 
+  await test('search modes update matches, survive Back and report invalid patterns inline', () => withSearch(async (page, search, matches) => {
+    const regex = page.getByRole('checkbox', {name:'Regex',exact:true});
+    const matchCase = page.getByRole('checkbox', {name:'Match case',exact:true});
+    const pattern = String.raw`^READER::READ_FILE$|^tools/run\.py$`;
+    const declaration = matches.getByText('reader::read_file', {exact:true});
+    const python = matches.getByRole('button', {name:/file run\.py tools\/run\.py/});
+    await regex.check();
+    await search.fill(pattern);
+    await declaration.waitFor();
+    await python.waitFor();
+
+    await matchCase.check();
+    await declaration.waitFor({state:'detached'});
+    assert.equal(await matches.getByRole('button').count(), 1);
+    assert.deepEqual(await page.evaluate(() => window.vizziMetrics.scene.files.map(file => file.path)), ['tools/run.py']);
+    await python.click();
+    await page.locator('#file-title').getByText('tools/run.py', {exact:true}).waitFor();
+    await page.getByRole('button', {name:'Clear filters'}).click();
+    await matches.waitFor({state:'hidden'});
+    assert.equal(await search.inputValue(), '');
+    assert.equal(await regex.isChecked(), true);
+    assert.equal(await matchCase.isChecked(), true);
+
+    await regex.uncheck();
+    await matchCase.uncheck();
+    await page.getByRole('button', {name:'Back',exact:true}).click();
+    await python.waitFor();
+    assert.equal(await search.inputValue(), pattern);
+    assert.equal(await regex.isChecked(), true);
+    assert.equal(await matchCase.isChecked(), true);
+
+    await search.fill('[');
+    await page.getByText(/Invalid regex.*unclosed character class/).waitFor();
+    assert.equal(await search.getAttribute('aria-invalid'), 'true');
+    assert.equal(await matches.isVisible(), false);
+    assert.equal(await page.locator('#error').isVisible(), false);
+    assert.equal(await page.locator('#file-title').textContent(), 'engine/input.rs');
+    await search.fill('^read_file$');
+    await declaration.waitFor();
+    assert.equal(await search.getAttribute('aria-invalid'), null);
+  }));
+
+  await test('search modes alone leave Clear filters hidden and survive clearing file types', () => withSearch(async page => {
+    const regex = page.getByRole('checkbox', {name:'Regex',exact:true});
+    const matchCase = page.getByRole('checkbox', {name:'Match case',exact:true});
+    const clear = page.getByRole('button', {name:'Clear filters'});
+    await regex.check();
+    assert.equal(await clear.isVisible(), false);
+    await regex.uncheck();
+    await matchCase.check();
+    assert.equal(await clear.isVisible(), false);
+    await regex.check();
+    assert.equal(await clear.isVisible(), false);
+
+    const rust = page.locator('#map-legend').getByRole('button', {name:'Rust',exact:true});
+    await rust.click();
+    await clear.click();
+    assert.equal(await rust.getAttribute('aria-pressed'), 'false');
+    assert.equal(await clear.isVisible(), false);
+    assert.equal(await regex.isChecked(), true);
+    assert.equal(await matchCase.isChecked(), true);
+  }));
+
+  await test('changing a search mode returns to the first results page', () => withSearch(async (page, search, matches) => {
+    await search.fill('paged_name');
+    await page.getByRole('button', {name:'Next matches'}).click();
+    await matches.getByText('paged_name_24', {exact:true}).waitFor();
+    await page.getByRole('checkbox', {name:'Match case',exact:true}).check();
+    await matches.getByText('paged_name_00', {exact:true}).waitFor();
+  }));
+
   await test('opening a match preserves search text typed while the response is in flight', () => withSearch(async (page, search, matches) => {
     const responseReady = Promise.withResolvers(), releaseMatch = Promise.withResolvers();
     await page.route('**/api/view?**', async route => {

@@ -23,6 +23,8 @@ installAppHeader(header);
 const element = id => document.getElementById(id);
 const pathFilter = element("filter"), clearFilters = element("clear-filters");
 const searchWithin = element("search-within"), matchPanel = element("source-matches");
+const searchRegex = element("search-regex"), searchCase = element("search-match-case");
+const searchError = element("search-error");
 const canvas = element("map"), context = canvas.getContext("2d");
 const overview=element("map-overview"),overviewContext=overview.getContext("2d");
 let overviewTransform,overviewDrag=false;
@@ -70,6 +72,7 @@ let scheduled = false, drag = null, previousFrame = null, filterTimer = null,fit
 let updates, viewFilter = "",mapModel,scene,mapWorkspace;
 let viewTypes = "", selectedTypes = new Set();
 let browseMap, searchOrigin, viewSearchDirectory = null;
+let viewSearchRegex = false, viewSearchCase = false;
 const dismissible=new Set(["navigation-notice","error","map-notice"]);
 const messages=Object.fromEntries([["status","workspace status"],["navigation-notice","navigation notice"],["coverage","source status"],["diagnostics","source diagnostics"],["error","workspace error"],["map-notice","map notice"]].map(([id,label])=>[id,dismissible.has(id)?createMessage(element(id),{label:`Dismiss ${label}`}):textRow(element(id))]));
 let palette=mapPalette(canvas);
@@ -205,7 +208,8 @@ const navigation = createNavigation({
   capture: () => ({ file:view?.selection.file ?? null,entity:view?.selection.entity ?? null,
     path:view?.source?.path ?? null,version:view?.source?.version ?? null,snapshot:view?.snapshot ?? null,
     filter:viewFilter,types:viewTypes,directory:view?.browse?.directory ?? ".",offset:view?.browse?.offset ?? 0,
-    find:true,searchDirectory:viewSearchDirectory,resultsOffset:view?.matches?.offset ?? 0,searchOrigin,
+    find:true,searchDirectory:viewSearchDirectory,searchRegex:viewSearchRegex,searchCaseSensitive:viewSearchCase,
+    resultsOffset:view?.matches?.offset ?? 0,searchOrigin,
     position:{inspector:inspector.position(),...mapPosition()} }),
   load: (query,intent) => controller.load(query,{intent,rollbackOnFailure:Boolean(intent.returning || intent.anchor)}),
   prepare: (query,intent,signal) => controller.prepare(query,{intent,signal,rollbackOnFailure:true}),
@@ -214,17 +218,28 @@ const navigation = createNavigation({
   onNotice: notice => messages["navigation-notice"].show(notice),
 });
 function selectedTypeQuery() { return [...selectedTypes].sort().join(","); }
+function searchText() { return searchRegex.checked ? pathFilter.value : pathFilter.value.trim(); }
+function draftSearch() {
+  const filter=searchText();
+  return {filter,types:selectedTypeQuery(),
+    search_directory:filter && searchWithin.checked ? searchOrigin?.directory ?? null : null,
+    search_regex:searchRegex.checked,search_case_sensitive:searchCase.checked};
+}
+function searchChanged({filter="",types="",search_directory=null,search_regex=false,search_case_sensitive=false}) {
+  return filter!==viewFilter || types!==viewTypes || search_directory!==viewSearchDirectory ||
+    search_regex!==viewSearchRegex || search_case_sensitive!==viewSearchCase;
+}
 function navigate(patch, anchor) {
   editorFiles.manual();
   clearTimeout(filterTimer);
   updateClearFilters();
-  const filter=pathFilter.value.trim(),types=selectedTypeQuery();
+  const filter=searchText();
   if(filter && !searchOrigin)searchOrigin={directory:scene?.focus ?? ".",offset:view?.browse?.offset ?? 0,position:mapPosition()};
-  const searchDirectory=filter && searchWithin.checked ? searchOrigin?.directory ?? null : null;
-  const changed=filter!==viewFilter || types!==viewTypes || searchDirectory!==viewSearchDirectory;
-  const map=filter && changed ? {directory:searchDirectory ?? ".",offset:0}
+  const query=draftSearch(), changed=searchChanged(query);
+  if(changed)renderSearchError();
+  const map=filter && changed ? {directory:query.search_directory ?? ".",offset:0}
     : !filter && searchOrigin ? {directory:searchOrigin.directory,offset:searchOrigin.offset} : {};
-  return navigation.navigate({filter,types,search_directory:searchDirectory, ...map,
+  return navigation.navigate({...query, ...map,
     ...(changed ? {results_offset:0} : {}), ...patch},anchor,{replaceHistory:false});
 }
 function openDirectory(directory) {
@@ -237,7 +252,7 @@ function openDirectory(directory) {
 }
 function changePage(direction) {
   const page=view?.browse;
-  if(!page)return;
+  if(!page || searchChanged(draftSearch()))return;
   return navigate({offset:Math.max(0,page.offset+direction*page.size)});
 }
 const controller = createController({
@@ -250,9 +265,7 @@ const controller = createController({
     const current=view, file=url.searchParams.get("file"), snapshot=url.searchParams.get("snapshot");
     if(current && file && file!==current.selection.file && snapshot===current.snapshot &&
        options.intent?.before && !options.intent.anchor && !url.searchParams.has("entity") &&
-       (url.searchParams.get("filter") ?? "")===viewFilter &&
-       (url.searchParams.get("types") ?? "")===viewTypes &&
-       url.searchParams.get("search_directory")===viewSearchDirectory &&
+       !searchChanged(options.query) &&
        Number(url.searchParams.get("results_offset"))===(current.matches?.offset ?? 0) &&
        url.searchParams.get("directory")===(current.browse?.directory ?? ".") &&
        Number(url.searchParams.get("offset"))===(current.browse?.offset ?? 0)) {
@@ -270,20 +283,26 @@ const controller = createController({
   onView: (next,info) => {
     const previousSelection=view?.selection.file;
     const wasSearching=Boolean(view?.matches), searching=Boolean(next.matches);
-    const searchDirectory=info.query.search_directory ?? null;
-    const first = !view, changedFilter=viewFilter!==(info.query.filter ?? "") || viewTypes!==(info.query.types ?? "") || viewSearchDirectory!==searchDirectory;
+    const types=info.query.types ?? "";
+    const first = !view, changedMapFilter=searchChanged(info.query) && (searching || wasSearching || viewTypes!==types);
     const changedMap=view?.files!==next.files;
     const changedPage=view?.browse?.directory!==next.browse?.directory || view?.browse?.offset!==next.browse?.offset;
     view = next;keepEvidence.disabled=!next.source;
     viewFilter=info.query.filter ?? "";
-    viewTypes=info.query.types ?? "";
-    viewSearchDirectory=searchDirectory;
+    viewTypes=types;
+    viewSearchDirectory=info.query.search_directory ?? null;
+    viewSearchRegex=info.query.search_regex ?? false;
+    viewSearchCase=info.query.search_case_sensitive ?? false;
     selectedTypes=new Set(viewTypes ? viewTypes.split(",") : []);
-    if(info.intent?.returning || info.intent?.editor)pathFilter.value=viewFilter;
+    if(info.intent?.returning || info.intent?.editor){
+      pathFilter.value=viewFilter;
+      searchRegex.checked=viewSearchRegex;
+      searchCase.checked=viewSearchCase;
+    }
     if(info.intent?.returning && searching)searchOrigin=info.intent.target.searchOrigin;
     const leavingSearch=searching ? null : searchOrigin;
     const restoreSearchMap=wasSearching && leavingSearch && !info.intent?.returning && !info.intent?.anchor;
-    if(!searching && !pathFilter.value.trim())searchOrigin=null;
+    if(!searching && !searchText())searchOrigin=null;
     searchWithin.checked=Boolean(viewSearchDirectory);
     updateClearFilters();
     if(mapWorkspace!==next.workspace){
@@ -299,12 +318,12 @@ const controller = createController({
     }
     else if(changedMap)mapModel.setFiles(next.files,next.browse);
     if(restoreSearchMap && !next.browse && !mapModel.focus(leavingSearch.directory))mapModel.focus(".");
-    if(searching && changedFilter && !next.browse)mapModel.focus(".");
+    if(searching && changedMapFilter && !next.browse)mapModel.focus(".");
     const layoutRevision=mapModel.revision;
     const revealSelection=!restoreSearchMap && (!first && previousSelection!==next.selection.file || info.intent?.anchor);
     if(revealSelection)mapModel.reveal(next.selection.file,{focusDeep:searching});
     if(changedMap || mapModel.revision!==layoutRevision)refreshScene();
-    element("empty").hidden = (next.browse?.entries ?? next.files.length) > 0;
+    element("empty").hidden = Boolean(next.matches?.error) || (next.browse?.entries ?? next.files.length) > 0;
     renderPage();
     renderMatches(next);
     element("file-title").textContent = next.source?.path ?? "Choose a file";
@@ -324,10 +343,12 @@ const controller = createController({
     callMenu.hide();inspector.apply(next); renderFileList();
     const restore=navigation.restoration(next,info.intent);
     const sameScene=restore && restore.snapshot===next.snapshot && restore.position.layoutRevision===mapModel.revision &&
-      restore.filter===viewFilter && restore.types===viewTypes && restore.directory===(next.browse?.directory ?? ".") && restore.offset===(next.browse?.offset ?? 0);
+      !searchChanged({filter:restore.filter,types:restore.types,search_directory:restore.searchDirectory,
+        search_regex:restore.searchRegex,search_case_sensitive:restore.searchCaseSensitive}) &&
+      restore.directory===(next.browse?.directory ?? ".") && restore.offset===(next.browse?.offset ?? 0);
     if(sameScene)restoreMapPosition(restore.position);
     else if(restoreSearchMap)restoreMapPosition(leavingSearch.position);
-    else if(first || changedFilter || changedPage || info.intent?.returning)fit(true);else invalidate();
+    else if(first || changedMapFilter || changedPage || info.intent?.returning)fit(true);else invalidate();
     if(revealSelection && !first && !info.intent?.returning){const file=scene.files.find(f=>f.id===next.selection.file);if(file){const x=camera.x+(file.rect.x+file.rect.width/2)*camera.scale,y=camera.y+(file.rect.y+file.rect.height/2)*camera.scale;if(x<12 || y<12 || x>canvas.clientWidth-12 || y>canvas.clientHeight-12){camera=jumpCamera(camera,{x:file.rect.x+file.rect.width/2,y:file.rect.y+file.rect.height/2},canvas.clientWidth,canvas.clientHeight);fitMode=null;invalidate();}}}
     if(info.intent || !editorFiles.pending())navigation.observe(info.intent);
     void editorFiles.resume();
@@ -407,18 +428,26 @@ function renderPage() {
 function renderSearchScope() {
   const directory=searchOrigin?.directory ?? scene?.focus ?? ".";
   const label=element("search-directory");
-  element("search-scope").hidden=!pathFilter.value.trim() || directory===".";
+  element("search-scope").hidden=!searchText() || directory===".";
   label.textContent=directory;
   label.title=directory;
+}
+
+function renderSearchError(error) {
+  const message=error ? `Invalid regex. ${error}` : "";
+  if(searchError.textContent!==message)searchError.textContent=message;
+  if(error)pathFilter.setAttribute("aria-invalid","true");
+  else pathFilter.removeAttribute("aria-invalid");
 }
 
 function renderMatches(next) {
   renderSearchScope();
   const page=next.matches;
-  matchPanel.hidden=!page;
-  if(!page)return;
+  matchPanel.hidden=!page || Boolean(page.error);
+  renderSearchError(searchChanged(draftSearch()) ? undefined : page?.error);
+  if(matchPanel.hidden)return;
   const list=element("match-list");
-  const key=JSON.stringify([next.snapshot,viewFilter,viewTypes,viewSearchDirectory,page.offset]);
+  const key=JSON.stringify([next.snapshot,viewFilter,viewTypes,viewSearchDirectory,viewSearchRegex,viewSearchCase,page.offset]);
   if(list.dataset.page!==key){
     list.dataset.page=key;
     list.replaceChildren(...page.items.map(result=>{
@@ -434,7 +463,7 @@ function renderMatches(next) {
       button.title=`${result.name}\n${path.textContent}`;
       button.append(kind,name,path);
       button.onclick=()=>{
-        if(pathFilter.value.trim()!==viewFilter || selectedTypeQuery()!==viewTypes || searchWithin.checked!==Boolean(viewSearchDirectory))return;
+        if(searchChanged(draftSearch()))return;
         void navigate({file:result.file,entity:result.entity,reveal_match:true},
           {snapshot:next.snapshot,file:result.file,version:result.version,entity:result.entity,line:result.line});
       };
@@ -460,7 +489,7 @@ function renderMatches(next) {
 
 function changeMatchPage(direction) {
   const page=view?.matches;
-  if(page)void navigate({results_offset:Math.max(0,page.offset+direction*page.size)});
+  if(page && !searchChanged(draftSearch()))void navigate({results_offset:Math.max(0,page.offset+direction*page.size)});
 }
 
 function renderFileList() {
@@ -644,9 +673,10 @@ pathFilter.addEventListener("input", () => {
   clearTimeout(filterTimer);
   updateClearFilters();
   renderSearchScope();
+  renderSearchError();
   filterTimer = setTimeout(() => navigate({}), 160);
 });
-searchWithin.addEventListener("change",()=>void navigate({}));
+for(const option of [searchWithin,searchRegex,searchCase])option.addEventListener("change",()=>void navigate({}));
 element("match-previous").addEventListener("click",()=>changeMatchPage(-1));
 element("match-next").addEventListener("click",()=>changeMatchPage(1));
 clearFilters.addEventListener("click", () => {
