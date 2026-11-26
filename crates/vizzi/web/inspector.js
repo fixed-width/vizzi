@@ -14,7 +14,7 @@ export function createInspector({ source, space, outline, transport, select, onE
   const outlineSpace = outline.ownerDocument.createElement("div"); outline.replaceChildren(outlineSpace);
   outline.setAttribute("role","list"); outline.setAttribute("aria-label","Declarations");
   outline.style.maxHeight = `${180 * OUTLINE_ROW}px`; source.style.maxHeight = `${64 * SOURCE_ROW}px`;
-  let view, data, sourceRows = new Map(), entries = new Map(), cursor = 0, scheduled = false, queuedActivation = false;
+  let view, outlineRows, sourceRows = new Map(), entries = new Map(), cursor = 0, scheduled = false, queuedActivation = false;
   let columnLine, column = 0;
   let actionsByLine = new Map(), actionRequest;
   const sourceNodes = new Map(), outlineNodes = new Map();
@@ -76,7 +76,12 @@ export function createInspector({ source, space, outline, transport, select, onE
       renderSource();
     }).catch(()=>{}).finally(()=>{if(actionRequest===request)actionRequest=undefined;});
   }
-  function accept(window, query, intent = {}, retainedFragment, reading) {
+  function coversOutlineViewport(rows) {
+    const first = Math.floor(outline.scrollTop / OUTLINE_ROW);
+    const end = Math.min(view.source.summary.declarations, Math.ceil((outline.scrollTop + outline.clientHeight) / OUTLINE_ROW));
+    return rows?.[0]?.index <= first && rows.at(-1).index >= end - 1;
+  }
+  function accept(window, query, intent = {}, retainedFragment, reading, preserveOutline = false) {
     const hadFocus=outline.contains(document.activeElement);
     if (intent.fragment) {
       for(const row of window.lines)sourceRows.set(row.number,row);
@@ -88,7 +93,10 @@ export function createInspector({ source, space, outline, transport, select, onE
       const row=sourceRows.get(retainedFragment.number);
       if(row && row.column===retainedFragment.column && row.end_column<retainedFragment.end_column)sourceRows.set(row.number,retainedFragment);
     }
-    data=window; entries=new Map(window.outline.map(row=>[row.index,row]));
+    if (!preserveOutline || coversOutlineViewport(window.outline) || !coversOutlineViewport(outlineRows)) {
+      outlineRows = window.outline;
+    }
+    entries = new Map(outlineRows.map(row => [row.index, row]));
     if(window.cursor)entries.set(window.cursor.index,window.cursor);
     cursor=window.cursor?.index ?? 0;
     renderSource(reading);renderOutline();
@@ -200,7 +208,7 @@ export function createInspector({ source, space, outline, transport, select, onE
     }
   }
   function covered(query) {
-    if(!data)return false;
+    if(!outlineRows)return false;
     const lines=view.source.summary.lines,decls=view.source.summary.declarations;
     const lastLine=Math.min(lines,Math.ceil(sourceReading(source.scrollTop+source.clientHeight).sourceTop/SOURCE_ROW)+16,query.line_start+95);
     const lastEntry=Math.min(decls,Math.ceil((outline.scrollTop+outline.clientHeight)/OUTLINE_ROW)+8,query.outline_start+199);
@@ -245,11 +253,12 @@ export function createInspector({ source, space, outline, transport, select, onE
       const active=next.source.summary.active;
       const restore=options.restore;
       const reveal=Boolean(options.reveal);
-      const sourceLine=options.line??(!restore&&active&&(changedSelection||reveal)?active.start_line:undefined);
+      const fromOutline = options.fromOutline && !changedFile;
+      const sourceLine=options.line??(!restore&&active&&(changedSelection||reveal||fromOutline)?active.start_line:undefined);
       const reading=sourceLine!==undefined?{sourceTop:Math.max(0,(sourceLine-4)*SOURCE_ROW)}:restore??(changedFile||reveal?{sourceTop:0}:sourceReading());
       const sourceTop=Math.max(0,Math.min(reading.sourceTop,next.source.summary.lines*SOURCE_ROW-(reflow?1:source.clientHeight)));
       let outlineTop=restore?restore.outlineTop:changedFile || reveal?0:outline.scrollTop;
-      if(!restore && (changedSelection || reveal) && active)outlineTop=Math.max(0,active.index*OUTLINE_ROW-outline.clientHeight/2);
+      if(!restore && !fromOutline && (changedSelection || reveal) && active)outlineTop=Math.max(0,active.index*OUTLINE_ROW-outline.clientHeight/2);
       outlineTop=Math.max(0,Math.min(outlineTop,next.source.summary.declarations*OUTLINE_ROW-outline.clientHeight));
       const query=ranges(sourceTop,outlineTop);query.cursor_index=changedFile?(active?.index ?? 0):changedSelection && active?active.index:cursor;
       if(reveal)query.cursor_index=active?.index ?? 0;
@@ -264,7 +273,9 @@ export function createInspector({ source, space, outline, transport, select, onE
       }
       const window=await reader.prepare(next,query,options);
       outlineTop+=(window.outline_start-query.outline_start)*OUTLINE_ROW;
-      return {...next,inspection:window,inspectionPosition:{sourceTop,sourceByte:reading.sourceByte,sourceLine,outlineTop,
+      const keepOutline = fromOutline && sameDocument && !restore;
+      return {...next,inspection:window,inspectionPosition:{sourceTop,sourceByte:reading.sourceByte,sourceLine,
+        outlineTop: keepOutline ? undefined : outlineTop,
         sourceLeft:restore?restore.sourceLeft:sameDocument && !reveal?source.scrollLeft:0,
         columnLine:restore?restore.columnLine:sameDocument && !reveal?columnLine:undefined,
         column:restore?restore.column:sameDocument && !reveal?column:0}};
@@ -272,23 +283,21 @@ export function createInspector({ source, space, outline, transport, select, onE
     apply(next) {
       const hadFocus=outline.contains(document.activeElement);
       const position=next.inspectionPosition;
-      const retainedFragment=view?.source?.id===next.source?.id && view?.source?.version===next.source?.version?sourceRows.get(position?.columnLine):undefined;
+      const sameDocument = view?.source?.id === next.source?.id && view?.source?.version === next.source?.version;
+      const retainedFragment = sameDocument ? sourceRows.get(position?.columnLine) : undefined;
       view=next;queuedActivation=false;reader.activate(view);
       if(!sourceNodes.size)space.replaceChildren();if(!outlineNodes.size)outlineSpace.replaceChildren();sizes();
       if(next.inspection){
+        const preserveOutline = sameDocument && position.outlineTop === undefined;
         if(!reflow)source.scrollTop=position.sourceTop;
-        outline.scrollTop=position.outlineTop;columnLine=position.columnLine;column=position.column;
-        accept(next.inspection,{},{},retainedFragment,reflow?position:undefined);
+        if (position.outlineTop !== undefined) outline.scrollTop = position.outlineTop;
+        columnLine=position.columnLine;column=position.column;
+        accept(next.inspection, {}, {}, retainedFragment, reflow ? position : undefined, preserveOutline);
         source.scrollLeft=position.sourceLeft;
-        if(reflow)schedule();
+        if (reflow || preserveOutline) schedule();
       }
-      else {refreshActions();data=null;sourceRows=new Map();entries=new Map();cursor=0;columnLine=undefined;column=0;renderSource();renderOutline();}
+      else {refreshActions();outlineRows=undefined;sourceRows=new Map();entries=new Map();cursor=0;columnLine=undefined;column=0;renderSource();renderOutline();}
       if(hadFocus && !view.source?.summary.declarations)outline.focus({preventScroll:true});
-    },
-    async revealActive() {
-      const active=view?.source?.summary.active;if(!active)return;
-      restoreSource({sourceTop:Math.max(0,(active.start_line-4)*SOURCE_ROW),sourceLine:reflow?active.start_line:undefined});revealOutline(active.index);
-      const query=ranges();if(!covered(query))await reader.request(query,{});else {renderSource();renderOutline();}
     },
   };
 }

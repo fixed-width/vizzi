@@ -178,7 +178,7 @@ element("start-index").addEventListener("click",()=>startup.activate());
 const inspector = createInspector({
   source,space,outline,transport:fetchJSON,reflow:true,
   onError:error=>{showError(error);updates?.restart();},
-  select:async fact=>{if(await navigate({entity:fact.id}))await inspector.revealActive();},
+  select: fact => navigate({entity: fact.id}, undefined, {fromOutline: true}),
   loadActions:async (captured,window,signal)=>{
     if(!captured.source.summary.declarations)return [];
     const post=async (path,body,signal)=>{
@@ -236,7 +236,7 @@ function searchChanged({filter="",types="",search_directory=null,search_regex=fa
   return filter!==viewFilter || types!==viewTypes || search_directory!==viewSearchDirectory ||
     search_regex!==viewSearchRegex || search_case_sensitive!==viewSearchCase;
 }
-function navigate(patch, anchor) {
+function navigate(patch, anchor, {fromOutline = false} = {}) {
   editorFiles.manual();
   clearTimeout(filterTimer);
   updateClearFilters();
@@ -247,7 +247,7 @@ function navigate(patch, anchor) {
   const map=filter && changed ? {directory:query.search_directory ?? ".",offset:0}
     : !filter && searchOrigin ? {directory:searchOrigin.directory,offset:searchOrigin.offset} : {};
   return navigation.navigate({...query, ...map,
-    ...(changed ? {results_offset:0} : {}), ...patch},anchor,{replaceHistory:false});
+    ...(changed ? {results_offset:0} : {}), ...patch},anchor,{replaceHistory:false,fromOutline});
 }
 function openDirectory(directory) {
   if(view?.matches && view.browse){
@@ -285,7 +285,11 @@ const controller = createController({
     }
     const next=await fetchJSON(url,options);
     const restore=navigation.restoration(next,options.intent);
-    return inspector.prepare(next,{...options,restore:restore?.position.inspector,line:options.intent?.anchor?.line,reveal:Boolean(options.intent?.anchor || options.intent?.returning && !restore)});
+    return inspector.prepare(next, {
+      ...options, restore: restore?.position.inspector, line: options.intent?.anchor?.line,
+      reveal: Boolean(options.intent?.anchor || options.intent?.returning && !restore),
+      fromOutline: options.intent?.fromOutline,
+    });
   },
   onView: (next,info) => {
     const previousSelection=view?.selection.file;

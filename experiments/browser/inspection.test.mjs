@@ -31,7 +31,7 @@ async function fixture(path="big.rs") {
     window.errors=[];window.activations=[];window.requests=[];
     window.transport=async(uri,options)=>{window.requests.push(uri);const response=await fetch(uri,options);if(!response.ok)throw new Error(await response.text());return response.json();};
     window.widget=createInspector({source:document.getElementById("source"),space:document.getElementById("source-space"),outline:document.getElementById("outline"),transport:window.transport,onError:e=>window.errors.push(e.message),select:async fact=>{
-      window.activations.push(fact.id);const next=await window.transport(`/api/view?projection=summary&file=${window.current.source.id}&entity=${fact.id}`);window.current=await window.widget.prepare(next);window.widget.apply(window.current);await window.widget.revealActive();
+      window.activations.push(fact.id);const next=await window.transport(`/api/view?projection=summary&file=${window.current.source.id}&entity=${fact.id}`);window.current=await window.widget.prepare(next,{fromOutline:true});window.widget.apply(window.current);
     }});
     const view=await window.transport(`/api/view?projection=summary&filter=${path}`);window.current=await window.widget.prepare(view);window.widget.apply(window.current);
     window.refresh=async()=>{const next=await window.transport(`/api/view?projection=summary&file=${window.current.source.id}`);window.current=await window.widget.prepare(next);window.widget.apply(window.current);};
