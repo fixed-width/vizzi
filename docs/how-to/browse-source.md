@@ -45,8 +45,10 @@ restores the default order and expansion.
 Enter a file path or a name such as `read_file` in **Find source**. You can also
 enter a qualified name such as `Reader::read_file`. The map narrows to matching
 files. Expand **Matches** below the map to choose a file or jump to a declaration.
-Select a match to read its source while keeping the other matches available. A file
-with several matching declarations has one tile and a row for each declaration.
+Scroll down in the list to load more matches. You can also focus the list and use
+Page Down or End. If loading fails, select **Retry loading matches**. Select a match
+to read its source while keeping the other matches available. A file with several
+matching declarations has one tile and a row for each declaration.
 
 Select **Match case** to distinguish names such as `Reader` and `reader`. Select
 **Regex** to enter a regular expression such as `^read_.*$` for declaration names

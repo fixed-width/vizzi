@@ -5,7 +5,7 @@ import {buildHost, browser, paint, startHost, workspace} from './support.mjs';
 if (!process.argv.includes('--no-build')) buildHost();
 const files = {
   'engine/input.rs': 'pub mod reader {\n    pub fn read_file() {}\n    pub fn read_file_extra() {}\n}\n' +
-    Array.from({length:27}, (_, i) => `fn paged_name_${String(i).padStart(2,'0')}() {}\n`).join(''),
+    Array.from({length:53}, (_, i) => `fn paged_name_${String(i).padStart(2,'0')}() {}\n`).join(''),
   'tools/run.py': 'def read_file():\n    pass\n',
 };
 let deepDirectory = 'z-deep';
@@ -17,9 +17,10 @@ const deepFile = `${deepDirectory}/leaf.rs`;
 files[deepFile] = 'fn deep_candidate() {}\n';
 const input = await workspace({files});
 let host, chromium;
-async function withSearch(run) {
-  const page = await chromium.newPage({viewport:{width:1280,height:960}});
+async function withSearch(run, options = {}) {
+  const page = await chromium.newPage({viewport:{width:1280,height:960}, ...options});
   try {
+    page.setDefaultTimeout(10000);
     await page.goto(host.url);
     await page.locator('#file-title').getByText('engine/input.rs', {exact:true}).waitFor();
     await run(page, page.getByRole('searchbox', {name:'Find source'}),
@@ -79,9 +80,14 @@ try {
   await matches.getByRole('button', {name:/file input\.rs engine\/input\.rs/}).waitFor();
   assert.equal(await matches.getByRole('button').count(), 1);
   await search.fill('paged_name');
-  await page.getByRole('button', {name:'Next matches'}).click();
+  await matches.getByText('paged_name_23', {exact:true}).waitFor();
+  assert.equal(await matches.getByRole('button').count(), 24);
+  const searchVisit = await page.evaluate(() => history.state);
+  await matches.hover();
+  await page.mouse.wheel(0, 2000);
   await matches.getByText('paged_name_24', {exact:true}).waitFor();
-  assert.equal(await matches.getByRole('button').count(), 3);
+  assert.equal(await matches.getByRole('button').count(), 48);
+  assert.deepEqual(await page.evaluate(() => history.state), searchVisit);
   assert.deepEqual(await page.evaluate(() => window.vizziMetrics.scene.files.map(file => file.path)), ['engine/input.rs']);
   await search.fill('');
   await page.locator('#source-matches').waitFor({state:'hidden'});
@@ -167,12 +173,144 @@ try {
     assert.equal(await matchCase.isChecked(), true);
   }));
 
-  await test('changing a search mode returns to the first results page', () => withSearch(async (page, search, matches) => {
+  await test('keyboard scrolling appends ranked results and opening a match preserves the list', () => withSearch(async (page, search, matches) => {
+    const offsets = [];
+    page.on('request', request => {
+      const url = new URL(request.url());
+      const offset = Number(url.searchParams.get('results_offset'));
+      if (url.pathname === '/api/view' && offset) offsets.push(offset);
+    });
     await search.fill('paged_name');
-    await page.getByRole('button', {name:'Next matches'}).click();
+    await matches.getByText('paged_name_23', {exact:true}).waitFor();
+    await matches.press('End');
     await matches.getByText('paged_name_24', {exact:true}).waitFor();
-    await page.getByRole('checkbox', {name:'Match case',exact:true}).check();
-    await matches.getByText('paged_name_00', {exact:true}).waitFor();
+    await matches.press('End');
+    const last = matches.getByRole('button', {name:/function paged_name_52 /});
+    await last.waitFor();
+    assert.deepEqual(await matches.locator('code').allTextContents(),
+      Array.from({length:53}, (_, i) => `paged_name_${String(i).padStart(2,'0')}`));
+    assert.deepEqual(offsets, [24, 48]);
+    assert.equal(await page.getByRole('navigation', {name:'Source match pages'}).count(), 0);
+
+    await matches.press('End');
+    await last.focus();
+    const scrollTop = await matches.evaluate(list => list.scrollTop);
+    await last.press('Enter');
+    await page.locator('#outline [aria-current="true"] .declaration-name').getByText('paged_name_52', {exact:true}).waitFor();
+    assert.equal(await last.getAttribute('aria-current'), 'location');
+    assert.equal(await last.evaluate(button => button === document.activeElement), true);
+    assert.equal(await matches.evaluate(list => list.scrollTop), scrollTop);
+    await page.getByRole('button', {name:'Back',exact:true}).click();
+    await page.waitForFunction(() => document.querySelector('#navigation').getAttribute('aria-busy') === 'false' &&
+      !document.querySelector('#match-list [aria-current="location"]'));
+    assert.equal(await matches.getByRole('button').count(), 53);
+    assert.deepEqual(offsets, [24, 48]);
+  }));
+
+  await test('changing a search mode resets scrolling and discards a pending page', {timeout:15000}, () => withSearch(async (page, search, matches) => {
+    const pending = Promise.withResolvers(), release = Promise.withResolvers();
+    let requests = 0;
+    await page.route('**/api/view?**', async route => {
+      const query = new URL(route.request().url()).searchParams;
+      if (query.get('results_offset') !== '48') return route.continue();
+      requests++;
+      const response = await route.fetch();
+      pending.resolve();
+      await release.promise;
+      await route.fulfill({response});
+    });
+    try {
+      await search.fill('paged_name');
+      await matches.getByText('paged_name_23', {exact:true}).waitFor();
+      await matches.press('End');
+      await matches.getByText('paged_name_47', {exact:true}).waitFor();
+      await matches.press('End');
+      await pending.promise;
+      await matches.press('PageUp');
+      await matches.press('End');
+      await paint(page);
+      assert.equal(requests, 1);
+      await page.getByRole('checkbox', {name:'Match case',exact:true}).check();
+      await matches.getByText('paged_name_47', {exact:true}).waitFor({state:'detached'});
+      release.resolve();
+      await paint(page);
+      assert.equal(await matches.getByRole('button').count(), 24);
+      assert.equal(await matches.evaluate(list => list.scrollTop), 0);
+    } finally {
+      release.resolve();
+    }
+  }));
+
+  await test('tapping Retry restores a failed page even after scrolling back to the top', {timeout:15000}, () => withSearch(async (page, search, matches) => {
+    const pending = Promise.withResolvers(), release = Promise.withResolvers();
+    let attempts = 0;
+    await page.route('**/api/view?**', async route => {
+      if (new URL(route.request().url()).searchParams.get('results_offset') === '24' && ++attempts === 1) {
+        pending.resolve();
+        await release.promise;
+        await route.fulfill({status:503,body:'Source temporarily unavailable'});
+      } else {
+        await route.continue();
+      }
+    });
+    try {
+      await search.fill('paged_name');
+      await matches.getByText('paged_name_23', {exact:true}).waitFor();
+      await matches.evaluate(list => list.scrollTop = list.scrollHeight);
+      await pending.promise;
+      await matches.evaluate(list => list.scrollTop = 0);
+      release.resolve();
+      const retry = page.getByRole('button', {name:'Retry loading matches',exact:true});
+      await retry.waitFor();
+      assert.equal(await matches.getByRole('button').count(), 24);
+      await retry.tap();
+      await matches.getByText('paged_name_24', {exact:true}).waitFor();
+      await retry.waitFor({state:'hidden'});
+      assert.equal(await matches.evaluate(list => list.scrollTop), 0);
+      assert.equal(attempts, 2);
+    } finally {
+      release.resolve();
+    }
+  }, {hasTouch:true}));
+
+  await test('restoring a draft search resumes pagination at the bottom', {timeout:15000}, () => withSearch(async (page, search, matches) => {
+    const pageReady = Promise.withResolvers(), releasePage = Promise.withResolvers();
+    const releaseOtherSearch = Promise.withResolvers();
+    let attempts = 0;
+    await page.route('**/api/view?**', async route => {
+      const query = new URL(route.request().url()).searchParams;
+      if (query.get('filter') === 'read_file') {
+        await releaseOtherSearch.promise;
+      } else if (query.get('results_offset') === '24' && ++attempts === 1) {
+        const response = await route.fetch();
+        pageReady.resolve();
+        await releasePage.promise;
+        return route.fulfill({response});
+      }
+      await route.continue();
+    });
+    try {
+      await search.fill('paged_name');
+      await matches.getByText('paged_name_23', {exact:true}).waitFor();
+      await matches.evaluate(list => list.scrollTop = list.scrollHeight);
+      await pageReady.promise;
+      const otherSearch = page.waitForRequest(request => {
+        const url = new URL(request.url());
+        return url.pathname === '/api/view' && url.searchParams.get('filter') === 'read_file';
+      });
+      await search.fill('read_file');
+      await otherSearch;
+      releasePage.resolve();
+      await page.waitForFunction(() => document.querySelector('#match-list').getAttribute('aria-busy') === 'false');
+      assert.equal(await matches.getByRole('button').count(), 24);
+
+      await search.fill('paged_name');
+      await matches.getByText('paged_name_24', {exact:true}).waitFor();
+      assert.equal(attempts, 2);
+    } finally {
+      releasePage.resolve();
+      releaseOtherSearch.resolve();
+    }
   }));
 
   await test('opening a match preserves search text typed while the response is in flight', () => withSearch(async (page, search, matches) => {

@@ -57,6 +57,7 @@ remains in Git and the project documentation.
 
 ### Changed
 
+- Load more **Find source** matches as you scroll the list, keeping earlier matches available.
 - Place **Fit width** before **Fit height** on code bubbles.
 - Color and smart-wrap captured excerpts in the Saved locations inspector. Excerpts
   use the shared **Code layout** setting.

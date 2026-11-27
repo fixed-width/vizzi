@@ -19,10 +19,10 @@ map and the Matches list show the same search at file and declaration granularit
    **Clear filters** is available when there is search text or a file-type selection.
    It clears both and keeps the search options.
 3. The map shows one tile per matching file, with paging where required. The compact,
-   collapsible **Matches** list appears below it during search. List pages include one
-   row for each matching file path or declaration. Literal searches rank exact
-   names ahead of partial matches. Each declaration row displays its kind,
-   qualified name, path and line.
+   collapsible **Matches** list appears below it during search. Scrolling near the
+   end of the list appends more matches, one row per matching file path or declaration.
+   Literal searches rank exact names ahead of partial matches. Each declaration row
+   displays its kind, qualified name, path and line.
 4. Selecting a tile opens its file; selecting a row reveals its exact captured file
    or declaration with the file selected on the map. Both actions enter the reading
    trail for a new location and keep the results available. If the selected tile is

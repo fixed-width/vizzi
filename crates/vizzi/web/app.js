@@ -23,6 +23,8 @@ installAppHeader(header);
 const element = id => document.getElementById(id);
 const pathFilter = element("filter"), clearFilters = element("clear-filters");
 const searchWithin = element("search-within"), matchPanel = element("source-matches");
+const matchList = element("match-list"), matchCount = element("match-count");
+const matchRetry = element("retry-matches");
 const searchRegex = element("search-regex"), searchCase = element("search-match-case");
 const searchError = element("search-error");
 const canvas = element("map"), context = canvas.getContext("2d");
@@ -73,6 +75,7 @@ let updates, viewFilter = "",mapModel,scene,mapWorkspace;
 let viewTypes = "", selectedTypes = new Set();
 let browseMap, searchOrigin, viewSearchDirectory = null;
 let viewSearchRegex = false, viewSearchCase = false;
+let matchResults;
 const dismissible=new Set(["navigation-notice","error","map-notice"]);
 const messages=Object.fromEntries([["status","workspace status"],["navigation-notice","navigation notice"],["coverage","source status"],["diagnostics","source diagnostics"],["error","workspace error"],["map-notice","map notice"]].map(([id,label])=>[id,dismissible.has(id)?createMessage(element(id),{label:`Dismiss ${label}`}):textRow(element(id))]));
 let palette=mapPalette(canvas);
@@ -216,7 +219,7 @@ const navigation = createNavigation({
     path:view?.source?.path ?? null,version:view?.source?.version ?? null,snapshot:view?.snapshot ?? null,
     filter:viewFilter,types:viewTypes,directory:view?.browse?.directory ?? ".",offset:view?.browse?.offset ?? 0,
     find:true,searchDirectory:viewSearchDirectory,searchRegex:viewSearchRegex,searchCaseSensitive:viewSearchCase,
-    resultsOffset:view?.matches?.offset ?? 0,searchOrigin,
+    searchOrigin,
     position:{inspector:inspector.position(),...mapPosition()} }),
   load: (query,intent) => controller.load(query,{intent,rollbackOnFailure:Boolean(intent.returning || intent.anchor)}),
   prepare: (query,intent,signal) => controller.prepare(query,{intent,signal,rollbackOnFailure:true}),
@@ -244,10 +247,10 @@ function navigate(patch, anchor, {fromOutline = false} = {}) {
   if(filter && !searchOrigin)searchOrigin={directory:scene?.focus ?? ".",offset:view?.browse?.offset ?? 0,position:mapPosition()};
   const query=draftSearch(), changed=searchChanged(query);
   if(changed)renderSearchError();
+  else void loadMoreMatches();
   const map=filter && changed ? {directory:query.search_directory ?? ".",offset:0}
     : !filter && searchOrigin ? {directory:searchOrigin.directory,offset:searchOrigin.offset} : {};
-  return navigation.navigate({...query, ...map,
-    ...(changed ? {results_offset:0} : {}), ...patch},anchor,{replaceHistory:false,fromOutline});
+  return navigation.navigate({...query, ...map, ...patch},anchor,{replaceHistory:false,fromOutline});
 }
 function openDirectory(directory) {
   if(view?.matches && view.browse){
@@ -273,7 +276,6 @@ const controller = createController({
     if(current && file && file!==current.selection.file && snapshot===current.snapshot &&
        options.intent?.before && !options.intent.anchor && !url.searchParams.has("entity") &&
        !searchChanged(options.query) &&
-       Number(url.searchParams.get("results_offset"))===(current.matches?.offset ?? 0) &&
        url.searchParams.get("directory")===(current.browse?.directory ?? ".") &&
        Number(url.searchParams.get("offset"))===(current.browse?.offset ?? 0)) {
       const query=new URLSearchParams({file,snapshot});
@@ -383,7 +385,7 @@ const editorFiles=installWorkspaceDelivery({mode:'file',
   prepare:async(action,{signal,replaceHistory})=>{
     if(action.kind==='reveal')return {commit(){}};
     clearTimeout(filterTimer);
-    return navigation.prepare({file:action.file,entity:null,filter:'',types:'',search_directory:null,results_offset:0},action,{signal,replaceHistory});
+    return navigation.prepare({file:action.file,entity:null,filter:'',types:'',search_directory:null},action,{signal,replaceHistory});
   },failed:showError,changed:pending=>{if(!pending && view)navigation.observe();}});
 function showError(error) { messages.error.show(`${error.message || error} · ${view?"Keeping the last captured view; retrying.":"No source observation is available. Retry indexing."}`); }
 
@@ -456,51 +458,94 @@ function renderMatches(next) {
   const page=next.matches;
   matchPanel.hidden=!page || Boolean(page.error);
   renderSearchError(searchChanged(draftSearch()) ? undefined : page?.error);
-  if(matchPanel.hidden)return;
-  const list=element("match-list");
-  const key=JSON.stringify([next.snapshot,viewFilter,viewTypes,viewSearchDirectory,viewSearchRegex,viewSearchCase,page.offset]);
-  if(list.dataset.page!==key){
-    list.dataset.page=key;
-    list.replaceChildren(...page.items.map(result=>{
-      const row=document.createElement("li"),button=document.createElement("button");
-      button.type="button";
-      button.className="match-row";
-      const kind=document.createElement("span"),name=document.createElement("code"),path=document.createElement("small");
-      kind.classList.add("kind-badge");
-      if(["function","module","type","constant"].includes(result.kind))kind.classList.add(`kind-${result.kind}`);
-      kind.textContent=result.kind;
-      name.textContent=result.name;
-      path.textContent=result.entity ? `${result.path}:${result.line}` : result.path;
-      button.title=`${result.name}\n${path.textContent}`;
-      button.append(kind,name,path);
-      button.onclick=()=>{
-        if(searchChanged(draftSearch()))return;
-        void navigate({file:result.file,entity:result.entity,reveal_match:true},
-          {snapshot:next.snapshot,file:result.file,version:result.version,entity:result.entity,line:result.line});
-      };
-      row.append(button);
-      return row;
-    }));
-    list.scrollTop=0;
+  const key=matchPanel.hidden ? undefined : JSON.stringify([
+    next.workspace,next.snapshot,viewFilter,viewTypes,viewSearchDirectory,viewSearchRegex,viewSearchCase,
+  ]);
+  if(matchResults?.key!==key){
+    matchResults?.request?.abort();
+    matchList.scrollTo({top:0,behavior:"instant"});
+    matchList.replaceChildren();
+    matchResults=key ? {key,snapshot:next.snapshot,total:page.total,size:page.size,items:[],selection:next.selection} : undefined;
+    if(matchResults)appendMatches(matchResults,page.items);
+    renderMatchProgress();
+  }else if(matchResults && (matchResults.selection.file!==next.selection.file || matchResults.selection.entity!==next.selection.entity)){
+    matchResults.selection=next.selection;
+    matchResults.items.forEach((result,index)=>markCurrentMatch(matchList.children[index].firstElementChild,result,next.selection));
   }
-  page.items.forEach((result,index)=>{
-    const active=result.file===next.selection.file && result.entity===next.selection.entity;
-    list.children[index].firstElementChild.setAttribute("aria-current",active?"location":"false");
-  });
-  const end=page.offset+page.items.length;
-  const count=page.total>page.size ? `${page.offset+1}–${end} of ${page.total.toLocaleString()}`
-    : page.total ? page.total.toLocaleString() : "No matches";
-  if(element("match-count").textContent!==count)element("match-count").textContent=count;
-  element("match-pages").hidden=page.total<=page.size;
-  const focused=document.activeElement;
-  element("match-previous").disabled=page.offset===0;
-  element("match-next").disabled=end>=page.total;
-  if(focused?.disabled && focused.parentElement===element("match-pages"))list.querySelector("button")?.focus();
 }
 
-function changeMatchPage(direction) {
-  const page=view?.matches;
-  if(page && !searchChanged(draftSearch()))void navigate({results_offset:Math.max(0,page.offset+direction*page.size)});
+function markCurrentMatch(button,result,selection) {
+  const active=result.file===selection.file && result.entity===selection.entity;
+  button.setAttribute("aria-current",active?"location":"false");
+}
+
+function appendMatches(results,items) {
+  const {snapshot,selection}=results;
+  matchList.append(...items.map(result=>{
+    const row=document.createElement("li"),button=document.createElement("button");
+    button.type="button";
+    button.className="match-row";
+    const kind=document.createElement("span"),name=document.createElement("code"),path=document.createElement("small");
+    kind.classList.add("kind-badge");
+    if(["function","module","type","constant"].includes(result.kind))kind.classList.add(`kind-${result.kind}`);
+    kind.textContent=result.kind;
+    name.textContent=result.name;
+    path.textContent=result.entity ? `${result.path}:${result.line}` : result.path;
+    button.title=`${result.name}\n${path.textContent}`;
+    button.append(kind,name,path);
+    markCurrentMatch(button,result,selection);
+    button.onclick=()=>{
+      if(searchChanged(draftSearch()))return;
+      void navigate({file:result.file,entity:result.entity,reveal_match:true},
+        {snapshot,file:result.file,version:result.version,entity:result.entity,line:result.line});
+    };
+    row.append(button);
+    return row;
+  }));
+  results.items.push(...items);
+}
+
+function renderMatchProgress() {
+  const busy=String(Boolean(matchResults?.request));
+  matchList.setAttribute("aria-busy",busy);
+  matchRetry.setAttribute("aria-disabled",busy);
+  if(!matchResults?.failed && document.activeElement===matchRetry){
+    (matchResults?.items.length ? matchList : pathFilter).focus({preventScroll:true});
+  }
+  matchRetry.hidden=!matchResults?.failed;
+  if(!matchResults){matchCount.textContent="";return;}
+  const {total,items,request,failed}=matchResults;
+  const count=items.length<total ? `${items.length.toLocaleString()} of ${total.toLocaleString()}`
+    : total ? total.toLocaleString() : "No matches";
+  const status=request ? " · Loading more…" : failed ? " · Could not load more matches." : "";
+  if(matchCount.textContent!==count+status)matchCount.textContent=count+status;
+}
+
+async function loadMoreMatches({retry=false}={}) {
+  const results=matchResults;
+  if(!results || results.request || results.items.length>=results.total || !matchPanel.open || !matchList.clientHeight)return;
+  if(retry ? !results.failed : results.failed || matchList.scrollHeight-matchList.scrollTop-matchList.clientHeight>96)return;
+  const query=draftSearch();
+  if(searchChanged(query))return;
+  const offset=results.items.length;
+  const params=new URLSearchParams({...query,find:"true",projection:"summary",limit:"1",snapshot:results.snapshot,results_offset:String(offset)});
+  if(!query.search_directory)params.delete("search_directory");
+  const request=results.request=new AbortController();
+  renderMatchProgress();
+  try{
+    const next=await fetchJSON(`/api/view?${params}`,{signal:request.signal});
+    if(matchResults!==results || searchChanged(draftSearch()))return;
+    const page=next.matches;
+    if(next.schema!==3 || next.snapshot!==results.snapshot || !page || page.error || page.offset!==offset ||
+      page.total!==results.total || page.items?.length!==Math.min(results.size,results.total-offset))throw new Error("Mismatched search results");
+    appendMatches(results,page.items);
+    results.failed=false;
+  }catch{
+    if(matchResults===results && !searchChanged(draftSearch()))results.failed=true;
+  }finally{
+    results.request=undefined;
+    if(matchResults===results)renderMatchProgress();
+  }
 }
 
 function renderFileList() {
@@ -688,8 +733,8 @@ pathFilter.addEventListener("input", () => {
   filterTimer = setTimeout(() => navigate({}), 160);
 });
 for(const option of [searchWithin,searchRegex,searchCase])option.addEventListener("change",()=>void navigate({}));
-element("match-previous").addEventListener("click",()=>changeMatchPage(-1));
-element("match-next").addEventListener("click",()=>changeMatchPage(1));
+matchList.addEventListener("scroll",()=>void loadMoreMatches());
+matchRetry.addEventListener("click",()=>void loadMoreMatches({retry:true}));
 clearFilters.addEventListener("click", () => {
   const hadTypeFilters = selectedTypes.size > 0;
   pathFilter.value = "";
