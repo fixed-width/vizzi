@@ -71,7 +71,7 @@ summary { cursor: pointer; }
 #source-matches summary { font-weight:650; }
 #match-count { margin-left:5px; color:var(--subdued); font-weight:400; }
 #retry-matches { margin-top:4px; padding:5px 8px; }
-#match-list { position:relative; list-style:none; padding:3px; margin:4px -3px 0; max-height:clamp(68px,19vh,170px); overflow:auto; }
+#match-list { list-style:none; padding:3px; margin:4px -3px 0; max-height:clamp(68px,19vh,170px); overflow:auto; }
 #match-list:empty { display:none; }
 .match-row { display:grid; grid-template-columns:max-content minmax(0,1fr); align-items:baseline; gap:2px 7px; width:100%; padding:4px 6px; border:0; background:transparent; text-align:left; }
 .match-row[aria-current="location"] { background:var(--selected-bg); color:var(--selected-text); }

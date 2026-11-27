@@ -597,16 +597,20 @@ function insertMatches(results,items,before=false) {
 
 function matchReading(results) {
   if(results.anchor)return results.anchor;
-  const top=matchList.scrollTop;
-  const index=Array.prototype.findIndex.call(matchList.children,row=>row.offsetTop+row.offsetHeight>top);
-  if(index>=0)return {rank:results.start+index,inset:top-matchList.children[index].offsetTop};
+  const top=matchList.getBoundingClientRect().top+matchList.clientTop;
+  const index=Array.prototype.findIndex.call(matchList.children,row=>row.getBoundingClientRect().bottom>top);
+  if(index>=0)return {rank:results.start+index,inset:top-matchList.children[index].getBoundingClientRect().top};
+}
+
+function matchRowOffset(row) {
+  return row.getBoundingClientRect().top-matchList.getBoundingClientRect().top-matchList.clientTop+matchList.scrollTop;
 }
 
 function restoreMatchReading(results) {
   const {rank,inset}=results.anchor;
   const row=matchList.children[rank-results.start];
   if(!row || !matchList.clientHeight)return;
-  const top=row.offsetTop+inset;
+  const top=matchRowOffset(row)+inset;
   if(results.start+results.items.length<results.total && top+matchList.clientHeight>matchList.scrollHeight)return;
   results.anchor=undefined;
   matchList.scrollTop=top;
@@ -675,10 +679,10 @@ async function loadMoreMatches({retry=false}={}) {
       restoreMatchReading(results);
     }else if(offset<start){
       const first=matchList.firstElementChild;
-      const inset=matchList.scrollTop-first.offsetTop;
+      const inset=matchList.scrollTop-matchRowOffset(first);
       insertMatches(results,items,true);
       results.start=offset;
-      matchList.scrollTop=first.offsetTop+inset;
+      matchList.scrollTop=matchRowOffset(first)+inset;
     }else insertMatches(results,items);
     results.failedOffset=undefined;
     loaded=true;
