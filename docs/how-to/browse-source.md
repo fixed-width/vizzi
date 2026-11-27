@@ -80,9 +80,10 @@ and use Left/Right, Shift for a larger step, or Home/End for its limits. Width p
 persist locally when browser storage is available.
 
 Use the view's **Back**/**Forward**, or browser history, to return to an accepted file,
-declaration and reading position. This is a browsing trail, not the visual task shelf;
-reload starts a new trail. Changed or missing source is identified instead of silently
-substituting another location.
+declaration and reading position. Returning through the header or reloading in the same
+tab restores your current selection, search, and reading position as the start of a
+new browsing trail. If the file changed while you were away, Vizzi opens its current
+capture. If the file disappeared, Vizzi reports that the previous selection is unavailable.
 
 Use **Save location** to retain a source anchor. [Saved locations](investigate-with-vscode.md)
 explains notes, editor handoff and optional persistence.

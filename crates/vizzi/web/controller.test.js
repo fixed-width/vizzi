@@ -39,6 +39,20 @@ test("a rejected return rolls back its query and still refreshes the current vie
   assert.deepEqual(displayed.map(v=>[v.selection.file,v.snapshot]),[["a","s1"],["a","s2"]]);
 });
 
+test("rejecting a remembered startup query loads the default view", async () => {
+  const requests=[],displayed=[];
+  const c=createController({initialQuery:{file:"previous",filter:"name"},
+    transport:async uri=>{
+      const query=new URL(uri,"http://local").searchParams;
+      requests.push(Object.fromEntries(query));
+      return view(query.get("file") ?? "first");
+    },acceptView:next=>next.selection.file!=="previous",onView:next=>displayed.push(next.selection.file)});
+  c.updates().receive(change());
+  await flush();
+  assert.deepEqual(requests,[{file:"previous",filter:"name",snapshot:"s1"},{snapshot:"s1"}]);
+  assert.deepEqual(displayed,["first"]);
+});
+
 test("return transport errors roll back intent while ordinary failed selections remain retryable", async () => {
   const calls=[],errors=[];let fail=false;
   const c=createController({transport:async(uri,options)=>{calls.push({uri,options});if(fail)throw new Error("offline");return view("a");},onError:e=>errors.push(e)});

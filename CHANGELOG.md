@@ -77,6 +77,8 @@ remains in Git and the project documentation.
 
 ### Fixed
 
+- Restore the Source browser's selection, reading position, search and map when returning
+  from another view.
 - Use the full code bubble title, including namespaces, when saving or re-saving a
   location from the Call workspace.
 - Keep the Source browser’s Declarations pane at its current scroll position when

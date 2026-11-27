@@ -12,7 +12,7 @@ import { createController } from "/controller.js";
 import { followChanges } from "/updates.js";
 import { describeSource } from "/source-description.js";
 import { createInspector } from "/inspector.js";
-import { createNavigation } from "/navigation.js";
+import { createNavigation, locationQuery } from "/navigation.js";
 import { createStartup } from "/startup.js";
 import {installWorkspaceDelivery} from "/editor-delivery.js";
 import {createCallMenu,requestSourceActions} from "/call-actions.js";
@@ -25,6 +25,7 @@ const pathFilter = element("filter"), clearFilters = element("clear-filters");
 const searchWithin = element("search-within"), matchPanel = element("source-matches");
 const matchList = element("match-list"), matchCount = element("match-count");
 const matchRetry = element("retry-matches");
+const MATCH_SCROLL_MARGIN = 96;
 const searchRegex = element("search-regex"), searchCase = element("search-match-case");
 const searchError = element("search-error");
 const canvas = element("map"), context = canvas.getContext("2d");
@@ -211,16 +212,61 @@ function restoreMapPosition(position) {
   fitMode=position.fitMode ?? null;
   const old=position.mapSize;
   mapSize={width:canvas.clientWidth,height:canvas.clientHeight};
+  if(fitMode && (old?.width!==mapSize.width || old?.height!==mapSize.height)){
+    fit(fitMode==="readable");
+    return;
+  }
   if(old)camera=jumpCamera(camera,{x:(old.width/2-camera.x)/camera.scale,y:(old.height/2-camera.y)/camera.scale},mapSize.width,mapSize.height);
   invalidate();
 }
-const navigation = createNavigation({
-  capture: () => ({ file:view?.selection.file ?? null,entity:view?.selection.entity ?? null,
+function captureLocation() {
+  return {file:view?.selection.file ?? null,entity:view?.selection.entity ?? null,
     path:view?.source?.path ?? null,version:view?.source?.version ?? null,snapshot:view?.snapshot ?? null,
     filter:viewFilter,types:viewTypes,directory:view?.browse?.directory ?? ".",offset:view?.browse?.offset ?? 0,
     find:true,searchDirectory:viewSearchDirectory,searchRegex:viewSearchRegex,searchCaseSensitive:viewSearchCase,
     searchOrigin,
-    position:{inspector:inspector.position(),...mapPosition()} }),
+    position:{inspector:inspector.position(),...mapPosition()}};
+}
+const SOURCE_SESSION_KEY = "vizzi.source-browser.v1", SOURCE_SESSION_LIMIT = 256 * 1024;
+function readSourceSession() {
+  const link = new URLSearchParams(location.hash.slice(1));
+  if (link.has("editor-file") || link.has("vizzi-delivery")) return;
+  try {
+    const raw = sessionStorage.getItem(SOURCE_SESSION_KEY);
+    if (!raw || raw.length > SOURCE_SESSION_LIMIT) return;
+    const saved = JSON.parse(raw);
+    if (typeof saved?.workspace === "string" && typeof saved.location?.snapshot === "string" &&
+        typeof saved.location.filter === "string" && saved.location.position?.inspector &&
+        Number.isFinite(saved.location.position.camera?.scale)) return saved;
+  } catch {}
+}
+let sourceSession = readSourceSession();
+window.addEventListener("pagehide", () => {
+  if (!view) return;
+  try {
+    const saved = {workspace:view.workspace,location:captureLocation(),matchesOpen:matchPanel.open};
+    const map = mapModel.preferences();
+    if (JSON.stringify(map).length <= 65536) saved.map=map;
+    if (view.matches) {
+      const browsingMap = browseMap.preferences();
+      if (JSON.stringify(browsingMap).length <= 65536) saved.browseMap=browsingMap;
+    }
+    if (matchResults) {
+      const {total,start,items}=matchResults;
+      const matches={total,start,anchor:matchReading(matchResults)};
+      saved.matches=matches;
+      const extra=start===0 ? items.slice(view.matches.items.length) : items;
+      const withMatches = JSON.stringify({...saved,matches:{...matches,extra}});
+      if (withMatches.length <= SOURCE_SESSION_LIMIT) {
+        sessionStorage.setItem(SOURCE_SESSION_KEY,withMatches);
+        return;
+      }
+    }
+    sessionStorage.setItem(SOURCE_SESSION_KEY,JSON.stringify(saved));
+  } catch {}
+});
+const navigation = createNavigation({
+  capture: captureLocation,
   load: (query,intent) => controller.load(query,{intent,rollbackOnFailure:Boolean(intent.returning || intent.anchor)}),
   prepare: (query,intent,signal) => controller.prepare(query,{intent,signal,rollbackOnFailure:true}),
   history: {push:state=>history.pushState(state,""),replace:state=>history.replaceState(state,""),go:delta=>history.go(delta)},
@@ -267,7 +313,14 @@ function changePage(direction) {
 }
 const controller = createController({
   viewSchema: 3,
-  acceptView: (next,info) => navigation.allow(next,info.intent),
+  initialQuery: sourceSession ? locationQuery(sourceSession.location) : undefined,
+  acceptView: (next,info) => {
+    if (!view && !info.intent && sourceSession && next.workspace !== sourceSession.workspace) {
+      sourceSession=undefined;
+      return false;
+    }
+    return navigation.allow(next,info.intent);
+  },
   transport: async (uri, options) => {
     const url=new URL(uri,location.origin);
     url.searchParams.set("projection","summary");
@@ -286,7 +339,12 @@ const controller = createController({
       return inspector.prepare(next,{...options,initialWindow});
     }
     const next=await fetchJSON(url,options);
-    const restore=navigation.restoration(next,options.intent);
+    const saved=!current && !options.intent ? sourceSession : undefined;
+    if (saved && saved.workspace!==next.workspace) return next;
+    const savedLocation=saved?.location;
+    const sameLocation=savedLocation && next.source && next.source.id===savedLocation.file &&
+      next.source.version===savedLocation.version && next.selection.entity===savedLocation.entity;
+    const restore=navigation.restoration(next,options.intent) ?? (sameLocation ? savedLocation : undefined);
     return inspector.prepare(next, {
       ...options, restore: restore?.position.inspector, line: options.intent?.anchor?.line,
       reveal: Boolean(options.intent?.anchor || options.intent?.returning && !restore),
@@ -294,6 +352,11 @@ const controller = createController({
     });
   },
   onView: (next,info) => {
+    const resumed=!view && !info.intent ? sourceSession : undefined;
+    sourceSession=undefined;
+    const sameSnapshot=resumed?.location.snapshot===next.snapshot;
+    const sameSavedMap=sameSnapshot && resumed.map && resumed.location.directory===(next.browse?.directory ?? ".") &&
+      resumed.location.offset===(next.browse?.offset ?? 0);
     const previousSelection=view?.selection.file;
     const wasSearching=Boolean(view?.matches), searching=Boolean(next.matches);
     const types=info.query.types ?? "";
@@ -307,12 +370,13 @@ const controller = createController({
     viewSearchRegex=info.query.search_regex ?? false;
     viewSearchCase=info.query.search_case_sensitive ?? false;
     selectedTypes=new Set(viewTypes ? viewTypes.split(",") : []);
-    if(info.intent?.returning || info.intent?.editor){
+    if(info.intent?.returning || info.intent?.editor || resumed){
       pathFilter.value=viewFilter;
       searchRegex.checked=viewSearchRegex;
       searchCase.checked=viewSearchCase;
     }
-    if(info.intent?.returning && searching)searchOrigin=info.intent.target.searchOrigin;
+    if(searching && (info.intent?.returning || resumed))searchOrigin=(info.intent?.target ?? resumed.location).searchOrigin;
+    if(resumed)matchPanel.open=resumed.matchesOpen!==false;
     const leavingSearch=searching ? null : searchOrigin;
     const restoreSearchMap=wasSearching && leavingSearch && !info.intent?.returning && !info.intent?.anchor;
     if(!searching && !searchText())searchOrigin=null;
@@ -321,8 +385,9 @@ const controller = createController({
     if(mapWorkspace!==next.workspace){
       let preferences={};
       try{const saved=localStorage.getItem(`vizzi.map.v1.${next.workspace}`);if(saved && saved.length<=65536 && new TextEncoder().encode(saved).length<=65536)preferences=JSON.parse(saved);}catch{}
-      browseMap=createMapModel(searching?[]:next.files,preferences,searching?null:next.browse);
-      mapModel=searching?createMapModel(next.files,{},next.browse):browseMap;
+      const browsePreferences=searching ? resumed?.browseMap : sameSavedMap ? resumed.map : undefined;
+      browseMap=createMapModel(searching?[]:next.files,browsePreferences ?? preferences,searching?null:next.browse);
+      mapModel=searching?createMapModel(next.files,sameSavedMap?resumed.map:{},next.browse):browseMap;
       mapWorkspace=next.workspace;
     }
     else if(searching!==wasSearching){
@@ -331,14 +396,14 @@ const controller = createController({
     }
     else if(changedMap)mapModel.setFiles(next.files,next.browse);
     if(restoreSearchMap && !next.browse && !mapModel.focus(leavingSearch.directory))mapModel.focus(".");
-    if(searching && changedMapFilter && !next.browse)mapModel.focus(".");
+    if(searching && changedMapFilter && !next.browse && !sameSavedMap)mapModel.focus(".");
     const layoutRevision=mapModel.revision;
     const revealSelection=!restoreSearchMap && (!first && previousSelection!==next.selection.file || info.intent?.anchor);
     if(revealSelection)mapModel.reveal(next.selection.file,{focusDeep:searching});
     if(changedMap || mapModel.revision!==layoutRevision)refreshScene();
     element("empty").hidden = Boolean(next.matches?.error) || (next.browse?.entries ?? next.files.length) > 0;
     renderPage();
-    renderMatches(next);
+    renderMatches(next,sameSnapshot ? resumed.matches : undefined);
     element("file-title").textContent = next.source?.path ?? "Choose a file";
     element("snapshot").textContent = next.snapshot.slice(0, 8);
     element("snapshot").title = `Captured observation ${next.snapshot}`;
@@ -359,11 +424,15 @@ const controller = createController({
       !searchChanged({filter:restore.filter,types:restore.types,search_directory:restore.searchDirectory,
         search_regex:restore.searchRegex,search_case_sensitive:restore.searchCaseSensitive}) &&
       restore.directory===(next.browse?.directory ?? ".") && restore.offset===(next.browse?.offset ?? 0);
-    if(sameScene)restoreMapPosition(restore.position);
+    if(sameSavedMap)restoreMapPosition(resumed.location.position);
+    else if(sameScene)restoreMapPosition(restore.position);
     else if(restoreSearchMap)restoreMapPosition(leavingSearch.position);
     else if(first || changedMapFilter || changedPage || info.intent?.returning)fit(true);else invalidate();
     if(revealSelection && !first && !info.intent?.returning){const file=scene.files.find(f=>f.id===next.selection.file);if(file){const x=camera.x+(file.rect.x+file.rect.width/2)*camera.scale,y=camera.y+(file.rect.y+file.rect.height/2)*camera.scale;if(x<12 || y<12 || x>canvas.clientWidth-12 || y>canvas.clientHeight-12){camera=jumpCamera(camera,{x:file.rect.x+file.rect.width/2,y:file.rect.y+file.rect.height/2},canvas.clientWidth,canvas.clientHeight);fitMode=null;invalidate();}}}
     if(info.intent || !editorFiles.pending())navigation.observe(info.intent);
+    if(resumed?.location.file && resumed.location.file!==next.selection.file){
+      messages["navigation-notice"].show(`Previously selected file is no longer available: ${resumed.location.path}`);
+    }
     void editorFiles.resume();
   },
   onStatus: (status,info) => {
@@ -453,7 +522,7 @@ function renderSearchError(error) {
   else pathFilter.removeAttribute("aria-invalid");
 }
 
-function renderMatches(next) {
+function renderMatches(next,saved) {
   renderSearchScope();
   const page=next.matches;
   matchPanel.hidden=!page || Boolean(page.error);
@@ -465,9 +534,24 @@ function renderMatches(next) {
     matchResults?.request?.abort();
     matchList.scrollTo({top:0,behavior:"instant"});
     matchList.replaceChildren();
-    matchResults=key ? {key,snapshot:next.snapshot,total:page.total,size:page.size,items:[],selection:next.selection} : undefined;
-    if(matchResults)appendMatches(matchResults,page.items);
+    matchResults=key ? {key,snapshot:next.snapshot,total:page.total,size:page.size,start:0,items:[],selection:next.selection} : undefined;
+    if(matchResults){
+      const start=saved?.start ?? 0, extra=saved?.extra;
+      const cached=saved?.total===page.total && Number.isSafeInteger(start) && start>=0 && start%page.size===0 &&
+        Array.isArray(extra) && (!start || extra.length>0) && start+(start ? 0 : page.items.length)+extra.length<=page.total &&
+        extra.every(result=>typeof result?.file==="string" && typeof result.name==="string");
+      if(cached && start)matchResults.start=start;
+      else insertMatches(matchResults,page.items);
+      if(cached)insertMatches(matchResults,extra);
+      const anchor=saved?.anchor;
+      if(saved?.total===page.total && Number.isSafeInteger(anchor?.rank) && anchor.rank>=0 && anchor.rank<page.total && Number.isFinite(anchor.inset)){
+        matchResults.anchor=anchor;
+      }else if(cached && Number.isFinite(saved.scrollTop)){
+        matchList.scrollTop=saved.scrollTop;
+      }
+    }
     renderMatchProgress();
+    resumeMatchReading();
   }else if(matchResults && (matchResults.selection.file!==next.selection.file || matchResults.selection.entity!==next.selection.entity)){
     matchResults.selection=next.selection;
     matchResults.items.forEach((result,index)=>markCurrentMatch(matchList.children[index].firstElementChild,result,next.selection));
@@ -479,9 +563,9 @@ function markCurrentMatch(button,result,selection) {
   button.setAttribute("aria-current",active?"location":"false");
 }
 
-function appendMatches(results,items) {
+function insertMatches(results,items,before=false) {
   const {snapshot,selection}=results;
-  matchList.append(...items.map(result=>{
+  const rows=items.map(result=>{
     const row=document.createElement("li"),button=document.createElement("button");
     button.type="button";
     button.className="match-row";
@@ -501,50 +585,115 @@ function appendMatches(results,items) {
     };
     row.append(button);
     return row;
-  }));
-  results.items.push(...items);
+  });
+  if(before){
+    matchList.prepend(...rows);
+    results.items.unshift(...items);
+  }else{
+    matchList.append(...rows);
+    results.items.push(...items);
+  }
+}
+
+function matchReading(results) {
+  if(results.anchor)return results.anchor;
+  const top=matchList.getBoundingClientRect().top+matchList.clientTop;
+  const index=Array.prototype.findIndex.call(matchList.children,row=>row.getBoundingClientRect().bottom>top);
+  if(index>=0)return {rank:results.start+index,inset:top-matchList.children[index].getBoundingClientRect().top};
+}
+
+function matchRowOffset(row) {
+  return row.getBoundingClientRect().top-matchList.getBoundingClientRect().top-matchList.clientTop+matchList.scrollTop;
+}
+
+function restoreMatchReading(results) {
+  const {rank,inset}=results.anchor;
+  const row=matchList.children[rank-results.start];
+  if(!row || !matchList.clientHeight)return;
+  const top=matchRowOffset(row)+inset;
+  if(results.start+results.items.length<results.total && top+matchList.clientHeight>matchList.scrollHeight)return;
+  results.anchor=undefined;
+  matchList.scrollTop=top;
+}
+
+function resumeMatchReading() {
+  const results=matchResults;
+  if(!results?.anchor || results.request || !matchList.clientHeight)return;
+  restoreMatchReading(results);
+  void loadMoreMatches();
 }
 
 function renderMatchProgress() {
   const busy=String(Boolean(matchResults?.request));
+  const failed=matchResults?.failedOffset!==undefined;
   matchList.setAttribute("aria-busy",busy);
   matchRetry.setAttribute("aria-disabled",busy);
-  if(!matchResults?.failed && document.activeElement===matchRetry){
+  if(!failed && document.activeElement===matchRetry){
     (matchResults?.items.length ? matchList : pathFilter).focus({preventScroll:true});
   }
-  matchRetry.hidden=!matchResults?.failed;
+  matchRetry.hidden=!failed;
   if(!matchResults){matchCount.textContent="";return;}
-  const {total,items,request,failed}=matchResults;
-  const count=items.length<total ? `${items.length.toLocaleString()} of ${total.toLocaleString()}`
+  const {total,start,items,request}=matchResults;
+  const count=start>0 ? `${(start+1).toLocaleString()}–${(start+items.length).toLocaleString()} of ${total.toLocaleString()}`
+    : items.length<total ? `${items.length.toLocaleString()} of ${total.toLocaleString()}`
     : total ? total.toLocaleString() : "No matches";
   const status=request ? " · Loading more…" : failed ? " · Could not load more matches." : "";
   if(matchCount.textContent!==count+status)matchCount.textContent=count+status;
 }
 
-async function loadMoreMatches({retry=false}={}) {
-  const results=matchResults;
-  if(!results || results.request || results.items.length>=results.total || !matchPanel.open || !matchList.clientHeight)return;
-  if(retry ? !results.failed : results.failed || matchList.scrollHeight-matchList.scrollTop-matchList.clientHeight>96)return;
-  const query=draftSearch();
-  if(searchChanged(query))return;
-  const offset=results.items.length;
+async function fetchMatchPage(results,offset,query,signal) {
   const params=new URLSearchParams({...query,find:"true",projection:"summary",limit:"1",snapshot:results.snapshot,results_offset:String(offset)});
   if(!query.search_directory)params.delete("search_directory");
+  const next=await fetchJSON(`/api/view?${params}`,{signal});
+  const page=next.matches;
+  if(next.schema!==3 || next.snapshot!==results.snapshot || !page || page.error || page.offset!==offset ||
+    page.total!==results.total || page.items?.length!==Math.min(results.size,results.total-offset))throw new Error("Mismatched search results");
+  return page.items;
+}
+
+async function loadMoreMatches({retry=false}={}) {
+  const results=matchResults;
+  if(!results || results.request || !matchPanel.open || !matchList.clientHeight || retry!==(results.failedOffset!==undefined))return;
+  const query=draftSearch();
+  if(searchChanged(query))return;
+  const {start,size,anchor,total}=results;
+  const end=start+results.items.length;
+  let offset=results.failedOffset;
+  if(anchor)offset=Math.floor(anchor.rank/size)*size;
+  else if(!retry && start>0 && matchList.scrollTop<=MATCH_SCROLL_MARGIN)offset=start-size;
+  else if(!retry && end<total && matchList.scrollHeight-matchList.scrollTop-matchList.clientHeight<=MATCH_SCROLL_MARGIN)offset=end;
+  if(offset===undefined)return;
   const request=results.request=new AbortController();
   renderMatchProgress();
+  let loaded=false;
   try{
-    const next=await fetchJSON(`/api/view?${params}`,{signal:request.signal});
+    const items=await fetchMatchPage(results,offset,query,request.signal);
     if(matchResults!==results || searchChanged(draftSearch()))return;
-    const page=next.matches;
-    if(next.schema!==3 || next.snapshot!==results.snapshot || !page || page.error || page.offset!==offset ||
-      page.total!==results.total || page.items?.length!==Math.min(results.size,results.total-offset))throw new Error("Mismatched search results");
-    appendMatches(results,page.items);
-    results.failed=false;
+    if(anchor){
+      if(offset+size<total)items.push(...await fetchMatchPage(results,offset+size,query,request.signal));
+      if(matchResults!==results || searchChanged(draftSearch()))return;
+      matchList.replaceChildren();
+      results.items=[];
+      results.start=offset;
+      insertMatches(results,items);
+      restoreMatchReading(results);
+    }else if(offset<start){
+      const first=matchList.firstElementChild;
+      const inset=matchList.scrollTop-matchRowOffset(first);
+      insertMatches(results,items,true);
+      results.start=offset;
+      matchList.scrollTop=matchRowOffset(first)+inset;
+    }else insertMatches(results,items);
+    results.failedOffset=undefined;
+    loaded=true;
   }catch{
-    if(matchResults===results && !searchChanged(draftSearch()))results.failed=true;
+    if(matchResults===results && !searchChanged(draftSearch()))results.failedOffset=offset;
   }finally{
     results.request=undefined;
-    if(matchResults===results)renderMatchProgress();
+    if(matchResults===results){
+      renderMatchProgress();
+      if(loaded && !results.anchor)void loadMoreMatches();
+    }
   }
 }
 
@@ -734,6 +883,7 @@ pathFilter.addEventListener("input", () => {
 });
 for(const option of [searchWithin,searchRegex,searchCase])option.addEventListener("change",()=>void navigate({}));
 matchList.addEventListener("scroll",()=>void loadMoreMatches());
+matchPanel.addEventListener("toggle",resumeMatchReading);
 matchRetry.addEventListener("click",()=>void loadMoreMatches({retry:true}));
 clearFilters.addEventListener("click", () => {
   const hadTypeFilters = selectedTypes.size > 0;
