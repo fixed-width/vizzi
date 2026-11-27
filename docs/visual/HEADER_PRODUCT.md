@@ -23,7 +23,12 @@ The shared header module owns link definitions, current-view indication, common 
 and menu behaviour. Each page supplies its existing controls and any extra settings through
 one installation interface. Theme application stays with the existing appearance module,
 including the source browser's palette callback. Moving between modes retains theme,
-code layout and saved call-workspace state.
+code layout and saved call-workspace state. When readers return to Source browser in
+the same tab, it restores the last accepted selection, search and map context, including
+the browsing map that clearing a search brings back. Reading positions and loaded matches
+are restored when their captured source still matches. For long result lists, the browser
+resumes at the saved result and loads surrounding matches as needed. A map in fit mode
+refits if the pane size changed while the reader was away.
 
 Reuse the existing Noto Sans/DejaVu Sans type and theme variables. The light palette remains
 paper `#ffffff`, background `#f3f6f9`, text `#183044`, muted `#526477`, border `#b8c7d6`

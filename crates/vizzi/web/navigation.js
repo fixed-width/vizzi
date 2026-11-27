@@ -1,15 +1,18 @@
 const isSearchAnchor = anchor => anchor != null && Object.hasOwn(anchor,"entity");
 
-export function createNavigation({ capture, load, prepare:prepareView, history, onState = () => {}, onNotice = () => {} }) {
-  const session = crypto.randomUUID();
-  let entries = [], cursor = 0, shown, active;
-  const query = entry => ({ file: entry.file, entity: entry.entity, filter: entry.filter,
+export function locationQuery(entry) {
+  return { file: entry.file, entity: entry.entity, filter: entry.filter,
     ...(entry.types === undefined ? {} : { types: entry.types }),
     ...(entry.find ? { find:true,search_directory:entry.searchDirectory,search_regex:entry.searchRegex,
       search_case_sensitive:entry.searchCaseSensitive,reveal_match:false } : {}),
-    ...(entry.directory === undefined ? {} : { directory: entry.directory, offset: entry.offset }) });
+    ...(entry.directory === undefined ? {} : { directory: entry.directory, offset: entry.offset }) };
+}
+
+export function createNavigation({ capture, load, prepare:prepareView, history, onState = () => {}, onNotice = () => {} }) {
+  const session = crypto.randomUUID();
+  let entries = [], cursor = 0, shown, active;
   function requestedQuery(current, patch) {
-    const requested = { ...query(current), ...patch };
+    const requested = { ...locationQuery(current), ...patch };
     if (patch.offset === undefined && requested.offset !== undefined && (requested.filter !== current.filter || requested.types !== current.types || requested.search_directory !== current.searchDirectory)) requested.offset = 0;
     return requested;
   }
@@ -97,7 +100,7 @@ export function createNavigation({ capture, load, prepare:prepareView, history, 
     }
     cursor = index;
     const entry = entries[index], target = copy(entry.location);
-    return request({ returning: true, key: entry.key, target, pending: true }, query(target));
+    return request({ returning: true, key: entry.key, target, pending: true }, locationQuery(target));
   }
   function allow(next, intent) {
     if (!intent) return true;

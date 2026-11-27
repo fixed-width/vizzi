@@ -15,8 +15,8 @@ function notification(change) {
   return BigInt(change.revision);
 }
 
-export function createController({ transport, onView = () => {}, onStatus = () => {}, onError = () => {}, onResync = () => {}, acceptView = () => true, viewSchema = 2 }) {
-  let query = {}, viewRequest, completedViewRequest, liveSession, activeFetch;
+export function createController({ transport, initialQuery = {}, onView = () => {}, onStatus = () => {}, onError = () => {}, onResync = () => {}, acceptView = () => true, viewSchema = 2 }) {
+  let query = { ...initialQuery }, viewRequest, completedViewRequest, liveSession, activeFetch;
   let acceptedQuery = {}, requestedOptions;
   let displayedSnapshot = null, latestStatus = null;
   function invalidate() {
