@@ -229,6 +229,7 @@ try {
 
   await test('changing a search mode resets scrolling and discards a pending page', {timeout:15000}, () => withSearch(async (page, search, matches) => {
     const pending = Promise.withResolvers(), release = Promise.withResolvers();
+    const scrollToBottom = () => matches.evaluate(list => list.scrollTo({top:list.scrollHeight, behavior:'instant'}));
     let requests = 0;
     await page.route('**/api/view?**', async route => {
       const query = new URL(route.request().url()).searchParams;
@@ -242,14 +243,16 @@ try {
     try {
       await search.fill('paged_name');
       await matches.getByText('paged_name_23', {exact:true}).waitFor();
-      await matches.press('End');
+      await scrollToBottom();
       await matches.getByText('paged_name_47', {exact:true}).waitFor();
-      await matches.press('End');
+      await scrollToBottom();
       await pending.promise;
-      await matches.press('PageUp');
-      await matches.press('End');
+      await matches.evaluate(list => list.scrollTo({top:0, behavior:'instant'}));
+      await paint(page);
+      await scrollToBottom();
       await paint(page);
       assert.equal(requests, 1);
+      assert.ok(await matches.evaluate(list => list.scrollTop) > 0);
       await page.getByRole('checkbox', {name:'Match case',exact:true}).check();
       await matches.getByText('paged_name_47', {exact:true}).waitFor({state:'detached'});
       release.resolve();
