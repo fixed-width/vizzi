@@ -10,6 +10,10 @@ The repository or directory whose source is captured and analysed, independent o
 source-control implementation.
 _Avoid_: workspace without a qualifier when discussing a visual layout.
 
+**Source search**:
+Lookup of captured file paths and lexical declarations in one observation of a source
+workspace. Each result identifies the document version that holds its destination.
+
 **Visual workspace**:
 A persistent spatial arrangement of views, groups, associations and reading positions
 for a task. One source workspace can support several visual workspaces.

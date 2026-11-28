@@ -12,6 +12,7 @@ use std::sync::{
 use vizzi_core::{
     model::Snapshot,
     publication::{Outcome, Publication},
+    query::SourceSearch,
 };
 
 struct Inner {
@@ -43,6 +44,7 @@ pub struct Application {
     inner: Mutex<Inner>,
     desired: AtomicU64,
     changes: Changes,
+    search: SourceSearch,
 }
 /// A small status response; polling never reads source or runs analysis.
 #[derive(Clone, Debug, PartialEq, Serialize)]
@@ -98,6 +100,7 @@ impl Application {
             inner: Mutex::new(inner),
             desired: AtomicU64::new(0),
             changes,
+            search: SourceSearch::default(),
         })
     }
     fn inner(&self) -> MutexGuard<'_, Inner> {
@@ -124,6 +127,9 @@ impl Application {
     /// Retrieves a retained observation, never rereading mutable source.
     pub fn pinned(&self, id: &str) -> Option<Arc<Snapshot>> {
         self.inner().publication.pinned(id)
+    }
+    pub(crate) fn source_search(&self) -> &SourceSearch {
+        &self.search
     }
     /// Publishes validated work only for the latest request.
     pub fn publish(&self, ticket: u64, refresh: Refresh) -> Outcome {

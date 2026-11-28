@@ -59,6 +59,8 @@ remains in Git and the project documentation.
 
 ### Changed
 
+- Reuse **Find source** rankings when scrolling results, opening a match, or paging
+  the filtered map.
 - Load more **Find source** matches as you scroll the list, keeping earlier matches available.
 - Place **Fit width** before **Fit height** on code bubbles.
 - Color and smart-wrap captured excerpts in the Saved locations inspector. Excerpts
