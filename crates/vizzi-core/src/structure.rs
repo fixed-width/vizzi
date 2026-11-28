@@ -627,12 +627,12 @@ impl Structure {
     pub fn areas(&self, search: &str, offset: usize) -> Result<Page<Area>, Error> {
         validate("", search)?;
         let search = search.trim().to_lowercase();
-        let query = crate::structure_search::Query::new(&search);
+        let mut query = crate::structure_search::Query::literal(&search, false);
         let matching_files = self
             .symbols
             .iter()
             .enumerate()
-            .filter(|(n, _)| query.rank(&self.search[*n]).is_some())
+            .filter(|(n, symbol)| query.rank(&self.search[*n], &symbol.name).is_some())
             .map(|(_, s)| s.source.path.as_str())
             .collect::<BTreeSet<_>>();
         Ok(self.page(
@@ -644,11 +644,11 @@ impl Structure {
             Clone::clone,
         ))
     }
-    /// Searches declarations, ranking exact/qualified names before prefixes, substrings and paths.
+    /// Searches declarations by literal names and paths.
     pub fn inventory(&self, area: &str, search: &str, offset: usize) -> Result<Page<Entry>, Error> {
         self.search_inventory(area, search, offset, false)
     }
-    /// Searches only functions, filtering before ranking and paging.
+    /// Searches functions by literal names, word abbreviations, and paths.
     pub fn functions(&self, area: &str, search: &str, offset: usize) -> Result<Page<Entry>, Error> {
         self.search_inventory(area, search, offset, true)
     }
@@ -660,13 +660,21 @@ impl Structure {
         functions: bool,
     ) -> Result<Page<Entry>, Error> {
         validate(area, search)?;
-        let query = crate::structure_search::Query::new(search);
+        let mut query = if functions {
+            crate::structure_search::Query::with_case(search, false)
+        } else {
+            crate::structure_search::Query::literal(search, false)
+        };
         let mut matches = self
             .symbols
             .iter()
             .enumerate()
             .filter(|(_, s)| within(&s.source.path, area) && (!functions || s.kind == "function"))
-            .filter_map(|(n, s)| query.rank(&self.search[n]).map(|rank| (rank, n, s)))
+            .filter_map(|(n, s)| {
+                query
+                    .rank(&self.search[n], &s.name)
+                    .map(|rank| (rank, n, s))
+            })
             .collect::<Vec<_>>();
         if !query.empty() || functions {
             matches.sort_by_key(|(rank, n, s)| {

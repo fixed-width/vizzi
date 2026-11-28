@@ -13,6 +13,8 @@ remains in Git and the project documentation.
   declarations at their source lines.
 - Enable **Regex** and **Match case** independently when searching in the Source browser.
   **Clear filters** keeps both settings.
+- Use CamelHumps abbreviations such as `rf` for `read_file` or `ReadFile` in
+  **Find source** and the Call workspace’s **Add bubble** chooser.
 - Reopen a saved location at its line in the Source browser or its bubble in the
   Call workspace, based on where it was saved.
 - Report the installed build with `vizzi --version`.

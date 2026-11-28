@@ -36,7 +36,8 @@ still exceeds these bounds remains scrollable. Manual resizing and section pagin
   captured qualified names with `::` or `.`. Rust method searches can omit the impl
   target's generic arguments while results display the captured name. Rank the complete
   function result set before paging: exact names/qualified names, exact qualified suffixes,
-  function-name prefixes/substrings, namespace prefixes/substrings, then path matches.
+  function-name prefixes, CamelHumps matches on unqualified names, function-name
+  substrings, namespace prefixes/substrings, then path matches.
   Break ties alphabetically and by source location. A guided Minitosis
   URL remains available for reproducible demonstrations, outside the workspace header.
 - Selecting a written call opens its destination beside the caller. Earlier views

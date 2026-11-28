@@ -2005,6 +2005,7 @@ version = "0.1.0"
 dependencies = [
  "base64",
  "blake3",
+ "icu_properties",
  "jsonc-parser",
  "pulldown-cmark",
  "regex",
@@ -2022,6 +2023,7 @@ dependencies = [
  "tree-sitter-ruby",
  "tree-sitter-rust",
  "tree-sitter-typescript",
+ "unicase",
 ]
 
 [[package]]

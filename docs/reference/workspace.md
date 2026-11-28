@@ -60,7 +60,9 @@ source fragments can still require scrolling or paging.
 
 Function lookup accepts names and supported qualified forms, including `Type::method`,
 `Type.method`, `Type#method`, `Type method` and `Type/method`. It ignores case.
-Exact function names rank before partial matches. **Source file path (optional)** limits
+An unqualified abbreviation such as `rf` matches word prefixes in `read_file` or
+`ReadFile`. Exact names and function-name prefixes rank first, followed by CamelHumps
+and other partial matches. **Source file path (optional)** limits
 the lookup to one captured file, including files and declarations omitted by the bounded
 repository search. Use the exact workspace-relative path with forward slashes.
 
