@@ -80,6 +80,22 @@ pub struct Refresh {
     /// Capture and analysis measurements.
     pub measurements: Measurements,
 }
+
+#[derive(Clone, Copy)]
+enum PreviousSnapshot<'a> {
+    Borrowed(&'a Snapshot),
+    Shared(&'a Arc<Snapshot>),
+}
+
+impl<'a> PreviousSnapshot<'a> {
+    fn snapshot(self) -> &'a Snapshot {
+        match self {
+            Self::Borrowed(snapshot) => snapshot,
+            Self::Shared(snapshot) => snapshot,
+        }
+    }
+}
+
 /// The native analysis boundary; no host transport or mutable publication state.
 pub struct Engine {
     directory: Directory,
@@ -143,8 +159,8 @@ impl Engine {
         scope: &CaptureScope,
         cancelled: &(dyn Fn() -> bool + Sync),
     ) -> Result<Option<Refresh>, EngineError> {
-        self.refresh_budget(
-            previous,
+        self.refresh_with_baseline(
+            previous.map(PreviousSnapshot::Borrowed),
             scope,
             cancelled,
             self.workers,
@@ -153,7 +169,24 @@ impl Engine {
     }
     pub(crate) fn refresh_budget(
         &self,
-        previous: Option<&Snapshot>,
+        previous: Option<&Arc<Snapshot>>,
+        scope: &CaptureScope,
+        cancelled: &(dyn Fn() -> bool + Sync),
+        workers: usize,
+        priority: Priority,
+    ) -> Result<Option<Refresh>, EngineError> {
+        self.refresh_with_baseline(
+            previous.map(PreviousSnapshot::Shared),
+            scope,
+            cancelled,
+            workers,
+            priority,
+        )
+    }
+
+    fn refresh_with_baseline(
+        &self,
+        baseline: Option<PreviousSnapshot<'_>>,
         scope: &CaptureScope,
         cancelled: &(dyn Fn() -> bool + Sync),
         workers: usize,
@@ -164,8 +197,9 @@ impl Engine {
             return Ok(None);
         }
         let started = Instant::now();
-        let previous =
-            previous.filter(|snapshot| snapshot.workspace() == self.directory.workspace());
+        let previous = baseline
+            .map(PreviousSnapshot::snapshot)
+            .filter(|snapshot| snapshot.workspace() == self.directory.workspace());
         let capture = match scope {
             CaptureScope::Paths(paths)
                 if previous.is_some_and(|snapshot| self.can_capture_paths(snapshot, paths)) =>
@@ -269,19 +303,36 @@ impl Engine {
         measurements.cache_warnings += result.measurements.cache_warnings;
         measurements.tree_reuses += result.measurements.tree_reuses;
         drop(allocation);
-        let snapshot = Arc::new(if measurements.reconciled {
-            self.directory
-                .plan()
-                .snapshot(self.directory.workspace().clone(), documents)?
+        let snapshot = if measurements.reconciled {
+            Arc::new(
+                self.directory
+                    .plan()
+                    .snapshot(self.directory.workspace().clone(), documents)?,
+            )
         } else {
-            self.directory.plan().update(
-                previous.ok_or_else(|| {
-                    EngineError::Configuration("partial capture lost its baseline".into())
-                })?,
-                documents,
-                &capture.removed,
-            )?
-        });
+            let previous = previous.ok_or_else(|| {
+                EngineError::Configuration("partial capture lost its baseline".into())
+            })?;
+            if let Some(PreviousSnapshot::Shared(shared)) = baseline
+                && capture
+                    .removed
+                    .iter()
+                    .all(|path| previous.file_by_path(path).is_none())
+                && documents.iter().all(|document| {
+                    previous
+                        .file_by_path(document.path())
+                        .is_some_and(|old| old.version() == document.version())
+                })
+            {
+                Arc::clone(shared)
+            } else {
+                Arc::new(
+                    self.directory
+                        .plan()
+                        .update(previous, documents, &capture.removed)?,
+                )
+            }
+        };
         if let Some(cache) = &self.syntax_cache {
             cache.reconcile(&snapshot);
         }
@@ -506,6 +557,76 @@ mod tests {
     }
 
     #[test]
+    fn verified_no_op_hints_reuse_the_shared_snapshot() {
+        let source = tempfile::tempdir().unwrap();
+        let cache = tempfile::tempdir().unwrap();
+        std::fs::write(source.path().join("a.rs"), "fn a() {}").unwrap();
+        std::fs::write(source.path().join("b.rs"), "fn b() {}").unwrap();
+        let engine = engine(source.path(), cache.path(), 2);
+        let baseline = engine.refresh(None, &|| false).unwrap().unwrap();
+        let hints = CaptureScope::Paths(["a.rs".into(), "already_absent.rs".into()].into());
+        let refreshed = engine
+            .refresh_budget(
+                Some(&baseline.snapshot),
+                &hints,
+                &|| false,
+                2,
+                Priority::Foreground,
+            )
+            .unwrap()
+            .unwrap();
+
+        assert!(Arc::ptr_eq(&refreshed.snapshot, &baseline.snapshot));
+        assert_eq!(refreshed.measurements.read_files, 1);
+        assert_eq!(refreshed.measurements.bytes, 9);
+        assert_eq!(refreshed.measurements.shared_sources, 1);
+        assert_eq!(refreshed.measurements.retained, 1);
+        assert_eq!(refreshed.measurements.reused, 2);
+        assert_eq!(refreshed.measurements.files, 2);
+        assert_eq!(refreshed.measurements.analyzed, 2);
+        assert_eq!(refreshed.measurements.parsed, 0);
+        assert!(!refreshed.measurements.reconciled);
+        assert!(refreshed.directories.is_none());
+    }
+
+    #[test]
+    fn unchanged_hints_retry_deferred_analysis_before_reusing_a_snapshot() {
+        let source = tempfile::tempdir().unwrap();
+        let cache = tempfile::tempdir().unwrap();
+        std::fs::write(source.path().join("a.rs"), "fn a() {}").unwrap();
+        let admission = Arc::new(Admission::new(128, 128, 0).unwrap());
+        let permit = admission.acquire(128, Priority::Foreground).unwrap();
+        let engine = engine(source.path(), cache.path(), 1).with_admission(admission.clone());
+        let baseline = engine.refresh(None, &|| false).unwrap().unwrap();
+        assert_eq!(baseline.measurements.deferred, 1);
+        let hints = CaptureScope::Paths(["a.rs".into()].into());
+        let retry = || {
+            engine
+                .refresh_budget(
+                    Some(&baseline.snapshot),
+                    &hints,
+                    &|| false,
+                    1,
+                    Priority::Foreground,
+                )
+                .unwrap()
+                .unwrap()
+        };
+
+        let still_deferred = retry();
+        assert!(Arc::ptr_eq(&still_deferred.snapshot, &baseline.snapshot));
+        assert_eq!(still_deferred.measurements.deferred, 1);
+        assert_eq!(admission.stats().busy, 2);
+
+        drop(permit);
+        let completed = retry();
+        assert_ne!(completed.snapshot.id(), baseline.snapshot.id());
+        assert_eq!(completed.measurements.parsed, 1);
+        assert_eq!(completed.measurements.deferred, 0);
+        assert_eq!(baseline.snapshot.deferred_files(), 1);
+    }
+
+    #[test]
     fn hinted_reads_detect_same_stamp_edits_and_reconciliation_recovers_silent_changes() {
         let source = tempfile::tempdir().unwrap();
         let cache = tempfile::tempdir().unwrap();
@@ -526,7 +647,13 @@ mod tests {
         std::fs::write(&b, "fn d() {}").unwrap();
         let hint = CaptureScope::Paths(["a.rs".into()].into());
         let incremental = engine
-            .refresh_scoped(Some(&initial.snapshot), &hint, &|| false)
+            .refresh_budget(
+                Some(&initial.snapshot),
+                &hint,
+                &|| false,
+                2,
+                Priority::Foreground,
+            )
             .unwrap()
             .unwrap();
         assert_eq!(incremental.measurements.read_files, 1);
@@ -579,10 +706,12 @@ mod tests {
         let initial = engine.refresh(None, &|| false).unwrap().unwrap();
         std::fs::rename(source.path().join("old.rs"), source.path().join("new.rs")).unwrap();
         let renamed = engine
-            .refresh_scoped(
+            .refresh_budget(
                 Some(&initial.snapshot),
                 &CaptureScope::Paths(["old.rs".into(), "new.rs".into()].into()),
                 &|| false,
+                1,
+                Priority::Foreground,
             )
             .unwrap()
             .unwrap();
@@ -599,10 +728,12 @@ mod tests {
         );
         std::fs::remove_file(source.path().join("new.rs")).unwrap();
         let removed = engine
-            .refresh_scoped(
+            .refresh_budget(
                 Some(&renamed.snapshot),
                 &CaptureScope::Paths(["new.rs".into()].into()),
                 &|| false,
+                1,
+                Priority::Foreground,
             )
             .unwrap()
             .unwrap();
