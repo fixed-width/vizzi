@@ -198,7 +198,7 @@ try {
     page.on('request', request => {
       const url = new URL(request.url());
       const offset = Number(url.searchParams.get('results_offset'));
-      if (url.pathname === '/api/view' && offset) offsets.push(offset);
+      if (offset) offsets.push({path:url.pathname,offset});
     });
     await search.fill('paged_name');
     await matches.getByText('paged_name_23', {exact:true}).waitFor();
@@ -209,7 +209,8 @@ try {
     await last.waitFor();
     assert.deepEqual(await matches.locator('code').allTextContents(),
       Array.from({length:53}, (_, i) => `paged_name_${String(i).padStart(2,'0')}`));
-    assert.deepEqual(offsets, [24, 48]);
+    const expected = [24, 48].map(offset => ({path:'/api/matches',offset}));
+    assert.deepEqual(offsets, expected);
     assert.equal(await page.getByRole('navigation', {name:'Source match pages'}).count(), 0);
 
     await matches.press('End');
@@ -224,14 +225,14 @@ try {
     await page.waitForFunction(() => document.querySelector('#navigation').getAttribute('aria-busy') === 'false' &&
       !document.querySelector('#match-list [aria-current="location"]'));
     assert.equal(await matches.getByRole('button').count(), 53);
-    assert.deepEqual(offsets, [24, 48]);
+    assert.deepEqual(offsets, expected);
   }));
 
   await test('changing a search mode resets scrolling and discards a pending page', {timeout:15000}, () => withSearch(async (page, search, matches) => {
     const pending = Promise.withResolvers(), release = Promise.withResolvers();
     const scrollToBottom = () => matches.evaluate(list => list.scrollTo({top:list.scrollHeight, behavior:'instant'}));
     let requests = 0;
-    await page.route('**/api/view?**', async route => {
+    await page.route('**/api/matches?**', async route => {
       const query = new URL(route.request().url()).searchParams;
       if (query.get('results_offset') !== '48') return route.continue();
       requests++;
@@ -267,7 +268,7 @@ try {
   await test('tapping Retry restores a failed page even after scrolling back to the top', {timeout:15000}, () => withSearch(async (page, search, matches) => {
     const pending = Promise.withResolvers(), release = Promise.withResolvers();
     let attempts = 0;
-    await page.route('**/api/view?**', async route => {
+    await page.route('**/api/matches?**', async route => {
       if (new URL(route.request().url()).searchParams.get('results_offset') === '24' && ++attempts === 1) {
         pending.resolve();
         await release.promise;
@@ -300,7 +301,7 @@ try {
     const pageReady = Promise.withResolvers(), releasePage = Promise.withResolvers();
     const releaseOtherSearch = Promise.withResolvers();
     let attempts = 0;
-    await page.route('**/api/view?**', async route => {
+    await page.route(/\/api\/(?:view|matches)\?/, async route => {
       const query = new URL(route.request().url()).searchParams;
       if (query.get('filter') === 'read_file') {
         await releaseOtherSearch.promise;

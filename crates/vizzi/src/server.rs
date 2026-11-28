@@ -14,7 +14,7 @@ use axum::{
 };
 use serde::Deserialize;
 use std::sync::{Arc, OnceLock};
-use vizzi_core::query::{SourceView, View, ViewQuery};
+use vizzi_core::query::{MatchPage, SourceView, View, ViewQuery};
 use vizzi_core::{
     model::SnapshotId,
     projection::{Window, WindowQuery},
@@ -99,6 +99,7 @@ pub fn router_with_reviews(
 pub fn router(application: Arc<Application>) -> Router {
     Router::new()
         .route("/api/status", get(status)).route("/api/view", get(view)).route("/api/source", get(source))
+        .route("/api/matches", get(matches))
         .route("/api/events", get(events)).route("/api/window",get(window))
         .route("/api/inspection", get(inspection))
         .route("/", get(source_browser))
@@ -255,7 +256,42 @@ async fn view(
             "Initial capture is not ready".into(),
         ))?
     };
-    Ok(Json(source_work(move || snapshot.view(&query)).await?))
+    Ok(Json(
+        source_work(move || app.source_search().view(&snapshot, &query)).await?,
+    ))
+}
+
+#[derive(Deserialize)]
+struct MatchPin {
+    snapshot: String,
+}
+
+#[derive(serde::Serialize)]
+struct PinnedMatches {
+    schema: u32,
+    snapshot: SnapshotId,
+    matches: MatchPage,
+}
+
+async fn matches(
+    State(app): State<Arc<Application>>,
+    Query(pin): Query<MatchPin>,
+    Query(query): Query<ViewQuery>,
+) -> Result<Json<PinnedMatches>, ApiError> {
+    let snapshot = app.pinned(&pin.snapshot).ok_or((
+        StatusCode::CONFLICT,
+        "Snapshot expired or unknown; resynchronise updates".into(),
+    ))?;
+    Ok(Json(
+        source_work(move || {
+            Ok(PinnedMatches {
+                schema: 1,
+                snapshot: snapshot.id().clone(),
+                matches: app.source_search().matches(&snapshot, &query),
+            })
+        })
+        .await?,
+    ))
 }
 #[derive(Deserialize)]
 struct SourceQuery {
@@ -500,6 +536,75 @@ mod tests {
             assert!(page.body.contains(marker), "{path} is missing {marker}");
         }
     }
+
+    #[tokio::test]
+    async fn match_pages_share_linked_view_order_and_keep_the_requested_snapshot() {
+        let root = tempfile::tempdir().unwrap();
+        let cache = tempfile::tempdir().unwrap();
+        let path = root.path().join("a.rs");
+        let initial: String = (0..26)
+            .map(|n| format!("fn item_{n:02}() {{}}\n"))
+            .collect();
+        std::fs::write(&path, initial).unwrap();
+        let engine = Engine::new(
+            Directory::open(root.path()).unwrap(),
+            Cache::new(cache.path().into()),
+            1,
+        )
+        .unwrap();
+        let application = Arc::new(Application::new("fixture".into()).unwrap());
+        let ticket = application.request();
+        application.publish(ticket, engine.refresh(None, &|| false).unwrap().unwrap());
+        let old = application.snapshot().unwrap();
+        let router = router(application.clone());
+        let query = format!(
+            "snapshot={}&filter=item&results_offset=24",
+            old.id().as_str()
+        );
+        let linked_uri = format!("/api/view?find=true&projection=summary&{query}");
+        let linked = diagnostic(router.clone(), serde_json::Value::Null, &linked_uri)
+            .await
+            .unwrap();
+        let linked: serde_json::Value = serde_json::from_str(&linked.body).unwrap();
+        assert_eq!(linked["matches"]["items"][0]["name"], "item_24");
+
+        std::fs::write(path, "fn item_new() {}").unwrap();
+        let ticket = application.request();
+        application.publish(
+            ticket,
+            engine.refresh(Some(&old), &|| false).unwrap().unwrap(),
+        );
+        let current = diagnostic(
+            router.clone(),
+            serde_json::Value::Null,
+            "/api/view?find=true&filter=item",
+        )
+        .await
+        .unwrap();
+        let current: serde_json::Value = serde_json::from_str(&current.body).unwrap();
+        assert_eq!(current["matches"]["total"], 1);
+        let page = diagnostic(
+            router.clone(),
+            serde_json::Value::Null,
+            &format!("/api/matches?{query}"),
+        )
+        .await
+        .unwrap();
+        assert_eq!(page.status, 200);
+        assert_eq!(
+            serde_json::from_str::<serde_json::Value>(&page.body).unwrap(),
+            serde_json::json!({"schema": 1, "snapshot": linked["snapshot"], "matches": linked["matches"]})
+        );
+        let expired = diagnostic(
+            router,
+            serde_json::Value::Null,
+            "/api/matches?snapshot=expired&filter=item",
+        )
+        .await
+        .unwrap();
+        assert_eq!(expired.status, 409);
+    }
+
     #[tokio::test]
     async fn handlers_pin_source_across_edits_and_diagnostics_share_results() {
         let root = tempfile::tempdir().unwrap();

@@ -642,11 +642,11 @@ function renderMatchProgress() {
 }
 
 async function fetchMatchPage(results,offset,query,signal) {
-  const params=new URLSearchParams({...query,find:"true",projection:"summary",limit:"1",snapshot:results.snapshot,results_offset:String(offset)});
+  const params=new URLSearchParams({...query,snapshot:results.snapshot,results_offset:String(offset)});
   if(!query.search_directory)params.delete("search_directory");
-  const next=await fetchJSON(`/api/view?${params}`,{signal});
+  const next=await fetchJSON(`/api/matches?${params}`,{signal});
   const page=next.matches;
-  if(next.schema!==3 || next.snapshot!==results.snapshot || !page || page.error || page.offset!==offset ||
+  if(next.schema!==1 || next.snapshot!==results.snapshot || !page || page.error || page.offset!==offset ||
     page.total!==results.total || page.items?.length!==Math.min(results.size,results.total-offset))throw new Error("Mismatched search results");
   return page.items;
 }

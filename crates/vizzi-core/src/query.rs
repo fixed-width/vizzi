@@ -14,7 +14,7 @@ use std::collections::{BTreeMap, BTreeSet};
 mod browse;
 mod search;
 pub use browse::{BrowsePage, DirectorySummary, Landmark, LandmarkKind};
-pub use search::{Match, MatchPage};
+pub use search::{Match, MatchPage, SourceSearch};
 
 const MAX_MAP_FILES: usize = 2000;
 
@@ -66,6 +66,24 @@ pub struct ViewQuery {
     #[serde(default)]
     pub offset: usize,
 }
+
+impl ViewQuery {
+    fn search_text(&self) -> &str {
+        if self.search_regex {
+            &self.filter
+        } else {
+            self.filter.trim()
+        }
+    }
+
+    fn search_scope(&self) -> &str {
+        self.search_directory
+            .as_deref()
+            .filter(|path| !path.is_empty())
+            .unwrap_or(".")
+    }
+}
+
 /// A rectangle in overview world coordinates.
 #[derive(Clone, Debug, Serialize)]
 pub struct Rect {
@@ -221,7 +239,15 @@ struct MapFilter<'a> {
     file_type_counts: BTreeMap<&'static str, usize>,
 }
 
-impl MapFilter<'_> {
+impl<'a> MapFilter<'a> {
+    fn for_types(types: &'a str) -> Self {
+        Self {
+            path: String::new(),
+            types: types.split(',').filter(|kind| !kind.is_empty()).collect(),
+            file_type_counts: BTreeMap::new(),
+        }
+    }
+
     fn collect_type(&mut self, doc: &Document) -> bool {
         let file_type = map_file_type(doc.classification());
         *self.file_type_counts.entry(file_type).or_default() += 1;
@@ -324,40 +350,42 @@ impl Snapshot {
         query: &ViewQuery,
         source_limit: usize,
     ) -> Result<View, SourceReadError> {
+        self.project_view(query, source_limit, None)
+    }
+
+    fn project_view(
+        &self,
+        query: &ViewQuery,
+        source_limit: usize,
+        search: Option<&SourceSearch>,
+    ) -> Result<View, SourceReadError> {
         let mut filter = MapFilter {
             path: query.filter.to_lowercase(),
-            types: query
-                .types
-                .split(',')
-                .filter(|kind| !kind.is_empty())
-                .collect(),
-            file_type_counts: BTreeMap::new(),
+            ..MapFilter::for_types(&query.types)
         };
         let mut matches = None;
-        let search_text = if query.search_regex {
-            query.filter.as_str()
-        } else {
-            query.filter.trim()
-        };
         let (count, limited, browse) = match &query.directory {
-            _ if query.find && !search_text.is_empty() => {
-                let path = query.search_directory.as_deref().unwrap_or(".");
-                let (results, mut files) = search::project(
-                    browse::exact_scope(self.documents(), path),
-                    &mut filter,
-                    query,
+            _ if query.find && !query.search_text().is_empty() => {
+                let ranked = search.map_or_else(
+                    || std::sync::Arc::new(search::Ranked::build(self, query)),
+                    |search| search.rank(self, query),
                 );
-                matches = Some(results);
+                filter.file_type_counts.clone_from(&ranked.file_type_counts);
+                let documents = self.documents();
+                matches = Some(ranked.page(documents, query.results_offset));
+                let files = ranked.files(documents);
                 let count = files.len();
-                if self.documents().len() > MAX_MAP_FILES {
+                if documents.len() > MAX_MAP_FILES {
                     let reveal = query
                         .reveal_match
                         .then_some(query.file.as_deref())
                         .flatten();
+                    let path = query.search_directory.as_deref().unwrap_or(".");
                     let (page, files) = browse::file_page(path, files, query.offset, reveal);
                     (count, files, Some(page))
                 } else {
-                    files.truncate(query.limit.unwrap_or(MAX_MAP_FILES).clamp(1, MAX_MAP_FILES));
+                    let limit = query.limit.unwrap_or(MAX_MAP_FILES).clamp(1, MAX_MAP_FILES);
+                    let files = files.take(limit).collect();
                     (count, files, None)
                 }
             }
@@ -540,6 +568,62 @@ mod tests {
         let b = crate::model::fixture_document(workspace.clone(), "other/b.rs".into(), b"", vec![])
             .unwrap();
         crate::model::fixture_snapshot(workspace, vec![Arc::new(a), Arc::new(b)]).unwrap()
+    }
+
+    #[test]
+    fn source_search_recomputes_exact_pages_when_other_criteria_replace_the_ranking() {
+        let snapshot = snapshot("fn Reader() {}");
+        let search = SourceSearch::default();
+        let query = ViewQuery {
+            filter: "reader".into(),
+            ..ViewQuery::default()
+        };
+        let initial = search.rank(&snapshot, &query);
+        for other in [
+            ViewQuery {
+                filter: "missing".into(),
+                ..query.clone()
+            },
+            ViewQuery {
+                search_directory: Some("other".into()),
+                ..query.clone()
+            },
+            ViewQuery {
+                types: "python".into(),
+                ..query.clone()
+            },
+            ViewQuery {
+                search_case_sensitive: true,
+                ..query.clone()
+            },
+        ] {
+            assert_eq!(search.matches(&snapshot, &other).total, 0);
+            assert_eq!(search.matches(&snapshot, &query).items[0].name, "Reader");
+        }
+        let pattern = ViewQuery {
+            filter: "^reader$".into(),
+            search_regex: true,
+            ..query.clone()
+        };
+        assert_eq!(search.matches(&snapshot, &pattern).total, 1);
+        assert_eq!(
+            search
+                .matches(
+                    &snapshot,
+                    &ViewQuery {
+                        search_regex: false,
+                        ..pattern
+                    }
+                )
+                .total,
+            0
+        );
+        let restored = search.rank(&snapshot, &query);
+        assert!(!Arc::ptr_eq(&initial, &restored));
+        assert_eq!(
+            serde_json::to_value(initial.page(snapshot.documents(), 0)).unwrap(),
+            serde_json::to_value(restored.page(snapshot.documents(), 0)).unwrap()
+        );
     }
 
     #[test]
@@ -753,7 +837,8 @@ mod tests {
             serde_json::to_value(snapshot.view(&query).unwrap()).unwrap()
         };
         let invalid = view(serde_json::json!({
-            "find": true, "filter": "[", "search_regex": true, "file": file
+            "find": true, "filter": "[", "search_regex": true, "file": file,
+            "search_directory": "src", "types": "python"
         }));
         assert!(
             invalid["matches"]["error"]
@@ -762,6 +847,7 @@ mod tests {
                 .contains("unclosed character class")
         );
         assert_eq!(invalid["files"], serde_json::json!([]));
+        assert_eq!(invalid["file_type_counts"], serde_json::json!({"rust": 1}));
         assert_eq!(invalid["matches"]["total"], 0);
         assert_eq!(invalid["source"]["id"], serde_json::json!(file));
         let literal = view(serde_json::json!({"find": true, "filter": "["}));

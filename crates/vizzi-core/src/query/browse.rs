@@ -4,6 +4,7 @@ use crate::{
     policy::{is_entry_module, is_manifest, is_readme},
 };
 use serde::Serialize;
+use std::ops::Range;
 use std::{collections::BTreeMap, sync::Arc};
 
 const PAGE_SIZE: usize = 100;
@@ -97,7 +98,7 @@ pub(super) fn project<'a>(
             .map(Arc::as_ref)
             .filter(|doc| filter.collect_type_and_match(doc))
             .collect();
-        return file_page(directory, matches, offset, None);
+        return file_page(directory, matches.into_iter(), offset, None);
     }
 
     let mut directories = BTreeMap::<&str, usize>::new();
@@ -160,13 +161,13 @@ fn page_offset(offset: usize, entries: usize) -> usize {
 
 pub(super) fn file_page<'a>(
     directory: &str,
-    matches: Vec<&'a Document>,
+    matches: impl ExactSizeIterator<Item = &'a Document> + Clone,
     offset: usize,
     reveal: Option<&str>,
 ) -> (BrowsePage, Vec<&'a Document>) {
     let count = matches.len();
     let offset = reveal
-        .and_then(|id| matches.iter().position(|doc| doc.id().as_str() == id))
+        .and_then(|id| matches.clone().position(|doc| doc.id().as_str() == id))
         .unwrap_or(offset);
     let offset = page_offset(offset, count);
     let page = BrowsePage {
@@ -178,7 +179,7 @@ pub(super) fn file_page<'a>(
         directories: vec![],
         landmarks: vec![],
     };
-    let files = matches.into_iter().skip(offset).take(PAGE_SIZE).collect();
+    let files = matches.skip(offset).take(PAGE_SIZE).collect();
     (page, files)
 }
 
@@ -195,7 +196,7 @@ fn scope<'a, 'p>(
     mut path: &'p str,
 ) -> (&'p str, &'a [Arc<Document>], usize) {
     while !matches!(path, "" | ".") {
-        let scoped = exact_scope(docs, path);
+        let scoped = &docs[exact_scope(docs, path)];
         if !scoped.is_empty() {
             return (path, scoped, path.len() + 1);
         }
@@ -204,13 +205,13 @@ fn scope<'a, 'p>(
     (".", docs, 0)
 }
 
-pub(super) fn exact_scope<'a>(docs: &'a [Arc<Document>], path: &str) -> &'a [Arc<Document>] {
+pub(super) fn exact_scope(docs: &[Arc<Document>], path: &str) -> Range<usize> {
     if matches!(path, "" | ".") {
-        return docs;
+        return 0..docs.len();
     }
     let prefix = format!("{path}/");
     let start = docs.partition_point(|doc| doc.path() < prefix.as_str());
     let scoped = &docs[start..];
     let len = scoped.partition_point(|doc| doc.path().starts_with(&prefix));
-    &scoped[..len]
+    start..start + len
 }

@@ -20,6 +20,7 @@ strings. HTTP responses disable caching. The host serves `/`, `/app.js`, `/contr
 | `GET /api/status` | None | Workspace name, generation, snapshot, readiness, foreground pending flag, measurements, recovery metadata, refresh error, observation mode |
 | `POST /api/workspace/start` | JSON `{}` | Activate live indexing or retry an initial failure; **202** with current status |
 | `GET /api/view` | Optional `snapshot`, `file`, `entity`, `filter`, `limit`, `directory`, `offset` | One snapshot's bounded overview, selection, captured source, and outlines |
+| `GET /api/matches` | Required `snapshot`. Optional `filter`, `search_directory`, `types`, `search_regex`, `search_case_sensitive`, and `results_offset` | Schema 1 with `snapshot` and the same ranked `matches` page as the linked view |
 | `GET /api/window` | Required `snapshot`, `file`, `version`; optional source/outline ranges | Bounded text fragments, declaration page, and logical cursor from that exact pin |
 | `GET /api/source` | Required `snapshot`, `file` | Captured source from the requested retained observation |
 | `GET /api/events` | None; `Last-Event-ID` does not request replay | Latest-state `workspace` events over SSE, followed by changes |
@@ -28,7 +29,8 @@ With `find=true`, a nonempty `filter` searches file paths and lexical declaratio
 names. The response includes a ranked `matches` page and map files from the same
 observation. `search_directory` narrows both projections to a subtree. The map
 uses `offset`, the ranked list uses `results_offset`, and `reveal_match=true`
-selects the map page containing the requested file.
+selects the map page containing the requested file. A match-only request returns **409**
+when its snapshot has expired.
 
 `readiness` is an additive status-schema-1 field, derived in this order:
 

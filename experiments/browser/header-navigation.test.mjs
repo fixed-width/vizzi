@@ -170,7 +170,7 @@ try {
   const offsets=[];
   page.on('request',request=>{
    const url=new URL(request.url());
-   if(url.pathname==='/api/view' && url.searchParams.has('results_offset'))offsets.push(Number(url.searchParams.get('results_offset')));
+   if(url.pathname==='/api/matches' && url.searchParams.has('results_offset'))offsets.push(Number(url.searchParams.get('results_offset')));
   });
   await selectView('Saved locations');
   await selectView('Source browser');
@@ -180,7 +180,7 @@ try {
   assert.ok(Math.abs(await rowTop()-top)<=1);
   assert.equal(offsets[0],216);
   const release=Promise.withResolvers();
-  const lastPage=url=>url.pathname==='/api/view' && url.searchParams.get('results_offset')==='264';
+  const lastPage=url=>url.pathname==='/api/matches' && url.searchParams.get('results_offset')==='264';
   await page.route(lastPage,async route=>{await release.promise;await route.continue();});
   try{
    const pending=page.waitForRequest(request=>lastPage(new URL(request.url())));
