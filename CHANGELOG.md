@@ -79,6 +79,7 @@ remains in Git and the project documentation.
 
 ### Fixed
 
+- Color attributes and constants in the Call workspace using the shared syntax palette.
 - Apply **Original lines** and **Smart reflow** to reference previews in the Call workspace.
 - Restore the Source browser's selection, reading position, search and map when returning
   from another view.
