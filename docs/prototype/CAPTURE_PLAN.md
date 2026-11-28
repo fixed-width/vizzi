@@ -36,9 +36,10 @@ rebuilds a full path map or reclassifies every baseline document for each hint. 
 captures can still reuse compatible old documents after verifying their bytes.
 
 Snapshot construction checks adjacent sorted paths instead of allocating a path set.
-It caches the number of files with analysis. Hinted updates still perform a linear
-Arc merge, workspace/hash checks, and version composition. Total update cost is not
-claimed to be proportional only to changed files; full-byte recovery remains scheduled.
+It caches the number of files with analysis. The native host can reuse a shared
+snapshot after a verified no-op hint. Hinted updates with changes perform a linear
+Arc merge, workspace checks, and version composition. Full-byte recovery remains
+scheduled. See [verified capture from dirty-path hints](INCREMENTAL_CAPTURE.md).
 
 ## Identity and transport
 

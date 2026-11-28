@@ -27,6 +27,11 @@ Full/hinted capture supports cancellation between filesystem operations. Reopene
 bytes may share immutable storage only after current-byte hashing; contexts and
 classification remain independently validated. See [captured source](CAPTURED_SOURCE.md).
 
+The native host reuses its shared snapshot after a hinted capture verifies the same
+document versions and finds no captured paths to remove. Deferred analysis still gets
+an attempt before the versions are compared. The accepted no-op retains its read and
+reuse measurements and acknowledges the processed hints through normal publication.
+
 ## Scheduling and acknowledgement
 
 Dirty paths coalesce in a bounded set; overflow promotes the request to reconciliation.
@@ -53,3 +58,11 @@ records; unavailable analysis still counts as an analysis record. A path-scoped
 attempt can legitimately report reconciliation after a conservative fallback.
 Incremental results must agree with a clean capture when the supplied hints cover the
 changes. Silent edits outside the hints remain visible only after reconciliation.
+
+An optimized native host probe submitted explicit hints for `kernel/locking/mutex.c`
+in a disposable 66,594-file Linux archive at `cbbddb6b`. With a warm analysis cache
+and four workers, median engine time for an unchanged hint fell from 28.52 ms to
+0.065 ms. A one-file edit took 43.27 ms before and 43.76 ms after. Each case had
+12 timed samples per build and excluded host debounce. Every unchanged hint read
+the selected file, and each build's final hinted observation matched an independent
+full capture.

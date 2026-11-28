@@ -298,7 +298,7 @@ impl Host {
                     let workers = engine.workers()
                         - usize::from(recovery.as_ref().is_some_and(RecoveryTask::running));
                     match engine.refresh_budget(
-                        previous.as_deref(),
+                        previous.as_ref(),
                         &plan.scope,
                         &cancelled,
                         workers,

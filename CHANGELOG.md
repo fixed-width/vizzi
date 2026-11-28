@@ -59,6 +59,7 @@ remains in Git and the project documentation.
 
 ### Changed
 
+- Reuse the existing source snapshot after verifying file notifications that leave it unchanged.
 - Reuse **Find source** rankings when scrolling results, opening a match, or paging
   the filtered map.
 - Load more **Find source** matches as you scroll the list, keeping earlier matches available.
