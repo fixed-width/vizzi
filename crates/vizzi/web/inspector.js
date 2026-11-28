@@ -1,7 +1,7 @@
-import {kindGroup,renderStyledText} from "/presentation.js";
+import {kindGroup} from "/presentation.js";
 import { createWindowReader } from "/windows.js";
 import { decorateSourceActions } from "/call-actions.js";
-import {copySourceSelection,renderReflowText} from "/reflow-text.js";
+import {copySourceSelection,renderReflowText,renderStyledText} from "/reflow-text.js";
 import {SourceLayout} from "/source-layout.js";
 
 const SOURCE_ROW = 22, OUTLINE_ROW = 48, SOURCE_GUTTER = 60, SOURCE_PADDING = 22;
