@@ -1,22 +1,21 @@
-import {planReflow} from './reflow.js';
-import {codeMeasurementContext,copySourceSelection,measureCode,sourceSelected} from './reflow-text.js';
+import {copySourceSelection} from './reflow-text.js';
+import {SourceLayout} from './source-layout.js';
 import {sourceMargin} from './source-margin.js';
 
-// Owns local display layout, source selection/copy, and resize reading anchors.
+// Owns mounted fragment rows, source copying and reading anchors.
 export class SourcePane {
     constructor(element,render) {
-        this.element=element;this.render=render;this.rows=[];this.enabled=true;this.pending=false;this.frame=null;this.closed=false;
+        this.element=element;this.render=render;this.rows=[];this.enabled=true;this.frame=null;this.closed=false;
         const document=element.ownerDocument;this.document=document;this.view=document.defaultView;
-        this.context=codeMeasurementContext(element);
+        this.layout=new SourceLayout(element,()=>this.schedule());
         this.resize=new ResizeObserver(()=>this.schedule());this.resize.observe(element);
-        this.selection=()=>{if(this.pending&&!this.selected())this.schedule();};document.addEventListener('selectionchange',this.selection);
         this.copy=event=>copySourceSelection(element,this.rows,event);document.addEventListener('copy',this.copy);
     }
     makeRows(lines,baseline) {
         return lines.map(line=>{
             const row=this.document.createElement('div');row.className='code-line';row.dataset.line=String(line.number);
             const number=this.document.createElement('span');number.className='line-number';number.textContent=String(line.number);
-            const text=this.document.createElement('span');text.className='code-text';row.append(number,text);return {line,row,text,key:null,margin:sourceMargin(line,baseline)};
+            const text=this.document.createElement('span');text.className='code-text';row.append(number,text);return {line,row,text,margin:sourceMargin(line,baseline)};
         });
     }
     set(lines,reading={top:0,left:0},baseline=0) {
@@ -44,9 +43,9 @@ export class SourcePane {
         this.renderRows(added);
         if(anchor?.isConnected)this.element.scrollTop=top+anchor.offsetTop-offset;
     }
-    rerender(){for(const row of this.rows)row.key=undefined;this.update(true);}
+    rerender(){for(const row of this.rows)row.dirty=true;this.update(true);}
     setReflow(enabled){if(this.enabled===enabled)return;this.enabled=enabled;this.update(true);}
-    selected(){return sourceSelected(this.element);}
+    selected(){return this.layout.selected();}
     schedule(){if(this.closed||this.frame!==null)return;this.frame=this.view.requestAnimationFrame(()=>{this.frame=null;this.update(true);});}
     anchor(){
         const top=this.element.scrollTop;
@@ -59,7 +58,7 @@ export class SourcePane {
     contentSize(start,count){
         const rows=start===undefined?this.rows:this.rows.filter(row=>row.line.number>=start&&row.line.number<start+count);
         if(!rows.length)return null;
-        const style=this.view.getComputedStyle(this.element),measure=measureCode(this.context,style);
+        const style=this.view.getComputedStyle(this.element),measure=this.layout.measure(style);
         const width=Math.max(...rows.map(r=>measure(' '.repeat(r.margin.columns)+r.line.text.slice(r.margin.bytes))));
         return {width:Math.ceil(width+67+this.element.offsetWidth-this.element.clientWidth),height:Math.max(parseFloat(style.minHeight)||0,rows.reduce((sum,r)=>sum+r.row.offsetHeight,0)+parseFloat(style.paddingTop)+parseFloat(style.paddingBottom))};
     }
@@ -80,16 +79,24 @@ export class SourcePane {
     }
     update(preserve,force=false){
         if(this.closed||!this.rows.length)return;
-        if(!force&&this.selected()){this.pending=true;return;}this.pending=false;
-        const anchor=preserve?this.anchor():null;
-        if(this.renderRows(this.rows)&&anchor)this.restore(anchor);
+        if(this.layout.defer(()=>!force))return;
+        let anchor;
+        this.renderRows(this.rows,preserve?()=>{anchor=this.anchor();}:undefined);
+        if(anchor)this.restore(anchor);
     }
-    renderRows(rows){
-        const width=this.element.clientWidth-63;if(width<=0)return false;
-        const measure=this.enabled&&this.context?measureCode(this.context,this.view.getComputedStyle(this.element)):null;
+    renderRows(rows,beforeRender){
+        const width=this.element.clientWidth-63;if(width<=0)return;
+        const planFor=this.layout.planRows(width,this.enabled);
         let changed=false;
-        for(const row of rows){const plan=measure?planReflow(row.line,width,measure,row.margin):null,key=JSON.stringify(plan);if(key!==row.key){this.render(row.text,row.line,plan,row.margin);row.key=key;changed=true;}}
-        return changed;
+        for(const row of rows){
+            const plan=planFor(row,row.line,row.margin);
+            if(plan===row.plan&&!row.dirty)continue;
+            if(!changed)beforeRender?.();
+            this.render(row.text,row.line,plan,row.margin);
+            row.plan=plan;
+            row.dirty=false;
+            changed=true;
+        }
     }
-    dispose(){this.closed=true;this.resize.disconnect();if(this.frame!==null)this.view.cancelAnimationFrame(this.frame);this.document.removeEventListener('selectionchange',this.selection);this.document.removeEventListener('copy',this.copy);}
+    dispose(){this.closed=true;this.resize.disconnect();if(this.frame!==null)this.view.cancelAnimationFrame(this.frame);this.layout.dispose();this.document.removeEventListener('copy',this.copy);}
 }

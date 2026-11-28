@@ -2,8 +2,8 @@ import {installWorkspaceDelivery} from '/editor-delivery.js';
 import {installAppHeader} from '/app-header.js';
 import {installAppearance,installCodeLayout} from '/appearance.js';
 import {createMessage,textRow} from '/messages.js';
-import {planReflow} from '/reflow.js';
-import {codeMeasurementContext,copySourceSelection,measureCode,renderReflowText,sourceSelected} from '/reflow-text.js';
+import {copySourceSelection,renderReflowText} from '/reflow-text.js';
+import {SourceLayout} from '/source-layout.js';
 import {followChanges} from '/updates.js';
 import {installStructuralPreview} from '/structural-preview.js';
 import {installSplitter} from '/splitter.js';
@@ -94,25 +94,25 @@ function renderDetail(){const evidence=view.board.evidence.find(e=>e.id===select
  resume.textContent=label??'';resume.hidden=!label;
 }
 function installSavedSource(details,excerpt){
- const context=codeMeasurementContext(excerpt);
- let current,rendered=[],smart=true,frame;
+ const layout=new SourceLayout(excerpt,schedule);
+ let current,smart=true,frame;
  function draw(){
   frame=undefined;
-  if(!current?.lines?.length||!excerpt.clientWidth||sourceSelected(excerpt))return;
+  if(!current?.lines?.length||!excerpt.clientWidth||layout.defer())return;
   const style=getComputedStyle(excerpt);
-  const width=smart&&context?excerpt.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight):0;
-  if(current.width===width)return;
-  const measure=width>0?measureCode(context,style):null;
-  const content=document.createDocumentFragment();
-  rendered=current.lines.map(line=>{
-   const text=document.createElement('span');text.className='saved-source-line';
-   const plan=measure&&line.reflow?planReflow(line,width,measure):null;
-   renderReflowText(text,line,plan);
-   content.append(text,line.ending);
-   return {text,line};
+  const width=excerpt.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight);
+  const planFor=layout.planRows(width,smart,{style});
+  const first=!current.rows;
+  current.rows??=current.lines.map(line=>{
+   const text=document.createElement('span');text.className='saved-source-line';return {text,line};
   });
-  excerpt.replaceChildren(content);
-  current.width=width;
+  for(const row of current.rows){
+   const plan=planFor(row,row.line);
+   if(plan===row.plan)continue;
+   renderReflowText(row.text,row.line,plan);
+   row.plan=plan;
+  }
+  if(first)excerpt.replaceChildren(...current.rows.flatMap(({text,line})=>[text,line.ending]));
  }
  function schedule(){if(frame===undefined)frame=requestAnimationFrame(draw);}
  async function loadExcerpt(){
@@ -131,13 +131,12 @@ function installSavedSource(details,excerpt){
  installCodeLayout(element('code-layout'),enabled=>{smart=enabled;schedule();},message=>showError(new Error(message)));
  details.addEventListener('toggle',loadExcerpt);
  new ResizeObserver(schedule).observe(excerpt);
- document.addEventListener('selectionchange',schedule);
- excerpt.addEventListener('copy',event=>copySourceSelection(excerpt,rendered,event));
+ excerpt.addEventListener('copy',event=>copySourceSelection(excerpt,current?.rows??[],event));
  return {refresh:loadExcerpt,set(evidence){
   if(current?.id===evidence?.id)return;
   current?.controller?.abort();
   current=evidence?{id:evidence.id,literal:evidence.source.excerpt}:undefined;
-  rendered=[];excerpt.textContent=current?.literal??'';
+  excerpt.textContent=current?.literal??'';
   excerpt.scrollTop=0;excerpt.scrollLeft=0;
   void loadExcerpt();
  }};

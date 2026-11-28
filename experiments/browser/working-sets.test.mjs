@@ -4,7 +4,8 @@ import {writeFile} from 'node:fs/promises';
 import {join} from 'node:path';
 import {buildHost,browser,startHost,workspace,paint} from './support.mjs';
 if(!process.argv.includes('--no-build'))buildHost();
-const text='fn target(){}\nfn caller_one(){\n let working_version = 1;\n'+' // context\n'.repeat(48)+' target();\n}\nfn caller_two(){\n'+' // context\n'.repeat(120)+' target();\n}\nfn unrelated(){}\n';
+const argumentsList=Array.from({length:16},(_,i)=>`argument_${i}`).join(', ');
+const text='fn target(){}\nfn caller_one(){\n let working_version = 1;\n'+' // context\n'.repeat(48)+' target();\n}\nfn caller_two(){\n'+' // context\n'.repeat(120)+` report(${argumentsList}, target());\n}\nfn unrelated(){}\n`;
 const input=await workspace({files:{'lib.rs':text,'Cargo.toml':"[package]\nname='working_sets'\nversion='0.1.0'\nedition='2024'\n[lib]\npath='lib.rs'\n"}});let host,chrome,page;
 try{
  const git=(...args)=>{const result=spawnSync('git',['-C',input.root,...args],{encoding:'utf8'});assert.equal(result.status,0,result.stderr);};
@@ -18,8 +19,20 @@ try{
  await page.addInitScript(()=>{const NativeSource=EventSource;window.workspaceTestStreams=[];window.EventSource=class extends NativeSource{constructor(...args){super(...args);workspaceTestStreams.push(this);}};});await page.goto(host.url+'/workspace');await page.waitForFunction(()=>document.querySelector('#visual-source-status').textContent.includes('ready'));
  async function menu(name){await page.locator('#workspace-actions>summary').click();await page.getByRole('button',{name,exact:true}).click();}
  async function open(name){await page.getByRole('button',{name:'Add bubble',exact:true}).click();await page.getByLabel('Find a function',{exact:true}).fill(name);await page.getByRole('button',{name:'Find functions',exact:true}).click();await page.locator(`[data-add-symbol][data-name="${name}"]`).click();const view=page.locator(`[data-view][data-name="${name}"]`);await view.locator('.code-line').first().waitFor();return view;}
- await page.locator('#workspace-settings > summary').click();await page.getByLabel('Module outlines',{exact:true}).check();await page.keyboard.press('Escape');
+ const settings=page.locator('#workspace-settings > summary');
+ const codeLayout=page.getByLabel('Code layout',{exact:true});
+ await settings.click();await page.getByLabel('Module outlines',{exact:true}).check();await codeLayout.selectOption('original');await page.keyboard.press('Escape');
  await open('target');const target=page.locator('[data-view][data-name="target"]');await target.getByRole('button',{name:'Actions for target bubble',exact:true}).click();await page.getByRole('menuitem',{name:'Find callers',exact:true}).click();const stack=page.locator('[data-reference-stack]');await stack.getByRole('status').filter({hasText:'Name-based candidates'}).waitFor();assert.equal(await stack.locator('[data-reference-row]').count(),2);await stack.locator('[data-reference-row]').last().hover();await stack.locator('.reference-preview .is-reference-line').waitFor({timeout:3000});assert.match(await stack.locator('.reference-preview .is-reference-line').textContent(),/target/);const beforeWheel=await page.locator('#workspace-world').evaluate(n=>n.style.transform);
+ const previewLine=stack.locator('.reference-preview .is-reference-line');
+ await previewLine.locator('.reflow-segment').first().waitFor();
+ assert.equal(await previewLine.locator('.reflow-segment').count(),1,'new previews honor Original lines');
+ await settings.click();
+ await codeLayout.selectOption('smart');
+ await previewLine.locator('.reflow-segment').nth(1).waitFor();
+ await codeLayout.selectOption('original');await paint(page);
+ assert.equal(await previewLine.locator('.reflow-segment').count(),1,'open previews honor Original lines');
+ await codeLayout.selectOption('smart');await previewLine.locator('.reflow-segment').nth(1).waitFor();
+ await page.keyboard.press('Escape');
  await stack.locator('.reference-body>p').hover();await page.mouse.wheel(0,140);await page.waitForTimeout(100);
  assert.equal(await page.locator('#workspace-world').evaluate(n=>n.style.transform),beforeWheel);
  assert.ok(await stack.locator('.reference-body').evaluate(n=>n.scrollTop>0));await stack.locator('.reference-body').evaluate(n=>n.scrollTop=0);

@@ -9,6 +9,7 @@ export function installReferenceStacks(root, {read, post, transport, open, compa
  const document = root.ownerDocument;
  const records = new Map();
  let queue = Promise.resolve();
+ let smartReflow = true;
  function element(tag, text = '') {
   const item = document.createElement(tag);
   item.textContent = text;
@@ -192,6 +193,10 @@ export function installReferenceStacks(root, {read, post, transport, open, compa
  }
  return {
   reset() { for (const record of records.values()) dispose(record); records.clear(); queue = Promise.resolve(); },
+  setReflow(enabled) {
+   smartReflow = enabled;
+   for (const {previewPane} of records.values()) previewPane.setReflow(enabled);
+  },
   refresh() {
    const model = read();
    const ids = new Set(model?.references.map(item => item.id));
@@ -229,6 +234,7 @@ export function installReferenceStacks(root, {read, post, transport, open, compa
      const previewCode = element('div');
      previewCode.className = 'code-pane';
      const previewPane = new SourcePane(previewCode, (text, line, plan, margin) => renderCallText(text, line, [], () => {}, plan, margin));
+     previewPane.setReflow(smartReflow);
      previewBox.append(previewTitle, previewCode);
      const resize = button('', () => {});
      resize.className = 'resize-handle';
