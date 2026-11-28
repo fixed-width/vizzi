@@ -86,7 +86,7 @@ fn qualified_name(analysis: &Analysis, index: usize) -> String {
 }
 
 enum Matcher {
-    Literal(Query),
+    Plain(Query),
     Pattern(Regex),
 }
 
@@ -98,16 +98,16 @@ impl Matcher {
                 .build()
                 .map(Self::Pattern)
         } else {
-            Ok(Self::Literal(Query::with_case(
+            Ok(Self::Plain(Query::with_case(
                 &query.filter,
                 query.search_case_sensitive,
             )))
         }
     }
 
-    fn rank_file(&self, path: &str) -> Option<Rank> {
+    fn rank_file(&mut self, path: &str) -> Option<Rank> {
         match self {
-            Self::Literal(query) => query.rank_file(path),
+            Self::Plain(query) => query.rank_file(path),
             Self::Pattern(regex) => {
                 let filename = path.rsplit('/').next().unwrap_or(path);
                 if regex.is_match(filename) {
@@ -119,10 +119,10 @@ impl Matcher {
         }
     }
 
-    fn rank_declaration(&self, analysis: &Analysis, index: usize) -> Option<Rank> {
+    fn rank_declaration(&mut self, analysis: &Analysis, index: usize) -> Option<Rank> {
         let fact = &analysis.facts[index];
         match self {
-            Self::Literal(query) => {
+            Self::Plain(query) => {
                 let qualified = query
                     .uses_qualification()
                     .then(|| qualified_name(analysis, index));
@@ -147,7 +147,7 @@ pub(super) fn project<'a>(
     filter: &mut MapFilter<'_>,
     query: &ViewQuery,
 ) -> (MatchPage, Vec<&'a Document>) {
-    let matcher = match Matcher::new(query) {
+    let mut matcher = match Matcher::new(query) {
         Ok(matcher) => matcher,
         Err(error) => {
             for doc in docs {

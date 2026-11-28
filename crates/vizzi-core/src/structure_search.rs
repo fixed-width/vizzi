@@ -3,6 +3,9 @@ use crate::structure::{NAME_BYTES, Symbol};
 use std::{borrow::Cow, collections::BTreeMap};
 use tree_sitter::Node;
 
+mod humps;
+use humps::Humps;
+
 #[derive(Default)]
 pub(crate) struct RustImplNames<'a> {
     parser: Option<tree_sitter::Parser>,
@@ -126,6 +129,7 @@ pub(crate) enum Rank {
     Exact,
     QualifiedSuffix,
     Prefix,
+    Hump,
     Substring,
     ScopePrefix,
     ScopeSubstring,
@@ -136,13 +140,17 @@ pub(crate) struct Query {
     qualified: String,
     suffix: String,
     case_sensitive: bool,
+    humps: Option<Humps>,
 }
 impl Query {
-    pub(crate) fn new(input: &str) -> Self {
-        Self::with_case(input, false)
+    pub(crate) fn with_case(input: &str, case_sensitive: bool) -> Self {
+        Self {
+            humps: Humps::new(input.trim(), case_sensitive),
+            ..Self::literal(input, case_sensitive)
+        }
     }
 
-    pub(crate) fn with_case(input: &str, case_sensitive: bool) -> Self {
+    pub(crate) fn literal(input: &str, case_sensitive: bool) -> Self {
         let literal = case_text(input.trim(), case_sensitive).into_owned();
         let qualified = literal.replace(['.', '#'], "::");
         let suffix = format!("::{qualified}");
@@ -151,16 +159,19 @@ impl Query {
             qualified,
             suffix,
             case_sensitive,
+            humps: None,
         }
     }
     pub(crate) fn empty(&self) -> bool {
         self.literal.is_empty()
     }
-    pub(crate) fn rank(&self, name: &Name) -> Option<Rank> {
+    pub(crate) fn rank(&mut self, name: &Name, original: &str) -> Option<Rank> {
         let qualified_names = std::iter::once(name.qualified.as_str())
             .chain(name.impl_aliases.iter().map(String::as_str));
-        self.rank_names(&name.simple, qualified_names)
-            .or_else(|| name.path.contains(&self.literal).then_some(Rank::Path))
+        let literal = self
+            .rank_names(&name.simple, qualified_names)
+            .or_else(|| name.path.contains(&self.literal).then_some(Rank::Path));
+        self.rank_humps(literal, original)
     }
 
     pub(crate) fn uses_qualification(&self) -> bool {
@@ -168,7 +179,7 @@ impl Query {
     }
 
     pub(crate) fn rank_declaration(
-        &self,
+        &mut self,
         name: &str,
         qualified_name: Option<&str>,
     ) -> Option<Rank> {
@@ -176,20 +187,38 @@ impl Query {
         let qualified_name = qualified_name
             .as_deref()
             .map(|name| case_text(name, self.case_sensitive));
-        self.rank_names(
+        let literal = self.rank_names(
             &case_text(name, self.case_sensitive),
             qualified_name.as_deref().into_iter(),
-        )
+        );
+        self.rank_humps(literal, name)
     }
 
-    pub(crate) fn rank_file(&self, path: &str) -> Option<Rank> {
-        let path = case_text(path, self.case_sensitive);
-        let filename = path.rsplit('/').next().unwrap_or(&path);
-        if path == self.literal {
-            Some(Rank::Exact)
+    pub(crate) fn rank_file(&mut self, path: &str) -> Option<Rank> {
+        let folded_path = case_text(path, self.case_sensitive);
+        if folded_path == self.literal {
+            return Some(Rank::Exact);
+        }
+        let filename = folded_path.rsplit('/').next().unwrap_or(&folded_path);
+        let literal = self
+            .rank_names(filename, std::iter::empty())
+            .or_else(|| folded_path.contains(&self.literal).then_some(Rank::Path));
+        let filename = path.rsplit('/').next().unwrap_or(path);
+        let stem = filename
+            .rsplit_once('.')
+            .filter(|(stem, _)| !stem.is_empty())
+            .map_or(filename, |(stem, _)| stem);
+        self.rank_humps(literal, stem)
+    }
+
+    fn rank_humps(&mut self, literal: Option<Rank>, name: &str) -> Option<Rank> {
+        if literal.is_some_and(|rank| rank < Rank::Hump) {
+            return literal;
+        }
+        if self.humps.as_mut().is_some_and(|humps| humps.matches(name)) {
+            Some(Rank::Hump)
         } else {
-            self.rank_names(filename, std::iter::empty())
-                .or_else(|| path.contains(&self.literal).then_some(Rank::Path))
+            literal
         }
     }
 

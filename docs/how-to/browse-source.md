@@ -50,6 +50,12 @@ Page Down or End. If loading fails, select **Retry loading matches**. Select a m
 to read its source while keeping the other matches available. A file with several
 matching declarations has one tile and a row for each declaration.
 
+Type a CamelHumps abbreviation such as `rf` to find `read_file` or `ReadFile.rs`.
+You can type part of each word, as in `ReaFi` for `ReadFile`. Exact names and
+name prefixes appear first, followed by CamelHumps matches and other partial
+matches. File abbreviations use the name before its extension. Turn off **Regex**
+to use CamelHumps.
+
 Select **Match case** to distinguish names such as `Reader` and `reader`. Select
 **Regex** to enter a regular expression such as `^read_.*$` for declaration names
 or `^src/.*\.rs$` for file paths. Regex also checks file basenames and qualified

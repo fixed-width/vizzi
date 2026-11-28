@@ -612,6 +612,106 @@ mod tests {
     }
 
     #[test]
+    fn source_search_ranks_camel_humps_between_prefixes_and_substrings() {
+        let snapshot = snapshot(
+            "fn surface() {} fn refresh() {} fn read_file() {} fn ReadFile() {}\n\
+             fn rf_prefix() {} fn rf() {}",
+        );
+        let page = snapshot
+            .view(&ViewQuery {
+                find: true,
+                filter: "rf".into(),
+                ..ViewQuery::default()
+            })
+            .unwrap()
+            .matches
+            .unwrap();
+        assert_eq!(page.total, 5);
+        assert_eq!(
+            page.items
+                .iter()
+                .map(|hit| hit.name.as_str())
+                .collect::<Vec<_>>(),
+            ["rf", "rf_prefix", "ReadFile", "read_file", "surface"]
+        );
+    }
+
+    #[test]
+    fn source_search_camel_humps_follow_match_case_and_regex() {
+        let snapshot = snapshot(
+            "fn ReadFile() {} fn read_file() {} fn refresh() {} fn AA_111() {} fn ΟςFile() {}",
+        );
+        let names = |filter: &str, search_case_sensitive, search_regex| {
+            snapshot
+                .view(&ViewQuery {
+                    find: true,
+                    filter: filter.into(),
+                    search_case_sensitive,
+                    search_regex,
+                    ..ViewQuery::default()
+                })
+                .unwrap()
+                .matches
+                .unwrap()
+                .items
+                .into_iter()
+                .map(|hit| hit.name)
+                .collect::<Vec<_>>()
+        };
+        assert_eq!(names("RF", true, false), ["ReadFile"]);
+        assert_eq!(names("rf", true, false), ["read_file"]);
+        assert_eq!(names("ReaFi", true, false), ["ReadFile"]);
+        assert_eq!(names("A1", true, false), ["AA_111"]);
+        assert_eq!(names("ΟΣF", false, false), ["ΟςFile"]);
+        assert_eq!(names("ΟF", true, false), ["ΟςFile"]);
+        assert!(names("ΟΣF", true, false).is_empty());
+        assert!(names("RF", false, true).is_empty());
+    }
+
+    #[test]
+    fn source_search_camel_humps_match_file_stems_within_scope() {
+        let workspace = WorkspaceId::derive(&[b"file-humps"]);
+        let documents = [
+            "src/ReadFile.rs",
+            "src/read-file.rs",
+            "src/refresh.rs",
+            "src/Read/First.rs",
+            "src/rf/engine.rs",
+            "other/ReadFile.rs",
+        ]
+        .into_iter()
+        .map(|path| {
+            Arc::new(
+                crate::model::fixture_document(workspace.clone(), path.into(), b"", vec![])
+                    .unwrap(),
+            )
+        })
+        .collect();
+        let snapshot = crate::model::fixture_snapshot(workspace, documents).unwrap();
+        let paths = |filter: &str| {
+            snapshot
+                .view(&ViewQuery {
+                    find: true,
+                    filter: filter.into(),
+                    search_directory: Some("src".into()),
+                    ..ViewQuery::default()
+                })
+                .unwrap()
+                .matches
+                .unwrap()
+                .items
+                .into_iter()
+                .map(|hit| hit.path)
+                .collect::<Vec<_>>()
+        };
+        assert_eq!(
+            paths("rf"),
+            ["src/ReadFile.rs", "src/read-file.rs", "src/rf/engine.rs"]
+        );
+        assert!(paths("firr").is_empty());
+    }
+
+    #[test]
     fn source_search_regex_matches_names_and_paths_with_independent_case_and_scope() {
         let snapshot = snapshot("mod Reader { fn read() {} fn Read() {} }");
         let pattern = r"^Reader::Read$|^OTHER/b\.rs$|^a\.rs$";

@@ -82,11 +82,11 @@ pub enum Operation {
     Inventory {
         /// Selected normalized source area.
         area: String,
-        /// Literal declaration/path filter.
+        /// Literal declaration name or path filter.
         search: String,
         /// Continuation offset.
         offset: usize,
-        /// Restrict the result set to functions before ranking and paging.
+        /// Restrict results to functions and allow word abbreviations in the filter.
         #[serde(default)]
         functions_only: bool,
     },

@@ -6,6 +6,7 @@ if (!process.argv.includes('--no-build')) buildHost();
 const files = {
   'engine/input.rs': 'pub mod reader {\n    pub fn read_file() {}\n    pub fn read_file_extra() {}\n}\n' +
     Array.from({length:53}, (_, i) => `fn paged_name_${String(i).padStart(2,'0')}() {}\n`).join(''),
+  'tools/ReadFile.rs': '// CamelHumps file match\n',
   'tools/run.py': 'def read_file():\n    pass\n',
 };
 let deepDirectory = 'z-deep';
@@ -109,6 +110,25 @@ try {
   await page.locator('.evidence-card').getByRole('heading', {name:'reader',exact:true}).waitFor();
   assert.deepEqual(errors, []);
   console.log('Source search coordinates scope, map membership, ranked rows, exact source and reading history.');
+
+  await test('CamelHumps finds declarations and filenames and follows Match case', () => withSearch(async (page, search, matches) => {
+    const file = matches.getByRole('button', {name:/file ReadFile\.rs tools\/ReadFile\.rs/});
+    const declaration = matches.getByText('reader::read_file', {exact:true});
+    await search.fill('rf');
+    await file.waitFor();
+    await declaration.waitFor();
+
+    const matchCase = page.getByRole('checkbox', {name:'Match case',exact:true});
+    await matchCase.check();
+    await file.waitFor({state:'detached'});
+    assert.equal(await declaration.isVisible(), true);
+
+    await search.fill('RF');
+    await file.waitFor();
+    assert.equal(await declaration.count(), 0);
+    await file.click();
+    await page.locator('#file-title').getByText('tools/ReadFile.rs', {exact:true}).waitFor();
+  }));
 
   await test('search modes update matches, survive Back and report invalid patterns inline', () => withSearch(async (page, search, matches) => {
     const regex = page.getByRole('checkbox', {name:'Regex',exact:true});

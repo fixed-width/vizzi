@@ -678,6 +678,114 @@ fn function_search_filters_kinds_before_counting_and_paging() {
 }
 
 #[test]
+fn function_search_ranks_camel_humps_before_paging() {
+    let declarations = (0..25)
+        .map(|i| format!("fn read_file_{i:02}() {{}}\n"))
+        .collect::<String>();
+    let index = Structure::new(&snapshot(&[
+        ("src/humps.rs", &declarations),
+        ("src/rank.rs", "fn rf() {} fn rf_extra() {} fn surface() {}"),
+        ("src/decoys.rs", "struct ReadFile; fn refresh() {}"),
+        ("other/lib.rs", "fn read_file() {}"),
+    ]));
+    let first = index.functions("src", "RF", 0).unwrap();
+    assert_eq!(first.matching, 28);
+    assert_eq!(first.next, Some(24));
+    assert_eq!(first.items[0].symbol.name, "rf");
+    assert_eq!(first.items[1].symbol.name, "rf_extra");
+    assert_eq!(first.items[2].symbol.name, "read_file_00");
+
+    let second = index.functions("src", "RF", 24).unwrap();
+    assert_eq!(second.next, None);
+    assert_eq!(
+        second
+            .items
+            .iter()
+            .map(|entry| entry.symbol.name.as_str())
+            .collect::<Vec<_>>(),
+        ["read_file_22", "read_file_23", "read_file_24", "surface"]
+    );
+}
+
+#[test]
+fn structural_trial_keeps_its_literal_filter_when_opening_a_file() {
+    let index = Structure::new(&snapshot(&[
+        ("src/mixed.rs", "fn rf() {} fn read_file() {}"),
+        ("src/other.rs", "fn read_file() {}"),
+    ]));
+    let areas = index.areas("rf", 0).unwrap();
+    assert!(areas.items.iter().any(|area| area.path == "src/mixed.rs"));
+    assert!(areas.items.iter().all(|area| area.path != "src/other.rs"));
+    let inventory = index.inventory("src/mixed.rs", "rf", 0).unwrap();
+    assert_eq!(inventory.matching, 1);
+    assert_eq!(inventory.items[0].symbol.name, "rf");
+    assert_eq!(
+        index.functions("src/mixed.rs", "rf", 0).unwrap().matching,
+        2
+    );
+}
+
+#[test]
+fn function_search_camel_humps_fold_unicode_case() {
+    let index = Structure::new(&snapshot(&[(
+        "src/names.rs",
+        "fn ΟςFile() {} fn StraßeFile() {}",
+    )]));
+    for (query, name) in [
+        ("οςf", "ΟςFile"),
+        ("ΟΣF", "ΟςFile"),
+        ("strassef", "StraßeFile"),
+    ] {
+        let page = index.functions("", query, 0).unwrap();
+        assert_eq!(page.matching, 1, "query {query}");
+        assert_eq!(page.items[0].symbol.name, name);
+    }
+}
+
+#[test]
+fn function_search_camel_humps_keep_combining_marks_in_their_words() {
+    let index = Structure::new(&snapshot(&[(
+        "src/names.rs",
+        "fn cafe\u{301}_token() {} fn cafe\u{301}teria_menu() {} fn a\u{301}Token() {} fn HTT\u{301}oken() {}",
+    )]));
+    for (query, name) in [
+        ("cafe\u{301}tok", "cafe\u{301}_token"),
+        ("at", "a\u{301}Token"),
+        ("ht\u{301}ok", "HTT\u{301}oken"),
+    ] {
+        let page = index.functions("", query, 0).unwrap();
+        assert_eq!(page.matching, 1, "query {query}");
+        assert_eq!(page.items[0].symbol.name, name);
+    }
+    assert_eq!(index.functions("", "ctm", 0).unwrap().matching, 0);
+}
+
+#[test]
+fn function_search_matches_partial_camel_humps_acronyms_digits_and_unicode() {
+    let index = Structure::new(&snapshot(&[(
+        "src/names.rs",
+        "fn HTTPParser2() {} fn HTTP2Parser() {} fn able_black_cat() {}\n\
+         fn ÜberLokaleZahl() {} fn ReadLocalFile() {} fn parseKelvin() {} fn readKelvin() {}",
+    )]));
+    for (query, expected) in [
+        ("hp2", "HTTPParser2"),
+        ("h2p", "HTTP2Parser"),
+        ("ablac", "able_black_cat"),
+        ("üz", "ÜberLokaleZahl"),
+        ("pK", "parseKelvin"),
+        ("rk", "readKelvin"),
+        ("rf", "ReadLocalFile"),
+    ] {
+        let page = index.functions("", query, 0).unwrap();
+        assert_eq!(page.matching, 1, "query {query}");
+        assert_eq!(page.items[0].symbol.name, expected, "query {query}");
+    }
+    assert_eq!(index.functions("", "a_b", 0).unwrap().matching, 0);
+    assert_eq!(index.functions("", "tpa", 0).unwrap().matching, 0);
+    assert_eq!(index.areas("h2p", 0).unwrap().matching, 0);
+}
+
+#[test]
 fn equal_name_matches_have_consistent_qualified_path_and_source_order() {
     let index = Structure::new(&snapshot(&[
         ("z.rs", "mod a { fn process() {} }"),
