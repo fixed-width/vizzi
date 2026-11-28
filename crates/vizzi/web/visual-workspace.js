@@ -49,7 +49,6 @@ function inlineAction(id,action,element,direct,keyboard){
 function inlineAvailability(code,id){for(const name of code.querySelectorAll('.code-call')){name.setAttribute('aria-disabled',String(!model.navigable(id)||Boolean(mounted.get(id)?.historyLoading)));name.tabIndex=model.navigable(id)&&!mounted.get(id)?.historyLoading?0:-1;if(frozenSource(model.view(id)))name.title='Captured-file call · Ctrl/⌘-click opens a same-file destination';}}
 installAppearance(el('theme'));
 let smartReflow;
-installCodeLayout(el('code-layout'),enabled=>{smartReflow=enabled;for(const r of mounted.values())r.sourcePane.setReflow(enabled);},message=>notice.show(message));
 const fail=e=>error.show(e?.message??String(e));
 async function transport(path,options){const response=await fetchRead(path,options);if(!response.ok){let text=await response.text();try{text=JSON.parse(text).message??text;}catch{}const error=new Error(text);error.status=response.status;throw error;}return response.json();}
 const post=(path,body,signal)=>transport(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal});
@@ -1063,6 +1062,11 @@ const referenceStacks=installReferenceStacks(el('reference-layer'),{
   }catch(error){fail(error);}
  },
 });
+installCodeLayout(el('code-layout'),enabled=>{
+ smartReflow=enabled;
+ for(const {sourcePane} of mounted.values())sourcePane.setReflow(enabled);
+ referenceStacks.setReflow(enabled);
+},message=>notice.show(message));
 const taskGroups=installTaskGroups(el('task-group-layer'),{read:()=>model,changed:()=>{geometry();save();},edit:id=>taskControls.showGroups(id),failed:fail});
 taskControls=installTaskControls({read:()=>model,replace:replaceTask,snapshot:()=>currentSnapshot,changed:()=>{geometry();save();},failed:fail});
 void transport('/api/investigation').then(view=>{board=view.board;editorName=view.editor;editorJavaArchives=view.editor_java_archives===true;for(const r of mounted.values()){r.editor.setAttribute('aria-label',`Open in ${editorName}`);r.editor.title=`Open in ${editorName}`;}geometry();}).catch(fail);

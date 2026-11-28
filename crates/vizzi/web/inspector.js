@@ -1,8 +1,8 @@
 import {kindGroup,renderStyledText} from "/presentation.js";
 import { createWindowReader } from "/windows.js";
 import { decorateSourceActions } from "/call-actions.js";
-import {planReflow} from "/reflow.js";
-import {codeMeasurementContext,copySourceSelection,measureCode,renderReflowText,sourceSelected} from "/reflow-text.js";
+import {copySourceSelection,renderReflowText} from "/reflow-text.js";
+import {SourceLayout} from "/source-layout.js";
 
 const SOURCE_ROW = 22, OUTLINE_ROW = 48, SOURCE_GUTTER = 60, SOURCE_PADDING = 22;
 function coversRows(rows,first,last) {
@@ -18,11 +18,10 @@ export function createInspector({ source, space, outline, transport, select, onE
   let columnLine, column = 0;
   let actionsByLine = new Map(), actionRequest;
   const sourceNodes = new Map(), outlineNodes = new Map();
-  const context=reflow?codeMeasurementContext(source):null;
-  let smartReflow=reflow, wrappedRows=[], pendingRender=false;
+  const layout=reflow?new SourceLayout(source,schedule):null;
+  let smartReflow=reflow, wrappedRows=[];
   if(reflow){
     source.classList.add("source-reflow");
-    document.addEventListener("selectionchange",()=>{if(pendingRender&&!sourceSelected(source))schedule();});
     document.addEventListener("copy",event=>copySourceSelection(source,[...sourceNodes.values()].sort((a,b)=>a.line.number-b.line.number),event));
   }
   const emptyNote=document.createElement("p");emptyNote.className="source-empty";
@@ -107,26 +106,25 @@ export function createInspector({ source, space, outline, transport, select, onE
   const reader=makeReader({transport,onWindow:accept,onError});
   function focusCursor() { const row=entries.get(cursor); if(row)outlineNodes.get(row.id)?.button.focus({preventScroll:true}); }
   function renderSource(reading) {
-    pendingRender=false;
     if(!view?.source || !view.source.summary.lines) {
       wrappedRows=[];sourceNodes.clear();space.replaceChildren(emptyNote);emptyNote.textContent=view?.source?"Source encoding is unavailable in this inspector.":emptyText;return;
     }
-    if(reflow&&!reading&&sourceSelected(source)){
+    if(layout?.defer(()=>{
+      if(reading)return false;
       const firstVisible=Math.floor(sourceReading().sourceTop/SOURCE_ROW)+1;
       const bottom=source.scrollTop+Math.max(0,source.clientHeight-1);
       const lastVisible=Math.min(view.source.summary.lines,Math.floor(sourceReading(bottom).sourceTop/SOURCE_ROW)+1);
-      if(coversRows(sourceNodes,firstVisible,lastVisible)||!coversRows(sourceRows,firstVisible,lastVisible)){
-        pendingRender=true;
-        return;
-      }
-    }
+      return coversRows(sourceNodes,firstVisible,lastVisible)||!coversRows(sourceRows,firstVisible,lastVisible);
+    }))return;
     reading??=sourceReading();
     const first=Math.max(1,Math.floor(source.scrollTop/SOURCE_ROW)-16+1),last=Math.min(view.source.summary.lines+1,Math.ceil((source.scrollTop+source.clientHeight)/SOURCE_ROW)+17,first+96);
     const numbers=[...sourceRows.keys()].filter(number=>reflow||number>=first&&number<last).sort((a,b)=>a-b);
     const wanted=new Set(numbers);
     for(const [number,node] of sourceNodes)if(!wanted.has(number)){node.row.remove();sourceNodes.delete(number);}
     const width=source.clientWidth-SOURCE_GUTTER-SOURCE_PADDING;
-    const measure=smartReflow&&context&&width>0?measureCode(context,getComputedStyle(source)):null;
+    const planFor=layout?.planRows(width,smartReflow,{
+      endInsetFor:node=>node.controls.offsetWidth+parseFloat(getComputedStyle(node.controls).marginRight),
+    });
     wrappedRows=[];
     let added=0,previousRow=null,previousNumber=0;
     for(const number of numbers) {
@@ -146,18 +144,8 @@ export function createInspector({ source, space, outline, transport, select, onE
       previousRow=node.row;
       for(const [action,button] of node.buttons)button.hidden=action==="first" || action==="previous" ? !line.left : !line.right;
       if(reflow)node.controls.hidden=!line.left&&!line.right;
-      let layoutWidth=0;
-      if(measure&&line.reflow&&!line.left){
-        layoutWidth=width;
-        if(line.right)layoutWidth-=node.controls.offsetWidth+parseFloat(getComputedStyle(node.controls).marginRight)+measure("…");
-      }
       const changedLine=node.line!==line;
-      let plan=node.plan;
-      if(changedLine||layoutWidth!==node.layoutWidth){
-        const next=layoutWidth>0?planReflow(line,layoutWidth,measure):null;
-        plan=next?.length>1?next:null;
-        node.layoutWidth=layoutWidth;
-      }
+      const plan=planFor?.(node,line)??null;
       const top=(number-1)*SOURCE_ROW+added;
       if(reflow)node.row.style.marginTop=`${(number-previousNumber-1)*SOURCE_ROW}px`;
       else node.row.style.top=`${top}px`;
@@ -167,8 +155,7 @@ export function createInspector({ source, space, outline, transport, select, onE
         added+=(plan.length-1)*SOURCE_ROW;
       }
       const actions=actionsByLine.get(number);
-      const changedPlan=node.plan!==plan&&JSON.stringify(node.plan)!==JSON.stringify(plan);
-      if(changedLine||node.actions!==actions||changedPlan){
+      if(changedLine||node.actions!==actions||node.plan!==plan){
         if(reflow)renderReflowText(node.text,line,plan);
         else if(changedLine||node.actions?.length)renderStyledText(node.text,line);
         if(activateAction&&actions?.length){

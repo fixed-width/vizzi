@@ -43,9 +43,11 @@ source mutation or cache-identity change is required. Bound hints per line and w
 unavailable/limited styling and left-clipped lines have no hints.
 
 A language-neutral browser planner chooses display segments for actual font/pane width.
-A source-pane module owns rendering, resize coalescing, selection/copy and reading anchors;
-the workspace controller owns captured-source requests and call-navigation intent. Retain
-source byte coordinates through styled segments. Decorative indentation/continuations are
+The shared source layout module reuses plans for mounted rows and defers layout while
+source text is selected. Fragment panes, the Source browser and Saved locations own their
+row geometry, rendering and reading positions. The Call workspace controller owns
+captured-source requests and call-navigation intent. Styled segments retain their captured
+byte coordinates. Decorative indentation and continuation marks are
 excluded from copied text. Reflow only changed layouts, defer resize work while source is
 selected, and preserve the visible source line/segment on width changes. Camera transforms
 do not change the layout width. Keep the existing palette/fonts and avoid extra toolbar

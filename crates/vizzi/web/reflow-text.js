@@ -1,35 +1,5 @@
 import {renderStyledText} from './presentation.js';
 
-export function codeMeasurementContext(element) {
-    const canvas=element.ownerDocument.createElement('canvas');
-    try{return canvas.getContext('2d');}catch{return null;}
-}
-
-export function measureCode(context,style) {
-    if(context){
-        context.font=`${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
-        context.fontKerning='none';
-    }
-    const width=text=>context?context.measureText(text).width:text.length*parseFloat(style.fontSize)*.6;
-    const tab=width('    ');
-    return text=>{
-        let result=0;
-        const parts=text.split('\t');
-        for(const [index,part] of parts.entries()){
-            result+=width(part);
-            if(index<parts.length-1)result=(Math.floor(result/tab)+1)*tab;
-        }
-        return result;
-    };
-}
-
-export function sourceSelected(element) {
-    const selection=element.ownerDocument.getSelection();
-    if(!selection||selection.isCollapsed)return false;
-    for(let i=0;i<selection.rangeCount;i++)if(selection.getRangeAt(i).intersectsNode(element))return true;
-    return false;
-}
-
 export function copySourceSelection(element,rows,event) {
     const document=element.ownerDocument,selection=document.getSelection();
     if(!event.clipboardData||!selection||selection.isCollapsed||selection.rangeCount!==1)return;

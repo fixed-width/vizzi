@@ -19,6 +19,11 @@ A concurrently visible view onto a selected source fragment, such as a function 
 with its source identity and context intact. The displayed view is distinct from a saved
 short excerpt used as evidence.
 
+**Code layout**:
+The reader's choice between Smart reflow and Original lines in the Source browser,
+Call workspace, and Saved locations inspector. Smart reflow can display one captured
+line on several rows while preserving its source text and coordinates.
+
 **Task working set**:
 The source fragments and other views relevant to one investigation or review, arranged
 so the reader can compare and revisit them.

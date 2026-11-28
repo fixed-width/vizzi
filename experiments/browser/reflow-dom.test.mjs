@@ -4,6 +4,7 @@ import {browser,paint} from './support.mjs';
 const chromium=await browser({desktopBus:false});
 try {
  const page=await chromium.newPage({viewport:{width:1200,height:900}});
+ page.setDefaultTimeout(5000);
  await page.route('http://fixture/**',async route=>{const path=new URL(route.request().url()).pathname;if(path==='/')return route.fulfill({contentType:'text/html',body:'<link rel="stylesheet" href="/visual.css"><div id="code" class="code-pane" style="flex:none;width:260px;height:220px"></div>'});return route.fulfill({contentType:path.endsWith('.css')?'text/css':'text/javascript',body:await readFile('crates/vizzi/web'+path,'utf8')});});
  await page.goto('http://fixture/');
  await page.evaluate(async()=>{
@@ -15,6 +16,39 @@ try {
   window.events=[];window.lines=Array.from({length:60},(_,i)=>({...line,number:i+1}));window.pane=new SourcePane(document.querySelector('#code'),(node,line,plan)=>renderCallText(node,line,actions,(site,element,direct)=>window.events.push([site.id,direct]),plan));window.pane.set(window.lines,{top:0,left:0});
  });
  await page.waitForFunction(()=>document.querySelectorAll('.reflow-segment').length>60);
+ await paint(page);
+ const heightOnly=await page.locator('#code').evaluate(async code=>{
+  const first=code.querySelector('.reflow-segment'),width=code.clientWidth;
+  const encode=TextEncoder.prototype.encode,measure=CanvasRenderingContext2D.prototype.measureText;
+  let encodes=0,measurements=0;
+  TextEncoder.prototype.encode=function(...args){encodes++;return encode.apply(this,args);};
+  CanvasRenderingContext2D.prototype.measureText=function(...args){measurements++;return measure.apply(this,args);};
+  try{
+   code.style.height='240px';
+   await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+   return {encodes,measurements,sameWidth:code.clientWidth===width,sameNode:code.querySelector('.reflow-segment')===first};
+  }finally{
+   TextEncoder.prototype.encode=encode;
+   CanvasRenderingContext2D.prototype.measureText=measure;
+  }
+ });
+ assert.deepEqual(heightOnly,{encodes:0,measurements:0,sameWidth:true,sameNode:true});
+ const continuation=page.locator('.code-text').first().locator('.reflow-segment').nth(1);
+ const indentation=await continuation.evaluate(segment=>parseFloat(segment.style.paddingLeft));
+ const originalContinuation=await continuation.elementHandle();
+ await page.locator('#code').evaluate(code=>{code.style.width='261px';});
+ await paint(page);
+ assert.equal(await originalContinuation.evaluate(segment=>segment.isConnected),true,'an equivalent wrap plan keeps its DOM');
+ await originalContinuation.dispose();
+ const paneWidth=await page.locator('#code').evaluate(code=>{
+  code.style.fontSize='8px';code.style.height='241px';return code.clientWidth;
+ });
+ await paint(page);
+ assert.ok(await continuation.evaluate(segment=>parseFloat(segment.style.paddingLeft))<indentation,'font changes invalidate the plan');
+ assert.equal(await page.locator('#code').evaluate(code=>code.clientWidth),paneWidth);
+ await page.locator('#code').evaluate(code=>{code.style.fontSize='';code.style.height='240px';});
+ await paint(page);
+ assert.equal(await continuation.evaluate(segment=>parseFloat(segment.style.paddingLeft)),indentation);
  assert.equal(await page.locator('.code-line').count(),60);
  assert.equal(await page.locator('.code-call').count(),1);
  await page.locator('.code-call').click({modifiers:['Control']});assert.deepEqual(await page.evaluate(()=>window.events),[['a'.repeat(64),true]]);

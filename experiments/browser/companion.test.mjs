@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';import {spawnSync} from 'node:child_proc
 import {buildHost,browser,startHost,workspace,paint} from './support.mjs';
 if(!process.argv.includes('--no-build'))buildHost();
 const callNamespace='call_namespace_'.repeat(8)+'test';
-const entrySource='\uFEFFpub fn entry() { call(first_argument, second_argument, third_argument, fourth_argument, fifth_argument); let html = "<img src=x>"; }\n';
+const entrySource='\uFEFFpub fn entry() { call(first_argument, second_argument, third_argument, fourth_argument, fifth_argument); let html = "<img src=x>"; }\n// Short line\n';
 const input=await workspace({files:{'src/entry.rs':entrySource,'src/reader.rs':'pub trait Reader { fn read(&self); }\n','src/target.rs':'\n'.repeat(119)+`mod ${callNamespace} {\n    pub fn resume_here() {}\n}\n`}});const record=join(input.cache,'editor-arguments'),editor=join(input.cache,'record-editor'),state=join(input.cache,'..','investigation.json');await mkdir(input.cache,{recursive:true});
 await writeFile(editor,`#!/bin/sh\nprintf '%s\\n' "$@" >> '${record}'\n`);await chmod(editor,0o700);input.sourceArguments=['--editor-code',editor,'--investigation-file',state];
 const bad=spawnSync('target/release/vizzi',['--root',input.root,'--cache',input.cache,'--investigation-file',join(input.cache,'investigation.json'),'--port','0'],{encoding:'utf8',timeout:1500});assert.match(bad.stderr,/Investigation file must be outside the analysis cache/);
@@ -70,10 +70,13 @@ try{
  assert.equal(await excerpt.locator('.syntax-string').textContent(),'"<img src=x>"');
  assert.equal(await excerpt.locator('img').count(),0);
  assert.ok(await excerpt.locator('.reflow-marker').count()>0,'long saved lines reflow in the inspector');
+ const unchangedChunk=await excerpt.locator('.source-chunk').filter({hasText:'// Short line'}).elementHandle();
  const beforeResize=await excerpt.locator('.reflow-marker').count();
  await page.setViewportSize({width:800,height:900});
  await paint(page);
  assert.ok(await excerpt.locator('.reflow-marker').count()>beforeResize,'narrowing the inspector reflows the saved line');
+ assert.equal(await unchangedChunk.evaluate(node=>node.isConnected),true,'unchanged saved rows keep their text nodes');
+ await unchangedChunk.dispose();
  assert.equal(await excerpt.evaluate(code=>code.scrollWidth<=code.clientWidth),true);
  const savedExcerpt=JSON.parse(await readFile(state,'utf8')).evidence[0].source.excerpt;
  assert.ok(savedExcerpt.startsWith('\uFEFF'));
