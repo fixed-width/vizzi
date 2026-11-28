@@ -54,6 +54,65 @@ test('syntax hues, weight and contrast remain distinct on plain, selection and d
  }}finally{await page.close();}
 });
 
+test('all code views use the shared syntax colors and retain their typography in both themes', async () => {
+ const views = [
+  {entry:'index.html', container:'#source', styled:true},
+  {entry:'visual.html', container:'#workspace-world', styled:false},
+  {entry:'review.html', container:'#working-source', styled:true},
+  {entry:'companion.html', container:'#detail-excerpt', styled:false},
+ ];
+ const hues = {keyword:'keyword', attribute:'keyword', type:'type', function:'function',
+  string:'string', comment:'comment', number:'number', constant:'number'};
+ const weights = {keyword:'650', attribute:'650', type:'700', function:'550', number:'550', constant:'550'};
+
+ for (const view of views) {
+  const page = await chromium.newPage();
+  try {
+   await page.route('http://fixture/**', async route => {
+    const {pathname} = new URL(route.request().url());
+    if (pathname.endsWith('.js')) return route.fulfill({contentType:'text/javascript', body:''});
+    const contentType = pathname === `/${view.entry}` ? 'text/html' : pathname.endsWith('.css') ? 'text/css' : null;
+    if (!contentType) return route.fulfill({status:404});
+    return route.fulfill({contentType, body:await readFile(resolve('crates/vizzi/web'+pathname),'utf8')});
+   });
+   await page.goto(`http://fixture/${view.entry}`);
+   await page.evaluate(({view,hues}) => {
+    const code = document.createElement('div');
+    code.id = 'syntax-fixture';
+    code.className = 'code-pane source-chunk';
+    for (const kind of Object.keys(hues)) {
+     const token = document.createElement('span');
+     token.className = `syntax-${kind}`;
+     token.textContent = kind;
+     code.append(token);
+    }
+    document.querySelector(view.container).append(code);
+   }, {view,hues});
+
+   for (const theme of ['light','dark']) {
+    const tokens = await page.evaluate(({theme,hues}) => {
+     document.documentElement.dataset.theme = theme;
+     const code = document.getElementById('syntax-fixture');
+     const probe = code.appendChild(document.createElement('span'));
+     const tokens = Object.entries(hues).map(([kind,hue]) => {
+      const {color,fontWeight,fontStyle} = getComputedStyle(code.querySelector(`.syntax-${kind}`));
+      probe.style.color = `var(--${hue})`;
+      return {kind, color, fontWeight, fontStyle, expectedColor:getComputedStyle(probe).color};
+     });
+     probe.remove();
+     return tokens;
+    }, {theme,hues});
+    for (const {kind,color,fontWeight,fontStyle,expectedColor} of tokens) {
+     const label = `${view.entry} ${theme} ${kind}`;
+     assert.equal(color, expectedColor, `${label} color`);
+     assert.equal(fontWeight, (view.styled && weights[kind]) || '400', `${label} weight`);
+     assert.equal(fontStyle, view.styled && kind === 'comment' ? 'italic' : 'normal', `${label} style`);
+    }
+   }
+  } finally { await page.close(); }
+ }
+});
+
 test('theme callbacks report the effective mode, ignore unrelated storage and retain explicit choices on media changes',async()=>{
  const page=await fixture({theme:'dark',saved:'light'});try{
   assert.equal(page.bootChoice,'light');assert.equal(await page.evaluate(()=>changes.at(-1)),'light');

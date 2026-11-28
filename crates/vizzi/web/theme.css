@@ -135,3 +135,10 @@
   --module-bg: #422553;
 }
 }
+
+.syntax-keyword, .syntax-attribute { color: var(--keyword); }
+.syntax-type { color: var(--type); }
+.syntax-function { color: var(--function); }
+.syntax-string { color: var(--string); }
+.syntax-comment { color: var(--comment); }
+.syntax-number, .syntax-constant { color: var(--number); }
