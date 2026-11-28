@@ -4,7 +4,7 @@ import {callRanges} from './call-ranges.js';
 // Keep source characters and syntax spans intact; controls wrap only native identifier ranges.
 export function renderCallText(node,line,actions,activate,plan=null,margin={bytes:0,columns:0}) {
     renderReflowText(node,line,plan,margin);
-    decorateSourceActions(node,line,actions,activate,'Call actions · Ctrl/⌘-click opens the definition');
+    if(actions.length)decorateSourceActions(node,line,actions,activate,'Call actions · Ctrl/⌘-click opens the definition');
 }
 
 export function decorateSourceActions(node,line,actions,activate,title) {

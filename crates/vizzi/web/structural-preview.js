@@ -1,4 +1,4 @@
-import {renderStyledText} from '/presentation.js';
+import {renderStyledText} from './reflow-text.js';
 
 export function installStructuralPreview({transport, keep, openEditor, showError}) {
   const el = id => document.getElementById(id);

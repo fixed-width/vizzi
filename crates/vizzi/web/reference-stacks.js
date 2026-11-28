@@ -1,5 +1,5 @@
 import {SourcePane} from './source-pane.js';
-import {renderCallText} from './call-actions.js';
+import {renderReflowText} from './reflow-text.js';
 import {originLabel} from './source-origin.js';
 import {functionIndent} from './source-margin.js';
 
@@ -233,7 +233,7 @@ export function installReferenceStacks(root, {read, post, transport, open, compa
      const previewTitle = element('strong');
      const previewCode = element('div');
      previewCode.className = 'code-pane';
-     const previewPane = new SourcePane(previewCode, (text, line, plan, margin) => renderCallText(text, line, [], () => {}, plan, margin));
+     const previewPane = new SourcePane(previewCode, renderReflowText);
      previewPane.setReflow(smartReflow);
      previewBox.append(previewTitle, previewCode);
      const resize = button('', () => {});

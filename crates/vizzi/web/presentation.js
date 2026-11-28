@@ -18,15 +18,3 @@ export function kindGroup(kind) {
   if(['module','namespace'].includes(kind))return 'module';
   return 'other';
 }
-export function renderStyledText(node,line) {
-  const document=node.ownerDocument,bytes=new TextEncoder().encode(line.text),decoder=new TextDecoder('utf-8',{fatal:true,ignoreBOM:true});
-  const children=[];let start=0;
-  if(line.left)children.push(document.createTextNode('…'));
-  for(const style of line.styles ?? []) {
-    children.push(document.createTextNode(decoder.decode(bytes.subarray(start,style.start))));
-    const span=document.createElement('span');span.className=`syntax-${style.kind}`;span.textContent=decoder.decode(bytes.subarray(style.start,style.end));children.push(span);start=style.end;
-  }
-  children.push(document.createTextNode(decoder.decode(bytes.subarray(start))));
-  if(line.right)children.push(document.createTextNode('…'));
-  node.replaceChildren(...children);
-}
